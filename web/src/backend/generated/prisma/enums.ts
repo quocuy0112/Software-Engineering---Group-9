@@ -430,6 +430,147 @@ export const ApplicationScoringStatus = {
 export type ApplicationScoringStatus = (typeof ApplicationScoringStatus)[keyof typeof ApplicationScoringStatus]
 
 
+export const ApplicationDocumentKind = {
+  CV: 'CV',
+  COVER_LETTER: 'COVER_LETTER'
+} as const
+
+export type ApplicationDocumentKind = (typeof ApplicationDocumentKind)[keyof typeof ApplicationDocumentKind]
+
+
+export const ApplicationArtifactPromotionState = {
+  PROMOTED: 'PROMOTED',
+  COMMITTED: 'COMMITTED',
+  DELETE_PENDING: 'DELETE_PENDING',
+  DELETING: 'DELETING',
+  DELETED: 'DELETED',
+  DELETE_FAILED: 'DELETE_FAILED'
+} as const
+
+export type ApplicationArtifactPromotionState = (typeof ApplicationArtifactPromotionState)[keyof typeof ApplicationArtifactPromotionState]
+
+
+export const ApplicationLegacyDocumentState = {
+  CURRENT: 'CURRENT',
+  BACKFILLABLE: 'BACKFILLABLE',
+  UNAVAILABLE: 'UNAVAILABLE'
+} as const
+
+export type ApplicationLegacyDocumentState = (typeof ApplicationLegacyDocumentState)[keyof typeof ApplicationLegacyDocumentState]
+
+
+export const ScoringResultState = {
+  DETERMINISTIC_ONLY: 'DETERMINISTIC_ONLY',
+  SCORED: 'SCORED'
+} as const
+
+export type ScoringResultState = (typeof ScoringResultState)[keyof typeof ScoringResultState]
+
+
+export const ScoringParseStatus = {
+  PARSED_SUCCESSFULLY: 'PARSED_SUCCESSFULLY',
+  PARSED_WITH_ERRORS: 'PARSED_WITH_ERRORS',
+  FAILED: 'FAILED'
+} as const
+
+export type ScoringParseStatus = (typeof ScoringParseStatus)[keyof typeof ScoringParseStatus]
+
+
+export const ScoringSkillRequirementKind = {
+  REQUIRED: 'REQUIRED',
+  PREFERRED: 'PREFERRED'
+} as const
+
+export type ScoringSkillRequirementKind = (typeof ScoringSkillRequirementKind)[keyof typeof ScoringSkillRequirementKind]
+
+
+export const ScoringSkillMatchState = {
+  FOUND: 'FOUND',
+  MISSING: 'MISSING',
+  NEUTRAL_PREFERRED: 'NEUTRAL_PREFERRED'
+} as const
+
+export type ScoringSkillMatchState = (typeof ScoringSkillMatchState)[keyof typeof ScoringSkillMatchState]
+
+
+export const ScoringAiConfidenceLevel = {
+  LOW: 'LOW',
+  STANDARD: 'STANDARD'
+} as const
+
+export type ScoringAiConfidenceLevel = (typeof ScoringAiConfidenceLevel)[keyof typeof ScoringAiConfidenceLevel]
+
+
+export const ScoringAiQuestionState = {
+  GENERATED: 'GENERATED',
+  INSUFFICIENT_DATA: 'INSUFFICIENT_DATA'
+} as const
+
+export type ScoringAiQuestionState = (typeof ScoringAiQuestionState)[keyof typeof ScoringAiQuestionState]
+
+
+export const ScoringOperationKind = {
+  INITIAL: 'INITIAL',
+  JOB_RESCORE: 'JOB_RESCORE',
+  AI_RETRY: 'AI_RETRY'
+} as const
+
+export type ScoringOperationKind = (typeof ScoringOperationKind)[keyof typeof ScoringOperationKind]
+
+
+export const ScoringOperationState = {
+  QUEUED: 'QUEUED',
+  RUNNING: 'RUNNING',
+  COMPLETED: 'COMPLETED',
+  COMPLETED_WITH_FAILURES: 'COMPLETED_WITH_FAILURES',
+  FAILED: 'FAILED'
+} as const
+
+export type ScoringOperationState = (typeof ScoringOperationState)[keyof typeof ScoringOperationState]
+
+
+export const ScoringWorkItemState = {
+  QUEUED: 'QUEUED',
+  LEASED: 'LEASED',
+  AUTOMATIC_READY: 'AUTOMATIC_READY',
+  AI_PENDING: 'AI_PENDING',
+  PUBLISHED: 'PUBLISHED',
+  DETERMINISTIC_ONLY: 'DETERMINISTIC_ONLY',
+  FAILED: 'FAILED',
+  SUPERSEDED: 'SUPERSEDED'
+} as const
+
+export type ScoringWorkItemState = (typeof ScoringWorkItemState)[keyof typeof ScoringWorkItemState]
+
+
+export const ManualPriorityValue = {
+  HIGH: 'HIGH',
+  NORMAL: 'NORMAL',
+  LOW: 'LOW',
+  HOLD: 'HOLD'
+} as const
+
+export type ManualPriorityValue = (typeof ManualPriorityValue)[keyof typeof ManualPriorityValue]
+
+
+export const ScoringDecisionKind = {
+  MOVE_TO_INTERVIEW: 'MOVE_TO_INTERVIEW',
+  REJECT: 'REJECT'
+} as const
+
+export type ScoringDecisionKind = (typeof ScoringDecisionKind)[keyof typeof ScoringDecisionKind]
+
+
+export const ScoringNotificationStatus = {
+  NOT_REQUIRED: 'NOT_REQUIRED',
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  FAILED_RETRYING: 'FAILED_RETRYING'
+} as const
+
+export type ScoringNotificationStatus = (typeof ScoringNotificationStatus)[keyof typeof ScoringNotificationStatus]
+
+
 export const RecruitmentNotificationAudience = {
   CANDIDATE: 'CANDIDATE',
   COMPANY: 'COMPANY'

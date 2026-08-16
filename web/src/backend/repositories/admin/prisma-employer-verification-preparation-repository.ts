@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "@/backend/database/prisma";
+import { splitCompanyIdentity } from "@/shared/contracts/employer-verification/business-verification";
 import type {
   EmployerVerificationPreparationRepository,
   VerificationPreparationDraftChanges,
@@ -44,6 +45,7 @@ export class PrismaEmployerVerificationPreparationRepository implements Employer
       EmployerVerificationPreparationRepository["replaceLookup"]
     >[0],
   ) {
+    const identity = splitCompanyIdentity(input.result.facts?.legalName ?? "");
     await prisma.$transaction(async (transaction) => {
       await transaction.companyContactEmailChallenge.updateMany({
         where: {
@@ -76,10 +78,12 @@ export class PrismaEmployerVerificationPreparationRepository implements Employer
           normalizedTaxIdentifier: input.taxIdentifier,
           providerKey: input.result.providerKey,
           outcome: input.result.outcome,
-          registryLegalName: input.result.facts?.legalName,
+          registryLegalName:
+            identity.name || input.result.facts?.legalName || null,
           registryInternationalName: input.result.facts?.internationalName,
           registryShortName: input.result.facts?.shortName,
           registryRegisteredAddress: input.result.facts?.registeredAddress,
+          registryEntityType: identity.entityType,
           responseDigest: input.responseDigest,
           checkedAt: input.now,
           expiresAt: input.expiresAt,
@@ -91,7 +95,8 @@ export class PrismaEmployerVerificationPreparationRepository implements Employer
         create: {
           applicantUserId: input.userId,
           lookupSnapshotId: snapshot.id,
-          applicantLegalName: input.result.facts?.legalName,
+          applicantLegalName:
+            identity.name || input.result.facts?.legalName || null,
           applicantRegisteredAddress: input.result.facts?.registeredAddress,
           expiresAt: input.preparationExpiresAt,
         },

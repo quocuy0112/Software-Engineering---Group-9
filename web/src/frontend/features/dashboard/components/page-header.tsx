@@ -1,7 +1,10 @@
+import { PageHeader } from "@/frontend/components/layout/page-header";
+
 type WorkspacePageHeaderProps = {
   eyebrow: string;
   title: string;
   subtitle?: string;
+  className?: string;
   statusBadge?: {
     label: string;
     state?: "connected" | "connecting" | "reconnecting" | "offline";
@@ -13,27 +16,36 @@ export function WorkspacePageHeader({
   eyebrow,
   title,
   subtitle,
+  className,
   statusBadge,
 }: WorkspacePageHeaderProps) {
   return (
-    <header className="workspace-page-header">
-      <div>
-        <p className="workspace-page-header__eyebrow">{eyebrow}</p>
-        <h1>{title}</h1>
-        {subtitle ? (
-          <p className="workspace-page-header__subtitle">{subtitle}</p>
-        ) : null}
-      </div>
-      {statusBadge ? (
-        <span
-          className="workspace-page-header__status"
-          data-state={statusBadge.state ?? "offline"}
-          role="status"
-        >
-          <span aria-hidden="true" />
-          {statusBadge.label}
-        </span>
-      ) : null}
-    </header>
+    <PageHeader
+      className={
+        className
+          ? `workspace-page-header ${className}`
+          : "workspace-page-header"
+      }
+      eyebrow={eyebrow}
+      title={title}
+      subtitle={subtitle}
+      status={
+        statusBadge
+          ? {
+              label: statusBadge.label,
+              tone:
+                statusBadge.state === "connected"
+                  ? "success"
+                  : statusBadge.state === "connecting" ||
+                      statusBadge.state === "reconnecting"
+                    ? "warning"
+                    : "neutral",
+              pulsing: statusBadge.state === "connected",
+              state: statusBadge.state ?? "offline",
+              announce: true,
+            }
+          : undefined
+      }
+    />
   );
 }

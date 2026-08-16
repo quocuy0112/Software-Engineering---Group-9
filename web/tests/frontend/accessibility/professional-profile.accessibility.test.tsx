@@ -22,6 +22,41 @@ const emptyProfile = {
   socialLinks: [],
 };
 
+const filledProfile = {
+  revision: 4,
+  empty: false,
+  basics: {
+    headline: "Senior product engineer",
+    summary: "Builds reliable systems.",
+    phone: "+84 912 345 678",
+    location: "Ho Chi Minh City",
+  },
+  skills: [{ id: "skill-1", label: "TypeScript" }],
+  experience: [
+    {
+      id: "experience-1",
+      title: "Product Engineer",
+      company: "Acme Labs",
+      description: "Improved the developer platform.",
+      startDate: "2022-01-01",
+      endDate: null,
+      current: true,
+    },
+  ],
+  education: [
+    {
+      id: "education-1",
+      institution: "HCMUS",
+      degree: "BSc Computer Science",
+      field: "Software engineering",
+      startDate: "2018-09-01",
+      endDate: "2022-06-01",
+      current: false,
+    },
+  ],
+  socialLinks: [{ id: "link-1", url: "https://github.com/example" }],
+};
+
 const account = {
   id: "8fc8b912-baad-4be8-8c49-f8f9323f6255",
   name: "Candidate Example",
@@ -96,7 +131,7 @@ describe("professional profile accessibility", () => {
       document.querySelector(
         '.social-link-row-platform .social-platform-mark[data-platform="github"] svg',
       ),
-    ).toHaveAttribute("viewBox", "0 0 24 24");
+    ).toHaveAttribute("data-platform-logo", "github");
   });
 
   it("uses explicit text and ARIA semantics instead of color-only state", () => {
@@ -120,7 +155,53 @@ describe("professional profile accessibility", () => {
     ).toHaveAttribute("type", "button");
   });
 
-  it("renders recognizable filled brand marks for each social platform", () => {
+  it("keeps saved sections read-only until an explicit edit action", () => {
+    render(
+      <ProfileOverview
+        account={account}
+        initialProfile={filledProfile}
+        csrfProof="csrf-proof"
+      />,
+    );
+
+    expect(screen.getByText("Senior product engineer")).toBeVisible();
+    expect(screen.getByText("TypeScript")).toBeVisible();
+    expect(screen.getByText("Acme Labs", { exact: false })).toBeVisible();
+    expect(screen.getByText("HCMUS", { exact: false })).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: "https://github.com/example" }),
+    ).toHaveAttribute("href", "https://github.com/example");
+    expect(screen.queryByLabelText("Skill 1")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit skills" }));
+    expect(screen.getByLabelText("Skill 1")).toHaveValue("TypeScript");
+    expect(screen.getByRole("button", { name: "Cancel" })).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByLabelText("Skill 1")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit experience" }));
+    expect(screen.getByRole("group", { name: "Experience 1" })).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.getByText("Product Engineer")).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit education" }));
+    expect(screen.getByRole("group", { name: "Education 1" })).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.getByText("BSc Computer Science")).toBeVisible();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Edit professional links" }),
+    );
+    expect(screen.getByLabelText("GitHub URL")).toHaveValue(
+      "https://github.com/example",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(
+      screen.getByRole("link", { name: "https://github.com/example" }),
+    ).toBeVisible();
+  });
+
+  it("renders an accessible brand logo for each supported social platform", () => {
     render(
       <ProfileOverview
         account={account}
@@ -129,26 +210,42 @@ describe("professional profile accessibility", () => {
       />,
     );
 
-    const expectedPathFragments = {
-      linkedin: "M20.447 20.452",
-      github: "M12 .297c-6.63",
-      facebook: "M24 12.073",
-      instagram: "M12 2.163",
-    } as const;
-
-    for (const [platform, pathFragment] of Object.entries(
-      expectedPathFragments,
-    )) {
+    for (const platform of ["linkedin", "github", "facebook", "instagram"]) {
       const icon = document.querySelector(
         `[data-platform="${platform}"] .social-platform-mark svg`,
       );
-      expect(icon).toHaveAttribute("viewBox", "0 0 24 24");
-      expect(icon).toHaveAttribute("focusable", "false");
-      expect(icon?.querySelector("path")).toHaveAttribute(
-        "d",
-        expect.stringContaining(pathFragment),
-      );
+      expect(icon).toHaveAttribute("data-platform-logo", platform);
+      expect(icon).toHaveAttribute("aria-hidden", "true");
     }
+  });
+
+  it("lists every saved social profile with its matching brand logo", () => {
+    render(
+      <ProfileOverview
+        account={account}
+        initialProfile={{
+          ...filledProfile,
+          socialLinks: [
+            { id: "link-1", url: "https://linkedin.com/in/example" },
+            { id: "link-2", url: "https://github.com/example" },
+            { id: "link-3", url: "https://facebook.com/example" },
+            { id: "link-4", url: "https://instagram.com/example" },
+          ],
+        }}
+        csrfProof="csrf-proof"
+      />,
+    );
+
+    for (const platform of ["linkedin", "github", "facebook", "instagram"]) {
+      expect(
+        document.querySelector(
+          `.profile-social-link .social-platform-logo[data-platform-logo="${platform}"]`,
+        ),
+      ).toHaveAttribute("aria-hidden", "true");
+    }
+    expect(
+      screen.getByRole("link", { name: "https://github.com/example" }),
+    ).toHaveAttribute("href", "https://github.com/example");
   });
 
   it("marks edited sections and blocks accidental in-app navigation", () => {
@@ -186,5 +283,7 @@ describe("professional profile accessibility", () => {
     expect(css).toMatch(/overflow-wrap:\s*anywhere/);
     expect(css).toMatch(/prefers-reduced-motion:\s*reduce/);
     expect(css).toMatch(/focus-visible/);
+    expect(css).toMatch(/\.profile-compact-row/);
+    expect(css).toMatch(/\.profile-compact-chip/);
   });
 });

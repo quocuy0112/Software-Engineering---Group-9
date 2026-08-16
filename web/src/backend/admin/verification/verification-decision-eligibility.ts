@@ -12,11 +12,7 @@ export type VerificationDecisionEligibility = {
     normalizedTaxIdentifier: string;
     targetCompanyId: string | null;
     prerequisiteId: string | null;
-    requestedRole:
-      | "OWNER"
-      | "HR_MANAGER"
-      | "RECRUITER"
-      | "HIRING_MANAGER";
+    requestedRole: "OWNER" | "HR_MANAGER" | "RECRUITER" | "HIRING_MANAGER";
     currentEvidenceId: string | null;
     currentSubmissionVersion: number;
     version: number;
@@ -26,6 +22,10 @@ export type VerificationDecisionEligibility = {
       id: string;
       displayName: string;
       verificationState: "ACTIVE" | "INACTIVE" | "UNVERIFIED";
+    } | null;
+    acceptedRegistrySnapshot: {
+      registryLegalName: string | null;
+      registryEntityType: string | null;
     } | null;
     businessFacts: unknown | null;
   };
@@ -55,7 +55,9 @@ async function lockRow(
     );
   }
   if (table === "user") {
-    return tx.$queryRaw<Array<{ id: string; state: string; deletedAt: Date | null }>>(
+    return tx.$queryRaw<
+      Array<{ id: string; state: string; deletedAt: Date | null }>
+    >(
       Prisma.sql`SELECT "id", "state", "deletedAt" FROM "user" WHERE "id" = ${id} FOR UPDATE`,
     );
   }
@@ -144,6 +146,9 @@ export async function loadVerificationDecisionEligibility(
     include: {
       targetCompany: {
         select: { id: true, displayName: true, verificationState: true },
+      },
+      acceptedRegistrySnapshot: {
+        select: { registryLegalName: true, registryEntityType: true },
       },
       businessFacts: { select: { requestId: true } },
     },
@@ -245,6 +250,7 @@ export async function loadVerificationDecisionEligibility(
       state: "PENDING_REVIEW",
       submissionIdempotencyKey: row.submissionIdempotencyKey,
       targetCompany: row.targetCompany,
+      acceptedRegistrySnapshot: row.acceptedRegistrySnapshot,
       businessFacts: row.businessFacts,
     },
     evidence: {

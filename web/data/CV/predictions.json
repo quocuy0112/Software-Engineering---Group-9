@@ -1,0 +1,2797 @@
+[
+  {
+    "cv_id": "cv-01",
+    "cv_pdf_file": "cv-01_TRAN_MINH_DUC.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "React Native",
+        "TypeScript",
+        "JavaScript (ES6+)",
+        "REST API Integration",
+        "Git",
+        "Data Analysis",
+        "Process Improvement",
+        "Problem Solving",
+        "Agile/Scrum",
+        "English",
+        "iOS",
+        "Android"
+      ],
+      "experience_entries": [
+        {
+          "title": "React Native Developer",
+          "company": "Bitscape Software Co., Ltd. — Da Nang",
+          "start_date": "08/2023",
+          "end_date": "Present",
+          "bullet_points": [
+            "Developed and maintained 3 cross-platform mobile apps (iOS/Android) using React Native and TypeScript, serving over 50,000 active users.",
+            "Collaborated with backend and QA teams to integrate REST APIs, reducing bug reports by 30% after refactoring shared components.",
+            "Performed data analysis on crash reports and performance metrics to prioritize technical debt and improve app stability.",
+            "Contributed to process improvement by introducing code review checklists, cutting release regression issues by 25%.",
+            "Communicated with international clients in English during sprint reviews and requirement clarification calls."
+          ]
+        },
+        {
+          "title": "Junior Mobile Developer (Intern to Full-time)",
+          "company": "Danang Software Solutions",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Built UI components in React Native based on Figma designs for an e-commerce app.",
+            "Fixed bugs and implemented small features under senior developer guidance.",
+            "Practiced problem-solving skills by debugging cross-platform layout issues on iOS and Android."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "Bachelor of Information Technology",
+          "school": "University of Science and Technology, Da Nang",
+          "dates": "GPA 3.4/4.0"
+        }
+      ],
+      "certifications": [
+        "Meta React Native Specialization (Coursera, 2023)"
+      ],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Good (TOEIC 780)"
+      ],
+      "extraction_flags": [
+        "Current role date format includes nonstandard redacted phone/date text near header: \"08/2023 - Present 06/[phone redacted]/[phone redacted]\"",
+        "Education section omits graduation date.",
+        "Second experience entry has no explicit dates.",
+        "CV uses bilingual/abbreviated labels (e.g., \"Dien thoai\", \"Dia chi\")."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The header contains redacted/garbled text adjacent to the current role start date, making the exact date boundary slightly ambiguous.",
+        "evidence_quote": "\"08/2023 - Present 06/[phone redacted]/[phone redacted]\""
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "No cover letter was provided, so no additional facts could be extracted from it.",
+        "evidence_quote": "\"No cover letter provided\""
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "The education entry does not include a graduation date, only the degree and school plus GPA.",
+        "evidence_quote": "\"Bachelor of Information Technology  University of Science and Technology, Da Nang — GPA 3.4/4.0\""
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "The second experience entry does not state start or end dates.",
+        "evidence_quote": "\"Junior Mobile Developer (Intern to Full-time)  Danang Software Solutions\""
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 28,
+      "experience_match": 21,
+      "preferred_skills_match": 0,
+      "education_certifications": 8,
+      "languages": 9
+    },
+    "total_score": 66,
+    "match_level": "medium",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 12,
+        "evidence_quote": "The CV contains \"Data Analysis\", \"Process Improvement\", and \"Problem Solving\", but does not explicitly show the other job-required skill area in the posting beyond those three."
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 4,
+        "evidence_quote": "\"Mobile developer with 2 years of hands-on experience building cross-platform apps with React Native.\" plus only one clearly dated React Native role and one undated junior role."
+      },
+      {
+        "criterion": "preferred_skills_match",
+        "points_deducted": 15,
+        "evidence_quote": "No preferred skills were specified in the job posting; therefore no points were awarded for this category."
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 2,
+        "evidence_quote": "\"Bachelor of Information Technology\" is relevant, but the CV does not show a graduation date or additional formal qualification details."
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 1,
+        "evidence_quote": "\"English - Good (TOEIC 780)\" is present, but the CV does not explicitly confirm separate written and spoken proficiency."
+      }
+    ],
+    "confidence_pct": 86,
+    "requires_human_review": false,
+    "review_reasons": [],
+    "overall_assessment": "Candidate appears to be a solid medium match for a React Native Developer role. The CV shows relevant React Native experience, measurable impact, and strong alignment with the required skills Data Analysis, Process Improvement, and Problem Solving. English proficiency is stated as good, and there is a relevant certification. Main limitations are limited date clarity for one role and missing graduation date."
+  },
+  {
+    "cv_id": "cv-02",
+    "cv_pdf_file": "cv-02_LE_THI_HOA.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Content Writing",
+        "Social Media Management",
+        "Canva & Basic Design",
+        "Customer Focus",
+        "Teamwork",
+        "Basic Campaign Reporting"
+      ],
+      "experience_entries": [
+        {
+          "title": "Content & Marketing Executive",
+          "company": "Dien thoai",
+          "start_date": "03/2025",
+          "end_date": "Present",
+          "bullet_points": []
+        },
+        {
+          "title": "Marketing Executive",
+          "company": "Song Xanh Media Co., Ltd.",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Planned and executed social media content calendars for 2 client brands, focusing on customer engagement.",
+            "Coordinated with the design team to produce visual assets for seasonal campaigns.",
+            "Tracked campaign performance metrics weekly and reported results to the account manager.",
+            "Worked closely with sales team to align promotional content with customer needs."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "College Diploma in Marketing",
+          "school": "Dong Nai Technology College",
+          "dates": ""
+        }
+      ],
+      "certifications": [
+        "Digital Marketing Fundamentals (Google, 2024)"
+      ],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Basic (communication level)"
+      ],
+      "extraction_flags": [
+        "Near-miss skill evidence: 'customer-focused' and 'customer engagement' relate to Customer Focus.",
+        "Near-miss skill evidence: 'worked closely with sales team' and 'collaborating across departments' relate to Teamwork.",
+        "Experience dates and company/title formatting are partially ambiguous in the first role.",
+        "No cover letter provided."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The first experience block merges location/contact text with the role title and company, so title/company parsing may be imperfect.",
+        "evidence_quote": "03/2025 - Present  LE THI HOA  Content & Marketing Executive  Dien thoai: [phone redacted]   Email: [email redacted]   Dia chi: Dong Nai, Vietnam"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "The CV does not state any direct evidence for Process Improvement, stakeholder management, or independent/under-pressure work beyond related teamwork/collaboration language.",
+        "evidence_quote": "No explicit mention found in the provided CV text."
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "No cover letter was provided, so additional role fit evidence may be missing.",
+        "evidence_quote": "No cover letter provided"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 26,
+      "experience_match": 14,
+      "preferred_skills_match": 0,
+      "education_certifications": 8,
+      "languages": 5
+    },
+    "total_score": 53,
+    "match_level": "medium",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 14,
+        "evidence_quote": "No exact evidence for Process Improvement; the CV only says 'Basic Campaign Reporting' and 'Tracked campaign performance metrics weekly and reported results to the account manager.'"
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 11,
+        "evidence_quote": "The CV says 'Marketing executive with 1 year of experience in content creation and social media campaigns,' but it does not explicitly show 1-3 years of hands-on experience specifically relevant to a Creative Planner role."
+      },
+      {
+        "criterion": "preferred_skills_match",
+        "points_deducted": 15,
+        "evidence_quote": "No preferred skills were specified in the job posting and the CV does not provide additional preferred-skill evidence beyond the required-skill-adjacent items."
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 2,
+        "evidence_quote": "Education and certification are present, but only a College Diploma in Marketing and 'Digital Marketing Fundamentals (Google, 2024)' are listed, which are relevant but not strongly aligned to the role requirements."
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 5,
+        "evidence_quote": "The CV lists 'English - Basic (communication level),' which does not demonstrate strong language capability; 'Vietnamese - Native' is present but no language requirement was specified."
+      }
+    ],
+    "confidence_pct": 82,
+    "requires_human_review": false,
+    "review_reasons": [
+      {
+        "bucket": "extraction_uncertainty",
+        "reason": "Role/company parsing in the first experience block is partially ambiguous due to merged contact and employment text."
+      }
+    ],
+    "overall_assessment": "Candidate shows solid alignment on customer focus, teamwork, and relevant marketing/content experience, with a marketing diploma and basic English. Main gaps are lack of explicit process improvement evidence and limited detail on Creative Planner-specific hands-on experience."
+  },
+  {
+    "cv_id": "cv-03",
+    "cv_pdf_file": "cv-03_PHAM_VAN_NAM.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Customer Service",
+        "MS Word/Excel (basic)",
+        "Time Management",
+        "Vietnamese",
+        "English"
+      ],
+      "experience_entries": [
+        {
+          "title": "Partnership Specialist",
+          "company": "PHAM VAN NAM",
+          "start_date": "05/2025",
+          "end_date": "Present",
+          "bullet_points": [
+            "Dien thoai: [phone redacted]",
+            "Email: [email redacted]",
+            "Dia chi: Hanoi, Vietnam"
+          ]
+        },
+        {
+          "title": "Customer Support Staff",
+          "company": "Viettel Post Retail Store — Hanoi",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Assisted walk-in customers with order inquiries and complaint handling.",
+            "Recorded daily transaction logs and reported to store supervisor.",
+            "Supported basic administrative tasks such as filing and data entry."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "College Diploma in Business Administration",
+          "school": "Hanoi Community College",
+          "dates": "GPA 6.8/10"
+        }
+      ],
+      "certifications": [],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Elementary (self-study, no certificate)"
+      ],
+      "extraction_flags": [
+        "Candidate name and current title appear merged in the header, making company/title parsing ambiguous.",
+        "No explicit dates provided for the Customer Support Staff role.",
+        "English proficiency is present but only at elementary level.",
+        "No cover letter provided."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The header line appears to combine the candidate name with the current role, so the company/title structure for the first experience entry may be misparsed.",
+        "evidence_quote": "05/2025 - Present [phone redacted]  PHAM VAN NAM  Partnership Specialist"
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The Customer Support Staff role has no explicit start or end dates in the raw CV.",
+        "evidence_quote": "Customer Support Staff  Viettel Post Retail Store — Hanoi"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "English is listed only as elementary self-study, which limits assessment of the required English proficiency, but the CV does provide the information.",
+        "evidence_quote": "English - Elementary (self-study, no certificate)"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 17,
+      "experience_match": 10,
+      "preferred_skills_match": 0,
+      "education_certifications": 5,
+      "languages": 4
+    },
+    "total_score": 36,
+    "match_level": "low",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 23,
+        "evidence_quote": "English - Elementary (self-study, no certificate)"
+      },
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 10,
+        "evidence_quote": "Customer Service; Time Management"
+      },
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 10,
+        "evidence_quote": "CAREER OBJECTIVE  Business graduate with 1 year of experience in customer support, looking to transition into partnership development."
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 15,
+        "evidence_quote": "CAREER OBJECTIVE  Business graduate with 1 year of experience in customer support"
+      },
+      {
+        "criterion": "preferred_skills_match",
+        "points_deducted": 15,
+        "evidence_quote": "No preferred skills specified in the job posting and no additional preferred-skill evidence appears in the CV."
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 5,
+        "evidence_quote": "College Diploma in Business Administration  Hanoi Community College — GPA 6.8/10"
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 6,
+        "evidence_quote": "English - Elementary (self-study, no certificate)"
+      }
+    ],
+    "confidence_pct": 70,
+    "requires_human_review": true,
+    "review_reasons": [
+      {
+        "bucket": "extraction_uncertainty",
+        "reason": "The first experience entry appears to be misparsed from the header and may not represent a true employment record."
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "reason": "The CV indicates only elementary English, which is borderline for the role’s English requirement."
+      },
+      {
+        "bucket": "input_limitation",
+        "reason": "The work history appears brief and partially ambiguous, making experience relevance difficult to verify precisely."
+      }
+    ],
+    "overall_assessment": "The CV shows basic customer support and time management exposure, but it does not demonstrate the 3+ years of relevant partnership experience, strong English proficiency, or clear evidence of partnership-related responsibilities. Human review is recommended due to parsing ambiguity in the header and limited experience detail."
+  },
+  {
+    "cv_id": "cv-04",
+    "cv_pdf_file": "cv-04_NGUYEN_THI_LAN.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Project Cost Accounting",
+        "MS Excel (Advanced)",
+        "Financial Reporting",
+        "Process Improvement",
+        "Project Management (basic)",
+        "Attention to Detail",
+        "English",
+        "project-based accounting",
+        "cost tracking",
+        "financial reporting",
+        "project management tools",
+        "analytical skills",
+        "compliance skills"
+      ],
+      "experience_entries": [
+        {
+          "title": "Project Accountant",
+          "company": "Mekong Construction JSC",
+          "start_date": "07/2023",
+          "end_date": "Present",
+          "bullet_points": [
+            "Tracked project budgets and expenditures for 5 concurrent construction projects, ensuring accuracy across all cost reports.",
+            "Prepared monthly financial reports and reconciliations, improving reporting turnaround time by 20%.",
+            "Coordinated with project managers to allocate resources and forecast project costs.",
+            "Implemented a standardized invoice-checking process, reducing discrepancies by 15%.",
+            "Ensured compliance with company accounting policies and tax regulations."
+          ]
+        },
+        {
+          "title": "Accounting Assistant",
+          "company": "Can Tho Trading Co.",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Supported general ledger entries and bank reconciliations.",
+            "Assisted in preparing documentation for internal audits."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "Bachelor of Accounting",
+          "school": "Can Tho University",
+          "dates": ""
+        }
+      ],
+      "certifications": [
+        "Certificate in Practical Accounting (VACPA, 2023)"
+      ],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Intermediate"
+      ],
+      "extraction_flags": [
+        "Date in header appears malformed/redacted: \"08/[phone redacted]/2023\"",
+        "Current role start date is partially inconsistent in header vs work experience section",
+        "Some bullets are truncated as dot placeholders in Accounting Assistant entry"
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "Header contains a malformed/redacted date string that may affect chronology parsing.",
+        "evidence_quote": "07/2023 - Present 08/[phone redacted]/2023"
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The CV shows a current role in the header and a matching work experience entry, but the header date string is partially corrupted.",
+        "evidence_quote": "07/2023 - Present 08/[phone redacted]/2023"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "No cover letter was provided, limiting evidence for motivation or additional context.",
+        "evidence_quote": "No cover letter provided"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 40,
+      "experience_match": 23,
+      "preferred_skills_match": 15,
+      "education_certifications": 10,
+      "languages": 8
+    },
+    "total_score": 96,
+    "match_level": "high",
+    "deduction_reasons": [
+      {
+        "criterion": "experience_match",
+        "points_deducted": 2,
+        "evidence_quote": "\"2 years of experience in project-based accounting\" is stated in the career objective, but the detailed work history shown only clearly covers one current role and one assistant role."
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 2,
+        "evidence_quote": "\"English - Intermediate\" does not fully demonstrate a good command of English (written and spoken)."
+      }
+    ],
+    "confidence_pct": 82,
+    "requires_human_review": false,
+    "review_reasons": [],
+    "overall_assessment": "The candidate is a strong match for Project Accountant. The CV explicitly shows relevant project accounting experience, attention to detail, process improvement, project management exposure, accounting education, and English proficiency. Minor uncertainty remains around chronology and the depth of English command, but overall evidence is highly relevant."
+  },
+  {
+    "cv_id": "cv-05",
+    "cv_pdf_file": "cv-05_VO_THI_MAI.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "MS Excel",
+        "MS Word",
+        "Filing & Documentation",
+        "Time Management",
+        "Basic Reporting",
+        "attention-to-detail"
+      ],
+      "experience_entries": [
+        {
+          "title": "Data Entry Clerk",
+          "company": "",
+          "start_date": "04/2025",
+          "end_date": "Present",
+          "bullet_points": []
+        },
+        {
+          "title": "Administrative Assistant",
+          "company": "Binh Duong Garment Co., Ltd.",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Handled general filing, scheduling, and document management for the HR department.",
+            "Prepared weekly attendance reports using Excel.",
+            "Assisted with printing and organizing employee records."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "College Diploma in Office Administration",
+          "school": "Binh Duong Vocational College",
+          "dates": ""
+        }
+      ],
+      "certifications": [],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Basic"
+      ],
+      "extraction_flags": [
+        "Near-miss skill phrasing: 'attention-to-detail' appears as a hyphenated phrase rather than the exact required skill term.",
+        "Current role date range is present but company information is redacted/missing.",
+        "No cover letter provided."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "input_limitation",
+        "description": "The current Data Entry Clerk role lacks a company name and detailed bullet points in the source CV.",
+        "evidence_quote": "04/2025 - Present [phone redacted]  VO THI MAI  Data Entry Clerk"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "Experience duration for the Administrative Assistant role is not provided, limiting validation of years of hands-on experience.",
+        "evidence_quote": "Administrative Assistant  Binh Duong Garment Co., Ltd."
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The CV lists 'attention-to-detail' in the career objective; this is likely relevant to detail orientation, but it is not the exact required skill string and may have been missed in skill normalization.",
+        "evidence_quote": "seeking a Data Entry Clerk position to apply attention- to-detail and reporting skills"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 30,
+      "experience_match": 15,
+      "preferred_skills_match": 15,
+      "education_certifications": 6,
+      "languages": 5
+    },
+    "total_score": 71,
+    "match_level": "medium",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 10,
+        "evidence_quote": "CAREER OBJECTIVE  Office administration professional with 1 year of general clerical experience. Organized and reliable, comfortable with MS Office tools, seeking a Data Entry Clerk position to apply attention- to-detail and reporting skills in a structured office environment."
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 10,
+        "evidence_quote": "Office administration professional with 1 year of general clerical experience."
+      },
+      {
+        "criterion": "preferred_skills_match",
+        "points_deducted": 0,
+        "evidence_quote": "No preferred skills were specified in the job posting."
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 4,
+        "evidence_quote": "College Diploma in Office Administration  Binh Duong Vocational College — GPA 7.0/10"
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 5,
+        "evidence_quote": "Vietnamese - Native English - Basic"
+      }
+    ],
+    "confidence_pct": 78,
+    "requires_human_review": false,
+    "review_reasons": [],
+    "overall_assessment": "Candidate shows a reasonable fit for a Data Entry Clerk role with direct clerical and reporting exposure, MS Office tools, and 1 year of general clerical experience. The profile is strongest on time management, reporting, and office administration fundamentals, but the experience section is sparse and the current role details are incomplete."
+  },
+  {
+    "cv_id": "cv-06",
+    "cv_pdf_file": "cv-06_HOANG_VAN_TUAN.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Basic Electrical Maintenance",
+        "Equipment Inspection",
+        "Teamwork",
+        "English - Elementary",
+        "Vietnamese - Native"
+      ],
+      "experience_entries": [
+        {
+          "title": "Maintenance Technician",
+          "company": "",
+          "start_date": "09/2024",
+          "end_date": "Present",
+          "bullet_points": []
+        },
+        {
+          "title": "Maintenance Support Staff",
+          "company": "Long Thanh Manufacturing Co.",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Assisted senior technicians with routine equipment inspections and minor repairs.",
+            "Logged maintenance activities in the daily equipment checklist.",
+            "Learned to read basic electrical schematics under supervision."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "College Diploma in Electrical Engineering",
+          "school": "Dong Nai Technical College",
+          "dates": ""
+        }
+      ],
+      "certifications": [],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Elementary"
+      ],
+      "extraction_flags": [
+        "The CV text appears partially unstructured; the line '09/2024 - Present [phone redacted] HOANG VAN TUAN Maintenance Technician' may represent a current role but company details are unclear.",
+        "Work experience duration is not explicitly stated as 1 year in the experience entries even though the career objective says '1 year of practical experience'."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The first work-history line is ambiguous and may combine name, current title, and redacted phone information, making title/company parsing uncertain.",
+        "evidence_quote": "'09/2024 - Present [phone redacted] HOANG VAN TUAN Maintenance Technician'"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "No explicit company name is provided for the current 'Maintenance Technician' role.",
+        "evidence_quote": "'09/2024 - Present [phone redacted] HOANG VAN TUAN Maintenance Technician'"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "Only one year of practical experience is stated, which is below the minimum 3 years required.",
+        "evidence_quote": "'Recent electrical engineering graduate with 1 year of practical experience in equipment maintenance support.'"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 5,
+      "experience_match": 5,
+      "preferred_skills_match": 15,
+      "education_certifications": 5,
+      "languages": 5
+    },
+    "total_score": 35,
+    "match_level": "low",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 35,
+        "evidence_quote": "The CV shows 'Recent electrical engineering graduate with 1 year of practical experience in equipment maintenance support.' and 'Learned to read basic electrical schematics under supervision.' but does not explicitly show Problem Solving, English Proficiency beyond elementary level, or Project Management."
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 20,
+        "evidence_quote": "'Recent electrical engineering graduate with 1 year of practical experience in equipment maintenance support.'"
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 5,
+        "evidence_quote": "'College Diploma in Electrical Engineering' and no certifications are listed."
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 5,
+        "evidence_quote": "'English - Elementary'"
+      }
+    ],
+    "confidence_pct": 78,
+    "requires_human_review": false,
+    "review_reasons": [],
+    "overall_assessment": "The CV indicates some maintenance-related exposure and an electrical engineering diploma, but it does not demonstrate the required 3+ years of relevant experience or clear evidence of the required skills at the level requested. English is listed as elementary, which is below the job's good written and spoken command requirement."
+  },
+  {
+    "cv_id": "cv-07",
+    "cv_pdf_file": "cv-07_DANG_THI_THU.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Leadership",
+        "Communication",
+        "Strategic Planning",
+        "Budget Management",
+        "Stakeholder Management",
+        "Coaching & Mentoring",
+        "Training Program Design",
+        "English",
+        "Vietnamese",
+        "Learning & Development Manager",
+        "L&D Specialist",
+        "HR Executive"
+      ],
+      "experience_entries": [
+        {
+          "title": "Learning & Development Manager",
+          "company": "Nha Trang Resort Group",
+          "start_date": "02/2022",
+          "end_date": "Present",
+          "bullet_points": [
+            "Led a team of 4 L&D specialists, designing and delivering training programs for over 300 employees annually.",
+            "Developed the company's annual training roadmap aligned with business strategy and leadership priorities.",
+            "Introduced a blended learning model (in-person + e-learning), increasing training completion rates by 40%.",
+            "Managed the L&D budget and vendor relationships, achieving a 15% cost reduction year-over-year.",
+            "Presented quarterly training impact reports to the executive committee."
+          ]
+        },
+        {
+          "title": "L&D Specialist",
+          "company": "Khanh Hoa Hospitality Corp.",
+          "start_date": "06/[phone redacted]/2022",
+          "end_date": "07/[phone redacted]/2019",
+          "bullet_points": [
+            "Coordinated onboarding and soft-skills training programs for new hires.",
+            "Facilitated leadership workshops for mid-level managers.",
+            "Assessed training needs across departments and proposed development plans."
+          ]
+        },
+        {
+          "title": "HR Executive",
+          "company": "Coastal Hotels JSC",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Supported recruitment and employee engagement initiatives.",
+            "Assisted in organizing internal communication programs."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "Bachelor of Human Resource Management",
+          "school": "Nha Trang University",
+          "dates": ""
+        }
+      ],
+      "certifications": [
+        "Certified Professional in Learning and Performance (CPLP, 2021)",
+        "Train the Trainer Certificate (2019)"
+      ],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Fluent (IELTS 7.5)"
+      ],
+      "extraction_flags": [
+        "Dates in one experience entry appear corrupted/redacted: '06/[phone redacted]/2022 07/[phone redacted]/2019'",
+        "Cover letter not provided"
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "One experience entry has corrupted/redacted dates, making the chronology ambiguous.",
+        "evidence_quote": "06/[phone redacted]/2022 07/[phone redacted]/2019"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "No cover letter was provided.",
+        "evidence_quote": "No cover letter provided"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 40,
+      "experience_match": 25,
+      "preferred_skills_match": 15,
+      "education_certifications": 10,
+      "languages": 10
+    },
+    "total_score": 100,
+    "match_level": "high",
+    "deduction_reasons": [],
+    "confidence_pct": 92,
+    "requires_human_review": false,
+    "review_reasons": [],
+    "overall_assessment": "Strong match for the L&D Manager role. The CV explicitly demonstrates leadership, communication, and planning/strategic planning, with 7 years in learning and development and 3 years in a managerial capacity. It also shows relevant team leadership, training program design, mentoring/coaching, English fluency, and recognized L&D certifications."
+  },
+  {
+    "cv_id": "cv-08",
+    "cv_pdf_file": "cv-08_BUI_THI_NGOC.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Customer Service",
+        "Reservation Handling",
+        "MS Office",
+        "Complaint Resolution",
+        "Cash Handling",
+        "Customer-focused",
+        "strong reporting habits"
+      ],
+      "experience_entries": [
+        {
+          "title": "Hotel Receptionist",
+          "company": "BUI THI NGOC",
+          "start_date": "05/2025",
+          "end_date": "Present",
+          "bullet_points": []
+        },
+        {
+          "title": "Front Desk & Guest Service Staff",
+          "company": "Saigon Riverside Restaurant",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Greeted and seated guests, managed reservation bookings via phone and online systems.",
+            "Handled guest complaints and coordinated with kitchen/service staff to resolve issues promptly.",
+            "Prepared daily guest-flow reports for the restaurant manager.",
+            "Processed payments and maintained accurate cash-handling records."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "College Diploma in Tourism & Hospitality",
+          "school": "Saigon Tourism College",
+          "dates": "GPA 7.2/10"
+        }
+      ],
+      "certifications": [],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Intermediate (communication level)"
+      ],
+      "extraction_flags": [
+        "Near-miss skill evidence: 'Customer-focused' and 'strong reporting habits' mapped to required skills.",
+        "Ambiguous current role line: '05/2025 - Present ... Hotel Receptionist' appears as a header-like entry without bullets or company name."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The first line appears to combine a date, candidate name, and job title, so the current role may have been parsed with uncertainty.",
+        "evidence_quote": "05/2025 - Present [phone redacted] BUI THI NGOC Hotel Receptionist"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "No company name or bullet points were provided for the apparent current Hotel Receptionist role.",
+        "evidence_quote": "05/2025 - Present ... Hotel Receptionist"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 32,
+      "experience_match": 16,
+      "preferred_skills_match": 0,
+      "education_certifications": 6,
+      "languages": 6
+    },
+    "total_score": 60,
+    "match_level": "medium",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 8,
+        "evidence_quote": "Customer-focused with strong reporting habits and proficiency in MS Office"
+      },
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 0,
+        "evidence_quote": "MS Office"
+      },
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 0,
+        "evidence_quote": "Customer-focused"
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 9,
+        "evidence_quote": "1 year of front-of-house experience in the restaurant industry"
+      },
+      {
+        "criterion": "preferred_skills_match",
+        "points_deducted": 15,
+        "evidence_quote": "Preferred Skills: None specified"
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 4,
+        "evidence_quote": "College Diploma in Tourism & Hospitality"
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 4,
+        "evidence_quote": "English - Intermediate (communication level)"
+      }
+    ],
+    "confidence_pct": 72,
+    "requires_human_review": true,
+    "review_reasons": [
+      {
+        "bucket": "extraction_uncertainty",
+        "reason": "Current-role parsing is ambiguous due to the combined header-like line with date, name, and title."
+      },
+      {
+        "bucket": "input_limitation",
+        "reason": "No employer/company details were provided for the apparent current Hotel Receptionist entry."
+      }
+    ],
+    "overall_assessment": "Candidate shows relevant hospitality and front-desk-adjacent experience, clear customer service exposure, reporting habits, and MS Office familiarity. English is present at an intermediate level, but the CV only partially matches the hotel receptionist requirements and contains ambiguity around the current role."
+  },
+  {
+    "cv_id": "cv-09",
+    "cv_pdf_file": "cv-09_NGO_VAN_PHUC.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Basic AutoCAD",
+        "Construction Site Support",
+        "MS Office",
+        "Basic AutoCAD (coursework)",
+        "MS Office (basic)"
+      ],
+      "experience_entries": [
+        {
+          "title": "Junior Architectural Drafter",
+          "company": "NGO VAN PHUC",
+          "start_date": "06/2024",
+          "end_date": "Present",
+          "bullet_points": []
+        },
+        {
+          "title": "Site Assistant",
+          "company": "Bac Ninh Civil Construction Co.",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Assisted site engineers with measuring and recording construction progress.",
+            "Helped organize physical blueprints and material delivery schedules.",
+            "Observed drafting processes performed by senior staff."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "College Diploma in Civil Engineering",
+          "school": "Bac Ninh Polytechnic College",
+          "dates": ""
+        }
+      ],
+      "certifications": [],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Elementary"
+      ],
+      "extraction_flags": [
+        "Near-miss skill: Basic AutoCAD (coursework) may indicate AutoCAD familiarity but not explicit professional proficiency.",
+        "Near-miss role relevance: Junior Architectural Drafter title appears without bullet-point detail.",
+        "CV contains redacted phone/email/address fields."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "input_limitation",
+        "description": "No bullet points were provided for the Junior Architectural Drafter role, limiting verification of responsibilities and scope relevant to the target job.",
+        "evidence_quote": "Junior Architectural Drafter  NGO VAN PHUC"
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The document format is sparse and some contact/formatting elements are redacted or garbled, which may affect precise parsing of role details.",
+        "evidence_quote": "Dien thoai: [phone redacted]   Email: [email redacted]   Dia chi: Bac Ninh, Vietnam"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 18,
+      "experience_match": 10,
+      "preferred_skills_match": 0,
+      "education_certifications": 3,
+      "languages": 10
+    },
+    "total_score": 41,
+    "match_level": "low",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 22,
+        "evidence_quote": "• Basic AutoCAD (coursework) • Construction Site Support • MS Office (basic)"
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 15,
+        "evidence_quote": "Civil engineering graduate with 1 year of general construction- site experience. Basic knowledge of AutoCAD from coursework, looking to build a career in architectural drafting."
+      },
+      {
+        "criterion": "preferred_skills_match",
+        "points_deducted": 15,
+        "evidence_quote": "No preferred skills were specified in the job posting; no additional preferred-skill evidence was present in the CV."
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 7,
+        "evidence_quote": "College Diploma in Civil Engineering  Bac Ninh Polytechnic College"
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 0,
+        "evidence_quote": "Vietnamese - Native; English - Elementary"
+      }
+    ],
+    "confidence_pct": 71,
+    "requires_human_review": true,
+    "review_reasons": [
+      {
+        "bucket": "input_limitation",
+        "reason": "Junior Architectural Drafter role has no bullet points, so relevant architectural drafting experience cannot be fully verified."
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "reason": "Sparse formatting and redacted contact details introduce some parsing uncertainty."
+      }
+    ],
+    "overall_assessment": "The CV shows limited but relevant exposure to architectural drafting through a Junior Architectural Drafter title, basic AutoCAD coursework, MS Office, and construction-site support experience. However, evidence for the required 3+ years of relevant experience and stronger architecture/interior design background is weak, so this is a low match and should be reviewed by a human recruiter."
+  },
+  {
+    "cv_id": "cv-10",
+    "cv_pdf_file": "cv-10_DO_THI_KIM_ANH.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Portfolio Management",
+        "Financial Modeling",
+        "MS Office (Advanced)",
+        "Risk Assessment",
+        "Strategic Planning",
+        "Problem Solving",
+        "Team Leadership"
+      ],
+      "experience_entries": [
+        {
+          "title": "Fund Manager",
+          "company": "Hai Phong Capital Management JSC",
+          "start_date": "01/2021",
+          "end_date": "Present",
+          "bullet_points": [
+            "Managed an investment portfolio exceeding VND 800 billion across equity and fixed-income assets.",
+            "Developed quarterly investment strategies, consistently outperforming benchmark index by an average of 3.2% annually.",
+            "Led a team of 5 investment analysts, overseeing research and risk assessment processes.",
+            "Presented portfolio performance and market outlook to the board and institutional investors.",
+            "Ensured compliance with State Securities Commission regulations and internal risk policies."
+          ]
+        },
+        {
+          "title": "Senior Investment Analyst",
+          "company": "VN Asset Management Corp.",
+          "start_date": "03/[phone redacted]/2020",
+          "end_date": "01/2021",
+          "bullet_points": [
+            "Conducted equity research and financial modeling to support investment decisions.",
+            "Built valuation models for over 40 listed companies across multiple sectors.",
+            "Assisted in preparing investment committee materials."
+          ]
+        },
+        {
+          "title": "Investment Analyst",
+          "company": "Sao Bien Securities",
+          "start_date": "07/[phone redacted]/2018",
+          "end_date": "03/[phone redacted]/2020",
+          "bullet_points": [
+            "Analyzed market trends and prepared daily investment briefs.",
+            "Supported senior analysts in due diligence for new fund products."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "Master of Finance",
+          "school": "National Economics University",
+          "dates": ""
+        },
+        {
+          "degree": "Bachelor of Finance & Banking",
+          "school": "Foreign Trade University",
+          "dates": ""
+        }
+      ],
+      "certifications": [
+        "CFA Charterholder (2020)",
+        "Securities Practicing Certificate (SSC Vietnam)"
+      ],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Fluent (IELTS 8.0)"
+      ],
+      "extraction_flags": [
+        "Dates in work history contain redacted phone-number placeholders, making exact month/year parsing partially uncertain.",
+        "CV lists 'Fund Manager' as current role but does not provide separate detailed employment dates for each role beyond the inline timeline format."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "input_limitation",
+        "description": "Exact end dates for some roles are obscured by redacted placeholders in the source CV, limiting precise chronology reconstruction.",
+        "evidence_quote": "03/[phone redacted]/2020 07/[phone redacted]/2018"
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The inline header timeline is difficult to map perfectly to each work entry, though the role order is clear.",
+        "evidence_quote": "01/2021 - Present 03/[phone redacted]/2020 07/[phone redacted]/2018"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 40,
+      "experience_match": 25,
+      "preferred_skills_match": 15,
+      "education_certifications": 10,
+      "languages": 10
+    },
+    "total_score": 100,
+    "match_level": "high",
+    "deduction_reasons": [],
+    "confidence_pct": 86,
+    "requires_human_review": false,
+    "review_reasons": [],
+    "overall_assessment": "Strong match for Fund Manager. The CV shows 8 years of relevant finance/investment experience, current fund management responsibility, leadership of a team of analysts, strong MS Office and problem-solving evidence, and solid education/certifications including CFA Charterholder and securities certification. Language requirements are also well covered."
+  },
+  {
+    "cv_id": "cv-11",
+    "cv_pdf_file": "cv-11_LY_VAN_HUNG.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "PLC Programming (Siemens S7)",
+        "Industrial Control Systems",
+        "Attention to Detail",
+        "Teamwork",
+        "Time Management",
+        "Basic HMI Configuration",
+        "English",
+        "Vietnamese"
+      ],
+      "experience_entries": [
+        {
+          "title": "PLC Engineer",
+          "company": "",
+          "start_date": "09/2023",
+          "end_date": "Present",
+          "bullet_points": [
+            "PLC Engineer"
+          ]
+        },
+        {
+          "title": "Automation Technician",
+          "company": "Binh Duong Precision Manufacturing Co.",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Programmed and troubleshot Siemens S7-1200 PLCs for packaging line automation.",
+            "Assisted senior engineers in commissioning new production equipment.",
+            "Maintained detailed documentation of control system changes for quality compliance.",
+            "Worked with the production team to minimize downtime during equipment changeovers."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "Bachelor of Automation Engineering",
+          "school": "Ho Chi Minh City University of Technology",
+          "dates": ""
+        }
+      ],
+      "certifications": [
+        "Siemens TIA Portal Basic Training (2023)"
+      ],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Basic technical reading"
+      ],
+      "extraction_flags": [
+        "Current role formatting is ambiguous: '09/2023 - Present [phone redacted] LY VAN HUNG PLC Engineer' may combine date, contact text, name, and title.",
+        "Experience date for Automation Technician is not explicitly provided.",
+        "English proficiency is limited to 'Basic technical reading'."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "Current role header may have been parsed imperfectly due to dense formatting and redacted contact details.",
+        "evidence_quote": "09/2023 - Present [phone redacted]  LY VAN HUNG  PLC Engineer"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "The CV does not provide a clear start/end date for the Automation Technician role.",
+        "evidence_quote": "Automation Technician  Binh Duong Precision Manufacturing Co."
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "English is only described at a basic reading level, not clearly as good written and spoken command.",
+        "evidence_quote": "English - Basic technical reading"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 28,
+      "experience_match": 10,
+      "preferred_skills_match": 0,
+      "education_certifications": 5,
+      "languages": 2
+    },
+    "total_score": 45,
+    "match_level": "medium",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 12,
+        "evidence_quote": "CAREER OBJECTIVE  Automation engineer with 2 years of experience in PLC programming and industrial control systems."
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 15,
+        "evidence_quote": "Automation engineer with 2 years of experience in PLC programming and industrial control systems."
+      },
+      {
+        "criterion": "preferred_skills_match",
+        "points_deducted": 15,
+        "evidence_quote": "No preferred skills were specified in the job posting."
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 5,
+        "evidence_quote": "Siemens TIA Portal Basic Training (2023)"
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 8,
+        "evidence_quote": "English - Basic technical reading"
+      }
+    ],
+    "confidence_pct": 78,
+    "requires_human_review": false,
+    "review_reasons": [],
+    "overall_assessment": "Candidate shows relevant PLC/industrial control exposure, Teamwork and Time Management are explicitly present, and there is direct Siemens S7 PLC experience. However, experience appears to be around 2 years rather than the required minimum 3 years, and English proficiency is only indicated as basic technical reading. Overall fit is borderline to moderate."
+  },
+  {
+    "cv_id": "cv-12",
+    "cv_pdf_file": "cv-12_TRUONG_VAN_DUY.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Manual Labor",
+        "Basic Inventory Counting",
+        "Teamwork"
+      ],
+      "experience_entries": [
+        {
+          "title": "Warehouse Staff",
+          "company": "",
+          "start_date": "02/2026",
+          "end_date": "Present",
+          "bullet_points": []
+        },
+        {
+          "title": "Warehouse Helper (Part-time)",
+          "company": "Vung Tau Cold Storage Co.",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Assisted with loading and unloading goods from delivery trucks.",
+            "Helped organize stock shelves under supervisor instructions.",
+            "Performed basic manual counting of inventory items."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "High School Diploma",
+          "school": "Vung Tau High School",
+          "dates": ""
+        }
+      ],
+      "certifications": [],
+      "languages": [
+        "Vietnamese - Native"
+      ],
+      "extraction_flags": [
+        "Career objective suggests entry-level warehouse experience; not counted as a formal experience entry.",
+        "The first line appears to be a current role header with missing company details.",
+        "No cover letter provided."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The first employment line is truncated/fragmented and may represent a role header rather than a complete experience entry, making title/company parsing uncertain.",
+        "evidence_quote": "02/2026 - Present [phone redacted]  TRUONG VAN DUY  Warehouse Staff  Dien thoai: [phone redacted]   Email: [email redacted]   Dia chi: Ba Ria - Vung Tau, Vietnam"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "Company/start and end dates are missing for the part-time warehouse helper role, limiting experience duration assessment.",
+        "evidence_quote": "Warehouse Helper (Part-time)  Vung Tau Cold Storage Co."
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "No certifications are listed on the CV.",
+        "evidence_quote": "No certifications shown in the provided CV text"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "Only one language is provided, so multilingual capability cannot be assessed beyond Vietnamese.",
+        "evidence_quote": "LANGUAGES  Vietnamese - Native"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 12,
+      "experience_match": 10,
+      "preferred_skills_match": 0,
+      "education_certifications": 5,
+      "languages": 10
+    },
+    "total_score": 37,
+    "match_level": "low",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 28,
+        "evidence_quote": "SKILLS  Manual Labor   Basic Inventory Counting   Teamwork"
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 15,
+        "evidence_quote": "Entry-level warehouse worker with a few months of practical experience handling stock and inventory tasks."
+      },
+      {
+        "criterion": "preferred_skills_match",
+        "points_deducted": 15,
+        "evidence_quote": "The job requires solid understanding of industry best practices and relevant tools or systems, but the CV only shows: \"Assisted with loading and unloading goods from delivery trucks. Helped organize stock shelves under supervisor instructions. Performed basic manual counting of inventory items.\""
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 5,
+        "evidence_quote": "EDUCATION  High School Diploma  Vung Tau High School"
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 0,
+        "evidence_quote": "LANGUAGES  Vietnamese - Native"
+      }
+    ],
+    "confidence_pct": 78,
+    "requires_human_review": false,
+    "review_reasons": [],
+    "overall_assessment": "The CV shows basic warehouse-related exposure and teamwork, but it does not provide clear evidence of the required transport & warehousing/process improvement experience depth or industry tools knowledge expected for the role. The profile is a weak match for a Warehouse Specialist position."
+  },
+  {
+    "cv_id": "cv-13",
+    "cv_pdf_file": "cv-13_NGUYEN_THI_BICH.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Pharmaceutical Sales",
+        "Territory Planning",
+        "Time Management",
+        "Process Improvement",
+        "CRM Reporting",
+        "Relationship Building",
+        "Medical Representative (ETC)",
+        "planning",
+        "time-management",
+        "building relationships"
+      ],
+      "experience_entries": [
+        {
+          "title": "Medical Representative (ETC)",
+          "company": "Vietnam Pharma Distribution JSC — Hanoi Region",
+          "start_date": "06/2024",
+          "end_date": "Present",
+          "bullet_points": [
+            "Managed a territory of 25 hospitals and clinics, consistently achieving 105-115% of quarterly sales targets.",
+            "Built and maintained relationships with doctors and pharmacists to promote prescription products ethically and effectively.",
+            "Planned monthly visit schedules and reported call activities using CRM software.",
+            "Organized product introduction seminars for healthcare professionals in coordination with the medical affairs team.",
+            "Tracked competitor activities and market trends, feeding insights back to the product team for process improvement."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "Bachelor of Pharmacy",
+          "school": "Hanoi University of Pharmacy",
+          "dates": "Not stated"
+        }
+      ],
+      "certifications": [
+        "Pharmacist Practice Certificate",
+        "Good Pharmacy Practice Training (2023)"
+      ],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Intermediate"
+      ],
+      "extraction_flags": [
+        "Candidate name appears in raw CV but is not used for scoring.",
+        "Phone and email are redacted in the raw CV.",
+        "CV contains a career objective section with self-reported experience summary.",
+        "Bullet formatting in work experience appears truncated at the end with trailing bullets."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "input_limitation",
+        "description": "Work experience dates are only partially specified as start date plus Present; no end date is available because the role is current.",
+        "evidence_quote": "06/2024 - Present"
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The work experience bullet points appear visually truncated or malformed at the end of the raw CV, which may hide additional details.",
+        "evidence_quote": "• • • • •"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 35,
+      "experience_match": 22,
+      "preferred_skills_match": 15,
+      "education_certifications": 8,
+      "languages": 10
+    },
+    "total_score": 90,
+    "match_level": "high",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 5,
+        "evidence_quote": "The CV shows 'Territory Planning' and 'Time Management', but not the exact required phrase 'Planning' as a standalone skill."
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 3,
+        "evidence_quote": "The CV states 'Pharmacy graduate with 2 years of experience as a medical representative' and '06/2024 - Present', which supports experience but is not fully detailed for the required 1-3 years hands-on range."
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 2,
+        "evidence_quote": "Education and certifications are relevant, but the CV does not explicitly show a pharmacy license for the ETC role beyond 'Pharmacist Practice Certificate' and 'Good Pharmacy Practice Training (2023)'."
+      }
+    ],
+    "confidence_pct": 82,
+    "requires_human_review": false,
+    "review_reasons": [],
+    "overall_assessment": "Strong fit for the Medical Representative (ETC) role. The CV shows directly relevant ETC experience, territory planning, time management, CRM use, relationship building, and process improvement, plus relevant pharmacy education and certifications. No preferred skills were specified, and language requirements are adequately met."
+  },
+  {
+    "cv_id": "cv-14",
+    "cv_pdf_file": "cv-14_PHAN_THI_DIEM.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Facial Treatment",
+        "Skin Analysis",
+        "Customer Focus",
+        "Time Management",
+        "Basic Product Upselling",
+        "negotiation",
+        "customer-focused",
+        "good time-management"
+      ],
+      "experience_entries": [
+        {
+          "title": "Skincare Specialist",
+          "company": "Dien thoai: [phone redacted]   Email: [email redacted]   Dia chi: Ba Ria - Vung Tau, Vietnam",
+          "start_date": "01/2025",
+          "end_date": "Present 06/[phone redacted]/2024  PHAN THI DIEM",
+          "bullet_points": []
+        },
+        {
+          "title": "Skincare Therapist",
+          "company": "Lotus Beauty Spa — Vung Tau",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Performed facial treatments and skin consultations for an average of 12 clients per day.",
+            "Recommended skincare product routines based on client skin analysis.",
+            "Maintained treatment room hygiene and equipment sterilization standards.",
+            "Assisted with basic retail sales of skincare products during peak hours."
+          ]
+        },
+        {
+          "title": "Spa Intern",
+          "company": "Serenity Spa & Wellness",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Shadowed senior therapists during facial and body treatments.",
+            "Handled front-desk booking during internship rotations."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "College Diploma in Cosmetology",
+          "school": "Vung Tau Beauty Vocational College",
+          "dates": "[phone redacted] | GPA 7.3/10"
+        }
+      ],
+      "certifications": [
+        "Certificate in Advanced Facial Therapy (2024)"
+      ],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Basic"
+      ],
+      "extraction_flags": [
+        "Near-miss skill present: 'negotiation' appears in career objective as developing stronger negotiation skills, not as a core listed skill.",
+        "Near-miss skill present: 'customer-focused' appears in career objective; also 'Customer Focus' appears in skills.",
+        "Date parsing ambiguity in header line mixes employment date and redacted phone content.",
+        "No explicit dates provided for Lotus Beauty Spa and Serenity Spa & Wellness."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The first experience line appears malformed and mixes title, dates, name, and contact details, making title/company/date parsing uncertain.",
+        "evidence_quote": "01/2025 - Present 06/[phone redacted]/2024  PHAN THI DIEM  Skincare Specialist  Dien thoai: [phone redacted]   Email: [email redacted]   Dia chi: Ba Ria - Vung Tau, Vietnam"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "No start/end dates are shown for Lotus Beauty Spa and Serenity Spa & Wellness, so tenure cannot be verified from the source.",
+        "evidence_quote": "Skincare Therapist  Lotus Beauty Spa — Vung Tau"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "The CV states 1.5 years of hands-on experience, which is below the job's 3-year minimum.",
+        "evidence_quote": "Skincare professional with 1.5 years of hands-on experience performing facial treatments and consulting clients."
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 32,
+      "experience_match": 10,
+      "preferred_skills_match": 15,
+      "education_certifications": 8,
+      "languages": 10
+    },
+    "total_score": 75,
+    "match_level": "high",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 8,
+        "evidence_quote": "currently developing stronger negotiation skills for retail upselling"
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 15,
+        "evidence_quote": "Skincare professional with 1.5 years of hands-on experience performing facial treatments and consulting clients."
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 2,
+        "evidence_quote": "College Diploma in Cosmetology"
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 0,
+        "evidence_quote": "Certificate in Advanced Facial Therapy (2024)"
+      }
+    ],
+    "confidence_pct": 68,
+    "requires_human_review": true,
+    "review_reasons": [
+      {
+        "bucket": "extraction_uncertainty",
+        "reason": "Employment header parsing is ambiguous and may affect the first experience entry."
+      },
+      {
+        "bucket": "input_limitation",
+        "reason": "Several experience entries lack explicit dates, making total experience verification incomplete."
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "reason": "Negotiation is mentioned as developing rather than demonstrated skill, which may require recruiter review."
+      }
+    ],
+    "overall_assessment": "The CV shows strong alignment in skincare-related hands-on work, customer focus, and time management, with relevant facial treatment and skin analysis experience. However, the source indicates only 1.5 years of experience versus the 3-year minimum, and the CV parsing contains date/header ambiguities that should be reviewed by a human recruiter."
+  },
+  {
+    "cv_id": "cv-15",
+    "cv_pdf_file": "cv-15_VU_VAN_KHOA.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Photoshop",
+        "Canva",
+        "Basic Layout Design",
+        "Vietnamese",
+        "English"
+      ],
+      "experience_entries": [
+        {
+          "title": "Freelance Designer (Informal projects)",
+          "company": "Self-employed",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Designed a few social media posts and simple flyers for local small businesses.",
+            "Learned Photoshop and Canva through online tutorials.",
+            "No formal team or client management experience yet."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "Fine Arts College Program (incomplete, left after 1 year)",
+          "school": "Local Fine Arts College",
+          "dates": ""
+        }
+      ],
+      "certifications": [],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Elementary"
+      ],
+      "extraction_flags": [
+        "Self-taught",
+        "limited professional experience",
+        "informal projects",
+        "basic",
+        "incomplete",
+        "left after 1 year"
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "input_limitation",
+        "description": "The CV does not provide exact dates for the freelance work or education, making timeline verification incomplete.",
+        "evidence_quote": "2024 - Present [phone redacted] (did not complete) ... WORK EXPERIENCE ... Freelance Designer (Informal projects) Self-employed"
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The heading '2024 - Present [phone redacted] (did not complete)' is ambiguous and may refer to a redacted contact detail rather than a job date, so the start/end date could not be reliably assigned.",
+        "evidence_quote": "2024 - Present [phone redacted] (did not complete)"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "The CV states the candidate has limited professional experience and only informal freelance projects, so depth of relevant graphic design experience is unclear.",
+        "evidence_quote": "Self-taught designer with limited professional experience, having completed some freelance projects for friends and small local shops."
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 5,
+      "experience_match": 6,
+      "preferred_skills_match": 15,
+      "education_certifications": 0,
+      "languages": 5
+    },
+    "total_score": 31,
+    "match_level": "low",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 35,
+        "evidence_quote": "Self-taught designer with limited professional experience, having completed some freelance projects for friends and small local shops. Passionate about visual design and eager to gain more structured experience as a Graphic Designer."
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 19,
+        "evidence_quote": "Self-taught designer with limited professional experience, having completed some freelance projects for friends and small local shops."
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 10,
+        "evidence_quote": "Fine Arts College Program (incomplete, left after 1 year)  Local Fine Arts College"
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 5,
+        "evidence_quote": "English - Elementary"
+      }
+    ],
+    "confidence_pct": 72,
+    "requires_human_review": true,
+    "review_reasons": [
+      {
+        "bucket": "input_limitation",
+        "reason": "The CV provides incomplete and informal work history with no exact dates or clear scope of professional responsibility."
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "reason": "The first line contains ambiguous redacted text that may affect date parsing and structured extraction."
+      }
+    ],
+    "overall_assessment": "The candidate shows basic graphic design exposure through informal freelance work and core tools like Photoshop and Canva, but the CV indicates limited professional experience, incomplete education, and only elementary English. Overall alignment with the role is low, and human review is recommended due to ambiguity in dates and the informal nature of the experience."
+  },
+  {
+    "cv_id": "cv-16",
+    "cv_pdf_file": "cv-16_DINH_THI_THAO.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Adobe Premiere Pro",
+        "After Effects",
+        "Reporting",
+        "Leadership",
+        "Customer Focus",
+        "Color Grading",
+        "Premiere Pro",
+        "English",
+        "Vietnamese"
+      ],
+      "experience_entries": [
+        {
+          "title": "Video Editor",
+          "company": "Dien thoai",
+          "start_date": "07/2023",
+          "end_date": "Present",
+          "bullet_points": [
+            "Video Editor",
+            "Dien thoai: [phone redacted]",
+            "Email: [email redacted]",
+            "Dia chi: Hai Phong, Vietnam"
+          ]
+        },
+        {
+          "title": "Video Editor",
+          "company": "Haiphong Digital Agency",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Edited over 150 short-form videos for social media campaigns across 8 client accounts using Premiere Pro and After Effects.",
+            "Led a small team of 2 junior editors on high-volume projects, reviewing outputs before client delivery.",
+            "Reported weekly production status and turnaround metrics to the account management team.",
+            "Worked directly with clients to understand brief requirements and incorporate feedback efficiently."
+          ]
+        },
+        {
+          "title": "Junior Video Editor (Internship)",
+          "company": "Coastal Media House",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Assisted with editing raw footage and basic color correction.",
+            "Organized media assets and project files for the editing team."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "College Diploma in Multimedia Design",
+          "school": "Hai Phong College of Arts",
+          "dates": ""
+        }
+      ],
+      "certifications": [
+        "Adobe Certified Professional - Premiere Pro (2023)"
+      ],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Intermediate"
+      ],
+      "extraction_flags": [
+        "Near-miss role header/date parsing: '07/2023 - Present 01/[phone redacted]/2023 DINH THI THAO Video Editor' appears merged with contact text.",
+        "Date fields missing for two experience entries.",
+        "Skill normalization needed for 'Color Grading (basic)' to 'Color Grading'."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The top-of-document line appears to merge employment dates, candidate name, role, and contact info, making the first experience entry ambiguous.",
+        "evidence_quote": "07/2023 - Present 01/[phone redacted]/2023 DINH THI THAO Video Editor Dien thoai: [phone redacted] Email: [email redacted] Dia chi: Hai Phong, Vietnam"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "Two work experience entries do not include explicit start/end dates in the source text.",
+        "evidence_quote": "Video Editor Haiphong Digital Agency ... Junior Video Editor (Internship) Coastal Media House ..."
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "No cover letter was provided, so additional context about fit, motivation, or tools cannot be assessed.",
+        "evidence_quote": "No cover letter provided"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 40,
+      "experience_match": 22,
+      "preferred_skills_match": 15,
+      "education_certifications": 10,
+      "languages": 10
+    },
+    "total_score": 97,
+    "match_level": "high",
+    "deduction_reasons": [
+      {
+        "criterion": "experience_match",
+        "points_deducted": 3,
+        "evidence_quote": "At least 1-3 years of hands-on experience relevant to the Video Editor role."
+      }
+    ],
+    "confidence_pct": 82,
+    "requires_human_review": false,
+    "review_reasons": [
+      {
+        "bucket": "extraction_uncertainty",
+        "reason": "The first experience entry is ambiguously merged with contact details and dates."
+      }
+    ],
+    "overall_assessment": "Candidate shows a strong match for the Video Editor role with direct editing experience, relevant tools (Adobe Premiere Pro, After Effects), leadership in small teams, reporting duties, customer focus, and relevant education/certification. Languages also align well. Main caution is ambiguity in the top experience/date parsing, but overall fit appears strong."
+  },
+  {
+    "cv_id": "cv-17",
+    "cv_pdf_file": "cv-17_NGUYEN_VAN_SON.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Team Supervision",
+        "Workshop Operations",
+        "Planning",
+        "Communication",
+        "Vehicle Diagnostics"
+      ],
+      "experience_entries": [
+        {
+          "title": "Workshop Team Leader",
+          "company": "Da Nang Auto Repair Center",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Supervised a team of 6 mechanics, coordinating daily repair schedules and quality checks.",
+            "Planned parts procurement in coordination with the purchasing department.",
+            "Communicated repair timelines and cost estimates to customers.",
+            "Maintained workshop safety standards and equipment maintenance logs."
+          ]
+        },
+        {
+          "title": "Senior Mechanic",
+          "company": "Central Auto Service",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Performed complex vehicle diagnostics and repairs.",
+            "Trained 2 junior mechanics on standard repair procedures."
+          ]
+        },
+        {
+          "title": "Mechanic",
+          "company": "Local Auto Garage",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Carried out routine maintenance and repair tasks under supervision."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "College Diploma in Mechanical Engineering",
+          "school": "Da Nang Technical College",
+          "dates": "GPA 7.0/10"
+        }
+      ],
+      "certifications": [
+        "Automotive Technician Certificate (2021)"
+      ],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Basic"
+      ],
+      "extraction_flags": [
+        "Career objective and experience dates are partially malformed/redacted, making chronology ambiguous.",
+        "Role dates in header are corrupted/redacted.",
+        "No cover letter provided."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "input_limitation",
+        "description": "Experience dates are partially redacted/corrupted, so exact start and end dates cannot be reliably extracted.",
+        "evidence_quote": "03/2024 - Present 06/[phone redacted]/2024 01/[phone redacted]/[phone redacted]"
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The header appears to contain a role title and date fragments that may belong to multiple entries, so parsing of chronology is uncertain.",
+        "evidence_quote": "03/2024 - Present 06/[phone redacted]/2024 01/[phone redacted]/[phone redacted]  NGUYEN VAN SON  Workshop Supervisor"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 26,
+      "experience_match": 15,
+      "preferred_skills_match": 0,
+      "education_certifications": 6,
+      "languages": 7
+    },
+    "total_score": 54,
+    "match_level": "medium",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 14,
+        "evidence_quote": "\"Strong planning and communication skills\" and \"vendor negotiation\" are mentioned, but no exact evidence of Negotiation as a demonstrated skill beyond a future aspiration."
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 10,
+        "evidence_quote": "\"Mechanical professional with 4 years of experience in workshop operations, including 1.5 years as a team leader.\" This is below the required 6+ years and 2-3 years in a management role."
+      },
+      {
+        "criterion": "preferred_skills_match",
+        "points_deducted": 15,
+        "evidence_quote": "No preferred skills were specified in the job posting."
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 4,
+        "evidence_quote": "\"College Diploma in Mechanical Engineering\" and \"Automotive Technician Certificate (2021)\" do not directly demonstrate the specified management qualification level."
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 3,
+        "evidence_quote": "\"English - Basic\" indicates limited proficiency; no stronger language requirement was specified, but language evidence is limited."
+      }
+    ],
+    "confidence_pct": 70,
+    "requires_human_review": true,
+    "review_reasons": [
+      {
+        "bucket": "input_limitation",
+        "reason": "Experience chronology is partially redacted/corrupted, limiting reliable date extraction."
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "reason": "The header contains ambiguous role/date fragments that may affect parsing of employment history."
+      }
+    ],
+    "overall_assessment": "Candidate shows relevant workshop exposure, planning, communication, team supervision, and some leadership experience, but appears below the stated experience and management thresholds for the Workshop Manager role."
+  },
+  {
+    "cv_id": "cv-18",
+    "cv_pdf_file": "cv-18_TA_THI_HUONG.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Basic Customer Service",
+        "Cash Handling",
+        "Vietnamese - Native",
+        "English - Very limited"
+      ],
+      "experience_entries": [
+        {
+          "title": "Real Estate Agent",
+          "company": "",
+          "start_date": "2023",
+          "end_date": "Present",
+          "bullet_points": [
+            "Retail sales professional looking to switch careers into real estate.",
+            "No prior real estate experience but motivated to learn the industry.",
+            "Comfortable with basic customer interactions in Vietnamese; English communication is currently limited."
+          ]
+        },
+        {
+          "title": "Retail Sales Staff",
+          "company": "Bach Hoa Xanh Convenience Store",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Assisted customers with product inquiries and checkout at a convenience store.",
+            "Restocked shelves and managed basic inventory counts.",
+            "No experience in sales negotiation, contracts, or real estate transactions."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "High School Diploma",
+          "school": "Long Thanh High School",
+          "dates": ""
+        }
+      ],
+      "certifications": [],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Very limited"
+      ],
+      "extraction_flags": [
+        "Title appears as 'Real Estate Agent' under candidate name/date line but context suggests it may be a target role rather than a completed job entry.",
+        "Dates for Retail Sales Staff are not provided.",
+        "English proficiency is described with a near-miss/limited qualifier rather than a standard proficiency level."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The top line mixes date, name, and role; 'Real Estate Agent' may be a target title or header rather than an actual experience entry.",
+        "evidence_quote": "2023 - Present [phone redacted]  TA THI HUONG  Real Estate Agent"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "No explicit dates are provided for the Retail Sales Staff role.",
+        "evidence_quote": "Retail Sales Staff  Bach Hoa Xanh Convenience Store"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "No certifications are listed in the CV.",
+        "evidence_quote": "SKILLS  Basic Customer Service   Cash Handling"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 10,
+      "experience_match": 4,
+      "preferred_skills_match": 0,
+      "education_certifications": 1,
+      "languages": 2
+    },
+    "total_score": 17,
+    "match_level": "low",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 30,
+        "evidence_quote": "English communication is currently limited."
+      },
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 10,
+        "evidence_quote": "Comfortable with basic customer interactions in Vietnamese; English communication is currently limited."
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 21,
+        "evidence_quote": "No prior real estate experience but motivated to learn the industry."
+      },
+      {
+        "criterion": "preferred_skills_match",
+        "points_deducted": 15,
+        "evidence_quote": "No prior real estate experience but motivated to learn the industry."
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 9,
+        "evidence_quote": "High School Diploma  Long Thanh High School"
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 8,
+        "evidence_quote": "English - Very limited"
+      }
+    ],
+    "confidence_pct": 71,
+    "requires_human_review": true,
+    "review_reasons": [
+      {
+        "bucket": "extraction_uncertainty",
+        "reason": "Top-line role/date formatting is ambiguous and may not represent a true experience entry."
+      },
+      {
+        "bucket": "input_limitation",
+        "reason": "Retail Sales Staff dates are missing, limiting experience duration assessment."
+      },
+      {
+        "bucket": "input_limitation",
+        "reason": "English proficiency is self-reported as very limited, which may require recruiter verification against role expectations."
+      }
+    ],
+    "overall_assessment": "The candidate shows customer-service and retail experience but lacks demonstrated real estate experience and has limited English proficiency. Overall match is low for a Real Estate Agent role, and human review is recommended due to ambiguity in the CV header and missing date details."
+  },
+  {
+    "cv_id": "cv-19",
+    "cv_pdf_file": "cv-19_LE_VAN_THANH.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "POS Systems",
+        "Cash Handling",
+        "Customer Focus",
+        "Time Management",
+        "Basic Data Analysis",
+        "sales tracking",
+        "customer service",
+        "data-handling accuracy",
+        "POS systems",
+        "cash register",
+        "register reconciliation",
+        "teamwork"
+      ],
+      "experience_entries": [
+        {
+          "title": "Cashier",
+          "company": "Co.opmart Vung Tau",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Processed an average of 200+ customer transactions per shift with high accuracy using POS systems.",
+            "Handled cash, card, and e-wallet payments, balancing the register at the end of each shift.",
+            "Assisted customers with product location and promotional inquiries in a friendly manner.",
+            "Reported daily sales discrepancies to the shift supervisor for reconciliation."
+          ]
+        },
+        {
+          "title": "Part-time Cashier",
+          "company": "Circle K Vung Tau",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Operated the cash register during evening shifts.",
+            "Maintained store cleanliness and stock organization."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "College Diploma in Business Administration",
+          "school": "Ba Ria - Vung Tau College",
+          "dates": "[phone redacted] | GPA 7.1/10"
+        }
+      ],
+      "certifications": [],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Basic"
+      ],
+      "extraction_flags": [
+        "Start/end dates for work experience are not clearly provided in a standard format; first line appears truncated/redacted with date fragments only.",
+        "The CV contains bullet placeholders '• • • • • •' under the second job, suggesting possible missing content or formatting loss.",
+        "'Basic Data Analysis' is written as part of a broader skill phrase 'Basic Data Analysis (sales tracking)' rather than a standalone detailed competency."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "input_limitation",
+        "description": "Work experience dates are incomplete/ambiguous in the source CV, limiting reliable extraction of employment periods.",
+        "evidence_quote": "02/2025 - Present 08/[phone redacted]/2025"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "Second job entry appears to have missing bullet content after placeholder symbols, so responsibilities may be incomplete.",
+        "evidence_quote": "• • • • • •"
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The raw CV format makes it unclear whether '08/[phone redacted]/2025' is a redacted end date or part of another date string.",
+        "evidence_quote": "08/[phone redacted]/2025"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 34,
+      "experience_match": 18,
+      "preferred_skills_match": 15,
+      "education_certifications": 7,
+      "languages": 10
+    },
+    "total_score": 84,
+    "match_level": "high",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 6,
+        "evidence_quote": "The CV shows 'Basic Data Analysis (sales tracking)' rather than explicit broader analytical work or advanced data analysis experience."
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 7,
+        "evidence_quote": "Work history is relevant, but dates are unclear and the second role details are sparse: '• • • • • •'."
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 3,
+        "evidence_quote": "The CV lists 'College Diploma in Business Administration' but no certifications."
+      }
+    ],
+    "confidence_pct": 82,
+    "requires_human_review": true,
+    "review_reasons": [
+      {
+        "bucket": "input_limitation",
+        "reason": "Employment dates are ambiguous/redacted in the CV."
+      },
+      {
+        "bucket": "input_limitation",
+        "reason": "One work experience entry appears to have missing content indicated by bullet placeholders."
+      }
+    ],
+    "overall_assessment": "Candidate appears strongly aligned to the Retail Cashier role based on relevant cashier experience, customer focus, time management, POS usage, and basic sales data handling. Education is relevant, and language requirements are sufficiently met with Vietnamese native and English basic. Human review is recommended due to ambiguous employment dates and possible missing job details."
+  },
+  {
+    "cv_id": "cv-20",
+    "cv_pdf_file": "cv-20_NGUYEN_THI_HONG_NHUNG.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "English Proficiency",
+        "Lesson Planning (basic)",
+        "Process Improvement (curriculum feedback)",
+        "Academic Research",
+        "TESOL Certificate",
+        "Vietnamese - Native",
+        "English - Fluent (IELTS 7.5)"
+      ],
+      "experience_entries": [
+        {
+          "title": "Lecturer",
+          "company": "Present",
+          "start_date": "09/2025",
+          "end_date": "Present",
+          "bullet_points": []
+        },
+        {
+          "title": "Teaching Assistant",
+          "company": "Binh Duong University",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Assisted the course lecturer with grading assignments and holding office hours for undergraduate students.",
+            "Prepared lecture material summaries and supplementary exercises.",
+            "Delivered 3 guest tutorial sessions on introductory topics under lecturer supervision."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "Master of Education",
+          "school": "Ho Chi Minh City University of Education",
+          "dates": ""
+        },
+        {
+          "degree": "Bachelor of English Language Teaching",
+          "school": "Binh Duong University",
+          "dates": ""
+        }
+      ],
+      "certifications": [
+        "TESOL Certificate (2024)"
+      ],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Fluent (IELTS 7.5)"
+      ],
+      "extraction_flags": [
+        "Near-miss skill evidence for leadership found as 'currently building classroom leadership experience' in career objective.",
+        "Near-miss experience date parsing for current Lecturer role; company/institution ambiguous in source line.",
+        "Experience duration for Teaching Assistant not explicitly dated in CV extract."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The current role line is difficult to parse into a standard experience entry because the institution/company is not clearly separated from the title.",
+        "evidence_quote": "09/2025 - Present NGUYEN THI HONG NHUNG Lecturer ..."
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "The Teaching Assistant role has no explicit dates in the provided CV text.",
+        "evidence_quote": "Teaching Assistant Binh Duong University Assisted the course lecturer with grading assignments..."
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "The CV states 1 year of practical teaching assistant experience, but the source text does not provide a fully dated timeline to verify exact months.",
+        "evidence_quote": "Master's degree holder in Education with 1 year of practical teaching assistant experience at university level."
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 35,
+      "experience_match": 20,
+      "preferred_skills_match": 15,
+      "education_certifications": 10,
+      "languages": 10
+    },
+    "total_score": 90,
+    "match_level": "high",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 5,
+        "evidence_quote": "The CV shows leadership only as a near-miss, not as an exact skill: 'currently building classroom leadership experience'."
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 5,
+        "evidence_quote": "The CV indicates relevant experience but does not clearly document 1-3 years with exact dates for all roles: '1 year of practical teaching assistant experience at university level.'"
+      }
+    ],
+    "confidence_pct": 78,
+    "requires_human_review": false,
+    "review_reasons": [],
+    "overall_assessment": "The candidate shows a strong overall fit for a Lecturer role, with exact evidence of English proficiency, process improvement, relevant teaching exposure, a master's degree, and TESOL certification. The main limitation is that leadership is only indirectly evidenced and one experience entry is not fully date-structured, but the profile is otherwise well-aligned."
+  },
+  {
+    "cv_id": "cv-21",
+    "cv_pdf_file": "cv-21_CAO_THI_YEN.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Basic Social Media Use (personal)",
+        "Willingness to Learn"
+      ],
+      "experience_entries": [],
+      "education_entries": [
+        {
+          "degree": "High School Diploma",
+          "school": "Son Tra High School, Da Nang",
+          "dates": ""
+        }
+      ],
+      "certifications": [],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Very limited"
+      ],
+      "extraction_flags": [
+        "Near-miss skill present in objective text: \"comfortable using social media apps personally\"",
+        "Near-miss requirement mentioned negatively in objective text: \"no professional experience with livestream operations, planning, or attention-to-detail tasks required in a work setting\"",
+        "No formal work experience yet"
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "CV layout is sparse and unstructured, which increases the chance of missed or misread fields, though the main facts are clear.",
+        "evidence_quote": "WORK EXPERIENCE  No formal work experience yet."
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "No cover letter provided, so there is no additional evidence for experience, skills, or language ability.",
+        "evidence_quote": "No cover letter provided"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 0,
+      "experience_match": 0,
+      "preferred_skills_match": 15,
+      "education_certifications": 5,
+      "languages": 4
+    },
+    "total_score": 24,
+    "match_level": "low",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 40,
+        "evidence_quote": "\"no professional experience with livestream operations, planning, or attention-to-detail tasks required in a work setting\""
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 25,
+        "evidence_quote": "\"No formal work experience yet.\""
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 5,
+        "evidence_quote": "\"High School Diploma\""
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 6,
+        "evidence_quote": "\"English - Very limited\""
+      }
+    ],
+    "confidence_pct": 83,
+    "requires_human_review": false,
+    "review_reasons": [],
+    "overall_assessment": "The candidate does not show the required hands-on experience for the E-Commerce Livestream Assistant role and explicitly states no formal work experience. Some transferable interest in e-commerce and basic personal social media use are present, but the core required skills of attention to detail, leadership, and planning are not evidenced in professional contexts. English is also listed as very limited."
+  },
+  {
+    "cv_id": "cv-22",
+    "cv_pdf_file": "cv-22_PHAM_THI_KIM_NGAN.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Complaint Resolution",
+        "Time Management",
+        "Project/Case Management",
+        "Customer Focus",
+        "Cross-department Coordination",
+        "CRM Tools",
+        "English - Intermediate",
+        "Vietnamese - Native"
+      ],
+      "experience_entries": [
+        {
+          "title": "Complaint Handling Specialist",
+          "company": "",
+          "start_date": "05/2023",
+          "end_date": "Present",
+          "bullet_points": []
+        },
+        {
+          "title": "Customer Complaint Resolution Officer",
+          "company": "TIKI Corporation",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Handled an average of 40 escalated customer complaints per week, achieving a 92% first-contact resolution rate.",
+            "Coordinated with logistics, finance, and merchant teams to resolve complex order disputes within SLA timelines.",
+            "Documented recurring complaint patterns and proposed process changes that reduced repeat complaints by 18%.",
+            "Managed multiple concurrent complaint cases using an internal case-management/project-tracking tool.",
+            "Trained 3 new hires on complaint-handling procedures and communication standards."
+          ]
+        },
+        {
+          "title": "Customer Service Representative",
+          "company": "Shopee Vietnam",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Responded to customer inquiries via chat and hotline, maintaining a customer satisfaction score above 4.5/5.",
+            "Escalated complex cases to the appropriate resolution team with clear documentation."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "Bachelor of Business Administration",
+          "school": "University of Economics HCMC",
+          "dates": ""
+        }
+      ],
+      "certifications": [
+        "Customer Experience Management Certificate (2022)"
+      ],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Intermediate"
+      ],
+      "extraction_flags": [
+        "Near-miss skill phrasing: \"Project/Case Management\" may correspond to Project Management.",
+        "Near-miss skill phrasing: \"Complaint Resolution\" may correspond to complaint handling experience.",
+        "Start/end date for current role partially ambiguous due to raw text formatting.",
+        "Company/start_date/end_date not fully separable for the top header line."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The first line appears to combine the current role title and date range in a formatting-corrupted way, so the extracted title/company/date fields may be imperfect.",
+        "evidence_quote": "05/2023 - Present 06/[phone redacted]/2023  PHAM THI KIM NGAN  Complaint Handling Specialist"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "No detailed bullet points are provided for the current 'Complaint Handling Specialist' header entry; only the subsequent work experience section has duties.",
+        "evidence_quote": "Complaint Handling Specialist"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "The company for the current 'Complaint Handling Specialist' header entry is not specified in the raw text.",
+        "evidence_quote": "Complaint Handling Specialist"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 40,
+      "experience_match": 23,
+      "preferred_skills_match": 15,
+      "education_certifications": 8,
+      "languages": 8
+    },
+    "total_score": 94,
+    "match_level": "high",
+    "deduction_reasons": [
+      {
+        "criterion": "experience_match",
+        "points_deducted": 2,
+        "evidence_quote": "CAREER OBJECTIVE  Customer service professional with 3 years of experience specializing in complaint resolution and escalation management for a retail brand."
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 2,
+        "evidence_quote": "Bachelor of Business Administration  University of Economics HCMC"
+      },
+      {
+        "criterion": "languages",
+        "points_deducted": 2,
+        "evidence_quote": "• English - Intermediate"
+      }
+    ],
+    "confidence_pct": 82,
+    "requires_human_review": false,
+    "review_reasons": [],
+    "overall_assessment": "The CV shows a strong match for Complaint Handling Specialist work. It includes explicit complaint-resolution experience, time management, customer focus, case/project tracking, cross-functional coordination, and English ability. The candidate appears to meet the core requirements with substantial relevant experience in complaint handling and customer service."
+  },
+  {
+    "cv_id": "cv-23",
+    "cv_pdf_file": "cv-23_TRAN_VAN_BAO.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Sales Team Leadership",
+        "English Proficiency",
+        "Teamwork",
+        "Client Relationship Management",
+        "Insurance Product Knowledge",
+        "Insurance Agent License",
+        "Advanced Sales Leadership Workshop",
+        "Vietnamese - Native",
+        "English - Good (IELTS 6.5)"
+      ],
+      "experience_entries": [
+        {
+          "title": "Senior Insurance Sales Executive / Team Lead",
+          "company": "Prudential Vietnam — Hai Phong Branch",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Led a team of 5 insurance sales agents, providing coaching and performance tracking.",
+            "Achieved 110% of personal sales target for 3 consecutive quarters.",
+            "Conducted product training sessions for new agents.",
+            "Built relationships with corporate clients for group insurance packages."
+          ]
+        },
+        {
+          "title": "Insurance Sales Executive",
+          "company": "Manulife Vietnam — Hai Phong",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Prospected and closed individual life insurance policies, maintaining a client retention rate above 85%.",
+            "Conducted financial needs analysis for clients to recommend suitable insurance products."
+          ]
+        },
+        {
+          "title": "Insurance Consultant",
+          "company": "AIA Vietnam",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Generated leads through networking and cold outreach.",
+            "Assisted clients with policy applications and claims documentation."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "Bachelor of Finance",
+          "school": "Hai Phong University",
+          "dates": "[phone redacted] | GPA 3.2/4.0"
+        }
+      ],
+      "certifications": [
+        "Insurance Agent License (Ministry of Finance)",
+        "Advanced Sales Leadership Workshop (2024)"
+      ],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Good (IELTS 6.5)"
+      ],
+      "extraction_flags": [
+        "No explicit dates parsed for work experiences; top line contains malformed/redacted date-like text.",
+        "CV states 4 years of experience and 1.5 years leading a small sales team, which appears shorter than role requirement.",
+        "Role title is a direct match to target job title, but experience duration appears insufficient.",
+        "Bullet list separators include repeated dots at end of CV; likely formatting artifact."
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "Work experience dates are not clearly attributable to each role due to formatting/redactions in the header line and missing explicit dates under each experience entry.",
+        "evidence_quote": "03/2025 - Present 01/[phone redacted]/2025 06/[phone redacted]/2022"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "The CV does not provide clear start/end dates for each job, limiting precise tenure calculation.",
+        "evidence_quote": "Senior Insurance Sales Executive / Team Lead ... Insurance Sales Executive ... Insurance Consultant"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "The candidate explicitly states only 4 years of experience and 1.5 years leading a small sales team, which is below the job's 6+ years and 2-3 years management requirement.",
+        "evidence_quote": "Insurance sales professional with 4 years of experience, including 1.5 years leading a small sales team."
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 32,
+      "experience_match": 10,
+      "preferred_skills_match": 15,
+      "education_certifications": 10,
+      "languages": 10
+    },
+    "total_score": 77,
+    "match_level": "high",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 8,
+        "evidence_quote": "Insurance sales professional with 4 years of experience, including 1.5 years leading a small sales team."
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 15,
+        "evidence_quote": "Insurance sales professional with 4 years of experience, including 1.5 years leading a small sales team."
+      }
+    ],
+    "confidence_pct": 73,
+    "requires_human_review": true,
+    "review_reasons": [
+      {
+        "bucket": "extraction_uncertainty",
+        "reason": "Work experience dates are ambiguous/redacted, so exact tenure cannot be fully verified."
+      },
+      {
+        "bucket": "input_limitation",
+        "reason": "The CV self-reports only 4 years of experience and 1.5 years in a leadership role, which is below the stated minimum requirement."
+      }
+    ],
+    "overall_assessment": "The candidate shows strong alignment with the Insurance Sales Manager role on leadership, English proficiency, teamwork, insurance sales, and team coaching experience. However, the CV self-reports only 4 years of experience and 1.5 years leading a small team, which is below the role's 6+ years and 2-3 years management requirement. Dates are also unclear, so human review is recommended."
+  },
+  {
+    "cv_id": "cv-24",
+    "cv_pdf_file": "cv-24_NGUYEN_VAN_LOC.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Basic Lab Equipment Handling",
+        "Sample Labeling",
+        "agriculture",
+        "science"
+      ],
+      "experience_entries": [
+        {
+          "title": "Lab Intern",
+          "company": "Nha Trang Aquaculture Research Station",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Assisted researchers with basic sample labeling and cleaning of lab equipment.",
+            "Observed water-quality testing procedures without independent responsibility.",
+            "Did not complete a full academic program; internship ended without further extension."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "College Diploma in Biology (did not graduate)",
+          "school": "Khanh Hoa College of Science",
+          "dates": ""
+        }
+      ],
+      "certifications": [],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Elementary"
+      ],
+      "extraction_flags": [
+        "Near-miss skill present as agriculture and science-related lab work rather than exact required skill phrases",
+        "Education appears incomplete / did not graduate",
+        "Experience dates not provided for internship",
+        "Phone number redacted and incomplete"
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "input_limitation",
+        "description": "The CV does not provide exact employment dates for the internship, limiting verification of duration beyond the 3-month note.",
+        "evidence_quote": "Lab Intern (3-month internship)"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "The education entry is incomplete because the candidate states they did not graduate.",
+        "evidence_quote": "College Diploma in Biology (did not graduate)"
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "The CV wording suggests agriculture and science-related interest, but does not explicitly list the required skill phrase as a standalone skill.",
+        "evidence_quote": "Interested in agriculture and science-related lab work, still developing core technical skills required for a full Lab Technician role."
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 20,
+      "experience_match": 10,
+      "preferred_skills_match": 0,
+      "education_certifications": 0,
+      "languages": 10
+    },
+    "total_score": 40,
+    "match_level": "low",
+    "deduction_reasons": [
+      {
+        "criterion": "required_skills_match",
+        "points_deducted": 20,
+        "evidence_quote": "The CV does not explicitly show Process Improvement or Planning, and only shows partial related evidence for Agriculture & Science: \"Interested in agriculture and science-related lab work, still developing core technical skills required for a full Lab Technician role.\""
+      },
+      {
+        "criterion": "experience_match",
+        "points_deducted": 15,
+        "evidence_quote": "\"Lab Intern (3-month internship)\" and \"Observed water-quality testing procedures without independent responsibility.\" indicate limited hands-on experience below the 1-3 years required."
+      },
+      {
+        "criterion": "preferred_skills_match",
+        "points_deducted": 15,
+        "evidence_quote": "No preferred skills were specified in the job posting, so no preferred-skill match can be awarded from the CV."
+      },
+      {
+        "criterion": "education_certifications",
+        "points_deducted": 10,
+        "evidence_quote": "\"College Diploma in Biology (did not graduate)\" and no certifications listed."
+      }
+    ],
+    "confidence_pct": 84,
+    "requires_human_review": false,
+    "review_reasons": [],
+    "overall_assessment": "The candidate shows limited laboratory exposure through a short internship and relevant interest in agriculture and science, but the CV does not demonstrate the required process improvement or planning skills, nor the minimum hands-on experience for a Lab Technician role. Education is incomplete and no certifications are listed. English is elementary and Vietnamese is native."
+  },
+  {
+    "cv_id": "cv-25",
+    "cv_pdf_file": "cv-25_HOANG_THI_YEN_NHI.pdf",
+    "extraction": {
+      "skills_found_verbatim": [
+        "Written Translation (EN-VI)",
+        "Terminology Research",
+        "Negotiation",
+        "Problem Solving",
+        "CAT Tools (Trados basic)",
+        "TOEIC 950",
+        "Certificate in Professional Translation (2023)",
+        "Vietnamese - Native",
+        "English - Fluent (IELTS 7.5)"
+      ],
+      "experience_entries": [
+        {
+          "title": "Translator (Written)",
+          "company": "Dien thoai",
+          "start_date": "03/2025",
+          "end_date": "Present 08/[phone redacted]/2025",
+          "bullet_points": []
+        },
+        {
+          "title": "Written Translator (English-Vietnamese)",
+          "company": "Dong Nai Import-Export Logistics Co.",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Translated an average of 15,000 words per week across contracts, technical manuals, and business correspondence.",
+            "Coordinated with sales and legal teams to clarify terminology and negotiate accurate translation of contract clauses.",
+            "Maintained a glossary of industry-specific logistics and trade terms to ensure consistency across documents.",
+            "Resolved translation ambiguities by researching context and consulting subject-matter experts, applying strong problem-solving skills."
+          ]
+        },
+        {
+          "title": "Freelance Translator",
+          "company": "Self-employed / Upwork",
+          "start_date": "",
+          "end_date": "",
+          "bullet_points": [
+            "Completed over 50 translation projects for international clients in business and marketing domains.",
+            "Managed client communication and delivery deadlines independently."
+          ]
+        }
+      ],
+      "education_entries": [
+        {
+          "degree": "Bachelor of English Linguistics",
+          "school": "University of Social Sciences and Humanities, HCMC",
+          "dates": ""
+        }
+      ],
+      "certifications": [
+        "TOEIC 950",
+        "Certificate in Professional Translation (2023)"
+      ],
+      "languages": [
+        "Vietnamese - Native",
+        "English - Fluent (IELTS 7.5)"
+      ],
+      "extraction_flags": [
+        "Possible malformed date in current role: 'Present 08/[phone redacted]/2025'",
+        "Potential company/title ambiguity in first line where role and contact details are concatenated",
+        "Experience dates missing for two roles"
+      ]
+    },
+    "data_quality_issues": [
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "Current role date string appears malformed and may combine present status with redacted phone/date text.",
+        "evidence_quote": "03/2025 - Present 08/[phone redacted]/2025"
+      },
+      {
+        "bucket": "extraction_uncertainty",
+        "description": "First experience entry may have title/company boundaries partially merged with contact details.",
+        "evidence_quote": "03/2025 - Present 08/[phone redacted]/2025  HOANG THI YEN NHI  Translator (Written)  Dien thoai: [phone redacted]"
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "Two experience entries do not include explicit start and end dates in the raw CV.",
+        "evidence_quote": "Translated an average of 15,000 words per week across contracts, technical manuals, and business correspondence."
+      },
+      {
+        "bucket": "input_limitation",
+        "description": "The CV does not provide a separate explicit end date for the freelance role.",
+        "evidence_quote": "Freelance Translator  Self-employed / Upwork"
+      }
+    ],
+    "score_breakdown": {
+      "required_skills_match": 40,
+      "experience_match": 20,
+      "preferred_skills_match": 15,
+      "education_certifications": 10,
+      "languages": 10
+    },
+    "total_score": 95,
+    "match_level": "high",
+    "deduction_reasons": [
+      {
+        "criterion": "experience_match",
+        "points_deducted": 5,
+        "evidence_quote": "Experience dates missing for two roles and one current role line is malformed: '03/2025 - Present 08/[phone redacted]/2025'."
+      }
+    ],
+    "confidence_pct": 88,
+    "requires_human_review": false,
+    "review_reasons": [],
+    "overall_assessment": "The candidate appears to be a strong match for a written translator role. The CV shows direct translation experience, exact required skills including translation-related work, negotiation, and problem solving, plus relevant education, certifications, and bilingual language ability. The main limitation is some date formatting ambiguity in the experience section, but the overall evidence supports a high match."
+  }
+]

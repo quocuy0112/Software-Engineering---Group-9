@@ -7,6 +7,9 @@ import {
   UnsavedChangesIndicator,
   useUnsavedChangesGuard,
 } from "../client/unsaved-changes";
+import { Button } from "@/frontend/components/ui/button";
+import { Panel } from "@/frontend/components/ui/design-system";
+import { TextField } from "@/frontend/components/ui/text-field";
 
 type EmailChangeValues = {
   newEmail: string;
@@ -66,19 +69,17 @@ export function EmailChangeForm({
   useUnsavedChangesGuard(isDirty);
 
   return (
-    <section
-      className="account-identity-panel"
+    <Panel
+      as="section"
+      className="candidate-account-panel"
       aria-labelledby="email-change-title"
+      eyebrow={copy.kicker}
+      title={copy.title}
+      titleId="email-change-title"
     >
-      <div className="account-panel-heading">
-        <div>
-          <p className="panel-kicker">{copy.kicker}</p>
-          <h2 id="email-change-title">{copy.title}</h2>
-          <UnsavedChangesIndicator dirty={isDirty} />
-        </div>
-      </div>
+      <UnsavedChangesIndicator dirty={isDirty} />
       {pending ? (
-        <div className="email-change-pending">
+        <div className="candidate-account-panel__pending">
           <strong>{copy.pending(pending.proposedEmail)}</strong>
           <span>
             {copy.pendingCopy(
@@ -89,34 +90,35 @@ export function EmailChangeForm({
           </span>
         </div>
       ) : (
-        <p className="account-panel-copy">{copy.intro}</p>
+        <p className="candidate-account-panel__copy">{copy.intro}</p>
       )}
       <form
+        className="candidate-account-panel__form"
         onSubmit={handleSubmit(async ({ newEmail, currentPassword }) => {
           if (await onRequest(newEmail, currentPassword)) reset();
         })}
       >
-        <label htmlFor="proposed-email">{copy.proposed}</label>
-        <input
+        <TextField
           id="proposed-email"
+          label={copy.proposed}
           type="email"
           maxLength={320}
           autoComplete="email"
           {...register("newEmail")}
         />
-        <label htmlFor="email-change-current-password">{copy.password}</label>
-        <input
+        <TextField
           id="email-change-current-password"
+          label={copy.password}
           type="password"
           maxLength={128}
           autoComplete="current-password"
           {...register("currentPassword")}
         />
-        <button type="submit" disabled={requesting}>
+        <Button fullWidth type="submit" disabled={requesting}>
           {requesting ? copy.requesting : copy.request}
-        </button>
+        </Button>
       </form>
-      <p className="account-panel-guidance">{copy.guidance}</p>
-    </section>
+      <p className="candidate-account-panel__guidance">{copy.guidance}</p>
+    </Panel>
   );
 }

@@ -5,6 +5,7 @@ import { useAccountIdentity } from "../client/use-account-identity";
 import { ProfileNavigation } from "./profile-navigation";
 import { AccountIdentityForm } from "./account-identity-form";
 import { EmailChangeForm } from "./email-change-form";
+import { PageHeader } from "@/frontend/components/layout/page-header";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
 export function ProfileAccountView({
@@ -33,17 +34,17 @@ export function ProfileAccountView({
           feedback: "Account feedback",
         };
   return (
-    <div className="profile-page account-identity-page">
-      <header className="page-heading profile-heading">
-        <div>
-          <p className="workspace-kicker">{copy.kicker}</p>
-          <h1 id="workspace-page-title">{copy.title}</h1>
-          <p className="page-heading-copy">{copy.subtitle}</p>
-        </div>
-      </header>
-      <ProfileNavigation active="account" />
+    <div className="candidate-profile-page candidate-account-page">
+      <ProfileNavigation active="account" accountName={state.identity.name} />
+      <PageHeader
+        className="candidate-profile-page__header"
+        eyebrow={copy.kicker}
+        title={copy.title}
+        titleId="workspace-page-title"
+        subtitle={copy.subtitle}
+      />
       <section
-        className="account-identity-feedback"
+        className="candidate-account-page__feedback"
         aria-label={copy.feedback}
         aria-live="polite"
         aria-atomic="true"
@@ -57,7 +58,7 @@ export function ProfileAccountView({
           </p>
         ) : null}
       </section>
-      <div className="account-identity-grid">
+      <div className="candidate-account-page__grid">
         <AccountIdentityForm
           identity={state.identity}
           saving={state.savingName}

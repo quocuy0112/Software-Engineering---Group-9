@@ -123,6 +123,7 @@ describe.sequential("CV admission and quota", () => {
       reservations.push(await reserve(index));
     await expect(reserve(5)).rejects.toMatchObject({
       code: "UPLOAD_RATE_LIMITED",
+      retryAfterSeconds: 3600,
     });
     const first = reservations[0];
     await expect(

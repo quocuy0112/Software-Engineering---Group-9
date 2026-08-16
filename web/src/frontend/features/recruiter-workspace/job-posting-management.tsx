@@ -4,8 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/frontend/components/ui/badge";
+import {
+  WorkspaceNavIcon,
+  type WorkspaceNavIconName,
+} from "@/frontend/features/dashboard/components/workspace-navigation-icons";
 import { CompanyAvatar } from "@/frontend/features/jobs/components/company-avatar";
 import { JobPostingEditor } from "./job-posting-editor";
+import { CandidateRankingList } from "@/frontend/features/recruiter-applications/candidate-ranking-list";
 import {
   createEmptyJobPosting,
   recruiterJobStatusMeta,
@@ -703,24 +708,11 @@ export function RecruiterJobPostingManagement({
     );
   if (view === "applicants" && applicantJob)
     return (
-      <section className="recruiter-applicants recruiter-surface-card">
-        <button
-          type="button"
-          className="recruiter-back-button"
-          onClick={() => setView("dashboard")}
-        >
-          Back to job postings
-        </button>
-        <p className="recruiter-eyebrow">Candidate list</p>
-        <h1>{applicantJob.title}</h1>
-        <p>
-          {applicantJob.stats.applicantCount
-            ? String(applicantJob.stats.applicantCount) +
-              " candidates have applied to this posting."
-            : "No applicants yet."}
-        </p>
-        <StatusPill status={applicantJob.status} />
-      </section>
+      <CandidateRankingList
+        jobId={applicantJob.id}
+        jobTitle={applicantJob.title}
+        onBack={() => setView("dashboard")}
+      />
     );
 
   if (!loading && current.companyProfileComplete === false) {
@@ -931,59 +923,10 @@ export function RecruiterJobPostingManagement({
   );
 }
 
-type RecruiterNavIconName =
-  | "overview"
-  | "jobs"
-  | "candidates"
-  | "settings"
-  | "signout";
-
-function RecruiterNavIcon({ name }: { name: RecruiterNavIconName }) {
-  const paths = {
-    overview: (
-      <>
-        <rect x="3" y="3" width="7" height="7" rx="1.5" />
-        <rect x="14" y="3" width="7" height="7" rx="1.5" />
-        <rect x="3" y="14" width="7" height="7" rx="1.5" />
-        <rect x="14" y="14" width="7" height="7" rx="1.5" />
-      </>
-    ),
-    jobs: (
-      <>
-        <rect x="3" y="7" width="18" height="13" rx="2" />
-        <path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3h3A2.5 2.5 0 0 1 16 5.5V7M3 12h18M9 12v2h6v-2" />
-      </>
-    ),
-    candidates: (
-      <>
-        <circle cx="9" cy="8" r="3" />
-        <circle cx="17" cy="9" r="2" />
-        <path d="M3.5 20c.6-4 2.5-6 5.5-6s4.9 2 5.5 6M14.5 15c2.8-.4 4.8 1.2 5.5 4" />
-      </>
-    ),
-    settings: (
-      <>
-        <circle cx="12" cy="12" r="3" />
-        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V20h-2.5v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H7v-2.5h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5V4h2.5v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2v2.5h-.2a1.7 1.7 0 0 0-1.5 1.4Z" />
-      </>
-    ),
-    signout: (
-      <>
-        <path d="M8 4H4.5A1.5 1.5 0 0 0 3 5.5v9A1.5 1.5 0 0 0 4.5 16H8" />
-        <path d="M11 6.5 14.5 10 11 13.5M7 10h7.5" />
-      </>
-    ),
-  } as const;
-  return (
-    <svg
-      className="nav-icon recruiter-nav-icon"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
-      {paths[name]}
-    </svg>
-  );
-}
+type RecruiterNavIconName = Exclude<
+  WorkspaceNavIconName,
+  "messages" | "support" | "profile"
+>;
 
 export function RecruiterWorkspaceNavigation({
   collapsed,
@@ -1001,7 +944,7 @@ export function RecruiterWorkspaceNavigation({
     href?: string;
     active: boolean;
   }> = [
-    { label: "Overview", icon: "overview", active: false },
+    { label: "Overview", icon: "dashboard", active: false },
     {
       label: "Job postings",
       icon: "jobs",
@@ -1009,7 +952,12 @@ export function RecruiterWorkspaceNavigation({
       active:
         pathname === "/recruiter" || pathname.startsWith("/recruiter/jobs"),
     },
-    { label: "Candidates", icon: "candidates", active: false },
+    {
+      label: "Candidates",
+      icon: "candidates",
+      href: "/recruiter/candidates",
+      active: pathname === "/recruiter/candidates",
+    },
     {
       label: "Company settings",
       icon: "settings",
@@ -1033,7 +981,7 @@ export function RecruiterWorkspaceNavigation({
         {destinations.map((item) => {
           const content = (
             <>
-              <RecruiterNavIcon name={item.icon} />
+              <WorkspaceNavIcon name={item.icon} />
               <span className="workspace-navigation-label">{item.label}</span>
               {!item.href ? (
                 <span className="recruiter-nav-soon">Soon</span>
@@ -1068,7 +1016,7 @@ export function RecruiterWorkspaceNavigation({
           disabled={busy}
           aria-busy={busy}
         >
-          <RecruiterNavIcon name="signout" />
+          <WorkspaceNavIcon name="signout" />
           <span className="workspace-navigation-label">
             {busy ? "Signing out..." : "Sign out"}
           </span>

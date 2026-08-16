@@ -71,7 +71,7 @@ describe("candidate CV library", () => {
     );
     expect(upsert).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { storageKey: "candidate-cv-upload-openai-1" },
+        where: { id: "candidate-cv-upload-openai-1" },
         create: expect.objectContaining({
           id: "candidate-cv-upload-openai-1",
           candidateUserId: "user-1",
@@ -80,6 +80,42 @@ describe("candidate CV library", () => {
         }),
       }),
     );
+  });
+
+  it("updates the stable upload-derived row when its storage key is stale", async () => {
+    const upsert = vi.fn().mockResolvedValue({});
+    const db = {
+      cvUpload: { findMany: vi.fn().mockResolvedValue([{ id: "upload-1", declaredMediaType: "application/pdf", actualBytes: 10, sourceSha256: new Uint8Array(32), confirmedAt: new Date("2026-08-07T00:00:00.000Z"), displayFilenameCiphertext: null }]) },
+      candidateCv: {
+        findMany: vi.fn().mockResolvedValue([{ id: "candidate-cv-upload-1", candidateUserId: "user-1", storageKey: "stale-key", displayName: "Imported CV" }]),
+        upsert,
+      },
+    } as never;
+
+    await ensureCandidateCvLibrary("user-1", db);
+
+    expect(upsert).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: "candidate-cv-upload-1" },
+      update: expect.objectContaining({ storageKey: "candidate-cv-upload-1" }),
+    }));
+  });
+
+  it("keeps a materialized private-storage locator stable when the library is listed", async () => {
+    const upsert = vi.fn().mockResolvedValue({});
+    const materialized = "A".repeat(43);
+    const db = {
+      cvUpload: { findMany: vi.fn().mockResolvedValue([{ id: "upload-1", declaredMediaType: "application/pdf", actualBytes: 10, sourceSha256: new Uint8Array(32), confirmedAt: new Date("2026-08-07T00:00:00.000Z"), displayFilenameCiphertext: null }]) },
+      candidateCv: {
+        findMany: vi.fn().mockResolvedValue([{ id: "candidate-cv-upload-1", candidateUserId: "user-1", storageKey: materialized, displayName: "Imported CV" }]),
+        upsert,
+      },
+    } as never;
+
+    await ensureCandidateCvLibrary("user-1", db);
+
+    expect(upsert).toHaveBeenCalledWith(expect.objectContaining({
+      update: expect.objectContaining({ storageKey: materialized }),
+    }));
   });
 
   it("renames the display label and archives without touching the storage metadata", async () => {

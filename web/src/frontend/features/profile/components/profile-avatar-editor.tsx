@@ -69,11 +69,17 @@ export function ProfileAvatarEditor({
   initialAvatar,
   csrfProof,
   onAvatarChanged,
+  compact = false,
+  open = false,
+  onOpenChange,
 }: {
   accountName: string;
   initialAvatar?: string | null;
   csrfProof: string;
   onAvatarChanged?: (image: string | null) => void;
+  compact?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const locale = useWorkspaceLocale();
   const copy =
@@ -133,6 +139,29 @@ export function ProfileAvatarEditor({
   const [removeConfirmationOpen, setRemoveConfirmationOpen] = useState(false);
 
   const preview = source ?? avatar;
+
+  if (compact) {
+    return (
+      <Modal
+        open={open}
+        title={copy.title}
+        description={copy.description}
+        onClose={() => onOpenChange?.(false)}
+      >
+        <div className="candidate-avatar-modal">
+          <ProfileAvatarEditor
+            accountName={accountName}
+            initialAvatar={avatar}
+            csrfProof={csrfProof}
+            onAvatarChanged={(image) => {
+              setAvatar(image);
+              onAvatarChanged?.(image);
+            }}
+          />
+        </div>
+      </Modal>
+    );
+  }
 
   function selectFile(file?: File) {
     setFeedback("");
@@ -238,7 +267,7 @@ export function ProfileAvatarEditor({
   return (
     <section
       id="profile-avatar-section"
-      className="profile-avatar-panel"
+      className={`profile-avatar-panel${compact ? "profile-avatar-panel--compact" : ""}`}
       aria-labelledby="avatar-title"
     >
       <div className="profile-avatar-copy">
@@ -280,6 +309,7 @@ export function ProfileAvatarEditor({
 
           <div className="profile-avatar-actions">
             <button
+              className="profile-avatar-save"
               type="button"
               disabled={!source || busy}
               onClick={() => void save()}

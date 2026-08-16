@@ -22,7 +22,7 @@ describe("Administrator review discovery UI", () => {
       "STALE_CONFLICT",
       "Minimum pending age in hours",
       "Submission version",
-      "Changed fields from prior approval",
+      "Version comparison",
       "Open protected verification viewer",
     ])
       expect(source).toContain(marker);

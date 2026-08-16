@@ -20,9 +20,11 @@ function formatBytes(bytes: number) {
 export function CandidateCvLibrary({
   csrfProof,
   initialItems,
+  embedded = false,
 }: {
   csrfProof: string;
   initialItems: readonly CandidateCvSummary[];
+  embedded?: boolean;
 }) {
   const locale = useWorkspaceLocale();
   const [items, setItems] = useState(() => [...initialItems]);
@@ -121,9 +123,11 @@ export function CandidateCvLibrary({
   return (
     <section
       className={styles.root}
-      aria-labelledby="candidate-cv-library-heading"
+      aria-labelledby={embedded ? undefined : "candidate-cv-library-heading"}
+      aria-label={embedded ? "Saved CVs" : undefined}
+      data-embedded={embedded ? "true" : undefined}
     >
-      <header className={styles.heading}>
+      {embedded ? null : <header className={styles.heading}>
         <div>
           <p className={styles.kicker}>APPLICATION CVs</p>
           <h2 id="candidate-cv-library-heading">
@@ -131,7 +135,7 @@ export function CandidateCvLibrary({
           </h2>
         </div>
         <span>{items.length}</span>
-      </header>
+      </header>}
       {error ? (
         <p className={styles.error} role="alert">
           {error}

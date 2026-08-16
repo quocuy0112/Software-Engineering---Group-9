@@ -17,6 +17,7 @@ import {
   type RecruiterCompanySettingsInput,
   type JobPostingStatus,
 } from "@/shared/contracts/jobs/catalog";
+import { splitCompanyIdentity } from "@/shared/contracts/employer-verification/business-verification";
 import type {
   RecruiterJob,
   RecruiterJobManagementData,
@@ -175,8 +176,11 @@ function normalizeJob(value: unknown): JobCatalogItem {
 
 function normalizeCompany(value: unknown): RecruiterCompany {
   const company = companyCatalogSchema.parse(value);
+  const identity = splitCompanyIdentity(company.name, company.entityType);
   return {
     ...company,
+    name: identity.name,
+    entityType: identity.entityType,
     ownerUserId: company.ownerUserId ?? null,
     memberUserIds: company.memberUserIds ?? [],
   };
@@ -194,6 +198,7 @@ type DatabaseCompanyRow = {
   size: string | null;
   industry: string | null;
   address: string | null;
+  entityType: string | null;
   normalizedTaxIdentifier: string | null;
   memberships: Array<{ userId: string; role: string }>;
 };
@@ -205,13 +210,21 @@ function databaseCompanyToRecruiterCompany(
   const owner = company.memberships.find(
     (membership) => membership.role === "OWNER",
   );
+  const legalIdentity = splitCompanyIdentity(company.legalName);
+  const identity = splitCompanyIdentity(
+    company.displayName || company.legalName,
+    company.entityType ??
+      catalogCompany?.entityType ??
+      legalIdentity.entityType,
+  );
   const databaseCompany: RecruiterCompany = {
     // Keep the legacy catalog id when the company is already represented in
     // jobs.json. Jobs are still stored in that catalog, while auth and
     // verification remain authoritative in PostgreSQL.
     id: catalogCompany?.id ?? company.id,
     slug: catalogCompany?.slug ?? company.slug,
-    name: company.displayName || company.legalName,
+    name: identity.name,
+    entityType: identity.entityType,
     logo: company.logoUrl ?? catalogCompany?.logo ?? null,
     size: company.size ?? "",
     industry: company.industry ?? "",
@@ -254,6 +267,7 @@ async function readDatabaseAuthorizedCompanies(userId: string) {
         size: true,
         industry: true,
         address: true,
+        entityType: true,
         normalizedTaxIdentifier: true,
         memberships: {
           where: { status: "ACTIVE" },
@@ -308,6 +322,23 @@ async function readCatalog() {
   const jobs = rawJobs.map(normalizeJob);
   const companies = rawCompanies.map(normalizeCompany);
   return { jobs, companies, rawJobs, rawCompanies };
+}
+
+export async function authorizeLegacyRecruiterJob(
+  userId: string,
+  jobId: string,
+) {
+  const { jobs, companies } = await readCatalog();
+  const job = jobs.find((item) => item.id === jobId);
+  if (!job) return null;
+  const company = companies.find((item) => item.id === job.companyId);
+  if (
+    !company ||
+    company.verificationStatus !== "approved" ||
+    (company.ownerUserId !== userId && !company.memberUserIds.includes(userId))
+  )
+    return null;
+  return { jobId: job.id, companyId: company.id, jobTitle: job.title };
 }
 
 function replaceRawJob(rawJobs: unknown[], updated: JobCatalogItem) {
@@ -634,10 +665,12 @@ export async function ensureRecruiterCompany(
     const existing = (await authorizedCompanies(companies, userId))[0] ?? null;
     if (existing) return existing;
     const id = `comp-${randomUUID()}`;
+    const identity = splitCompanyIdentity(input.name);
     const company = companyCatalogSchema.parse({
       id,
-      slug: `${slugPart(input.name)}-${id.slice(-8)}`,
-      name: input.name,
+      slug: `${slugPart(identity.name)}-${id.slice(-8)}`,
+      name: identity.name,
+      entityType: identity.entityType,
       logo: null,
       size: "1-50 employees",
       industry: input.industry,
@@ -662,6 +695,7 @@ function settingsFromCompany(
     id: company.id,
     slug: company.slug,
     name: company.name,
+    entityType: company.entityType ?? null,
     logo: company.logo,
     size: company.size,
     industry: company.industry,
@@ -693,6 +727,10 @@ export async function updateRecruiterCompanySettings(
     if (!company) throw new Error("Recruiter company not found.");
     const editable = recruiterCompanySettingsInputSchema.parse(input);
     validateCompanyLogo(editable.logo);
+    const identity = splitCompanyIdentity(
+      company.verificationStatus === "approved" ? company.name : editable.name,
+      company.entityType,
+    );
     // These fields identify the PostgreSQL bridge and are not part of the
     // strict public catalog contract. Strip them before parsing the updated
     // catalog record, otherwise every DB-backed company save fails with an
@@ -702,7 +740,8 @@ export async function updateRecruiterCompanySettings(
     delete catalogCompany.databaseBacked;
     const updated = companyCatalogSchema.parse({
       ...catalogCompany,
-      name: editable.name,
+      name: identity.name,
+      entityType: identity.entityType,
       logo: editable.logo,
       size: editable.size,
       industry: editable.industry,
@@ -718,6 +757,7 @@ export async function updateRecruiterCompanySettings(
         where: { id: company.databaseId },
         data: {
           displayName: updated.name,
+          entityType: updated.entityType,
           logoUrl: updated.logo,
           size: updated.size,
           industry: updated.industry,
