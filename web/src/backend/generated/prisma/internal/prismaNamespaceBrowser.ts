@@ -79,6 +79,7 @@ export const ModelName = {
   Company: 'Company',
   CompanyMembership: 'CompanyMembership',
   PlatformAdministratorGrant: 'PlatformAdministratorGrant',
+  PlatformAdministratorGrantScopeAssignment: 'PlatformAdministratorGrantScopeAssignment',
   AdministratorSessionPolicy: 'AdministratorSessionPolicy',
   CompanyMembershipHistory: 'CompanyMembershipHistory',
   CompanyAccessPrerequisite: 'CompanyAccessPrerequisite',
@@ -101,6 +102,12 @@ export const ModelName = {
   ModerationPrivateNote: 'ModerationPrivateNote',
   JobPosting: 'JobPosting',
   JobPostReviewAggregate: 'JobPostReviewAggregate',
+  JobPostRevisionRequest: 'JobPostRevisionRequest',
+  JobPostFeaturedPlacement: 'JobPostFeaturedPlacement',
+  JobPostEnforcementAction: 'JobPostEnforcementAction',
+  JobPostEnforcementTarget: 'JobPostEnforcementTarget',
+  ModerationReportEnforcementLink: 'ModerationReportEnforcementLink',
+  JobPostOperationalHistory: 'JobPostOperationalHistory',
   JobPostReviewVersion: 'JobPostReviewVersion',
   JobPostReviewHistory: 'JobPostReviewHistory',
   JobPostReviewPrivateNote: 'JobPostReviewPrivateNote',
@@ -701,6 +708,15 @@ export const PlatformAdministratorGrantScalarFieldEnum = {
 export type PlatformAdministratorGrantScalarFieldEnum = (typeof PlatformAdministratorGrantScalarFieldEnum)[keyof typeof PlatformAdministratorGrantScalarFieldEnum]
 
 
+export const PlatformAdministratorGrantScopeAssignmentScalarFieldEnum = {
+  grantId: 'grantId',
+  scope: 'scope',
+  createdAt: 'createdAt'
+} as const
+
+export type PlatformAdministratorGrantScopeAssignmentScalarFieldEnum = (typeof PlatformAdministratorGrantScopeAssignmentScalarFieldEnum)[keyof typeof PlatformAdministratorGrantScopeAssignmentScalarFieldEnum]
+
+
 export const AdministratorSessionPolicyScalarFieldEnum = {
   grantId: 'grantId',
   designatedSessionId: 'designatedSessionId',
@@ -1159,6 +1175,19 @@ export const JobPostReviewAggregateScalarFieldEnum = {
   publicJobPostingId: 'publicJobPostingId',
   closedAt: 'closedAt',
   closedByUserId: 'closedByUserId',
+  visibilityState: 'visibilityState',
+  applicationState: 'applicationState',
+  hiddenAt: 'hiddenAt',
+  hiddenByUserId: 'hiddenByUserId',
+  hiddenReason: 'hiddenReason',
+  archivedAt: 'archivedAt',
+  archivedByUserId: 'archivedByUserId',
+  applicationClosedAt: 'applicationClosedAt',
+  applicationClosedByUserId: 'applicationClosedByUserId',
+  softDeletedAt: 'softDeletedAt',
+  softDeletedByUserId: 'softDeletedByUserId',
+  softDeleteReason: 'softDeleteReason',
+  operationalVersion: 'operationalVersion',
   version: 'version',
   adoptedAt: 'adoptedAt',
   createdAt: 'createdAt',
@@ -1166,6 +1195,95 @@ export const JobPostReviewAggregateScalarFieldEnum = {
 } as const
 
 export type JobPostReviewAggregateScalarFieldEnum = (typeof JobPostReviewAggregateScalarFieldEnum)[keyof typeof JobPostReviewAggregateScalarFieldEnum]
+
+
+export const JobPostRevisionRequestScalarFieldEnum = {
+  id: 'id',
+  aggregateId: 'aggregateId',
+  liveVersionId: 'liveVersionId',
+  requestedByAdminUserId: 'requestedByAdminUserId',
+  publicExplanation: 'publicExplanation',
+  hideImmediately: 'hideImmediately',
+  state: 'state',
+  submittedRevisionId: 'submittedRevisionId',
+  createdAt: 'createdAt',
+  satisfiedAt: 'satisfiedAt',
+  cancelledAt: 'cancelledAt'
+} as const
+
+export type JobPostRevisionRequestScalarFieldEnum = (typeof JobPostRevisionRequestScalarFieldEnum)[keyof typeof JobPostRevisionRequestScalarFieldEnum]
+
+
+export const JobPostFeaturedPlacementScalarFieldEnum = {
+  id: 'id',
+  aggregateId: 'aggregateId',
+  placement: 'placement',
+  priority: 'priority',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  state: 'state',
+  reason: 'reason',
+  createdByAdminUserId: 'createdByAdminUserId',
+  cancelledByAdminUserId: 'cancelledByAdminUserId',
+  cancelledAt: 'cancelledAt',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobPostFeaturedPlacementScalarFieldEnum = (typeof JobPostFeaturedPlacementScalarFieldEnum)[keyof typeof JobPostFeaturedPlacementScalarFieldEnum]
+
+
+export const JobPostEnforcementActionScalarFieldEnum = {
+  id: 'id',
+  correlationId: 'correlationId',
+  type: 'type',
+  actorAdminUserId: 'actorAdminUserId',
+  actorSessionId: 'actorSessionId',
+  reason: 'reason',
+  publicExplanation: 'publicExplanation',
+  occurredAt: 'occurredAt'
+} as const
+
+export type JobPostEnforcementActionScalarFieldEnum = (typeof JobPostEnforcementActionScalarFieldEnum)[keyof typeof JobPostEnforcementActionScalarFieldEnum]
+
+
+export const JobPostEnforcementTargetScalarFieldEnum = {
+  id: 'id',
+  enforcementActionId: 'enforcementActionId',
+  aggregateId: 'aggregateId',
+  targetType: 'targetType',
+  targetReference: 'targetReference',
+  priorState: 'priorState',
+  resultingState: 'resultingState'
+} as const
+
+export type JobPostEnforcementTargetScalarFieldEnum = (typeof JobPostEnforcementTargetScalarFieldEnum)[keyof typeof JobPostEnforcementTargetScalarFieldEnum]
+
+
+export const ModerationReportEnforcementLinkScalarFieldEnum = {
+  moderationReportId: 'moderationReportId',
+  enforcementActionId: 'enforcementActionId',
+  createdAt: 'createdAt'
+} as const
+
+export type ModerationReportEnforcementLinkScalarFieldEnum = (typeof ModerationReportEnforcementLinkScalarFieldEnum)[keyof typeof ModerationReportEnforcementLinkScalarFieldEnum]
+
+
+export const JobPostOperationalHistoryScalarFieldEnum = {
+  id: 'id',
+  aggregateId: 'aggregateId',
+  action: 'action',
+  actorUserId: 'actorUserId',
+  correlationId: 'correlationId',
+  priorState: 'priorState',
+  resultingState: 'resultingState',
+  reason: 'reason',
+  version: 'version',
+  occurredAt: 'occurredAt'
+} as const
+
+export type JobPostOperationalHistoryScalarFieldEnum = (typeof JobPostOperationalHistoryScalarFieldEnum)[keyof typeof JobPostOperationalHistoryScalarFieldEnum]
 
 
 export const JobPostReviewVersionScalarFieldEnum = {

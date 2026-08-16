@@ -288,6 +288,45 @@ enum JobPostReviewHistoryAction {
   CLOSED
 }
 
+enum JobPostVisibilityState {
+  PUBLISHED
+  HIDDEN
+  ARCHIVED
+}
+
+enum JobPostApplicationState {
+  OPEN
+  CLOSED
+}
+
+enum JobPostRevisionRequestState {
+  OPEN
+  SATISFIED
+  CANCELLED
+}
+
+enum JobPostFeatureState {
+  SCHEDULED
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+enum JobPostEnforcementType {
+  HIDE_JOB
+  CLOSE_APPLICATIONS
+  REQUEST_CHANGES
+  SOFT_DELETE_JOB
+  SUSPEND_COMPANY
+  SUSPEND_RECRUITER
+}
+
+enum PlatformAdministratorScope {
+  JOB_POST_MODERATE
+  JOB_POST_FEATURE
+  JOB_POST_ENFORCE
+}
+
 enum ApplicationQuestionKind {
   TEXT
   BOOLEAN
@@ -1557,9 +1596,20 @@ model PlatformAdministratorGrant {
   updatedAt      DateTime                    @updatedAt
   user           UserAccount                 @relation(fields: [userId], references: [id], onDelete: Restrict)
   sessionPolicy  AdministratorSessionPolicy?
+  scopes         PlatformAdministratorGrantScopeAssignment[]
 
   @@unique([userId])
   @@index([state, expiresAt])
+}
+
+model PlatformAdministratorGrantScopeAssignment {
+  grantId   String
+  scope     PlatformAdministratorScope
+  createdAt DateTime @default(now())
+  grant     PlatformAdministratorGrant @relation(fields: [grantId], references: [id], onDelete: Cascade)
+
+  @@id([grantId, scope])
+  @@index([scope, grantId])
 }
 
 model AdministratorSessionPolicy {
@@ -1977,6 +2027,7 @@ model ModerationReport {
   reporter               UserAccount               @relation("ModerationReporter", fields: [reporterUserId], references: [id], onDelete: Restrict)
   history                ModerationReportHistory[]
   notes                  ModerationPrivateNote[]
+  enforcementLinks       ModerationReportEnforcementLink[]
 
   @@index([state, priority, createdAt, id])
   @@index([reporterUserId, createdAt(sort: Desc)])
@@ -2074,6 +2125,19 @@ model JobPostReviewAggregate {
   publicJobPostingId String?                @unique
   closedAt           DateTime?
   closedByUserId     String?
+  visibilityState    JobPostVisibilityState  @default(PUBLISHED)
+  applicationState   JobPostApplicationState @default(OPEN)
+  hiddenAt           DateTime?
+  hiddenByUserId     String?
+  hiddenReason       String?                 @db.VarChar(1000)
+  archivedAt         DateTime?
+  archivedByUserId   String?
+  applicationClosedAt DateTime?
+  applicationClosedByUserId String?
+  softDeletedAt      DateTime?
+  softDeletedByUserId String?
+  softDeleteReason   String?                 @db.VarChar(1000)
+  operationalVersion Int                     @default(1)
   version            Int                    @default(1)
   adoptedAt          DateTime               @default(now())
   createdAt          DateTime               @default(now())
@@ -2084,9 +2148,108 @@ model JobPostReviewAggregate {
   pendingVersion     JobPostReviewVersion?  @relation("JobPostReviewPendingVersion", fields: [pendingVersionId], references: [id], onDelete: Restrict)
   approvedVersion    JobPostReviewVersion?  @relation("JobPostReviewApprovedVersion", fields: [approvedVersionId], references: [id], onDelete: Restrict)
   publicJobPosting   JobPosting?            @relation(fields: [publicJobPostingId], references: [id], onDelete: Restrict)
+  correctionRequests JobPostRevisionRequest[]
+  featuredPlacements JobPostFeaturedPlacement[]
+  operationalHistory JobPostOperationalHistory[]
+  enforcementTargets JobPostEnforcementTarget[]
 
   @@index([companyId, updatedAt(sort: Desc), id])
   @@index([pendingVersionId, version])
+}
+
+model JobPostRevisionRequest {
+  id                     String                      @id @default(cuid())
+  aggregateId            String
+  liveVersionId          String
+  requestedByAdminUserId String
+  publicExplanation      String                      @db.VarChar(1000)
+  hideImmediately        Boolean                     @default(false)
+  state                  JobPostRevisionRequestState @default(OPEN)
+  submittedRevisionId    String?                     @unique
+  createdAt              DateTime                    @default(now())
+  satisfiedAt            DateTime?
+  cancelledAt            DateTime?
+  aggregate              JobPostReviewAggregate      @relation(fields: [aggregateId], references: [id], onDelete: Restrict)
+
+  @@index([aggregateId, state, createdAt])
+}
+
+model JobPostFeaturedPlacement {
+  id                     String              @id @default(cuid())
+  aggregateId            String
+  placement              String              @db.VarChar(64)
+  priority               Int
+  startsAt               DateTime
+  endsAt                 DateTime
+  state                  JobPostFeatureState @default(SCHEDULED)
+  reason                 String              @db.VarChar(1000)
+  createdByAdminUserId   String
+  cancelledByAdminUserId String?
+  cancelledAt            DateTime?
+  version                Int                 @default(1)
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
+  aggregate              JobPostReviewAggregate @relation(fields: [aggregateId], references: [id], onDelete: Restrict)
+
+  @@index([placement, startsAt, endsAt])
+  @@index([aggregateId, state, startsAt])
+}
+
+model JobPostEnforcementAction {
+  id              String                  @id @default(cuid())
+  correlationId   String                  @unique @db.VarChar(128)
+  type            JobPostEnforcementType
+  actorAdminUserId String
+  actorSessionId  String?
+  reason          String                  @db.VarChar(1000)
+  publicExplanation String?               @db.VarChar(1000)
+  occurredAt      DateTime                @default(now())
+  targets         JobPostEnforcementTarget[]
+  reportLinks     ModerationReportEnforcementLink[]
+
+  @@index([actorAdminUserId, occurredAt])
+}
+
+model JobPostEnforcementTarget {
+  id                  String                   @id @default(cuid())
+  enforcementActionId String
+  aggregateId         String?
+  targetType          String                   @db.VarChar(32)
+  targetReference     String                   @db.VarChar(128)
+  priorState          Json?
+  resultingState      Json?
+  enforcementAction   JobPostEnforcementAction @relation(fields: [enforcementActionId], references: [id], onDelete: Cascade)
+  aggregate           JobPostReviewAggregate?  @relation(fields: [aggregateId], references: [id], onDelete: Restrict)
+
+  @@index([aggregateId])
+  @@index([targetType, targetReference])
+}
+
+model ModerationReportEnforcementLink {
+  moderationReportId  String
+  enforcementActionId String
+  createdAt           DateTime                 @default(now())
+  moderationReport    ModerationReport         @relation(fields: [moderationReportId], references: [id], onDelete: Restrict)
+  enforcementAction   JobPostEnforcementAction @relation(fields: [enforcementActionId], references: [id], onDelete: Restrict)
+
+  @@id([moderationReportId, enforcementActionId])
+  @@index([enforcementActionId])
+}
+
+model JobPostOperationalHistory {
+  id              String                 @id @default(cuid())
+  aggregateId     String
+  action          String                 @db.VarChar(64)
+  actorUserId     String?
+  correlationId   String                 @db.VarChar(128)
+  priorState      Json?
+  resultingState  Json?
+  reason          String?                @db.VarChar(1000)
+  version         Int
+  occurredAt      DateTime               @default(now())
+  aggregate       JobPostReviewAggregate @relation(fields: [aggregateId], references: [id], onDelete: Restrict)
+
+  @@index([aggregateId, occurredAt, id])
 }
 
 model JobPostReviewVersion {

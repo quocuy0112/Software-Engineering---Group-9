@@ -115,6 +115,7 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
         WHERE r."publicJobPostingId" = j."id"
           AND r."approvedVersionId" IS NOT NULL
           AND r."closedAt" IS NULL
+          AND r."visibilityState" = 'PUBLISHED'::"JobPostVisibilityState"
       )
     )`,
   ];
@@ -299,7 +300,7 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
           },
           {
             reviewAggregate: {
-              is: { approvedVersionId: { not: null }, closedAt: null },
+              is: { approvedVersionId: { not: null }, closedAt: null, visibilityState: "PUBLISHED" },
             },
             status: "ACTIVE",
             applicationDeadline: { gt: now },
@@ -338,7 +339,7 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
               { reviewAggregate: null },
               {
                 reviewAggregate: {
-                  is: { approvedVersionId: { not: null }, closedAt: null },
+                  is: { approvedVersionId: { not: null }, closedAt: null, visibilityState: "PUBLISHED" },
                 },
               },
             ],
@@ -374,7 +375,7 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
               { reviewAggregate: null },
               {
                 reviewAggregate: {
-                  is: { approvedVersionId: { not: null }, closedAt: null },
+                  is: { approvedVersionId: { not: null }, closedAt: null, visibilityState: "PUBLISHED" },
                 },
               },
             ],
@@ -400,7 +401,7 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
           { reviewAggregate: null },
           {
             reviewAggregate: {
-              is: { approvedVersionId: { not: null }, closedAt: null },
+              is: { approvedVersionId: { not: null }, closedAt: null, visibilityState: "PUBLISHED" },
             },
           },
         ],

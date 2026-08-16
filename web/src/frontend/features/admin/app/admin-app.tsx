@@ -33,6 +33,8 @@ import { ProfessionalConnectionProposalShow } from "../professional-connections/
 import { AdminNotificationList } from "../notifications/admin-notification-list";
 import { JobPostReviewList } from "../job-post-reviews/job-post-review-list";
 import { JobPostReviewShow } from "../job-post-reviews/job-post-review-show";
+import { JobPostManagementList } from "../job-post-management/job-post-management-list";
+import { JobPostManagementShow } from "../job-post-management/job-post-management-show";
 
 const theme = createTheme({
   palette: { mode: "light", primary: { main: "#155eef" } },
@@ -104,6 +106,7 @@ export function AdminApp() {
             list={JobPostReviewList}
             show={JobPostReviewShow}
           />
+          <Resource name="job-postings" options={{ label: "Job Post Management" }} icon={FactCheckOutlinedIcon} list={JobPostManagementList} show={JobPostManagementShow} />
           <Resource
             name="accounts"
             list={AccountList}
