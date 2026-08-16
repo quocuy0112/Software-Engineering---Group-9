@@ -10,6 +10,7 @@ import { createEmptyJobPosting } from "@/shared/contracts/recruiter-job-posting"
 const fsMocks = vi.hoisted(() => ({
   readFile: vi.fn(),
   writeFile: vi.fn(),
+  temporaryWrites: new Map<string, string>(),
 }));
 
 const prismaMocks = vi.hoisted(() => ({
@@ -17,16 +18,45 @@ const prismaMocks = vi.hoisted(() => ({
     findMany: vi.fn(),
     update: vi.fn(),
   },
+  jobPostReviewAggregate: {
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+  },
 }));
 
-vi.mock("node:fs/promises", () => ({
-  default: {
+vi.mock("node:fs/promises", () => {
+  const stat = vi.fn(async (path: string) => ({
+    isFile: () => path.endsWith(".json"),
+    isDirectory: () => !path.endsWith(".json"),
+  }));
+  const open = vi.fn(async (path: string) => ({
+    writeFile: async (value: string) => {
+      fsMocks.temporaryWrites.set(path, value);
+    },
+    sync: async () => undefined,
+    close: async () => undefined,
+  }));
+  const rename = vi.fn(async (source: string, target: string) => {
+    await fsMocks.writeFile(
+      target,
+      fsMocks.temporaryWrites.get(source),
+      "utf8",
+    );
+  });
+  const rm = vi.fn(async () => undefined);
+  const mocked = {
     readFile: fsMocks.readFile,
     writeFile: fsMocks.writeFile,
-  },
-  readFile: fsMocks.readFile,
-  writeFile: fsMocks.writeFile,
-}));
+    stat,
+    open,
+    rename,
+    rm,
+  };
+  return {
+    default: mocked,
+    ...mocked,
+  };
+});
 
 vi.mock("@/backend/database/prisma", () => ({
   prisma: prismaMocks,
@@ -68,10 +98,15 @@ describe("recruiter JSON job persistence", () => {
     fsMocks.readFile.mockReset();
     fsMocks.writeFile.mockReset();
     fsMocks.writeFile.mockResolvedValue(undefined);
+    fsMocks.temporaryWrites.clear();
     prismaMocks.company.findMany.mockReset();
     prismaMocks.company.findMany.mockResolvedValue([]);
     prismaMocks.company.update.mockReset();
     prismaMocks.company.update.mockResolvedValue({});
+    prismaMocks.jobPostReviewAggregate.findMany.mockReset();
+    prismaMocks.jobPostReviewAggregate.findMany.mockResolvedValue([]);
+    prismaMocks.jobPostReviewAggregate.findUnique.mockReset();
+    prismaMocks.jobPostReviewAggregate.findUnique.mockResolvedValue(null);
   });
 
   it("exposes an admin-approved database company to recruiter settings", async () => {

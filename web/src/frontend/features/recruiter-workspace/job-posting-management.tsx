@@ -14,6 +14,7 @@ import { CandidateRankingList } from "@/frontend/features/recruiter-applications
 import {
   createEmptyJobPosting,
   recruiterJobStatusMeta,
+  type RecruiterCompanyView,
   type RecruiterJob,
   type RecruiterJobManagementData,
   type RecruiterJobStatus,
@@ -43,6 +44,8 @@ function Icon({
     | "briefcase"
     | "users"
     | "clock"
+    | "check"
+    | "warning"
     | "calendar"
     | "search"
     | "plus"
@@ -93,6 +96,12 @@ function Icon({
     ),
     close: <path d="M6 6l12 12M18 6 6 18" />,
     check: <path d="m5 12 4 4L19 6" />,
+    warning: (
+      <>
+        <path d="M12 2 2 19.5h20L12 2z" />
+        <path d="M12 9v4M12 17h.01" />
+      </>
+    ),
   } as const;
   return (
     <svg className="recruiter-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -128,6 +137,21 @@ function isClosingSoon(job: RecruiterJob) {
   if (job.status !== "active" || !job.applyDeadline) return false;
   const remaining = new Date(job.applyDeadline).getTime() - Date.now();
   return remaining >= 0 && remaining <= 7 * 86_400_000;
+}
+
+function formatReasonCode(code: string): string {
+  const reasonLabels: Record<string, string> = {
+    INCOMPLETE_OR_UNCLEAR: "Incomplete or unclear information",
+    MISLEADING_CONTENT: "Misleading content",
+    INAPPROPRIATE_LANGUAGE: "Inappropriate language",
+    DUPLICATE_POSTING: "Duplicate posting",
+    INVALID_REQUIREMENTS: "Invalid requirements",
+    INSUFFICIENT_COMPENSATION: "Insufficient compensation details",
+    VERIFICATION_MISMATCH: "Verification mismatch",
+    PROHIBITED_CONTENT: "Prohibited content",
+    OTHER: "Other reason",
+  };
+  return reasonLabels[code] || code.replace(/_/g, " ");
 }
 
 function statusForTab(job: RecruiterJob, tab: (typeof tabs)[number]["value"]) {
@@ -209,6 +233,57 @@ function JobPostingCard({
           <span aria-hidden="true">|</span>
           {arrangementLabel(job)}
         </p>
+        {job.review ? (
+          <>
+            <p
+              className={`recruiter-review-state recruiter-review-state--${job.review.state.toLowerCase()}`}
+              role="status"
+              aria-live="polite"
+            >
+              <Icon
+                name={
+                  job.review.state === "APPROVED"
+                    ? "check"
+                    : job.review.state === "REJECTED"
+                      ? "warning"
+                      : "clock"
+                }
+                aria-hidden="true"
+              />
+              <strong>
+                Review version {job.review.sequence}:{" "}
+                {job.review.state.replace("_", " ")}
+              </strong>
+              {job.review.readOnly
+                ? " — This submitted version is locked while an Administrator reviews it."
+                : null}
+            </p>
+            {job.review.state === "REJECTED" && job.review.reasonCode ? (
+              <div
+                className="recruiter-review-feedback"
+                role="region"
+                aria-label="Rejection feedback"
+              >
+                <p className="recruiter-review-feedback__reason">
+                  <strong>{formatReasonCode(job.review.reasonCode)}</strong>
+                </p>
+                {job.review.publicExplanation ? (
+                  <p className="recruiter-review-feedback__explanation">
+                    {job.review.publicExplanation}
+                  </p>
+                ) : null}
+                <p className="recruiter-review-feedback__guidance">
+                  Revise the posting and submit again to request a new review.
+                </p>
+              </div>
+            ) : null}
+            {job.review.state === "APPROVED" ? (
+              <p className="recruiter-review-approved-note" role="status">
+                This job post has been approved and is visible to candidates.
+              </p>
+            ) : null}
+          </>
+        ) : null}
         <div className="recruiter-job-card__chips" aria-label="Skills">
           {job.skillTags.slice(0, 6).map((skill) => (
             <span className="recruiter-skill-chip" key={skill}>
@@ -234,11 +309,20 @@ function JobPostingCard({
             type="button"
             className="recruiter-outline-button"
             onClick={onEdit}
+            aria-label={
+              job.status === "rejected"
+                ? `Revise rejected job posting: ${title}`
+                : job.status === "pending_approval"
+                  ? `View job posting under review: ${title}`
+                  : `Edit job posting: ${title}`
+            }
           >
             <Icon name="edit" />
-            {job.status === "pending_approval"
-              ? "View posting"
-              : "Edit posting"}
+            {job.status === "rejected"
+              ? "Revise posting"
+              : job.status === "pending_approval"
+                ? "View posting"
+                : "Edit posting"}
           </button>
           {job.status === "active" ? (
             <button
@@ -387,6 +471,39 @@ function CompanyProfileRequiredState({
     </section>
   );
 }
+
+function withCompany(
+  job: JobCatalogItem,
+  companies: RecruiterCompanyView[],
+): RecruiterJob {
+  const company =
+    companies.find((item) => item.id === job.companyId) ?? companies[0];
+  if (!company) {
+    throw new Error("Company data is required for recruiter jobs.");
+  }
+  return {
+    ...job,
+    company,
+  };
+}
+
+function withCompanyFromState(
+  job: JobCatalogItem,
+  companies: RecruiterCompanyView[],
+  existing?: RecruiterJobManagementData["jobs"],
+): RecruiterJob {
+  const company =
+    existing?.find((item) => item.id === job.id)?.company ??
+    companies.find((item) => item.id === job.companyId) ??
+    companies[0];
+  if (!company) {
+    throw new Error("Company data is required for recruiter jobs.");
+  }
+  return {
+    ...job,
+    company,
+  };
+}
 export function RecruiterJobPostingManagement({
   initialData,
   onNavigate,
@@ -405,7 +522,7 @@ export function RecruiterJobPostingManagement({
   const [view, setView] = useState<"dashboard" | "editor" | "applicants">(
     "dashboard",
   );
-  const [editorJob, setEditorJob] = useState<JobCatalogItem | null>(null);
+  const [editorJob, setEditorJob] = useState<RecruiterJob | null>(null);
   const [applicantJob, setApplicantJob] = useState<RecruiterJob | null>(null);
   const [message, setMessage] = useState("");
 
@@ -505,7 +622,7 @@ export function RecruiterJobPostingManagement({
       onNavigate("/recruiter/jobs/create");
       return;
     }
-    setEditorJob(createEmptyJobPosting(current.companyId));
+    setEditorJob(withCompany(createEmptyJobPosting(current.companyId), current.companies));
     setView("editor");
   };
   const openEdit = (job: RecruiterJob) => {
@@ -519,12 +636,15 @@ export function RecruiterJobPostingManagement({
   const receiveSavedJob = (job: RecruiterJob) => {
     setData((currentData) => {
       const next = currentData ?? emptyData;
+      const normalizedJob = withCompanyFromState(job, next.companies, next.jobs);
       const exists = next.jobs.some((item) => item.id === job.id);
       return {
         ...next,
         jobs: exists
-          ? next.jobs.map((item) => (item.id === job.id ? job : item))
-          : [job, ...next.jobs],
+          ? next.jobs.map((item) =>
+              item.id === normalizedJob.id ? normalizedJob : item,
+            )
+          : [normalizedJob, ...next.jobs],
       };
     });
     setMessage("Job posting saved to the mock database.");
@@ -545,13 +665,13 @@ export function RecruiterJobPostingManagement({
       { method: "DELETE" },
     );
     const payload = (await response.json().catch(() => null)) as
-      | (RecruiterJob & { message?: string })
+      | (JobCatalogItem & { message?: string })
       | null;
     if (!response.ok || !payload) {
       setMessage(payload?.message ?? "Unable to close this posting.");
       return;
     }
-    receiveSavedJob(payload);
+    receiveSavedJob(withCompanyFromState(payload, current.companies, current.jobs));
     setMessage("Job posting closed and saved to the mock database.");
   };
 
@@ -568,13 +688,13 @@ export function RecruiterJobPostingManagement({
       }),
     });
     const payload = (await response.json().catch(() => null)) as
-      | (RecruiterJob & { message?: string })
+      | (JobCatalogItem & { message?: string })
       | null;
     if (!response.ok || !payload) {
       setMessage(payload?.message ?? "Unable to extend this deadline.");
       return;
     }
-    receiveSavedJob(payload);
+    receiveSavedJob(withCompanyFromState(payload, current.companies, current.jobs));
     setMessage("Application deadline extended by 30 days.");
   };
   if (view === "editor" && editorJob)

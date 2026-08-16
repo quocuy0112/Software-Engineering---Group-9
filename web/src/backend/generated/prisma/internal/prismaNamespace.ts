@@ -446,6 +446,11 @@ export const ModelName = {
   ModerationReportHistory: 'ModerationReportHistory',
   ModerationPrivateNote: 'ModerationPrivateNote',
   JobPosting: 'JobPosting',
+  JobPostReviewAggregate: 'JobPostReviewAggregate',
+  JobPostReviewVersion: 'JobPostReviewVersion',
+  JobPostReviewHistory: 'JobPostReviewHistory',
+  JobPostReviewPrivateNote: 'JobPostReviewPrivateNote',
+  JobCatalogueWriteLease: 'JobCatalogueWriteLease',
   JobPostingSkill: 'JobPostingSkill',
   ApplicationQuestion: 'ApplicationQuestion',
   CandidateCv: 'CandidateCv',
@@ -526,7 +531,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "companyMembership" | "platformAdministratorGrant" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "applicationDocument" | "applicationCoverLetterText" | "applicationArtifactPromotion" | "applicationDocumentLegalHold" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence" | "automaticMatchResult" | "documentParseResult" | "skillEvidenceExtraction" | "cvEvidenceExcerpt" | "aiAssessment" | "aiAssessmentFinding" | "aiSuggestedInterviewQuestion" | "scoringOperation" | "scoringWorkItem" | "aiAssessmentAttempt" | "applicationScoringResult" | "manualApplicationPriority" | "rankingSnapshot" | "rankingSnapshotRow"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "companyMembership" | "platformAdministratorGrant" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostReviewAggregate" | "jobPostReviewVersion" | "jobPostReviewHistory" | "jobPostReviewPrivateNote" | "jobCatalogueWriteLease" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "applicationDocument" | "applicationCoverLetterText" | "applicationArtifactPromotion" | "applicationDocumentLegalHold" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence" | "automaticMatchResult" | "documentParseResult" | "skillEvidenceExtraction" | "cvEvidenceExcerpt" | "aiAssessment" | "aiAssessmentFinding" | "aiSuggestedInterviewQuestion" | "scoringOperation" | "scoringWorkItem" | "aiAssessmentAttempt" | "applicationScoringResult" | "manualApplicationPriority" | "rankingSnapshot" | "rankingSnapshotRow"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4153,6 +4158,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.JobPostingCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.JobPostingCountAggregateOutputType> | number
+        }
+      }
+    }
+    JobPostReviewAggregate: {
+      payload: Prisma.$JobPostReviewAggregatePayload<ExtArgs>
+      fields: Prisma.JobPostReviewAggregateFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JobPostReviewAggregateFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewAggregatePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JobPostReviewAggregateFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewAggregatePayload>
+        }
+        findFirst: {
+          args: Prisma.JobPostReviewAggregateFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewAggregatePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JobPostReviewAggregateFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewAggregatePayload>
+        }
+        findMany: {
+          args: Prisma.JobPostReviewAggregateFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewAggregatePayload>[]
+        }
+        create: {
+          args: Prisma.JobPostReviewAggregateCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewAggregatePayload>
+        }
+        createMany: {
+          args: Prisma.JobPostReviewAggregateCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JobPostReviewAggregateCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewAggregatePayload>[]
+        }
+        delete: {
+          args: Prisma.JobPostReviewAggregateDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewAggregatePayload>
+        }
+        update: {
+          args: Prisma.JobPostReviewAggregateUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewAggregatePayload>
+        }
+        deleteMany: {
+          args: Prisma.JobPostReviewAggregateDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JobPostReviewAggregateUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JobPostReviewAggregateUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewAggregatePayload>[]
+        }
+        upsert: {
+          args: Prisma.JobPostReviewAggregateUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewAggregatePayload>
+        }
+        aggregate: {
+          args: Prisma.JobPostReviewAggregateAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJobPostReviewAggregate>
+        }
+        groupBy: {
+          args: Prisma.JobPostReviewAggregateGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobPostReviewAggregateGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JobPostReviewAggregateCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobPostReviewAggregateCountAggregateOutputType> | number
+        }
+      }
+    }
+    JobPostReviewVersion: {
+      payload: Prisma.$JobPostReviewVersionPayload<ExtArgs>
+      fields: Prisma.JobPostReviewVersionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JobPostReviewVersionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewVersionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JobPostReviewVersionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewVersionPayload>
+        }
+        findFirst: {
+          args: Prisma.JobPostReviewVersionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewVersionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JobPostReviewVersionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewVersionPayload>
+        }
+        findMany: {
+          args: Prisma.JobPostReviewVersionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewVersionPayload>[]
+        }
+        create: {
+          args: Prisma.JobPostReviewVersionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewVersionPayload>
+        }
+        createMany: {
+          args: Prisma.JobPostReviewVersionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JobPostReviewVersionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewVersionPayload>[]
+        }
+        delete: {
+          args: Prisma.JobPostReviewVersionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewVersionPayload>
+        }
+        update: {
+          args: Prisma.JobPostReviewVersionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewVersionPayload>
+        }
+        deleteMany: {
+          args: Prisma.JobPostReviewVersionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JobPostReviewVersionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JobPostReviewVersionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewVersionPayload>[]
+        }
+        upsert: {
+          args: Prisma.JobPostReviewVersionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewVersionPayload>
+        }
+        aggregate: {
+          args: Prisma.JobPostReviewVersionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJobPostReviewVersion>
+        }
+        groupBy: {
+          args: Prisma.JobPostReviewVersionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobPostReviewVersionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JobPostReviewVersionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobPostReviewVersionCountAggregateOutputType> | number
+        }
+      }
+    }
+    JobPostReviewHistory: {
+      payload: Prisma.$JobPostReviewHistoryPayload<ExtArgs>
+      fields: Prisma.JobPostReviewHistoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JobPostReviewHistoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewHistoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JobPostReviewHistoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewHistoryPayload>
+        }
+        findFirst: {
+          args: Prisma.JobPostReviewHistoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewHistoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JobPostReviewHistoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewHistoryPayload>
+        }
+        findMany: {
+          args: Prisma.JobPostReviewHistoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewHistoryPayload>[]
+        }
+        create: {
+          args: Prisma.JobPostReviewHistoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewHistoryPayload>
+        }
+        createMany: {
+          args: Prisma.JobPostReviewHistoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JobPostReviewHistoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewHistoryPayload>[]
+        }
+        delete: {
+          args: Prisma.JobPostReviewHistoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewHistoryPayload>
+        }
+        update: {
+          args: Prisma.JobPostReviewHistoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewHistoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.JobPostReviewHistoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JobPostReviewHistoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JobPostReviewHistoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewHistoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.JobPostReviewHistoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewHistoryPayload>
+        }
+        aggregate: {
+          args: Prisma.JobPostReviewHistoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJobPostReviewHistory>
+        }
+        groupBy: {
+          args: Prisma.JobPostReviewHistoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobPostReviewHistoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JobPostReviewHistoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobPostReviewHistoryCountAggregateOutputType> | number
+        }
+      }
+    }
+    JobPostReviewPrivateNote: {
+      payload: Prisma.$JobPostReviewPrivateNotePayload<ExtArgs>
+      fields: Prisma.JobPostReviewPrivateNoteFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JobPostReviewPrivateNoteFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewPrivateNotePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JobPostReviewPrivateNoteFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewPrivateNotePayload>
+        }
+        findFirst: {
+          args: Prisma.JobPostReviewPrivateNoteFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewPrivateNotePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JobPostReviewPrivateNoteFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewPrivateNotePayload>
+        }
+        findMany: {
+          args: Prisma.JobPostReviewPrivateNoteFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewPrivateNotePayload>[]
+        }
+        create: {
+          args: Prisma.JobPostReviewPrivateNoteCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewPrivateNotePayload>
+        }
+        createMany: {
+          args: Prisma.JobPostReviewPrivateNoteCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JobPostReviewPrivateNoteCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewPrivateNotePayload>[]
+        }
+        delete: {
+          args: Prisma.JobPostReviewPrivateNoteDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewPrivateNotePayload>
+        }
+        update: {
+          args: Prisma.JobPostReviewPrivateNoteUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewPrivateNotePayload>
+        }
+        deleteMany: {
+          args: Prisma.JobPostReviewPrivateNoteDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JobPostReviewPrivateNoteUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JobPostReviewPrivateNoteUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewPrivateNotePayload>[]
+        }
+        upsert: {
+          args: Prisma.JobPostReviewPrivateNoteUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostReviewPrivateNotePayload>
+        }
+        aggregate: {
+          args: Prisma.JobPostReviewPrivateNoteAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJobPostReviewPrivateNote>
+        }
+        groupBy: {
+          args: Prisma.JobPostReviewPrivateNoteGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobPostReviewPrivateNoteGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JobPostReviewPrivateNoteCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobPostReviewPrivateNoteCountAggregateOutputType> | number
+        }
+      }
+    }
+    JobCatalogueWriteLease: {
+      payload: Prisma.$JobCatalogueWriteLeasePayload<ExtArgs>
+      fields: Prisma.JobCatalogueWriteLeaseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JobCatalogueWriteLeaseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobCatalogueWriteLeasePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JobCatalogueWriteLeaseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobCatalogueWriteLeasePayload>
+        }
+        findFirst: {
+          args: Prisma.JobCatalogueWriteLeaseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobCatalogueWriteLeasePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JobCatalogueWriteLeaseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobCatalogueWriteLeasePayload>
+        }
+        findMany: {
+          args: Prisma.JobCatalogueWriteLeaseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobCatalogueWriteLeasePayload>[]
+        }
+        create: {
+          args: Prisma.JobCatalogueWriteLeaseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobCatalogueWriteLeasePayload>
+        }
+        createMany: {
+          args: Prisma.JobCatalogueWriteLeaseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JobCatalogueWriteLeaseCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobCatalogueWriteLeasePayload>[]
+        }
+        delete: {
+          args: Prisma.JobCatalogueWriteLeaseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobCatalogueWriteLeasePayload>
+        }
+        update: {
+          args: Prisma.JobCatalogueWriteLeaseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobCatalogueWriteLeasePayload>
+        }
+        deleteMany: {
+          args: Prisma.JobCatalogueWriteLeaseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JobCatalogueWriteLeaseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JobCatalogueWriteLeaseUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobCatalogueWriteLeasePayload>[]
+        }
+        upsert: {
+          args: Prisma.JobCatalogueWriteLeaseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobCatalogueWriteLeasePayload>
+        }
+        aggregate: {
+          args: Prisma.JobCatalogueWriteLeaseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJobCatalogueWriteLease>
+        }
+        groupBy: {
+          args: Prisma.JobCatalogueWriteLeaseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobCatalogueWriteLeaseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JobCatalogueWriteLeaseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobCatalogueWriteLeaseCountAggregateOutputType> | number
         }
       }
     }
@@ -9966,6 +10341,94 @@ export const JobPostingScalarFieldEnum = {
 export type JobPostingScalarFieldEnum = (typeof JobPostingScalarFieldEnum)[keyof typeof JobPostingScalarFieldEnum]
 
 
+export const JobPostReviewAggregateScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  companyId: 'companyId',
+  latestSequence: 'latestSequence',
+  pendingVersionId: 'pendingVersionId',
+  approvedVersionId: 'approvedVersionId',
+  publicJobPostingId: 'publicJobPostingId',
+  closedAt: 'closedAt',
+  closedByUserId: 'closedByUserId',
+  version: 'version',
+  adoptedAt: 'adoptedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobPostReviewAggregateScalarFieldEnum = (typeof JobPostReviewAggregateScalarFieldEnum)[keyof typeof JobPostReviewAggregateScalarFieldEnum]
+
+
+export const JobPostReviewVersionScalarFieldEnum = {
+  id: 'id',
+  reviewAggregateId: 'reviewAggregateId',
+  sequence: 'sequence',
+  snapshot: 'snapshot',
+  snapshotSchemaVersion: 'snapshotSchemaVersion',
+  snapshotSha256: 'snapshotSha256',
+  state: 'state',
+  submittedByUserId: 'submittedByUserId',
+  submittedMembershipId: 'submittedMembershipId',
+  submissionIdempotencyKey: 'submissionIdempotencyKey',
+  submissionRequestHash: 'submissionRequestHash',
+  submittedAt: 'submittedAt',
+  assignedAdminUserId: 'assignedAdminUserId',
+  assignedAt: 'assignedAt',
+  decidedByAdminUserId: 'decidedByAdminUserId',
+  decidedAt: 'decidedAt',
+  publishedAt: 'publishedAt',
+  reasonCode: 'reasonCode',
+  publicExplanation: 'publicExplanation',
+  decisionCorrelationId: 'decisionCorrelationId',
+  importedBaseline: 'importedBaseline',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobPostReviewVersionScalarFieldEnum = (typeof JobPostReviewVersionScalarFieldEnum)[keyof typeof JobPostReviewVersionScalarFieldEnum]
+
+
+export const JobPostReviewHistoryScalarFieldEnum = {
+  id: 'id',
+  reviewVersionId: 'reviewVersionId',
+  action: 'action',
+  actorUserId: 'actorUserId',
+  priorState: 'priorState',
+  resultingState: 'resultingState',
+  priorAssigneeUserId: 'priorAssigneeUserId',
+  resultingAssigneeUserId: 'resultingAssigneeUserId',
+  resultingAggregateVersion: 'resultingAggregateVersion',
+  correlationId: 'correlationId',
+  occurredAt: 'occurredAt'
+} as const
+
+export type JobPostReviewHistoryScalarFieldEnum = (typeof JobPostReviewHistoryScalarFieldEnum)[keyof typeof JobPostReviewHistoryScalarFieldEnum]
+
+
+export const JobPostReviewPrivateNoteScalarFieldEnum = {
+  id: 'id',
+  reviewVersionId: 'reviewVersionId',
+  authorAdminUserId: 'authorAdminUserId',
+  normalizedText: 'normalizedText',
+  createdAt: 'createdAt'
+} as const
+
+export type JobPostReviewPrivateNoteScalarFieldEnum = (typeof JobPostReviewPrivateNoteScalarFieldEnum)[keyof typeof JobPostReviewPrivateNoteScalarFieldEnum]
+
+
+export const JobCatalogueWriteLeaseScalarFieldEnum = {
+  catalogueKey: 'catalogueKey',
+  ownerTokenHash: 'ownerTokenHash',
+  leaseExpiresAt: 'leaseExpiresAt',
+  expectedCatalogueSha256: 'expectedCatalogueSha256',
+  version: 'version',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobCatalogueWriteLeaseScalarFieldEnum = (typeof JobCatalogueWriteLeaseScalarFieldEnum)[keyof typeof JobCatalogueWriteLeaseScalarFieldEnum]
+
+
 export const JobPostingSkillScalarFieldEnum = {
   jobPostingId: 'jobPostingId',
   skillId: 'skillId',
@@ -12040,6 +12503,48 @@ export type ListEnumJobPostingStatusFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+ * Reference to a field of type 'JobPostReviewState'
+ */
+export type EnumJobPostReviewStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobPostReviewState'>
+    
+
+
+/**
+ * Reference to a field of type 'JobPostReviewState[]'
+ */
+export type ListEnumJobPostReviewStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobPostReviewState[]'>
+    
+
+
+/**
+ * Reference to a field of type 'JobPostReviewReasonCode'
+ */
+export type EnumJobPostReviewReasonCodeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobPostReviewReasonCode'>
+    
+
+
+/**
+ * Reference to a field of type 'JobPostReviewReasonCode[]'
+ */
+export type ListEnumJobPostReviewReasonCodeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobPostReviewReasonCode[]'>
+    
+
+
+/**
+ * Reference to a field of type 'JobPostReviewHistoryAction'
+ */
+export type EnumJobPostReviewHistoryActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobPostReviewHistoryAction'>
+    
+
+
+/**
+ * Reference to a field of type 'JobPostReviewHistoryAction[]'
+ */
+export type ListEnumJobPostReviewHistoryActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobPostReviewHistoryAction[]'>
+    
+
+
+/**
  * Reference to a field of type 'ApplicationQuestionKind'
  */
 export type EnumApplicationQuestionKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApplicationQuestionKind'>
@@ -13148,6 +13653,11 @@ export type GlobalOmitConfig = {
   moderationReportHistory?: Prisma.ModerationReportHistoryOmit
   moderationPrivateNote?: Prisma.ModerationPrivateNoteOmit
   jobPosting?: Prisma.JobPostingOmit
+  jobPostReviewAggregate?: Prisma.JobPostReviewAggregateOmit
+  jobPostReviewVersion?: Prisma.JobPostReviewVersionOmit
+  jobPostReviewHistory?: Prisma.JobPostReviewHistoryOmit
+  jobPostReviewPrivateNote?: Prisma.JobPostReviewPrivateNoteOmit
+  jobCatalogueWriteLease?: Prisma.JobCatalogueWriteLeaseOmit
   jobPostingSkill?: Prisma.JobPostingSkillOmit
   applicationQuestion?: Prisma.ApplicationQuestionOmit
   candidateCv?: Prisma.CandidateCvOmit

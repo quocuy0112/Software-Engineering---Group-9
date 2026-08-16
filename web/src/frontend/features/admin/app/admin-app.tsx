@@ -9,6 +9,7 @@ import {
 } from "react-admin";
 import { createTheme, ScopedCssBaseline } from "@mui/material";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
+import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
 import { adminAuthProvider } from "./auth-provider";
 import { adminDataProvider } from "./data-provider";
 import { createAdminQueryClient } from "./query-client";
@@ -30,6 +31,8 @@ import { SupportCaseShow } from "../support/support-case-show";
 import { ProfessionalConnectionProposalList } from "../professional-connections/professional-connection-proposal-list";
 import { ProfessionalConnectionProposalShow } from "../professional-connections/professional-connection-proposal-show";
 import { AdminNotificationList } from "../notifications/admin-notification-list";
+import { JobPostReviewList } from "../job-post-reviews/job-post-review-list";
+import { JobPostReviewShow } from "../job-post-reviews/job-post-review-show";
 
 const theme = createTheme({
   palette: { mode: "light", primary: { main: "#155eef" } },
@@ -93,6 +96,13 @@ export function AdminApp() {
             options={{ label: "Notifications" }}
             icon={NotificationsOutlinedIcon}
             list={AdminNotificationList}
+          />
+          <Resource
+            name="job-post-reviews"
+            options={{ label: "Job Post Reviews" }}
+            icon={FactCheckOutlinedIcon}
+            list={JobPostReviewList}
+            show={JobPostReviewShow}
           />
           <Resource
             name="accounts"

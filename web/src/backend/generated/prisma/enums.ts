@@ -163,7 +163,8 @@ export const InAppNotificationContextType = {
   CONNECTION: 'CONNECTION',
   CONVERSATION: 'CONVERSATION',
   MESSAGING_REPORT: 'MESSAGING_REPORT',
-  MODERATION_REPORT: 'MODERATION_REPORT'
+  MODERATION_REPORT: 'MODERATION_REPORT',
+  JOB_POST_REVIEW: 'JOB_POST_REVIEW'
 } as const
 
 export type InAppNotificationContextType = (typeof InAppNotificationContextType)[keyof typeof InAppNotificationContextType]
@@ -219,7 +220,10 @@ export const InAppNotificationKind = {
   MODERATION_REPORT_DISMISSED: 'MODERATION_REPORT_DISMISSED',
   MODERATION_REPORT_RECEIVED_ADMIN: 'MODERATION_REPORT_RECEIVED_ADMIN',
   VERIFICATION_REVIEW_OVERDUE: 'VERIFICATION_REVIEW_OVERDUE',
-  DELIVERY_MANUAL_INTERVENTION_REQUIRED: 'DELIVERY_MANUAL_INTERVENTION_REQUIRED'
+  DELIVERY_MANUAL_INTERVENTION_REQUIRED: 'DELIVERY_MANUAL_INTERVENTION_REQUIRED',
+  JOB_POST_REVIEW_REQUESTED_ADMIN: 'JOB_POST_REVIEW_REQUESTED_ADMIN',
+  JOB_POST_APPROVED: 'JOB_POST_APPROVED',
+  JOB_POST_REJECTED: 'JOB_POST_REJECTED'
 } as const
 
 export type InAppNotificationKind = (typeof InAppNotificationKind)[keyof typeof InAppNotificationKind]
@@ -330,6 +334,44 @@ export const SalaryPeriod = {
 } as const
 
 export type SalaryPeriod = (typeof SalaryPeriod)[keyof typeof SalaryPeriod]
+
+
+export const JobPostReviewState = {
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type JobPostReviewState = (typeof JobPostReviewState)[keyof typeof JobPostReviewState]
+
+
+export const JobPostReviewReasonCode = {
+  INCOMPLETE_OR_UNCLEAR: 'INCOMPLETE_OR_UNCLEAR',
+  MISLEADING_CONTENT: 'MISLEADING_CONTENT',
+  COMPENSATION_OR_LOCATION_UNCLEAR: 'COMPENSATION_OR_LOCATION_UNCLEAR',
+  DISCRIMINATORY_OR_PROHIBITED: 'DISCRIMINATORY_OR_PROHIBITED',
+  COMPANY_OR_ROLE_MISMATCH: 'COMPANY_OR_ROLE_MISMATCH',
+  DUPLICATE_OR_SPAM: 'DUPLICATE_OR_SPAM',
+  EXPIRED_OR_INVALID_DEADLINE: 'EXPIRED_OR_INVALID_DEADLINE',
+  POLICY_OR_LEGAL_RISK: 'POLICY_OR_LEGAL_RISK',
+  OTHER_ACTION_REQUIRED: 'OTHER_ACTION_REQUIRED'
+} as const
+
+export type JobPostReviewReasonCode = (typeof JobPostReviewReasonCode)[keyof typeof JobPostReviewReasonCode]
+
+
+export const JobPostReviewHistoryAction = {
+  SUBMITTED: 'SUBMITTED',
+  CLAIMED: 'CLAIMED',
+  REASSIGNED: 'REASSIGNED',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  RESUBMITTED: 'RESUBMITTED',
+  LEGACY_BASELINE_IMPORTED: 'LEGACY_BASELINE_IMPORTED',
+  CLOSED: 'CLOSED'
+} as const
+
+export type JobPostReviewHistoryAction = (typeof JobPostReviewHistoryAction)[keyof typeof JobPostReviewHistoryAction]
 
 
 export const ApplicationQuestionKind = {

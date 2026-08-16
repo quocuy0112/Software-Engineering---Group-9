@@ -19,6 +19,7 @@ export type ActionableAdministratorNotificationKind = Extract<
   | "MODERATION_REPORT_RECEIVED_ADMIN"
   | "VERIFICATION_REVIEW_OVERDUE"
   | "DELIVERY_MANUAL_INTERVENTION_REQUIRED"
+  | "JOB_POST_REVIEW_REQUESTED_ADMIN"
 >;
 
 export async function notifyActionableAdministrators(

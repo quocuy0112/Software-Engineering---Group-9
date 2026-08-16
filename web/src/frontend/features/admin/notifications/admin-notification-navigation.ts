@@ -19,6 +19,7 @@ export function adminNotificationTarget(
     MESSAGING_REPORT: "messaging-reports",
     MODERATION_REPORT: "moderation-reports",
     CONNECTION_PROPOSAL: "professional-connection-proposals",
+    JOB_POST_REVIEW: "job-post-reviews",
   };
   const resource = notification.contextType
     ? resources[notification.contextType]

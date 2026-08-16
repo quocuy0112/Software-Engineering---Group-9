@@ -1,4 +1,19 @@
-import type { NotificationSeverity } from "@/shared/contracts/notifications";
+import type {
+  NotificationItem,
+  NotificationSeverity,
+} from "@/shared/contracts/notifications";
+
+export function recruiterNotificationDestination(
+  notification: NotificationItem,
+): string | null {
+  if (
+    notification.contextType !== "JOB_POST_REVIEW" ||
+    !notification.contextId ||
+    !["JOB_POST_APPROVED", "JOB_POST_REJECTED"].includes(notification.kind)
+  )
+    return notification.href;
+  return `/recruiter/job-postings?review=${encodeURIComponent(notification.contextId)}`;
+}
 
 export const notificationCopy = {
   vi: {

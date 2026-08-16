@@ -267,6 +267,7 @@ export type CompanyMembershipWhereInput = {
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   user?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   history?: Prisma.CompanyMembershipHistoryListRelationFilter
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionListRelationFilter
 }
 
 export type CompanyMembershipOrderByWithRelationInput = {
@@ -284,6 +285,7 @@ export type CompanyMembershipOrderByWithRelationInput = {
   company?: Prisma.CompanyOrderByWithRelationInput
   user?: Prisma.UserAccountOrderByWithRelationInput
   history?: Prisma.CompanyMembershipHistoryOrderByRelationAggregateInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionOrderByRelationAggregateInput
 }
 
 export type CompanyMembershipWhereUniqueInput = Prisma.AtLeast<{
@@ -305,6 +307,7 @@ export type CompanyMembershipWhereUniqueInput = Prisma.AtLeast<{
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   user?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   history?: Prisma.CompanyMembershipHistoryListRelationFilter
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionListRelationFilter
 }, "id" | "companyId_userId">
 
 export type CompanyMembershipOrderByWithAggregationInput = {
@@ -356,6 +359,7 @@ export type CompanyMembershipCreateInput = {
   company: Prisma.CompanyCreateNestedOneWithoutMembershipsInput
   user: Prisma.UserAccountCreateNestedOneWithoutCompanyMembershipsInput
   history?: Prisma.CompanyMembershipHistoryCreateNestedManyWithoutMembershipInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionCreateNestedManyWithoutSubmittedMembershipInput
 }
 
 export type CompanyMembershipUncheckedCreateInput = {
@@ -371,6 +375,7 @@ export type CompanyMembershipUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   history?: Prisma.CompanyMembershipHistoryUncheckedCreateNestedManyWithoutMembershipInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutSubmittedMembershipInput
 }
 
 export type CompanyMembershipUpdateInput = {
@@ -386,6 +391,7 @@ export type CompanyMembershipUpdateInput = {
   company?: Prisma.CompanyUpdateOneRequiredWithoutMembershipsNestedInput
   user?: Prisma.UserAccountUpdateOneRequiredWithoutCompanyMembershipsNestedInput
   history?: Prisma.CompanyMembershipHistoryUpdateManyWithoutMembershipNestedInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUpdateManyWithoutSubmittedMembershipNestedInput
 }
 
 export type CompanyMembershipUncheckedUpdateInput = {
@@ -401,6 +407,7 @@ export type CompanyMembershipUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   history?: Prisma.CompanyMembershipHistoryUncheckedUpdateManyWithoutMembershipNestedInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutSubmittedMembershipNestedInput
 }
 
 export type CompanyMembershipCreateManyInput = {
@@ -513,6 +520,11 @@ export type CompanyMembershipScalarRelationFilter = {
   isNot?: Prisma.CompanyMembershipWhereInput
 }
 
+export type CompanyMembershipNullableScalarRelationFilter = {
+  is?: Prisma.CompanyMembershipWhereInput | null
+  isNot?: Prisma.CompanyMembershipWhereInput | null
+}
+
 export type CompanyMembershipCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.CompanyMembershipCreateWithoutUserInput, Prisma.CompanyMembershipUncheckedCreateWithoutUserInput> | Prisma.CompanyMembershipCreateWithoutUserInput[] | Prisma.CompanyMembershipUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.CompanyMembershipCreateOrConnectWithoutUserInput | Prisma.CompanyMembershipCreateOrConnectWithoutUserInput[]
@@ -623,6 +635,22 @@ export type CompanyMembershipUpdateOneRequiredWithoutHistoryNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyMembershipUpdateToOneWithWhereWithoutHistoryInput, Prisma.CompanyMembershipUpdateWithoutHistoryInput>, Prisma.CompanyMembershipUncheckedUpdateWithoutHistoryInput>
 }
 
+export type CompanyMembershipCreateNestedOneWithoutSubmittedJobPostReviewsInput = {
+  create?: Prisma.XOR<Prisma.CompanyMembershipCreateWithoutSubmittedJobPostReviewsInput, Prisma.CompanyMembershipUncheckedCreateWithoutSubmittedJobPostReviewsInput>
+  connectOrCreate?: Prisma.CompanyMembershipCreateOrConnectWithoutSubmittedJobPostReviewsInput
+  connect?: Prisma.CompanyMembershipWhereUniqueInput
+}
+
+export type CompanyMembershipUpdateOneWithoutSubmittedJobPostReviewsNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyMembershipCreateWithoutSubmittedJobPostReviewsInput, Prisma.CompanyMembershipUncheckedCreateWithoutSubmittedJobPostReviewsInput>
+  connectOrCreate?: Prisma.CompanyMembershipCreateOrConnectWithoutSubmittedJobPostReviewsInput
+  upsert?: Prisma.CompanyMembershipUpsertWithoutSubmittedJobPostReviewsInput
+  disconnect?: Prisma.CompanyMembershipWhereInput | boolean
+  delete?: Prisma.CompanyMembershipWhereInput | boolean
+  connect?: Prisma.CompanyMembershipWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyMembershipUpdateToOneWithWhereWithoutSubmittedJobPostReviewsInput, Prisma.CompanyMembershipUpdateWithoutSubmittedJobPostReviewsInput>, Prisma.CompanyMembershipUncheckedUpdateWithoutSubmittedJobPostReviewsInput>
+}
+
 export type CompanyMembershipCreateWithoutUserInput = {
   id?: string
   role: $Enums.CompanyMembershipRole
@@ -635,6 +663,7 @@ export type CompanyMembershipCreateWithoutUserInput = {
   updatedAt?: Date | string
   company: Prisma.CompanyCreateNestedOneWithoutMembershipsInput
   history?: Prisma.CompanyMembershipHistoryCreateNestedManyWithoutMembershipInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionCreateNestedManyWithoutSubmittedMembershipInput
 }
 
 export type CompanyMembershipUncheckedCreateWithoutUserInput = {
@@ -649,6 +678,7 @@ export type CompanyMembershipUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   history?: Prisma.CompanyMembershipHistoryUncheckedCreateNestedManyWithoutMembershipInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutSubmittedMembershipInput
 }
 
 export type CompanyMembershipCreateOrConnectWithoutUserInput = {
@@ -706,6 +736,7 @@ export type CompanyMembershipCreateWithoutCompanyInput = {
   updatedAt?: Date | string
   user: Prisma.UserAccountCreateNestedOneWithoutCompanyMembershipsInput
   history?: Prisma.CompanyMembershipHistoryCreateNestedManyWithoutMembershipInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionCreateNestedManyWithoutSubmittedMembershipInput
 }
 
 export type CompanyMembershipUncheckedCreateWithoutCompanyInput = {
@@ -720,6 +751,7 @@ export type CompanyMembershipUncheckedCreateWithoutCompanyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   history?: Prisma.CompanyMembershipHistoryUncheckedCreateNestedManyWithoutMembershipInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutSubmittedMembershipInput
 }
 
 export type CompanyMembershipCreateOrConnectWithoutCompanyInput = {
@@ -760,6 +792,7 @@ export type CompanyMembershipCreateWithoutHistoryInput = {
   updatedAt?: Date | string
   company: Prisma.CompanyCreateNestedOneWithoutMembershipsInput
   user: Prisma.UserAccountCreateNestedOneWithoutCompanyMembershipsInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionCreateNestedManyWithoutSubmittedMembershipInput
 }
 
 export type CompanyMembershipUncheckedCreateWithoutHistoryInput = {
@@ -774,6 +807,7 @@ export type CompanyMembershipUncheckedCreateWithoutHistoryInput = {
   removedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutSubmittedMembershipInput
 }
 
 export type CompanyMembershipCreateOrConnectWithoutHistoryInput = {
@@ -804,6 +838,7 @@ export type CompanyMembershipUpdateWithoutHistoryInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutMembershipsNestedInput
   user?: Prisma.UserAccountUpdateOneRequiredWithoutCompanyMembershipsNestedInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUpdateManyWithoutSubmittedMembershipNestedInput
 }
 
 export type CompanyMembershipUncheckedUpdateWithoutHistoryInput = {
@@ -818,6 +853,83 @@ export type CompanyMembershipUncheckedUpdateWithoutHistoryInput = {
   removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutSubmittedMembershipNestedInput
+}
+
+export type CompanyMembershipCreateWithoutSubmittedJobPostReviewsInput = {
+  id?: string
+  role: $Enums.CompanyMembershipRole
+  status?: $Enums.CompanyMembershipStatus
+  priorApprovedRole?: $Enums.CompanyMembershipRole | null
+  version?: number
+  stateChangedAt?: Date | string
+  removedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  company: Prisma.CompanyCreateNestedOneWithoutMembershipsInput
+  user: Prisma.UserAccountCreateNestedOneWithoutCompanyMembershipsInput
+  history?: Prisma.CompanyMembershipHistoryCreateNestedManyWithoutMembershipInput
+}
+
+export type CompanyMembershipUncheckedCreateWithoutSubmittedJobPostReviewsInput = {
+  id?: string
+  companyId: string
+  userId: string
+  role: $Enums.CompanyMembershipRole
+  status?: $Enums.CompanyMembershipStatus
+  priorApprovedRole?: $Enums.CompanyMembershipRole | null
+  version?: number
+  stateChangedAt?: Date | string
+  removedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  history?: Prisma.CompanyMembershipHistoryUncheckedCreateNestedManyWithoutMembershipInput
+}
+
+export type CompanyMembershipCreateOrConnectWithoutSubmittedJobPostReviewsInput = {
+  where: Prisma.CompanyMembershipWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyMembershipCreateWithoutSubmittedJobPostReviewsInput, Prisma.CompanyMembershipUncheckedCreateWithoutSubmittedJobPostReviewsInput>
+}
+
+export type CompanyMembershipUpsertWithoutSubmittedJobPostReviewsInput = {
+  update: Prisma.XOR<Prisma.CompanyMembershipUpdateWithoutSubmittedJobPostReviewsInput, Prisma.CompanyMembershipUncheckedUpdateWithoutSubmittedJobPostReviewsInput>
+  create: Prisma.XOR<Prisma.CompanyMembershipCreateWithoutSubmittedJobPostReviewsInput, Prisma.CompanyMembershipUncheckedCreateWithoutSubmittedJobPostReviewsInput>
+  where?: Prisma.CompanyMembershipWhereInput
+}
+
+export type CompanyMembershipUpdateToOneWithWhereWithoutSubmittedJobPostReviewsInput = {
+  where?: Prisma.CompanyMembershipWhereInput
+  data: Prisma.XOR<Prisma.CompanyMembershipUpdateWithoutSubmittedJobPostReviewsInput, Prisma.CompanyMembershipUncheckedUpdateWithoutSubmittedJobPostReviewsInput>
+}
+
+export type CompanyMembershipUpdateWithoutSubmittedJobPostReviewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
+  status?: Prisma.EnumCompanyMembershipStatusFieldUpdateOperationsInput | $Enums.CompanyMembershipStatus
+  priorApprovedRole?: Prisma.NullableEnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  company?: Prisma.CompanyUpdateOneRequiredWithoutMembershipsNestedInput
+  user?: Prisma.UserAccountUpdateOneRequiredWithoutCompanyMembershipsNestedInput
+  history?: Prisma.CompanyMembershipHistoryUpdateManyWithoutMembershipNestedInput
+}
+
+export type CompanyMembershipUncheckedUpdateWithoutSubmittedJobPostReviewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
+  status?: Prisma.EnumCompanyMembershipStatusFieldUpdateOperationsInput | $Enums.CompanyMembershipStatus
+  priorApprovedRole?: Prisma.NullableEnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  history?: Prisma.CompanyMembershipHistoryUncheckedUpdateManyWithoutMembershipNestedInput
 }
 
 export type CompanyMembershipCreateManyUserInput = {
@@ -845,6 +957,7 @@ export type CompanyMembershipUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutMembershipsNestedInput
   history?: Prisma.CompanyMembershipHistoryUpdateManyWithoutMembershipNestedInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUpdateManyWithoutSubmittedMembershipNestedInput
 }
 
 export type CompanyMembershipUncheckedUpdateWithoutUserInput = {
@@ -859,6 +972,7 @@ export type CompanyMembershipUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   history?: Prisma.CompanyMembershipHistoryUncheckedUpdateManyWithoutMembershipNestedInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutSubmittedMembershipNestedInput
 }
 
 export type CompanyMembershipUncheckedUpdateManyWithoutUserInput = {
@@ -899,6 +1013,7 @@ export type CompanyMembershipUpdateWithoutCompanyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserAccountUpdateOneRequiredWithoutCompanyMembershipsNestedInput
   history?: Prisma.CompanyMembershipHistoryUpdateManyWithoutMembershipNestedInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUpdateManyWithoutSubmittedMembershipNestedInput
 }
 
 export type CompanyMembershipUncheckedUpdateWithoutCompanyInput = {
@@ -913,6 +1028,7 @@ export type CompanyMembershipUncheckedUpdateWithoutCompanyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   history?: Prisma.CompanyMembershipHistoryUncheckedUpdateManyWithoutMembershipNestedInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutSubmittedMembershipNestedInput
 }
 
 export type CompanyMembershipUncheckedUpdateManyWithoutCompanyInput = {
@@ -935,10 +1051,12 @@ export type CompanyMembershipUncheckedUpdateManyWithoutCompanyInput = {
 
 export type CompanyMembershipCountOutputType = {
   history: number
+  submittedJobPostReviews: number
 }
 
 export type CompanyMembershipCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   history?: boolean | CompanyMembershipCountOutputTypeCountHistoryArgs
+  submittedJobPostReviews?: boolean | CompanyMembershipCountOutputTypeCountSubmittedJobPostReviewsArgs
 }
 
 /**
@@ -958,6 +1076,13 @@ export type CompanyMembershipCountOutputTypeCountHistoryArgs<ExtArgs extends run
   where?: Prisma.CompanyMembershipHistoryWhereInput
 }
 
+/**
+ * CompanyMembershipCountOutputType without action
+ */
+export type CompanyMembershipCountOutputTypeCountSubmittedJobPostReviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.JobPostReviewVersionWhereInput
+}
+
 
 export type CompanyMembershipSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -974,6 +1099,7 @@ export type CompanyMembershipSelect<ExtArgs extends runtime.Types.Extensions.Int
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   history?: boolean | Prisma.CompanyMembership$historyArgs<ExtArgs>
+  submittedJobPostReviews?: boolean | Prisma.CompanyMembership$submittedJobPostReviewsArgs<ExtArgs>
   _count?: boolean | Prisma.CompanyMembershipCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["companyMembership"]>
 
@@ -1028,6 +1154,7 @@ export type CompanyMembershipInclude<ExtArgs extends runtime.Types.Extensions.In
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   history?: boolean | Prisma.CompanyMembership$historyArgs<ExtArgs>
+  submittedJobPostReviews?: boolean | Prisma.CompanyMembership$submittedJobPostReviewsArgs<ExtArgs>
   _count?: boolean | Prisma.CompanyMembershipCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CompanyMembershipIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1045,6 +1172,7 @@ export type $CompanyMembershipPayload<ExtArgs extends runtime.Types.Extensions.I
     company: Prisma.$CompanyPayload<ExtArgs>
     user: Prisma.$UserAccountPayload<ExtArgs>
     history: Prisma.$CompanyMembershipHistoryPayload<ExtArgs>[]
+    submittedJobPostReviews: Prisma.$JobPostReviewVersionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1455,6 +1583,7 @@ export interface Prisma__CompanyMembershipClient<T, Null = never, ExtArgs extend
   company<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserAccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccountDefaultArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   history<T extends Prisma.CompanyMembership$historyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyMembership$historyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CompanyMembershipHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  submittedJobPostReviews<T extends Prisma.CompanyMembership$submittedJobPostReviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyMembership$submittedJobPostReviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostReviewVersionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1917,6 +2046,30 @@ export type CompanyMembership$historyArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.CompanyMembershipHistoryScalarFieldEnum | Prisma.CompanyMembershipHistoryScalarFieldEnum[]
+}
+
+/**
+ * CompanyMembership.submittedJobPostReviews
+ */
+export type CompanyMembership$submittedJobPostReviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JobPostReviewVersion
+   */
+  select?: Prisma.JobPostReviewVersionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JobPostReviewVersion
+   */
+  omit?: Prisma.JobPostReviewVersionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JobPostReviewVersionInclude<ExtArgs> | null
+  where?: Prisma.JobPostReviewVersionWhereInput
+  orderBy?: Prisma.JobPostReviewVersionOrderByWithRelationInput | Prisma.JobPostReviewVersionOrderByWithRelationInput[]
+  cursor?: Prisma.JobPostReviewVersionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.JobPostReviewVersionScalarFieldEnum | Prisma.JobPostReviewVersionScalarFieldEnum[]
 }
 
 /**
