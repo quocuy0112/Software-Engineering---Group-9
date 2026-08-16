@@ -8,6 +8,8 @@ type ManagementRecord = {
   version: number;
   visibilityState: string;
   applicationState: string;
+  applicationCount?: number;
+  recruiterContact?: { name: string; maskedEmail: string } | null;
   company?: { displayName?: string };
   publicJobPosting?: { title?: string };
   approvedVersion?: { id?: string; decidedByAdmin?: { name?: string } };
@@ -54,8 +56,19 @@ function Detail() {
         <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
           <Chip label={`Visibility: ${record.visibilityState}`} />
           <Chip label={`Applications: ${record.applicationState}`} />
+          <Chip label={`Applicants: ${record.applicationCount ?? 0}`} />
           <Chip label={`Version ${record.version}`} />
         </Stack>
+      </Paper>
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h6">Recruiter contact</Typography>
+        {record.recruiterContact ? (
+          <Typography>
+            {record.recruiterContact.name} · {record.recruiterContact.maskedEmail}
+          </Typography>
+        ) : (
+          <Typography color="text.secondary">Unavailable</Typography>
+        )}
       </Paper>
       <Paper sx={{ p: 3 }}>
         <Typography variant="h6">Approval and versions</Typography>

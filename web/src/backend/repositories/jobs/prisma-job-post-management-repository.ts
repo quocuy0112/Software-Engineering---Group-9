@@ -5,6 +5,7 @@ import {
 } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
 import { FEATURED_PLACEMENT_CAPACITY } from "@/backend/jobs/management/job-post-feature-policy";
+import { maskEmail } from "@/backend/repositories/admin/prisma-account-directory-repository";
 import type { z } from "zod";
 import type { jobManagementListQuerySchema } from "@/shared/contracts/admin/job-post-management";
 
@@ -151,16 +152,26 @@ export async function listManagedJobPosts(input: JobManagementListInput) {
     }),
     prisma.jobPostReviewAggregate.count({ where }),
   ]);
-  const reportRows = await prisma.moderationReport.groupBy({
+  const [reportRows, applicationRows] = await Promise.all([
+    prisma.moderationReport.groupBy({
     by: ["jobReference"],
     where: {
       jobReference: { in: rows.map((row) => row.jobId) },
       state: "PENDING_REVIEW",
     },
     _count: { _all: true },
-  });
+    }),
+    prisma.jobApplication.groupBy({
+      by: ["jobPostingId"],
+      where: { jobPostingId: { in: rows.map((row) => row.jobId) } },
+      _count: { _all: true },
+    }),
+  ]);
   const reportCount = new Map(
     reportRows.map((row) => [row.jobReference, row._count._all]),
+  );
+  const applicationCount = new Map(
+    applicationRows.map((row) => [row.jobPostingId, row._count._all]),
   );
   return {
     data: rows.map((row) => ({
@@ -171,6 +182,7 @@ export async function listManagedJobPosts(input: JobManagementListInput) {
       approver: row.approvedVersion?.decidedByAdmin?.name ?? null,
       visibility: row.visibilityState,
       applicationState: row.applicationState,
+      applicationCount: applicationCount.get(row.jobId) ?? 0,
       approvedAt: row.publicJobPosting?.approvedAt?.toISOString() ?? null,
       publishedAt: row.publicJobPosting?.publishedAt?.toISOString() ?? null,
       featured: row.featuredPlacements.length > 0,
@@ -191,7 +203,7 @@ export async function findManagedJobPostDetail(jobId: string) {
       publicJobPosting: true,
       approvedVersion: {
         include: {
-          submittedBy: { select: { id: true, name: true } },
+        submittedBy: { select: { id: true, name: true, email: true } },
           decidedByAdmin: { select: { id: true, name: true } },
         },
       },
@@ -207,7 +219,8 @@ export async function findManagedJobPostDetail(jobId: string) {
     },
   });
   if (!row) return null;
-  const reports = await prisma.moderationReport.findMany({
+  const [reports, applicationCount] = await Promise.all([
+    prisma.moderationReport.findMany({
     where: { jobReference: jobId, state: "PENDING_REVIEW" },
     select: {
       id: true,
@@ -216,7 +229,9 @@ export async function findManagedJobPostDetail(jobId: string) {
       category: true,
       createdAt: true,
     },
-  });
+    }),
+    prisma.jobApplication.count({ where: { jobPostingId: jobId } }),
+  ]);
   const priorities = { CRITICAL: 3, HIGH: 2, NORMAL: 1 } as const;
   const highestPriority = reports.reduce<keyof typeof priorities | null>(
     (highest, report) =>
@@ -239,6 +254,13 @@ export async function findManagedJobPostDetail(jobId: string) {
     reports: reports.map(
       ({ reporterUserId: _reporterUserId, ...report }) => report,
     ),
+    applicationCount,
+    recruiterContact: row.approvedVersion?.submittedBy
+      ? {
+          name: row.approvedVersion.submittedBy.name,
+          maskedEmail: maskEmail(row.approvedVersion.submittedBy.email),
+        }
+      : null,
   };
 }
 

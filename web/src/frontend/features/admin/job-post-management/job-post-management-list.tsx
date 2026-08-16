@@ -59,6 +59,7 @@ export function JobPostManagementList() {
         <TextField source="recruiter" />
         <TextField source="visibility" />
         <TextField source="applicationState" label="Applications" />
+        <TextField source="applicationCount" label="Applicants" />
         <BooleanField source="featured" />
         <TextField source="reportCount" label="Reports" />
         <DateField source="publishedAt" showTime />
