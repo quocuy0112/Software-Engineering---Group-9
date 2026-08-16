@@ -6,7 +6,11 @@ import { fileURLToPath } from "node:url";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { config as loadEnvironment } from "dotenv";
 import { z } from "zod";
-import { Prisma, PrismaClient } from "../src/backend/generated/prisma/client";
+import {
+  CompanyVerificationState,
+  Prisma,
+  PrismaClient,
+} from "../src/backend/generated/prisma/client";
 
 const webRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaultCompaniesPath = resolve(webRoot, "data/jobs/companies.json");
@@ -400,6 +404,7 @@ async function importReferenceData(
 
   return prisma.$transaction(async (transaction) => {
     for (const company of companies) {
+      const isVerified = verifiedCompanyIds.has(company.id);
       const data = {
         slug: company.slug,
         legalName: company.name,
@@ -411,9 +416,11 @@ async function importReferenceData(
         size: company.size,
         industry: company.industry,
         address: company.address,
-        verifiedAt: verifiedCompanyIds.has(company.id)
-          ? new Date(splitFixtureVerificationDate)
-          : null,
+        verifiedAt: isVerified ? new Date(splitFixtureVerificationDate) : null,
+        verificationState: isVerified
+          ? CompanyVerificationState.ACTIVE
+          : CompanyVerificationState.UNVERIFIED,
+        verificationInactiveAt: null,
       };
       await transaction.company.upsert({
         where: { id: company.id },

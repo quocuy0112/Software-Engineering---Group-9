@@ -32,7 +32,7 @@
 
 ## Phase 6: Polish
 
-- [ ] T008 Run the relevant notification backend/frontend suites, typecheck, and quickstart scenarios; record results in `spec-kit/specs/017-notification-deep-link/quickstart.md`
+- [ ] T008 Run the relevant notification backend/frontend suites, typecheck, and quickstart scenarios; record results in `spec-kit/specs/019-notification-deep-link/quickstart.md`
 
 ## Dependencies
 
