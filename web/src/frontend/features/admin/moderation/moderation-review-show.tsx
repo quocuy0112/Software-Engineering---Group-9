@@ -29,6 +29,15 @@ type Report = {
     normalizedText: string;
     createdAt: string;
   }>;
+  enforcementLinks: Array<{
+    enforcementAction: {
+      id: string;
+      type: string;
+      reason: string;
+      occurredAt: string;
+      targets: Array<{ targetType: string; targetReference: string }>;
+    };
+  }>;
 };
 function Review() {
   const record = useRecordContext<Report>();
@@ -61,6 +70,22 @@ function Review() {
       {record.notes.map((note) => (
         <Typography key={note.id}>{note.normalizedText}</Typography>
       ))}
+      <Typography component="h2" variant="h6">
+        Linked enforcement
+      </Typography>
+      {record.enforcementLinks.length ? (
+        record.enforcementLinks.map(({ enforcementAction }) => (
+          <Typography key={enforcementAction.id}>
+            {enforcementAction.type}: {enforcementAction.reason} ({" "}
+            {enforcementAction.targets
+              .map((target) => `${target.targetType} ${target.targetReference}`)
+              .join(", ")}
+            )
+          </Typography>
+        ))
+      ) : (
+        <Typography color="text.secondary">No enforcement linked.</Typography>
+      )}
       <Typography component="h2" variant="h6">
         Immutable history
       </Typography>

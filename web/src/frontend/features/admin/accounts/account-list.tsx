@@ -9,6 +9,7 @@ import {
   TextField,
   TextInput,
 } from "react-admin";
+import { AccessRolesField } from "./access-roles-field";
 
 const filters = [
   <TextInput
@@ -55,7 +56,7 @@ function counts(record: Record<string, unknown>) {
   if (value.unavailable === true) return "Unavailable";
   if (value.kind === "CANDIDATE")
     return `CVs ${value.cvCount}; applications ${value.applicationCount}`;
-  return `Active ${value.active}; pending ${value.pendingReview}; rejected ${value.rejected}; draft ${value.draft}; closed ${value.closed}`;
+  return `Submitted jobs — active ${value.active}; pending ${value.pendingReview}; rejected ${value.rejected}; draft ${value.draft}; closed ${value.closed}`;
 }
 
 export function AccountList() {
@@ -70,7 +71,7 @@ export function AccountList() {
         <TextField source="accountReference" label="Account reference" />
         <TextField source="displayName" />
         <TextField source="maskedEmail" />
-        <TextField source="type" label="Account type" />
+        <FunctionField label="Roles" render={() => <AccessRolesField />} />
         <TextField source="status" label="Status" />
         <DateField source="registeredAt" showTime />
         <FunctionField label="Activity" render={counts} />

@@ -8,6 +8,7 @@ import {
   Preview,
   Text,
 } from "react-email";
+import { formatEmailTimestamp } from "./email-format";
 
 export type ProfessionalConnectionEmailProps = {
   eventKind:
@@ -36,6 +37,7 @@ const copy = {
 export function ProfessionalConnectionEmail(
   props: ProfessionalConnectionEmailProps,
 ) {
+  const timestamp = formatEmailTimestamp(props.occurredAt);
   return (
     <Html>
       <Head />
@@ -53,7 +55,7 @@ export function ProfessionalConnectionEmail(
         >
           <Heading>Professional connection update</Heading>
           <Text>{copy[props.eventKind]}</Text>
-          <Text>Updated at: {props.occurredAt}</Text>
+          <Text>Updated at: {timestamp}</Text>
           <Button
             href={props.connectionsUrl}
             style={{
@@ -81,7 +83,7 @@ export function professionalConnectionEmailText(
   return [
     "SmartHire professional connection update",
     copy[props.eventKind],
-    `Updated at: ${props.occurredAt}`,
+    `Updated at: ${formatEmailTimestamp(props.occurredAt)}`,
     `Open Connections: ${props.connectionsUrl}`,
     "This email intentionally excludes names, email addresses, reasons, decisions, support content, and private messages.",
   ].join("\n");

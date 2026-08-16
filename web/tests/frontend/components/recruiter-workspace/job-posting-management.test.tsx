@@ -99,6 +99,22 @@ describe("recruiter job posting management", () => {
     vi.unstubAllGlobals();
   });
 
+  it("uses the stable job id when opening candidates from a routed workspace", () => {
+    const onNavigate = vi.fn();
+    render(
+      <RecruiterJobPostingManagement
+        initialData={initialData}
+        onNavigate={onNavigate}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /48 Applicants/ }));
+
+    expect(onNavigate).toHaveBeenCalledWith(
+      "/recruiter/candidates/job-1",
+    );
+  });
+
   it("shows live overview metrics and opens the structured editor", () => {
     render(<RecruiterJobPostingManagement initialData={initialData} />);
 

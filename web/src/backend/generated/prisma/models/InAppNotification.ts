@@ -41,6 +41,7 @@ export type InAppNotificationMinAggregateOutputType = {
   category: $Enums.InAppNotificationCategory | null
   severity: $Enums.InAppNotificationSeverity | null
   audience: $Enums.InAppNotificationAudience | null
+  recipientRole: $Enums.InAppNotificationRecipientRole | null
   title: string | null
   summary: string | null
   href: string | null
@@ -63,6 +64,7 @@ export type InAppNotificationMaxAggregateOutputType = {
   category: $Enums.InAppNotificationCategory | null
   severity: $Enums.InAppNotificationSeverity | null
   audience: $Enums.InAppNotificationAudience | null
+  recipientRole: $Enums.InAppNotificationRecipientRole | null
   title: string | null
   summary: string | null
   href: string | null
@@ -85,6 +87,7 @@ export type InAppNotificationCountAggregateOutputType = {
   category: number
   severity: number
   audience: number
+  recipientRole: number
   title: number
   summary: number
   variables: number
@@ -118,6 +121,7 @@ export type InAppNotificationMinAggregateInputType = {
   category?: true
   severity?: true
   audience?: true
+  recipientRole?: true
   title?: true
   summary?: true
   href?: true
@@ -140,6 +144,7 @@ export type InAppNotificationMaxAggregateInputType = {
   category?: true
   severity?: true
   audience?: true
+  recipientRole?: true
   title?: true
   summary?: true
   href?: true
@@ -162,6 +167,7 @@ export type InAppNotificationCountAggregateInputType = {
   category?: true
   severity?: true
   audience?: true
+  recipientRole?: true
   title?: true
   summary?: true
   variables?: true
@@ -272,6 +278,7 @@ export type InAppNotificationGroupByOutputType = {
   category: $Enums.InAppNotificationCategory
   severity: $Enums.InAppNotificationSeverity
   audience: $Enums.InAppNotificationAudience
+  recipientRole: $Enums.InAppNotificationRecipientRole
   title: string
   summary: string
   variables: runtime.JsonValue | null
@@ -318,6 +325,7 @@ export type InAppNotificationWhereInput = {
   category?: Prisma.EnumInAppNotificationCategoryFilter<"InAppNotification"> | $Enums.InAppNotificationCategory
   severity?: Prisma.EnumInAppNotificationSeverityFilter<"InAppNotification"> | $Enums.InAppNotificationSeverity
   audience?: Prisma.EnumInAppNotificationAudienceFilter<"InAppNotification"> | $Enums.InAppNotificationAudience
+  recipientRole?: Prisma.EnumInAppNotificationRecipientRoleFilter<"InAppNotification"> | $Enums.InAppNotificationRecipientRole
   title?: Prisma.StringFilter<"InAppNotification"> | string
   summary?: Prisma.StringFilter<"InAppNotification"> | string
   variables?: Prisma.JsonNullableFilter<"InAppNotification">
@@ -342,6 +350,7 @@ export type InAppNotificationOrderByWithRelationInput = {
   category?: Prisma.SortOrder
   severity?: Prisma.SortOrder
   audience?: Prisma.SortOrder
+  recipientRole?: Prisma.SortOrder
   title?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   variables?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -370,6 +379,7 @@ export type InAppNotificationWhereUniqueInput = Prisma.AtLeast<{
   category?: Prisma.EnumInAppNotificationCategoryFilter<"InAppNotification"> | $Enums.InAppNotificationCategory
   severity?: Prisma.EnumInAppNotificationSeverityFilter<"InAppNotification"> | $Enums.InAppNotificationSeverity
   audience?: Prisma.EnumInAppNotificationAudienceFilter<"InAppNotification"> | $Enums.InAppNotificationAudience
+  recipientRole?: Prisma.EnumInAppNotificationRecipientRoleFilter<"InAppNotification"> | $Enums.InAppNotificationRecipientRole
   title?: Prisma.StringFilter<"InAppNotification"> | string
   summary?: Prisma.StringFilter<"InAppNotification"> | string
   variables?: Prisma.JsonNullableFilter<"InAppNotification">
@@ -393,6 +403,7 @@ export type InAppNotificationOrderByWithAggregationInput = {
   category?: Prisma.SortOrder
   severity?: Prisma.SortOrder
   audience?: Prisma.SortOrder
+  recipientRole?: Prisma.SortOrder
   title?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   variables?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -424,6 +435,7 @@ export type InAppNotificationScalarWhereWithAggregatesInput = {
   category?: Prisma.EnumInAppNotificationCategoryWithAggregatesFilter<"InAppNotification"> | $Enums.InAppNotificationCategory
   severity?: Prisma.EnumInAppNotificationSeverityWithAggregatesFilter<"InAppNotification"> | $Enums.InAppNotificationSeverity
   audience?: Prisma.EnumInAppNotificationAudienceWithAggregatesFilter<"InAppNotification"> | $Enums.InAppNotificationAudience
+  recipientRole?: Prisma.EnumInAppNotificationRecipientRoleWithAggregatesFilter<"InAppNotification"> | $Enums.InAppNotificationRecipientRole
   title?: Prisma.StringWithAggregatesFilter<"InAppNotification"> | string
   summary?: Prisma.StringWithAggregatesFilter<"InAppNotification"> | string
   variables?: Prisma.JsonNullableWithAggregatesFilter<"InAppNotification">
@@ -446,6 +458,7 @@ export type InAppNotificationCreateInput = {
   category: $Enums.InAppNotificationCategory
   severity: $Enums.InAppNotificationSeverity
   audience?: $Enums.InAppNotificationAudience
+  recipientRole?: $Enums.InAppNotificationRecipientRole
   title: string
   summary: string
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -470,6 +483,7 @@ export type InAppNotificationUncheckedCreateInput = {
   category: $Enums.InAppNotificationCategory
   severity: $Enums.InAppNotificationSeverity
   audience?: $Enums.InAppNotificationAudience
+  recipientRole?: $Enums.InAppNotificationRecipientRole
   title: string
   summary: string
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -492,6 +506,7 @@ export type InAppNotificationUpdateInput = {
   category?: Prisma.EnumInAppNotificationCategoryFieldUpdateOperationsInput | $Enums.InAppNotificationCategory
   severity?: Prisma.EnumInAppNotificationSeverityFieldUpdateOperationsInput | $Enums.InAppNotificationSeverity
   audience?: Prisma.EnumInAppNotificationAudienceFieldUpdateOperationsInput | $Enums.InAppNotificationAudience
+  recipientRole?: Prisma.EnumInAppNotificationRecipientRoleFieldUpdateOperationsInput | $Enums.InAppNotificationRecipientRole
   title?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -516,6 +531,7 @@ export type InAppNotificationUncheckedUpdateInput = {
   category?: Prisma.EnumInAppNotificationCategoryFieldUpdateOperationsInput | $Enums.InAppNotificationCategory
   severity?: Prisma.EnumInAppNotificationSeverityFieldUpdateOperationsInput | $Enums.InAppNotificationSeverity
   audience?: Prisma.EnumInAppNotificationAudienceFieldUpdateOperationsInput | $Enums.InAppNotificationAudience
+  recipientRole?: Prisma.EnumInAppNotificationRecipientRoleFieldUpdateOperationsInput | $Enums.InAppNotificationRecipientRole
   title?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -539,6 +555,7 @@ export type InAppNotificationCreateManyInput = {
   category: $Enums.InAppNotificationCategory
   severity: $Enums.InAppNotificationSeverity
   audience?: $Enums.InAppNotificationAudience
+  recipientRole?: $Enums.InAppNotificationRecipientRole
   title: string
   summary: string
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -561,6 +578,7 @@ export type InAppNotificationUpdateManyMutationInput = {
   category?: Prisma.EnumInAppNotificationCategoryFieldUpdateOperationsInput | $Enums.InAppNotificationCategory
   severity?: Prisma.EnumInAppNotificationSeverityFieldUpdateOperationsInput | $Enums.InAppNotificationSeverity
   audience?: Prisma.EnumInAppNotificationAudienceFieldUpdateOperationsInput | $Enums.InAppNotificationAudience
+  recipientRole?: Prisma.EnumInAppNotificationRecipientRoleFieldUpdateOperationsInput | $Enums.InAppNotificationRecipientRole
   title?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -584,6 +602,7 @@ export type InAppNotificationUncheckedUpdateManyInput = {
   category?: Prisma.EnumInAppNotificationCategoryFieldUpdateOperationsInput | $Enums.InAppNotificationCategory
   severity?: Prisma.EnumInAppNotificationSeverityFieldUpdateOperationsInput | $Enums.InAppNotificationSeverity
   audience?: Prisma.EnumInAppNotificationAudienceFieldUpdateOperationsInput | $Enums.InAppNotificationAudience
+  recipientRole?: Prisma.EnumInAppNotificationRecipientRoleFieldUpdateOperationsInput | $Enums.InAppNotificationRecipientRole
   title?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -617,6 +636,7 @@ export type InAppNotificationCountOrderByAggregateInput = {
   category?: Prisma.SortOrder
   severity?: Prisma.SortOrder
   audience?: Prisma.SortOrder
+  recipientRole?: Prisma.SortOrder
   title?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   variables?: Prisma.SortOrder
@@ -644,6 +664,7 @@ export type InAppNotificationMaxOrderByAggregateInput = {
   category?: Prisma.SortOrder
   severity?: Prisma.SortOrder
   audience?: Prisma.SortOrder
+  recipientRole?: Prisma.SortOrder
   title?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   href?: Prisma.SortOrder
@@ -666,6 +687,7 @@ export type InAppNotificationMinOrderByAggregateInput = {
   category?: Prisma.SortOrder
   severity?: Prisma.SortOrder
   audience?: Prisma.SortOrder
+  recipientRole?: Prisma.SortOrder
   title?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   href?: Prisma.SortOrder
@@ -743,6 +765,10 @@ export type EnumInAppNotificationAudienceFieldUpdateOperationsInput = {
   set?: $Enums.InAppNotificationAudience
 }
 
+export type EnumInAppNotificationRecipientRoleFieldUpdateOperationsInput = {
+  set?: $Enums.InAppNotificationRecipientRole
+}
+
 export type NullableEnumInAppNotificationContextTypeFieldUpdateOperationsInput = {
   set?: $Enums.InAppNotificationContextType | null
 }
@@ -753,6 +779,7 @@ export type InAppNotificationCreateWithoutRecipientInput = {
   category: $Enums.InAppNotificationCategory
   severity: $Enums.InAppNotificationSeverity
   audience?: $Enums.InAppNotificationAudience
+  recipientRole?: $Enums.InAppNotificationRecipientRole
   title: string
   summary: string
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -775,6 +802,7 @@ export type InAppNotificationUncheckedCreateWithoutRecipientInput = {
   category: $Enums.InAppNotificationCategory
   severity: $Enums.InAppNotificationSeverity
   audience?: $Enums.InAppNotificationAudience
+  recipientRole?: $Enums.InAppNotificationRecipientRole
   title: string
   summary: string
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -827,6 +855,7 @@ export type InAppNotificationScalarWhereInput = {
   category?: Prisma.EnumInAppNotificationCategoryFilter<"InAppNotification"> | $Enums.InAppNotificationCategory
   severity?: Prisma.EnumInAppNotificationSeverityFilter<"InAppNotification"> | $Enums.InAppNotificationSeverity
   audience?: Prisma.EnumInAppNotificationAudienceFilter<"InAppNotification"> | $Enums.InAppNotificationAudience
+  recipientRole?: Prisma.EnumInAppNotificationRecipientRoleFilter<"InAppNotification"> | $Enums.InAppNotificationRecipientRole
   title?: Prisma.StringFilter<"InAppNotification"> | string
   summary?: Prisma.StringFilter<"InAppNotification"> | string
   variables?: Prisma.JsonNullableFilter<"InAppNotification">
@@ -849,6 +878,7 @@ export type InAppNotificationCreateManyRecipientInput = {
   category: $Enums.InAppNotificationCategory
   severity: $Enums.InAppNotificationSeverity
   audience?: $Enums.InAppNotificationAudience
+  recipientRole?: $Enums.InAppNotificationRecipientRole
   title: string
   summary: string
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -871,6 +901,7 @@ export type InAppNotificationUpdateWithoutRecipientInput = {
   category?: Prisma.EnumInAppNotificationCategoryFieldUpdateOperationsInput | $Enums.InAppNotificationCategory
   severity?: Prisma.EnumInAppNotificationSeverityFieldUpdateOperationsInput | $Enums.InAppNotificationSeverity
   audience?: Prisma.EnumInAppNotificationAudienceFieldUpdateOperationsInput | $Enums.InAppNotificationAudience
+  recipientRole?: Prisma.EnumInAppNotificationRecipientRoleFieldUpdateOperationsInput | $Enums.InAppNotificationRecipientRole
   title?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -893,6 +924,7 @@ export type InAppNotificationUncheckedUpdateWithoutRecipientInput = {
   category?: Prisma.EnumInAppNotificationCategoryFieldUpdateOperationsInput | $Enums.InAppNotificationCategory
   severity?: Prisma.EnumInAppNotificationSeverityFieldUpdateOperationsInput | $Enums.InAppNotificationSeverity
   audience?: Prisma.EnumInAppNotificationAudienceFieldUpdateOperationsInput | $Enums.InAppNotificationAudience
+  recipientRole?: Prisma.EnumInAppNotificationRecipientRoleFieldUpdateOperationsInput | $Enums.InAppNotificationRecipientRole
   title?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -915,6 +947,7 @@ export type InAppNotificationUncheckedUpdateManyWithoutRecipientInput = {
   category?: Prisma.EnumInAppNotificationCategoryFieldUpdateOperationsInput | $Enums.InAppNotificationCategory
   severity?: Prisma.EnumInAppNotificationSeverityFieldUpdateOperationsInput | $Enums.InAppNotificationSeverity
   audience?: Prisma.EnumInAppNotificationAudienceFieldUpdateOperationsInput | $Enums.InAppNotificationAudience
+  recipientRole?: Prisma.EnumInAppNotificationRecipientRoleFieldUpdateOperationsInput | $Enums.InAppNotificationRecipientRole
   title?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -940,6 +973,7 @@ export type InAppNotificationSelect<ExtArgs extends runtime.Types.Extensions.Int
   category?: boolean
   severity?: boolean
   audience?: boolean
+  recipientRole?: boolean
   title?: boolean
   summary?: boolean
   variables?: boolean
@@ -964,6 +998,7 @@ export type InAppNotificationSelectCreateManyAndReturn<ExtArgs extends runtime.T
   category?: boolean
   severity?: boolean
   audience?: boolean
+  recipientRole?: boolean
   title?: boolean
   summary?: boolean
   variables?: boolean
@@ -988,6 +1023,7 @@ export type InAppNotificationSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   category?: boolean
   severity?: boolean
   audience?: boolean
+  recipientRole?: boolean
   title?: boolean
   summary?: boolean
   variables?: boolean
@@ -1012,6 +1048,7 @@ export type InAppNotificationSelectScalar = {
   category?: boolean
   severity?: boolean
   audience?: boolean
+  recipientRole?: boolean
   title?: boolean
   summary?: boolean
   variables?: boolean
@@ -1028,7 +1065,7 @@ export type InAppNotificationSelectScalar = {
   updatedAt?: boolean
 }
 
-export type InAppNotificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "recipientUserId" | "kind" | "category" | "severity" | "audience" | "title" | "summary" | "variables" | "href" | "contextType" | "contextId" | "deduplicationKey" | "correlationId" | "occurrenceCount" | "readAt" | "expiresAt" | "createdAt" | "lastOccurredAt" | "updatedAt", ExtArgs["result"]["inAppNotification"]>
+export type InAppNotificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "recipientUserId" | "kind" | "category" | "severity" | "audience" | "recipientRole" | "title" | "summary" | "variables" | "href" | "contextType" | "contextId" | "deduplicationKey" | "correlationId" | "occurrenceCount" | "readAt" | "expiresAt" | "createdAt" | "lastOccurredAt" | "updatedAt", ExtArgs["result"]["inAppNotification"]>
 export type InAppNotificationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recipient?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
 }
@@ -1051,6 +1088,7 @@ export type $InAppNotificationPayload<ExtArgs extends runtime.Types.Extensions.I
     category: $Enums.InAppNotificationCategory
     severity: $Enums.InAppNotificationSeverity
     audience: $Enums.InAppNotificationAudience
+    recipientRole: $Enums.InAppNotificationRecipientRole
     title: string
     summary: string
     variables: runtime.JsonValue | null
@@ -1495,6 +1533,7 @@ export interface InAppNotificationFieldRefs {
   readonly category: Prisma.FieldRef<"InAppNotification", 'InAppNotificationCategory'>
   readonly severity: Prisma.FieldRef<"InAppNotification", 'InAppNotificationSeverity'>
   readonly audience: Prisma.FieldRef<"InAppNotification", 'InAppNotificationAudience'>
+  readonly recipientRole: Prisma.FieldRef<"InAppNotification", 'InAppNotificationRecipientRole'>
   readonly title: Prisma.FieldRef<"InAppNotification", 'String'>
   readonly summary: Prisma.FieldRef<"InAppNotification", 'String'>
   readonly variables: Prisma.FieldRef<"InAppNotification", 'Json'>

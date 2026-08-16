@@ -117,4 +117,17 @@ describe("notification event producer coverage", () => {
     expect(report).toContain('kind: "MESSAGE_REPORT_RECEIVED"');
     expect(report).not.toContain("emailOutbox");
   });
+
+  it("creates job review requests inside the submission transaction", () => {
+    const submission = read(
+      "src/backend/jobs/review/job-post-submission-service.ts",
+    );
+    const cleanup = read(
+      "tests/helpers/notifications/job-post-review-notification-cleanup.ts",
+    );
+    expect(submission).toContain("prisma.$transaction");
+    expect(submission).toContain('kind: "JOB_POST_REVIEW_REQUESTED_ADMIN"');
+    expect(submission).toContain('contextType: "JOB_POST_REVIEW"');
+    expect(cleanup).toContain('contextType: "JOB_POST_REVIEW"');
+  });
 });

@@ -63,6 +63,15 @@ function text(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+function isInternalFilename(value: string | null) {
+  return Boolean(
+    value &&
+    /^(?:imported-cv|application-cv|candidate-cv)-[A-Za-z0-9-]+\.[A-Za-z0-9]{1,8}$/iu.test(
+      value,
+    ),
+  );
+}
+
 function summary(row: SummaryRow): CandidateApplicationSummary {
   const snapshot = object(row.jobSnapshot);
   const stage = applicationStageSchema.parse(row.stage);
@@ -174,12 +183,20 @@ export class PrismaApplicationTrackingRepository {
     if (!row) return null;
 
     const cvSnapshot = object(row.cvSnapshot);
+    const snapshotFileName = text(cvSnapshot.fileName);
+    const selectedFileName = text(row.selectedCv.fileName);
     return candidateApplicationDetailSchema.parse({
       ...summary(row),
       coverLetter: row.coverLetter,
       cv: {
         displayName: text(cvSnapshot.displayName) ?? row.selectedCv.displayName,
-        fileName: text(cvSnapshot.fileName) ?? row.selectedCv.fileName,
+        fileName:
+          (snapshotFileName && !isInternalFilename(snapshotFileName)
+            ? snapshotFileName
+            : null) ??
+          (selectedFileName && !isInternalFilename(selectedFileName)
+            ? selectedFileName
+            : "candidate-cv.pdf"),
       },
       answers: row.answers.flatMap((answer) => {
         const question = text(object(answer.questionSnapshot).prompt);

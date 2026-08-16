@@ -91,8 +91,8 @@ describe.sequential("atomic CV draft confirmation", () => {
     expect(savedCv.rows[0]).toMatchObject({
       id: "candidate-cv-" + seeded.uploadId,
       candidateUserId: seeded.accountId,
-      displayName: "imported-cv-" + seeded.uploadId + ".pdf",
-      fileName: "imported-cv-" + seeded.uploadId + ".pdf",
+      displayName: "candidate-cv.pdf",
+      fileName: "candidate-cv.pdf",
       storageKey: "candidate-cv-" + seeded.uploadId,
       checksumSha256: "11".repeat(32),
     });

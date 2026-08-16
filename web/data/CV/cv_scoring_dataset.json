@@ -1,0 +1,1070 @@
+[
+  {
+    "cv_id": "cv-01",
+    "cv_pdf_file": "cv-01_TRAN_MINH_DUC.pdf",
+    "candidate_name": "TRAN MINH DUC",
+    "candidate_target_role": "React Native Developer",
+    "job_id": "job-004515",
+    "job_title": "React Native Developer",
+    "job_slug": "react-native-developer-da-nang-004515",
+    "match_level": "high",
+    "total_score": 91,
+    "score_breakdown": {
+      "experience_match": 27,
+      "skills_match": 23,
+      "education_match": 14,
+      "language_match": 8,
+      "role_relevance": 19
+    },
+    "scoring_reasons": [
+      "2 years of direct React Native experience meets the job's 1-3 years requirement.",
+      "Strong overlap on required skills: Problem Solving, Process Improvement, and hands-on Data Analysis via crash-report reviews.",
+      "Bachelor's degree in IT satisfies the College-degree-or-above requirement.",
+      "English proficiency (TOEIC 780) supports the 'good command of English' requirement.",
+      "Job title and domain (mobile app development) directly match the candidate's current role."
+    ],
+    "job_snapshot": {
+      "experience_required": "1-3 years",
+      "level": "staff",
+      "education_required": "College degree or above",
+      "skill_tags": [
+        "Data Analysis",
+        "Process Improvement",
+        "Problem Solving"
+      ],
+      "key_requirements": [
+        "At least 1-3 years of hands-on experience relevant to the React Native Developer role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Good command of English (written and spoken)",
+        "Strong time-management and prioritization skills",
+        "Excellent problem-solving and analytical thinking",
+        "Eagerness to learn and grow within a professional environment."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-02",
+    "cv_pdf_file": "cv-02_LE_THI_HOA.pdf",
+    "candidate_name": "LE THI HOA",
+    "candidate_target_role": "Content & Marketing Executive",
+    "job_id": "job-000868",
+    "job_title": "Creative Planner",
+    "job_slug": "creative-planner-dong-nai-000868",
+    "match_level": "medium",
+    "total_score": 62,
+    "score_breakdown": {
+      "experience_match": 16,
+      "skills_match": 15,
+      "education_match": 15,
+      "language_match": 4,
+      "role_relevance": 12
+    },
+    "scoring_reasons": [
+      "1 year of marketing experience meets the minimum years but lacks depth in creative campaign planning specifically.",
+      "Customer Focus and Teamwork skills are present, but no direct 'Process Improvement' evidence in campaign strategy.",
+      "College diploma in Marketing satisfies the education requirement.",
+      "English is only basic, below what most creative/advertising roles typically prefer.",
+      "Related field (marketing/content) but the role is Marketing Executive, not specifically Creative Planner."
+    ],
+    "job_snapshot": {
+      "experience_required": "1-3 years",
+      "level": "staff",
+      "education_required": "College degree or above",
+      "skill_tags": [
+        "Process Improvement",
+        "Customer Focus",
+        "Teamwork"
+      ],
+      "key_requirements": [
+        "At least 1-3 years of hands-on experience relevant to the Creative Planner role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Ability to work independently and under pressure",
+        "Team player with a collaborative working style",
+        "Good stakeholder management and cross-team collaboration",
+        "Eagerness to learn and grow within a professional environment."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-03",
+    "cv_pdf_file": "cv-03_PHAM_VAN_NAM.pdf",
+    "candidate_name": "PHAM VAN NAM",
+    "candidate_target_role": "Partnership Specialist",
+    "job_id": "job-000026",
+    "job_title": "Partnership Specialist",
+    "job_slug": "partnership-specialist-hanoi-000026",
+    "match_level": "low",
+    "total_score": 27,
+    "score_breakdown": {
+      "experience_match": 6,
+      "skills_match": 5,
+      "education_match": 10,
+      "language_match": 2,
+      "role_relevance": 4
+    },
+    "scoring_reasons": [
+      "Job requires 3+ years senior-level experience; candidate has only 1 year in an unrelated customer support role.",
+      "No evidence of partnership development, negotiation, or B2B relationship skills required by the job.",
+      "College diploma meets minimum, but job prefers Bachelor's degree or above.",
+      "English is elementary/self-taught with no certificate, far below the 'English Proficiency' requirement.",
+      "Current role (retail customer support) has minimal relevance to Partnership Specialist responsibilities."
+    ],
+    "job_snapshot": {
+      "experience_required": "3+ years",
+      "level": "senior",
+      "education_required": "Bachelor's degree or above",
+      "skill_tags": [
+        "English Proficiency",
+        "Time Management",
+        "Customer Focus"
+      ],
+      "key_requirements": [
+        "3-6 years of proven experience relevant to the Partnership Specialist role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Good command of English (written and spoken)",
+        "Strong communication skills, both written and verbal",
+        "Ability to work independently and under pressure"
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-04",
+    "cv_pdf_file": "cv-04_NGUYEN_THI_LAN.pdf",
+    "candidate_name": "NGUYEN THI LAN",
+    "candidate_target_role": "Project Accountant",
+    "job_id": "job-002167",
+    "job_title": "Project Accountant",
+    "job_slug": "project-accountant-can-tho-002167",
+    "match_level": "high",
+    "total_score": 90,
+    "score_breakdown": {
+      "experience_match": 26,
+      "skills_match": 23,
+      "education_match": 15,
+      "language_match": 7,
+      "role_relevance": 19
+    },
+    "scoring_reasons": [
+      "2 years of direct project accounting experience aligns well with the 1-3 years requirement.",
+      "Strong match on required skills: Attention to Detail, Process Improvement (invoice-checking process), and Project Management basics.",
+      "Bachelor of Accounting exceeds the College-degree-or-above requirement.",
+      "Intermediate English is sufficient for most project accounting documentation tasks.",
+      "Current title (Project Accountant) is an exact match to the job title."
+    ],
+    "job_snapshot": {
+      "experience_required": "1-3 years",
+      "level": "staff",
+      "education_required": "College degree or above",
+      "skill_tags": [
+        "Attention to Detail",
+        "Process Improvement",
+        "Project Management"
+      ],
+      "key_requirements": [
+        "At least 1-3 years of hands-on experience relevant to the Project Accountant role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Team player with a collaborative working style",
+        "Adaptability in a fast-paced, changing environment",
+        "Good command of English (written and spoken)",
+        "Eagerness to learn and grow within a professional environment."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-05",
+    "cv_pdf_file": "cv-05_VO_THI_MAI.pdf",
+    "candidate_name": "VO THI MAI",
+    "candidate_target_role": "Data Entry Clerk",
+    "job_id": "job-002198",
+    "job_title": "Data Entry Clerk",
+    "job_slug": "data-entry-clerk-binh-duong-002198",
+    "match_level": "medium",
+    "total_score": 62,
+    "score_breakdown": {
+      "experience_match": 17,
+      "skills_match": 16,
+      "education_match": 15,
+      "language_match": 4,
+      "role_relevance": 10
+    },
+    "scoring_reasons": [
+      "1 year of general office admin experience meets the minimum years but is not data-entry-specific.",
+      "MS Excel/Word and basic reporting skills partially match the required Reporting and Problem Solving skills.",
+      "College diploma in Office Administration satisfies the education requirement.",
+      "Basic English is on the lower end for typical clerical role expectations.",
+      "Role is administrative support rather than dedicated data entry, giving moderate but not strong relevance."
+    ],
+    "job_snapshot": {
+      "experience_required": "1-3 years",
+      "level": "staff",
+      "education_required": "College degree or above",
+      "skill_tags": [
+        "Time Management",
+        "Problem Solving",
+        "Reporting"
+      ],
+      "key_requirements": [
+        "At least 1-3 years of hands-on experience relevant to the Data Entry Clerk role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Excellent problem-solving and analytical thinking",
+        "Adaptability in a fast-paced, changing environment",
+        "Detail-oriented with a strong sense of ownership",
+        "Eagerness to learn and grow within a professional environment."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-06",
+    "cv_pdf_file": "cv-06_HOANG_VAN_TUAN.pdf",
+    "candidate_name": "HOANG VAN TUAN",
+    "candidate_target_role": "Maintenance Technician",
+    "job_id": "job-001416",
+    "job_title": "Maintenance Engineer",
+    "job_slug": "maintenance-engineer-dong-nai-001416",
+    "match_level": "low",
+    "total_score": 27,
+    "score_breakdown": {
+      "experience_match": 5,
+      "skills_match": 6,
+      "education_match": 9,
+      "language_match": 2,
+      "role_relevance": 5
+    },
+    "scoring_reasons": [
+      "Job requires 3+ years senior experience; candidate has only 1 year in a support (non-engineer) capacity.",
+      "Lacks demonstrated Problem Solving and Project Management skills expected at the engineer level.",
+      "College diploma is below the Bachelor's degree requirement typically expected for this senior role.",
+      "English is elementary, insufficient for the job's English Proficiency requirement.",
+      "Current title (Maintenance Support Staff) is a junior support role, not an engineering-level position."
+    ],
+    "job_snapshot": {
+      "experience_required": "3+ years",
+      "level": "senior",
+      "education_required": "Bachelor's degree or above",
+      "skill_tags": [
+        "Problem Solving",
+        "English Proficiency",
+        "Project Management"
+      ],
+      "key_requirements": [
+        "3-6 years of proven experience relevant to the Maintenance Engineer role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Adaptability in a fast-paced, changing environment",
+        "Excellent problem-solving and analytical thinking",
+        "Good command of English (written and spoken)"
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-07",
+    "cv_pdf_file": "cv-07_DANG_THI_THU.pdf",
+    "candidate_name": "DANG THI THU",
+    "candidate_target_role": "Learning & Development Manager",
+    "job_id": "job-001004",
+    "job_title": "L&D Manager",
+    "job_slug": "l-d-manager-nha-trang-khanh-hoa-001004",
+    "match_level": "high",
+    "total_score": 99,
+    "score_breakdown": {
+      "experience_match": 30,
+      "skills_match": 24,
+      "education_match": 15,
+      "language_match": 10,
+      "role_relevance": 20
+    },
+    "scoring_reasons": [
+      "7 years of experience, including 3 years in a managerial L&D role, exceeds the 6+ years requirement.",
+      "Excellent match on Leadership, Communication, and Planning (team leadership, training roadmap, stakeholder reporting).",
+      "Bachelor's degree in HR Management satisfies the education requirement.",
+      "Fluent English (IELTS 7.5) fully meets communication expectations for a manager-level role.",
+      "Current title (L&D Manager) is an exact match to the target job title."
+    ],
+    "job_snapshot": {
+      "experience_required": "6+ years",
+      "level": "manager",
+      "education_required": "Bachelor's degree or above",
+      "skill_tags": [
+        "Leadership",
+        "Communication",
+        "Planning"
+      ],
+      "key_requirements": [
+        "6+ years of experience, including 2-3 years in a management role relevant to the L&D Manager role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Proactive mindset with a can-do attitude",
+        "Strong time-management and prioritization skills",
+        "Good command of English (written and spoken)",
+        "Proven ability to lead, mentor, and develop high-performing teams."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-08",
+    "cv_pdf_file": "cv-08_BUI_THI_NGOC.pdf",
+    "candidate_name": "BUI THI NGOC",
+    "candidate_target_role": "Hotel Receptionist",
+    "job_id": "job-001137",
+    "job_title": "Hotel Receptionist",
+    "job_slug": "hotel-receptionist-ho-chi-minh-city-001137",
+    "match_level": "medium",
+    "total_score": 65,
+    "score_breakdown": {
+      "experience_match": 16,
+      "skills_match": 17,
+      "education_match": 15,
+      "language_match": 6,
+      "role_relevance": 11
+    },
+    "scoring_reasons": [
+      "1 year of front-of-house experience meets minimum years but is in a restaurant, not hotel, setting.",
+      "Strong overlap on Customer Focus, Reporting, and MS Office skills required by the job.",
+      "College diploma in Tourism & Hospitality satisfies the education requirement.",
+      "Intermediate English is adequate for guest communication at a hotel front desk.",
+      "Adjacent hospitality experience (restaurant) is relevant but not identical to hotel reception duties."
+    ],
+    "job_snapshot": {
+      "experience_required": "1-3 years",
+      "level": "staff",
+      "education_required": "College degree or above",
+      "skill_tags": [
+        "Customer Focus",
+        "Reporting",
+        "MS Office"
+      ],
+      "key_requirements": [
+        "At least 1-3 years of hands-on experience relevant to the Hotel Receptionist role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Strong time-management and prioritization skills",
+        "Good command of English (written and spoken)",
+        "Detail-oriented with a strong sense of ownership",
+        "Eagerness to learn and grow within a professional environment."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-09",
+    "cv_pdf_file": "cv-09_NGO_VAN_PHUC.pdf",
+    "candidate_name": "NGO VAN PHUC",
+    "candidate_target_role": "Junior Architectural Drafter",
+    "job_id": "job-004669",
+    "job_title": "Architectural Drafter",
+    "job_slug": "architectural-drafter-bac-ninh-004669",
+    "match_level": "low",
+    "total_score": 27,
+    "score_breakdown": {
+      "experience_match": 5,
+      "skills_match": 6,
+      "education_match": 9,
+      "language_match": 2,
+      "role_relevance": 5
+    },
+    "scoring_reasons": [
+      "Job requires 3+ years senior drafting experience; candidate has 1 year of general site-assistant work, not drafting.",
+      "Only coursework-level AutoCAD knowledge, no professional Project Management or Architecture & Interior Design experience.",
+      "College diploma in Civil Engineering is below the Bachelor's degree requirement expected for a senior drafter.",
+      "Elementary English does not meet typical technical documentation needs for this role.",
+      "No direct drafting job title or responsibilities on the CV, resulting in weak role relevance."
+    ],
+    "job_snapshot": {
+      "experience_required": "3+ years",
+      "level": "senior",
+      "education_required": "Bachelor's degree or above",
+      "skill_tags": [
+        "Project Management",
+        "Architecture & Interior Design",
+        "MS Office"
+      ],
+      "key_requirements": [
+        "3-6 years of proven experience relevant to the Architectural Drafter role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Ability to work independently and under pressure",
+        "Good stakeholder management and cross-team collaboration",
+        "Proactive mindset with a can-do attitude"
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-10",
+    "cv_pdf_file": "cv-10_DO_THI_KIM_ANH.pdf",
+    "candidate_name": "DO THI KIM ANH",
+    "candidate_target_role": "Fund Manager",
+    "job_id": "job-000702",
+    "job_title": "Fund Manager",
+    "job_slug": "fund-manager-hai-phong-000702",
+    "match_level": "high",
+    "total_score": 99,
+    "score_breakdown": {
+      "experience_match": 30,
+      "skills_match": 24,
+      "education_match": 15,
+      "language_match": 10,
+      "role_relevance": 20
+    },
+    "scoring_reasons": [
+      "8 years of experience, including 4 years managing large investment portfolios, exceeds the 6+ years requirement.",
+      "Excellent match on MS Office, Problem Solving, and Planning (quarterly strategy, risk assessment, team leadership).",
+      "Master of Finance exceeds the Bachelor's-degree-or-above requirement.",
+      "Fluent English (IELTS 8.0) comfortably supports institutional investor communication.",
+      "Current title (Fund Manager) is an exact match to the job title, with CFA credential adding further credibility."
+    ],
+    "job_snapshot": {
+      "experience_required": "6+ years",
+      "level": "manager",
+      "education_required": "Bachelor's degree or above",
+      "skill_tags": [
+        "MS Office",
+        "Problem Solving",
+        "Planning"
+      ],
+      "key_requirements": [
+        "6+ years of experience, including 2-3 years in a management role relevant to the Fund Manager role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Team player with a collaborative working style",
+        "Excellent problem-solving and analytical thinking",
+        "Strong communication skills, both written and verbal",
+        "Proven ability to lead, mentor, and develop high-performing teams."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-11",
+    "cv_pdf_file": "cv-11_LY_VAN_HUNG.pdf",
+    "candidate_name": "LY VAN HUNG",
+    "candidate_target_role": "PLC Engineer",
+    "job_id": "job-003856",
+    "job_title": "PLC Engineer",
+    "job_slug": "plc-engineer-binh-duong-003856",
+    "match_level": "medium",
+    "total_score": 63,
+    "score_breakdown": {
+      "experience_match": 16,
+      "skills_match": 16,
+      "education_match": 15,
+      "language_match": 5,
+      "role_relevance": 11
+    },
+    "scoring_reasons": [
+      "2 years of automation/PLC experience meets the minimum years but job targets a 3+ years senior profile.",
+      "Good overlap on Attention to Detail, Teamwork, and Time Management, with practical Siemens PLC programming experience.",
+      "Bachelor of Automation Engineering satisfies the education requirement.",
+      "Only basic technical English reading, slightly below ideal for engineering documentation.",
+      "Current title (Automation Technician) is closely related but one level below the target Engineer-level role."
+    ],
+    "job_snapshot": {
+      "experience_required": "3+ years",
+      "level": "senior",
+      "education_required": "Bachelor's degree or above",
+      "skill_tags": [
+        "Attention to Detail",
+        "Teamwork",
+        "Time Management"
+      ],
+      "key_requirements": [
+        "3-6 years of proven experience relevant to the PLC Engineer role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Good command of English (written and spoken)",
+        "Adaptability in a fast-paced, changing environment",
+        "Strong communication skills, both written and verbal"
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-12",
+    "cv_pdf_file": "cv-12_TRUONG_VAN_DUY.pdf",
+    "candidate_name": "TRUONG VAN DUY",
+    "candidate_target_role": "Warehouse Staff",
+    "job_id": "job-000260",
+    "job_title": "Warehouse Specialist",
+    "job_slug": "warehouse-specialist-vung-tau-ba-ria-vung-tau-000260",
+    "match_level": "low",
+    "total_score": 22,
+    "score_breakdown": {
+      "experience_match": 4,
+      "skills_match": 5,
+      "education_match": 6,
+      "language_match": 2,
+      "role_relevance": 5
+    },
+    "scoring_reasons": [
+      "Job requires 3+ years senior logistics experience; candidate has only a few months of informal part-time warehouse work.",
+      "No demonstrated Transport & Warehousing systems knowledge, Communication, or Process Improvement skills.",
+      "High school diploma is well below the Bachelor's-degree-or-above requirement.",
+      "No English proficiency shown on the CV.",
+      "Role (Warehouse Helper, part-time) is entry-level and far below the specialist-level responsibilities required."
+    ],
+    "job_snapshot": {
+      "experience_required": "3+ years",
+      "level": "senior",
+      "education_required": "Bachelor's degree or above",
+      "skill_tags": [
+        "Transport & Warehousing",
+        "Communication",
+        "Process Improvement"
+      ],
+      "key_requirements": [
+        "3-6 years of proven experience relevant to the Warehouse Specialist role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Proactive mindset with a can-do attitude",
+        "Strong time-management and prioritization skills",
+        "Team player with a collaborative working style"
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-13",
+    "cv_pdf_file": "cv-13_NGUYEN_THI_BICH.pdf",
+    "candidate_name": "NGUYEN THI BICH",
+    "candidate_target_role": "Medical Representative (ETC)",
+    "job_id": "job-000322",
+    "job_title": "Medical Representative (ETC)",
+    "job_slug": "medical-representative-etc-hanoi-000322",
+    "match_level": "high",
+    "total_score": 91,
+    "score_breakdown": {
+      "experience_match": 27,
+      "skills_match": 23,
+      "education_match": 15,
+      "language_match": 7,
+      "role_relevance": 19
+    },
+    "scoring_reasons": [
+      "2 years of direct ETC medical representative experience meets the 1-3 years requirement.",
+      "Strong match on Planning, Time Management, and Process Improvement, backed by concrete sales-target achievements.",
+      "Bachelor of Pharmacy satisfies and exceeds the College-degree-or-above requirement.",
+      "Intermediate English is sufficient for typical pharma sales documentation and training needs.",
+      "Current title (Medical Representative ETC) is an exact match to the job title."
+    ],
+    "job_snapshot": {
+      "experience_required": "1-3 years",
+      "level": "staff",
+      "education_required": "College degree or above",
+      "skill_tags": [
+        "Planning",
+        "Time Management",
+        "Process Improvement"
+      ],
+      "key_requirements": [
+        "At least 1-3 years of hands-on experience relevant to the Medical Representative (ETC) role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Adaptability in a fast-paced, changing environment",
+        "Strong time-management and prioritization skills",
+        "Good stakeholder management and cross-team collaboration",
+        "Eagerness to learn and grow within a professional environment."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-14",
+    "cv_pdf_file": "cv-14_PHAN_THI_DIEM.pdf",
+    "candidate_name": "PHAN THI DIEM",
+    "candidate_target_role": "Skincare Specialist",
+    "job_id": "job-000763",
+    "job_title": "Skincare Specialist",
+    "job_slug": "skincare-specialist-vung-tau-ba-ria-vung-tau-000763",
+    "match_level": "medium",
+    "total_score": 59,
+    "score_breakdown": {
+      "experience_match": 15,
+      "skills_match": 14,
+      "education_match": 15,
+      "language_match": 4,
+      "role_relevance": 11
+    },
+    "scoring_reasons": [
+      "1.5 years of skincare therapist experience is below the job's 3+ years senior requirement.",
+      "Good match on Time Management and Customer Focus, but Negotiation skills for retail upselling are only basic.",
+      "College diploma in Cosmetology satisfies the education requirement.",
+      "Basic English is below what a senior specialist role interacting with varied clientele might need.",
+      "Job title and duties (skincare/facial treatment) are directly relevant, though at a more junior level than required."
+    ],
+    "job_snapshot": {
+      "experience_required": "3+ years",
+      "level": "senior",
+      "education_required": "Bachelor's degree or above",
+      "skill_tags": [
+        "Time Management",
+        "Negotiation",
+        "Customer Focus"
+      ],
+      "key_requirements": [
+        "3-6 years of proven experience relevant to the Skincare Specialist role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Strong time-management and prioritization skills",
+        "Strong communication skills, both written and verbal",
+        "Team player with a collaborative working style"
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-15",
+    "cv_pdf_file": "cv-15_VU_VAN_KHOA.pdf",
+    "candidate_name": "VU VAN KHOA",
+    "candidate_target_role": "Graphic Designer",
+    "job_id": "job-001482",
+    "job_title": "Graphic Designer",
+    "job_slug": "graphic-designer-vung-tau-ba-ria-vung-tau-001482",
+    "match_level": "low",
+    "total_score": 23,
+    "score_breakdown": {
+      "experience_match": 4,
+      "skills_match": 6,
+      "education_match": 5,
+      "language_match": 2,
+      "role_relevance": 6
+    },
+    "scoring_reasons": [
+      "No formal work experience; only informal freelance projects for friends, far below the 1-3 years requirement.",
+      "Limited software skills (basic Photoshop and Canva only), no evidence of Leadership or Teamwork in a professional design setting.",
+      "Did not complete formal Fine Arts education, below the College-degree-or-above requirement.",
+      "Elementary English limits ability to work with international briefs or documentation.",
+      "No professional job title held; portfolio and experience are informal and unverified."
+    ],
+    "job_snapshot": {
+      "experience_required": "1-3 years",
+      "level": "staff",
+      "education_required": "College degree or above",
+      "skill_tags": [
+        "Problem Solving",
+        "Leadership",
+        "Teamwork"
+      ],
+      "key_requirements": [
+        "At least 1-3 years of hands-on experience relevant to the Graphic Designer role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Adaptability in a fast-paced, changing environment",
+        "Strong communication skills, both written and verbal",
+        "Good stakeholder management and cross-team collaboration",
+        "Eagerness to learn and grow within a professional environment."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-16",
+    "cv_pdf_file": "cv-16_DINH_THI_THAO.pdf",
+    "candidate_name": "DINH THI THAO",
+    "candidate_target_role": "Video Editor",
+    "job_id": "job-001584",
+    "job_title": "Video Editor",
+    "job_slug": "video-editor-hai-phong-001584",
+    "match_level": "high",
+    "total_score": 89,
+    "score_breakdown": {
+      "experience_match": 26,
+      "skills_match": 23,
+      "education_match": 15,
+      "language_match": 6,
+      "role_relevance": 19
+    },
+    "scoring_reasons": [
+      "2 years of video editing experience meets the 1-3 years requirement with a strong project portfolio.",
+      "Strong match on Reporting, Leadership (managing junior editors), and Customer Focus (client-facing brief work).",
+      "College diploma in Multimedia Design satisfies the education requirement.",
+      "Intermediate English is adequate for typical agency client communication.",
+      "Current title (Video Editor) is an exact match to the job title, with Adobe certification adding credibility."
+    ],
+    "job_snapshot": {
+      "experience_required": "1-3 years",
+      "level": "staff",
+      "education_required": "College degree or above",
+      "skill_tags": [
+        "Reporting",
+        "Leadership",
+        "Customer Focus"
+      ],
+      "key_requirements": [
+        "At least 1-3 years of hands-on experience relevant to the Video Editor role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Strong time-management and prioritization skills",
+        "Strong communication skills, both written and verbal",
+        "Ability to work independently and under pressure",
+        "Eagerness to learn and grow within a professional environment."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-17",
+    "cv_pdf_file": "cv-17_NGUYEN_VAN_SON.pdf",
+    "candidate_name": "NGUYEN VAN SON",
+    "candidate_target_role": "Workshop Supervisor",
+    "job_id": "job-003882",
+    "job_title": "Workshop Manager",
+    "job_slug": "workshop-manager-da-nang-003882",
+    "match_level": "medium",
+    "total_score": 61,
+    "score_breakdown": {
+      "experience_match": 18,
+      "skills_match": 15,
+      "education_match": 12,
+      "language_match": 3,
+      "role_relevance": 13
+    },
+    "scoring_reasons": [
+      "4 years total experience with 1.5 years as team leader is solid but short of the 6+ years manager-level requirement.",
+      "Good match on Planning and Communication, though Negotiation experience (vendor/contract) is not clearly demonstrated.",
+      "College diploma is below the Bachelor's-degree-or-above requirement typically expected for a manager position.",
+      "Basic English is limited for a role that may require supplier or corporate-level communication.",
+      "Current title (Workshop Team Leader) is closely related but one level below full Workshop Manager scope."
+    ],
+    "job_snapshot": {
+      "experience_required": "6+ years",
+      "level": "manager",
+      "education_required": "Bachelor's degree or above",
+      "skill_tags": [
+        "Planning",
+        "Negotiation",
+        "Communication"
+      ],
+      "key_requirements": [
+        "6+ years of experience, including 2-3 years in a management role relevant to the Workshop Manager role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Detail-oriented with a strong sense of ownership",
+        "Good stakeholder management and cross-team collaboration",
+        "Ability to work independently and under pressure",
+        "Proven ability to lead, mentor, and develop high-performing teams."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-18",
+    "cv_pdf_file": "cv-18_TA_THI_HUONG.pdf",
+    "candidate_name": "TA THI HUONG",
+    "candidate_target_role": "Real Estate Agent",
+    "job_id": "job-004730",
+    "job_title": "Real Estate Agent",
+    "job_slug": "real-estate-agent-dong-nai-004730",
+    "match_level": "low",
+    "total_score": 17,
+    "score_breakdown": {
+      "experience_match": 3,
+      "skills_match": 4,
+      "education_match": 6,
+      "language_match": 1,
+      "role_relevance": 3
+    },
+    "scoring_reasons": [
+      "No real estate experience at all; current role is unrelated retail sales, well below the 1-3 years requirement.",
+      "No evidence of Customer Focus in a sales/negotiation context, and no English Proficiency or Communication skills for client-facing real estate work.",
+      "High school diploma is below the College-degree-or-above requirement.",
+      "English is very limited, a significant gap given the job's English Proficiency requirement.",
+      "No transferable job title or real estate-specific responsibilities on the CV."
+    ],
+    "job_snapshot": {
+      "experience_required": "1-3 years",
+      "level": "staff",
+      "education_required": "College degree or above",
+      "skill_tags": [
+        "Customer Focus",
+        "English Proficiency",
+        "Communication"
+      ],
+      "key_requirements": [
+        "At least 1-3 years of hands-on experience relevant to the Real Estate Agent role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Strong communication skills, both written and verbal",
+        "Excellent problem-solving and analytical thinking",
+        "Strong time-management and prioritization skills",
+        "Eagerness to learn and grow within a professional environment."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-19",
+    "cv_pdf_file": "cv-19_LE_VAN_THANH.pdf",
+    "candidate_name": "LE VAN THANH",
+    "candidate_target_role": "Retail Cashier",
+    "job_id": "job-000329",
+    "job_title": "Retail Cashier",
+    "job_slug": "retail-cashier-vung-tau-ba-ria-vung-tau-000329",
+    "match_level": "high",
+    "total_score": 87,
+    "score_breakdown": {
+      "experience_match": 25,
+      "skills_match": 22,
+      "education_match": 15,
+      "language_match": 6,
+      "role_relevance": 19
+    },
+    "scoring_reasons": [
+      "1.5 years of cashier experience meets the 1-3 years requirement in a comparable supermarket setting.",
+      "Strong match on Time Management, Customer Focus, and basic Data Analysis (sales discrepancy reporting).",
+      "College diploma in Business Administration satisfies the education requirement.",
+      "Basic English is sufficient for a retail cashier role with mostly domestic customers.",
+      "Current title (Cashier) is an exact match to the job title, with additional part-time cashier experience."
+    ],
+    "job_snapshot": {
+      "experience_required": "1-3 years",
+      "level": "staff",
+      "education_required": "College degree or above",
+      "skill_tags": [
+        "Time Management",
+        "Customer Focus",
+        "Data Analysis"
+      ],
+      "key_requirements": [
+        "At least 1-3 years of hands-on experience relevant to the Retail Cashier role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Strong time-management and prioritization skills",
+        "Team player with a collaborative working style",
+        "Good stakeholder management and cross-team collaboration",
+        "Eagerness to learn and grow within a professional environment."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-20",
+    "cv_pdf_file": "cv-20_NGUYEN_THI_HONG_NHUNG.pdf",
+    "candidate_name": "NGUYEN THI HONG NHUNG",
+    "candidate_target_role": "Lecturer",
+    "job_id": "job-004367",
+    "job_title": "Lecturer",
+    "job_slug": "lecturer-binh-duong-004367",
+    "match_level": "medium",
+    "total_score": 64,
+    "score_breakdown": {
+      "experience_match": 15,
+      "skills_match": 15,
+      "education_match": 15,
+      "language_match": 9,
+      "role_relevance": 10
+    },
+    "scoring_reasons": [
+      "1 year as a Teaching Assistant meets the minimum years but lacks independent lecturing experience.",
+      "Good match on English Proficiency and some Process Improvement (curriculum feedback), but Leadership in a classroom setting is still developing.",
+      "Master of Education exceeds the Bachelor's-degree-or-above requirement.",
+      "Fluent English (IELTS 7.5) strongly meets the language requirement.",
+      "Role (Teaching Assistant) is closely related but not yet at full Lecturer responsibility level."
+    ],
+    "job_snapshot": {
+      "experience_required": "1-3 years",
+      "level": "staff",
+      "education_required": "College degree or above",
+      "skill_tags": [
+        "English Proficiency",
+        "Leadership",
+        "Process Improvement"
+      ],
+      "key_requirements": [
+        "At least 1-3 years of hands-on experience relevant to the Lecturer role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Good stakeholder management and cross-team collaboration",
+        "Detail-oriented with a strong sense of ownership",
+        "Excellent problem-solving and analytical thinking",
+        "Eagerness to learn and grow within a professional environment."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-21",
+    "cv_pdf_file": "cv-21_CAO_THI_YEN.pdf",
+    "candidate_name": "CAO THI YEN",
+    "candidate_target_role": "E-Commerce Livestream Assistant",
+    "job_id": "job-001563",
+    "job_title": "E-Commerce Livestream Assistant",
+    "job_slug": "e-commerce-livestream-assistant-da-nang-001563",
+    "match_level": "low",
+    "total_score": 12,
+    "score_breakdown": {
+      "experience_match": 0,
+      "skills_match": 3,
+      "education_match": 6,
+      "language_match": 1,
+      "role_relevance": 2
+    },
+    "scoring_reasons": [
+      "No formal work experience at all, well below the job's 1-3 years requirement.",
+      "No demonstrated Attention to Detail, Leadership, or Planning skills relevant to livestream operations.",
+      "High school diploma is below the College-degree-or-above requirement.",
+      "English is very limited, which may hinder engagement with e-commerce platform tools and international content.",
+      "No relevant job title or e-commerce/livestream responsibilities on the CV."
+    ],
+    "job_snapshot": {
+      "experience_required": "1-3 years",
+      "level": "staff",
+      "education_required": "College degree or above",
+      "skill_tags": [
+        "Attention to Detail",
+        "Leadership",
+        "Planning"
+      ],
+      "key_requirements": [
+        "At least 1-3 years of hands-on experience relevant to the E-Commerce Livestream Assistant role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Good command of English (written and spoken)",
+        "Team player with a collaborative working style",
+        "Ability to work independently and under pressure",
+        "Eagerness to learn and grow within a professional environment."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-22",
+    "cv_pdf_file": "cv-22_PHAM_THI_KIM_NGAN.pdf",
+    "candidate_name": "PHAM THI KIM NGAN",
+    "candidate_target_role": "Complaint Handling Specialist",
+    "job_id": "job-004695",
+    "job_title": "Complaint Handling Specialist",
+    "job_slug": "complaint-handling-specialist-ho-chi-minh-city-004695",
+    "match_level": "high",
+    "total_score": 92,
+    "score_breakdown": {
+      "experience_match": 27,
+      "skills_match": 24,
+      "education_match": 15,
+      "language_match": 7,
+      "role_relevance": 19
+    },
+    "scoring_reasons": [
+      "3 years of experience, including 2 years specifically in complaint resolution, meets the 3+ years requirement.",
+      "Excellent match on Time Management, Project/Case Management, and Customer Focus, with measurable resolution-rate results.",
+      "Bachelor of Business Administration satisfies the Bachelor's-degree-or-above requirement.",
+      "Intermediate English is adequate for typical e-commerce customer service documentation.",
+      "Current title and responsibilities directly match the Complaint Handling Specialist role."
+    ],
+    "job_snapshot": {
+      "experience_required": "3+ years",
+      "level": "senior",
+      "education_required": "Bachelor's degree or above",
+      "skill_tags": [
+        "Time Management",
+        "Project Management",
+        "Customer Focus"
+      ],
+      "key_requirements": [
+        "3-6 years of proven experience relevant to the Complaint Handling Specialist role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Good command of English (written and spoken)",
+        "Ability to work independently and under pressure",
+        "Detail-oriented with a strong sense of ownership"
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-23",
+    "cv_pdf_file": "cv-23_TRAN_VAN_BAO.pdf",
+    "candidate_name": "TRAN VAN BAO",
+    "candidate_target_role": "Insurance Sales Manager",
+    "job_id": "job-003523",
+    "job_title": "Insurance Sales Manager",
+    "job_slug": "insurance-sales-manager-hai-phong-003523",
+    "match_level": "medium",
+    "total_score": 66,
+    "score_breakdown": {
+      "experience_match": 18,
+      "skills_match": 16,
+      "education_match": 12,
+      "language_match": 8,
+      "role_relevance": 12
+    },
+    "scoring_reasons": [
+      "4 years of experience with 1.5 years leading a small team falls short of the 6+ years manager-level requirement.",
+      "Good match on Leadership, English Proficiency, and Teamwork, though experience managing a large-scale sales force is still developing.",
+      "Bachelor of Finance is below what's typically expected for a full managerial insurance role at this seniority.",
+      "Good English (IELTS 6.5) meets the language requirement well.",
+      "Current title (Senior Insurance Sales Executive / Team Lead) is adjacent to, but not yet at, full Manager level."
+    ],
+    "job_snapshot": {
+      "experience_required": "6+ years",
+      "level": "manager",
+      "education_required": "Bachelor's degree or above",
+      "skill_tags": [
+        "Leadership",
+        "English Proficiency",
+        "Teamwork"
+      ],
+      "key_requirements": [
+        "6+ years of experience, including 2-3 years in a management role relevant to the Insurance Sales Manager role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Adaptability in a fast-paced, changing environment",
+        "Team player with a collaborative working style",
+        "Ability to work independently and under pressure",
+        "Proven ability to lead, mentor, and develop high-performing teams."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-24",
+    "cv_pdf_file": "cv-24_NGUYEN_VAN_LOC.pdf",
+    "candidate_name": "NGUYEN VAN LOC",
+    "candidate_target_role": "Lab Assistant",
+    "job_id": "job-001193",
+    "job_title": "Lab Technician",
+    "job_slug": "lab-technician-nha-trang-khanh-hoa-001193",
+    "match_level": "low",
+    "total_score": 20,
+    "score_breakdown": {
+      "experience_match": 4,
+      "skills_match": 5,
+      "education_match": 5,
+      "language_match": 2,
+      "role_relevance": 4
+    },
+    "scoring_reasons": [
+      "Only a 3-month internship, far below the job's 1-3 years requirement.",
+      "Very limited Process Improvement, Planning, or Agriculture & Science domain skills demonstrated.",
+      "Did not complete the Biology diploma program, below the College-degree-or-above requirement.",
+      "English is elementary, insufficient for technical lab documentation and reporting.",
+      "No formal Lab Technician title held; internship responsibilities were observational rather than hands-on."
+    ],
+    "job_snapshot": {
+      "experience_required": "1-3 years",
+      "level": "staff",
+      "education_required": "College degree or above",
+      "skill_tags": [
+        "Process Improvement",
+        "Planning",
+        "Agriculture & Science"
+      ],
+      "key_requirements": [
+        "At least 1-3 years of hands-on experience relevant to the Lab Technician role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Detail-oriented with a strong sense of ownership",
+        "Proactive mindset with a can-do attitude",
+        "Strong communication skills, both written and verbal",
+        "Eagerness to learn and grow within a professional environment."
+      ]
+    }
+  },
+  {
+    "cv_id": "cv-25",
+    "cv_pdf_file": "cv-25_HOANG_THI_YEN_NHI.pdf",
+    "candidate_name": "HOANG THI YEN NHI",
+    "candidate_target_role": "Translator (Written)",
+    "job_id": "job-003989",
+    "job_title": "Translator (Written)",
+    "job_slug": "translator-written-dong-nai-003989",
+    "match_level": "high",
+    "total_score": 94,
+    "score_breakdown": {
+      "experience_match": 26,
+      "skills_match": 24,
+      "education_match": 15,
+      "language_match": 10,
+      "role_relevance": 19
+    },
+    "scoring_reasons": [
+      "1.5 years of professional written translation experience meets the 1-3 years requirement, plus freelance translation background.",
+      "Excellent match on Translation, Negotiation (contract clause clarification), and Problem Solving skills.",
+      "Bachelor of English Linguistics satisfies the College-degree-or-above requirement.",
+      "Fluent English (IELTS 7.5, TOEIC 950) strongly exceeds typical translator language requirements.",
+      "Current title (Written Translator) is an exact match to the job title."
+    ],
+    "job_snapshot": {
+      "experience_required": "1-3 years",
+      "level": "staff",
+      "education_required": "College degree or above",
+      "skill_tags": [
+        "Translation",
+        "Negotiation",
+        "Problem Solving"
+      ],
+      "key_requirements": [
+        "At least 1-3 years of hands-on experience relevant to the Translator (Written) role.",
+        "Solid understanding of industry best practices and relevant tools or systems.",
+        "Strong communication skills, both written and verbal",
+        "Good stakeholder management and cross-team collaboration",
+        "Detail-oriented with a strong sense of ownership",
+        "Eagerness to learn and grow within a professional environment."
+      ]
+    }
+  }
+]

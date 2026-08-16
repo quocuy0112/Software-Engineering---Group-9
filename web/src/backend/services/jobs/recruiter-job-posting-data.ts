@@ -1,10 +1,11 @@
 import "server-only";
 
 import { randomUUID } from "node:crypto";
-import { readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import { z } from "zod";
 import { prisma } from "@/backend/database/prisma";
+import { configuredJsonJobCatalogueRepository } from "@/backend/repositories/jobs/job-catalogue-repository-factory";
+import { adoptActiveJobBaseline } from "@/backend/jobs/review/job-post-active-baseline-service";
+import { closeManagedJobPost } from "@/backend/jobs/review/job-post-review-service";
 import {
   companyCatalogSchema,
   recruiterCompanySettingsInputSchema,
@@ -22,10 +23,11 @@ import type {
   RecruiterJobManagementData,
 } from "@/shared/contracts/recruiter-job-posting";
 
-const dataPath = (name: string) => resolve(process.cwd(), "data", "jobs", name);
-const jobsPath = dataPath("jobs.json");
-const companiesPath = dataPath("companies.json");
-const applicationsPath = dataPath("applications.json");
+const jobsRepository = configuredJsonJobCatalogueRepository("jobs.json");
+const companiesRepository =
+  configuredJsonJobCatalogueRepository("companies.json");
+const applicationsRepository =
+  configuredJsonJobCatalogueRepository("applications.json");
 const MAX_COMPANY_LOGO_BYTES = 800 * 1024;
 type CompanyProfileField =
   RecruiterCompanySettings["missingProfileFields"][number];
@@ -138,6 +140,13 @@ const legacyStatusMap: Record<
 };
 
 let writeQueue: Promise<void> = Promise.resolve();
+type RecruiterCatalog = {
+  jobs: JobCatalogItem[];
+  companies: RecruiterCompany[];
+  rawJobs: unknown[];
+  rawCompanies: unknown[];
+};
+let catalogRead: Promise<RecruiterCatalog> | null = null;
 
 function withWriteLock<T>(operation: () => Promise<T>) {
   const next = writeQueue.then(operation, operation);
@@ -146,14 +155,6 @@ function withWriteLock<T>(operation: () => Promise<T>) {
     () => undefined,
   );
   return next;
-}
-
-async function readJson(path: string) {
-  return JSON.parse(await readFile(path, "utf8")) as unknown;
-}
-
-async function writeJson(path: string, value: unknown) {
-  await writeFile(path, JSON.stringify(value, null, 2) + "\n", "utf8");
 }
 
 function normalizedStatus(value: string): JobPostingStatus {
@@ -319,15 +320,83 @@ async function authorizedCompanies(
 }
 
 async function readCatalog() {
-  const [jobsValue, companiesValue] = await Promise.all([
-    readJson(jobsPath),
-    readJson(companiesPath),
-  ]);
-  const rawJobs = z.array(z.unknown()).parse(jobsValue);
-  const rawCompanies = z.array(z.unknown()).parse(companiesValue);
-  const jobs = rawJobs.map(normalizeJob);
-  const companies = rawCompanies.map(normalizeCompany);
-  return { jobs, companies, rawJobs, rawCompanies };
+  if (catalogRead) return catalogRead;
+
+  catalogRead = Promise.all([jobsRepository.read(), companiesRepository.read()])
+    .then(([jobsValue, companiesValue]) => {
+      const rawJobs = z.array(z.unknown()).parse(jobsValue);
+      const rawCompanies = z.array(z.unknown()).parse(companiesValue);
+      const jobs = rawJobs.map(normalizeJob);
+      const companies = rawCompanies.map(normalizeCompany);
+      return { jobs, companies, rawJobs, rawCompanies };
+    })
+    .then((catalog) => catalog);
+  try {
+    return await catalogRead;
+  } finally {
+    catalogRead = null;
+  }
+}
+
+export async function authorizeLegacyRecruiterJobs(
+  userId: string,
+  jobIds: readonly string[],
+) {
+  const requestedJobIds = new Set(jobIds);
+  const authorized = new Map<
+    string,
+    { jobId: string; companyId: string; jobTitle: string }
+  >();
+  if (requestedJobIds.size === 0) return authorized;
+
+  const { jobs, companies } = await readCatalog();
+  const databaseCompanies = await readDatabaseAuthorizedCompanies(userId);
+  const databaseCompanyIds = new Set(
+    databaseCompanies.map((company) => company.id),
+  );
+  const databaseCompanyIdsByTaxCode = new Set(
+    databaseCompanies
+      .map((company) => company.normalizedTaxIdentifier)
+      .filter((taxCode): taxCode is string => Boolean(taxCode)),
+  );
+  const companyById = new Map(
+    companies.map((company) => [company.id, company]),
+  );
+  for (const job of jobs) {
+    if (!requestedJobIds.has(job.id)) continue;
+    const company = companyById.get(job.companyId);
+    const companyAuthorizedByDatabase = Boolean(
+      databaseCompanyIds.has(job.companyId) ||
+      (company &&
+        (databaseCompanyIds.has(company.id) ||
+          (company.taxCode &&
+            databaseCompanyIdsByTaxCode.has(company.taxCode)))),
+    );
+    if (
+      (!company && !databaseCompanyIds.has(job.companyId)) ||
+      (company &&
+        !companyAuthorizedByDatabase &&
+        (company.verificationStatus !== "approved" ||
+          (company.ownerUserId !== userId &&
+            !company.memberUserIds.includes(userId))))
+    )
+      continue;
+    authorized.set(job.id, {
+      jobId: job.id,
+      companyId: company?.id ?? job.companyId,
+      jobTitle: job.title,
+    });
+  }
+  return authorized;
+}
+
+export async function authorizeLegacyRecruiterJob(
+  userId: string,
+  jobId: string,
+) {
+  return (
+    (await authorizeLegacyRecruiterJobs(userId, [jobId])).get(jobId) ?? null
+  );
 }
 
 function replaceRawJob(rawJobs: unknown[], updated: JobCatalogItem) {
@@ -372,7 +441,7 @@ function replaceOrAppendRawCompany(
 
 async function readApplications(): Promise<JobApplicationRecord[]> {
   try {
-    const value = await readJson(applicationsPath);
+    const value = await applicationsRepository.read();
     return z.array(applicationSchema).parse(value);
   } catch {
     return [];
@@ -395,9 +464,71 @@ export async function readRecruiterJobManagementData(
   const companyById = new Map(
     [...companies, ...ownedCompanies].map((company) => [company.id, company]),
   );
+  const ownedJobIds = jobs
+    .filter((job) => ownedCompanyIds.has(job.companyId))
+    .map((job) => job.id);
+  const reviewAggregates = ownedJobIds.length
+    ? await prisma.jobPostReviewAggregate.findMany({
+        where: { jobId: { in: ownedJobIds } },
+        include: {
+          pendingVersion: true,
+          versions: { orderBy: { sequence: "desc" }, take: 1 },
+          correctionRequests: {
+            where: { state: "OPEN" },
+            orderBy: { createdAt: "desc" },
+            take: 1,
+          },
+        },
+      })
+    : [];
+  const reviewByJobId = new Map(
+    reviewAggregates.map((aggregate) => [aggregate.jobId, aggregate]),
+  );
   const recruiterJobs: RecruiterJob[] = jobs
     .filter((job) => ownedCompanyIds.has(job.companyId))
-    .map((job) => ({ ...job, company: companyById.get(job.companyId)! }))
+    .map((job) => {
+      const aggregate = reviewByJobId.get(job.id);
+      const current = aggregate?.pendingVersion ?? aggregate?.versions[0];
+      const correctionRequest = aggregate?.correctionRequests[0];
+      const derivedStatus = aggregate?.pendingVersion
+        ? "pending_approval"
+        : current?.state === "REJECTED"
+          ? "rejected"
+          : current?.state === "APPROVED"
+            ? "active"
+            : job.status;
+      return {
+        ...job,
+        status: derivedStatus,
+        company: companyById.get(job.companyId)!,
+        ...(aggregate && current
+          ? {
+              review: {
+                reviewId: current.id,
+                jobId: aggregate.jobId,
+                sequence: current.sequence,
+                state: current.state,
+                readOnly: current.state === "PENDING_REVIEW",
+                reasonCode: current.reasonCode,
+                publicExplanation: current.publicExplanation,
+                submittedAt: current.submittedAt.toISOString(),
+                decidedAt: current.decidedAt?.toISOString() ?? null,
+                version: aggregate.version,
+              },
+            }
+          : {}),
+        ...(correctionRequest
+          ? {
+              correctionRequest: {
+                id: correctionRequest.id,
+                publicExplanation: correctionRequest.publicExplanation,
+                hideImmediately: correctionRequest.hideImmediately,
+                createdAt: correctionRequest.createdAt.toISOString(),
+              },
+            }
+          : {}),
+      };
+    })
     .filter((job) => job.company !== undefined);
 
   const primaryCompany = ownedCompanies[0] ?? null;
@@ -414,6 +545,38 @@ export async function readRecruiterJobManagementData(
     ),
     missingCompanyProfileFields: missingProfileFields,
   };
+}
+
+export async function readRecruiterJobReviewSource(
+  userId: string,
+  jobId: string,
+) {
+  const { jobs, companies } = await readCatalog();
+  const authorized = await authorizedCompanies(companies, userId);
+  const companyById = new Map(
+    authorized.map((company) => [company.id, company]),
+  );
+  const job = jobs.find((candidate) => candidate.id === jobId);
+  const company = job ? companyById.get(job.companyId) : undefined;
+  if (!job || !company?.databaseBacked || !company.databaseId)
+    throw new Error("JOB_POST_REVIEW_UNAVAILABLE");
+  const membership = await prisma.companyMembership.findFirst({
+    where: {
+      companyId: company.databaseId,
+      userId,
+      status: "ACTIVE",
+      role: { in: ["OWNER", "HR_MANAGER", "RECRUITER", "HIRING_MANAGER"] },
+      user: { state: "ACTIVE", deletedAt: null },
+      company: {
+        verificationState: "ACTIVE",
+        verifiedAt: { not: null },
+        verificationInactiveAt: null,
+      },
+    },
+    select: { id: true, companyId: true },
+  });
+  if (!membership) throw new Error("JOB_POST_REVIEW_UNAVAILABLE");
+  return { job, membership };
 }
 
 function slugPart(value: string) {
@@ -460,7 +623,7 @@ function jobFromCommand(
 export async function createRecruiterJob(
   userId: string,
   raw: unknown,
-  status: Extract<JobPostingStatus, "draft" | "pending_approval">,
+  status: Extract<JobPostingStatus, "draft">,
 ) {
   return withWriteLock(async () => {
     const { companies, rawJobs } = await readCatalog();
@@ -472,7 +635,7 @@ export async function createRecruiterJob(
       throw new Error("Company profile is incomplete.");
     }
     const job = jobFromCommand(raw, company.id, status, now);
-    await writeJson(jobsPath, [...rawJobs, job]);
+    await jobsRepository.mutate(() => [...rawJobs, job]);
     return { ...job, company } satisfies RecruiterJob;
   });
 }
@@ -484,7 +647,7 @@ function recruiterCanUpdateStatus(
   if (current === "draft" || current === "rejected") {
     return target === "draft" || target === "pending_approval";
   }
-  if (current === "active") return target === "active";
+  if (current === "active") return target === "active" || target === "draft";
   if (current === "closed") return target === "closed";
   return false;
 }
@@ -498,6 +661,21 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
       (job) => job.id === input.id && job.companyId === company.id,
     );
     if (!current) throw new Error("Job posting not found.");
+    const reviewLock = await prisma.jobPostReviewAggregate.findUnique({
+      where: { jobId: current.id },
+      select: { pendingVersionId: true },
+    });
+    if (reviewLock?.pendingVersionId)
+      throw new Error("This job posting is locked while review is pending.");
+    if (current.status === "active" && input.status === "draft") {
+      if (!company.databaseBacked || !company.databaseId)
+        throw new Error("JOB_POST_REVIEW_UNAVAILABLE");
+      await adoptActiveJobBaseline({
+        job: current,
+        authoritativeCompanyId: company.databaseId,
+        actorUserId: userId,
+      });
+    }
     if (!recruiterCanUpdateStatus(current.status, input.status)) {
       throw new Error(
         "This job posting cannot be edited in its current status.",
@@ -517,7 +695,7 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
         applicantCount: current.stats.applicantCount,
       },
     });
-    await writeJson(jobsPath, replaceRawJob(rawJobs, updated));
+    await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
     return { ...updated, company } satisfies RecruiterJob;
   });
 }
@@ -536,12 +714,18 @@ export async function closeRecruiterJob(userId: string, jobId: string) {
         "This job posting cannot be closed in its current status.",
       );
     }
+    if (company.databaseBacked && company.databaseId)
+      await closeManagedJobPost({
+        jobId: current.id,
+        companyId: company.databaseId,
+        actorUserId: userId,
+      });
     const updated = jobCatalogSchema.parse({
       ...current,
       status: "closed",
       updatedAt: new Date().toISOString(),
     });
-    await writeJson(jobsPath, replaceRawJob(rawJobs, updated));
+    await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
     return { ...updated, company } satisfies RecruiterJob;
   });
 }
@@ -573,7 +757,7 @@ export async function ensureRecruiterCompany(
       verificationStatus: "pending",
       jobCount: 0,
     });
-    await writeJson(companiesPath, [...rawCompanies, company]);
+    await companiesRepository.mutate(() => [...rawCompanies, company]);
     return { ...company, ownerUserId: userId } satisfies RecruiterCompany;
   });
 }
@@ -639,8 +823,7 @@ export async function updateRecruiterCompanySettings(
       website: editable.website,
       description: editable.description,
     });
-    await writeJson(
-      companiesPath,
+    await companiesRepository.mutate(() =>
       replaceOrAppendRawCompany(rawCompanies, updated),
     );
     if (company.databaseBacked && company.databaseId) {
@@ -689,17 +872,20 @@ export async function recordApplication(
         applicantCount: job.stats.applicantCount + 1,
       },
     });
-    await writeJson(jobsPath, replaceRawJob(rawJobs, updated));
-    await writeJson(applicationsPath, [
-      ...applications,
-      {
-        id: `application-${randomUUID()}`,
-        jobId,
-        userId,
-        appliedAt: new Date().toISOString(),
-        status,
-      },
-    ] satisfies JobApplicationRecord[]);
+    await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
+    await applicationsRepository.mutate(
+      () =>
+        [
+          ...applications,
+          {
+            id: `application-${randomUUID()}`,
+            jobId,
+            userId,
+            appliedAt: new Date().toISOString(),
+            status,
+          },
+        ] satisfies JobApplicationRecord[],
+    );
     return updated;
   });
 }

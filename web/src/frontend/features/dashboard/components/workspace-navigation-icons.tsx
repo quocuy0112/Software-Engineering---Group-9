@@ -1,6 +1,7 @@
 export type WorkspaceNavIconName =
   | "dashboard"
   | "jobs"
+  | "candidates"
   | "messages"
   | "connections"
   | "support"
@@ -60,6 +61,16 @@ export function WorkspaceNavIcon({ name }: { name: WorkspaceNavIconName }) {
         <circle cx="6" cy="7" r="2.5" />
         <circle cx="14" cy="7" r="2.5" />
         <path d="M2.5 16c.4-3 1.6-4.5 3.5-4.5S9.1 13 9.5 16M10.5 16c.4-3 1.6-4.5 3.5-4.5s3.1 1.5 3.5 4.5M8.5 8.5h3" />
+      </svg>
+    );
+  }
+
+  if (name === "candidates") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
+        <circle cx="7" cy="6.5" r="2.5" />
+        <circle cx="14.5" cy="7.5" r="2" />
+        <path d="M2.5 16c.4-3.1 1.9-4.7 4.5-4.7s4.1 1.6 4.5 4.7M12 12.3c2.4-.5 4.4.8 5 3.7" />
       </svg>
     );
   }

@@ -10,6 +10,47 @@
   "hiddenJobIds": [
     "job-000099"
   ],
+  "appliedJobs": [
+    {
+      "jobId": "job-000001",
+      "appliedAt": "2026-08-04T10:00:00.000Z",
+      "status": "submitted",
+      "cvFileRef": "cv-storage-id-xyz",
+      "contactSnapshot": {
+        "fullName": "Nguyen Van A",
+        "email": "candidate@example.com",
+        "phone": "0901234567"
+      },
+      "aiAnalysisConsent": true,
+      "aiMatchScore": 82
+    },
+    {
+      "jobId": "job-000074",
+      "appliedAt": "2026-08-07T14:40:16.026Z",
+      "status": "submitted",
+      "cvFileRef": "cv-import-26a37398-6f27-49e2-a80a-4b15c3a7157b",
+      "contactSnapshot": {
+        "fullName": "Tuấn",
+        "email": "phucrom105@gmail.com",
+        "phone": "+84918475726"
+      },
+      "aiAnalysisConsent": true,
+      "aiMatchScore": 82
+    },
+    {
+      "jobId": "job-000222",
+      "appliedAt": "2026-08-07T17:26:08.579Z",
+      "status": "submitted",
+      "cvFileRef": "candidate-cv-eddc3000-5c42-45ae-a4fd-32eed808083f",
+      "contactSnapshot": {
+        "fullName": "Tuấn",
+        "email": "phucrom105@gmail.com",
+        "phone": "+84901234567"
+      },
+      "aiAnalysisConsent": true,
+      "aiMatchScore": 82
+    }
+  ],
   "jobPreferences": {
     "gender": "male",
     "professionalPositions": [
@@ -38,9 +79,5 @@
         "city": "Ho Chi Minh City"
       }
     }
-  ],
-  "appliedJobIds": [
-    "job-000001",
-    "job-000002"
   ]
 }

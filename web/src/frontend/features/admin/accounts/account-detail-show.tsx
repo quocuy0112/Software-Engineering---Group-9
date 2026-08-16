@@ -166,7 +166,7 @@ function Content() {
           >
             Recruiter activity
           </Typography>
-          <Count value={record.recruiterActivity} label="Job postings" />
+          <Count value={record.recruiterActivity} label="Job postings submitted" />
         </Box>
       )}
       {record.authorities.length > 0 && (

@@ -20,13 +20,11 @@ import {
   useDataProvider,
   useGetList,
   useNotify,
-  useRedirect,
   useRefresh,
   useUpdate,
 } from "react-admin";
 import type { NotificationItem } from "@/shared/contracts/notifications";
 import type { AdminDataProvider } from "../app/data-provider";
-import { adminNotificationTarget } from "./admin-notification-navigation";
 
 const visibleInterval = () =>
   typeof document === "undefined" || document.visibilityState === "visible"
@@ -37,7 +35,6 @@ export function AdminNotificationButton() {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const [markingAll, setMarkingAll] = useState(false);
   const notify = useNotify();
-  const redirect = useRedirect();
   const refresh = useRefresh();
   const dataProvider = useDataProvider<AdminDataProvider>();
   const [update, updateState] = useUpdate<NotificationItem>();
@@ -53,10 +50,9 @@ export function AdminNotificationButton() {
   const unreadCount = Number(notifications.meta?.unreadCount ?? 0);
 
   function openNotification(notification: NotificationItem) {
-    const target = adminNotificationTarget(notification);
     const navigate = () => {
       setAnchor(null);
-      if (target) redirect("show", target.resource, target.id);
+      if (notification.href) window.location.assign(notification.href);
     };
     if (notification.readAt) {
       navigate();
@@ -70,15 +66,12 @@ export function AdminNotificationButton() {
         previousData: notification,
       },
       {
-        mutationMode: "pessimistic",
-        onSuccess: () => {
-          void notifications.refetch();
-          navigate();
-        },
-        onError: () =>
-          notify("Unable to mark notification as read", { type: "error" }),
+        mutationMode: "optimistic",
+        onSettled: () => void notifications.refetch(),
+        onError: () => notify("Unable to mark notification as read", { type: "error" }),
       },
     );
+    navigate();
   }
 
   async function markAllRead() {

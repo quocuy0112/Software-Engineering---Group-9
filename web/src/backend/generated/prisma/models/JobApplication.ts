@@ -29,11 +29,13 @@ export type AggregateJobApplication = {
 export type JobApplicationAvgAggregateOutputType = {
   aiMatchScore: number | null
   stageVersion: number | null
+  scoringGeneration: number | null
 }
 
 export type JobApplicationSumAggregateOutputType = {
   aiMatchScore: number | null
   stageVersion: number | null
+  scoringGeneration: number | null
 }
 
 export type JobApplicationMinAggregateOutputType = {
@@ -54,6 +56,13 @@ export type JobApplicationMinAggregateOutputType = {
   idempotencyKey: string | null
   submissionBindingDigest: string | null
   submittedAt: Date | null
+  documentRetentionDueAt: Date | null
+  documentAccessDeniedAt: Date | null
+  documentDeletionDueAt: Date | null
+  documentDeletedAt: Date | null
+  legacyDocumentState: $Enums.ApplicationLegacyDocumentState | null
+  currentScoringResultId: string | null
+  scoringGeneration: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -76,6 +85,13 @@ export type JobApplicationMaxAggregateOutputType = {
   idempotencyKey: string | null
   submissionBindingDigest: string | null
   submittedAt: Date | null
+  documentRetentionDueAt: Date | null
+  documentAccessDeniedAt: Date | null
+  documentDeletionDueAt: Date | null
+  documentDeletedAt: Date | null
+  legacyDocumentState: $Enums.ApplicationLegacyDocumentState | null
+  currentScoringResultId: string | null
+  scoringGeneration: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -102,6 +118,13 @@ export type JobApplicationCountAggregateOutputType = {
   idempotencyKey: number
   submissionBindingDigest: number
   submittedAt: number
+  documentRetentionDueAt: number
+  documentAccessDeniedAt: number
+  documentDeletionDueAt: number
+  documentDeletedAt: number
+  legacyDocumentState: number
+  currentScoringResultId: number
+  scoringGeneration: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -111,11 +134,13 @@ export type JobApplicationCountAggregateOutputType = {
 export type JobApplicationAvgAggregateInputType = {
   aiMatchScore?: true
   stageVersion?: true
+  scoringGeneration?: true
 }
 
 export type JobApplicationSumAggregateInputType = {
   aiMatchScore?: true
   stageVersion?: true
+  scoringGeneration?: true
 }
 
 export type JobApplicationMinAggregateInputType = {
@@ -136,6 +161,13 @@ export type JobApplicationMinAggregateInputType = {
   idempotencyKey?: true
   submissionBindingDigest?: true
   submittedAt?: true
+  documentRetentionDueAt?: true
+  documentAccessDeniedAt?: true
+  documentDeletionDueAt?: true
+  documentDeletedAt?: true
+  legacyDocumentState?: true
+  currentScoringResultId?: true
+  scoringGeneration?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -158,6 +190,13 @@ export type JobApplicationMaxAggregateInputType = {
   idempotencyKey?: true
   submissionBindingDigest?: true
   submittedAt?: true
+  documentRetentionDueAt?: true
+  documentAccessDeniedAt?: true
+  documentDeletionDueAt?: true
+  documentDeletedAt?: true
+  legacyDocumentState?: true
+  currentScoringResultId?: true
+  scoringGeneration?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -184,6 +223,13 @@ export type JobApplicationCountAggregateInputType = {
   idempotencyKey?: true
   submissionBindingDigest?: true
   submittedAt?: true
+  documentRetentionDueAt?: true
+  documentAccessDeniedAt?: true
+  documentDeletionDueAt?: true
+  documentDeletedAt?: true
+  legacyDocumentState?: true
+  currentScoringResultId?: true
+  scoringGeneration?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -297,6 +343,13 @@ export type JobApplicationGroupByOutputType = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt: Date
+  documentRetentionDueAt: Date | null
+  documentAccessDeniedAt: Date | null
+  documentDeletionDueAt: Date | null
+  documentDeletedAt: Date | null
+  legacyDocumentState: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId: string | null
+  scoringGeneration: number
   createdAt: Date
   updatedAt: Date
   _count: JobApplicationCountAggregateOutputType | null
@@ -346,6 +399,13 @@ export type JobApplicationWhereInput = {
   idempotencyKey?: Prisma.StringFilter<"JobApplication"> | string
   submissionBindingDigest?: Prisma.StringFilter<"JobApplication"> | string
   submittedAt?: Prisma.DateTimeFilter<"JobApplication"> | Date | string
+  documentRetentionDueAt?: Prisma.DateTimeNullableFilter<"JobApplication"> | Date | string | null
+  documentAccessDeniedAt?: Prisma.DateTimeNullableFilter<"JobApplication"> | Date | string | null
+  documentDeletionDueAt?: Prisma.DateTimeNullableFilter<"JobApplication"> | Date | string | null
+  documentDeletedAt?: Prisma.DateTimeNullableFilter<"JobApplication"> | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFilter<"JobApplication"> | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.StringNullableFilter<"JobApplication"> | string | null
+  scoringGeneration?: Prisma.IntFilter<"JobApplication"> | number
   createdAt?: Prisma.DateTimeFilter<"JobApplication"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"JobApplication"> | Date | string
   candidate?: Prisma.XOR<Prisma.CandidateIdentityScalarRelationFilter, Prisma.CandidateIdentityWhereInput>
@@ -355,6 +415,18 @@ export type JobApplicationWhereInput = {
   notificationWork?: Prisma.RecruitmentNotificationWorkListRelationFilter
   stageEvents?: Prisma.ApplicationStageEventListRelationFilter
   messagingConversations?: Prisma.MessagingConversationListRelationFilter
+  applicationDocuments?: Prisma.ApplicationDocumentListRelationFilter
+  coverLetterText?: Prisma.XOR<Prisma.ApplicationCoverLetterTextNullableScalarRelationFilter, Prisma.ApplicationCoverLetterTextWhereInput> | null
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionListRelationFilter
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldListRelationFilter
+  currentScoringResult?: Prisma.XOR<Prisma.ApplicationScoringResultNullableScalarRelationFilter, Prisma.ApplicationScoringResultWhereInput> | null
+  scoringResults?: Prisma.ApplicationScoringResultListRelationFilter
+  scoringOperations?: Prisma.ScoringOperationListRelationFilter
+  manualPriorities?: Prisma.ManualApplicationPriorityListRelationFilter
+  rankingRows?: Prisma.RankingSnapshotRowListRelationFilter
+  aiAssessments?: Prisma.AiAssessmentListRelationFilter
+  scoringWorkItems?: Prisma.ScoringWorkItemListRelationFilter
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptListRelationFilter
 }
 
 export type JobApplicationOrderByWithRelationInput = {
@@ -379,6 +451,13 @@ export type JobApplicationOrderByWithRelationInput = {
   idempotencyKey?: Prisma.SortOrder
   submissionBindingDigest?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  documentRetentionDueAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  documentAccessDeniedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  documentDeletionDueAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  documentDeletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  legacyDocumentState?: Prisma.SortOrder
+  currentScoringResultId?: Prisma.SortOrderInput | Prisma.SortOrder
+  scoringGeneration?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   candidate?: Prisma.CandidateIdentityOrderByWithRelationInput
@@ -388,10 +467,23 @@ export type JobApplicationOrderByWithRelationInput = {
   notificationWork?: Prisma.RecruitmentNotificationWorkOrderByRelationAggregateInput
   stageEvents?: Prisma.ApplicationStageEventOrderByRelationAggregateInput
   messagingConversations?: Prisma.MessagingConversationOrderByRelationAggregateInput
+  applicationDocuments?: Prisma.ApplicationDocumentOrderByRelationAggregateInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextOrderByWithRelationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionOrderByRelationAggregateInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldOrderByRelationAggregateInput
+  currentScoringResult?: Prisma.ApplicationScoringResultOrderByWithRelationInput
+  scoringResults?: Prisma.ApplicationScoringResultOrderByRelationAggregateInput
+  scoringOperations?: Prisma.ScoringOperationOrderByRelationAggregateInput
+  manualPriorities?: Prisma.ManualApplicationPriorityOrderByRelationAggregateInput
+  rankingRows?: Prisma.RankingSnapshotRowOrderByRelationAggregateInput
+  aiAssessments?: Prisma.AiAssessmentOrderByRelationAggregateInput
+  scoringWorkItems?: Prisma.ScoringWorkItemOrderByRelationAggregateInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptOrderByRelationAggregateInput
 }
 
 export type JobApplicationWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  currentScoringResultId?: string
   candidateUserId_jobPostingId?: Prisma.JobApplicationCandidateUserIdJobPostingIdCompoundUniqueInput
   candidateUserId_idempotencyKey?: Prisma.JobApplicationCandidateUserIdIdempotencyKeyCompoundUniqueInput
   AND?: Prisma.JobApplicationWhereInput | Prisma.JobApplicationWhereInput[]
@@ -417,6 +509,12 @@ export type JobApplicationWhereUniqueInput = Prisma.AtLeast<{
   idempotencyKey?: Prisma.StringFilter<"JobApplication"> | string
   submissionBindingDigest?: Prisma.StringFilter<"JobApplication"> | string
   submittedAt?: Prisma.DateTimeFilter<"JobApplication"> | Date | string
+  documentRetentionDueAt?: Prisma.DateTimeNullableFilter<"JobApplication"> | Date | string | null
+  documentAccessDeniedAt?: Prisma.DateTimeNullableFilter<"JobApplication"> | Date | string | null
+  documentDeletionDueAt?: Prisma.DateTimeNullableFilter<"JobApplication"> | Date | string | null
+  documentDeletedAt?: Prisma.DateTimeNullableFilter<"JobApplication"> | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFilter<"JobApplication"> | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFilter<"JobApplication"> | number
   createdAt?: Prisma.DateTimeFilter<"JobApplication"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"JobApplication"> | Date | string
   candidate?: Prisma.XOR<Prisma.CandidateIdentityScalarRelationFilter, Prisma.CandidateIdentityWhereInput>
@@ -426,7 +524,19 @@ export type JobApplicationWhereUniqueInput = Prisma.AtLeast<{
   notificationWork?: Prisma.RecruitmentNotificationWorkListRelationFilter
   stageEvents?: Prisma.ApplicationStageEventListRelationFilter
   messagingConversations?: Prisma.MessagingConversationListRelationFilter
-}, "id" | "candidateUserId_jobPostingId" | "candidateUserId_idempotencyKey">
+  applicationDocuments?: Prisma.ApplicationDocumentListRelationFilter
+  coverLetterText?: Prisma.XOR<Prisma.ApplicationCoverLetterTextNullableScalarRelationFilter, Prisma.ApplicationCoverLetterTextWhereInput> | null
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionListRelationFilter
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldListRelationFilter
+  currentScoringResult?: Prisma.XOR<Prisma.ApplicationScoringResultNullableScalarRelationFilter, Prisma.ApplicationScoringResultWhereInput> | null
+  scoringResults?: Prisma.ApplicationScoringResultListRelationFilter
+  scoringOperations?: Prisma.ScoringOperationListRelationFilter
+  manualPriorities?: Prisma.ManualApplicationPriorityListRelationFilter
+  rankingRows?: Prisma.RankingSnapshotRowListRelationFilter
+  aiAssessments?: Prisma.AiAssessmentListRelationFilter
+  scoringWorkItems?: Prisma.ScoringWorkItemListRelationFilter
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptListRelationFilter
+}, "id" | "currentScoringResultId" | "candidateUserId_jobPostingId" | "candidateUserId_idempotencyKey">
 
 export type JobApplicationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -450,6 +560,13 @@ export type JobApplicationOrderByWithAggregationInput = {
   idempotencyKey?: Prisma.SortOrder
   submissionBindingDigest?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  documentRetentionDueAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  documentAccessDeniedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  documentDeletionDueAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  documentDeletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  legacyDocumentState?: Prisma.SortOrder
+  currentScoringResultId?: Prisma.SortOrderInput | Prisma.SortOrder
+  scoringGeneration?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.JobApplicationCountOrderByAggregateInput
@@ -484,6 +601,13 @@ export type JobApplicationScalarWhereWithAggregatesInput = {
   idempotencyKey?: Prisma.StringWithAggregatesFilter<"JobApplication"> | string
   submissionBindingDigest?: Prisma.StringWithAggregatesFilter<"JobApplication"> | string
   submittedAt?: Prisma.DateTimeWithAggregatesFilter<"JobApplication"> | Date | string
+  documentRetentionDueAt?: Prisma.DateTimeNullableWithAggregatesFilter<"JobApplication"> | Date | string | null
+  documentAccessDeniedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"JobApplication"> | Date | string | null
+  documentDeletionDueAt?: Prisma.DateTimeNullableWithAggregatesFilter<"JobApplication"> | Date | string | null
+  documentDeletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"JobApplication"> | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateWithAggregatesFilter<"JobApplication"> | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.StringNullableWithAggregatesFilter<"JobApplication"> | string | null
+  scoringGeneration?: Prisma.IntWithAggregatesFilter<"JobApplication"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"JobApplication"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"JobApplication"> | Date | string
 }
@@ -507,6 +631,12 @@ export type JobApplicationCreateInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
@@ -516,6 +646,18 @@ export type JobApplicationCreateInput = {
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
   messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateInput = {
@@ -540,12 +682,30 @@ export type JobApplicationUncheckedCreateInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
   messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUpdateInput = {
@@ -567,6 +727,12 @@ export type JobApplicationUpdateInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
@@ -576,6 +742,18 @@ export type JobApplicationUpdateInput = {
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
   messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateInput = {
@@ -600,12 +778,30 @@ export type JobApplicationUncheckedUpdateInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
   messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationCreateManyInput = {
@@ -630,6 +826,13 @@ export type JobApplicationCreateManyInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -653,6 +856,12 @@ export type JobApplicationUpdateManyMutationInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -679,6 +888,13 @@ export type JobApplicationUncheckedUpdateManyInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -725,6 +941,13 @@ export type JobApplicationCountOrderByAggregateInput = {
   idempotencyKey?: Prisma.SortOrder
   submissionBindingDigest?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  documentRetentionDueAt?: Prisma.SortOrder
+  documentAccessDeniedAt?: Prisma.SortOrder
+  documentDeletionDueAt?: Prisma.SortOrder
+  documentDeletedAt?: Prisma.SortOrder
+  legacyDocumentState?: Prisma.SortOrder
+  currentScoringResultId?: Prisma.SortOrder
+  scoringGeneration?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -732,6 +955,7 @@ export type JobApplicationCountOrderByAggregateInput = {
 export type JobApplicationAvgOrderByAggregateInput = {
   aiMatchScore?: Prisma.SortOrder
   stageVersion?: Prisma.SortOrder
+  scoringGeneration?: Prisma.SortOrder
 }
 
 export type JobApplicationMaxOrderByAggregateInput = {
@@ -752,6 +976,13 @@ export type JobApplicationMaxOrderByAggregateInput = {
   idempotencyKey?: Prisma.SortOrder
   submissionBindingDigest?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  documentRetentionDueAt?: Prisma.SortOrder
+  documentAccessDeniedAt?: Prisma.SortOrder
+  documentDeletionDueAt?: Prisma.SortOrder
+  documentDeletedAt?: Prisma.SortOrder
+  legacyDocumentState?: Prisma.SortOrder
+  currentScoringResultId?: Prisma.SortOrder
+  scoringGeneration?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -774,6 +1005,13 @@ export type JobApplicationMinOrderByAggregateInput = {
   idempotencyKey?: Prisma.SortOrder
   submissionBindingDigest?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  documentRetentionDueAt?: Prisma.SortOrder
+  documentAccessDeniedAt?: Prisma.SortOrder
+  documentDeletionDueAt?: Prisma.SortOrder
+  documentDeletedAt?: Prisma.SortOrder
+  legacyDocumentState?: Prisma.SortOrder
+  currentScoringResultId?: Prisma.SortOrder
+  scoringGeneration?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -781,16 +1019,17 @@ export type JobApplicationMinOrderByAggregateInput = {
 export type JobApplicationSumOrderByAggregateInput = {
   aiMatchScore?: Prisma.SortOrder
   stageVersion?: Prisma.SortOrder
-}
-
-export type JobApplicationNullableScalarRelationFilter = {
-  is?: Prisma.JobApplicationWhereInput | null
-  isNot?: Prisma.JobApplicationWhereInput | null
+  scoringGeneration?: Prisma.SortOrder
 }
 
 export type JobApplicationScalarRelationFilter = {
   is?: Prisma.JobApplicationWhereInput
   isNot?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationNullableScalarRelationFilter = {
+  is?: Prisma.JobApplicationWhereInput | null
+  isNot?: Prisma.JobApplicationWhereInput | null
 }
 
 export type JobApplicationCreateNestedManyWithoutCandidateInput = {
@@ -927,6 +1166,68 @@ export type EnumApplicationStageFieldUpdateOperationsInput = {
   set?: $Enums.ApplicationStage
 }
 
+export type EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput = {
+  set?: $Enums.ApplicationLegacyDocumentState
+}
+
+export type JobApplicationCreateNestedOneWithoutApplicationDocumentsInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutApplicationDocumentsInput, Prisma.JobApplicationUncheckedCreateWithoutApplicationDocumentsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutApplicationDocumentsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationUpdateOneRequiredWithoutApplicationDocumentsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutApplicationDocumentsInput, Prisma.JobApplicationUncheckedCreateWithoutApplicationDocumentsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutApplicationDocumentsInput
+  upsert?: Prisma.JobApplicationUpsertWithoutApplicationDocumentsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutApplicationDocumentsInput, Prisma.JobApplicationUpdateWithoutApplicationDocumentsInput>, Prisma.JobApplicationUncheckedUpdateWithoutApplicationDocumentsInput>
+}
+
+export type JobApplicationCreateNestedOneWithoutCoverLetterTextInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutCoverLetterTextInput, Prisma.JobApplicationUncheckedCreateWithoutCoverLetterTextInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutCoverLetterTextInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationUpdateOneRequiredWithoutCoverLetterTextNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutCoverLetterTextInput, Prisma.JobApplicationUncheckedCreateWithoutCoverLetterTextInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutCoverLetterTextInput
+  upsert?: Prisma.JobApplicationUpsertWithoutCoverLetterTextInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutCoverLetterTextInput, Prisma.JobApplicationUpdateWithoutCoverLetterTextInput>, Prisma.JobApplicationUncheckedUpdateWithoutCoverLetterTextInput>
+}
+
+export type JobApplicationCreateNestedOneWithoutArtifactPromotionsInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutArtifactPromotionsInput, Prisma.JobApplicationUncheckedCreateWithoutArtifactPromotionsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutArtifactPromotionsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationUpdateOneWithoutArtifactPromotionsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutArtifactPromotionsInput, Prisma.JobApplicationUncheckedCreateWithoutArtifactPromotionsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutArtifactPromotionsInput
+  upsert?: Prisma.JobApplicationUpsertWithoutArtifactPromotionsInput
+  disconnect?: Prisma.JobApplicationWhereInput | boolean
+  delete?: Prisma.JobApplicationWhereInput | boolean
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutArtifactPromotionsInput, Prisma.JobApplicationUpdateWithoutArtifactPromotionsInput>, Prisma.JobApplicationUncheckedUpdateWithoutArtifactPromotionsInput>
+}
+
+export type JobApplicationCreateNestedOneWithoutLegalHoldsInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutLegalHoldsInput, Prisma.JobApplicationUncheckedCreateWithoutLegalHoldsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutLegalHoldsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationUpdateOneRequiredWithoutLegalHoldsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutLegalHoldsInput, Prisma.JobApplicationUncheckedCreateWithoutLegalHoldsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutLegalHoldsInput
+  upsert?: Prisma.JobApplicationUpsertWithoutLegalHoldsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutLegalHoldsInput, Prisma.JobApplicationUpdateWithoutLegalHoldsInput>, Prisma.JobApplicationUncheckedUpdateWithoutLegalHoldsInput>
+}
+
 export type JobApplicationCreateNestedOneWithoutMessagingConversationsInput = {
   create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutMessagingConversationsInput, Prisma.JobApplicationUncheckedCreateWithoutMessagingConversationsInput>
   connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutMessagingConversationsInput
@@ -985,6 +1286,138 @@ export type JobApplicationUpdateOneRequiredWithoutNotificationWorkNestedInput = 
   update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutNotificationWorkInput, Prisma.JobApplicationUpdateWithoutNotificationWorkInput>, Prisma.JobApplicationUncheckedUpdateWithoutNotificationWorkInput>
 }
 
+export type JobApplicationCreateNestedOneWithoutAiAssessmentsInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutAiAssessmentsInput, Prisma.JobApplicationUncheckedCreateWithoutAiAssessmentsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutAiAssessmentsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationUpdateOneRequiredWithoutAiAssessmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutAiAssessmentsInput, Prisma.JobApplicationUncheckedCreateWithoutAiAssessmentsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutAiAssessmentsInput
+  upsert?: Prisma.JobApplicationUpsertWithoutAiAssessmentsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutAiAssessmentsInput, Prisma.JobApplicationUpdateWithoutAiAssessmentsInput>, Prisma.JobApplicationUncheckedUpdateWithoutAiAssessmentsInput>
+}
+
+export type JobApplicationCreateNestedOneWithoutScoringOperationsInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutScoringOperationsInput, Prisma.JobApplicationUncheckedCreateWithoutScoringOperationsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutScoringOperationsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationUpdateOneWithoutScoringOperationsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutScoringOperationsInput, Prisma.JobApplicationUncheckedCreateWithoutScoringOperationsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutScoringOperationsInput
+  upsert?: Prisma.JobApplicationUpsertWithoutScoringOperationsInput
+  disconnect?: Prisma.JobApplicationWhereInput | boolean
+  delete?: Prisma.JobApplicationWhereInput | boolean
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutScoringOperationsInput, Prisma.JobApplicationUpdateWithoutScoringOperationsInput>, Prisma.JobApplicationUncheckedUpdateWithoutScoringOperationsInput>
+}
+
+export type JobApplicationCreateNestedOneWithoutScoringWorkItemsInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutScoringWorkItemsInput, Prisma.JobApplicationUncheckedCreateWithoutScoringWorkItemsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutScoringWorkItemsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationUpdateOneRequiredWithoutScoringWorkItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutScoringWorkItemsInput, Prisma.JobApplicationUncheckedCreateWithoutScoringWorkItemsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutScoringWorkItemsInput
+  upsert?: Prisma.JobApplicationUpsertWithoutScoringWorkItemsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutScoringWorkItemsInput, Prisma.JobApplicationUpdateWithoutScoringWorkItemsInput>, Prisma.JobApplicationUncheckedUpdateWithoutScoringWorkItemsInput>
+}
+
+export type JobApplicationCreateNestedOneWithoutAiAssessmentAttemptsInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutAiAssessmentAttemptsInput, Prisma.JobApplicationUncheckedCreateWithoutAiAssessmentAttemptsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutAiAssessmentAttemptsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationUpdateOneRequiredWithoutAiAssessmentAttemptsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutAiAssessmentAttemptsInput, Prisma.JobApplicationUncheckedCreateWithoutAiAssessmentAttemptsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutAiAssessmentAttemptsInput
+  upsert?: Prisma.JobApplicationUpsertWithoutAiAssessmentAttemptsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutAiAssessmentAttemptsInput, Prisma.JobApplicationUpdateWithoutAiAssessmentAttemptsInput>, Prisma.JobApplicationUncheckedUpdateWithoutAiAssessmentAttemptsInput>
+}
+
+export type JobApplicationCreateNestedOneWithoutScoringResultsInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutScoringResultsInput, Prisma.JobApplicationUncheckedCreateWithoutScoringResultsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutScoringResultsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationCreateNestedOneWithoutCurrentScoringResultInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutCurrentScoringResultInput, Prisma.JobApplicationUncheckedCreateWithoutCurrentScoringResultInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutCurrentScoringResultInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationUncheckedCreateNestedOneWithoutCurrentScoringResultInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutCurrentScoringResultInput, Prisma.JobApplicationUncheckedCreateWithoutCurrentScoringResultInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutCurrentScoringResultInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationUpdateOneRequiredWithoutScoringResultsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutScoringResultsInput, Prisma.JobApplicationUncheckedCreateWithoutScoringResultsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutScoringResultsInput
+  upsert?: Prisma.JobApplicationUpsertWithoutScoringResultsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutScoringResultsInput, Prisma.JobApplicationUpdateWithoutScoringResultsInput>, Prisma.JobApplicationUncheckedUpdateWithoutScoringResultsInput>
+}
+
+export type JobApplicationUpdateOneWithoutCurrentScoringResultNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutCurrentScoringResultInput, Prisma.JobApplicationUncheckedCreateWithoutCurrentScoringResultInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutCurrentScoringResultInput
+  upsert?: Prisma.JobApplicationUpsertWithoutCurrentScoringResultInput
+  disconnect?: Prisma.JobApplicationWhereInput | boolean
+  delete?: Prisma.JobApplicationWhereInput | boolean
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutCurrentScoringResultInput, Prisma.JobApplicationUpdateWithoutCurrentScoringResultInput>, Prisma.JobApplicationUncheckedUpdateWithoutCurrentScoringResultInput>
+}
+
+export type JobApplicationUncheckedUpdateOneWithoutCurrentScoringResultNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutCurrentScoringResultInput, Prisma.JobApplicationUncheckedCreateWithoutCurrentScoringResultInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutCurrentScoringResultInput
+  upsert?: Prisma.JobApplicationUpsertWithoutCurrentScoringResultInput
+  disconnect?: Prisma.JobApplicationWhereInput | boolean
+  delete?: Prisma.JobApplicationWhereInput | boolean
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutCurrentScoringResultInput, Prisma.JobApplicationUpdateWithoutCurrentScoringResultInput>, Prisma.JobApplicationUncheckedUpdateWithoutCurrentScoringResultInput>
+}
+
+export type JobApplicationCreateNestedOneWithoutManualPrioritiesInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutManualPrioritiesInput, Prisma.JobApplicationUncheckedCreateWithoutManualPrioritiesInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutManualPrioritiesInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationUpdateOneRequiredWithoutManualPrioritiesNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutManualPrioritiesInput, Prisma.JobApplicationUncheckedCreateWithoutManualPrioritiesInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutManualPrioritiesInput
+  upsert?: Prisma.JobApplicationUpsertWithoutManualPrioritiesInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutManualPrioritiesInput, Prisma.JobApplicationUpdateWithoutManualPrioritiesInput>, Prisma.JobApplicationUncheckedUpdateWithoutManualPrioritiesInput>
+}
+
+export type JobApplicationCreateNestedOneWithoutRankingRowsInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutRankingRowsInput, Prisma.JobApplicationUncheckedCreateWithoutRankingRowsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutRankingRowsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationUpdateOneRequiredWithoutRankingRowsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutRankingRowsInput, Prisma.JobApplicationUncheckedCreateWithoutRankingRowsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutRankingRowsInput
+  upsert?: Prisma.JobApplicationUpsertWithoutRankingRowsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutRankingRowsInput, Prisma.JobApplicationUpdateWithoutRankingRowsInput>, Prisma.JobApplicationUncheckedUpdateWithoutRankingRowsInput>
+}
+
 export type JobApplicationCreateWithoutCandidateInput = {
   id?: string
   cvFileRef?: string | null
@@ -1004,6 +1437,12 @@ export type JobApplicationCreateWithoutCandidateInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
@@ -1012,6 +1451,18 @@ export type JobApplicationCreateWithoutCandidateInput = {
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
   messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutCandidateInput = {
@@ -1035,12 +1486,30 @@ export type JobApplicationUncheckedCreateWithoutCandidateInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
   messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutCandidateInput = {
@@ -1094,6 +1563,13 @@ export type JobApplicationScalarWhereInput = {
   idempotencyKey?: Prisma.StringFilter<"JobApplication"> | string
   submissionBindingDigest?: Prisma.StringFilter<"JobApplication"> | string
   submittedAt?: Prisma.DateTimeFilter<"JobApplication"> | Date | string
+  documentRetentionDueAt?: Prisma.DateTimeNullableFilter<"JobApplication"> | Date | string | null
+  documentAccessDeniedAt?: Prisma.DateTimeNullableFilter<"JobApplication"> | Date | string | null
+  documentDeletionDueAt?: Prisma.DateTimeNullableFilter<"JobApplication"> | Date | string | null
+  documentDeletedAt?: Prisma.DateTimeNullableFilter<"JobApplication"> | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFilter<"JobApplication"> | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.StringNullableFilter<"JobApplication"> | string | null
+  scoringGeneration?: Prisma.IntFilter<"JobApplication"> | number
   createdAt?: Prisma.DateTimeFilter<"JobApplication"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"JobApplication"> | Date | string
 }
@@ -1117,6 +1593,12 @@ export type JobApplicationCreateWithoutJobPostingInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
@@ -1125,6 +1607,18 @@ export type JobApplicationCreateWithoutJobPostingInput = {
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
   messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutJobPostingInput = {
@@ -1148,12 +1642,30 @@ export type JobApplicationUncheckedCreateWithoutJobPostingInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
   messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutJobPostingInput = {
@@ -1201,6 +1713,12 @@ export type JobApplicationCreateWithoutSelectedCvInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
@@ -1209,6 +1727,18 @@ export type JobApplicationCreateWithoutSelectedCvInput = {
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
   messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutSelectedCvInput = {
@@ -1232,12 +1762,30 @@ export type JobApplicationUncheckedCreateWithoutSelectedCvInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
   messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutSelectedCvInput = {
@@ -1266,6 +1814,822 @@ export type JobApplicationUpdateManyWithWhereWithoutSelectedCvInput = {
   data: Prisma.XOR<Prisma.JobApplicationUpdateManyMutationInput, Prisma.JobApplicationUncheckedUpdateManyWithoutSelectedCvInput>
 }
 
+export type JobApplicationCreateWithoutApplicationDocumentsInput = {
+  id?: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
+  jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
+  selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
+  answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationUncheckedCreateWithoutApplicationDocumentsInput = {
+  id?: string
+  candidateUserId: string
+  jobPostingId: string
+  selectedCvId: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationCreateOrConnectWithoutApplicationDocumentsInput = {
+  where: Prisma.JobApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutApplicationDocumentsInput, Prisma.JobApplicationUncheckedCreateWithoutApplicationDocumentsInput>
+}
+
+export type JobApplicationUpsertWithoutApplicationDocumentsInput = {
+  update: Prisma.XOR<Prisma.JobApplicationUpdateWithoutApplicationDocumentsInput, Prisma.JobApplicationUncheckedUpdateWithoutApplicationDocumentsInput>
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutApplicationDocumentsInput, Prisma.JobApplicationUncheckedCreateWithoutApplicationDocumentsInput>
+  where?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationUpdateToOneWithWhereWithoutApplicationDocumentsInput = {
+  where?: Prisma.JobApplicationWhereInput
+  data: Prisma.XOR<Prisma.JobApplicationUpdateWithoutApplicationDocumentsInput, Prisma.JobApplicationUncheckedUpdateWithoutApplicationDocumentsInput>
+}
+
+export type JobApplicationUpdateWithoutApplicationDocumentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
+  jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
+  selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
+  answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUncheckedUpdateWithoutApplicationDocumentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobPostingId?: Prisma.StringFieldUpdateOperationsInput | string
+  selectedCvId?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationCreateWithoutCoverLetterTextInput = {
+  id?: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
+  jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
+  selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
+  answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationUncheckedCreateWithoutCoverLetterTextInput = {
+  id?: string
+  candidateUserId: string
+  jobPostingId: string
+  selectedCvId: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationCreateOrConnectWithoutCoverLetterTextInput = {
+  where: Prisma.JobApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutCoverLetterTextInput, Prisma.JobApplicationUncheckedCreateWithoutCoverLetterTextInput>
+}
+
+export type JobApplicationUpsertWithoutCoverLetterTextInput = {
+  update: Prisma.XOR<Prisma.JobApplicationUpdateWithoutCoverLetterTextInput, Prisma.JobApplicationUncheckedUpdateWithoutCoverLetterTextInput>
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutCoverLetterTextInput, Prisma.JobApplicationUncheckedCreateWithoutCoverLetterTextInput>
+  where?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationUpdateToOneWithWhereWithoutCoverLetterTextInput = {
+  where?: Prisma.JobApplicationWhereInput
+  data: Prisma.XOR<Prisma.JobApplicationUpdateWithoutCoverLetterTextInput, Prisma.JobApplicationUncheckedUpdateWithoutCoverLetterTextInput>
+}
+
+export type JobApplicationUpdateWithoutCoverLetterTextInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
+  jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
+  selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
+  answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUncheckedUpdateWithoutCoverLetterTextInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobPostingId?: Prisma.StringFieldUpdateOperationsInput | string
+  selectedCvId?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationCreateWithoutArtifactPromotionsInput = {
+  id?: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
+  jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
+  selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
+  answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationUncheckedCreateWithoutArtifactPromotionsInput = {
+  id?: string
+  candidateUserId: string
+  jobPostingId: string
+  selectedCvId: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationCreateOrConnectWithoutArtifactPromotionsInput = {
+  where: Prisma.JobApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutArtifactPromotionsInput, Prisma.JobApplicationUncheckedCreateWithoutArtifactPromotionsInput>
+}
+
+export type JobApplicationUpsertWithoutArtifactPromotionsInput = {
+  update: Prisma.XOR<Prisma.JobApplicationUpdateWithoutArtifactPromotionsInput, Prisma.JobApplicationUncheckedUpdateWithoutArtifactPromotionsInput>
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutArtifactPromotionsInput, Prisma.JobApplicationUncheckedCreateWithoutArtifactPromotionsInput>
+  where?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationUpdateToOneWithWhereWithoutArtifactPromotionsInput = {
+  where?: Prisma.JobApplicationWhereInput
+  data: Prisma.XOR<Prisma.JobApplicationUpdateWithoutArtifactPromotionsInput, Prisma.JobApplicationUncheckedUpdateWithoutArtifactPromotionsInput>
+}
+
+export type JobApplicationUpdateWithoutArtifactPromotionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
+  jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
+  selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
+  answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUncheckedUpdateWithoutArtifactPromotionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobPostingId?: Prisma.StringFieldUpdateOperationsInput | string
+  selectedCvId?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationCreateWithoutLegalHoldsInput = {
+  id?: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
+  jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
+  selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
+  answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationUncheckedCreateWithoutLegalHoldsInput = {
+  id?: string
+  candidateUserId: string
+  jobPostingId: string
+  selectedCvId: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationCreateOrConnectWithoutLegalHoldsInput = {
+  where: Prisma.JobApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutLegalHoldsInput, Prisma.JobApplicationUncheckedCreateWithoutLegalHoldsInput>
+}
+
+export type JobApplicationUpsertWithoutLegalHoldsInput = {
+  update: Prisma.XOR<Prisma.JobApplicationUpdateWithoutLegalHoldsInput, Prisma.JobApplicationUncheckedUpdateWithoutLegalHoldsInput>
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutLegalHoldsInput, Prisma.JobApplicationUncheckedCreateWithoutLegalHoldsInput>
+  where?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationUpdateToOneWithWhereWithoutLegalHoldsInput = {
+  where?: Prisma.JobApplicationWhereInput
+  data: Prisma.XOR<Prisma.JobApplicationUpdateWithoutLegalHoldsInput, Prisma.JobApplicationUncheckedUpdateWithoutLegalHoldsInput>
+}
+
+export type JobApplicationUpdateWithoutLegalHoldsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
+  jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
+  selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
+  answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUncheckedUpdateWithoutLegalHoldsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobPostingId?: Prisma.StringFieldUpdateOperationsInput | string
+  selectedCvId?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
 export type JobApplicationCreateWithoutMessagingConversationsInput = {
   id?: string
   cvFileRef?: string | null
@@ -1285,6 +2649,12 @@ export type JobApplicationCreateWithoutMessagingConversationsInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
@@ -1293,6 +2663,18 @@ export type JobApplicationCreateWithoutMessagingConversationsInput = {
   answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutMessagingConversationsInput = {
@@ -1317,11 +2699,29 @@ export type JobApplicationUncheckedCreateWithoutMessagingConversationsInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutMessagingConversationsInput = {
@@ -1359,6 +2759,12 @@ export type JobApplicationUpdateWithoutMessagingConversationsInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
@@ -1367,6 +2773,18 @@ export type JobApplicationUpdateWithoutMessagingConversationsInput = {
   answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutMessagingConversationsInput = {
@@ -1391,11 +2809,29 @@ export type JobApplicationUncheckedUpdateWithoutMessagingConversationsInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationCreateWithoutStageEventsInput = {
@@ -1417,6 +2853,12 @@ export type JobApplicationCreateWithoutStageEventsInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
@@ -1425,6 +2867,18 @@ export type JobApplicationCreateWithoutStageEventsInput = {
   answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
   messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutStageEventsInput = {
@@ -1449,11 +2903,29 @@ export type JobApplicationUncheckedCreateWithoutStageEventsInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
   messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutStageEventsInput = {
@@ -1491,6 +2963,12 @@ export type JobApplicationUpdateWithoutStageEventsInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
@@ -1499,6 +2977,18 @@ export type JobApplicationUpdateWithoutStageEventsInput = {
   answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
   messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutStageEventsInput = {
@@ -1523,11 +3013,29 @@ export type JobApplicationUncheckedUpdateWithoutStageEventsInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
   messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationCreateWithoutAnswersInput = {
@@ -1549,6 +3057,12 @@ export type JobApplicationCreateWithoutAnswersInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
@@ -1557,6 +3071,18 @@ export type JobApplicationCreateWithoutAnswersInput = {
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
   messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutAnswersInput = {
@@ -1581,11 +3107,29 @@ export type JobApplicationUncheckedCreateWithoutAnswersInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
   messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutAnswersInput = {
@@ -1623,6 +3167,12 @@ export type JobApplicationUpdateWithoutAnswersInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
@@ -1631,6 +3181,18 @@ export type JobApplicationUpdateWithoutAnswersInput = {
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
   messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutAnswersInput = {
@@ -1655,11 +3217,29 @@ export type JobApplicationUncheckedUpdateWithoutAnswersInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
   messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationCreateWithoutNotificationWorkInput = {
@@ -1681,6 +3261,12 @@ export type JobApplicationCreateWithoutNotificationWorkInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
@@ -1689,6 +3275,18 @@ export type JobApplicationCreateWithoutNotificationWorkInput = {
   answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
   messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutNotificationWorkInput = {
@@ -1713,11 +3311,29 @@ export type JobApplicationUncheckedCreateWithoutNotificationWorkInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
   messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutNotificationWorkInput = {
@@ -1755,6 +3371,12 @@ export type JobApplicationUpdateWithoutNotificationWorkInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
@@ -1763,6 +3385,18 @@ export type JobApplicationUpdateWithoutNotificationWorkInput = {
   answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
   messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutNotificationWorkInput = {
@@ -1787,11 +3421,1661 @@ export type JobApplicationUncheckedUpdateWithoutNotificationWorkInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
   messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationCreateWithoutAiAssessmentsInput = {
+  id?: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
+  jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
+  selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
+  answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationUncheckedCreateWithoutAiAssessmentsInput = {
+  id?: string
+  candidateUserId: string
+  jobPostingId: string
+  selectedCvId: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationCreateOrConnectWithoutAiAssessmentsInput = {
+  where: Prisma.JobApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutAiAssessmentsInput, Prisma.JobApplicationUncheckedCreateWithoutAiAssessmentsInput>
+}
+
+export type JobApplicationUpsertWithoutAiAssessmentsInput = {
+  update: Prisma.XOR<Prisma.JobApplicationUpdateWithoutAiAssessmentsInput, Prisma.JobApplicationUncheckedUpdateWithoutAiAssessmentsInput>
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutAiAssessmentsInput, Prisma.JobApplicationUncheckedCreateWithoutAiAssessmentsInput>
+  where?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationUpdateToOneWithWhereWithoutAiAssessmentsInput = {
+  where?: Prisma.JobApplicationWhereInput
+  data: Prisma.XOR<Prisma.JobApplicationUpdateWithoutAiAssessmentsInput, Prisma.JobApplicationUncheckedUpdateWithoutAiAssessmentsInput>
+}
+
+export type JobApplicationUpdateWithoutAiAssessmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
+  jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
+  selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
+  answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUncheckedUpdateWithoutAiAssessmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobPostingId?: Prisma.StringFieldUpdateOperationsInput | string
+  selectedCvId?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationCreateWithoutScoringOperationsInput = {
+  id?: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
+  jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
+  selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
+  answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationUncheckedCreateWithoutScoringOperationsInput = {
+  id?: string
+  candidateUserId: string
+  jobPostingId: string
+  selectedCvId: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationCreateOrConnectWithoutScoringOperationsInput = {
+  where: Prisma.JobApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutScoringOperationsInput, Prisma.JobApplicationUncheckedCreateWithoutScoringOperationsInput>
+}
+
+export type JobApplicationUpsertWithoutScoringOperationsInput = {
+  update: Prisma.XOR<Prisma.JobApplicationUpdateWithoutScoringOperationsInput, Prisma.JobApplicationUncheckedUpdateWithoutScoringOperationsInput>
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutScoringOperationsInput, Prisma.JobApplicationUncheckedCreateWithoutScoringOperationsInput>
+  where?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationUpdateToOneWithWhereWithoutScoringOperationsInput = {
+  where?: Prisma.JobApplicationWhereInput
+  data: Prisma.XOR<Prisma.JobApplicationUpdateWithoutScoringOperationsInput, Prisma.JobApplicationUncheckedUpdateWithoutScoringOperationsInput>
+}
+
+export type JobApplicationUpdateWithoutScoringOperationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
+  jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
+  selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
+  answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUncheckedUpdateWithoutScoringOperationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobPostingId?: Prisma.StringFieldUpdateOperationsInput | string
+  selectedCvId?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationCreateWithoutScoringWorkItemsInput = {
+  id?: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
+  jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
+  selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
+  answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationUncheckedCreateWithoutScoringWorkItemsInput = {
+  id?: string
+  candidateUserId: string
+  jobPostingId: string
+  selectedCvId: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationCreateOrConnectWithoutScoringWorkItemsInput = {
+  where: Prisma.JobApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutScoringWorkItemsInput, Prisma.JobApplicationUncheckedCreateWithoutScoringWorkItemsInput>
+}
+
+export type JobApplicationUpsertWithoutScoringWorkItemsInput = {
+  update: Prisma.XOR<Prisma.JobApplicationUpdateWithoutScoringWorkItemsInput, Prisma.JobApplicationUncheckedUpdateWithoutScoringWorkItemsInput>
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutScoringWorkItemsInput, Prisma.JobApplicationUncheckedCreateWithoutScoringWorkItemsInput>
+  where?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationUpdateToOneWithWhereWithoutScoringWorkItemsInput = {
+  where?: Prisma.JobApplicationWhereInput
+  data: Prisma.XOR<Prisma.JobApplicationUpdateWithoutScoringWorkItemsInput, Prisma.JobApplicationUncheckedUpdateWithoutScoringWorkItemsInput>
+}
+
+export type JobApplicationUpdateWithoutScoringWorkItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
+  jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
+  selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
+  answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUncheckedUpdateWithoutScoringWorkItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobPostingId?: Prisma.StringFieldUpdateOperationsInput | string
+  selectedCvId?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationCreateWithoutAiAssessmentAttemptsInput = {
+  id?: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
+  jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
+  selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
+  answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationUncheckedCreateWithoutAiAssessmentAttemptsInput = {
+  id?: string
+  candidateUserId: string
+  jobPostingId: string
+  selectedCvId: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationCreateOrConnectWithoutAiAssessmentAttemptsInput = {
+  where: Prisma.JobApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutAiAssessmentAttemptsInput, Prisma.JobApplicationUncheckedCreateWithoutAiAssessmentAttemptsInput>
+}
+
+export type JobApplicationUpsertWithoutAiAssessmentAttemptsInput = {
+  update: Prisma.XOR<Prisma.JobApplicationUpdateWithoutAiAssessmentAttemptsInput, Prisma.JobApplicationUncheckedUpdateWithoutAiAssessmentAttemptsInput>
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutAiAssessmentAttemptsInput, Prisma.JobApplicationUncheckedCreateWithoutAiAssessmentAttemptsInput>
+  where?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationUpdateToOneWithWhereWithoutAiAssessmentAttemptsInput = {
+  where?: Prisma.JobApplicationWhereInput
+  data: Prisma.XOR<Prisma.JobApplicationUpdateWithoutAiAssessmentAttemptsInput, Prisma.JobApplicationUncheckedUpdateWithoutAiAssessmentAttemptsInput>
+}
+
+export type JobApplicationUpdateWithoutAiAssessmentAttemptsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
+  jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
+  selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
+  answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUncheckedUpdateWithoutAiAssessmentAttemptsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobPostingId?: Prisma.StringFieldUpdateOperationsInput | string
+  selectedCvId?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationCreateWithoutScoringResultsInput = {
+  id?: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
+  jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
+  selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
+  answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationUncheckedCreateWithoutScoringResultsInput = {
+  id?: string
+  candidateUserId: string
+  jobPostingId: string
+  selectedCvId: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationCreateOrConnectWithoutScoringResultsInput = {
+  where: Prisma.JobApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutScoringResultsInput, Prisma.JobApplicationUncheckedCreateWithoutScoringResultsInput>
+}
+
+export type JobApplicationCreateWithoutCurrentScoringResultInput = {
+  id?: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
+  jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
+  selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
+  answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationUncheckedCreateWithoutCurrentScoringResultInput = {
+  id?: string
+  candidateUserId: string
+  jobPostingId: string
+  selectedCvId: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationCreateOrConnectWithoutCurrentScoringResultInput = {
+  where: Prisma.JobApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutCurrentScoringResultInput, Prisma.JobApplicationUncheckedCreateWithoutCurrentScoringResultInput>
+}
+
+export type JobApplicationUpsertWithoutScoringResultsInput = {
+  update: Prisma.XOR<Prisma.JobApplicationUpdateWithoutScoringResultsInput, Prisma.JobApplicationUncheckedUpdateWithoutScoringResultsInput>
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutScoringResultsInput, Prisma.JobApplicationUncheckedCreateWithoutScoringResultsInput>
+  where?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationUpdateToOneWithWhereWithoutScoringResultsInput = {
+  where?: Prisma.JobApplicationWhereInput
+  data: Prisma.XOR<Prisma.JobApplicationUpdateWithoutScoringResultsInput, Prisma.JobApplicationUncheckedUpdateWithoutScoringResultsInput>
+}
+
+export type JobApplicationUpdateWithoutScoringResultsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
+  jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
+  selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
+  answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUncheckedUpdateWithoutScoringResultsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobPostingId?: Prisma.StringFieldUpdateOperationsInput | string
+  selectedCvId?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUpsertWithoutCurrentScoringResultInput = {
+  update: Prisma.XOR<Prisma.JobApplicationUpdateWithoutCurrentScoringResultInput, Prisma.JobApplicationUncheckedUpdateWithoutCurrentScoringResultInput>
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutCurrentScoringResultInput, Prisma.JobApplicationUncheckedCreateWithoutCurrentScoringResultInput>
+  where?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationUpdateToOneWithWhereWithoutCurrentScoringResultInput = {
+  where?: Prisma.JobApplicationWhereInput
+  data: Prisma.XOR<Prisma.JobApplicationUpdateWithoutCurrentScoringResultInput, Prisma.JobApplicationUncheckedUpdateWithoutCurrentScoringResultInput>
+}
+
+export type JobApplicationUpdateWithoutCurrentScoringResultInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
+  jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
+  selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
+  answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUncheckedUpdateWithoutCurrentScoringResultInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobPostingId?: Prisma.StringFieldUpdateOperationsInput | string
+  selectedCvId?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationCreateWithoutManualPrioritiesInput = {
+  id?: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
+  jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
+  selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
+  answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationUncheckedCreateWithoutManualPrioritiesInput = {
+  id?: string
+  candidateUserId: string
+  jobPostingId: string
+  selectedCvId: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationCreateOrConnectWithoutManualPrioritiesInput = {
+  where: Prisma.JobApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutManualPrioritiesInput, Prisma.JobApplicationUncheckedCreateWithoutManualPrioritiesInput>
+}
+
+export type JobApplicationUpsertWithoutManualPrioritiesInput = {
+  update: Prisma.XOR<Prisma.JobApplicationUpdateWithoutManualPrioritiesInput, Prisma.JobApplicationUncheckedUpdateWithoutManualPrioritiesInput>
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutManualPrioritiesInput, Prisma.JobApplicationUncheckedCreateWithoutManualPrioritiesInput>
+  where?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationUpdateToOneWithWhereWithoutManualPrioritiesInput = {
+  where?: Prisma.JobApplicationWhereInput
+  data: Prisma.XOR<Prisma.JobApplicationUpdateWithoutManualPrioritiesInput, Prisma.JobApplicationUncheckedUpdateWithoutManualPrioritiesInput>
+}
+
+export type JobApplicationUpdateWithoutManualPrioritiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
+  jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
+  selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
+  answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUncheckedUpdateWithoutManualPrioritiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobPostingId?: Prisma.StringFieldUpdateOperationsInput | string
+  selectedCvId?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationCreateWithoutRankingRowsInput = {
+  id?: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
+  jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
+  selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
+  answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutApplicationInput
+  currentScoringResult?: Prisma.ApplicationScoringResultCreateNestedOneWithoutCurrentForApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationUncheckedCreateWithoutRankingRowsInput = {
+  id?: string
+  candidateUserId: string
+  jobPostingId: string
+  selectedCvId: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedCreateNestedOneWithoutApplicationInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutApplicationInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutApplicationInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedCreateNestedManyWithoutApplicationInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutApplicationInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedCreateNestedManyWithoutApplicationInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedCreateNestedManyWithoutApplicationInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationCreateOrConnectWithoutRankingRowsInput = {
+  where: Prisma.JobApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutRankingRowsInput, Prisma.JobApplicationUncheckedCreateWithoutRankingRowsInput>
+}
+
+export type JobApplicationUpsertWithoutRankingRowsInput = {
+  update: Prisma.XOR<Prisma.JobApplicationUpdateWithoutRankingRowsInput, Prisma.JobApplicationUncheckedUpdateWithoutRankingRowsInput>
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutRankingRowsInput, Prisma.JobApplicationUncheckedCreateWithoutRankingRowsInput>
+  where?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationUpdateToOneWithWhereWithoutRankingRowsInput = {
+  where?: Prisma.JobApplicationWhereInput
+  data: Prisma.XOR<Prisma.JobApplicationUpdateWithoutRankingRowsInput, Prisma.JobApplicationUncheckedUpdateWithoutRankingRowsInput>
+}
+
+export type JobApplicationUpdateWithoutRankingRowsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
+  jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
+  selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
+  answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUncheckedUpdateWithoutRankingRowsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobPostingId?: Prisma.StringFieldUpdateOperationsInput | string
+  selectedCvId?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationCreateManyCandidateInput = {
@@ -1815,6 +5099,13 @@ export type JobApplicationCreateManyCandidateInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1838,6 +5129,12 @@ export type JobApplicationUpdateWithoutCandidateInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
@@ -1846,6 +5143,18 @@ export type JobApplicationUpdateWithoutCandidateInput = {
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
   messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutCandidateInput = {
@@ -1869,12 +5178,30 @@ export type JobApplicationUncheckedUpdateWithoutCandidateInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
   messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateManyWithoutCandidateInput = {
@@ -1898,6 +5225,13 @@ export type JobApplicationUncheckedUpdateManyWithoutCandidateInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1923,6 +5257,13 @@ export type JobApplicationCreateManyJobPostingInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1946,6 +5287,12 @@ export type JobApplicationUpdateWithoutJobPostingInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
@@ -1954,6 +5301,18 @@ export type JobApplicationUpdateWithoutJobPostingInput = {
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
   messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutJobPostingInput = {
@@ -1977,12 +5336,30 @@ export type JobApplicationUncheckedUpdateWithoutJobPostingInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
   messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateManyWithoutJobPostingInput = {
@@ -2006,6 +5383,13 @@ export type JobApplicationUncheckedUpdateManyWithoutJobPostingInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -2031,6 +5415,13 @@ export type JobApplicationCreateManySelectedCvInput = {
   idempotencyKey: string
   submissionBindingDigest: string
   submittedAt?: Date | string
+  documentRetentionDueAt?: Date | string | null
+  documentAccessDeniedAt?: Date | string | null
+  documentDeletionDueAt?: Date | string | null
+  documentDeletedAt?: Date | string | null
+  legacyDocumentState?: $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: string | null
+  scoringGeneration?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -2054,6 +5445,12 @@ export type JobApplicationUpdateWithoutSelectedCvInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
@@ -2062,6 +5459,18 @@ export type JobApplicationUpdateWithoutSelectedCvInput = {
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
   messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutApplicationNestedInput
+  currentScoringResult?: Prisma.ApplicationScoringResultUpdateOneWithoutCurrentForApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutSelectedCvInput = {
@@ -2085,12 +5494,30 @@ export type JobApplicationUncheckedUpdateWithoutSelectedCvInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
   messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  coverLetterText?: Prisma.ApplicationCoverLetterTextUncheckedUpdateOneWithoutApplicationNestedInput
+  artifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutApplicationNestedInput
+  legalHolds?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringResults?: Prisma.ApplicationScoringResultUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutApplicationNestedInput
+  manualPriorities?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutApplicationNestedInput
+  rankingRows?: Prisma.RankingSnapshotRowUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessments?: Prisma.AiAssessmentUncheckedUpdateManyWithoutApplicationNestedInput
+  scoringWorkItems?: Prisma.ScoringWorkItemUncheckedUpdateManyWithoutApplicationNestedInput
+  aiAssessmentAttempts?: Prisma.AiAssessmentAttemptUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateManyWithoutSelectedCvInput = {
@@ -2114,6 +5541,13 @@ export type JobApplicationUncheckedUpdateManyWithoutSelectedCvInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documentRetentionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentAccessDeniedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  documentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyDocumentState?: Prisma.EnumApplicationLegacyDocumentStateFieldUpdateOperationsInput | $Enums.ApplicationLegacyDocumentState
+  currentScoringResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringGeneration?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -2128,6 +5562,16 @@ export type JobApplicationCountOutputType = {
   notificationWork: number
   stageEvents: number
   messagingConversations: number
+  applicationDocuments: number
+  artifactPromotions: number
+  legalHolds: number
+  scoringResults: number
+  scoringOperations: number
+  manualPriorities: number
+  rankingRows: number
+  aiAssessments: number
+  scoringWorkItems: number
+  aiAssessmentAttempts: number
 }
 
 export type JobApplicationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2135,6 +5579,16 @@ export type JobApplicationCountOutputTypeSelect<ExtArgs extends runtime.Types.Ex
   notificationWork?: boolean | JobApplicationCountOutputTypeCountNotificationWorkArgs
   stageEvents?: boolean | JobApplicationCountOutputTypeCountStageEventsArgs
   messagingConversations?: boolean | JobApplicationCountOutputTypeCountMessagingConversationsArgs
+  applicationDocuments?: boolean | JobApplicationCountOutputTypeCountApplicationDocumentsArgs
+  artifactPromotions?: boolean | JobApplicationCountOutputTypeCountArtifactPromotionsArgs
+  legalHolds?: boolean | JobApplicationCountOutputTypeCountLegalHoldsArgs
+  scoringResults?: boolean | JobApplicationCountOutputTypeCountScoringResultsArgs
+  scoringOperations?: boolean | JobApplicationCountOutputTypeCountScoringOperationsArgs
+  manualPriorities?: boolean | JobApplicationCountOutputTypeCountManualPrioritiesArgs
+  rankingRows?: boolean | JobApplicationCountOutputTypeCountRankingRowsArgs
+  aiAssessments?: boolean | JobApplicationCountOutputTypeCountAiAssessmentsArgs
+  scoringWorkItems?: boolean | JobApplicationCountOutputTypeCountScoringWorkItemsArgs
+  aiAssessmentAttempts?: boolean | JobApplicationCountOutputTypeCountAiAssessmentAttemptsArgs
 }
 
 /**
@@ -2175,6 +5629,76 @@ export type JobApplicationCountOutputTypeCountMessagingConversationsArgs<ExtArgs
   where?: Prisma.MessagingConversationWhereInput
 }
 
+/**
+ * JobApplicationCountOutputType without action
+ */
+export type JobApplicationCountOutputTypeCountApplicationDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApplicationDocumentWhereInput
+}
+
+/**
+ * JobApplicationCountOutputType without action
+ */
+export type JobApplicationCountOutputTypeCountArtifactPromotionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApplicationArtifactPromotionWhereInput
+}
+
+/**
+ * JobApplicationCountOutputType without action
+ */
+export type JobApplicationCountOutputTypeCountLegalHoldsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApplicationDocumentLegalHoldWhereInput
+}
+
+/**
+ * JobApplicationCountOutputType without action
+ */
+export type JobApplicationCountOutputTypeCountScoringResultsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApplicationScoringResultWhereInput
+}
+
+/**
+ * JobApplicationCountOutputType without action
+ */
+export type JobApplicationCountOutputTypeCountScoringOperationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ScoringOperationWhereInput
+}
+
+/**
+ * JobApplicationCountOutputType without action
+ */
+export type JobApplicationCountOutputTypeCountManualPrioritiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ManualApplicationPriorityWhereInput
+}
+
+/**
+ * JobApplicationCountOutputType without action
+ */
+export type JobApplicationCountOutputTypeCountRankingRowsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RankingSnapshotRowWhereInput
+}
+
+/**
+ * JobApplicationCountOutputType without action
+ */
+export type JobApplicationCountOutputTypeCountAiAssessmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AiAssessmentWhereInput
+}
+
+/**
+ * JobApplicationCountOutputType without action
+ */
+export type JobApplicationCountOutputTypeCountScoringWorkItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ScoringWorkItemWhereInput
+}
+
+/**
+ * JobApplicationCountOutputType without action
+ */
+export type JobApplicationCountOutputTypeCountAiAssessmentAttemptsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AiAssessmentAttemptWhereInput
+}
+
 
 export type JobApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2198,6 +5722,13 @@ export type JobApplicationSelect<ExtArgs extends runtime.Types.Extensions.Intern
   idempotencyKey?: boolean
   submissionBindingDigest?: boolean
   submittedAt?: boolean
+  documentRetentionDueAt?: boolean
+  documentAccessDeniedAt?: boolean
+  documentDeletionDueAt?: boolean
+  documentDeletedAt?: boolean
+  legacyDocumentState?: boolean
+  currentScoringResultId?: boolean
+  scoringGeneration?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   candidate?: boolean | Prisma.CandidateIdentityDefaultArgs<ExtArgs>
@@ -2207,6 +5738,18 @@ export type JobApplicationSelect<ExtArgs extends runtime.Types.Extensions.Intern
   notificationWork?: boolean | Prisma.JobApplication$notificationWorkArgs<ExtArgs>
   stageEvents?: boolean | Prisma.JobApplication$stageEventsArgs<ExtArgs>
   messagingConversations?: boolean | Prisma.JobApplication$messagingConversationsArgs<ExtArgs>
+  applicationDocuments?: boolean | Prisma.JobApplication$applicationDocumentsArgs<ExtArgs>
+  coverLetterText?: boolean | Prisma.JobApplication$coverLetterTextArgs<ExtArgs>
+  artifactPromotions?: boolean | Prisma.JobApplication$artifactPromotionsArgs<ExtArgs>
+  legalHolds?: boolean | Prisma.JobApplication$legalHoldsArgs<ExtArgs>
+  currentScoringResult?: boolean | Prisma.JobApplication$currentScoringResultArgs<ExtArgs>
+  scoringResults?: boolean | Prisma.JobApplication$scoringResultsArgs<ExtArgs>
+  scoringOperations?: boolean | Prisma.JobApplication$scoringOperationsArgs<ExtArgs>
+  manualPriorities?: boolean | Prisma.JobApplication$manualPrioritiesArgs<ExtArgs>
+  rankingRows?: boolean | Prisma.JobApplication$rankingRowsArgs<ExtArgs>
+  aiAssessments?: boolean | Prisma.JobApplication$aiAssessmentsArgs<ExtArgs>
+  scoringWorkItems?: boolean | Prisma.JobApplication$scoringWorkItemsArgs<ExtArgs>
+  aiAssessmentAttempts?: boolean | Prisma.JobApplication$aiAssessmentAttemptsArgs<ExtArgs>
   _count?: boolean | Prisma.JobApplicationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["jobApplication"]>
 
@@ -2232,11 +5775,19 @@ export type JobApplicationSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   idempotencyKey?: boolean
   submissionBindingDigest?: boolean
   submittedAt?: boolean
+  documentRetentionDueAt?: boolean
+  documentAccessDeniedAt?: boolean
+  documentDeletionDueAt?: boolean
+  documentDeletedAt?: boolean
+  legacyDocumentState?: boolean
+  currentScoringResultId?: boolean
+  scoringGeneration?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   candidate?: boolean | Prisma.CandidateIdentityDefaultArgs<ExtArgs>
   jobPosting?: boolean | Prisma.JobPostingDefaultArgs<ExtArgs>
   selectedCv?: boolean | Prisma.CandidateCvDefaultArgs<ExtArgs>
+  currentScoringResult?: boolean | Prisma.JobApplication$currentScoringResultArgs<ExtArgs>
 }, ExtArgs["result"]["jobApplication"]>
 
 export type JobApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2261,11 +5812,19 @@ export type JobApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   idempotencyKey?: boolean
   submissionBindingDigest?: boolean
   submittedAt?: boolean
+  documentRetentionDueAt?: boolean
+  documentAccessDeniedAt?: boolean
+  documentDeletionDueAt?: boolean
+  documentDeletedAt?: boolean
+  legacyDocumentState?: boolean
+  currentScoringResultId?: boolean
+  scoringGeneration?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   candidate?: boolean | Prisma.CandidateIdentityDefaultArgs<ExtArgs>
   jobPosting?: boolean | Prisma.JobPostingDefaultArgs<ExtArgs>
   selectedCv?: boolean | Prisma.CandidateCvDefaultArgs<ExtArgs>
+  currentScoringResult?: boolean | Prisma.JobApplication$currentScoringResultArgs<ExtArgs>
 }, ExtArgs["result"]["jobApplication"]>
 
 export type JobApplicationSelectScalar = {
@@ -2290,11 +5849,18 @@ export type JobApplicationSelectScalar = {
   idempotencyKey?: boolean
   submissionBindingDigest?: boolean
   submittedAt?: boolean
+  documentRetentionDueAt?: boolean
+  documentAccessDeniedAt?: boolean
+  documentDeletionDueAt?: boolean
+  documentDeletedAt?: boolean
+  legacyDocumentState?: boolean
+  currentScoringResultId?: boolean
+  scoringGeneration?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type JobApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "candidateUserId" | "jobPostingId" | "selectedCvId" | "cvFileRef" | "contactSnapshot" | "aiAnalysisConsent" | "aiMatchScore" | "scoringStatus" | "stage" | "stageVersion" | "lastStageChangedAt" | "coverLetter" | "profileSnapshot" | "cvSnapshot" | "jobSnapshot" | "consentVersion" | "consentedAt" | "idempotencyKey" | "submissionBindingDigest" | "submittedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["jobApplication"]>
+export type JobApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "candidateUserId" | "jobPostingId" | "selectedCvId" | "cvFileRef" | "contactSnapshot" | "aiAnalysisConsent" | "aiMatchScore" | "scoringStatus" | "stage" | "stageVersion" | "lastStageChangedAt" | "coverLetter" | "profileSnapshot" | "cvSnapshot" | "jobSnapshot" | "consentVersion" | "consentedAt" | "idempotencyKey" | "submissionBindingDigest" | "submittedAt" | "documentRetentionDueAt" | "documentAccessDeniedAt" | "documentDeletionDueAt" | "documentDeletedAt" | "legacyDocumentState" | "currentScoringResultId" | "scoringGeneration" | "createdAt" | "updatedAt", ExtArgs["result"]["jobApplication"]>
 export type JobApplicationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   candidate?: boolean | Prisma.CandidateIdentityDefaultArgs<ExtArgs>
   jobPosting?: boolean | Prisma.JobPostingDefaultArgs<ExtArgs>
@@ -2303,17 +5869,31 @@ export type JobApplicationInclude<ExtArgs extends runtime.Types.Extensions.Inter
   notificationWork?: boolean | Prisma.JobApplication$notificationWorkArgs<ExtArgs>
   stageEvents?: boolean | Prisma.JobApplication$stageEventsArgs<ExtArgs>
   messagingConversations?: boolean | Prisma.JobApplication$messagingConversationsArgs<ExtArgs>
+  applicationDocuments?: boolean | Prisma.JobApplication$applicationDocumentsArgs<ExtArgs>
+  coverLetterText?: boolean | Prisma.JobApplication$coverLetterTextArgs<ExtArgs>
+  artifactPromotions?: boolean | Prisma.JobApplication$artifactPromotionsArgs<ExtArgs>
+  legalHolds?: boolean | Prisma.JobApplication$legalHoldsArgs<ExtArgs>
+  currentScoringResult?: boolean | Prisma.JobApplication$currentScoringResultArgs<ExtArgs>
+  scoringResults?: boolean | Prisma.JobApplication$scoringResultsArgs<ExtArgs>
+  scoringOperations?: boolean | Prisma.JobApplication$scoringOperationsArgs<ExtArgs>
+  manualPriorities?: boolean | Prisma.JobApplication$manualPrioritiesArgs<ExtArgs>
+  rankingRows?: boolean | Prisma.JobApplication$rankingRowsArgs<ExtArgs>
+  aiAssessments?: boolean | Prisma.JobApplication$aiAssessmentsArgs<ExtArgs>
+  scoringWorkItems?: boolean | Prisma.JobApplication$scoringWorkItemsArgs<ExtArgs>
+  aiAssessmentAttempts?: boolean | Prisma.JobApplication$aiAssessmentAttemptsArgs<ExtArgs>
   _count?: boolean | Prisma.JobApplicationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type JobApplicationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   candidate?: boolean | Prisma.CandidateIdentityDefaultArgs<ExtArgs>
   jobPosting?: boolean | Prisma.JobPostingDefaultArgs<ExtArgs>
   selectedCv?: boolean | Prisma.CandidateCvDefaultArgs<ExtArgs>
+  currentScoringResult?: boolean | Prisma.JobApplication$currentScoringResultArgs<ExtArgs>
 }
 export type JobApplicationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   candidate?: boolean | Prisma.CandidateIdentityDefaultArgs<ExtArgs>
   jobPosting?: boolean | Prisma.JobPostingDefaultArgs<ExtArgs>
   selectedCv?: boolean | Prisma.CandidateCvDefaultArgs<ExtArgs>
+  currentScoringResult?: boolean | Prisma.JobApplication$currentScoringResultArgs<ExtArgs>
 }
 
 export type $JobApplicationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2326,6 +5906,18 @@ export type $JobApplicationPayload<ExtArgs extends runtime.Types.Extensions.Inte
     notificationWork: Prisma.$RecruitmentNotificationWorkPayload<ExtArgs>[]
     stageEvents: Prisma.$ApplicationStageEventPayload<ExtArgs>[]
     messagingConversations: Prisma.$MessagingConversationPayload<ExtArgs>[]
+    applicationDocuments: Prisma.$ApplicationDocumentPayload<ExtArgs>[]
+    coverLetterText: Prisma.$ApplicationCoverLetterTextPayload<ExtArgs> | null
+    artifactPromotions: Prisma.$ApplicationArtifactPromotionPayload<ExtArgs>[]
+    legalHolds: Prisma.$ApplicationDocumentLegalHoldPayload<ExtArgs>[]
+    currentScoringResult: Prisma.$ApplicationScoringResultPayload<ExtArgs> | null
+    scoringResults: Prisma.$ApplicationScoringResultPayload<ExtArgs>[]
+    scoringOperations: Prisma.$ScoringOperationPayload<ExtArgs>[]
+    manualPriorities: Prisma.$ManualApplicationPriorityPayload<ExtArgs>[]
+    rankingRows: Prisma.$RankingSnapshotRowPayload<ExtArgs>[]
+    aiAssessments: Prisma.$AiAssessmentPayload<ExtArgs>[]
+    scoringWorkItems: Prisma.$ScoringWorkItemPayload<ExtArgs>[]
+    aiAssessmentAttempts: Prisma.$AiAssessmentAttemptPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2349,6 +5941,13 @@ export type $JobApplicationPayload<ExtArgs extends runtime.Types.Extensions.Inte
     idempotencyKey: string
     submissionBindingDigest: string
     submittedAt: Date
+    documentRetentionDueAt: Date | null
+    documentAccessDeniedAt: Date | null
+    documentDeletionDueAt: Date | null
+    documentDeletedAt: Date | null
+    legacyDocumentState: $Enums.ApplicationLegacyDocumentState
+    currentScoringResultId: string | null
+    scoringGeneration: number
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["jobApplication"]>
@@ -2752,6 +6351,18 @@ export interface Prisma__JobApplicationClient<T, Null = never, ExtArgs extends r
   notificationWork<T extends Prisma.JobApplication$notificationWorkArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$notificationWorkArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecruitmentNotificationWorkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   stageEvents<T extends Prisma.JobApplication$stageEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$stageEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationStageEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messagingConversations<T extends Prisma.JobApplication$messagingConversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$messagingConversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  applicationDocuments<T extends Prisma.JobApplication$applicationDocumentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$applicationDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  coverLetterText<T extends Prisma.JobApplication$coverLetterTextArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$coverLetterTextArgs<ExtArgs>>): Prisma.Prisma__ApplicationCoverLetterTextClient<runtime.Types.Result.GetResult<Prisma.$ApplicationCoverLetterTextPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  artifactPromotions<T extends Prisma.JobApplication$artifactPromotionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$artifactPromotionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationArtifactPromotionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  legalHolds<T extends Prisma.JobApplication$legalHoldsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$legalHoldsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationDocumentLegalHoldPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  currentScoringResult<T extends Prisma.JobApplication$currentScoringResultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$currentScoringResultArgs<ExtArgs>>): Prisma.Prisma__ApplicationScoringResultClient<runtime.Types.Result.GetResult<Prisma.$ApplicationScoringResultPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  scoringResults<T extends Prisma.JobApplication$scoringResultsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$scoringResultsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationScoringResultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  scoringOperations<T extends Prisma.JobApplication$scoringOperationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$scoringOperationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScoringOperationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  manualPriorities<T extends Prisma.JobApplication$manualPrioritiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$manualPrioritiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ManualApplicationPriorityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  rankingRows<T extends Prisma.JobApplication$rankingRowsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$rankingRowsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RankingSnapshotRowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  aiAssessments<T extends Prisma.JobApplication$aiAssessmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$aiAssessmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AiAssessmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  scoringWorkItems<T extends Prisma.JobApplication$scoringWorkItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$scoringWorkItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScoringWorkItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  aiAssessmentAttempts<T extends Prisma.JobApplication$aiAssessmentAttemptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$aiAssessmentAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AiAssessmentAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2802,6 +6413,13 @@ export interface JobApplicationFieldRefs {
   readonly idempotencyKey: Prisma.FieldRef<"JobApplication", 'String'>
   readonly submissionBindingDigest: Prisma.FieldRef<"JobApplication", 'String'>
   readonly submittedAt: Prisma.FieldRef<"JobApplication", 'DateTime'>
+  readonly documentRetentionDueAt: Prisma.FieldRef<"JobApplication", 'DateTime'>
+  readonly documentAccessDeniedAt: Prisma.FieldRef<"JobApplication", 'DateTime'>
+  readonly documentDeletionDueAt: Prisma.FieldRef<"JobApplication", 'DateTime'>
+  readonly documentDeletedAt: Prisma.FieldRef<"JobApplication", 'DateTime'>
+  readonly legacyDocumentState: Prisma.FieldRef<"JobApplication", 'ApplicationLegacyDocumentState'>
+  readonly currentScoringResultId: Prisma.FieldRef<"JobApplication", 'String'>
+  readonly scoringGeneration: Prisma.FieldRef<"JobApplication", 'Int'>
   readonly createdAt: Prisma.FieldRef<"JobApplication", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"JobApplication", 'DateTime'>
 }
@@ -3298,6 +6916,284 @@ export type JobApplication$messagingConversationsArgs<ExtArgs extends runtime.Ty
   take?: number
   skip?: number
   distinct?: Prisma.MessagingConversationScalarFieldEnum | Prisma.MessagingConversationScalarFieldEnum[]
+}
+
+/**
+ * JobApplication.applicationDocuments
+ */
+export type JobApplication$applicationDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApplicationDocument
+   */
+  select?: Prisma.ApplicationDocumentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApplicationDocument
+   */
+  omit?: Prisma.ApplicationDocumentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApplicationDocumentInclude<ExtArgs> | null
+  where?: Prisma.ApplicationDocumentWhereInput
+  orderBy?: Prisma.ApplicationDocumentOrderByWithRelationInput | Prisma.ApplicationDocumentOrderByWithRelationInput[]
+  cursor?: Prisma.ApplicationDocumentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ApplicationDocumentScalarFieldEnum | Prisma.ApplicationDocumentScalarFieldEnum[]
+}
+
+/**
+ * JobApplication.coverLetterText
+ */
+export type JobApplication$coverLetterTextArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApplicationCoverLetterText
+   */
+  select?: Prisma.ApplicationCoverLetterTextSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApplicationCoverLetterText
+   */
+  omit?: Prisma.ApplicationCoverLetterTextOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApplicationCoverLetterTextInclude<ExtArgs> | null
+  where?: Prisma.ApplicationCoverLetterTextWhereInput
+}
+
+/**
+ * JobApplication.artifactPromotions
+ */
+export type JobApplication$artifactPromotionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApplicationArtifactPromotion
+   */
+  select?: Prisma.ApplicationArtifactPromotionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApplicationArtifactPromotion
+   */
+  omit?: Prisma.ApplicationArtifactPromotionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApplicationArtifactPromotionInclude<ExtArgs> | null
+  where?: Prisma.ApplicationArtifactPromotionWhereInput
+  orderBy?: Prisma.ApplicationArtifactPromotionOrderByWithRelationInput | Prisma.ApplicationArtifactPromotionOrderByWithRelationInput[]
+  cursor?: Prisma.ApplicationArtifactPromotionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ApplicationArtifactPromotionScalarFieldEnum | Prisma.ApplicationArtifactPromotionScalarFieldEnum[]
+}
+
+/**
+ * JobApplication.legalHolds
+ */
+export type JobApplication$legalHoldsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApplicationDocumentLegalHold
+   */
+  select?: Prisma.ApplicationDocumentLegalHoldSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApplicationDocumentLegalHold
+   */
+  omit?: Prisma.ApplicationDocumentLegalHoldOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApplicationDocumentLegalHoldInclude<ExtArgs> | null
+  where?: Prisma.ApplicationDocumentLegalHoldWhereInput
+  orderBy?: Prisma.ApplicationDocumentLegalHoldOrderByWithRelationInput | Prisma.ApplicationDocumentLegalHoldOrderByWithRelationInput[]
+  cursor?: Prisma.ApplicationDocumentLegalHoldWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ApplicationDocumentLegalHoldScalarFieldEnum | Prisma.ApplicationDocumentLegalHoldScalarFieldEnum[]
+}
+
+/**
+ * JobApplication.currentScoringResult
+ */
+export type JobApplication$currentScoringResultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApplicationScoringResult
+   */
+  select?: Prisma.ApplicationScoringResultSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApplicationScoringResult
+   */
+  omit?: Prisma.ApplicationScoringResultOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApplicationScoringResultInclude<ExtArgs> | null
+  where?: Prisma.ApplicationScoringResultWhereInput
+}
+
+/**
+ * JobApplication.scoringResults
+ */
+export type JobApplication$scoringResultsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApplicationScoringResult
+   */
+  select?: Prisma.ApplicationScoringResultSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApplicationScoringResult
+   */
+  omit?: Prisma.ApplicationScoringResultOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApplicationScoringResultInclude<ExtArgs> | null
+  where?: Prisma.ApplicationScoringResultWhereInput
+  orderBy?: Prisma.ApplicationScoringResultOrderByWithRelationInput | Prisma.ApplicationScoringResultOrderByWithRelationInput[]
+  cursor?: Prisma.ApplicationScoringResultWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ApplicationScoringResultScalarFieldEnum | Prisma.ApplicationScoringResultScalarFieldEnum[]
+}
+
+/**
+ * JobApplication.scoringOperations
+ */
+export type JobApplication$scoringOperationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ScoringOperation
+   */
+  select?: Prisma.ScoringOperationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ScoringOperation
+   */
+  omit?: Prisma.ScoringOperationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScoringOperationInclude<ExtArgs> | null
+  where?: Prisma.ScoringOperationWhereInput
+  orderBy?: Prisma.ScoringOperationOrderByWithRelationInput | Prisma.ScoringOperationOrderByWithRelationInput[]
+  cursor?: Prisma.ScoringOperationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ScoringOperationScalarFieldEnum | Prisma.ScoringOperationScalarFieldEnum[]
+}
+
+/**
+ * JobApplication.manualPriorities
+ */
+export type JobApplication$manualPrioritiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ManualApplicationPriority
+   */
+  select?: Prisma.ManualApplicationPrioritySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ManualApplicationPriority
+   */
+  omit?: Prisma.ManualApplicationPriorityOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ManualApplicationPriorityInclude<ExtArgs> | null
+  where?: Prisma.ManualApplicationPriorityWhereInput
+  orderBy?: Prisma.ManualApplicationPriorityOrderByWithRelationInput | Prisma.ManualApplicationPriorityOrderByWithRelationInput[]
+  cursor?: Prisma.ManualApplicationPriorityWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ManualApplicationPriorityScalarFieldEnum | Prisma.ManualApplicationPriorityScalarFieldEnum[]
+}
+
+/**
+ * JobApplication.rankingRows
+ */
+export type JobApplication$rankingRowsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RankingSnapshotRow
+   */
+  select?: Prisma.RankingSnapshotRowSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RankingSnapshotRow
+   */
+  omit?: Prisma.RankingSnapshotRowOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RankingSnapshotRowInclude<ExtArgs> | null
+  where?: Prisma.RankingSnapshotRowWhereInput
+  orderBy?: Prisma.RankingSnapshotRowOrderByWithRelationInput | Prisma.RankingSnapshotRowOrderByWithRelationInput[]
+  cursor?: Prisma.RankingSnapshotRowWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RankingSnapshotRowScalarFieldEnum | Prisma.RankingSnapshotRowScalarFieldEnum[]
+}
+
+/**
+ * JobApplication.aiAssessments
+ */
+export type JobApplication$aiAssessmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AiAssessment
+   */
+  select?: Prisma.AiAssessmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AiAssessment
+   */
+  omit?: Prisma.AiAssessmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AiAssessmentInclude<ExtArgs> | null
+  where?: Prisma.AiAssessmentWhereInput
+  orderBy?: Prisma.AiAssessmentOrderByWithRelationInput | Prisma.AiAssessmentOrderByWithRelationInput[]
+  cursor?: Prisma.AiAssessmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AiAssessmentScalarFieldEnum | Prisma.AiAssessmentScalarFieldEnum[]
+}
+
+/**
+ * JobApplication.scoringWorkItems
+ */
+export type JobApplication$scoringWorkItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ScoringWorkItem
+   */
+  select?: Prisma.ScoringWorkItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ScoringWorkItem
+   */
+  omit?: Prisma.ScoringWorkItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScoringWorkItemInclude<ExtArgs> | null
+  where?: Prisma.ScoringWorkItemWhereInput
+  orderBy?: Prisma.ScoringWorkItemOrderByWithRelationInput | Prisma.ScoringWorkItemOrderByWithRelationInput[]
+  cursor?: Prisma.ScoringWorkItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ScoringWorkItemScalarFieldEnum | Prisma.ScoringWorkItemScalarFieldEnum[]
+}
+
+/**
+ * JobApplication.aiAssessmentAttempts
+ */
+export type JobApplication$aiAssessmentAttemptsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AiAssessmentAttempt
+   */
+  select?: Prisma.AiAssessmentAttemptSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AiAssessmentAttempt
+   */
+  omit?: Prisma.AiAssessmentAttemptOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AiAssessmentAttemptInclude<ExtArgs> | null
+  where?: Prisma.AiAssessmentAttemptWhereInput
+  orderBy?: Prisma.AiAssessmentAttemptOrderByWithRelationInput | Prisma.AiAssessmentAttemptOrderByWithRelationInput[]
+  cursor?: Prisma.AiAssessmentAttemptWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AiAssessmentAttemptScalarFieldEnum | Prisma.AiAssessmentAttemptScalarFieldEnum[]
 }
 
 /**

@@ -35,7 +35,7 @@ describe("in-app notification event policy", () => {
     }
   });
 
-  it("uses Vietnamese with English fallback and safe internal destinations", () => {
+  it("uses Vietnamese with English fallback and defers destinations", () => {
     const vi = buildNotification(
       {
         ...base,
@@ -58,7 +58,7 @@ describe("in-app notification event policy", () => {
     );
     expect(vi.summary).toContain("tin nhắn chưa đọc");
     expect(en.summary).toContain("unread messages");
-    expect(en.href).toBe("/messages?conversation=conversation%201");
+    expect(en.href).toBeNull();
     expect(en.groupable).toBe(true);
   });
 

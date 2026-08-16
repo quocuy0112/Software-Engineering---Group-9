@@ -143,15 +143,19 @@ export function CvUploadForm({
       );
     } catch (cause) {
       showError(
-        cause instanceof Error && cause.message.includes("not available")
-          ? locale === "vi"
-            ? "Bộ phân tích đã chọn hiện không khả dụng. Hãy kiểm tra cấu hình rồi thử lại."
-            : cause.message
-          : locale === "vi"
-            ? "Tải CV không thành công. Hãy thử lại hoặc nhập hồ sơ thủ công."
-            : "The CV upload failed. Try again or enter your profile manually.",
+        cause instanceof Error && !cause.message.startsWith("CV_")
+          ? cause.message
+          : cause instanceof Error && cause.message.includes("not available")
+            ? locale === "vi"
+              ? "Bộ phân tích đã chọn hiện không khả dụng. Hãy kiểm tra cấu hình rồi thử lại."
+              : cause.message
+            : locale === "vi"
+              ? "Tải CV không thành công. Hãy thử lại hoặc nhập hồ sơ thủ công."
+              : "The CV upload failed. Try again or enter your profile manually.",
       );
-      setMessage(locale === "vi" ? "Tải lên không thành công." : "Upload failed.");
+      setMessage(
+        locale === "vi" ? "Tải lên không thành công." : "Upload failed.",
+      );
     } finally {
       setBusy(false);
     }

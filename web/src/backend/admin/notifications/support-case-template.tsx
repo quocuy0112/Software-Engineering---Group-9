@@ -9,6 +9,7 @@ import {
   Section,
   Text,
 } from "react-email";
+import { formatEmailTimestamp } from "./email-format";
 
 export type SupportCaseEmailProps = {
   caseId: string;
@@ -18,6 +19,7 @@ export type SupportCaseEmailProps = {
 };
 
 export function SupportCaseEmail(props: SupportCaseEmailProps) {
+  const timestamp = formatEmailTimestamp(props.occurredAt);
   return (
     <Html>
       <Head />
@@ -40,7 +42,7 @@ export function SupportCaseEmail(props: SupportCaseEmailProps) {
               ? "SmartHire Support replied. Sign in to read the response."
               : "SmartHire Support marked this case resolved. You may reopen it by replying within seven days."}
           </Text>
-          <Text>Updated at: {props.occurredAt}</Text>
+          <Text>Updated at: {timestamp}</Text>
           <Section>
             <Button
               href={props.supportUrl}
@@ -70,7 +72,7 @@ export function supportCaseEmailText(props: SupportCaseEmailProps) {
     props.state === "WAITING_FOR_USER"
       ? "SmartHire Support replied. Sign in to read the response."
       : "SmartHire Support marked this case resolved. You may reopen it by replying within seven days.",
-    `Updated at: ${props.occurredAt}`,
+    `Updated at: ${formatEmailTimestamp(props.occurredAt)}`,
     `Open Support Center: ${props.supportUrl}`,
     "This email intentionally contains no support-message content.",
   ].join("\n");

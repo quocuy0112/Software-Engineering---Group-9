@@ -319,6 +319,7 @@ export type ModerationReportWhereInput = {
   reporter?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   history?: Prisma.ModerationReportHistoryListRelationFilter
   notes?: Prisma.ModerationPrivateNoteListRelationFilter
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkListRelationFilter
 }
 
 export type ModerationReportOrderByWithRelationInput = {
@@ -343,6 +344,7 @@ export type ModerationReportOrderByWithRelationInput = {
   reporter?: Prisma.UserAccountOrderByWithRelationInput
   history?: Prisma.ModerationReportHistoryOrderByRelationAggregateInput
   notes?: Prisma.ModerationPrivateNoteOrderByRelationAggregateInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkOrderByRelationAggregateInput
 }
 
 export type ModerationReportWhereUniqueInput = Prisma.AtLeast<{
@@ -370,6 +372,7 @@ export type ModerationReportWhereUniqueInput = Prisma.AtLeast<{
   reporter?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   history?: Prisma.ModerationReportHistoryListRelationFilter
   notes?: Prisma.ModerationPrivateNoteListRelationFilter
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkListRelationFilter
 }, "id" | "unresolvedKey">
 
 export type ModerationReportOrderByWithAggregationInput = {
@@ -443,6 +446,7 @@ export type ModerationReportCreateInput = {
   reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedModerationReportsInput
   history?: Prisma.ModerationReportHistoryCreateNestedManyWithoutReportInput
   notes?: Prisma.ModerationPrivateNoteCreateNestedManyWithoutReportInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkCreateNestedManyWithoutModerationReportInput
 }
 
 export type ModerationReportUncheckedCreateInput = {
@@ -466,6 +470,7 @@ export type ModerationReportUncheckedCreateInput = {
   updatedAt?: Date | string
   history?: Prisma.ModerationReportHistoryUncheckedCreateNestedManyWithoutReportInput
   notes?: Prisma.ModerationPrivateNoteUncheckedCreateNestedManyWithoutReportInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkUncheckedCreateNestedManyWithoutModerationReportInput
 }
 
 export type ModerationReportUpdateInput = {
@@ -489,6 +494,7 @@ export type ModerationReportUpdateInput = {
   reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedModerationReportsNestedInput
   history?: Prisma.ModerationReportHistoryUpdateManyWithoutReportNestedInput
   notes?: Prisma.ModerationPrivateNoteUpdateManyWithoutReportNestedInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkUpdateManyWithoutModerationReportNestedInput
 }
 
 export type ModerationReportUncheckedUpdateInput = {
@@ -512,6 +518,7 @@ export type ModerationReportUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   history?: Prisma.ModerationReportHistoryUncheckedUpdateManyWithoutReportNestedInput
   notes?: Prisma.ModerationPrivateNoteUncheckedUpdateManyWithoutReportNestedInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkUncheckedUpdateManyWithoutModerationReportNestedInput
 }
 
 export type ModerationReportCreateManyInput = {
@@ -746,6 +753,20 @@ export type ModerationReportUpdateOneRequiredWithoutNotesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ModerationReportUpdateToOneWithWhereWithoutNotesInput, Prisma.ModerationReportUpdateWithoutNotesInput>, Prisma.ModerationReportUncheckedUpdateWithoutNotesInput>
 }
 
+export type ModerationReportCreateNestedOneWithoutEnforcementLinksInput = {
+  create?: Prisma.XOR<Prisma.ModerationReportCreateWithoutEnforcementLinksInput, Prisma.ModerationReportUncheckedCreateWithoutEnforcementLinksInput>
+  connectOrCreate?: Prisma.ModerationReportCreateOrConnectWithoutEnforcementLinksInput
+  connect?: Prisma.ModerationReportWhereUniqueInput
+}
+
+export type ModerationReportUpdateOneRequiredWithoutEnforcementLinksNestedInput = {
+  create?: Prisma.XOR<Prisma.ModerationReportCreateWithoutEnforcementLinksInput, Prisma.ModerationReportUncheckedCreateWithoutEnforcementLinksInput>
+  connectOrCreate?: Prisma.ModerationReportCreateOrConnectWithoutEnforcementLinksInput
+  upsert?: Prisma.ModerationReportUpsertWithoutEnforcementLinksInput
+  connect?: Prisma.ModerationReportWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ModerationReportUpdateToOneWithWhereWithoutEnforcementLinksInput, Prisma.ModerationReportUpdateWithoutEnforcementLinksInput>, Prisma.ModerationReportUncheckedUpdateWithoutEnforcementLinksInput>
+}
+
 export type ModerationReportCreateWithoutReporterInput = {
   id?: string
   targetType: $Enums.ModerationTargetType
@@ -766,6 +787,7 @@ export type ModerationReportCreateWithoutReporterInput = {
   updatedAt?: Date | string
   history?: Prisma.ModerationReportHistoryCreateNestedManyWithoutReportInput
   notes?: Prisma.ModerationPrivateNoteCreateNestedManyWithoutReportInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkCreateNestedManyWithoutModerationReportInput
 }
 
 export type ModerationReportUncheckedCreateWithoutReporterInput = {
@@ -788,6 +810,7 @@ export type ModerationReportUncheckedCreateWithoutReporterInput = {
   updatedAt?: Date | string
   history?: Prisma.ModerationReportHistoryUncheckedCreateNestedManyWithoutReportInput
   notes?: Prisma.ModerationPrivateNoteUncheckedCreateNestedManyWithoutReportInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkUncheckedCreateNestedManyWithoutModerationReportInput
 }
 
 export type ModerationReportCreateOrConnectWithoutReporterInput = {
@@ -860,6 +883,7 @@ export type ModerationReportCreateWithoutHistoryInput = {
   updatedAt?: Date | string
   reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedModerationReportsInput
   notes?: Prisma.ModerationPrivateNoteCreateNestedManyWithoutReportInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkCreateNestedManyWithoutModerationReportInput
 }
 
 export type ModerationReportUncheckedCreateWithoutHistoryInput = {
@@ -882,6 +906,7 @@ export type ModerationReportUncheckedCreateWithoutHistoryInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   notes?: Prisma.ModerationPrivateNoteUncheckedCreateNestedManyWithoutReportInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkUncheckedCreateNestedManyWithoutModerationReportInput
 }
 
 export type ModerationReportCreateOrConnectWithoutHistoryInput = {
@@ -920,6 +945,7 @@ export type ModerationReportUpdateWithoutHistoryInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedModerationReportsNestedInput
   notes?: Prisma.ModerationPrivateNoteUpdateManyWithoutReportNestedInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkUpdateManyWithoutModerationReportNestedInput
 }
 
 export type ModerationReportUncheckedUpdateWithoutHistoryInput = {
@@ -942,6 +968,7 @@ export type ModerationReportUncheckedUpdateWithoutHistoryInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.ModerationPrivateNoteUncheckedUpdateManyWithoutReportNestedInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkUncheckedUpdateManyWithoutModerationReportNestedInput
 }
 
 export type ModerationReportCreateWithoutNotesInput = {
@@ -964,6 +991,7 @@ export type ModerationReportCreateWithoutNotesInput = {
   updatedAt?: Date | string
   reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedModerationReportsInput
   history?: Prisma.ModerationReportHistoryCreateNestedManyWithoutReportInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkCreateNestedManyWithoutModerationReportInput
 }
 
 export type ModerationReportUncheckedCreateWithoutNotesInput = {
@@ -986,6 +1014,7 @@ export type ModerationReportUncheckedCreateWithoutNotesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   history?: Prisma.ModerationReportHistoryUncheckedCreateNestedManyWithoutReportInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkUncheckedCreateNestedManyWithoutModerationReportInput
 }
 
 export type ModerationReportCreateOrConnectWithoutNotesInput = {
@@ -1024,6 +1053,7 @@ export type ModerationReportUpdateWithoutNotesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedModerationReportsNestedInput
   history?: Prisma.ModerationReportHistoryUpdateManyWithoutReportNestedInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkUpdateManyWithoutModerationReportNestedInput
 }
 
 export type ModerationReportUncheckedUpdateWithoutNotesInput = {
@@ -1046,6 +1076,115 @@ export type ModerationReportUncheckedUpdateWithoutNotesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   history?: Prisma.ModerationReportHistoryUncheckedUpdateManyWithoutReportNestedInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkUncheckedUpdateManyWithoutModerationReportNestedInput
+}
+
+export type ModerationReportCreateWithoutEnforcementLinksInput = {
+  id?: string
+  targetType: $Enums.ModerationTargetType
+  targetReference: string
+  companyReference?: string | null
+  jobReference?: string | null
+  applicationReference?: string | null
+  qualifyingRelationship: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  priority?: $Enums.ModerationPriority
+  state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  unresolvedKey?: string | null
+  version?: number
+  terminalAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedModerationReportsInput
+  history?: Prisma.ModerationReportHistoryCreateNestedManyWithoutReportInput
+  notes?: Prisma.ModerationPrivateNoteCreateNestedManyWithoutReportInput
+}
+
+export type ModerationReportUncheckedCreateWithoutEnforcementLinksInput = {
+  id?: string
+  reporterUserId: string
+  targetType: $Enums.ModerationTargetType
+  targetReference: string
+  companyReference?: string | null
+  jobReference?: string | null
+  applicationReference?: string | null
+  qualifyingRelationship: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  priority?: $Enums.ModerationPriority
+  state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  unresolvedKey?: string | null
+  version?: number
+  terminalAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  history?: Prisma.ModerationReportHistoryUncheckedCreateNestedManyWithoutReportInput
+  notes?: Prisma.ModerationPrivateNoteUncheckedCreateNestedManyWithoutReportInput
+}
+
+export type ModerationReportCreateOrConnectWithoutEnforcementLinksInput = {
+  where: Prisma.ModerationReportWhereUniqueInput
+  create: Prisma.XOR<Prisma.ModerationReportCreateWithoutEnforcementLinksInput, Prisma.ModerationReportUncheckedCreateWithoutEnforcementLinksInput>
+}
+
+export type ModerationReportUpsertWithoutEnforcementLinksInput = {
+  update: Prisma.XOR<Prisma.ModerationReportUpdateWithoutEnforcementLinksInput, Prisma.ModerationReportUncheckedUpdateWithoutEnforcementLinksInput>
+  create: Prisma.XOR<Prisma.ModerationReportCreateWithoutEnforcementLinksInput, Prisma.ModerationReportUncheckedCreateWithoutEnforcementLinksInput>
+  where?: Prisma.ModerationReportWhereInput
+}
+
+export type ModerationReportUpdateToOneWithWhereWithoutEnforcementLinksInput = {
+  where?: Prisma.ModerationReportWhereInput
+  data: Prisma.XOR<Prisma.ModerationReportUpdateWithoutEnforcementLinksInput, Prisma.ModerationReportUncheckedUpdateWithoutEnforcementLinksInput>
+}
+
+export type ModerationReportUpdateWithoutEnforcementLinksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumModerationTargetTypeFieldUpdateOperationsInput | $Enums.ModerationTargetType
+  targetReference?: Prisma.StringFieldUpdateOperationsInput | string
+  companyReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qualifyingRelationship?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.EnumModerationPriorityFieldUpdateOperationsInput | $Enums.ModerationPriority
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  terminalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedModerationReportsNestedInput
+  history?: Prisma.ModerationReportHistoryUpdateManyWithoutReportNestedInput
+  notes?: Prisma.ModerationPrivateNoteUpdateManyWithoutReportNestedInput
+}
+
+export type ModerationReportUncheckedUpdateWithoutEnforcementLinksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumModerationTargetTypeFieldUpdateOperationsInput | $Enums.ModerationTargetType
+  targetReference?: Prisma.StringFieldUpdateOperationsInput | string
+  companyReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qualifyingRelationship?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.EnumModerationPriorityFieldUpdateOperationsInput | $Enums.ModerationPriority
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  terminalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  history?: Prisma.ModerationReportHistoryUncheckedUpdateManyWithoutReportNestedInput
+  notes?: Prisma.ModerationPrivateNoteUncheckedUpdateManyWithoutReportNestedInput
 }
 
 export type ModerationReportCreateManyReporterInput = {
@@ -1088,6 +1227,7 @@ export type ModerationReportUpdateWithoutReporterInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   history?: Prisma.ModerationReportHistoryUpdateManyWithoutReportNestedInput
   notes?: Prisma.ModerationPrivateNoteUpdateManyWithoutReportNestedInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkUpdateManyWithoutModerationReportNestedInput
 }
 
 export type ModerationReportUncheckedUpdateWithoutReporterInput = {
@@ -1110,6 +1250,7 @@ export type ModerationReportUncheckedUpdateWithoutReporterInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   history?: Prisma.ModerationReportHistoryUncheckedUpdateManyWithoutReportNestedInput
   notes?: Prisma.ModerationPrivateNoteUncheckedUpdateManyWithoutReportNestedInput
+  enforcementLinks?: Prisma.ModerationReportEnforcementLinkUncheckedUpdateManyWithoutModerationReportNestedInput
 }
 
 export type ModerationReportUncheckedUpdateManyWithoutReporterInput = {
@@ -1140,11 +1281,13 @@ export type ModerationReportUncheckedUpdateManyWithoutReporterInput = {
 export type ModerationReportCountOutputType = {
   history: number
   notes: number
+  enforcementLinks: number
 }
 
 export type ModerationReportCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   history?: boolean | ModerationReportCountOutputTypeCountHistoryArgs
   notes?: boolean | ModerationReportCountOutputTypeCountNotesArgs
+  enforcementLinks?: boolean | ModerationReportCountOutputTypeCountEnforcementLinksArgs
 }
 
 /**
@@ -1171,6 +1314,13 @@ export type ModerationReportCountOutputTypeCountNotesArgs<ExtArgs extends runtim
   where?: Prisma.ModerationPrivateNoteWhereInput
 }
 
+/**
+ * ModerationReportCountOutputType without action
+ */
+export type ModerationReportCountOutputTypeCountEnforcementLinksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ModerationReportEnforcementLinkWhereInput
+}
+
 
 export type ModerationReportSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1194,6 +1344,7 @@ export type ModerationReportSelect<ExtArgs extends runtime.Types.Extensions.Inte
   reporter?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   history?: boolean | Prisma.ModerationReport$historyArgs<ExtArgs>
   notes?: boolean | Prisma.ModerationReport$notesArgs<ExtArgs>
+  enforcementLinks?: boolean | Prisma.ModerationReport$enforcementLinksArgs<ExtArgs>
   _count?: boolean | Prisma.ModerationReportCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["moderationReport"]>
 
@@ -1267,6 +1418,7 @@ export type ModerationReportInclude<ExtArgs extends runtime.Types.Extensions.Int
   reporter?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   history?: boolean | Prisma.ModerationReport$historyArgs<ExtArgs>
   notes?: boolean | Prisma.ModerationReport$notesArgs<ExtArgs>
+  enforcementLinks?: boolean | Prisma.ModerationReport$enforcementLinksArgs<ExtArgs>
   _count?: boolean | Prisma.ModerationReportCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ModerationReportIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1282,6 +1434,7 @@ export type $ModerationReportPayload<ExtArgs extends runtime.Types.Extensions.In
     reporter: Prisma.$UserAccountPayload<ExtArgs>
     history: Prisma.$ModerationReportHistoryPayload<ExtArgs>[]
     notes: Prisma.$ModerationPrivateNotePayload<ExtArgs>[]
+    enforcementLinks: Prisma.$ModerationReportEnforcementLinkPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1699,6 +1852,7 @@ export interface Prisma__ModerationReportClient<T, Null = never, ExtArgs extends
   reporter<T extends Prisma.UserAccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccountDefaultArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   history<T extends Prisma.ModerationReport$historyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ModerationReport$historyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModerationReportHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notes<T extends Prisma.ModerationReport$notesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ModerationReport$notesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModerationPrivateNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  enforcementLinks<T extends Prisma.ModerationReport$enforcementLinksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ModerationReport$enforcementLinksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModerationReportEnforcementLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2192,6 +2346,30 @@ export type ModerationReport$notesArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.ModerationPrivateNoteScalarFieldEnum | Prisma.ModerationPrivateNoteScalarFieldEnum[]
+}
+
+/**
+ * ModerationReport.enforcementLinks
+ */
+export type ModerationReport$enforcementLinksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ModerationReportEnforcementLink
+   */
+  select?: Prisma.ModerationReportEnforcementLinkSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ModerationReportEnforcementLink
+   */
+  omit?: Prisma.ModerationReportEnforcementLinkOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ModerationReportEnforcementLinkInclude<ExtArgs> | null
+  where?: Prisma.ModerationReportEnforcementLinkWhereInput
+  orderBy?: Prisma.ModerationReportEnforcementLinkOrderByWithRelationInput | Prisma.ModerationReportEnforcementLinkOrderByWithRelationInput[]
+  cursor?: Prisma.ModerationReportEnforcementLinkWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ModerationReportEnforcementLinkScalarFieldEnum | Prisma.ModerationReportEnforcementLinkScalarFieldEnum[]
 }
 
 /**

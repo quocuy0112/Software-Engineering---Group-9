@@ -55,14 +55,22 @@ function NotificationCenterContent({
   }, [open]);
 
   async function openItem(item: NotificationItem) {
-    try {
-      if (!item.readAt)
-        await markRead.mutateAsync({ notificationId: item.id });
-      setOpen(false);
-      if (item.href) router.push(item.href);
-    } catch {
-      toast.error(copy.error);
-    }
+    if (!item.readAt)
+      void markRead
+        .mutateAsync({ notificationId: item.id })
+        .catch(() => toast.error(copy.error));
+    if (!item.href) return;
+    const current = `${window.location.pathname}${window.location.search}`;
+    if (current === item.href) return;
+    setOpen(false);
+    router.push(item.href);
+  }
+
+  function markItemRead(item: NotificationItem) {
+    if (item.readAt) return;
+    void markRead
+      .mutateAsync({ notificationId: item.id })
+      .catch(() => toast.error(copy.error));
   }
 
   return (
@@ -137,6 +145,26 @@ function NotificationCenterContent({
                       {notificationTime(item.lastOccurredAt, locale)}
                     </time>
                   </button>
+                  <div className="notification-item__actions">
+                    {!item.readAt ? (
+                      <button
+                        type="button"
+                        onClick={() => markItemRead(item)}
+                        aria-label={`Mark ${item.title} as read`}
+                      >
+                        Mark as read
+                      </button>
+                    ) : null}
+                    {item.href ? (
+                      <button
+                        type="button"
+                        onClick={() => void openItem(item)}
+                        aria-label={`View details for ${item.title}`}
+                      >
+                        View details
+                      </button>
+                    ) : null}
+                  </div>
                 </li>
               ))}
             </ul>

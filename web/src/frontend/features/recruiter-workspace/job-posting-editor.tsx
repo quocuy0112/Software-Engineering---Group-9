@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Badge } from "@/frontend/components/ui/badge";
+import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import {
   formatVndInput,
   parseVndInput,
@@ -26,6 +27,21 @@ import {
   titleCase,
 } from "./job-posting-editor-options";
 import { JobPostingPreview } from "./job-posting-preview";
+
+function formatReasonCode(code: string): string {
+  const reasonLabels: Record<string, string> = {
+    INCOMPLETE_OR_UNCLEAR: "Incomplete or unclear information",
+    MISLEADING_CONTENT: "Misleading content",
+    INAPPROPRIATE_LANGUAGE: "Inappropriate language",
+    DUPLICATE_POSTING: "Duplicate posting",
+    INVALID_REQUIREMENTS: "Invalid requirements",
+    INSUFFICIENT_COMPENSATION: "Insufficient compensation details",
+    VERIFICATION_MISMATCH: "Verification mismatch",
+    PROHIBITED_CONTENT: "Prohibited content",
+    OTHER: "Other reason",
+  };
+  return reasonLabels[code] || code.replace(/_/g, " ");
+}
 
 function FieldError({
   field,
@@ -138,13 +154,15 @@ export function JobPostingEditor({
   onBack,
   onSaved,
 }: {
-  initialJob: JobCatalogItem;
+  initialJob: RecruiterJob;
   companyName: string;
   onBack: () => void;
   onSaved: (job: RecruiterJob) => void;
 }) {
   const [job, setJob] = useState(initialJob);
+  const csrfProof = useCsrfProof();
   const [saving, setSaving] = useState(false);
+  const submissionKey = useRef<string | null>(null);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<RecruiterJobFieldErrors>({});
   const [openSections, setOpenSections] = useState<boolean[]>(
@@ -199,6 +217,7 @@ export function JobPostingEditor({
     clearFieldErrors(...fields);
     setJob((current) => ({
       ...updater(current),
+      company: current.company,
       updatedAt: new Date().toISOString(),
     }));
   };
@@ -284,7 +303,10 @@ export function JobPostingEditor({
     if (readOnly) return;
     const prepared = prepareRecruiterJobForSave(job);
     const nextErrors = validateRecruiterJobForSave(prepared, targetStatus);
-    setJob(prepared);
+    setJob((current) => ({
+      ...prepared,
+      company: current.company,
+    }));
     setFieldErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
       setOpenSections((current) => {
@@ -337,14 +359,24 @@ export function JobPostingEditor({
     setSaving(true);
     setError("");
     try {
+      if (
+        targetStatus === "pending_approval" &&
+        !window.confirm(
+          "Submit this exact version for Administrator review? You cannot edit it while the review is pending.",
+        )
+      )
+        return;
       const method = prepared.id === "new-job" ? "POST" : "PATCH";
       const response = await fetch("/api/recruiter/job-postings", {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-csrf-token": csrfProof,
+        },
         body: JSON.stringify(
           method === "POST"
-            ? { job: prepared, status: targetStatus }
-            : { ...prepared, status: targetStatus },
+            ? { job: prepared, status: "draft" }
+            : { ...prepared, status: "draft" },
         ),
       });
       const payload = (await response.json().catch(() => null)) as
@@ -360,6 +392,41 @@ export function JobPostingEditor({
       }
       if (!payload) {
         setError("The server returned an invalid response.");
+        return;
+      }
+      if (targetStatus === "pending_approval") {
+        submissionKey.current ??= crypto.randomUUID();
+        const submissionResponse = await fetch(
+          `/api/recruiter/job-postings/${encodeURIComponent(payload.id)}/submit-review`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "idempotency-key": submissionKey.current,
+              "x-csrf-token": csrfProof,
+            },
+            body: JSON.stringify({
+              expectedWorkingUpdatedAt: payload.updatedAt,
+            }),
+          },
+        );
+        const review = (await submissionResponse.json().catch(() => null)) as
+          | RecruiterJob["review"]
+          | { message?: string; fieldErrors?: RecruiterJobFieldErrors }
+          | null;
+        if (!submissionResponse.ok || !review || !("reviewId" in review)) {
+          setFieldErrors(
+            review && "fieldErrors" in review ? (review.fieldErrors ?? {}) : {},
+          );
+          setError(
+            review && "message" in review
+              ? (review.message ?? "Unable to submit this posting for review.")
+              : "Unable to submit this posting for review.",
+          );
+          return;
+        }
+        submissionKey.current = null;
+        onSaved({ ...payload, status: "pending_approval", review });
         return;
       }
       onSaved(payload);
@@ -421,6 +488,36 @@ export function JobPostingEditor({
           Build a complete, structured listing and review exactly what
           candidates will see.
         </p>
+        {job.review?.state === "REJECTED" && job.review.reasonCode ? (
+          <div
+            className="recruiter-editor-rejection-notice"
+            role="alert"
+            aria-live="polite"
+          >
+            <strong>Revision needed</strong>
+            <p>
+              <strong>{formatReasonCode(job.review.reasonCode)}</strong>
+              {job.review.publicExplanation
+                ? `: ${job.review.publicExplanation}`
+                : null}
+            </p>
+            <p>Make the required changes and submit again for a new review.</p>
+          </div>
+        ) : null}
+        {job.correctionRequest ? (
+          <div
+            className="recruiter-editor-rejection-notice"
+            role="status"
+            aria-live="polite"
+          >
+            <strong>Administrator requested changes</strong>
+            <p>{job.correctionRequest.publicExplanation}</p>
+            <p>
+              The current approved version remains live until your revised
+              version is reviewed.
+            </p>
+          </div>
+        ) : null}
       </div>
 
       <div className="recruiter-editor-progress recruiter-surface-card">
