@@ -1665,6 +1665,7 @@
 .recruiter-editor-rejection-notice > p:last-child {
   font-style: italic;
   font-size: 0.875rem;
+}
 
 /* AI ranking workspace --------------------------------------------------- */
 .ai-ranking-workspace {
