@@ -52,6 +52,7 @@ function Detail() {
       <JobPostManagementActionPanel
         jobId={record.id}
         version={record.version}
+        featuredPlacements={record.featuredPlacements ?? []}
         onDone={refresh}
       />
       <Paper sx={{ p: 3 }}>

@@ -415,6 +415,11 @@ export async function readRecruiterJobManagementData(
         include: {
           pendingVersion: true,
           versions: { orderBy: { sequence: "desc" }, take: 1 },
+          correctionRequests: {
+            where: { state: "OPEN" },
+            orderBy: { createdAt: "desc" },
+            take: 1,
+          },
         },
       })
     : [];
@@ -426,6 +431,7 @@ export async function readRecruiterJobManagementData(
     .map((job) => {
       const aggregate = reviewByJobId.get(job.id);
       const current = aggregate?.pendingVersion ?? aggregate?.versions[0];
+      const correctionRequest = aggregate?.correctionRequests[0];
       const derivedStatus = aggregate?.pendingVersion
         ? "pending_approval"
         : current?.state === "REJECTED"
@@ -450,6 +456,16 @@ export async function readRecruiterJobManagementData(
                 submittedAt: current.submittedAt.toISOString(),
                 decidedAt: current.decidedAt?.toISOString() ?? null,
                 version: aggregate.version,
+              },
+            }
+          : {}),
+        ...(correctionRequest
+          ? {
+              correctionRequest: {
+                id: correctionRequest.id,
+                publicExplanation: correctionRequest.publicExplanation,
+                hideImmediately: correctionRequest.hideImmediately,
+                createdAt: correctionRequest.createdAt.toISOString(),
               },
             }
           : {}),

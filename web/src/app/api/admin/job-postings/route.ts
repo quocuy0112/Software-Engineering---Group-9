@@ -7,13 +7,32 @@ export async function GET(request: Request) {
     const authority = await new AdminRequestBoundary().require(request);
     const params = new URL(request.url).searchParams;
     let filter: Record<string, unknown> = {};
-    try { filter = JSON.parse(params.get("filter") ?? "{}"); } catch { filter = {}; }
+    try {
+      filter = JSON.parse(params.get("filter") ?? "{}");
+    } catch {
+      filter = {};
+    }
     const value = (key: string) => params.get(key) ?? filter[key];
-    return adminJson(await new JobPostManagementService().list(authority, {
-      page: value("page") ?? 1, perPage: value("perPage") ?? value("pageSize") ?? 25,
-      q: value("q") || undefined, visibility: value("visibility") || undefined,
-      applicationState: value("applicationState") || undefined,
-      featured: value("featured") || undefined, minimumReports: value("minimumReports") || undefined,
-    }));
-  } catch (error) { return adminRouteError(error); }
+    return adminJson(
+      await new JobPostManagementService().list(authority, {
+        page: value("page") ?? 1,
+        perPage: value("perPage") ?? value("pageSize") ?? 25,
+        q: value("q") || undefined,
+        visibility: value("visibility") || undefined,
+        applicationState: value("applicationState") || undefined,
+        featured: value("featured") || undefined,
+        minimumReports: value("minimumReports") || undefined,
+        reportState: value("reportState") || undefined,
+        companyId: value("companyId") || undefined,
+        recruiterId: value("recruiterId") || undefined,
+        approverId: value("approverId") || undefined,
+        approvedFrom: value("approvedFrom") || undefined,
+        approvedTo: value("approvedTo") || undefined,
+        publishedFrom: value("publishedFrom") || undefined,
+        publishedTo: value("publishedTo") || undefined,
+      }),
+    );
+  } catch (error) {
+    return adminRouteError(error);
+  }
 }
