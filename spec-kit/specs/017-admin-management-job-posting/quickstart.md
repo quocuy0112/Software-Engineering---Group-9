@@ -205,3 +205,34 @@ Do not release when any of the following remains:
 - serious/critical accessibility finding;
 - undocumented performance conditions or threshold failure;
 - regression failure in job, notification, Administrator, or verification workflows.
+
+## Phase 7 Release-Gate Evidence (2026-08-16)
+
+- Added migration adoption safety, notification privacy, authorization-matrix, and architecture-boundary coverage. Focused release-gate command: 5 files passed, 18 tests passed.
+- `npm.cmd run typecheck`: passed.
+- Focused ESLint for the added release-gate suites and performance harness: passed.
+- `npm.cmd run db:migrations:check`: passed with 37 migrations; latest is `036_job_post_review_authority`.
+- Performance self-test: Node `v24.18.0` on `win32`, 120 managed jobs, 36 pending reviews, 3 active Administrators, 3 warm-up runs, 9 measured samples, concurrency 3. Notification visible P95 432 ms, queue visible P95 160 ms, decision visible P95 910 ms; integrity/privacy/audit success rates were 100%.
+- The performance result is deterministic self-test evidence with `managedDb: false`; a database-backed measurement remains required before release.
+- PostgreSQL-backed migration/adoption verification was not run because the configured local database was unavailable in this workspace.
+- Playwright review workflow/recovery was not run because the configured web server attempts to build Docker worker images and the Docker daemon is unavailable.
+- Moderated usability execution was not run; the fixed protocol and raw-results template are present, but participant evidence remains pending.
+- Static final-diff audit for the feature-owned boundaries found no review-specific direct JSON writes outside the catalogue repository, second session owner, automated decision path, or notification log fields containing snapshots/private notes; the focused architecture/privacy suites passed.
+- `npm.cmd run db:validate`: passed. `npm.cmd run db:generate`: passed with Prisma Client 7.9.0.
+- `npm.cmd run build`: passed with Next.js 16.3.0. The build emitted two existing dynamic-filesystem tracing warnings for the JSON catalogue and business-evidence storage paths; no build error occurred.
+- The notification OpenAPI parity regression initially exposed a missing `JOB_POST_REVIEW` context enum; the contract was updated and the targeted parity/privacy command passed with 2 files and 6 tests. The remaining notification regression failures are PostgreSQL-backed setup/cleanup failures against unavailable `localhost:55432`.
+- T112 harness execution was performed with the deterministic self-test dataset and threshold output recorded above; a live database-backed run remains required for release evidence.
+- Regression status: job-board completed 33 passing and 9 skipped tests, with 6 PostgreSQL fixture failures. Administrator management timed out at 150 seconds after multiple PostgreSQL-backed integration failures. These are environment blockers, not assertion failures in the release-gate tests.
+- Live regression rerun after applying migration 036: job-board passed 39 files/136 tests; business-verification passed 25 files/61 tests; notification passed 23 files/58 tests; full job-post review passed 39 files/213 tests; full lint passed.
+- Adoption/verification rerun against PostgreSQL completed twice with identical output: 3 unresolved historical rows, zero adopted rows, zero invalid pointers, zero invalid hashes, zero invalid lifecycle rows, and zero missing terminal notifications. No database rows were written by the dry-runs.
+- Prisma migration deployment applied `036_job_post_review_authority` successfully. `prisma migrate status` still reports pre-existing history drift because the database contains applied migration `20260815023247_smarthire`, which is absent from this checkout; this was not modified or removed.
+- Serialized Administrator regression passed 72 files/187 tests using one Vitest fork and the live PostgreSQL database.
+- The job-review Playwright server now starts successfully with Docker workers. The four workflow/recovery cases redirect to `/login` because no authenticated Recruiter/Administrator review fixtures are provisioned; they are not counted as passed.
+
+## Verification Required To Close Remaining Tasks
+
+- T108 requires two representative participants, one Recruiter and one Administrator, to execute the fixed usability protocol and provide first-attempt completion times, errors, and raw notes.
+- T109-T111 require PostgreSQL reachable at `localhost:55432` or an equivalent `DATABASE_URL`, applied migrations, isolated legacy JSON fixtures, and permission to run adoption/verification twice without destructive cleanup.
+- T110 is complete: the full notification, Administrator, job-board, and business-verification regression suites completed against the live database; the Recruiter workspace coverage is included in the full job-post review suite.
+- T113 requires a running application plus Docker-backed worker services, provisioned Better Auth sessions, responsive browser access, and axe/keyboard validation fixtures.
+- T115 requires explicit approval to create the final English Git commit; it has not been performed automatically.

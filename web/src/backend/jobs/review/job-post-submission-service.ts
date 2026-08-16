@@ -47,7 +47,20 @@ export class JobPostSubmissionService {
       );
 
     const snapshot = jobReviewSnapshotFromCatalog(job, membership.companyId);
-    projectJobReviewSnapshot(snapshot);
+    try {
+      projectJobReviewSnapshot(snapshot);
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "UNPUBLISHABLE_JOB_MAPPING"
+      ) {
+        throw new JobPostReviewError(
+          "JOB_POST_REVIEW_VALIDATION",
+          "Choose a supported experience level, employment type, work arrangement, and salary period before submitting.",
+        );
+      }
+      throw error;
+    }
     const snapshotSha256 = jobReviewSnapshotSha256(snapshot);
     const submissionRequestHash = requestHash(
       JSON.stringify({

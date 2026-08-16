@@ -9,12 +9,17 @@ const employmentTypes = {
   temporary: "TEMPORARY",
 } as const;
 const experienceLevels = {
+  intern: "ENTRY",
+  staff: "MID",
   entry: "ENTRY",
   junior: "JUNIOR",
   mid: "MID",
   senior: "SENIOR",
+  team_lead: "LEAD",
   lead: "LEAD",
   manager: "MANAGER",
+  executive: "MANAGER",
+  director: "MANAGER",
 } as const;
 const workArrangements = {
   onsite: "ONSITE",

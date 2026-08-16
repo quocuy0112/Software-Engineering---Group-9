@@ -2,6 +2,7 @@
 
 import { useRef, useState, type ReactNode } from "react";
 import { Badge } from "@/frontend/components/ui/badge";
+import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import {
   formatVndInput,
   parseVndInput,
@@ -159,6 +160,7 @@ export function JobPostingEditor({
   onSaved: (job: RecruiterJob) => void;
 }) {
   const [job, setJob] = useState(initialJob);
+  const csrfProof = useCsrfProof();
   const [saving, setSaving] = useState(false);
   const submissionKey = useRef<string | null>(null);
   const [error, setError] = useState("");
@@ -367,7 +369,10 @@ export function JobPostingEditor({
       const method = prepared.id === "new-job" ? "POST" : "PATCH";
       const response = await fetch("/api/recruiter/job-postings", {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-csrf-token": csrfProof,
+        },
         body: JSON.stringify(
           method === "POST"
             ? { job: prepared, status: "draft" }
@@ -398,6 +403,7 @@ export function JobPostingEditor({
             headers: {
               "Content-Type": "application/json",
               "idempotency-key": submissionKey.current,
+              "x-csrf-token": csrfProof,
             },
             body: JSON.stringify({
               expectedWorkingUpdatedAt: payload.updatedAt,

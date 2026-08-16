@@ -52,4 +52,28 @@ describe("job-post review architecture boundaries", () => {
     );
     expect(schema.match(/^model Session \{/gmu)).toHaveLength(1);
   });
+
+  it("keeps PostgreSQL review state authoritative and JobPosting derivative", () => {
+    const repository = read(
+      resolve(root, "backend/repositories/jobs/prisma-job-post-review-repository.ts"),
+    );
+    const projector = read(
+      resolve(root, "backend/jobs/review/job-post-publication-projector.ts"),
+    );
+    const publicRepository = read(
+      resolve(root, "backend/repositories/jobs/prisma-public-job-repository.ts"),
+    );
+    expect(repository).toContain("jobPostReviewAggregate");
+    expect(repository).toContain("jobPosting");
+    expect(projector).toContain("projectJobReviewSnapshot");
+    expect(publicRepository).toContain("approvedVersion");
+    expect(publicRepository).not.toContain("jobs.json");
+  });
+
+  it("does not expose mutable JSON lifecycle fields as public review authority", () => {
+    const service = read(resolve(root, "backend/services/jobs/job-workspace-data.ts"));
+    const discovery = read(resolve(root, "backend/services/jobs/job-discovery-service.ts"));
+    expect(`${service}\n${discovery}`).toMatch(/approvedVersion|reviewAggregate/iu);
+    expect(`${service}\n${discovery}`).not.toMatch(/json.*status|status.*json/iu);
+  });
 });
