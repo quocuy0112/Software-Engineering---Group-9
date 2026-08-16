@@ -22,7 +22,7 @@
 
 **Independent Test**: An item activation sends mark-read then navigates despite 500; null/current href does not navigate and the refresh reconciles unread count.
 
-- [ ] T006 [US2] Implement optimistic non-blocking notification activation, explicit actions, and component resilience tests in `web/src/frontend/features/notifications/components/notification-center.tsx`, `web/src/frontend/features/notifications/client/use-notifications.ts`, and `web/tests/frontend/components/notifications/notification-center.test.tsx`
+- [X] T006 [US2] Implement optimistic non-blocking notification activation, explicit actions, and component resilience tests in `web/src/frontend/features/notifications/components/notification-center.tsx`, `web/src/frontend/features/notifications/client/use-notifications.ts`, and `web/tests/frontend/components/notifications/notification-center.test.tsx`
 
 ## Phase 5: User Story 3 - Accessible unavailable states (P2)
 
