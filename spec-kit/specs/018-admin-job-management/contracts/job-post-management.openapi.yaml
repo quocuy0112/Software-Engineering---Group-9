@@ -144,11 +144,12 @@ components:
     AmendFeatureCommand:
       type: object
       additionalProperties: false
-      required: [command, confirmation, featureId, startsAt, endsAt, priority, reason]
+      required: [command, confirmation, featureId, placement, startsAt, endsAt, priority, reason]
       properties:
         command: { const: AMEND_FEATURE }
         confirmation: { const: true }
         featureId: { type: string, minLength: 1, maxLength: 128 }
+        placement: { type: string, enum: [HOME_FEATURED, SEARCH_FEATURED] }
         startsAt: { type: string, format: date-time }
         endsAt: { type: string, format: date-time }
         priority: { type: integer, minimum: 1, maximum: 100 }

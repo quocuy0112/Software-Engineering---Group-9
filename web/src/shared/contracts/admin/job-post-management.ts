@@ -53,6 +53,8 @@ export const jobManagementCommandSchema = z.discriminatedUnion("command", [
       "CLOSE_APPLICATIONS",
       "REQUEST_CHANGES",
       "SOFT_DELETE_JOB",
+      "SUSPEND_COMPANY",
+      "SUSPEND_RECRUITER",
     ]),
     reportIds: z.array(z.string().min(1).max(128)).min(1).max(100),
     reason,

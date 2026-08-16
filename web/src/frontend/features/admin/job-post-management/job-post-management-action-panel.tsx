@@ -266,6 +266,10 @@ export function JobPostManagementActionPanel({
         <MenuItem value="CLOSE_APPLICATIONS">Close applications</MenuItem>
         <MenuItem value="REQUEST_CHANGES">Request changes and hide</MenuItem>
         <MenuItem value="SOFT_DELETE_JOB">Soft delete job</MenuItem>
+        <MenuItem value="SUSPEND_COMPANY">
+          Suspend company verification
+        </MenuItem>
+        <MenuItem value="SUSPEND_RECRUITER">Suspend posting recruiter</MenuItem>
       </TextField>
       <Button
         sx={{ mt: 1, ml: { md: 1 } }}

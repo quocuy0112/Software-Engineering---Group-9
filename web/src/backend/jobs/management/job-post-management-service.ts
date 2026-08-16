@@ -319,7 +319,7 @@ export class JobPostManagementService {
               publicJobPosting: {
                 select: { id: true, applicationDeadline: true },
               },
-              approvedVersion: true,
+              approvedVersion: { select: { submittedByUserId: true } },
             },
           });
           if (!row || !row.publicJobPosting || !row.approvedVersionId)
@@ -563,7 +563,12 @@ export class JobPostManagementService {
                 jobReference: jobId,
                 state: "PENDING_REVIEW",
               },
-              select: { id: true, version: true, state: true },
+              select: {
+                id: true,
+                version: true,
+                state: true,
+                companyReference: true,
+              },
             });
             if (reports.length !== command.reportIds.length)
               throw new Error("REPORT_TARGET_UNAVAILABLE");
@@ -587,6 +592,55 @@ export class JobPostManagementService {
                 resultingState: { visibility, applicationState },
               },
             });
+            if (command.type === "SUSPEND_COMPANY") {
+              const company = await tx.company.findUnique({
+                where: { id: row.companyId },
+                select: { verificationState: true, verifiedAt: true },
+              });
+              if (!company) throw new Error("TARGET_UNAVAILABLE");
+              await tx.company.update({
+                where: { id: row.companyId },
+                data: {
+                  verificationState: "INACTIVE",
+                  verificationInactiveAt: now,
+                  verifiedAt: null,
+                },
+              });
+              await tx.jobPostEnforcementTarget.create({
+                data: {
+                  enforcementActionId: action.id,
+                  targetType: "COMPANY",
+                  targetReference: row.companyId,
+                  priorState: {
+                    verificationState: company.verificationState,
+                    verifiedAt: company.verifiedAt?.toISOString() ?? null,
+                  },
+                  resultingState: { verificationState: "INACTIVE" },
+                },
+              });
+            }
+            if (command.type === "SUSPEND_RECRUITER") {
+              const recruiterId = row.approvedVersion?.submittedByUserId;
+              if (!recruiterId) throw new Error("TARGET_UNAVAILABLE");
+              const suspended = await tx.companyMembership.updateMany({
+                where: {
+                  companyId: row.companyId,
+                  userId: recruiterId,
+                  status: "ACTIVE",
+                },
+                data: { status: "SUSPENDED", stateChangedAt: now },
+              });
+              if (suspended.count !== 1) throw new Error("TARGET_UNAVAILABLE");
+              await tx.jobPostEnforcementTarget.create({
+                data: {
+                  enforcementActionId: action.id,
+                  targetType: "RECRUITER",
+                  targetReference: recruiterId,
+                  priorState: { membershipState: "ACTIVE" },
+                  resultingState: { membershipState: "SUSPENDED" },
+                },
+              });
+            }
             await tx.moderationReportEnforcementLink.createMany({
               data: reports.map((report) => ({
                 moderationReportId: report.id,
