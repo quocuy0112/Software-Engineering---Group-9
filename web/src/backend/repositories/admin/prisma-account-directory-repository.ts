@@ -142,6 +142,14 @@ export class PrismaAccountDirectoryRepository {
             where: recruiterAuthorityWhere,
             select: { companyId: true },
           },
+          platformAdministratorGrants: {
+            where: {
+              state: "ACTIVE",
+              OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+            },
+            select: { id: true },
+            take: 1,
+          },
         },
       }),
       this.db.userAccount.count({ where }),
@@ -154,6 +162,7 @@ export class PrismaAccountDirectoryRepository {
           (membership) => membership.companyId,
         ),
         isCandidate: row.candidateIdentity !== null,
+        hasActiveAdministratorGrant: row.platformAdministratorGrants.length > 0,
       })),
       total,
     };
@@ -163,7 +172,8 @@ export class PrismaAccountDirectoryRepository {
     rows: Array<{
       id: string;
       recruiterCompanyIds: string[];
-      isCandidate: boolean;
+        isCandidate: boolean;
+        hasActiveAdministratorGrant: boolean;
     }>,
   ) {
     const accountIds = rows.map((row) => row.id);
@@ -265,6 +275,7 @@ export class PrismaAccountDirectoryRepository {
       id: row.id,
       recruiterCompanyIds: row.recruiterCompanyIds,
       isCandidate: row.isCandidate,
+      hasActiveAdministratorGrant: row.hasActiveAdministratorGrant,
     }));
     return { ...page, aggregates: await this.aggregatesFor(aggregateRows) };
   }
@@ -418,6 +429,8 @@ export class PrismaAccountDirectoryRepository {
               .filter((membership) => membership.status === "ACTIVE")
               .map((membership) => membership.company.id),
             isCandidate: account.candidateIdentity !== null,
+            hasActiveAdministratorGrant:
+              account.platformAdministratorGrants.length > 0,
           },
         ]),
         this.db.auditEvent.findMany({

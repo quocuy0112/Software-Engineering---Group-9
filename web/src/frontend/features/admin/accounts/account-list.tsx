@@ -9,6 +9,7 @@ import {
   TextField,
   TextInput,
 } from "react-admin";
+import { AccessRolesField } from "./access-roles-field";
 
 const filters = [
   <TextInput
@@ -70,7 +71,7 @@ export function AccountList() {
         <TextField source="accountReference" label="Account reference" />
         <TextField source="displayName" />
         <TextField source="maskedEmail" />
-        <TextField source="type" label="Account type" />
+        <FunctionField label="Roles" render={() => <AccessRolesField />} />
         <TextField source="status" label="Status" />
         <DateField source="registeredAt" showTime />
         <FunctionField label="Activity" render={counts} />
