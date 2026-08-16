@@ -39,8 +39,16 @@ function Detail() {
       <Paper sx={{ p: 3 }}>
         <Typography variant="h6">Reports and featured placement</Typography>
         <Typography>
-          Linked report actions: {record.reportSummary?.activeCount ?? 0}
+          Active reports: {record.reportSummary?.activeCount ?? 0}; distinct
+          reporters: {record.reportSummary?.distinctReporterCount ?? 0};
+          highest priority: {record.reportSummary?.highestPriority ?? "none"}
         </Typography>
+        {record.reports?.map((report: any) => (
+          <Typography key={report.id} sx={{ mt: 1 }}>
+            Report {report.id}: {report.category} / {report.priority} /{" "}
+            {new Date(report.createdAt).toLocaleString()}
+          </Typography>
+        ))}
         {record.featuredPlacements?.map((item: any) => (
           <Typography key={item.id}>
             {item.placement}: {item.state} (
