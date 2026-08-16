@@ -55,6 +55,7 @@ export type AiAssessmentMinAggregateOutputType = {
   technicalAbilitySummaryEncrypted: string | null
   roleFitSummaryEncrypted: string | null
   deductionSummaryEncrypted: string | null
+  scoreReasoningJsonEncrypted: string | null
   complianceStatementCode: string | null
   complianceStatementLabel: string | null
   questionState: $Enums.ScoringAiQuestionState | null
@@ -85,6 +86,7 @@ export type AiAssessmentMaxAggregateOutputType = {
   technicalAbilitySummaryEncrypted: string | null
   roleFitSummaryEncrypted: string | null
   deductionSummaryEncrypted: string | null
+  scoreReasoningJsonEncrypted: string | null
   complianceStatementCode: string | null
   complianceStatementLabel: string | null
   questionState: $Enums.ScoringAiQuestionState | null
@@ -115,6 +117,7 @@ export type AiAssessmentCountAggregateOutputType = {
   technicalAbilitySummaryEncrypted: number
   roleFitSummaryEncrypted: number
   deductionSummaryEncrypted: number
+  scoreReasoningJsonEncrypted: number
   complianceStatementCode: number
   complianceStatementLabel: number
   questionState: number
@@ -157,6 +160,7 @@ export type AiAssessmentMinAggregateInputType = {
   technicalAbilitySummaryEncrypted?: true
   roleFitSummaryEncrypted?: true
   deductionSummaryEncrypted?: true
+  scoreReasoningJsonEncrypted?: true
   complianceStatementCode?: true
   complianceStatementLabel?: true
   questionState?: true
@@ -187,6 +191,7 @@ export type AiAssessmentMaxAggregateInputType = {
   technicalAbilitySummaryEncrypted?: true
   roleFitSummaryEncrypted?: true
   deductionSummaryEncrypted?: true
+  scoreReasoningJsonEncrypted?: true
   complianceStatementCode?: true
   complianceStatementLabel?: true
   questionState?: true
@@ -217,6 +222,7 @@ export type AiAssessmentCountAggregateInputType = {
   technicalAbilitySummaryEncrypted?: true
   roleFitSummaryEncrypted?: true
   deductionSummaryEncrypted?: true
+  scoreReasoningJsonEncrypted?: true
   complianceStatementCode?: true
   complianceStatementLabel?: true
   questionState?: true
@@ -334,6 +340,7 @@ export type AiAssessmentGroupByOutputType = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -387,6 +394,7 @@ export type AiAssessmentWhereInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFilter<"AiAssessment"> | string
   roleFitSummaryEncrypted?: Prisma.StringFilter<"AiAssessment"> | string
   deductionSummaryEncrypted?: Prisma.StringFilter<"AiAssessment"> | string
+  scoreReasoningJsonEncrypted?: Prisma.StringNullableFilter<"AiAssessment"> | string | null
   complianceStatementCode?: Prisma.StringFilter<"AiAssessment"> | string
   complianceStatementLabel?: Prisma.StringFilter<"AiAssessment"> | string
   questionState?: Prisma.EnumScoringAiQuestionStateFilter<"AiAssessment"> | $Enums.ScoringAiQuestionState
@@ -423,6 +431,7 @@ export type AiAssessmentOrderByWithRelationInput = {
   technicalAbilitySummaryEncrypted?: Prisma.SortOrder
   roleFitSummaryEncrypted?: Prisma.SortOrder
   deductionSummaryEncrypted?: Prisma.SortOrder
+  scoreReasoningJsonEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
   complianceStatementCode?: Prisma.SortOrder
   complianceStatementLabel?: Prisma.SortOrder
   questionState?: Prisma.SortOrder
@@ -462,6 +471,7 @@ export type AiAssessmentWhereUniqueInput = Prisma.AtLeast<{
   technicalAbilitySummaryEncrypted?: Prisma.StringFilter<"AiAssessment"> | string
   roleFitSummaryEncrypted?: Prisma.StringFilter<"AiAssessment"> | string
   deductionSummaryEncrypted?: Prisma.StringFilter<"AiAssessment"> | string
+  scoreReasoningJsonEncrypted?: Prisma.StringNullableFilter<"AiAssessment"> | string | null
   complianceStatementCode?: Prisma.StringFilter<"AiAssessment"> | string
   complianceStatementLabel?: Prisma.StringFilter<"AiAssessment"> | string
   questionState?: Prisma.EnumScoringAiQuestionStateFilter<"AiAssessment"> | $Enums.ScoringAiQuestionState
@@ -498,6 +508,7 @@ export type AiAssessmentOrderByWithAggregationInput = {
   technicalAbilitySummaryEncrypted?: Prisma.SortOrder
   roleFitSummaryEncrypted?: Prisma.SortOrder
   deductionSummaryEncrypted?: Prisma.SortOrder
+  scoreReasoningJsonEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
   complianceStatementCode?: Prisma.SortOrder
   complianceStatementLabel?: Prisma.SortOrder
   questionState?: Prisma.SortOrder
@@ -536,6 +547,7 @@ export type AiAssessmentScalarWhereWithAggregatesInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringWithAggregatesFilter<"AiAssessment"> | string
   roleFitSummaryEncrypted?: Prisma.StringWithAggregatesFilter<"AiAssessment"> | string
   deductionSummaryEncrypted?: Prisma.StringWithAggregatesFilter<"AiAssessment"> | string
+  scoreReasoningJsonEncrypted?: Prisma.StringNullableWithAggregatesFilter<"AiAssessment"> | string | null
   complianceStatementCode?: Prisma.StringWithAggregatesFilter<"AiAssessment"> | string
   complianceStatementLabel?: Prisma.StringWithAggregatesFilter<"AiAssessment"> | string
   questionState?: Prisma.EnumScoringAiQuestionStateWithAggregatesFilter<"AiAssessment"> | $Enums.ScoringAiQuestionState
@@ -564,6 +576,7 @@ export type AiAssessmentCreateInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -600,6 +613,7 @@ export type AiAssessmentUncheckedCreateInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -632,6 +646,7 @@ export type AiAssessmentUpdateInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -668,6 +683,7 @@ export type AiAssessmentUncheckedUpdateInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -702,6 +718,7 @@ export type AiAssessmentCreateManyInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -730,6 +747,7 @@ export type AiAssessmentUpdateManyMutationInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -760,6 +778,7 @@ export type AiAssessmentUncheckedUpdateManyInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -800,6 +819,7 @@ export type AiAssessmentCountOrderByAggregateInput = {
   technicalAbilitySummaryEncrypted?: Prisma.SortOrder
   roleFitSummaryEncrypted?: Prisma.SortOrder
   deductionSummaryEncrypted?: Prisma.SortOrder
+  scoreReasoningJsonEncrypted?: Prisma.SortOrder
   complianceStatementCode?: Prisma.SortOrder
   complianceStatementLabel?: Prisma.SortOrder
   questionState?: Prisma.SortOrder
@@ -835,6 +855,7 @@ export type AiAssessmentMaxOrderByAggregateInput = {
   technicalAbilitySummaryEncrypted?: Prisma.SortOrder
   roleFitSummaryEncrypted?: Prisma.SortOrder
   deductionSummaryEncrypted?: Prisma.SortOrder
+  scoreReasoningJsonEncrypted?: Prisma.SortOrder
   complianceStatementCode?: Prisma.SortOrder
   complianceStatementLabel?: Prisma.SortOrder
   questionState?: Prisma.SortOrder
@@ -865,6 +886,7 @@ export type AiAssessmentMinOrderByAggregateInput = {
   technicalAbilitySummaryEncrypted?: Prisma.SortOrder
   roleFitSummaryEncrypted?: Prisma.SortOrder
   deductionSummaryEncrypted?: Prisma.SortOrder
+  scoreReasoningJsonEncrypted?: Prisma.SortOrder
   complianceStatementCode?: Prisma.SortOrder
   complianceStatementLabel?: Prisma.SortOrder
   questionState?: Prisma.SortOrder
@@ -1060,6 +1082,7 @@ export type AiAssessmentCreateWithoutApplicationInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -1094,6 +1117,7 @@ export type AiAssessmentUncheckedCreateWithoutApplicationInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -1157,6 +1181,7 @@ export type AiAssessmentScalarWhereInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFilter<"AiAssessment"> | string
   roleFitSummaryEncrypted?: Prisma.StringFilter<"AiAssessment"> | string
   deductionSummaryEncrypted?: Prisma.StringFilter<"AiAssessment"> | string
+  scoreReasoningJsonEncrypted?: Prisma.StringNullableFilter<"AiAssessment"> | string | null
   complianceStatementCode?: Prisma.StringFilter<"AiAssessment"> | string
   complianceStatementLabel?: Prisma.StringFilter<"AiAssessment"> | string
   questionState?: Prisma.EnumScoringAiQuestionStateFilter<"AiAssessment"> | $Enums.ScoringAiQuestionState
@@ -1185,6 +1210,7 @@ export type AiAssessmentCreateWithoutAutomaticMatchResultInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -1219,6 +1245,7 @@ export type AiAssessmentUncheckedCreateWithoutAutomaticMatchResultInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -1277,6 +1304,7 @@ export type AiAssessmentCreateWithoutFindingsInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -1312,6 +1340,7 @@ export type AiAssessmentUncheckedCreateWithoutFindingsInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -1359,6 +1388,7 @@ export type AiAssessmentUpdateWithoutFindingsInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -1394,6 +1424,7 @@ export type AiAssessmentUncheckedUpdateWithoutFindingsInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -1425,6 +1456,7 @@ export type AiAssessmentCreateWithoutQuestionsInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -1460,6 +1492,7 @@ export type AiAssessmentUncheckedCreateWithoutQuestionsInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -1507,6 +1540,7 @@ export type AiAssessmentUpdateWithoutQuestionsInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -1542,6 +1576,7 @@ export type AiAssessmentUncheckedUpdateWithoutQuestionsInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -1573,6 +1608,7 @@ export type AiAssessmentCreateWithoutAttemptsInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -1608,6 +1644,7 @@ export type AiAssessmentUncheckedCreateWithoutAttemptsInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -1655,6 +1692,7 @@ export type AiAssessmentUpdateWithoutAttemptsInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -1690,6 +1728,7 @@ export type AiAssessmentUncheckedUpdateWithoutAttemptsInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -1721,6 +1760,7 @@ export type AiAssessmentCreateWithoutScoringResultsInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -1756,6 +1796,7 @@ export type AiAssessmentUncheckedCreateWithoutScoringResultsInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -1803,6 +1844,7 @@ export type AiAssessmentUpdateWithoutScoringResultsInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -1838,6 +1880,7 @@ export type AiAssessmentUncheckedUpdateWithoutScoringResultsInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -1870,6 +1913,7 @@ export type AiAssessmentCreateManyApplicationInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -1898,6 +1942,7 @@ export type AiAssessmentUpdateWithoutApplicationInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -1932,6 +1977,7 @@ export type AiAssessmentUncheckedUpdateWithoutApplicationInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -1965,6 +2011,7 @@ export type AiAssessmentUncheckedUpdateManyWithoutApplicationInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -1994,6 +2041,7 @@ export type AiAssessmentCreateManyAutomaticMatchResultInput = {
   technicalAbilitySummaryEncrypted: string
   roleFitSummaryEncrypted: string
   deductionSummaryEncrypted: string
+  scoreReasoningJsonEncrypted?: string | null
   complianceStatementCode: string
   complianceStatementLabel: string
   questionState: $Enums.ScoringAiQuestionState
@@ -2022,6 +2070,7 @@ export type AiAssessmentUpdateWithoutAutomaticMatchResultInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -2056,6 +2105,7 @@ export type AiAssessmentUncheckedUpdateWithoutAutomaticMatchResultInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -2089,6 +2139,7 @@ export type AiAssessmentUncheckedUpdateManyWithoutAutomaticMatchResultInput = {
   technicalAbilitySummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   roleFitSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
   deductionSummaryEncrypted?: Prisma.StringFieldUpdateOperationsInput | string
+  scoreReasoningJsonEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   complianceStatementCode?: Prisma.StringFieldUpdateOperationsInput | string
   complianceStatementLabel?: Prisma.StringFieldUpdateOperationsInput | string
   questionState?: Prisma.EnumScoringAiQuestionStateFieldUpdateOperationsInput | $Enums.ScoringAiQuestionState
@@ -2177,6 +2228,7 @@ export type AiAssessmentSelect<ExtArgs extends runtime.Types.Extensions.Internal
   technicalAbilitySummaryEncrypted?: boolean
   roleFitSummaryEncrypted?: boolean
   deductionSummaryEncrypted?: boolean
+  scoreReasoningJsonEncrypted?: boolean
   complianceStatementCode?: boolean
   complianceStatementLabel?: boolean
   questionState?: boolean
@@ -2214,6 +2266,7 @@ export type AiAssessmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   technicalAbilitySummaryEncrypted?: boolean
   roleFitSummaryEncrypted?: boolean
   deductionSummaryEncrypted?: boolean
+  scoreReasoningJsonEncrypted?: boolean
   complianceStatementCode?: boolean
   complianceStatementLabel?: boolean
   questionState?: boolean
@@ -2246,6 +2299,7 @@ export type AiAssessmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   technicalAbilitySummaryEncrypted?: boolean
   roleFitSummaryEncrypted?: boolean
   deductionSummaryEncrypted?: boolean
+  scoreReasoningJsonEncrypted?: boolean
   complianceStatementCode?: boolean
   complianceStatementLabel?: boolean
   questionState?: boolean
@@ -2278,6 +2332,7 @@ export type AiAssessmentSelectScalar = {
   technicalAbilitySummaryEncrypted?: boolean
   roleFitSummaryEncrypted?: boolean
   deductionSummaryEncrypted?: boolean
+  scoreReasoningJsonEncrypted?: boolean
   complianceStatementCode?: boolean
   complianceStatementLabel?: boolean
   questionState?: boolean
@@ -2289,7 +2344,7 @@ export type AiAssessmentSelectScalar = {
   createdAt?: boolean
 }
 
-export type AiAssessmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobApplicationId" | "automaticMatchResultId" | "score" | "confidencePercent" | "confidenceLevel" | "confidenceLabel" | "humanReviewGuidance" | "providerAdapterVersion" | "providerModel" | "modelVersion" | "promptVersion" | "assessmentSchemaVersion" | "sensitiveAttributePolicyVersion" | "overallSummaryEncrypted" | "technicalAbilitySummaryEncrypted" | "roleFitSummaryEncrypted" | "deductionSummaryEncrypted" | "complianceStatementCode" | "complianceStatementLabel" | "questionState" | "questionFallbackLabel" | "accessDeniedAt" | "deleteAfter" | "deletedAt" | "computedAt" | "createdAt", ExtArgs["result"]["aiAssessment"]>
+export type AiAssessmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobApplicationId" | "automaticMatchResultId" | "score" | "confidencePercent" | "confidenceLevel" | "confidenceLabel" | "humanReviewGuidance" | "providerAdapterVersion" | "providerModel" | "modelVersion" | "promptVersion" | "assessmentSchemaVersion" | "sensitiveAttributePolicyVersion" | "overallSummaryEncrypted" | "technicalAbilitySummaryEncrypted" | "roleFitSummaryEncrypted" | "deductionSummaryEncrypted" | "scoreReasoningJsonEncrypted" | "complianceStatementCode" | "complianceStatementLabel" | "questionState" | "questionFallbackLabel" | "accessDeniedAt" | "deleteAfter" | "deletedAt" | "computedAt" | "createdAt", ExtArgs["result"]["aiAssessment"]>
 export type AiAssessmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   application?: boolean | Prisma.JobApplicationDefaultArgs<ExtArgs>
   automaticMatchResult?: boolean | Prisma.AutomaticMatchResultDefaultArgs<ExtArgs>
@@ -2337,6 +2392,7 @@ export type $AiAssessmentPayload<ExtArgs extends runtime.Types.Extensions.Intern
     technicalAbilitySummaryEncrypted: string
     roleFitSummaryEncrypted: string
     deductionSummaryEncrypted: string
+    scoreReasoningJsonEncrypted: string | null
     complianceStatementCode: string
     complianceStatementLabel: string
     questionState: $Enums.ScoringAiQuestionState
@@ -2793,6 +2849,7 @@ export interface AiAssessmentFieldRefs {
   readonly technicalAbilitySummaryEncrypted: Prisma.FieldRef<"AiAssessment", 'String'>
   readonly roleFitSummaryEncrypted: Prisma.FieldRef<"AiAssessment", 'String'>
   readonly deductionSummaryEncrypted: Prisma.FieldRef<"AiAssessment", 'String'>
+  readonly scoreReasoningJsonEncrypted: Prisma.FieldRef<"AiAssessment", 'String'>
   readonly complianceStatementCode: Prisma.FieldRef<"AiAssessment", 'String'>
   readonly complianceStatementLabel: Prisma.FieldRef<"AiAssessment", 'String'>
   readonly questionState: Prisma.FieldRef<"AiAssessment", 'ScoringAiQuestionState'>

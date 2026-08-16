@@ -90,12 +90,80 @@ export const aiFindingSchema = z
   })
   .strict();
 
+export const aiScoreCategorySchema = z.enum([
+  "Required skills",
+  "Experience",
+  "Preferred skills",
+  "Education/certifications",
+  "Languages",
+]);
+
+export const aiScoreReasoningBreakdownSchema = z
+  .object({
+    category: aiScoreCategorySchema,
+    points: z.string().regex(/^\d+(?:\.\d+)?\/\d+(?:\.\d+)?$/u),
+    note: z.string().nullable(),
+  })
+  .strict();
+
+export const aiScoreReasoningSchema = z
+  .object({
+    score: z.number().min(0).max(100),
+    breakdown: z.array(aiScoreReasoningBreakdownSchema).length(5),
+    aiTotal: z.number().min(0).max(100),
+    matchLabel: z.enum(["high match", "medium match", "low match"]),
+    confidence: z
+      .object({
+        percent: z.number().int().min(0).max(100),
+        level: z.enum(["Low", "Medium", "High"]),
+        cappedReason: z.string().nullable(),
+      })
+      .strict(),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    const total = value.breakdown.reduce((sum, item) => {
+      const [earned] = item.points.split("/");
+      return sum + Number(earned);
+    }, 0);
+    if (Math.abs(total - value.score) > 0.1) {
+      context.addIssue({
+        code: "custom",
+        path: ["score"],
+        message: `score must equal scoreReasoning breakdown sum (${total})`,
+      });
+    }
+    if (Math.abs(value.score - value.aiTotal) > 0.1) {
+      context.addIssue({
+        code: "custom",
+        path: ["aiTotal"],
+        message: "aiTotal must equal score",
+      });
+    }
+  });
+
+export const aiStrengthSchema = z
+  .object({
+    title: z.string().min(1).max(160),
+    evidence: z.string().min(1).max(2_000),
+  })
+  .strict();
+
+export const aiPointToVerifySchema = z
+  .object({
+    title: z.string().min(1).max(160),
+    reason: z.string().min(1).max(2_000),
+  })
+  .strict();
+
 export const aiDataQualityNoteSchema = z
   .object({
     id: z.string().min(1),
     bucket: z.enum(["input_limitation", "extraction_uncertainty"]),
+    severity: z.enum(["MINOR", "HIGH"]).default("MINOR"),
     title: z.string().min(1).max(160),
     evidence: z.string().min(1).max(2_000),
+    affectedCategories: z.array(aiScoreCategorySchema).max(5).default([]),
   })
   .strict();
 
@@ -129,7 +197,7 @@ export const aiAssessmentSchema = z
     assessmentId: z.string().min(1),
     score: z.number().min(0).max(100),
     confidencePercent: z.number().int().min(0).max(100),
-    confidenceLevel: z.enum(["LOW", "STANDARD"]),
+    confidenceLevel: z.enum(["LOW", "MEDIUM", "HIGH", "STANDARD"]),
     confidenceLabel: z.string().min(1),
     humanReviewGuidance: z.string().min(1).nullable(),
     requiresHumanReview: z.boolean(),
@@ -139,6 +207,15 @@ export const aiAssessmentSchema = z
     policyVersion: z.string().min(1),
     overallSummary: z.string().min(1),
     breakdown: z.array(z.string().min(1).max(300)).length(3),
+    scoreReasoning: aiScoreReasoningSchema,
+    strengths: z.array(aiStrengthSchema).max(4),
+    pointsToVerify: z.array(aiPointToVerifySchema).max(4),
+    suggestedQuestions: z
+      .array(z.string().min(1).max(500))
+      .refine((items) => items.length === 0 || items.length === 3, {
+        message: "Suggested questions must contain exactly 3 items or be empty",
+      }),
+    questionsUnavailableReason: z.string().min(1).max(500).nullable(),
     assessmentLimitedByDataQuality: z.boolean(),
     dataQualityNotes: z.array(aiDataQualityNoteSchema).max(30),
     findings: z.array(aiFindingSchema),
@@ -152,7 +229,66 @@ export const aiAssessmentSchema = z
       .strict(),
     questions: aiQuestionsSchema,
   })
-  .strict();
+  .strict()
+  .superRefine((value, context) => {
+    if (Math.abs(value.score - value.scoreReasoning.score) > 0.1) {
+      context.addIssue({
+        code: "custom",
+        path: ["scoreReasoning", "score"],
+        message: "scoreReasoning.score must equal score",
+      });
+    }
+    if (value.confidencePercent !== value.scoreReasoning.confidence.percent) {
+      context.addIssue({
+        code: "custom",
+        path: ["scoreReasoning", "confidence", "percent"],
+        message: "scoreReasoning confidence must equal confidencePercent",
+      });
+    }
+    if (
+      value.suggestedQuestions.length === 0 &&
+      value.questionsUnavailableReason === null
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["questionsUnavailableReason"],
+        message: "Empty suggested questions require an unavailable reason",
+      });
+    }
+    if (
+      value.suggestedQuestions.length === 3 &&
+      value.questionsUnavailableReason !== null
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["questionsUnavailableReason"],
+        message:
+          "Generated suggested questions cannot have an unavailable reason",
+      });
+    }
+    if (
+      value.questions.kind === "GENERATED" &&
+      value.suggestedQuestions.length !== 3
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["suggestedQuestions"],
+        message:
+          "Generated questions must contain exactly three suggestedQuestions",
+      });
+    }
+    if (
+      value.questions.kind === "INSUFFICIENT_DATA" &&
+      value.suggestedQuestions.length !== 0
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["suggestedQuestions"],
+        message:
+          "Unavailable questions must have an empty suggestedQuestions array",
+      });
+    }
+  });
 
 export const finalScoreSchema = z
   .object({
@@ -352,6 +488,7 @@ export const rankedApplicationPageSchema = z
     processingExclusionLabel: z.string().min(1).nullable(),
     defaultRejectedExclusionLabel: z.string().min(1).nullable(),
     rescoreInProgress: z.boolean(),
+    lastScoredAt: isoDateTime.nullable(),
     filteredCandidates: z.number().int().nonnegative(),
     totalCandidates: z.number().int().nonnegative(),
     summary: z
@@ -469,6 +606,8 @@ export const rescoreRequestSchema = confirmedCommandSchema.extend({
 });
 
 export const aiRetryRequestSchema = confirmedCommandSchema;
+
+export const scoreApplicationRequestSchema = confirmedCommandSchema;
 
 export const setPriorityRequestSchema = confirmedCommandSchema.extend({
   value: z.enum(["HIGH", "NORMAL", "LOW", "HOLD"]),

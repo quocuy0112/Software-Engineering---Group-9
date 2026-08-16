@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { AlertTriangle, Download, LoaderCircle, X } from "lucide-react";
 
 export function ApplicationDocumentViewer({
   jobId,
@@ -20,17 +21,98 @@ export function ApplicationDocumentViewer({
   const previewUrl = `/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(applicationId)}/documents/${kind}`;
   const downloadUrl = `${previewUrl}/download`;
 
+  useEffect(() => {
+    let active = true;
+    void fetch(previewUrl, { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) {
+          const payload = (await response.json().catch(() => null)) as {
+            message?: unknown;
+          } | null;
+          throw new Error(
+            typeof payload?.message === "string"
+              ? payload.message
+              : "Couldn't load document — try downloading the original.",
+          );
+        }
+        void response.body?.cancel();
+        if (active) setState("ready");
+      })
+      .catch((error) => {
+        if (!active) return;
+        setMessage(
+          error instanceof Error
+            ? error.message
+            : "Couldn't load document — try downloading the original.",
+        );
+        setState("error");
+      });
+    return () => {
+      active = false;
+    };
+  }, [previewUrl]);
+
   return (
-    <div className="application-document-overlay" role="dialog" aria-modal="true" aria-labelledby="application-document-title">
+    <div
+      className="application-document-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="application-document-title"
+    >
       <div className="application-document-dialog">
-        <button type="button" onClick={onClose} aria-label="Close document viewer">Close</button>
-        <h2 id="application-document-title">{fileName ?? (kind === "cv" ? "Original CV" : "Cover letter")}</h2>
-        {state === "loading" ? <p role="status">Loading document preview…</p> : null}
-        {state === "error" ? <p role="alert">{message} Download the original file instead.</p> : null}
-        {state !== "error" ? (
-          <iframe title={`${kind === "cv" ? "CV" : "Cover letter"} preview`} src={previewUrl} onLoad={() => setState("ready")} onError={() => { setState("error"); setMessage("The original document could not be previewed."); }} />
-        ) : null}
-        <a href={downloadUrl} download={fileName ?? undefined}>Download original {kind === "cv" ? "CV" : "cover letter"}</a>
+        <header className="application-document-dialog__header">
+          <div>
+            <span>Original document</span>
+            <h2 id="application-document-title">
+              {fileName ?? (kind === "cv" ? "Original CV" : "Cover letter")}
+            </h2>
+          </div>
+          <button
+            type="button"
+            className="ranking-icon-button"
+            onClick={onClose}
+            aria-label="Close document viewer"
+          >
+            <X aria-hidden="true" />
+          </button>
+        </header>
+        <div className="application-document-dialog__body">
+          {state === "loading" ? (
+            <div className="application-document-dialog__state" role="status">
+              <LoaderCircle aria-hidden="true" className="is-spinning" />
+              <strong>Loading document preview</strong>
+            </div>
+          ) : null}
+          {state === "error" ? (
+            <div
+              className="application-document-dialog__state is-error"
+              role="alert"
+            >
+              <AlertTriangle aria-hidden="true" />
+              <strong>Couldn&apos;t load document</strong>
+              <p>{message}</p>
+            </div>
+          ) : null}
+          {state === "ready" ? (
+            <iframe
+              title={`${kind === "cv" ? "CV" : "Cover letter"} preview`}
+              src={previewUrl}
+              onLoad={() => setState("ready")}
+              onError={() => {
+                setState("error");
+                setMessage(
+                  "Couldn't load document — try downloading the original.",
+                );
+              }}
+            />
+          ) : null}
+        </div>
+        <footer className="application-document-dialog__footer">
+          <a href={downloadUrl} download={fileName ?? undefined}>
+            <Download aria-hidden="true" /> Download original{" "}
+            {kind === "cv" ? "CV" : "cover letter"}
+          </a>
+        </footer>
       </div>
     </div>
   );

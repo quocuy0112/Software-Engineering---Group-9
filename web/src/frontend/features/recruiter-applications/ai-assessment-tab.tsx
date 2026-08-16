@@ -19,10 +19,10 @@ import type {
 
 export function AiAssessmentTab({
   state,
-  onRetry,
+  onScore,
 }: {
   state: ScoringState;
-  onRetry: () => void;
+  onScore: () => void;
 }) {
   if (state.kind === "PENDING")
     return <RetryingAssessment automatic={state.automaticMatch} />;
@@ -58,6 +58,13 @@ export function AiAssessmentTab({
           There is no published deterministic result to send for AI assessment
           yet.
         </p>
+        <button
+          type="button"
+          className="ai-ranking-button ai-ranking-button--primary"
+          onClick={onScore}
+        >
+          <BrainCircuit aria-hidden="true" /> Score this candidate
+        </button>
       </div>
     );
   }
@@ -66,7 +73,7 @@ export function AiAssessmentTab({
       <UnavailableAssessment
         automatic={state.automaticMatch}
         failures={state.consecutiveFailures}
-        onRetry={onRetry}
+        safeFailureCode={state.aiAssessment.safeFailureCode}
       />
     );
   return (
@@ -143,31 +150,14 @@ function RetryingAssessment({
 function UnavailableAssessment({
   automatic,
   failures,
-  onRetry,
+  safeFailureCode,
 }: {
   automatic: AutomaticMatch;
   failures: number;
-  onRetry: () => void;
+  safeFailureCode: string;
 }) {
   return (
     <div className="ranking-tab-content">
-      <div className="ranking-warning ranking-warning--amber" role="alert">
-        <AlertTriangle aria-hidden="true" />
-        <div>
-          <strong>AI evaluation is unavailable</strong>
-          <p>
-            Deterministic matching is complete. No hybrid final score is shown
-            until AI succeeds.
-          </p>
-        </div>
-        <button
-          type="button"
-          className="ai-ranking-button ai-ranking-button--secondary"
-          onClick={onRetry}
-        >
-          <LoaderCircle aria-hidden="true" /> Retry AI evaluation
-        </button>
-      </div>
       <div className="automatic-score-cards">
         <AssessmentMetric
           title="Automatic match"
@@ -202,7 +192,8 @@ function UnavailableAssessment({
       </div>
       {failures >= 3 ? (
         <div className="ranking-support-callout" role="status">
-          Repeated AI failure · try later or contact support.
+          Repeated AI failure ({safeFailureCode}) · try later or contact
+          support.
         </div>
       ) : null}
       <p className="ranking-method-note">
@@ -222,8 +213,8 @@ function ReadyAssessment({
   ai: AiAssessment;
   finalScore: FinalScore;
 }) {
-  const strengths = ai.findings.filter((item) => item.kind === "STRENGTH");
-  const verify = ai.findings.filter((item) => item.kind === "POINT_TO_VERIFY");
+  const strengths = ai.strengths;
+  const verify = ai.pointsToVerify;
   return (
     <div className="ranking-tab-content ai-assessment-tab">
       <section className="ai-overall-card">
@@ -231,32 +222,22 @@ function ReadyAssessment({
           <BrainCircuit />
         </span>
         <div>
-          <div className="ai-overall-card__heading">
-            <h3>Overall assessment</h3>
-            <span>AI-generated</span>
-          </div>
+          <h3>Overall assessment</h3>
           <p>{ai.overallSummary}</p>
         </div>
       </section>
-      {ai.assessmentLimitedByDataQuality ? (
-        <div className="ranking-warning" role="alert">
-          <AlertTriangle aria-hidden="true" />
-          <span>
-            <strong>Low data quality — assessment limited.</strong> Review the
-            parsing notes before relying on this score.
-          </span>
-        </div>
-      ) : ai.requiresHumanReview ? (
+      {ai.assessmentLimitedByDataQuality || ai.requiresHumanReview ? (
         <div className="ranking-warning" role="alert">
           <AlertTriangle aria-hidden="true" />
           <span>
             <strong>Human review required.</strong>{" "}
-            {ai.humanReviewGuidance ??
-              "Review the extraction and evidence before making a recruitment decision."}
+            {ai.assessmentLimitedByDataQuality
+              ? "CV data quality is low, so this assessment is limited. Review the parsing notes before relying on this score."
+              : (ai.humanReviewGuidance ??
+                "Review the extraction and evidence before making a recruitment decision.")}
           </span>
         </div>
       ) : null}
-
       <div className="ai-finding-grid">
         <FindingColumn
           title="Evidence-based strengths"
@@ -280,8 +261,13 @@ function ReadyAssessment({
         <div>
           <h3>Why did the AI give a score of {ai.score}?</h3>
           <ul>
-            {ai.breakdown.map((line) => (
-              <li key={line}>{line}</li>
+            {ai.scoreReasoning.breakdown.slice(0, 4).map((line) => (
+              <li key={line.category}>
+                <strong>
+                  {line.category}: {line.points}
+                </strong>
+                {line.note ? <span> ({line.note})</span> : null}
+              </li>
             ))}
           </ul>
         </div>
@@ -291,10 +277,12 @@ function ReadyAssessment({
         <section className="ai-confidence-card">
           <div>
             <span>
-              Confidence · {ai.modelVersion} · {ai.promptVersion}
+              Confidence &middot; Model {ai.modelVersion} &middot; Prompt{" "}
+              {ai.promptVersion}
             </span>
             <strong>
-              {ai.confidencePercent}% · {ai.confidenceLabel}
+              {ai.confidencePercent}% &middot;{" "}
+              {ai.confidenceLabel.replace(/\s+confidence$/i, "")}
             </strong>
           </div>
           <div
@@ -311,6 +299,9 @@ function ReadyAssessment({
               Review required — assess the evidence carefully yourself.
             </p>
           ) : null}
+          {ai.scoreReasoning.confidence.cappedReason ? (
+            <p>{ai.scoreReasoning.confidence.cappedReason}</p>
+          ) : null}
         </section>
         <div className="ai-trust-note">
           <ShieldCheck aria-hidden="true" />
@@ -323,23 +314,29 @@ function ReadyAssessment({
           <MessageCircleQuestion aria-hidden="true" /> Suggested interview
           questions
         </h3>
-        {ai.questions.kind === "GENERATED" ? (
+        {ai.suggestedQuestions.length > 0 ? (
           <ol>
-            {ai.questions.items.map((question, index) => (
-              <li key={`${question.pointToVerifyId}-${question.question}`}>
+            {ai.suggestedQuestions.map((question, index) => (
+              <li key={`${index}-${question}`}>
                 <span>{index + 1}</span>
-                <p>{question.question}</p>
+                <p>{question}</p>
               </li>
             ))}
           </ol>
         ) : (
-          <p className="ranking-muted-text">{ai.questions.fallbackMessage}</p>
+          <p className="ranking-muted-text">
+            {ai.questionsUnavailableReason ??
+              "There is not enough job-relevant evidence to generate candidate-specific questions."}
+          </p>
         )}
       </section>
-      <p className="ranking-method-note">
-        Formula: {finalScore.formulaText} · Automatic {automatic.score} × 0.6 +
-        AI {ai.score} × 0.4
-      </p>
+      <details className="ai-score-formula">
+        <summary>How this score is calculated</summary>
+        <p>
+          {finalScore.formulaText} &middot; Automatic {automatic.score} &times;
+          0.6 + AI {ai.score} &times; 0.4
+        </p>
+      </details>
     </div>
   );
 }
@@ -352,7 +349,7 @@ function FindingColumn({
 }: {
   title: string;
   icon: typeof CheckCircle2;
-  items: AiAssessment["findings"];
+  items: AiAssessment["strengths"] | AiAssessment["pointsToVerify"];
   tone: "green" | "amber";
 }) {
   return (
@@ -363,14 +360,20 @@ function FindingColumn({
       {items.length ? (
         <ul>
           {items.map((item) => (
-            <li key={item.id}>
+            <li
+              key={`${item.title}-${"evidence" in item ? item.evidence : item.reason}`}
+            >
               <strong>{item.title}</strong>
-              <span>{item.evidence}</span>
+              <span>{"evidence" in item ? item.evidence : item.reason}</span>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="ranking-muted-text">No items returned.</p>
+        <p className="ranking-muted-text">
+          {title === "Points to verify"
+            ? "No significant gaps identified."
+            : "No reliable strengths could be synthesized."}
+        </p>
       )}
     </section>
   );

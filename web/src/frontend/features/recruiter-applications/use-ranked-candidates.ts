@@ -136,6 +136,14 @@ export function useRankedCandidates(
     };
   }, [fetchPage, queryKey]);
 
+  const refresh = useCallback(() => {
+    // A score update can change both the row score and its rank. Reusing the
+    // current cursor would reuse the old ranking snapshot and keep stale
+    // values on pages after the first one.
+    cursors.current = [undefined];
+    void fetchPage(undefined, 0);
+  }, [fetchPage]);
+
   return {
     page,
     loading,
@@ -152,6 +160,6 @@ export function useRankedCandidates(
         ? void fetchPage(cursors.current[pageIndex - 1], pageIndex - 1)
         : undefined,
     retry: () => void fetchPage(cursors.current[pageIndex], pageIndex),
-    refresh: () => void fetchPage(cursors.current[pageIndex], pageIndex),
+    refresh,
   };
 }

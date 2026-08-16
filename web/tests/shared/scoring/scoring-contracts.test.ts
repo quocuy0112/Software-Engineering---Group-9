@@ -17,7 +17,7 @@ describe("scoring contract state unions", () => {
     const valid = {
       applicationId: "app-1", stage: "APPLIED", stageVersion: 1, submittedAt: "2026-08-15T00:00:00.000Z", candidate: { displayName: "A", verifiedEmail: "a@example.com", avatarUrl: null }, experienceYears: null, skills: [], scoring: { kind: "PROCESSING", label: "Processing", operationId: "op-1" }, scoreSummary: { automatic: null, ai: null, final: null, band: null }, manuallyPrioritized: false, manualPriority: null, allowedActions: { moveToInterview: { allowed: true, label: "Move" }, reject: { allowed: true, label: "Reject" } },
     };
-    const page = { items: [valid], nextCursor: null, rankingSnapshotId: "snapshot-1", activeFilters: [], processingExcludedCount: 1, processingExclusionLabel: "1 candidates still processing are excluded from this score filter.", defaultRejectedExclusionLabel: null, rescoreInProgress: false, filteredCandidates: 1, totalCandidates: 1, summary: { total: 1, strong: 0, review: 0, low: 0, processing: 1 } };
+    const page = { items: [valid], nextCursor: null, rankingSnapshotId: "snapshot-1", activeFilters: [], processingExcludedCount: 1, processingExclusionLabel: "1 candidates still processing are excluded from this score filter.", defaultRejectedExclusionLabel: null, rescoreInProgress: false, lastScoredAt: null, filteredCandidates: 1, totalCandidates: 1, summary: { total: 1, strong: 0, review: 0, low: 0, processing: 1 } };
     expect(rankedApplicationPageSchema.parse(page)).toBeDefined();
     expect(() => rankedApplicationPageSchema.parse({ ...page, items: [{ ...valid, scoreSummary: { ...valid.scoreSummary, final: 0 } }] })).toThrow();
   });

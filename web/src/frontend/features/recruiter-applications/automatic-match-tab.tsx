@@ -1,11 +1,11 @@
 "use client";
 
 import {
+  Calculator,
   Check,
   CircleAlert,
   CircleX,
   FileSearch,
-  Gauge,
   Minus,
   Plus,
 } from "lucide-react";
@@ -111,7 +111,7 @@ export function AutomaticMatchTab({
   ].flatMap((item) => item.evidence.map((excerpt) => ({ item, excerpt })));
 
   return (
-    <div className="ranking-tab-content">
+    <div className="ranking-tab-content automatic-match-tab">
       <div className="automatic-score-cards" aria-label="Score components">
         <ScoreCard
           title="Automatic match"
@@ -142,13 +142,7 @@ export function AutomaticMatchTab({
                 ? "Pending"
                 : "—/100"
           }
-          meta={
-            finalScore
-              ? "Hybrid result"
-              : retrying
-                ? "AI retry in progress"
-                : "AI unavailable"
-          }
+          meta="Result"
           tone="green"
           progress={finalScore?.value ?? automatic.score}
         />
@@ -156,7 +150,7 @@ export function AutomaticMatchTab({
 
       <div className="automatic-formula-row">
         <span className="automatic-formula-row__icon" aria-hidden="true">
-          <Gauge />
+          <Calculator />
         </span>
         <strong>
           {finalScore
@@ -184,11 +178,7 @@ export function AutomaticMatchTab({
       <div className="automatic-match-grid">
         <section className="ranking-panel automatic-skills-panel">
           <div className="ranking-section-heading">
-            <div>
-              <h3>Skills required for the role</h3>
-              <p>Matched against the current job description</p>
-            </div>
-            <span className="ranking-version-tag">Required + preferred</span>
+            <h3>Skills required for the role</h3>
           </div>
           <SkillChips
             title="Found in the CV"
@@ -211,11 +201,7 @@ export function AutomaticMatchTab({
         </section>
         <section className="ranking-panel automatic-experience-panel">
           <div className="ranking-section-heading">
-            <div>
-              <h3>Experience</h3>
-              <p>Deterministic CV signal</p>
-            </div>
-            <FileSearch aria-hidden="true" />
+            <h3>Experience</h3>
           </div>
           <div className="experience-metric experience-metric--required">
             <span>Minimum required</span>
@@ -255,13 +241,12 @@ export function AutomaticMatchTab({
 
       <section className="ranking-panel evidence-panel">
         <div className="ranking-section-heading">
-          <div>
-            <h3>
-              <FileSearch aria-hidden="true" /> Evidence found in the CV
-            </h3>
-            <p>Verbatim excerpts retained from the scoring snapshot</p>
-          </div>
-          <span className="ranking-version-tag">CV · pages 1–2</span>
+          <h3>
+            <FileSearch aria-hidden="true" /> Evidence found in the CV
+          </h3>
+          <span className="ranking-version-tag">
+            CV &middot; pages 1&ndash;2
+          </span>
         </div>
         {evidence.length ? (
           <div className="evidence-list">
@@ -271,7 +256,7 @@ export function AutomaticMatchTab({
                 key={`${item.skillCode}-${excerpt.excerpt}`}
               >
                 <span className="evidence-row__skill">{item.label}</span>
-                <blockquote>“{excerpt.excerpt}”</blockquote>
+                <blockquote>&ldquo;{excerpt.excerpt}&rdquo;</blockquote>
                 <span className="evidence-row__page">
                   {excerpt.pageNumber
                     ? `Page ${excerpt.pageNumber}`
@@ -286,11 +271,6 @@ export function AutomaticMatchTab({
           </p>
         )}
       </section>
-
-      <p className="ranking-method-note">
-        Automatic rubric: 75% required-skill evidence + 25% relevant experience.
-        Preferred skills are evidence-only and do not add points.
-      </p>
     </div>
   );
 }

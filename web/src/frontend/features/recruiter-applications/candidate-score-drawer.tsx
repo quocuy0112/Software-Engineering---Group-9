@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   AlertTriangle,
   ArrowRight,
-  BrainCircuit,
   FileText,
+  LoaderCircle,
   Mail,
-  MoveRight,
   RefreshCw,
   ShieldCheck,
   UserRoundCheck,
@@ -35,6 +34,7 @@ export function CandidateScoreDrawer({
   onSetPriority,
   onMoveToInterview,
   onReject,
+  onScoringChanged,
 }: {
   jobId: string;
   jobTitle: string;
@@ -43,6 +43,7 @@ export function CandidateScoreDrawer({
   onSetPriority: () => void;
   onMoveToInterview: () => void;
   onReject: () => void;
+  onScoringChanged: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<Tab>(() => {
     if (typeof window === "undefined") return "automatic";
@@ -54,50 +55,87 @@ export function CandidateScoreDrawer({
   const [detail, setDetail] = useState<ScoringDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [retryConfirm, setRetryConfirm] = useState(false);
+  const [scoreConfirm, setScoreConfirm] = useState(false);
+  const [scoringActionLoading, setScoringActionLoading] = useState(false);
   const [openDocument, setOpenDocument] = useState<
     "cv" | "cover-letter" | null
   >(null);
+  const [openDocumentRequest, setOpenDocumentRequest] = useState(0);
+
+  const loadDetail = useCallback(
+    async (signal?: AbortSignal) => {
+      const response = await fetch(
+        `/api/recruiter/applications/${encodeURIComponent(candidate.applicationId)}/scoring`,
+        { cache: "no-store", signal },
+      );
+      const payload = await response.json();
+      if (!response.ok)
+        throw new Error(payload.message ?? "Unable to load score explanation.");
+      const next = scoringDetailSchema.parse(payload);
+      return next;
+    },
+    [candidate.applicationId],
+  );
 
   useEffect(() => {
-    let cancelled = false;
-    void fetch(
-      `/api/recruiter/applications/${encodeURIComponent(candidate.applicationId)}/scoring`,
-      { cache: "no-store" },
-    )
-      .then(async (response) => {
-        const payload = await response.json();
-        if (!response.ok)
-          throw new Error(
-            payload.message ?? "Unable to load score explanation.",
-          );
-        return scoringDetailSchema.parse(payload);
-      })
+    const controller = new AbortController();
+    void loadDetail(controller.signal)
       .then((next) => {
-        if (!cancelled) setDetail(next);
+        if (!controller.signal.aborted) {
+          setDetail(next);
+          setError(null);
+        }
       })
       .catch((cause) => {
-        if (!cancelled)
+        if (!controller.signal.aborted)
           setError(
             cause instanceof Error
               ? cause.message
               : "Unable to load score explanation.",
           );
       });
-    return () => {
-      cancelled = true;
-    };
-  }, [candidate.applicationId]);
+    return () => controller.abort();
+  }, [loadDetail]);
+
+  useEffect(() => {
+    if (
+      !detail ||
+      !(
+        detail.rescoreInProgress ||
+        detail.scoring.kind === "PROCESSING" ||
+        detail.scoring.kind === "PENDING"
+      )
+    )
+      return;
+    const timer = window.setInterval(() => {
+      void loadDetail()
+        .then((next) => {
+          const wasInProgress =
+            detail.rescoreInProgress ||
+            detail.scoring.kind === "PROCESSING" ||
+            detail.scoring.kind === "PENDING";
+          const hasFinished =
+            !next.rescoreInProgress &&
+            next.scoring.kind !== "PROCESSING" &&
+            next.scoring.kind !== "PENDING";
+          if (wasInProgress && hasFinished) onScoringChanged();
+          setDetail(next);
+        })
+        .catch(() => undefined);
+    }, 3_000);
+    return () => window.clearInterval(timer);
+  }, [detail, loadDetail, onScoringChanged]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !retryConfirm) {
+      if (event.key === "Escape" && !retryConfirm && !scoreConfirm) {
         event.preventDefault();
         onClose();
       }
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onClose, retryConfirm]);
+  }, [onClose, retryConfirm, scoreConfirm]);
 
   const scoring = detail?.scoring ?? rowToScoring(candidate);
   const finalScore = scoring.kind === "SCORED" ? scoring.finalScore : null;
@@ -141,6 +179,11 @@ export function CandidateScoreDrawer({
   const headerCode =
     badge?.code ??
     (scoring.kind === "UNAVAILABLE" ? "RULE_BASED" : scoring.kind);
+  const canScoreCandidate =
+    detail?.scoring.kind === "NOT_CALCULATED" ||
+    detail?.scoring.kind === "SCORED";
+  const scoreActionLabel =
+    detail?.scoring.kind === "SCORED" ? "Rescore candidate" : "Score candidate";
 
   const retry = async () => {
     setRetryConfirm(false);
@@ -169,9 +212,49 @@ export function CandidateScoreDrawer({
       );
     }
   };
+  const scoreCandidate = async () => {
+    setScoreConfirm(false);
+    setScoringActionLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `/api/recruiter/applications/${encodeURIComponent(candidate.applicationId)}/scoring/score`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Idempotency-Key":
+              globalThis.crypto?.randomUUID?.() ?? `score-${Date.now()}`,
+          },
+          body: JSON.stringify({ confirmed: true }),
+        },
+      );
+      const payload = await response.json().catch(() => null);
+      if (!response.ok)
+        throw new Error(
+          payload?.message ?? "Candidate scoring could not be started.",
+        );
+      setDetail(await loadDetail());
+      onScoringChanged();
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "Candidate scoring could not be started. Check your connection and try again.",
+      );
+    } finally {
+      setScoringActionLoading(false);
+    }
+  };
   const changeTab = (next: Tab) => {
+    if (next !== "documents") setOpenDocument(null);
     setActiveTab(next);
     window.sessionStorage.setItem("smartHire.scoreDrawerTab", next);
+  };
+  const requestDocument = (kind: "cv" | "cover-letter") => {
+    setOpenDocument(kind);
+    setOpenDocumentRequest((current) => current + 1);
+    changeTab("documents");
   };
 
   return (
@@ -201,9 +284,6 @@ export function CandidateScoreDrawer({
                 {candidate.candidate.displayName}
               </h2>
               <p>Applying for {jobTitle}</p>
-              <span>
-                <Mail aria-hidden="true" /> {candidate.candidate.verifiedEmail}
-              </span>
             </div>
           </div>
           <button
@@ -217,45 +297,43 @@ export function CandidateScoreDrawer({
         </header>
 
         <div className="ranking-drawer__scoreline">
-          <div className="ranking-drawer__score">
-            <strong>{headerScore}</strong>
-            <span>
-              {scoring.kind === "UNAVAILABLE"
-                ? "Hybrid score unavailable"
-                : scoring.kind === "PENDING"
-                  ? "Hybrid score pending"
-                  : "Final score"}
-            </span>
+          <div className="ranking-drawer__score-summary">
+            <div className="ranking-drawer__score">
+              <strong>{headerScore}</strong>
+              <span>
+                {scoring.kind === "UNAVAILABLE"
+                  ? "Hybrid score unavailable"
+                  : scoring.kind === "PENDING"
+                    ? "Hybrid score pending"
+                    : "Final score"}
+              </span>
+            </div>
+            <ScoreBadgeFromLabel code={headerCode} label={headerLabel} />
           </div>
-          <ScoreBadgeFromLabel code={headerCode} label={headerLabel} />
-          <button
-            type="button"
-            className="ai-ranking-button ai-ranking-button--secondary"
-            onClick={() => {
-              setOpenDocument("cv");
-              changeTab("documents");
-            }}
-          >
-            <FileText aria-hidden="true" /> View CV
-          </button>
-          <button
-            type="button"
-            className="ai-ranking-button ai-ranking-button--secondary"
-            onClick={() => {
-              setOpenDocument("cover-letter");
-              changeTab("documents");
-            }}
-          >
-            <Mail aria-hidden="true" /> View cover letter
-          </button>
-          <button
-            type="button"
-            className="ai-ranking-button ai-ranking-button--primary"
-            onClick={onMoveToInterview}
-            disabled={!candidate.allowedActions.moveToInterview.allowed}
-          >
-            <ArrowRight aria-hidden="true" /> Move to interview
-          </button>
+          <div className="ranking-drawer__scoreline-actions">
+            <button
+              type="button"
+              className="ai-ranking-button ai-ranking-button--secondary"
+              onClick={() => requestDocument("cv")}
+            >
+              <FileText aria-hidden="true" /> View CV
+            </button>
+            <button
+              type="button"
+              className="ai-ranking-button ai-ranking-button--secondary"
+              onClick={() => requestDocument("cover-letter")}
+            >
+              <Mail aria-hidden="true" /> View cover letter
+            </button>
+            <button
+              type="button"
+              className="ai-ranking-button ai-ranking-button--primary"
+              onClick={onMoveToInterview}
+              disabled={!candidate.allowedActions.moveToInterview.allowed}
+            >
+              <ArrowRight aria-hidden="true" /> Move to interview
+            </button>
+          </div>
         </div>
 
         <nav
@@ -271,7 +349,6 @@ export function CandidateScoreDrawer({
             onClick={() => changeTab("automatic")}
           >
             <span>Automatic match</span>
-            <small>System computed</small>
           </button>
           <button
             type="button"
@@ -280,9 +357,7 @@ export function CandidateScoreDrawer({
             className={activeTab === "ai" ? "is-active" : ""}
             onClick={() => changeTab("ai")}
           >
-            <BrainCircuit aria-hidden="true" />
             <span>AI assessment</span>
-            <small>Evidence-based</small>
           </button>
           <button
             type="button"
@@ -292,7 +367,6 @@ export function CandidateScoreDrawer({
             onClick={() => changeTab("documents")}
           >
             <span>CV &amp; Cover letter</span>
-            <small>Source documents</small>
           </button>
         </nav>
 
@@ -301,6 +375,21 @@ export function CandidateScoreDrawer({
             <div className="ranking-error" role="alert">
               <AlertTriangle aria-hidden="true" />
               <span>{error}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setError(null);
+                  void loadDetail().catch((cause) =>
+                    setError(
+                      cause instanceof Error
+                        ? cause.message
+                        : "Unable to load score explanation.",
+                    ),
+                  );
+                }}
+              >
+                Retry
+              </button>
               <button type="button" onClick={() => setError(null)}>
                 Dismiss
               </button>
@@ -315,8 +404,7 @@ export function CandidateScoreDrawer({
               <div>
                 <strong>AI evaluation unavailable</strong>
                 <span>
-                  Deterministic matching is complete. The rule-based score and
-                  CV evidence remain visible.
+                  {aiUnavailableMessage(scoring.aiAssessment.safeFailureCode)}
                 </span>
               </div>
               <button type="button" onClick={() => setRetryConfirm(true)}>
@@ -370,11 +458,11 @@ export function CandidateScoreDrawer({
           ) : activeTab === "ai" ? (
             <AiAssessmentTab
               state={scoring}
-              onRetry={() => setRetryConfirm(true)}
+              onScore={() => setScoreConfirm(true)}
             />
           ) : (
             <DocumentsTab
-              key={openDocument ?? "documents"}
+              key={`${openDocument ?? "documents"}-${openDocumentRequest}`}
               jobId={jobId}
               applicationId={candidate.applicationId}
               automatic={automatic}
@@ -384,6 +472,7 @@ export function CandidateScoreDrawer({
                   : []
               }
               openKind={openDocument}
+              openRequest={openDocumentRequest}
             />
           )}
         </div>
@@ -397,6 +486,21 @@ export function CandidateScoreDrawer({
             </span>
           </div>
           <div className="ranking-drawer__actions">
+            {canScoreCandidate ? (
+              <button
+                type="button"
+                className="ai-ranking-button ai-ranking-button--secondary"
+                onClick={() => setScoreConfirm(true)}
+                disabled={scoringActionLoading}
+              >
+                {scoringActionLoading ? (
+                  <LoaderCircle aria-hidden="true" className="is-spinning" />
+                ) : (
+                  <RefreshCw aria-hidden="true" />
+                )}{" "}
+                {scoreActionLabel}
+              </button>
+            ) : null}
             <button
               type="button"
               className="ai-ranking-button ai-ranking-button--secondary"
@@ -404,14 +508,6 @@ export function CandidateScoreDrawer({
             >
               <ShieldCheck aria-hidden="true" />{" "}
               {candidate.manuallyPrioritized ? "Edit priority" : "Set priority"}
-            </button>
-            <button
-              type="button"
-              className="ai-ranking-button ai-ranking-button--primary"
-              onClick={onMoveToInterview}
-              disabled={!candidate.allowedActions.moveToInterview.allowed}
-            >
-              <MoveRight aria-hidden="true" /> Move to interview
             </button>
             <button
               type="button"
@@ -435,6 +531,18 @@ export function CandidateScoreDrawer({
           onConfirm={() => void retry()}
         />
       ) : null}
+      {scoreConfirm ? (
+        <RankingModalFrame
+          title={`${scoreActionLabel}?`}
+          subtitle={`${candidate.candidate.displayName} · one application`}
+          icon="AI"
+          info="Only this candidate will be queued. The score and assessment will update here when the background worker finishes."
+          confirmLabel={scoreActionLabel}
+          confirmDisabled={scoringActionLoading}
+          onCancel={() => setScoreConfirm(false)}
+          onConfirm={() => void scoreCandidate()}
+        />
+      ) : null}
     </div>
   );
 }
@@ -454,4 +562,20 @@ function rowToScoring(candidate: RankedApplicationRow): ScoringState {
       automaticMatch: null,
     };
   return { kind: "NOT_CALCULATED", label: "Not calculated" };
+}
+
+function aiUnavailableMessage(code: string) {
+  if (code === "AI_PROVIDER_INVALID_REQUEST")
+    return "The AI provider rejected the assessment request. Check the provider/model configuration before retrying.";
+  if (code === "AI_PROVIDER_MODEL_NOT_FOUND")
+    return "The configured AI model is unavailable. Update the model configuration before retrying.";
+  if (code === "AI_PROVIDER_AUTHENTICATION")
+    return "The AI provider authentication failed. Check the server API key before retrying.";
+  if (code === "AI_PROVIDER_POLICY_NOT_APPROVED")
+    return "AI scoring is disabled by the current privacy or local-development configuration.";
+  if (code === "AI_PROVIDER_NOT_CONFIGURED")
+    return "The AI provider is not configured. Add the approved provider settings before retrying.";
+  if (code === "AI_PROVIDER_MALFORMED")
+    return "The AI provider returned an assessment that could not be validated. Restart the scoring worker and retry once.";
+  return "Deterministic matching is complete. The rule-based score and CV evidence remain visible while the AI provider is unavailable.";
 }

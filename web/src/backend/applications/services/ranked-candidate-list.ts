@@ -31,6 +31,7 @@ function stateFor(row: RankedSourceRow) {
   if (row.scoringStatus === "PENDING") return { kind: "PENDING", label: "Pending", operationId: `retry-${row.id}` } as const;
   if (!row.currentScoringResultId) {
     if (row.scoringStatus === "NOT_REQUESTED") return { kind: "NOT_CALCULATED", label: "Not calculated" } as const;
+    if (row.scoringStatus === "FAILED") return { kind: "NOT_CALCULATED", label: "Not calculated" } as const;
     return { kind: "PROCESSING", label: "Processing", operationId: `initial-${row.id}` } as const;
   }
   if (row.currentScoringResult?.state === "SCORED" && row.currentScoringResult.finalScore !== null) return { kind: "SCORED", label: "Scored" } as const;
@@ -204,7 +205,26 @@ export class RankedCandidateListService {
       low: baseProjected.filter((row) => row.scoreSummary.band?.code === "LOW_MATCH").length,
       processing: baseProjected.filter((row) => row.scoring.kind === "PROCESSING" || row.scoring.kind === "PENDING").length,
     };
-    const rescoreInProgress = await this.db.scoringOperation.count({ where: { jobPostingId: input.jobId, kind: "JOB_RESCORE", state: { in: ["QUEUED", "RUNNING"] } } }) > 0;
+    const [activeRescoreCount, lastSuccessfulRescore] = await Promise.all([
+      this.db.scoringOperation.count({
+        where: {
+          jobPostingId: input.jobId,
+          kind: "JOB_RESCORE",
+          state: { in: ["QUEUED", "RUNNING"] },
+        },
+      }),
+      this.db.scoringOperation.findFirst({
+        where: {
+          jobPostingId: input.jobId,
+          kind: "JOB_RESCORE",
+          state: "COMPLETED",
+          completedAt: { not: null },
+        },
+        orderBy: { completedAt: "desc" },
+        select: { completedAt: true },
+      }),
+    ]);
+    const rescoreInProgress = activeRescoreCount > 0;
     const page = {
       items: pageItems,
       nextCursor: next,
@@ -214,6 +234,7 @@ export class RankedCandidateListService {
       processingExclusionLabel: processingExcludedCount ? `${processingExcludedCount} candidates still processing are excluded from this score filter.` : null,
       defaultRejectedExclusionLabel: filters.stage === "ACTIVE_PIPELINE" ? "Rejected candidates are excluded from the active pipeline. Choose All or Rejected to view them." : null,
       rescoreInProgress,
+      lastScoredAt: lastSuccessfulRescore?.completedAt?.toISOString() ?? null,
       filteredCandidates: projected.length,
       totalCandidates: baseProjected.length,
       summary,

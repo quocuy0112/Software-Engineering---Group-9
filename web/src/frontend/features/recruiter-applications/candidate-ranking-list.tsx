@@ -1,6 +1,7 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
 import {
   AlertCircle,
   ArrowLeft,
@@ -30,6 +31,7 @@ import { RejectCandidateModal } from "./reject-candidate-modal";
 import {
   EmptyCandidatesIllustration,
   formatScore,
+  formatTableScore,
   RankingSkeleton,
   ScoreBadge,
   scoreBadgeForRow,
@@ -42,6 +44,20 @@ const defaultQuery: RankedCandidateQuery = {
   stage: "ACTIVE_PIPELINE",
   scoringStatus: "ALL",
 };
+
+function formatLastScoredAt(value: string | null | undefined) {
+  if (!value) return "Not yet scored";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Unavailable";
+  return `${date.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+  })}, ${date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  })}`;
+}
 
 function displayFilterLabel(label: string) {
   return label.replaceAll("â€“", "–").replaceAll("â€”", "—");
@@ -228,7 +244,7 @@ function CandidateRow({
         data-label="Experience"
       >
         {row.experienceYears === null ? (
-          <span className="ranking-muted-text">Not detected</span>
+          <span className="ranking-muted-text">{"\u2014"}</span>
         ) : (
           `${row.experienceYears} ${row.experienceYears === 1 ? "year" : "years"}`
         )}
@@ -239,14 +255,32 @@ function CandidateRow({
         data-label="Key skills"
       >
         {skills.length ? (
-          <>
-            {skills.map((skill) => (
-              <span key={skill}>{skill}</span>
+          <span className="ranking-skills-chip">
+            {skills.map((skill, index) => (
+              <span className="ranking-skills-chip__item" key={`${skill}-${index}`}>
+                {index > 0 ? (
+                  <span className="ranking-skills-chip__separator" aria-hidden="true">
+                    {"\u00b7"}
+                  </span>
+                ) : null}
+                {skill}
+              </span>
             ))}
-            {extraSkills ? <small>+{extraSkills} more</small> : null}
-          </>
+            {extraSkills ? (
+              <span className="ranking-skills-chip__extra">
+                <span className="ranking-skills-chip__separator" aria-hidden="true">
+                  {"\u00b7"}
+                </span>
+                +{extraSkills} more
+              </span>
+            ) : null}
+          </span>
         ) : (
-          <span className="ranking-muted-text">Not detected</span>
+          <span className="ranking-muted-text">
+            {row.scoring.kind === "PROCESSING" || row.scoring.kind === "PENDING"
+              ? "Extracting skills"
+              : "Not detected"}
+          </span>
         )}
       </span>
       <span
@@ -254,14 +288,14 @@ function CandidateRow({
         role="cell"
         data-label="Auto match"
       >
-        {formatScore(row.scoreSummary.automatic)}
+        {formatTableScore(row.scoreSummary.automatic)}
       </span>
       <span
         className="ranking-table__cell ranking-score-number ranking-score-number--ai"
         role="cell"
-        data-label="AI score"
+        data-label="AI"
       >
-        {formatScore(row.scoreSummary.ai)}
+        {formatTableScore(row.scoreSummary.ai)}
       </span>
       <span
         className="ranking-table__cell ranking-final-score"
@@ -308,6 +342,16 @@ export function CandidateRankingList({
   const [message, setMessage] = useState<string | null>(null);
   const ranking = useRankedCandidates(jobId, query, pageSize);
   const page = ranking.page;
+  const { loading: rankingLoading, refresh: refreshRanking } = ranking;
+
+  useEffect(() => {
+    if (!page?.rescoreInProgress) return;
+    const timer = window.setInterval(() => {
+      if (!rankingLoading) refreshRanking();
+    }, 3_000);
+    return () => window.clearInterval(timer);
+  }, [page?.rescoreInProgress, rankingLoading, refreshRanking]);
+
   const activeFilterCount = [
     query.search,
     query.minScore !== undefined || query.maxScore !== undefined,
@@ -375,6 +419,25 @@ export function CandidateRankingList({
     >
       <header className="ai-ranking-page-header">
         <div>
+          <nav className="ranking-breadcrumbs" aria-label="Breadcrumb">
+            <Link href="/recruiter">Recruitment</Link>
+            <span aria-hidden="true">/</span>
+            <Link href="/recruiter/candidates">Campaigns</Link>
+            <span aria-hidden="true">/</span>
+            {onBack ? (
+              <button
+                type="button"
+                className="ranking-breadcrumbs__button"
+                onClick={onBack}
+              >
+                {jobTitle}
+              </button>
+            ) : (
+              <Link href="/recruiter/candidates">{jobTitle}</Link>
+            )}
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">Candidates</span>
+          </nav>
           {onBack ? (
             <button
               type="button"
@@ -385,7 +448,13 @@ export function CandidateRankingList({
             </button>
           ) : null}
           <p className="recruiter-eyebrow">Candidate intelligence</p>
-          <h1 id="candidate-ranking-title">{jobTitle} candidates</h1>
+          <h1 id="candidate-ranking-title">
+            Candidates {"\u2013"} {jobTitle}
+          </h1>
+          <p className="ranking-last-scored">
+            {page?.totalCandidates?.toLocaleString("en-US") ?? "\u2014"} applications
+            {" "}{"\u00b7"}{" "}Last scored: {formatLastScoredAt(page?.lastScoredAt)}
+          </p>
           <p>
             Review every score with its evidence before making a human decision.
           </p>
@@ -691,7 +760,7 @@ export function CandidateRankingList({
                     "Experience",
                     "Key skills",
                     "Auto match",
-                    "AI score",
+                    "AI",
                     "Final score",
                     "Applied",
                   ].map((heading) => (
@@ -741,6 +810,7 @@ export function CandidateRankingList({
           onSetPriority={() => setModal("priority")}
           onMoveToInterview={() => setModal("interview")}
           onReject={() => setModal("reject")}
+          onScoringChanged={ranking.refresh}
         />
       ) : null}
       {modal === "rescore" ? (
