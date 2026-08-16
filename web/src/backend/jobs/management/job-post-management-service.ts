@@ -9,6 +9,11 @@ import {
   AdminCommandConflict,
 } from "@/backend/repositories/admin/prisma-admin-command-repository";
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
+import {
+  findManagedJobPostForCommand,
+  reserveManagedJobFeaturePlacement,
+  syncManagedJobPublicProjection,
+} from "@/backend/repositories/jobs/prisma-job-post-management-repository";
 import type { AdminAuthority } from "@/backend/security/admin-request-boundary";
 import {
   jobManagementCommandSchema,
@@ -16,7 +21,6 @@ import {
 } from "@/shared/contracts/admin/job-post-management";
 import {
   assertJobPostManagementTransition,
-  FEATURED_PLACEMENT_CAPACITY,
   jobPostManagementScope,
 } from "./job-post-management-policy";
 import { emitJobPostManagementOperation } from "./job-post-management-operations";
@@ -313,15 +317,7 @@ export class JobPostManagementService {
           normalizedBody: { jobId, expectedVersion, command },
         },
         async (tx, correlationId) => {
-          const row = await tx.jobPostReviewAggregate.findUnique({
-            where: { jobId },
-            include: {
-              publicJobPosting: {
-                select: { id: true, applicationDeadline: true },
-              },
-              approvedVersion: { select: { submittedByUserId: true } },
-            },
-          });
+          const row = await findManagedJobPostForCommand(tx, jobId);
           if (!row || !row.publicJobPosting || !row.approvedVersionId)
             throw new Error("TARGET_UNAVAILABLE");
           if (row.version !== expectedVersion)
@@ -491,56 +487,19 @@ export class JobPostManagementService {
               applicationState !== "OPEN"
             )
               throw new Error("VALIDATION_FAILED");
-            await tx.$executeRaw(
-              Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${command.placement}))`,
-            );
-            const booked = await tx.jobPostFeaturedPlacement.count({
-              where: {
-                placement: command.placement,
-                state: { in: ["SCHEDULED", "ACTIVE"] },
-                startsAt: { lt: command.endsAt },
-                endsAt: { gt: command.startsAt },
-                ...(command.command === "AMEND_FEATURE"
-                  ? { id: { not: command.featureId } }
-                  : {}),
-              },
+            await reserveManagedJobFeaturePlacement(tx, {
+              aggregateId: row.id,
+              ...(command.command === "AMEND_FEATURE"
+                ? { featureId: command.featureId }
+                : {}),
+              placement: command.placement,
+              startsAt: command.startsAt,
+              endsAt: command.endsAt,
+              priority: command.priority,
+              reason: command.reason,
+              createdByAdminUserId: authority.userId,
+              now,
             });
-            if (booked >= FEATURED_PLACEMENT_CAPACITY)
-              throw new Error("FEATURE_CAPACITY_CONFLICT");
-            if (command.command === "FEATURE") {
-              await tx.jobPostFeaturedPlacement.create({
-                data: {
-                  aggregateId: row.id,
-                  placement: command.placement,
-                  priority: command.priority,
-                  startsAt: command.startsAt,
-                  endsAt: command.endsAt,
-                  state: command.startsAt <= now ? "ACTIVE" : "SCHEDULED",
-                  reason: command.reason,
-                  createdByAdminUserId: authority.userId,
-                },
-              });
-            } else {
-              const changedPlacement =
-                await tx.jobPostFeaturedPlacement.updateMany({
-                  where: {
-                    id: command.featureId,
-                    aggregateId: row.id,
-                    state: { in: ["SCHEDULED", "ACTIVE"] },
-                  },
-                  data: {
-                    placement: command.placement,
-                    priority: command.priority,
-                    startsAt: command.startsAt,
-                    endsAt: command.endsAt,
-                    state: command.startsAt <= now ? "ACTIVE" : "SCHEDULED",
-                    reason: command.reason,
-                    version: { increment: 1 },
-                  },
-                });
-              if (changedPlacement.count !== 1)
-                throw new Error("TARGET_UNAVAILABLE");
-            }
           }
           if (command.command === "UNFEATURE")
             await tx.jobPostFeaturedPlacement.updateMany({
@@ -671,20 +630,11 @@ export class JobPostManagementService {
               });
             }
           }
-          const publicStatus =
-            visibility === "PUBLISHED"
-              ? applicationState === "OPEN"
-                ? "ACTIVE"
-                : "CLOSED"
-              : "REMOVED";
-          await tx.jobPosting.update({
-            where: { id: row.publicJobPostingId! },
-            data: {
-              status: publicStatus,
-              closedAt: applicationState === "CLOSED" ? now : null,
-              removedAt: visibility === "PUBLISHED" ? null : now,
-              version: { increment: 1 },
-            },
+          await syncManagedJobPublicProjection(tx, {
+            publicJobPostingId: row.publicJobPosting.id,
+            visibility,
+            applicationState,
+            now,
           });
           const version = expectedVersion + 1;
           await tx.jobPostOperationalHistory.create({
