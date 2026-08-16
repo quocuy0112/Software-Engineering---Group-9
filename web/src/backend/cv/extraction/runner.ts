@@ -3,6 +3,7 @@ import "server-only";
 import { spawn, type ChildProcess } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve as resolvePath } from "node:path";
+import { pathToFileURL } from "node:url";
 
 import {
   DocumentExtractionError,
@@ -40,11 +41,20 @@ export async function runExtractionChild(
       reject(new DocumentExtractionError("EXTRACTION_FAILED"));
       return;
     }
+    const preload = [
+      resolvePath(process.cwd(), "src/backend/cv/extraction/tsx-preload.mjs"),
+      resolvePath(
+        process.cwd(),
+        "web",
+        "src/backend/cv/extraction/tsx-preload.mjs",
+      ),
+    ].find((candidate) => existsSync(candidate));
     const child = spawn(
       process.execPath,
       [
         `--max-old-space-size=${request.limits.maximumOldSpaceMb}`,
         "--conditions=react-server",
+        ...(preload ? ["--import", pathToFileURL(preload).href] : []),
         "--import",
         "tsx",
         childEntry,
@@ -91,7 +101,9 @@ export async function runExtractionChild(
         finish(new DocumentExtractionError("OUTPUT_LIMIT"));
       } else output.push(Buffer.from(chunk));
     });
-    child.stderr?.on("data", (chunk: Buffer) => diagnostics.push(Buffer.from(chunk)));
+    child.stderr?.on("data", (chunk: Buffer) =>
+      diagnostics.push(Buffer.from(chunk)),
+    );
     child.once("exit", (code) => {
       if (settled) return;
       try {
@@ -107,7 +119,9 @@ export async function runExtractionChild(
         else finish(undefined, message.value);
       } catch {
         if (process.env.CV_EXTRACTION_DEBUG === "1") {
-          console.warn(`[cv-extraction] child exited code=${String(code)} stderr=${Buffer.concat(diagnostics).toString("utf8").slice(0, 500)}`);
+          console.warn(
+            `[cv-extraction] child exited code=${String(code)} stderr=${Buffer.concat(diagnostics).toString("utf8").slice(0, 500)}`,
+          );
         }
         finish(new DocumentExtractionError("EXTRACTION_FAILED"));
       }

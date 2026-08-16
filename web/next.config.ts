@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
       process.env.NODE_ENV === "development"
         ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
         : "script-src 'self' 'unsafe-inline'";
-    const csp = `default-src 'self'; ${scripts}; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ws: wss:; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'`;
+    const csp = `default-src 'self'; ${scripts}; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ws: wss:; frame-src 'self' blob:; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'`;
     const globalHeaders = [
       { key: "Content-Security-Policy", value: csp },
       { key: "Referrer-Policy", value: "no-referrer" },

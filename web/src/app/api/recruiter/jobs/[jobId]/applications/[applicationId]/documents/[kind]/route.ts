@@ -7,7 +7,9 @@ import {
 
 const noStore = {
   "Cache-Control": "private, no-store",
+  "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'",
   "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "SAMEORIGIN",
 };
 
 function safeFileName(value: string | null, kind: string) {

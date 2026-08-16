@@ -522,6 +522,7 @@ export const campaignScoringStatsResponseSchema = z
 export const rankedListQuerySchema = z
   .object({
     cursor: z.string().min(1).max(1_024).optional(),
+    page: z.coerce.number().int().min(0).max(2_000).default(0),
     limit: z.coerce.number().int().min(1).max(100).default(25),
     sort: z
       .enum(["FINAL_SCORE", "MANUAL_PRIORITY", "SUBMITTED_AT"])

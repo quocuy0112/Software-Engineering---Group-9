@@ -146,12 +146,7 @@ type RecruiterCatalog = {
   rawJobs: unknown[];
   rawCompanies: unknown[];
 };
-let catalogCache: RecruiterCatalog | null = null;
 let catalogRead: Promise<RecruiterCatalog> | null = null;
-
-function invalidateCatalogCache() {
-  catalogCache = null;
-}
 
 function withWriteLock<T>(operation: () => Promise<T>) {
   const next = writeQueue.then(operation, operation);
@@ -325,7 +320,6 @@ async function authorizedCompanies(
 }
 
 async function readCatalog() {
-  if (catalogCache) return catalogCache;
   if (catalogRead) return catalogRead;
 
   catalogRead = Promise.all([jobsRepository.read(), companiesRepository.read()])
@@ -336,10 +330,7 @@ async function readCatalog() {
       const companies = rawCompanies.map(normalizeCompany);
       return { jobs, companies, rawJobs, rawCompanies };
     })
-    .then((catalog) => {
-      catalogCache = catalog;
-      return catalog;
-    });
+    .then((catalog) => catalog);
   try {
     return await catalogRead;
   } finally {
@@ -359,22 +350,40 @@ export async function authorizeLegacyRecruiterJobs(
   if (requestedJobIds.size === 0) return authorized;
 
   const { jobs, companies } = await readCatalog();
+  const databaseCompanies = await readDatabaseAuthorizedCompanies(userId);
+  const databaseCompanyIds = new Set(
+    databaseCompanies.map((company) => company.id),
+  );
+  const databaseCompanyIdsByTaxCode = new Set(
+    databaseCompanies
+      .map((company) => company.normalizedTaxIdentifier)
+      .filter((taxCode): taxCode is string => Boolean(taxCode)),
+  );
   const companyById = new Map(
     companies.map((company) => [company.id, company]),
   );
   for (const job of jobs) {
     if (!requestedJobIds.has(job.id)) continue;
     const company = companyById.get(job.companyId);
+    const companyAuthorizedByDatabase = Boolean(
+      databaseCompanyIds.has(job.companyId) ||
+      (company &&
+        (databaseCompanyIds.has(company.id) ||
+          (company.taxCode &&
+            databaseCompanyIdsByTaxCode.has(company.taxCode)))),
+    );
     if (
-      !company ||
-      company.verificationStatus !== "approved" ||
-      (company.ownerUserId !== userId &&
-        !company.memberUserIds.includes(userId))
+      (!company && !databaseCompanyIds.has(job.companyId)) ||
+      (company &&
+        !companyAuthorizedByDatabase &&
+        (company.verificationStatus !== "approved" ||
+          (company.ownerUserId !== userId &&
+            !company.memberUserIds.includes(userId))))
     )
       continue;
     authorized.set(job.id, {
       jobId: job.id,
-      companyId: company.id,
+      companyId: company?.id ?? job.companyId,
       jobTitle: job.title,
     });
   }
@@ -611,7 +620,6 @@ export async function createRecruiterJob(
     }
     const job = jobFromCommand(raw, company.id, status, now);
     await jobsRepository.mutate(() => [...rawJobs, job]);
-    invalidateCatalogCache();
     return { ...job, company } satisfies RecruiterJob;
   });
 }
@@ -672,7 +680,6 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
       },
     });
     await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
-    invalidateCatalogCache();
     return { ...updated, company } satisfies RecruiterJob;
   });
 }
@@ -703,7 +710,6 @@ export async function closeRecruiterJob(userId: string, jobId: string) {
       updatedAt: new Date().toISOString(),
     });
     await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
-    invalidateCatalogCache();
     return { ...updated, company } satisfies RecruiterJob;
   });
 }
@@ -736,7 +742,6 @@ export async function ensureRecruiterCompany(
       jobCount: 0,
     });
     await companiesRepository.mutate(() => [...rawCompanies, company]);
-    invalidateCatalogCache();
     return { ...company, ownerUserId: userId } satisfies RecruiterCompany;
   });
 }
@@ -805,7 +810,6 @@ export async function updateRecruiterCompanySettings(
     await companiesRepository.mutate(() =>
       replaceOrAppendRawCompany(rawCompanies, updated),
     );
-    invalidateCatalogCache();
     if (company.databaseBacked && company.databaseId) {
       await prisma.company.update({
         where: { id: company.databaseId },
@@ -853,7 +857,6 @@ export async function recordApplication(
       },
     });
     await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
-    invalidateCatalogCache();
     await applicationsRepository.mutate(
       () =>
         [

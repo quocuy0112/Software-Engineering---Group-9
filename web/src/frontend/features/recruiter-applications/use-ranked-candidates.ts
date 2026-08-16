@@ -30,31 +30,110 @@ export type RankedCandidateQuery = Readonly<{
     | "NOT_CALCULATED";
 }>;
 
+type RankedPageCacheEntry = Readonly<{
+  page: RankedApplicationPage;
+  updatedAt: number;
+}>;
+
+const RANKED_PAGE_CACHE_MAX_AGE_MS = 10 * 60_000;
+const RANKED_PAGE_CACHE_MAX_ENTRIES = 100;
+const rankedPageCache = new Map<string, RankedPageCacheEntry>();
+const rankedPageRequests = new Map<string, Promise<RankedApplicationPage>>();
+
+function rankedPageCacheKey(
+  jobId: string,
+  queryKey: string,
+  pageSize: number,
+  pageIndex: number,
+) {
+  return `${jobId}:${pageSize}:${pageIndex}:${queryKey}`;
+}
+
+function readRankedPageCache(key: string) {
+  const entry = rankedPageCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.updatedAt > RANKED_PAGE_CACHE_MAX_AGE_MS) {
+    rankedPageCache.delete(key);
+    return null;
+  }
+  return entry;
+}
+
+function writeRankedPageCache(key: string, page: RankedApplicationPage) {
+  rankedPageCache.delete(key);
+  rankedPageCache.set(key, { page, updatedAt: Date.now() });
+  while (rankedPageCache.size > RANKED_PAGE_CACHE_MAX_ENTRIES) {
+    const oldestKey = rankedPageCache.keys().next().value;
+    if (oldestKey === undefined) break;
+    rankedPageCache.delete(oldestKey);
+  }
+}
+
+async function requestRankedPage(key: string, url: string) {
+  const existing = rankedPageRequests.get(key);
+  if (existing) return existing;
+
+  const request = (async () => {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 15_000);
+    try {
+      const response = await fetch(url, {
+        cache: "no-store",
+        signal: controller.signal,
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | (RankedApplicationPage & { message?: string })
+        | null;
+      if (!response.ok || !payload) {
+        throw new Error(
+          payload?.message ?? "Unable to load candidate ranking.",
+        );
+      }
+      writeRankedPageCache(key, payload);
+      return payload;
+    } finally {
+      window.clearTimeout(timeout);
+      rankedPageRequests.delete(key);
+    }
+  })();
+  rankedPageRequests.set(key, request);
+  return request;
+}
+
 export function useRankedCandidates(
   jobId: string,
   query: RankedCandidateQuery,
   pageSize: number,
 ) {
-  const [page, setPage] = useState<RankedApplicationPage | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [pageIndex, setPageIndex] = useState(0);
-  const cursors = useRef<Array<string | undefined>>([undefined]);
-  const requestId = useRef(0);
-  const activeController = useRef<AbortController | null>(null);
   const queryKey = useMemo(
     () => JSON.stringify({ ...query, pageSize }),
     [pageSize, query],
   );
+  const initialCacheEntry = useMemo(
+    () => readRankedPageCache(rankedPageCacheKey(jobId, queryKey, pageSize, 0)),
+    [jobId, pageSize, queryKey],
+  );
+  const [page, setPage] = useState<RankedApplicationPage | null>(
+    () => initialCacheEntry?.page ?? null,
+  );
+  const [loading, setLoading] = useState(() => !initialCacheEntry);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pageIndex, setPageIndex] = useState(0);
+  const requestId = useRef(0);
 
   const fetchPage = useCallback(
-    async (cursor: string | undefined, index: number) => {
+    async (index: number) => {
       const id = ++requestId.current;
-      activeController.current?.abort();
-      const controller = new AbortController();
-      activeController.current = controller;
-      const timeout = window.setTimeout(() => controller.abort(), 15_000);
-      setLoading(true);
+      const key = rankedPageCacheKey(jobId, queryKey, pageSize, index);
+      const cachedPage = readRankedPageCache(key);
+      const hasCachedPage = Boolean(cachedPage);
+      if (cachedPage) {
+        setPage(cachedPage.page);
+        setPageIndex(index);
+      }
+      setLoading(!hasCachedPage);
+      setRefreshing(hasCachedPage);
       setError(null);
       try {
         const params = new URLSearchParams({
@@ -62,8 +141,8 @@ export function useRankedCandidates(
           sort: query.sort,
           stage: query.stage,
           scoringStatus: query.scoringStatus,
+          page: String(index),
         });
-        if (cursor) params.set("cursor", cursor);
         for (const [key, value] of Object.entries(query)) {
           if (
             key === "sort" ||
@@ -75,26 +154,19 @@ export function useRankedCandidates(
             continue;
           params.set(key, String(value));
         }
-        const response = await fetch(
+        const payload = await requestRankedPage(
+          key,
           `/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/ranked?${params}`,
-          { cache: "no-store", signal: controller.signal },
         );
-        const payload = (await response.json().catch(() => null)) as
-          | (RankedApplicationPage & { message?: string })
-          | null;
-        if (!response.ok || !payload)
-          throw new Error(
-            payload?.message ?? "Unable to load candidate ranking.",
-          );
         if (id !== requestId.current) return;
         setPage(payload);
         setPageIndex(index);
-        cursors.current[index + 1] = payload.nextCursor ?? undefined;
       } catch (cause) {
         if (id !== requestId.current) return;
         const isAbortError =
           (cause instanceof DOMException && cause.name === "AbortError") ||
-          (cause instanceof Error && cause.name === "AbortError");
+          (cause instanceof Error &&
+            ["AbortError", "TimeoutError"].includes(cause.name));
         if (isAbortError) {
           setError("Candidate ranking took too long to respond.");
           return;
@@ -114,52 +186,55 @@ export function useRankedCandidates(
             : "Unable to load candidate ranking.",
         );
       } finally {
-        window.clearTimeout(timeout);
-        if (activeController.current === controller) {
-          activeController.current = null;
+        if (id === requestId.current) {
+          setLoading(false);
+          setRefreshing(false);
         }
-        if (id === requestId.current) setLoading(false);
       }
     },
-    [jobId, pageSize, query],
+    [jobId, pageSize, query, queryKey],
   );
 
   useEffect(() => {
-    cursors.current = [undefined];
     // The fetch callback owns loading/error/page state; this effect only starts the request.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    void fetchPage(undefined, 0);
+    void fetchPage(0);
     return () => {
       requestId.current += 1;
-      activeController.current?.abort();
-      activeController.current = null;
     };
   }, [fetchPage, queryKey]);
 
   const refresh = useCallback(() => {
-    // A score update can change both the row score and its rank. Reusing the
-    // current cursor would reuse the old ranking snapshot and keep stale
-    // values on pages after the first one.
-    cursors.current = [undefined];
-    void fetchPage(undefined, 0);
+    // A score update can change both the row score and its rank, so restart
+    // from the first page and let the current query create a fresh snapshot.
+    void fetchPage(0);
   }, [fetchPage]);
 
   return {
     page,
     loading,
+    refreshing,
     error,
     pageIndex,
     hasPrevious: pageIndex > 0,
-    hasNext: Boolean(page?.nextCursor),
+    hasNext: Boolean(
+      page && (pageIndex + 1) * pageSize < page.filteredCandidates,
+    ),
+    goToPage: (nextPageIndex: number) => {
+      if (nextPageIndex < 0) return;
+      const pageCount = Math.max(
+        1,
+        Math.ceil((page?.filteredCandidates ?? 0) / pageSize),
+      );
+      if (nextPageIndex >= pageCount) return;
+      void fetchPage(nextPageIndex);
+    },
     next: () =>
-      page?.nextCursor
-        ? void fetchPage(page.nextCursor, pageIndex + 1)
+      page && (pageIndex + 1) * pageSize < page.filteredCandidates
+        ? void fetchPage(pageIndex + 1)
         : undefined,
-    previous: () =>
-      pageIndex > 0
-        ? void fetchPage(cursors.current[pageIndex - 1], pageIndex - 1)
-        : undefined,
-    retry: () => void fetchPage(cursors.current[pageIndex], pageIndex),
+    previous: () => (pageIndex > 0 ? void fetchPage(pageIndex - 1) : undefined),
+    retry: () => void fetchPage(pageIndex),
     refresh,
   };
 }

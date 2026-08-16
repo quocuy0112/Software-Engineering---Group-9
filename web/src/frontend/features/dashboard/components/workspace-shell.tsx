@@ -32,6 +32,7 @@ import { closeMessagingConnectionOnLogout } from "@/frontend/features/messaging/
 import { RecruiterHeaderAction } from "@/frontend/features/recruiter-header/components/recruiter-header-action";
 import type { RecruiterHeaderStatus } from "@/shared/contracts/recruiter-header-status";
 import type { RecruiterJobManagementData } from "@/shared/contracts/recruiter-job-posting";
+import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
 import {
   WORKSPACE_MODE_COOKIE,
   type WorkspaceMode,
@@ -249,7 +250,7 @@ function WorkspaceShellContent({
 
   function openRecruiterWorkspace() {
     document.cookie = `${WORKSPACE_MODE_COOKIE}=recruiter; Path=/; Max-Age=31536000; SameSite=Lax`;
-    startNavigation(() => router.push("/recruiter"));
+    startNavigation(() => router.push(recruiterRoutes.jobPostings));
   }
 
   function openCandidateWorkspace() {

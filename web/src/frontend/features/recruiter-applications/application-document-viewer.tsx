@@ -18,12 +18,20 @@ export function ApplicationDocumentViewer({
 }) {
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [message, setMessage] = useState("");
+  const [documentUrl, setDocumentUrl] = useState<string | null>(null);
   const previewUrl = `/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(applicationId)}/documents/${kind}`;
   const downloadUrl = `${previewUrl}/download`;
 
   useEffect(() => {
     let active = true;
-    void fetch(previewUrl, { cache: "no-store" })
+    let objectUrl: string | null = null;
+    void fetch(previewUrl, {
+      cache: "no-store",
+      credentials: "same-origin",
+      headers: {
+        Accept: "application/pdf, application/octet-stream, text/plain",
+      },
+    })
       .then(async (response) => {
         if (!response.ok) {
           const payload = (await response.json().catch(() => null)) as {
@@ -35,8 +43,16 @@ export function ApplicationDocumentViewer({
               : "Couldn't load document — try downloading the original.",
           );
         }
-        void response.body?.cancel();
-        if (active) setState("ready");
+        const blob = await response.blob();
+        if (!blob.size) throw new Error("The document is empty.");
+        objectUrl = URL.createObjectURL(blob);
+        if (!active) {
+          URL.revokeObjectURL(objectUrl);
+          objectUrl = null;
+          return;
+        }
+        setDocumentUrl(objectUrl);
+        setState("ready");
       })
       .catch((error) => {
         if (!active) return;
@@ -49,6 +65,7 @@ export function ApplicationDocumentViewer({
       });
     return () => {
       active = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
   }, [previewUrl]);
 
@@ -91,12 +108,15 @@ export function ApplicationDocumentViewer({
               <AlertTriangle aria-hidden="true" />
               <strong>Couldn&apos;t load document</strong>
               <p>{message}</p>
+              <a href={downloadUrl} download={fileName ?? undefined}>
+                Download original file
+              </a>
             </div>
           ) : null}
           {state === "ready" ? (
             <iframe
               title={`${kind === "cv" ? "CV" : "Cover letter"} preview`}
-              src={previewUrl}
+              src={documentUrl ?? undefined}
               onLoad={() => setState("ready")}
               onError={() => {
                 setState("error");

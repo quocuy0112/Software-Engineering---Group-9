@@ -33,19 +33,23 @@ const pipelineStageLabels: Record<string, string> = {
 };
 
 export function statusLabel(value: string) {
-  return pipelineStageLabels[value] ?? value
-    .replaceAll("_", " ")
-    .toLowerCase()
-    .replace(/\b\w/gu, (letter) => letter.toUpperCase());
+  return (
+    pipelineStageLabels[value] ??
+    value
+      .replaceAll("_", " ")
+      .toLowerCase()
+      .replace(/\b\w/gu, (letter) => letter.toUpperCase())
+  );
 }
 
 export function formatScore(value: number | null | undefined) {
-  return value === null || value === undefined ? "—" : value.toFixed(1);
+  if (value === null || value === undefined) return "\u2014";
+  return value.toFixed(1);
 }
 
 export function formatTableScore(value: number | null | undefined) {
   if (value === null || value === undefined) return "\u2014";
-  return Number.isInteger(value) ? String(value) : value.toFixed(1);
+  return String(Math.round(value));
 }
 
 export type ScoreBadgeMeta = {
@@ -68,7 +72,7 @@ export function scoreBadgeForRow(row: RankedApplicationRow): ScoreBadgeMeta {
     return {
       code: "PENDING",
       label: "Processing",
-      tone: "blue",
+      tone: "purple",
       icon: LoaderCircle,
     };
   }
@@ -76,7 +80,7 @@ export function scoreBadgeForRow(row: RankedApplicationRow): ScoreBadgeMeta {
     return {
       code: "PROCESSING",
       label: "Processing",
-      tone: "blue",
+      tone: "purple",
       icon: LoaderCircle,
     };
   }
@@ -148,7 +152,7 @@ export function ScoreBadgeFromLabel({
       : normalized.includes("RULE") || normalized.includes("UNAVAILABLE")
         ? { code, label, tone: "amber", icon: Check }
         : normalized.includes("PROCESS") || normalized.includes("PENDING")
-          ? { code, label, tone: "blue", icon: LoaderCircle }
+          ? { code, label, tone: "purple", icon: LoaderCircle }
           : { code, label, tone: "slate", icon: CircleDot };
   return <ScoreBadge meta={meta} compact={compact} />;
 }

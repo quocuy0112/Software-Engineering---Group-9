@@ -32,6 +32,20 @@ afterEach(() => {
 });
 
 describe("recruiter campaign pagination", () => {
+  it("uses the job id in candidate links when job titles are duplicated", () => {
+    const jobs = makeJobs(2).map((job) => ({
+      ...job,
+      title: "Product Designer",
+    }));
+    render(<RecruiterCandidatesPage jobs={jobs} />);
+
+    const links = screen.getAllByRole("link", {
+      name: "Review candidates for Product Designer",
+    });
+    expect(links[0]).toHaveAttribute("href", "/recruiter/candidates/job-1");
+    expect(links[1]).toHaveAttribute("href", "/recruiter/candidates/job-2");
+  });
+
   it("pages the campaign grid and resets to page one when filters change", () => {
     render(<RecruiterCandidatesPage jobs={makeJobs(25)} />);
 
