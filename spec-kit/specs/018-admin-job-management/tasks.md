@@ -30,7 +30,7 @@
 - [X] T009 [P] Implement safe operation events and metrics boundary in `web/src/backend/jobs/management/job-post-management-operations.ts` and `web/tests/backend/unit/job-post-management/job-post-management-operations.test.ts`
 - [X] T010 Implement transactional repository queries, aggregate locking, report summaries, feature overlap capacity checks, and public projection sync in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
 - [X] T011 Implement versioned command service with AdminRequestBoundary/command receipts/audit/notifications in `web/src/backend/jobs/management/job-post-management-service.ts`
-- [ ] T012 Integrate approved revision satisfaction and candidate projection guards into `web/src/backend/jobs/review/job-post-review-service.ts`, `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts`, and candidate job read/application boundaries
+- [X] T012 Integrate approved revision satisfaction and candidate projection guards into `web/src/backend/jobs/review/job-post-review-service.ts`, `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts`, and candidate job read/application boundaries
 - [X] T013 Add protected list/detail/command routes and strict path-command validation in `web/src/app/api/admin/job-postings/route.ts`, `web/src/app/api/admin/job-postings/[jobId]/route.ts`, and `web/src/app/api/admin/job-postings/[jobId]/[action]/route.ts`
 - [ ] T014 Add foundational authorization, idempotency, projection-integrity, and migration tests in `web/tests/security/job-post-management/`, `web/tests/backend/integration/job-post-management/`, and `web/tests/architecture/job-post-management-boundaries.test.ts`
 
@@ -78,8 +78,8 @@
 
 ### Implementation
 
-- [ ] T028 [US2] Implement state-transition validation, required reasons, scoped authorization, command receipts, history, audit, and safe notifications in `web/src/backend/jobs/management/job-post-management-policy.ts` and `web/src/backend/jobs/management/job-post-management-service.ts`
-- [ ] T029 [US2] Implement aggregate/public-projection updates and terminal soft-delete safeguards in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
+- [X] T028 [US2] Implement state-transition validation, required reasons, scoped authorization, command receipts, history, audit, and safe notifications in `web/src/backend/jobs/management/job-post-management-policy.ts` and `web/src/backend/jobs/management/job-post-management-service.ts`
+- [X] T029 [US2] Implement aggregate/public-projection updates and terminal soft-delete safeguards in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
 - [X] T030 [US2] Implement lifecycle command endpoint handling and neutral errors in `web/src/app/api/admin/job-postings/[jobId]/[action]/route.ts`
 - [X] T031 [US2] Build confirmation-based hide/restore/close/reopen/archive/soft-delete controls with conflict recovery in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx`
 - [X] T032 [US2] Surface independent state, command outcomes, and candidate-effect guidance in `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`
@@ -102,8 +102,8 @@
 
 ### Implementation
 
-- [ ] T036 [US3] Implement correction-request persistence, single-open-request invariant, and immediate-hide composition in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts` and `web/src/backend/jobs/management/job-post-management-service.ts`
-- [ ] T037 [US3] Link recruiter submission and review approval/rejection to correction-request state in `web/src/backend/jobs/review/job-post-review-service.ts`, `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts`, and `web/src/backend/jobs/review/job-post-publication-projector.ts`
+- [X] T036 [US3] Implement correction-request persistence, single-open-request invariant, and immediate-hide composition in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts` and `web/src/backend/jobs/management/job-post-management-service.ts`
+- [X] T037 [US3] Link recruiter submission and review approval/rejection to correction-request state in `web/src/backend/jobs/review/job-post-review-service.ts`, `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts`, and `web/src/backend/jobs/review/job-post-publication-projector.ts`
 - [ ] T038 [US3] Expose authorized correction context and read-only version labels in `web/src/backend/jobs/review/job-post-review-service-factory.ts`, recruiter job APIs, and `web/src/shared/contracts/recruiter-job-posting.ts`
 - [X] T039 [US3] Build administrator correction-request controls and live/pending version distinction in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx` and `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`
 - [X] T040 [US3] Build recruiter correction banner and revision-submit guidance in `web/src/frontend/features/recruiter/jobs/` and `web/src/frontend/styles/recruiter-workspace-full.css`
