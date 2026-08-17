@@ -13,11 +13,8 @@ import type {
   VerificationEventKind,
 } from "./notification-events";
 import {
-  formatEmailTimestamp,
+  formatVerificationEmailTimestamp,
   membershipRoleLabel,
-  nextActionLabel,
-  rejectionCategoryLabel,
-  verificationStateLabel,
 } from "./email-format";
 
 export type VerificationNotice = {
@@ -34,17 +31,18 @@ export type VerificationNotice = {
 };
 
 export function verificationEmailText(props: VerificationNotice) {
-  const timestamp = formatEmailTimestamp(props.occurredAt);
+  const timestamp = formatVerificationEmailTimestamp(props.occurredAt);
   if (props.eventKind === "VERIFICATION_APPROVED")
     return `${props.companyDisplayName} is verified. Company membership role: ${membershipRoleLabel(props.approvedMembershipRole ?? "")}. Open Recruiter workspace: ${props.recruiterWorkspaceUrl}. Your Candidate identity remains unchanged.`;
   if (props.eventKind === "VERIFICATION_REJECTED")
-    return `Employer verification request ${props.requestId} was rejected. Reason category: ${rejectionCategoryLabel(props.rejectionCategory ?? "OTHER")}. Reason: ${props.applicantComment ?? "The recorded reason is unavailable."} Recorded at ${timestamp}. ${nextActionLabel(props.nextAction)}`;
-  return `Employer verification request ${props.requestId} is now ${verificationStateLabel(props.resultingState)}. Recorded at ${timestamp}. ${nextActionLabel(props.nextAction)}`;
+    return `We reviewed your employer verification request submitted on ${timestamp}. Unfortunately, we could not approve it because the company details provided do not match our records. Feedback from our team: ${props.applicantComment ?? "The recorded reason is unavailable."} We want to help you get verified. Please double-check your company information and feel free to submit a new request in the app.`;
+  return `Thank you for submitting your employer verification. Your request was safely received on ${timestamp} and is now undergoing standard review. Our team is working on it, and we will update you as soon as the check is complete. You do not need to take any action right now.`;
 }
 
 export function VerificationEmail(props: VerificationNotice) {
   const approved = props.eventKind === "VERIFICATION_APPROVED";
-  const timestamp = formatEmailTimestamp(props.occurredAt);
+  const rejected = props.eventKind === "VERIFICATION_REJECTED";
+  const timestamp = formatVerificationEmailTimestamp(props.occurredAt);
   return (
     <Html>
       <Head />
@@ -85,28 +83,40 @@ export function VerificationEmail(props: VerificationNotice) {
                 Open Recruiter workspace
               </Button>
             </>
+          ) : rejected ? (
+            <>
+              <Text>
+                We reviewed your employer verification request submitted on{" "}
+                {timestamp}.
+              </Text>
+              <Text>
+                Unfortunately, we could not approve it because the company
+                details provided do not match our records.
+              </Text>
+              <Text>
+                Feedback from our team:{" "}
+                {props.applicantComment ??
+                  "The recorded reason is unavailable."}
+              </Text>
+              <Text>
+                We want to help you get verified. Please double-check your
+                company information and feel free to submit a new request in the
+                app.
+              </Text>
+            </>
           ) : (
             <>
               <Text>
-                Request {props.requestId} is now{" "}
-                {verificationStateLabel(props.resultingState)}.
+                Thank you for submitting your employer verification.
               </Text>
-              {props.eventKind === "VERIFICATION_REJECTED" && (
-                <>
-                  <Text>
-                    Reason category:{" "}
-                    {rejectionCategoryLabel(props.rejectionCategory ?? "OTHER")}
-                    .
-                  </Text>
-                  <Text>
-                    Applicant-visible reason:{" "}
-                    {props.applicantComment ??
-                      "The recorded reason is unavailable."}
-                  </Text>
-                </>
-              )}
-              <Text>Recorded at {timestamp}.</Text>
-              <Text>{nextActionLabel(props.nextAction)}</Text>
+              <Text>
+                Your request was safely received on {timestamp} and is now
+                undergoing standard review.
+              </Text>
+              <Text>
+                Our team is working on it, and we will update you as soon as the
+                check is complete. You do not need to take any action right now.
+              </Text>
             </>
           )}
         </Container>
