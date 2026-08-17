@@ -34,19 +34,19 @@
 
 - [ ] T006 Define application draft, intake, public update, notification preference, withdrawal outcome, private check, private attempt, private component, evidence, and cleanup models with required indexes and constraints in `web/prisma/schema.prisma`
 - [ ] T007 Implement the additive schema migration, legacy intake/default-preference backfill, private-pipeline isolation constraints, and reversible indexes in `web/prisma/migrations/<timestamp>_candidate_application_tracking_private_match/migration.sql`
-- [ ] T008 [P] Implement shared Zod value contracts for score inputs, provenance, 60/40 components, bands, and limited/full discriminated states in `web/src/backend/scoring-engine/scoring-contracts.ts`
-- [ ] T009 [P] Implement the exact one-time-rounding 60/40 formula and approved band policy in `web/src/backend/scoring-engine/hybrid-score-policy.ts`
-- [ ] T010 [P] Define persistence-free automatic matching and AI evaluation ports in `web/src/backend/scoring-engine/automatic-matching-port.ts` and `web/src/backend/scoring-engine/ai-evaluation-port.ts`
-- [ ] T011 Adapt the existing Feature 015 deterministic matcher and the selected OpenAI Responses API adapter (`gpt-5.4-mini-2026-03-17` baseline) behind purpose-neutral ports with DPA/cross-border/privacy/zero-data-retention gates in `web/src/backend/scoring-engine/scoring-engine-adapter.ts`
+- [x] T008 [P] Implement shared Zod value contracts for score inputs, provenance, 60/40 components, bands, and limited/full discriminated states in `web/src/backend/scoring-engine/scoring-contracts.ts`
+- [x] T009 [P] Implement the exact one-time-rounding 60/40 formula and approved band policy in `web/src/backend/scoring-engine/hybrid-score-policy.ts`
+- [x] T010 [P] Define persistence-free automatic matching and AI evaluation ports in `web/src/backend/scoring-engine/automatic-matching-port.ts` and `web/src/backend/scoring-engine/ai-evaluation-port.ts`
+- [x] T011 Adapt the existing Feature 015 deterministic matcher and the selected OpenAI Responses API adapter (`gpt-5.4-mini-2026-03-17` baseline) behind purpose-neutral ports with DPA/cross-border/privacy/zero-data-retention gates in `web/src/backend/scoring-engine/scoring-engine-adapter.ts`
 - [ ] T012 [P] Implement Candidate session, ownership, CSRF, and indistinguishable-unavailable helpers in `web/src/backend/security/candidate-application-request-boundary.ts`
 - [ ] T013 [P] Implement Candidate-safe application and private-report error mappings in `web/src/backend/candidate-applications/candidate-application-errors.ts` and `web/src/backend/private-cv-match/private-match-errors.ts`
 - [ ] T014 Implement the application repository transaction boundary for drafts, submission, intake, public updates, preferences, and withdrawal in `web/src/backend/repositories/candidate-applications/prisma-candidate-application-repository.ts`
-- [ ] T015 Implement the isolated private-check repository with owner predicates, immutable attempts, current publication, leases, and cleanup claims in `web/src/backend/repositories/private-cv-match/prisma-private-cv-match-repository.ts`
-- [ ] T016 [P] Add a migration verifier for uniqueness, stage preservation, private-table isolation, current-attempt integrity, deadlines, and work indexes in `web/scripts/verify-candidate-application-private-match-migration.mjs`
-- [ ] T017 [P] Add architecture tests forbidding recruiter/employer imports or queries of private-match modules in `web/tests/architecture/candidate-application-private-match-boundaries.test.ts`
+- [x] T015 Implement the isolated private-check repository with owner predicates, immutable attempts, current publication, leases, and cleanup claims in `web/src/backend/repositories/private-cv-match/prisma-private-cv-match-repository.ts`
+- [x] T016 [P] Add a migration verifier for uniqueness, stage preservation, private-table isolation, current-attempt integrity, deadlines, and work indexes in `web/scripts/verify-candidate-application-private-match-migration.mjs`
+- [x] T017 [P] Add architecture tests forbidding recruiter/employer imports or queries of private-match modules in `web/tests/architecture/candidate-application-private-match-boundaries.test.ts`
 - [ ] T018 [P] Add cross-owner, cross-company, identifier-tampering, CSRF, and response-shape security fixtures in `web/tests/security/candidate-application-private-match/authorization-matrix.test.ts`
 - [ ] T019 [P] Add scoring parity fixtures proving private and employer invocations use identical formula/config behavior without shared persistence in `web/tests/backend/integration/private-cv-match/scoring-engine-parity.test.ts`
-- [ ] T020 Validate and generate Prisma client changes and make the migration verifier pass using `web/prisma/schema.prisma` and `web/scripts/verify-candidate-application-private-match-migration.mjs`
+- [x] T020 Validate and generate Prisma client changes and make the migration verifier pass using `web/prisma/schema.prisma` and `web/scripts/verify-candidate-application-private-match-migration.mjs`
 
 **Checkpoint**: Database, authorization, isolated persistence, shared scoring engine, and worker primitives are ready; story work may begin.
 
@@ -96,22 +96,22 @@
 - [ ] T038 [P] [US2] Add normal scoring tests for deterministic evidence, AI schema validation, one-time rounding, bands, evidence signals, sensitive-attribute exclusion, and truthful guidance in `web/tests/backend/unit/private-cv-match/private-match-scoring.test.ts`
 - [ ] T039 [P] [US2] Add setup, report-ready, and full-report component tests for every required block and Apply now prefill behavior in `web/tests/frontend/components/private-cv-match/private-match-normal.test.tsx`
 - [ ] T040 [P] [US2] Add keyboard, focus, progress announcement, report semantics, contrast, and responsive tests in `web/tests/frontend/accessibility/private-cv-match/private-match.accessibility.test.tsx`
-- [ ] T041 [P] [US2] Add security tests proving recruiter/company/admin enumeration, exports, logs, and employer result repositories cannot access private checks in `web/tests/security/candidate-application-private-match/private-pipeline-isolation.test.ts`
+- [x] T041 [P] [US2] Add security tests proving recruiter/company/admin enumeration, exports, logs, and employer result repositories cannot access private checks in `web/tests/security/candidate-application-private-match/private-pipeline-isolation.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T042 [P] [US2] Implement setup, status, evidence, metric, provenance, and full-report discriminated contracts in `web/src/shared/contracts/private-cv-match/index.ts`
-- [ ] T043 [US2] Implement check creation, CV/JD eligibility, immutable sanitized input snapshots, idempotency, and background enqueue in `web/src/backend/private-cv-match/private-cv-match-service.ts`
-- [ ] T044 [US2] Implement deterministic-first and normal hybrid attempt execution with schema validation and atomic publication in `web/src/backend/private-cv-match/private-match-worker.ts`
-- [ ] T045 [US2] Implement owner-only status/ready/full report projections with recruiter fields structurally absent in `web/src/backend/private-cv-match/private-match-projection.ts`
-- [ ] T046 [US2] Implement create and owner-only read Route Handlers in `web/src/app/api/candidate/private-cv-matches/route.ts` and `web/src/app/api/candidate/private-cv-matches/[checkId]/route.ts`
-- [ ] T047 [P] [US2] Implement the private-match worker entry and probe in `web/scripts/run-candidate-match-worker.mjs`
-- [ ] T048 [P] [US2] Implement setup job/CV selectors, requirement chips, parse status, comparison checklist, limitations, and privacy callout in `web/src/frontend/features/private-cv-match/components/private-match-setup.tsx`
-- [ ] T049 [P] [US2] Implement analysis progress and report-ready preview with sources and privacy commitments in `web/src/frontend/features/private-cv-match/components/private-match-ready.tsx`
-- [ ] T050 [US2] Implement full report metrics, matched requirements, gaps, evidence quotes, prioritized actions, formula, provenance, and privacy block in `web/src/frontend/features/private-cv-match/components/private-match-report.tsx`
-- [ ] T051 [US2] Implement polling, cache invalidation after analysis commands, and Apply now prefill clients in `web/src/frontend/features/private-cv-match/client/use-private-cv-match.ts`
-- [ ] T052 [US2] Wire setup and owner-only report routes in `web/src/app/jobs/matches/page.tsx` and `web/src/app/jobs/matches/[checkId]/page.tsx`
-- [ ] T053 [US2] Add responsive private-report layout and non-color score/confidence/band styles in `web/src/frontend/features/private-cv-match/styles/private-cv-match.css`
+- [x] T042 [P] [US2] Implement setup, status, evidence, metric, provenance, and full-report discriminated contracts in `web/src/shared/contracts/private-cv-match/index.ts`
+- [x] T043 [US2] Implement check creation, CV/JD eligibility, immutable sanitized input snapshots, idempotency, and background enqueue in `web/src/backend/private-cv-match/private-cv-match-service.ts`
+- [x] T044 [US2] Implement deterministic-first and normal hybrid attempt execution with schema validation and atomic publication in `web/src/backend/private-cv-match/private-match-worker.ts`
+- [x] T045 [US2] Implement owner-only status/ready/full report projections with recruiter fields structurally absent in `web/src/backend/private-cv-match/private-match-projection.ts`
+- [x] T046 [US2] Implement create and owner-only read Route Handlers in `web/src/app/api/candidate/private-cv-matches/route.ts` and `web/src/app/api/candidate/private-cv-matches/[checkId]/route.ts`
+- [x] T047 [P] [US2] Implement the private-match worker entry and probe in `web/scripts/run-candidate-match-worker.mjs`
+- [x] T048 [P] [US2] Implement setup job/CV selectors, requirement chips, parse status, comparison checklist, limitations, and privacy callout in `web/src/frontend/features/private-cv-match/components/private-match-setup.tsx`
+- [x] T049 [P] [US2] Implement analysis progress and report-ready preview with sources and privacy commitments in `web/src/frontend/features/private-cv-match/components/private-match-ready.tsx`
+- [x] T050 [US2] Implement full report metrics, matched requirements, gaps, evidence quotes, prioritized actions, formula, provenance, and privacy block in `web/src/frontend/features/private-cv-match/components/private-match-report.tsx`
+- [x] T051 [US2] Implement polling, cache invalidation after analysis commands, and Apply now prefill clients in `web/src/frontend/features/private-cv-match/client/use-private-cv-match.ts`
+- [x] T052 [US2] Wire setup and owner-only report routes in `web/src/app/jobs/matches/page.tsx` and `web/src/app/jobs/matches/[checkId]/page.tsx`
+- [x] T053 [US2] Add responsive private-report layout and non-color score/confidence/band styles in `web/src/frontend/features/private-cv-match/styles/private-cv-match.css`
 - [ ] T054 [US2] Run US2 contract, scoring, isolation, component, accessibility, and parity tests and record fixes in `web/tests/backend/integration/private-cv-match/scoring-engine-parity.test.ts`
 
 **Checkpoint**: US2 independently delivers a normal private report with proven storage/query isolation.
@@ -163,10 +163,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T073 [US4] Implement deterministic limited publication and safe AI failure classification in `web/src/backend/private-cv-match/private-match-worker.ts`
-- [ ] T074 [US4] Implement immutable AI retry attempts, idempotency, lease protection, fixed-input reuse, and current-pointer promotion in `web/src/backend/private-cv-match/private-cv-match-service.ts`
-- [ ] T075 [US4] Implement the owner-only Retry AI Route Handler in `web/src/app/api/candidate/private-cv-matches/[checkId]/retry-ai/route.ts`
-- [ ] T076 [US4] Implement the limited report presentation and retry/apply actions in `web/src/frontend/features/private-cv-match/components/private-match-limited-report.tsx`
+- [x] T073 [US4] Implement deterministic limited publication and safe AI failure classification in `web/src/backend/private-cv-match/private-match-worker.ts`
+- [x] T074 [US4] Implement immutable AI retry attempts, idempotency, lease protection, fixed-input reuse, and current-pointer promotion in `web/src/backend/private-cv-match/private-cv-match-service.ts`
+- [x] T075 [US4] Implement the owner-only Retry AI Route Handler in `web/src/app/api/candidate/private-cv-matches/[checkId]/retry-ai/route.ts`
+- [x] T076 [US4] Implement the limited report presentation and retry/apply actions in `web/src/frontend/features/private-cv-match/components/private-match-limited-report.tsx`
 - [ ] T077 [US4] Run US4 fallback, retry, application-nonblocking, contract, and UI tests and record fixes in `web/tests/backend/integration/private-cv-match/private-match-fallback.test.ts`
 
 **Checkpoint**: US4 independently demonstrates deterministic continuity through AI outage and recovery.
@@ -191,7 +191,7 @@
 - [ ] T082 [US5] Implement transactional pre-interview withdrawal with optimistic concurrency, preserved canonical stage, terminal outcome, active-work stop, public update, audit, and recruiter notification intent in `web/src/backend/candidate-applications/application-withdrawal-service.ts`
 - [ ] T083 [US5] Implement the owner-only withdrawal Route Handler in `web/src/app/api/candidate/applications/[applicationId]/withdraw/route.ts`
 - [ ] T084 [US5] Implement immediate private logical deletion, lease invalidation, 12-month expiry, legal-hold denial, and bounded physical cleanup in `web/src/backend/private-cv-match/private-match-retention.ts`
-- [ ] T085 [US5] Integrate private cleanup claims into the Candidate match worker loop in `web/src/backend/private-cv-match/private-match-worker.ts`
+- [x] T085 [US5] Integrate private cleanup claims into the Candidate match worker loop in `web/src/backend/private-cv-match/private-match-worker.ts`
 - [ ] T086 [US5] Implement the owner-only private-check DELETE Route Handler and client mutation after T084, plus Application withdrawal/private-check delete confirmation controls in `web/src/app/api/candidate/private-cv-matches/[checkId]/route.ts`, `web/src/frontend/features/private-cv-match/client/use-private-cv-match.ts`, `web/src/frontend/features/candidate-applications/components/application-data-controls.tsx`, and `web/src/frontend/features/private-cv-match/components/private-match-delete-control.tsx`
 - [ ] T087 [US5] Add withdrawn public Outcome rendering and disable active tracking actions in `web/src/frontend/features/candidate-applications/components/application-tracker.tsx`
 - [ ] T088 [US5] Run US5 withdrawal, deletion, retention, concurrency, audit, notification, and UI tests and record fixes in `web/tests/backend/integration/candidate-applications/application-withdrawal.test.ts`

@@ -148,6 +148,16 @@ paths:
         '404': { $ref: '#/components/responses/Unavailable' }
         '409': { $ref: '#/components/responses/Conflict' }
   /api/candidate/private-cv-matches:
+    get:
+      operationId: listPrivateCvMatches
+      responses:
+        '200':
+          description: Owner-only list of retained private checks
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PrivateMatchListResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
     post:
       operationId: createPrivateCvMatch
       parameters:
@@ -375,44 +385,179 @@ components:
         aiModel: { type: [string, 'null'], maxLength: 200 }
         promptVersion: { type: [string, 'null'], maxLength: 100 }
         inputPolicyVersion: { type: [string, 'null'], maxLength: 100 }
+    PrivateMatchCv:
+      type: object
+      additionalProperties: false
+      required: [versionId, version, displayName, fileName, mimeType, byteSize, pageCount, parseStatus, confirmedAt]
+      properties:
+        versionId: { type: string, minLength: 1, maxLength: 128 }
+        version: { type: integer, minimum: 1 }
+        displayName: { type: string, minLength: 1, maxLength: 200 }
+        fileName: { type: string, minLength: 1, maxLength: 255 }
+        mimeType: { type: string, enum: [application/pdf, application/vnd.openxmlformats-officedocument.wordprocessingml.document] }
+        byteSize: { type: integer, minimum: 1, maximum: 5000000 }
+        pageCount: { type: [integer, 'null'], minimum: 1 }
+        parseStatus: { type: string, enum: [READY, PARTIAL, FAILED] }
+        confirmedAt: { type: string, format: date-time }
+    PrivateMatchJob:
+      type: object
+      additionalProperties: false
+      required: [jobId, slug, title, company, location, employmentType, workArrangement, requiredExperienceYears, requirements, jdVersion, jdUpdatedAt]
+      properties:
+        jobId: { type: string, minLength: 1, maxLength: 128 }
+        slug: { type: string, minLength: 1, maxLength: 200 }
+        title: { type: string, minLength: 1, maxLength: 200 }
+        company: { type: string, minLength: 1, maxLength: 200 }
+        location: { type: string, minLength: 1, maxLength: 200 }
+        employmentType: { type: string, minLength: 1, maxLength: 80 }
+        workArrangement: { type: string, minLength: 1, maxLength: 80 }
+        requiredExperienceYears: { type: [integer, 'null'], minimum: 0 }
+        requirements: { type: array, maxItems: 100, items: { type: string, minLength: 1, maxLength: 200 } }
+        jdVersion: { type: integer, minimum: 1 }
+        jdUpdatedAt: { type: string, format: date-time }
     PrivateMatchStatus:
       type: object
       additionalProperties: false
-      required: [view, checkId, state, createdAt, expiresAt, provenance]
+      required: [view, checkId, state, createdAt, expiresAt, provenance, job, cv, failureCode, durationSeconds]
       properties:
         view: { const: STATUS }
-        checkId: { type: string }
+        checkId: { type: string, minLength: 1, maxLength: 128 }
         state: { type: string, enum: [QUEUED, ANALYZING, FAILED] }
         createdAt: { type: string, format: date-time }
         expiresAt: { type: string, format: date-time }
         provenance: { $ref: '#/components/schemas/SourceProvenance' }
+        job: { $ref: '#/components/schemas/PrivateMatchJob' }
+        cv: { $ref: '#/components/schemas/PrivateMatchCv' }
+        failureCode: { type: [string, 'null'], maxLength: 80 }
+        durationSeconds: { type: [number, 'null'], minimum: 0 }
+    PrivateMatchListResponse:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/PrivateMatchListItem' }
+    PrivateMatchListItem:
+      type: object
+      additionalProperties: false
+      required: [checkId, state, createdAt, expiresAt, job, cv, hybridScore, deterministicScore]
+      properties:
+        checkId: { type: string, minLength: 1, maxLength: 128 }
+        state: { type: string, enum: [QUEUED, ANALYZING, LIMITED, READY, FAILED] }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        job:
+          type: object
+          additionalProperties: false
+          required: [jobId, slug, title, company, location]
+          properties:
+            jobId: { type: string, minLength: 1, maxLength: 128 }
+            slug: { type: string, minLength: 1, maxLength: 200 }
+            title: { type: string, minLength: 1, maxLength: 200 }
+            company: { type: string, minLength: 1, maxLength: 200 }
+            location: { type: string, minLength: 1, maxLength: 200 }
+        cv:
+          type: object
+          additionalProperties: false
+          required: [versionId, displayName, fileName, version]
+          properties:
+            versionId: { type: string, minLength: 1, maxLength: 128 }
+            displayName: { type: string, minLength: 1, maxLength: 200 }
+            fileName: { type: string, minLength: 1, maxLength: 255 }
+            version: { type: integer, minimum: 1 }
+        hybridScore: { type: [number, 'null'], minimum: 0, maximum: 100, multipleOf: 0.1 }
+        deterministicScore: { type: [number, 'null'], minimum: 0, maximum: 100 }
     EvidenceItem:
       type: object
       additionalProperties: false
-      required: [type, quote, criterion]
+      required: [type, quote, criterion, location, confidence]
       properties:
         type: { type: string, enum: [SKILL, PROJECT, IMPACT, EXPERIENCE, EDUCATION, OTHER] }
         quote: { type: string, maxLength: 1000 }
         criterion: { type: string, maxLength: 300 }
+        location: { type: string, maxLength: 160 }
+        confidence: { type: number, minimum: 0, maximum: 1 }
+    RequirementMatch:
+      type: object
+      additionalProperties: false
+      required: [id, label, kind, matched]
+      properties:
+        id: { type: string, maxLength: 128 }
+        label: { type: string, maxLength: 200 }
+        kind: { type: string, enum: [REQUIRED, PREFERRED] }
+        matched: { type: boolean }
+    RequirementGap:
+      type: object
+      additionalProperties: false
+      required: [code, title, description, kind]
+      properties:
+        code: { type: string, maxLength: 160 }
+        title: { type: string, maxLength: 300 }
+        description: { type: string, maxLength: 500 }
+        kind: { type: string, enum: [REQUIRED, PREFERRED, EXPERIENCE] }
     AutomaticComponent:
       type: object
       additionalProperties: false
-      required: [score, weight, weightedContribution, evidenceCoverage, matchedRequirements, gaps, evidence]
+      required: [score, weight, weightedContribution, evidenceCoverage, evidenceConfidence, matchedRequirements, gaps, requiredExperience, detectedExperience, evidence, parserProvenance, mayBeIncomplete]
       properties:
         score: { type: number, minimum: 0, maximum: 100 }
         weight: { const: 0.6 }
         weightedContribution: { type: number, minimum: 0, maximum: 60 }
         evidenceCoverage: { type: number, minimum: 0, maximum: 100 }
-        matchedRequirements: { type: array, items: { type: string, maxLength: 200 } }
-        gaps: { type: array, items: { type: string, maxLength: 500 } }
+        evidenceConfidence: { type: number, minimum: 0, maximum: 100 }
+        matchedRequirements: { type: array, maxItems: 200, items: { $ref: '#/components/schemas/RequirementMatch' } }
+        gaps: { type: array, maxItems: 200, items: { $ref: '#/components/schemas/RequirementGap' } }
+        requiredExperience: { type: [number, 'null'], minimum: 0 }
+        detectedExperience: { type: [number, 'null'], minimum: 0 }
         evidence: { type: array, items: { $ref: '#/components/schemas/EvidenceItem' } }
+        parserProvenance:
+          type: object
+          additionalProperties: false
+          required: [parserVersion, cvStatus, jdStatus]
+          properties:
+            parserVersion: { type: string, maxLength: 80 }
+            cvStatus: { type: string, maxLength: 80 }
+            jdStatus: { type: string, maxLength: 80 }
+        mayBeIncomplete: { type: boolean }
+    AiEvaluation:
+      type: object
+      additionalProperties: false
+      required: [score, weight, weightedContribution, summary, strengths, mainGap, actions, evidenceConfidence, evidenceLevel, provider, model, promptVersion, policyVersion, durationMs, completedAt]
+      properties:
+        score: { type: number, minimum: 0, maximum: 100 }
+        weight: { const: 0.4 }
+        weightedContribution: { type: number, minimum: 0, maximum: 40 }
+        summary: { type: string, minLength: 1, maxLength: 1000 }
+        strengths:
+          type: array
+          maxItems: 4
+          items:
+            type: object
+            additionalProperties: false
+            required: [title, evidence]
+            properties:
+              title: { type: string, maxLength: 160 }
+              evidence: { type: string, maxLength: 1000 }
+        mainGap: { type: [string, 'null'], maxLength: 1000 }
+        actions: { type: array, maxItems: 4, items: { type: string, maxLength: 500 } }
+        evidenceConfidence: { type: integer, minimum: 0, maximum: 100 }
+        evidenceLevel: { type: string, enum: [LOW, MEDIUM, HIGH] }
+        provider: { type: string, maxLength: 100 }
+        model: { type: string, maxLength: 200 }
+        promptVersion: { type: string, maxLength: 100 }
+        policyVersion: { type: string, maxLength: 100 }
+        durationMs: { type: integer, minimum: 0 }
+        completedAt: { type: string, format: date-time }
     LimitedPrivateReport:
       type: object
       additionalProperties: false
-      required: [view, checkId, mode, automatic, aiEvaluation, hybridScore, matchBand, provenance, canRetryAi, canApply]
+      required: [view, checkId, state, mode, automatic, aiEvaluation, hybridScore, matchBand, provenance, canRetryAi, canApply, retryInProgress, completedAt, failureCode, job, cv, createdAt, expiresAt]
       properties:
         view: { const: LIMITED_REPORT }
         checkId: { type: string }
+        state: { const: LIMITED }
         mode: { const: LIMITED }
         automatic: { $ref: '#/components/schemas/AutomaticComponent' }
         aiEvaluation: { type: 'null' }
@@ -421,30 +566,37 @@ components:
         provenance: { $ref: '#/components/schemas/SourceProvenance' }
         canRetryAi: { const: true }
         canApply: { type: boolean }
+        retryInProgress: { type: boolean }
+        completedAt: { type: string, format: date-time }
+        failureCode: { type: [string, 'null'], maxLength: 80 }
+        job: { $ref: '#/components/schemas/PrivateMatchJob' }
+        cv: { $ref: '#/components/schemas/PrivateMatchCv' }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
     FullPrivateReport:
       type: object
       additionalProperties: false
-      required: [view, checkId, mode, hybridScore, matchBand, automatic, aiEvaluation, evidenceConfidence, summary, actions, provenance, canApply]
+      required: [view, checkId, state, mode, hybridScore, matchBand, automatic, aiEvaluation, evidenceConfidence, summary, actions, provenance, canApply, completedAt, retryInProgress, job, cv, createdAt, expiresAt]
       properties:
         view: { const: FULL_REPORT }
         checkId: { type: string }
+        state: { const: READY }
         mode: { const: HYBRID }
         hybridScore: { type: number, minimum: 0, maximum: 100, multipleOf: 0.1 }
         matchBand: { type: string, enum: [HIGH_MATCH, MEDIUM_MATCH, LOW_MATCH] }
         automatic: { $ref: '#/components/schemas/AutomaticComponent' }
-        aiEvaluation:
-          type: object
-          additionalProperties: false
-          required: [score, weight, weightedContribution]
-          properties:
-            score: { type: number, minimum: 0, maximum: 100 }
-            weight: { const: 0.4 }
-            weightedContribution: { type: number, minimum: 0, maximum: 40 }
+        aiEvaluation: { $ref: '#/components/schemas/AiEvaluation' }
         evidenceConfidence: { type: number, minimum: 0, maximum: 100 }
         summary: { type: string, maxLength: 1000 }
         actions: { type: array, items: { type: string, maxLength: 500 } }
         provenance: { $ref: '#/components/schemas/SourceProvenance' }
         canApply: { type: boolean }
+        completedAt: { type: string, format: date-time }
+        retryInProgress: { const: false }
+        job: { $ref: '#/components/schemas/PrivateMatchJob' }
+        cv: { $ref: '#/components/schemas/PrivateMatchCv' }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
     ErrorResponse:
       type: object
       additionalProperties: false
@@ -452,7 +604,7 @@ components:
       properties:
         code:
           type: string
-          enum: [AUTH_REQUIRED, FORBIDDEN, INVALID_REQUEST, UNAVAILABLE, CONFLICT, JOB_UNAVAILABLE, CV_UNAVAILABLE, CV_NOT_PARSED, WITHDRAWAL_NOT_ALLOWED, INTERNAL_FAILURE]
+          enum: [AUTH_REQUIRED, FORBIDDEN, INVALID_REQUEST, UNAVAILABLE, CONFLICT, JOB_UNAVAILABLE, CV_UNAVAILABLE, CV_NOT_PARSED, INTERNAL_FAILURE]
   responses:
     Unauthorized:
       description: Authentication required
