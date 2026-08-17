@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LockKeyhole, ShieldCheck } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -33,6 +34,17 @@ const ACCEPTED_CV_TYPES = new Set([
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]);
+
+function prefilledCvId(form: ApplicationForm) {
+  if (typeof window !== "undefined") {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("jobId") === form.jobId) {
+      const requested = params.get("cvVersionId");
+      if (requested && form.cvs.some((cv) => cv.id === requested)) return requested;
+    }
+  }
+  return form.cvs.length === 1 ? form.cvs[0]!.id : "";
+}
 type FieldErrors = Record<string, string>;
 function formatBytes(bytes: number) {
   if (bytes < 1024) return bytes + " B";
@@ -111,9 +123,7 @@ function InlineApplicationForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const idempotencyKey = useRef<string | null>(null);
   const cvUploadIdempotencyKey = useRef<string | null>(null);
-  const [selectedCvId, setSelectedCvId] = useState(() =>
-    form.cvs.length === 1 ? form.cvs[0]!.id : "",
-  );
+  const [selectedCvId, setSelectedCvId] = useState(() => prefilledCvId(form));
   const [savedCvs, setSavedCvs] = useState(() => form.cvs);
   const [newCvFile, setNewCvFile] = useState<File | null>(null);
   const [newCvAttached, setNewCvAttached] = useState(false);
@@ -435,7 +445,7 @@ function InlineApplicationForm({
       onSubmitted({
         ...outcome,
         aiAnalysisConsent: aiConsent,
-        aiMatchScore: aiConsent ? 82 : null,
+        aiMatchScore: outcome.aiMatchScore,
       });
     } catch {
       setError("Unable to submit your application. Please try again.");
@@ -787,6 +797,21 @@ function InlineApplicationForm({
           {error}
         </div>
       ) : null}
+      <section className="job-application-transparency" aria-label="Transparency about automated support">
+        <div className="job-application-transparency-heading">
+          <ShieldCheck aria-hidden="true" />
+          <strong>Transparency about automated support</strong>
+        </div>
+        <p>
+          Recruiters may use automated tools to compare an application with job
+          requirements. Scores, rankings, and internal notes are not shown to
+          candidates and do not make the final hiring decision.
+        </p>
+        <div className="job-application-private-note">
+          <LockKeyhole aria-hidden="true" />
+          <span>Your private CV Match Check is separate. It is visible only to you, is not included in this application, and does not change recruiter ranking.</span>
+        </div>
+      </section>
       <div className="job-actions">
         <div className="job-ai-consent">
           <label className="job-checkbox-label" htmlFor="application-consent">
@@ -1070,13 +1095,7 @@ export function ApplyFormSection({
                 Application submitted successfully for{" "}
                 {form?.jobTitle ?? jobTitle}.
               </strong>
-              <p>The employer will contact you if there is a match.</p>
-              {outcome.aiAnalysisConsent ? (
-                <p>
-                  AI match: <strong>{outcome.aiMatchScore ?? 82}%</strong> —
-                  based on skills and experience relevant to this role.
-                </p>
-              ) : null}
+              <p>The employer will contact you if there is a match. You can follow the application status from Applications.</p>
             </div>
           ) : applied ? (
             <div className="job-application-confirmation" role="status">

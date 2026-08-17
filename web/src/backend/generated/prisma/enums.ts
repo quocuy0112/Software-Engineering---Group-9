@@ -545,6 +545,51 @@ export const ScoringWorkItemState = {
 export type ScoringWorkItemState = (typeof ScoringWorkItemState)[keyof typeof ScoringWorkItemState]
 
 
+export const PrivateCvMatchCheckState = {
+  QUEUED: 'QUEUED',
+  ANALYZING: 'ANALYZING',
+  LIMITED: 'LIMITED',
+  READY: 'READY',
+  FAILED: 'FAILED',
+  INACCESSIBLE: 'INACCESSIBLE'
+} as const
+
+export type PrivateCvMatchCheckState = (typeof PrivateCvMatchCheckState)[keyof typeof PrivateCvMatchCheckState]
+
+
+export const PrivateCvMatchAttemptTrigger = {
+  INITIAL: 'INITIAL',
+  AI_RETRY: 'AI_RETRY'
+} as const
+
+export type PrivateCvMatchAttemptTrigger = (typeof PrivateCvMatchAttemptTrigger)[keyof typeof PrivateCvMatchAttemptTrigger]
+
+
+export const PrivateCvMatchAttemptState = {
+  QUEUED: 'QUEUED',
+  AUTOMATIC_RUNNING: 'AUTOMATIC_RUNNING',
+  AUTOMATIC_READY: 'AUTOMATIC_READY',
+  AI_RUNNING: 'AI_RUNNING',
+  READY: 'READY',
+  LIMITED: 'LIMITED',
+  FAILED: 'FAILED'
+} as const
+
+export type PrivateCvMatchAttemptState = (typeof PrivateCvMatchAttemptState)[keyof typeof PrivateCvMatchAttemptState]
+
+
+export const PrivateMatchEvidenceClassification = {
+  SKILL: 'SKILL',
+  PROJECT: 'PROJECT',
+  IMPACT: 'IMPACT',
+  EXPERIENCE: 'EXPERIENCE',
+  EDUCATION: 'EDUCATION',
+  OTHER: 'OTHER'
+} as const
+
+export type PrivateMatchEvidenceClassification = (typeof PrivateMatchEvidenceClassification)[keyof typeof PrivateMatchEvidenceClassification]
+
+
 export const ManualPriorityValue = {
   HIGH: 'HIGH',
   NORMAL: 'NORMAL',

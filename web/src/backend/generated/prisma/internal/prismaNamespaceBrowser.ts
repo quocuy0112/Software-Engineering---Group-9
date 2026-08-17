@@ -108,6 +108,12 @@ export const ModelName = {
   JobPostingSkill: 'JobPostingSkill',
   ApplicationQuestion: 'ApplicationQuestion',
   CandidateCv: 'CandidateCv',
+  PrivateCvMatchCheck: 'PrivateCvMatchCheck',
+  PrivateCvMatchAttempt: 'PrivateCvMatchAttempt',
+  PrivateAutomaticMatchResult: 'PrivateAutomaticMatchResult',
+  PrivateAiEvaluationResult: 'PrivateAiEvaluationResult',
+  PrivateMatchEvidence: 'PrivateMatchEvidence',
+  PrivateCvMatchCommandReceipt: 'PrivateCvMatchCommandReceipt',
   SavedJob: 'SavedJob',
   JobReport: 'JobReport',
   JobApplication: 'JobApplication',
@@ -1284,6 +1290,132 @@ export const CandidateCvScalarFieldEnum = {
 } as const
 
 export type CandidateCvScalarFieldEnum = (typeof CandidateCvScalarFieldEnum)[keyof typeof CandidateCvScalarFieldEnum]
+
+
+export const PrivateCvMatchCheckScalarFieldEnum = {
+  id: 'id',
+  candidateUserId: 'candidateUserId',
+  cvVersionId: 'cvVersionId',
+  cvVersion: 'cvVersion',
+  cvDigest: 'cvDigest',
+  jobPostingId: 'jobPostingId',
+  jdVersion: 'jdVersion',
+  jdDigest: 'jdDigest',
+  scoringConfigVersion: 'scoringConfigVersion',
+  creationDedupeKey: 'creationDedupeKey',
+  cvSnapshot: 'cvSnapshot',
+  jdSnapshot: 'jdSnapshot',
+  cvTextSnapshot: 'cvTextSnapshot',
+  currentAttemptId: 'currentAttemptId',
+  state: 'state',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  inaccessibleAt: 'inaccessibleAt',
+  deleteAfter: 'deleteAfter',
+  deletedAt: 'deletedAt',
+  deleteLeaseOwner: 'deleteLeaseOwner',
+  deleteLeaseExpiresAt: 'deleteLeaseExpiresAt',
+  deleteAttempts: 'deleteAttempts',
+  deleteFailureCode: 'deleteFailureCode'
+} as const
+
+export type PrivateCvMatchCheckScalarFieldEnum = (typeof PrivateCvMatchCheckScalarFieldEnum)[keyof typeof PrivateCvMatchCheckScalarFieldEnum]
+
+
+export const PrivateCvMatchAttemptScalarFieldEnum = {
+  id: 'id',
+  checkId: 'checkId',
+  attemptNumber: 'attemptNumber',
+  trigger: 'trigger',
+  state: 'state',
+  deterministicResultId: 'deterministicResultId',
+  aiResultId: 'aiResultId',
+  hybridScore: 'hybridScore',
+  matchBand: 'matchBand',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  failureCode: 'failureCode',
+  provider: 'provider',
+  model: 'model',
+  promptVersion: 'promptVersion',
+  inputPolicyVersion: 'inputPolicyVersion',
+  scoringPolicyVersion: 'scoringPolicyVersion',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PrivateCvMatchAttemptScalarFieldEnum = (typeof PrivateCvMatchAttemptScalarFieldEnum)[keyof typeof PrivateCvMatchAttemptScalarFieldEnum]
+
+
+export const PrivateAutomaticMatchResultScalarFieldEnum = {
+  id: 'id',
+  attemptId: 'attemptId',
+  score: 'score',
+  weight: 'weight',
+  weightedContribution: 'weightedContribution',
+  matchedRequirements: 'matchedRequirements',
+  gaps: 'gaps',
+  requiredExperience: 'requiredExperience',
+  detectedExperience: 'detectedExperience',
+  evidenceCoverage: 'evidenceCoverage',
+  parserProvenance: 'parserProvenance',
+  calculatedAt: 'calculatedAt',
+  mayBeIncomplete: 'mayBeIncomplete'
+} as const
+
+export type PrivateAutomaticMatchResultScalarFieldEnum = (typeof PrivateAutomaticMatchResultScalarFieldEnum)[keyof typeof PrivateAutomaticMatchResultScalarFieldEnum]
+
+
+export const PrivateAiEvaluationResultScalarFieldEnum = {
+  id: 'id',
+  attemptId: 'attemptId',
+  score: 'score',
+  weight: 'weight',
+  weightedContribution: 'weightedContribution',
+  summary: 'summary',
+  strengths: 'strengths',
+  mainGap: 'mainGap',
+  actions: 'actions',
+  evidenceConfidence: 'evidenceConfidence',
+  evidenceLevel: 'evidenceLevel',
+  provider: 'provider',
+  model: 'model',
+  promptVersion: 'promptVersion',
+  policyVersion: 'policyVersion',
+  durationMs: 'durationMs',
+  completedAt: 'completedAt'
+} as const
+
+export type PrivateAiEvaluationResultScalarFieldEnum = (typeof PrivateAiEvaluationResultScalarFieldEnum)[keyof typeof PrivateAiEvaluationResultScalarFieldEnum]
+
+
+export const PrivateMatchEvidenceScalarFieldEnum = {
+  id: 'id',
+  automaticResultId: 'automaticResultId',
+  criterionId: 'criterionId',
+  criterionVersion: 'criterionVersion',
+  classification: 'classification',
+  quote: 'quote',
+  location: 'location',
+  confidenceMetadata: 'confidenceMetadata',
+  exclusionFlags: 'exclusionFlags'
+} as const
+
+export type PrivateMatchEvidenceScalarFieldEnum = (typeof PrivateMatchEvidenceScalarFieldEnum)[keyof typeof PrivateMatchEvidenceScalarFieldEnum]
+
+
+export const PrivateCvMatchCommandReceiptScalarFieldEnum = {
+  id: 'id',
+  candidateUserId: 'candidateUserId',
+  idempotencyKey: 'idempotencyKey',
+  commandKind: 'commandKind',
+  requestDigest: 'requestDigest',
+  checkId: 'checkId',
+  createdAt: 'createdAt'
+} as const
+
+export type PrivateCvMatchCommandReceiptScalarFieldEnum = (typeof PrivateCvMatchCommandReceiptScalarFieldEnum)[keyof typeof PrivateCvMatchCommandReceiptScalarFieldEnum]
 
 
 export const SavedJobScalarFieldEnum = {

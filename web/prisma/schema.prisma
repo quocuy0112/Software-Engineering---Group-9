@@ -408,6 +408,39 @@ enum ScoringWorkItemState {
   SUPERSEDED
 }
 
+enum PrivateCvMatchCheckState {
+  QUEUED
+  ANALYZING
+  LIMITED
+  READY
+  FAILED
+  INACCESSIBLE
+}
+
+enum PrivateCvMatchAttemptTrigger {
+  INITIAL
+  AI_RETRY
+}
+
+enum PrivateCvMatchAttemptState {
+  QUEUED
+  AUTOMATIC_RUNNING
+  AUTOMATIC_READY
+  AI_RUNNING
+  READY
+  LIMITED
+  FAILED
+}
+
+enum PrivateMatchEvidenceClassification {
+  SKILL
+  PROJECT
+  IMPACT
+  EXPERIENCE
+  EDUCATION
+  OTHER
+}
+
 enum ManualPriorityValue {
   HIGH
   NORMAL
@@ -2228,6 +2261,151 @@ model CandidateCv {
   applicationDocuments ApplicationDocument[] @relation("ApplicationDocumentSourceCv")
 
   @@index([candidateUserId, confirmedAt, archivedAt])
+}
+
+/// Candidate-private CV match data deliberately has no relations to the
+/// application, company, recruiter, job, or CV tables. The identifiers are
+/// immutable provenance values, not authorization paths. Candidate ownership
+/// is enforced by the private repository on every read and mutation.
+model PrivateCvMatchCheck {
+  id                    String                    @id @default(cuid())
+  candidateUserId       String                    @db.VarChar(128)
+  cvVersionId           String                    @db.VarChar(128)
+  cvVersion             Int
+  cvDigest              String                    @db.Char(64)
+  jobPostingId          String                    @db.VarChar(128)
+  jdVersion             Int
+  jdDigest              String                    @db.Char(64)
+  scoringConfigVersion  String                    @db.VarChar(64)
+  creationDedupeKey     String?                   @unique @db.Char(64)
+  cvSnapshot            Json
+  jdSnapshot            Json
+  cvTextSnapshot        String?                   @db.Text
+  currentAttemptId      String?                   @unique
+  state                 PrivateCvMatchCheckState   @default(QUEUED)
+  createdAt             DateTime                  @default(now())
+  expiresAt             DateTime
+  inaccessibleAt        DateTime?
+  deleteAfter           DateTime?
+  deletedAt             DateTime?
+  deleteLeaseOwner      String?                   @db.VarChar(128)
+  deleteLeaseExpiresAt  DateTime?
+  deleteAttempts        Int                       @default(0)
+  deleteFailureCode     String?                   @db.VarChar(80)
+  attempts              PrivateCvMatchAttempt[]   @relation("PrivateCheckAttempts")
+  currentAttempt        PrivateCvMatchAttempt?    @relation("PrivateCurrentAttempt", fields: [currentAttemptId], references: [id], onDelete: Restrict)
+  commandReceipts       PrivateCvMatchCommandReceipt[]
+
+  @@index([candidateUserId, createdAt(sort: Desc), id(sort: Desc)], map: "PrivateCvMatchCheck_candidate_created_idx")
+  @@index([expiresAt, inaccessibleAt], map: "PrivateCvMatchCheck_expiry_idx")
+  @@index([deleteAfter, deletedAt], map: "PrivateCvMatchCheck_cleanup_idx")
+}
+
+model PrivateCvMatchAttempt {
+  id                    String                    @id @default(cuid())
+  checkId               String
+  attemptNumber         Int
+  trigger               PrivateCvMatchAttemptTrigger
+  state                 PrivateCvMatchAttemptState @default(QUEUED)
+  deterministicResultId String?                   @unique
+  aiResultId            String?                   @unique
+  hybridScore           Decimal?                  @db.Decimal(5, 1)
+  matchBand             String?                   @db.VarChar(32)
+  startedAt             DateTime?
+  completedAt           DateTime?
+  failureCode           String?                   @db.VarChar(80)
+  provider              String?                   @db.VarChar(100)
+  model                 String?                   @db.VarChar(200)
+  promptVersion         String?                   @db.VarChar(100)
+  inputPolicyVersion    String?                   @db.VarChar(100)
+  scoringPolicyVersion  String                    @db.VarChar(64)
+  leaseOwner            String?                   @db.VarChar(128)
+  leaseExpiresAt        DateTime?
+  createdAt             DateTime                  @default(now())
+  check                 PrivateCvMatchCheck        @relation("PrivateCheckAttempts", fields: [checkId], references: [id], onDelete: Cascade)
+  deterministicResultByAttempt PrivateAutomaticMatchResult? @relation("PrivateAttemptAutomatic")
+  aiResultByAttempt       PrivateAiEvaluationResult? @relation("PrivateAttemptAi")
+  deterministicResult     PrivateAutomaticMatchResult? @relation("PrivateAttemptAutomaticPointer", fields: [deterministicResultId], references: [id], onDelete: SetNull)
+  aiResult                PrivateAiEvaluationResult? @relation("PrivateAttemptAiPointer", fields: [aiResultId], references: [id], onDelete: SetNull)
+  currentForCheck       PrivateCvMatchCheck?      @relation("PrivateCurrentAttempt")
+
+  @@unique([checkId, attemptNumber], map: "PrivateCvMatchAttempt_check_attempt_key")
+  @@index([state, leaseExpiresAt, id], map: "PrivateCvMatchAttempt_work_idx")
+  @@index([checkId, createdAt, id], map: "PrivateCvMatchAttempt_check_created_idx")
+}
+
+model PrivateAutomaticMatchResult {
+  id                    String                    @id @default(cuid())
+  attemptId             String                    @unique
+  score                 Decimal                   @db.Decimal(5, 2)
+  weight                Decimal                   @default(0.60) @db.Decimal(3, 2)
+  weightedContribution  Decimal                   @db.Decimal(5, 2)
+  matchedRequirements   Json
+  gaps                  Json
+  requiredExperience    Decimal?                  @db.Decimal(5, 2)
+  detectedExperience    Decimal?                  @db.Decimal(5, 2)
+  evidenceCoverage      Decimal                   @db.Decimal(5, 2)
+  parserProvenance      Json
+  calculatedAt          DateTime
+  mayBeIncomplete       Boolean                   @default(false)
+  attempt               PrivateCvMatchAttempt     @relation("PrivateAttemptAutomatic", fields: [attemptId], references: [id], onDelete: Cascade)
+  attemptPointer        PrivateCvMatchAttempt?    @relation("PrivateAttemptAutomaticPointer")
+  evidence              PrivateMatchEvidence[]
+
+  @@index([calculatedAt, id], map: "PrivateAutomaticMatchResult_calculated_idx")
+}
+
+model PrivateAiEvaluationResult {
+  id                    String                    @id @default(cuid())
+  attemptId             String                    @unique
+  score                 Decimal                   @db.Decimal(5, 2)
+  weight                Decimal                   @default(0.40) @db.Decimal(3, 2)
+  weightedContribution  Decimal                   @db.Decimal(5, 2)
+  summary               String                    @db.Text
+  strengths             Json
+  mainGap               String?                   @db.VarChar(1000)
+  actions               Json
+  evidenceConfidence    Int
+  evidenceLevel         String                    @db.VarChar(16)
+  provider              String                    @db.VarChar(100)
+  model                 String                    @db.VarChar(200)
+  promptVersion         String                    @db.VarChar(100)
+  policyVersion         String                    @db.VarChar(100)
+  durationMs            Int
+  completedAt           DateTime
+  attempt               PrivateCvMatchAttempt     @relation("PrivateAttemptAi", fields: [attemptId], references: [id], onDelete: Cascade)
+  attemptPointer        PrivateCvMatchAttempt?    @relation("PrivateAttemptAiPointer")
+
+  @@index([completedAt, id], map: "PrivateAiEvaluationResult_completed_idx")
+}
+
+model PrivateMatchEvidence {
+  id                    String                    @id @default(cuid())
+  automaticResultId     String
+  criterionId           String                    @db.VarChar(128)
+  criterionVersion      String                    @db.VarChar(64)
+  classification        PrivateMatchEvidenceClassification
+  quote                 String                    @db.VarChar(1000)
+  location              Json
+  confidenceMetadata    Json
+  exclusionFlags        Json
+  automaticResult       PrivateAutomaticMatchResult @relation(fields: [automaticResultId], references: [id], onDelete: Cascade)
+
+  @@index([automaticResultId, classification, id], map: "PrivateMatchEvidence_result_idx")
+}
+
+model PrivateCvMatchCommandReceipt {
+  id                    String                    @id @default(cuid())
+  candidateUserId       String                    @db.VarChar(128)
+  idempotencyKey        String                    @db.VarChar(128)
+  commandKind           String                    @db.VarChar(32)
+  requestDigest         String                    @db.Char(64)
+  checkId               String
+  createdAt             DateTime                  @default(now())
+  check                 PrivateCvMatchCheck       @relation(fields: [checkId], references: [id], onDelete: Cascade)
+
+  @@unique([candidateUserId, idempotencyKey], map: "PrivateCvMatchCommandReceipt_actor_key")
+  @@index([checkId, createdAt, id], map: "PrivateCvMatchCommandReceipt_check_idx")
 }
 
 model SavedJob {

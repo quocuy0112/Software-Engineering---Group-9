@@ -303,6 +303,39 @@ export type ApplicationQuestion = Prisma.ApplicationQuestionModel
  */
 export type CandidateCv = Prisma.CandidateCvModel
 /**
+ * Model PrivateCvMatchCheck
+ * Candidate-private CV match data deliberately has no relations to the
+ * application, company, recruiter, job, or CV tables. The identifiers are
+ * immutable provenance values, not authorization paths. Candidate ownership
+ * is enforced by the private repository on every read and mutation.
+ */
+export type PrivateCvMatchCheck = Prisma.PrivateCvMatchCheckModel
+/**
+ * Model PrivateCvMatchAttempt
+ * 
+ */
+export type PrivateCvMatchAttempt = Prisma.PrivateCvMatchAttemptModel
+/**
+ * Model PrivateAutomaticMatchResult
+ * 
+ */
+export type PrivateAutomaticMatchResult = Prisma.PrivateAutomaticMatchResultModel
+/**
+ * Model PrivateAiEvaluationResult
+ * 
+ */
+export type PrivateAiEvaluationResult = Prisma.PrivateAiEvaluationResultModel
+/**
+ * Model PrivateMatchEvidence
+ * 
+ */
+export type PrivateMatchEvidence = Prisma.PrivateMatchEvidenceModel
+/**
+ * Model PrivateCvMatchCommandReceipt
+ * 
+ */
+export type PrivateCvMatchCommandReceipt = Prisma.PrivateCvMatchCommandReceiptModel
+/**
  * Model SavedJob
  * 
  */

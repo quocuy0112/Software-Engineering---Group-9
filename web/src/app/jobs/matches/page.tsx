@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
-import { readJobWorkspaceSnapshot } from "@/backend/services/jobs/job-workspace-data";
 import {
   isJobPreferencesConfigured,
+  readJobWorkspaceSnapshot,
   suggestedJobsForSnapshot,
 } from "@/backend/services/jobs/job-workspace-data";
 import { JobsWorkspace } from "@/frontend/features/jobs/components/jobs-workspace";
