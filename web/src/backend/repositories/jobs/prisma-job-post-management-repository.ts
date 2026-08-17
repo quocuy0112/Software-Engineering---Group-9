@@ -251,9 +251,11 @@ export async function findManagedJobPostDetail(jobId: string) {
       ).size,
       highestPriority,
     },
-    reports: reports.map(
-      ({ reporterUserId: _reporterUserId, ...report }) => report,
-    ),
+    reports: reports.map((report) => {
+      const { reporterUserId, ...safeReport } = report;
+      void reporterUserId;
+      return safeReport;
+    }),
     applicationCount,
     recruiterContact: row.approvedVersion?.submittedBy
       ? {

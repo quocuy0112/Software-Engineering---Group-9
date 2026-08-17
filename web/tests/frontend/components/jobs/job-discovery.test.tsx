@@ -75,7 +75,7 @@ describe("job discovery presentation", () => {
     expect(screen.getByText("Hồ Chí Minh")).toBeVisible();
   });
 
-  it("routes authenticated card Apply clicks to the detail-page modal", () => {
+  it("routes authenticated card Apply clicks to the page-based flow", () => {
     render(
       <ApplyButton
         job={{
@@ -87,7 +87,7 @@ describe("job discovery presentation", () => {
 
     expect(screen.getByRole("link", { name: "Apply" })).toHaveAttribute(
       "href",
-      "/jobs/lap-trinh-vien?apply=true",
+      "/jobs/lap-trinh-vien/apply",
     );
   });
 

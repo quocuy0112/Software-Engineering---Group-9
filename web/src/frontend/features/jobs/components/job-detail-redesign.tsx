@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { JobHeroCard } from "@/frontend/components/ui/job-hero-card";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
 import { formatSalary } from "@/shared/utils/jobs/job-display";
-import { ApplyFormSection } from "./apply-form-section";
 import { CompanyLogo, JobDetailSidebar } from "./job-detail-sidebar";
 import { JobDetailOverview, JobDetailSections } from "./job-detail-sections";
 import { JobMetaIcon } from "./job-meta-icon";
@@ -22,27 +21,15 @@ const stateLabel = {
 
 const jobDate = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" });
 
-function shouldOpenApplyFromLocation() {
-  const params = new URLSearchParams(window.location.search);
-  return (
-    window.location.hash.toLowerCase() === "#apply" ||
-    params.get("apply") === "true" ||
-    params.get("openApply") === "true"
-  );
-}
-
 function DetailActionButtons({
   job,
   applied,
-  applyOpen,
-  onApply,
 }: {
   job: JobDetail;
   applied: boolean;
-  applyOpen: boolean;
-  onApply: () => void;
 }) {
-  const returnTo = encodeURIComponent("/jobs/" + job.slug);
+  const applyPath = "/jobs/" + job.slug + "/apply";
+  const returnTo = encodeURIComponent(applyPath);
 
   return (
     <div className="job-detail-primary-actions">
@@ -50,15 +37,12 @@ function DetailActionButtons({
         applied ? (
           <span className="job-applied-state">✓ Applied</span>
         ) : job.actions.authenticated ? (
-          <button
+          <Link
             className="sh-button job-detail-apply-button job-detail-board-apply-button"
-            type="button"
-            aria-expanded={applyOpen}
-            aria-controls="apply"
-            onClick={onApply}
+            href={applyPath}
           >
-            {applyOpen ? "Hide application form" : "Apply now"}
-          </button>
+            Apply now
+          </Link>
         ) : (
           <Link
             className="sh-button job-detail-apply-button job-detail-board-apply-button"
@@ -101,11 +85,8 @@ function DetailActionButtons({
 
 export function JobDetailPage({ job }: { job: JobDetail }) {
   const shared = useOptionalJobInteraction();
-  const [applyOpen, setApplyOpen] = useState(false);
-  const [submittedHere, setSubmittedHere] = useState(false);
   const applied =
     job.actions.applied ||
-    submittedHere ||
     Boolean(shared?.records[job.id]?.applied);
   const registerJob = shared?.registerJob;
 
@@ -115,35 +96,6 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
       applied: job.actions.applied,
     });
   }, [job.actions.applied, job.actions.saved, job.id, registerJob]);
-
-  useEffect(() => {
-    function syncApplyState() {
-      setApplyOpen(shouldOpenApplyFromLocation());
-    }
-
-    syncApplyState();
-    window.addEventListener("hashchange", syncApplyState);
-    window.addEventListener("popstate", syncApplyState);
-    return () => {
-      window.removeEventListener("hashchange", syncApplyState);
-      window.removeEventListener("popstate", syncApplyState);
-    };
-  }, []);
-
-  function setApplyVisibility(next: boolean) {
-    setApplyOpen(next);
-    const url = new URL(window.location.href);
-    if (next) {
-      url.searchParams.set("apply", "true");
-      url.searchParams.delete("openApply");
-      url.hash = "";
-    } else {
-      url.hash = "";
-      url.searchParams.delete("apply");
-      url.searchParams.delete("openApply");
-    }
-    window.history.replaceState(null, "", url);
-  }
 
   return (
     <article className="jobs-detail-page job-redesign-detail job-detail-board-page">
@@ -204,8 +156,6 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
               <DetailActionButtons
                 job={job}
                 applied={applied}
-                applyOpen={applyOpen}
-                onApply={() => setApplyVisibility(!applyOpen)}
               />
             }
           />
@@ -214,14 +164,6 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
           <WhyJoinUsSection job={job} />
           <JobDetailSections job={job} includeOverview={false} />
 
-          <ApplyFormSection
-            jobId={job.id}
-            jobTitle={job.title}
-            open={applyOpen}
-            applied={applied}
-            onOpenChange={setApplyVisibility}
-            onSubmitted={() => setSubmittedHere(true)}
-          />
           <RelatedJobsCarousel jobs={job.relatedJobs ?? []} />
         </main>
 

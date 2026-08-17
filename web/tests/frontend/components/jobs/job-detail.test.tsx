@@ -76,7 +76,7 @@ describe("job detail presentation", () => {
     for (const link of signInLinks) {
       expect(link).toHaveAttribute(
         "href",
-        "/login?returnTo=%2Fjobs%2Flap-trinh-vien",
+        "/login?returnTo=%2Fjobs%2Flap-trinh-vien%2Fapply",
       );
     }
   });

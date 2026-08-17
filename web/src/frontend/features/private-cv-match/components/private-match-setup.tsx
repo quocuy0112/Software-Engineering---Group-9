@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   BriefcaseBusiness,
@@ -17,7 +17,12 @@ import {
   privateMatchErrorMessage,
   useCreatePrivateCvMatch,
 } from "../client/use-private-cv-match";
-import { PrivateMatchStepper } from "./private-match-shared";
+import {
+  formatEmploymentType,
+  formatExperienceRequirement,
+  formatWorkArrangement,
+  PrivateMatchStepper,
+} from "./private-match-shared";
 
 export type PrivateMatchSetupJob = Readonly<{
   jobId: string;
@@ -81,25 +86,22 @@ export function PrivateMatchSetup({
   const requestedJobIsUnavailable = Boolean(
     initialJobId && !jobs.some((job) => job.jobId === initialJobId),
   );
-  const [jobId, setJobId] = useState(
-    initialJobId && jobs.some((job) => job.jobId === initialJobId)
-      ? initialJobId
-      : initialJobId
-        ? ""
-        : (jobs[0]?.jobId ?? ""),
+  const requestedCvIsUnavailable = Boolean(
+    initialCvId && !cvs.some((cv) => cv.id === initialCvId),
   );
-  const [cvId, setCvId] = useState(
-    initialCvId && cvs.some((cv) => cv.id === initialCvId)
-      ? initialCvId
-      : (cvs.find((cv) => cv.parseStatus === "READY")?.id ?? cvs[0]?.id ?? ""),
-  );
+  const selectedJobId = initialJobId ?? jobs[0]?.jobId ?? "";
+  const selectedCvId =
+    initialCvId ??
+    cvs.find((cv) => cv.parseStatus === "READY")?.id ??
+    cvs[0]?.id ??
+    "";
   const selectedJob = useMemo(
-    () => jobs.find((job) => job.jobId === jobId),
-    [jobs, jobId],
+    () => jobs.find((job) => job.jobId === selectedJobId),
+    [jobs, selectedJobId],
   );
   const selectedCv = useMemo(
-    () => cvs.find((cv) => cv.id === cvId) ?? cvs[0],
-    [cvs, cvId],
+    () => cvs.find((cv) => cv.id === selectedCvId),
+    [cvs, selectedCvId],
   );
   const ready = selectedCv?.parseStatus === "READY";
 
@@ -137,6 +139,36 @@ export function PrivateMatchSetup({
           disabled={!jobs.length}
         >
           Choose another job
+        </button>
+        <button
+          className="private-match-secondary-button"
+          type="button"
+          onClick={() => router.push("/cv-match-check")}
+        >
+          Back to CV Match Check
+        </button>
+      </main>
+    );
+  }
+
+  if (requestedCvIsUnavailable) {
+    return (
+      <main
+        className="private-match-page private-match-empty"
+        aria-live="polite"
+      >
+        <TriangleAlert aria-hidden="true" />
+        <h1>This CV version is no longer available for a private check.</h1>
+        <p>
+          Choose another CV from your CV library and return when it is ready.
+          Your CV has not been changed.
+        </p>
+        <button
+          className="private-match-primary-button"
+          type="button"
+          onClick={() => router.push("/profile/cv-imports")}
+        >
+          Choose another CV
         </button>
         <button
           className="private-match-secondary-button"
@@ -189,29 +221,16 @@ export function PrivateMatchSetup({
             aria-labelledby="target-job-title"
           >
             <div className="private-match-card-topline">
-              <div className="private-match-card-label">Current job</div>
-              <label
-                className="private-match-compact-select"
-                htmlFor="private-match-job"
+              <h2
+                id="target-job-title"
+                className="private-match-card-topline-heading"
               >
-                <span className="private-match-visually-hidden">
-                  Job to assess
-                </span>
-                <select
-                  id="private-match-job"
-                  className="private-match-select"
-                  value={jobId}
-                  onChange={(event) => setJobId(event.target.value)}
-                >
-                  {jobs.map((job) => (
-                    <option key={job.jobId} value={job.jobId}>
-                      {job.title} · {job.company}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                Target job description
+              </h2>
+              <span className="private-match-card-topline-caption">
+                Current job
+              </span>
             </div>
-            <h2 id="target-job-title">Target job description</h2>
             <div className="private-match-job-panel">
               <span className="private-match-large-icon">
                 <BriefcaseBusiness aria-hidden="true" />
@@ -220,13 +239,13 @@ export function PrivateMatchSetup({
                 <h3>{selectedJob.title}</h3>
                 <span>
                   {selectedJob.company} · {selectedJob.location} ·{" "}
-                  {selectedJob.workArrangement}
+                  {formatWorkArrangement(selectedJob.workArrangement)}
                 </span>
                 <small>
-                  {selectedJob.employmentType}
-                  {selectedJob.requiredExperienceYears === null
-                    ? ""
-                    : ` · ${selectedJob.requiredExperienceYears}+ years`}{" "}
+                  {formatEmploymentType(selectedJob.employmentType)} ·{" "}
+                  {formatExperienceRequirement(
+                    selectedJob.requiredExperienceYears,
+                  )}{" "}
                   · Source: SmartHire job post
                 </small>
               </div>
@@ -234,9 +253,15 @@ export function PrivateMatchSetup({
                 <Check aria-hidden="true" /> Selected
               </span>
             </div>
+            <p
+              id="key-requirements-found"
+              className="private-match-requirements-label"
+            >
+              Key requirements found
+            </p>
             <div
               className="private-match-chip-group"
-              aria-label="Key requirements found"
+              aria-labelledby="key-requirements-found"
             >
               {selectedJob.requirements.slice(0, 8).map((requirement) => (
                 <span className="private-match-chip" key={requirement}>
@@ -251,34 +276,21 @@ export function PrivateMatchSetup({
             aria-labelledby="cv-assess-title"
           >
             <div className="private-match-card-topline">
-              <div className="private-match-card-label">Current CV</div>
-              <label
-                className="private-match-compact-select"
-                htmlFor="private-match-cv"
+              <h2
+                id="cv-assess-title"
+                className="private-match-card-topline-heading"
               >
-                <span className="private-match-visually-hidden">
-                  CV version to assess
-                </span>
-                <select
-                  id="private-match-cv"
-                  className="private-match-select"
-                  value={cvId}
-                  onChange={(event) => setCvId(event.target.value)}
-                >
-                  {cvs.map((cv) => (
-                    <option key={cv.id} value={cv.id}>
-                      {cv.displayName} · v{cv.version}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                CV to assess
+              </h2>
+              <span className="private-match-card-topline-caption">
+                Current CV
+              </span>
             </div>
             <div className="private-match-card-heading">
               <span className="private-match-large-icon">
                 <FileText aria-hidden="true" />
               </span>
               <div>
-                <h2 id="cv-assess-title">CV to assess</h2>
                 <p>{selectedCv.fileName}</p>
                 <span>
                   {selectedCv.pageCount
@@ -409,21 +421,21 @@ export function PrivateMatchSetup({
               </p>
             </div>
           </section>
-          <button
-            className="private-match-primary-button private-match-primary-button--wide"
-            type="button"
-            onClick={() => void analyze()}
-            disabled={!ready || create.isPending}
-          >
-            {create.isPending ? (
-              <span className="private-match-spinner" aria-hidden="true" />
-            ) : (
-              <Sparkles aria-hidden="true" />
-            )}
-            {create.isPending ? "Analyzing…" : "Analyze my CV"}
-          </button>
         </aside>
       </div>
+      <button
+        className="private-match-primary-button private-match-primary-button--wide private-match-setup-cta"
+        type="button"
+        onClick={() => void analyze()}
+        disabled={!ready || create.isPending}
+      >
+        {create.isPending ? (
+          <span className="private-match-spinner" aria-hidden="true" />
+        ) : (
+          <Sparkles aria-hidden="true" />
+        )}
+        {create.isPending ? "Analyzing…" : "Analyze my CV"}
+      </button>
     </main>
   );
 }

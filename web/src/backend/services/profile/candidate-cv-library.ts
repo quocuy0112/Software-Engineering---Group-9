@@ -1,6 +1,11 @@
 import "server-only";
 
 import { prisma } from "@/backend/database/prisma";
+import {
+  createCvWorkerCryptor,
+  createCvWorkerIntegrityReader,
+  createCvWorkerStorage,
+} from "@/backend/cv/workers/cv-worker-resources";
 import { safeFilename } from "@/backend/services/cv-import/cv-import-projection";
 import {
   candidateCvDeleteOutcomeSchema,
@@ -238,6 +243,83 @@ export async function ensureCandidateCvLibrary(
       });
     }),
   );
+}
+
+/**
+ * Replace the temporary bridge locator with a verified private-storage copy
+ * after a CV import is confirmed. The CV-import workflow calls this profile
+ * projection service instead of writing CandidateCv directly.
+ */
+export async function materializeConfirmedCandidateCv(
+  accountId: string,
+  uploadId: string,
+  db: typeof prisma = prisma,
+) {
+  const candidateCvId = `candidate-cv-${uploadId}`;
+  const cv = await db.candidateCv.findUnique({
+    where: { id: candidateCvId },
+  });
+  if (!cv || cv.storageKey !== candidateCvId) return;
+  const rows = await db.$queryRaw<
+    Array<{
+      id: string;
+      storageLocator: string;
+      encryptionKeyVersion: number;
+      encryptionIvHex: string;
+      authenticationTagHex: string;
+      plaintextBytes: number;
+      ciphertextBytes: number;
+      plaintextSha256Hex: string;
+    }>
+  >`
+    SELECT artifact."id", artifact."storageLocator", artifact."encryptionKeyVersion",
+           encode(artifact."encryptionIv", 'hex') AS "encryptionIvHex",
+           encode(artifact."authenticationTag", 'hex') AS "authenticationTagHex",
+           artifact."plaintextBytes", artifact."ciphertextBytes",
+           encode(artifact."plaintextSha256", 'hex') AS "plaintextSha256Hex"
+      FROM "CvStoredArtifact" artifact
+     WHERE artifact."uploadId" = ${uploadId}
+       AND artifact."accountId" = ${accountId}
+       AND artifact."kind" = 'SOURCE_DOCUMENT'
+       AND artifact."deletedAt" IS NULL
+     ORDER BY artifact."createdAt" DESC LIMIT 1
+  `;
+  const artifact = rows[0];
+  if (!artifact) throw new Error("CANDIDATE_CV_SOURCE_UNAVAILABLE");
+  const storage = createCvWorkerStorage();
+  await storage.assertReady();
+  const verified = await createCvWorkerIntegrityReader(
+    storage,
+    createCvWorkerCryptor(),
+  ).verify({
+    locator: artifact.storageLocator,
+    ciphertextBytes: artifact.ciphertextBytes,
+    plaintextBytes: artifact.plaintextBytes,
+    plaintextSha256: Buffer.from(artifact.plaintextSha256Hex, "hex"),
+    context: {
+      accountId,
+      uploadId,
+      artifactId: artifact.id,
+      kind: "SOURCE_DOCUMENT",
+    },
+    envelope: {
+      keyVersion: artifact.encryptionKeyVersion,
+      iv: Buffer.from(artifact.encryptionIvHex, "hex"),
+      authenticationTag: Buffer.from(artifact.authenticationTagHex, "hex"),
+    },
+  });
+  try {
+    const stored = await storage.put({
+      source: verified.open(),
+      expectedBytes: verified.plaintextBytes,
+    });
+    await db.candidateCv.update({
+      where: { id: candidateCvId, storageKey: candidateCvId },
+      data: { storageKey: String(stored.locator) },
+    });
+  } finally {
+    await verified.dispose();
+  }
 }
 
 export async function listCandidateCvLibrary(

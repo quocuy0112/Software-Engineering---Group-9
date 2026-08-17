@@ -66,6 +66,7 @@
     "test:candidate-application-private-match": "vitest run tests/shared/private-cv-match tests/backend/private-cv-match tests/frontend/private-cv-match tests/security/private-cv-match tests/security/candidate-application-private-match tests/architecture/candidate-application-private-match-boundaries.test.ts --passWithNoTests",
     "applications:migration:verify": "node scripts/verify-application-migration.mjs",
     "applications:retention": "node scripts/run-application-retention-worker.mjs",
+    "applications:intake": "node --conditions=react-server --import tsx scripts/run-application-intake-worker.mjs",
     "applications:scoring": "node --conditions=react-server --import tsx scripts/run-application-scoring-worker.mjs",
     "applications:scoring:reconcile": "node scripts/reconcile-initial-application-scoring.mjs",
     "applications:repair-documents": "node --conditions=react-server --import tsx scripts/repair-application-documents.ts",
