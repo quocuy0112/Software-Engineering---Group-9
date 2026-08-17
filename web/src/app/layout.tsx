@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/500.css";
 import "@fontsource/be-vietnam-pro/600.css";
@@ -52,11 +51,12 @@ export default function RootLayout({
     >
       <head>
         <meta charSet="utf-8" />
+        <script
+          id="smarthire-theme-bootstrap"
+          dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
+        />
       </head>
       <body suppressHydrationWarning>
-        <Script id="smarthire-theme-bootstrap" strategy="beforeInteractive">
-          {themeBootstrapScript}
-        </Script>
         <ThemeProvider>
           {children}
           <Toaster

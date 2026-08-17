@@ -85,6 +85,13 @@ export class PrismaModerationRepository {
       include: {
         history: { orderBy: [{ occurredAt: "asc" }, { id: "asc" }] },
         notes: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
+        enforcementLinks: {
+          include: {
+            enforcementAction: {
+              include: { targets: true },
+            },
+          },
+        },
       },
     });
     return row

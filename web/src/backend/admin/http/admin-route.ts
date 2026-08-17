@@ -116,6 +116,8 @@ export function adminRouteError(error: unknown) {
       ADMIN_AUTHORITY_STALE: 403,
       VALIDATION_FAILED: 400,
       ACTION_BLOCKED: 423,
+      CORRECTION_REQUEST_OPEN: 409,
+      FEATURE_CAPACITY_CONFLICT: 409,
     };
     if (known[error.message])
       return adminJson(

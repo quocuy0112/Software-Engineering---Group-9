@@ -28,11 +28,13 @@ export type AggregateJobPostReviewAggregate = {
 
 export type JobPostReviewAggregateAvgAggregateOutputType = {
   latestSequence: number | null
+  operationalVersion: number | null
   version: number | null
 }
 
 export type JobPostReviewAggregateSumAggregateOutputType = {
   latestSequence: number | null
+  operationalVersion: number | null
   version: number | null
 }
 
@@ -46,6 +48,19 @@ export type JobPostReviewAggregateMinAggregateOutputType = {
   publicJobPostingId: string | null
   closedAt: Date | null
   closedByUserId: string | null
+  visibilityState: $Enums.JobPostVisibilityState | null
+  applicationState: $Enums.JobPostApplicationState | null
+  hiddenAt: Date | null
+  hiddenByUserId: string | null
+  hiddenReason: string | null
+  archivedAt: Date | null
+  archivedByUserId: string | null
+  applicationClosedAt: Date | null
+  applicationClosedByUserId: string | null
+  softDeletedAt: Date | null
+  softDeletedByUserId: string | null
+  softDeleteReason: string | null
+  operationalVersion: number | null
   version: number | null
   adoptedAt: Date | null
   createdAt: Date | null
@@ -62,6 +77,19 @@ export type JobPostReviewAggregateMaxAggregateOutputType = {
   publicJobPostingId: string | null
   closedAt: Date | null
   closedByUserId: string | null
+  visibilityState: $Enums.JobPostVisibilityState | null
+  applicationState: $Enums.JobPostApplicationState | null
+  hiddenAt: Date | null
+  hiddenByUserId: string | null
+  hiddenReason: string | null
+  archivedAt: Date | null
+  archivedByUserId: string | null
+  applicationClosedAt: Date | null
+  applicationClosedByUserId: string | null
+  softDeletedAt: Date | null
+  softDeletedByUserId: string | null
+  softDeleteReason: string | null
+  operationalVersion: number | null
   version: number | null
   adoptedAt: Date | null
   createdAt: Date | null
@@ -78,6 +106,19 @@ export type JobPostReviewAggregateCountAggregateOutputType = {
   publicJobPostingId: number
   closedAt: number
   closedByUserId: number
+  visibilityState: number
+  applicationState: number
+  hiddenAt: number
+  hiddenByUserId: number
+  hiddenReason: number
+  archivedAt: number
+  archivedByUserId: number
+  applicationClosedAt: number
+  applicationClosedByUserId: number
+  softDeletedAt: number
+  softDeletedByUserId: number
+  softDeleteReason: number
+  operationalVersion: number
   version: number
   adoptedAt: number
   createdAt: number
@@ -88,11 +129,13 @@ export type JobPostReviewAggregateCountAggregateOutputType = {
 
 export type JobPostReviewAggregateAvgAggregateInputType = {
   latestSequence?: true
+  operationalVersion?: true
   version?: true
 }
 
 export type JobPostReviewAggregateSumAggregateInputType = {
   latestSequence?: true
+  operationalVersion?: true
   version?: true
 }
 
@@ -106,6 +149,19 @@ export type JobPostReviewAggregateMinAggregateInputType = {
   publicJobPostingId?: true
   closedAt?: true
   closedByUserId?: true
+  visibilityState?: true
+  applicationState?: true
+  hiddenAt?: true
+  hiddenByUserId?: true
+  hiddenReason?: true
+  archivedAt?: true
+  archivedByUserId?: true
+  applicationClosedAt?: true
+  applicationClosedByUserId?: true
+  softDeletedAt?: true
+  softDeletedByUserId?: true
+  softDeleteReason?: true
+  operationalVersion?: true
   version?: true
   adoptedAt?: true
   createdAt?: true
@@ -122,6 +178,19 @@ export type JobPostReviewAggregateMaxAggregateInputType = {
   publicJobPostingId?: true
   closedAt?: true
   closedByUserId?: true
+  visibilityState?: true
+  applicationState?: true
+  hiddenAt?: true
+  hiddenByUserId?: true
+  hiddenReason?: true
+  archivedAt?: true
+  archivedByUserId?: true
+  applicationClosedAt?: true
+  applicationClosedByUserId?: true
+  softDeletedAt?: true
+  softDeletedByUserId?: true
+  softDeleteReason?: true
+  operationalVersion?: true
   version?: true
   adoptedAt?: true
   createdAt?: true
@@ -138,6 +207,19 @@ export type JobPostReviewAggregateCountAggregateInputType = {
   publicJobPostingId?: true
   closedAt?: true
   closedByUserId?: true
+  visibilityState?: true
+  applicationState?: true
+  hiddenAt?: true
+  hiddenByUserId?: true
+  hiddenReason?: true
+  archivedAt?: true
+  archivedByUserId?: true
+  applicationClosedAt?: true
+  applicationClosedByUserId?: true
+  softDeletedAt?: true
+  softDeletedByUserId?: true
+  softDeleteReason?: true
+  operationalVersion?: true
   version?: true
   adoptedAt?: true
   createdAt?: true
@@ -241,6 +323,19 @@ export type JobPostReviewAggregateGroupByOutputType = {
   publicJobPostingId: string | null
   closedAt: Date | null
   closedByUserId: string | null
+  visibilityState: $Enums.JobPostVisibilityState
+  applicationState: $Enums.JobPostApplicationState
+  hiddenAt: Date | null
+  hiddenByUserId: string | null
+  hiddenReason: string | null
+  archivedAt: Date | null
+  archivedByUserId: string | null
+  applicationClosedAt: Date | null
+  applicationClosedByUserId: string | null
+  softDeletedAt: Date | null
+  softDeletedByUserId: string | null
+  softDeleteReason: string | null
+  operationalVersion: number
   version: number
   adoptedAt: Date
   createdAt: Date
@@ -280,6 +375,19 @@ export type JobPostReviewAggregateWhereInput = {
   publicJobPostingId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
   closedAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
   closedByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFilter<"JobPostReviewAggregate"> | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFilter<"JobPostReviewAggregate"> | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
+  hiddenByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  hiddenReason?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  archivedAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
+  archivedByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  applicationClosedAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
+  applicationClosedByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  softDeletedAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
+  softDeletedByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  softDeleteReason?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  operationalVersion?: Prisma.IntFilter<"JobPostReviewAggregate"> | number
   version?: Prisma.IntFilter<"JobPostReviewAggregate"> | number
   adoptedAt?: Prisma.DateTimeFilter<"JobPostReviewAggregate"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"JobPostReviewAggregate"> | Date | string
@@ -290,6 +398,10 @@ export type JobPostReviewAggregateWhereInput = {
   pendingVersion?: Prisma.XOR<Prisma.JobPostReviewVersionNullableScalarRelationFilter, Prisma.JobPostReviewVersionWhereInput> | null
   approvedVersion?: Prisma.XOR<Prisma.JobPostReviewVersionNullableScalarRelationFilter, Prisma.JobPostReviewVersionWhereInput> | null
   publicJobPosting?: Prisma.XOR<Prisma.JobPostingNullableScalarRelationFilter, Prisma.JobPostingWhereInput> | null
+  correctionRequests?: Prisma.JobPostRevisionRequestListRelationFilter
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementListRelationFilter
+  operationalHistory?: Prisma.JobPostOperationalHistoryListRelationFilter
+  enforcementTargets?: Prisma.JobPostEnforcementTargetListRelationFilter
 }
 
 export type JobPostReviewAggregateOrderByWithRelationInput = {
@@ -302,6 +414,19 @@ export type JobPostReviewAggregateOrderByWithRelationInput = {
   publicJobPostingId?: Prisma.SortOrderInput | Prisma.SortOrder
   closedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   closedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  visibilityState?: Prisma.SortOrder
+  applicationState?: Prisma.SortOrder
+  hiddenAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  hiddenByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  hiddenReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  archivedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  applicationClosedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  applicationClosedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  softDeletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  softDeletedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  softDeleteReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  operationalVersion?: Prisma.SortOrder
   version?: Prisma.SortOrder
   adoptedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -312,6 +437,10 @@ export type JobPostReviewAggregateOrderByWithRelationInput = {
   pendingVersion?: Prisma.JobPostReviewVersionOrderByWithRelationInput
   approvedVersion?: Prisma.JobPostReviewVersionOrderByWithRelationInput
   publicJobPosting?: Prisma.JobPostingOrderByWithRelationInput
+  correctionRequests?: Prisma.JobPostRevisionRequestOrderByRelationAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementOrderByRelationAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryOrderByRelationAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetOrderByRelationAggregateInput
 }
 
 export type JobPostReviewAggregateWhereUniqueInput = Prisma.AtLeast<{
@@ -327,6 +456,19 @@ export type JobPostReviewAggregateWhereUniqueInput = Prisma.AtLeast<{
   latestSequence?: Prisma.IntFilter<"JobPostReviewAggregate"> | number
   closedAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
   closedByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFilter<"JobPostReviewAggregate"> | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFilter<"JobPostReviewAggregate"> | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
+  hiddenByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  hiddenReason?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  archivedAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
+  archivedByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  applicationClosedAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
+  applicationClosedByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  softDeletedAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
+  softDeletedByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  softDeleteReason?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  operationalVersion?: Prisma.IntFilter<"JobPostReviewAggregate"> | number
   version?: Prisma.IntFilter<"JobPostReviewAggregate"> | number
   adoptedAt?: Prisma.DateTimeFilter<"JobPostReviewAggregate"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"JobPostReviewAggregate"> | Date | string
@@ -337,6 +479,10 @@ export type JobPostReviewAggregateWhereUniqueInput = Prisma.AtLeast<{
   pendingVersion?: Prisma.XOR<Prisma.JobPostReviewVersionNullableScalarRelationFilter, Prisma.JobPostReviewVersionWhereInput> | null
   approvedVersion?: Prisma.XOR<Prisma.JobPostReviewVersionNullableScalarRelationFilter, Prisma.JobPostReviewVersionWhereInput> | null
   publicJobPosting?: Prisma.XOR<Prisma.JobPostingNullableScalarRelationFilter, Prisma.JobPostingWhereInput> | null
+  correctionRequests?: Prisma.JobPostRevisionRequestListRelationFilter
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementListRelationFilter
+  operationalHistory?: Prisma.JobPostOperationalHistoryListRelationFilter
+  enforcementTargets?: Prisma.JobPostEnforcementTargetListRelationFilter
 }, "id" | "jobId" | "pendingVersionId" | "approvedVersionId" | "publicJobPostingId">
 
 export type JobPostReviewAggregateOrderByWithAggregationInput = {
@@ -349,6 +495,19 @@ export type JobPostReviewAggregateOrderByWithAggregationInput = {
   publicJobPostingId?: Prisma.SortOrderInput | Prisma.SortOrder
   closedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   closedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  visibilityState?: Prisma.SortOrder
+  applicationState?: Prisma.SortOrder
+  hiddenAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  hiddenByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  hiddenReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  archivedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  applicationClosedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  applicationClosedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  softDeletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  softDeletedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  softDeleteReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  operationalVersion?: Prisma.SortOrder
   version?: Prisma.SortOrder
   adoptedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -373,6 +532,19 @@ export type JobPostReviewAggregateScalarWhereWithAggregatesInput = {
   publicJobPostingId?: Prisma.StringNullableWithAggregatesFilter<"JobPostReviewAggregate"> | string | null
   closedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"JobPostReviewAggregate"> | Date | string | null
   closedByUserId?: Prisma.StringNullableWithAggregatesFilter<"JobPostReviewAggregate"> | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateWithAggregatesFilter<"JobPostReviewAggregate"> | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateWithAggregatesFilter<"JobPostReviewAggregate"> | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.DateTimeNullableWithAggregatesFilter<"JobPostReviewAggregate"> | Date | string | null
+  hiddenByUserId?: Prisma.StringNullableWithAggregatesFilter<"JobPostReviewAggregate"> | string | null
+  hiddenReason?: Prisma.StringNullableWithAggregatesFilter<"JobPostReviewAggregate"> | string | null
+  archivedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"JobPostReviewAggregate"> | Date | string | null
+  archivedByUserId?: Prisma.StringNullableWithAggregatesFilter<"JobPostReviewAggregate"> | string | null
+  applicationClosedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"JobPostReviewAggregate"> | Date | string | null
+  applicationClosedByUserId?: Prisma.StringNullableWithAggregatesFilter<"JobPostReviewAggregate"> | string | null
+  softDeletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"JobPostReviewAggregate"> | Date | string | null
+  softDeletedByUserId?: Prisma.StringNullableWithAggregatesFilter<"JobPostReviewAggregate"> | string | null
+  softDeleteReason?: Prisma.StringNullableWithAggregatesFilter<"JobPostReviewAggregate"> | string | null
+  operationalVersion?: Prisma.IntWithAggregatesFilter<"JobPostReviewAggregate"> | number
   version?: Prisma.IntWithAggregatesFilter<"JobPostReviewAggregate"> | number
   adoptedAt?: Prisma.DateTimeWithAggregatesFilter<"JobPostReviewAggregate"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"JobPostReviewAggregate"> | Date | string
@@ -384,6 +556,19 @@ export type JobPostReviewAggregateCreateInput = {
   jobId: string
   latestSequence?: number
   closedAt?: Date | string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
@@ -394,6 +579,10 @@ export type JobPostReviewAggregateCreateInput = {
   pendingVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutPendingForAggregateInput
   approvedVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutApprovedForAggregateInput
   publicJobPosting?: Prisma.JobPostingCreateNestedOneWithoutReviewAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetCreateNestedManyWithoutAggregateInput
 }
 
 export type JobPostReviewAggregateUncheckedCreateInput = {
@@ -406,11 +595,28 @@ export type JobPostReviewAggregateUncheckedCreateInput = {
   publicJobPostingId?: string | null
   closedAt?: Date | string | null
   closedByUserId?: string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
   versions?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedCreateNestedManyWithoutAggregateInput
 }
 
 export type JobPostReviewAggregateUpdateInput = {
@@ -418,6 +624,19 @@ export type JobPostReviewAggregateUpdateInput = {
   jobId?: Prisma.StringFieldUpdateOperationsInput | string
   latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -428,6 +647,10 @@ export type JobPostReviewAggregateUpdateInput = {
   pendingVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutPendingForAggregateNestedInput
   approvedVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutApprovedForAggregateNestedInput
   publicJobPosting?: Prisma.JobPostingUpdateOneWithoutReviewAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUpdateManyWithoutAggregateNestedInput
 }
 
 export type JobPostReviewAggregateUncheckedUpdateInput = {
@@ -440,11 +663,28 @@ export type JobPostReviewAggregateUncheckedUpdateInput = {
   publicJobPostingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   closedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   versions?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedUpdateManyWithoutAggregateNestedInput
 }
 
 export type JobPostReviewAggregateCreateManyInput = {
@@ -457,6 +697,19 @@ export type JobPostReviewAggregateCreateManyInput = {
   publicJobPostingId?: string | null
   closedAt?: Date | string | null
   closedByUserId?: string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
@@ -468,6 +721,19 @@ export type JobPostReviewAggregateUpdateManyMutationInput = {
   jobId?: Prisma.StringFieldUpdateOperationsInput | string
   latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -484,6 +750,19 @@ export type JobPostReviewAggregateUncheckedUpdateManyInput = {
   publicJobPostingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   closedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -515,6 +794,19 @@ export type JobPostReviewAggregateCountOrderByAggregateInput = {
   publicJobPostingId?: Prisma.SortOrder
   closedAt?: Prisma.SortOrder
   closedByUserId?: Prisma.SortOrder
+  visibilityState?: Prisma.SortOrder
+  applicationState?: Prisma.SortOrder
+  hiddenAt?: Prisma.SortOrder
+  hiddenByUserId?: Prisma.SortOrder
+  hiddenReason?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
+  archivedByUserId?: Prisma.SortOrder
+  applicationClosedAt?: Prisma.SortOrder
+  applicationClosedByUserId?: Prisma.SortOrder
+  softDeletedAt?: Prisma.SortOrder
+  softDeletedByUserId?: Prisma.SortOrder
+  softDeleteReason?: Prisma.SortOrder
+  operationalVersion?: Prisma.SortOrder
   version?: Prisma.SortOrder
   adoptedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -523,6 +815,7 @@ export type JobPostReviewAggregateCountOrderByAggregateInput = {
 
 export type JobPostReviewAggregateAvgOrderByAggregateInput = {
   latestSequence?: Prisma.SortOrder
+  operationalVersion?: Prisma.SortOrder
   version?: Prisma.SortOrder
 }
 
@@ -536,6 +829,19 @@ export type JobPostReviewAggregateMaxOrderByAggregateInput = {
   publicJobPostingId?: Prisma.SortOrder
   closedAt?: Prisma.SortOrder
   closedByUserId?: Prisma.SortOrder
+  visibilityState?: Prisma.SortOrder
+  applicationState?: Prisma.SortOrder
+  hiddenAt?: Prisma.SortOrder
+  hiddenByUserId?: Prisma.SortOrder
+  hiddenReason?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
+  archivedByUserId?: Prisma.SortOrder
+  applicationClosedAt?: Prisma.SortOrder
+  applicationClosedByUserId?: Prisma.SortOrder
+  softDeletedAt?: Prisma.SortOrder
+  softDeletedByUserId?: Prisma.SortOrder
+  softDeleteReason?: Prisma.SortOrder
+  operationalVersion?: Prisma.SortOrder
   version?: Prisma.SortOrder
   adoptedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -552,6 +858,19 @@ export type JobPostReviewAggregateMinOrderByAggregateInput = {
   publicJobPostingId?: Prisma.SortOrder
   closedAt?: Prisma.SortOrder
   closedByUserId?: Prisma.SortOrder
+  visibilityState?: Prisma.SortOrder
+  applicationState?: Prisma.SortOrder
+  hiddenAt?: Prisma.SortOrder
+  hiddenByUserId?: Prisma.SortOrder
+  hiddenReason?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
+  archivedByUserId?: Prisma.SortOrder
+  applicationClosedAt?: Prisma.SortOrder
+  applicationClosedByUserId?: Prisma.SortOrder
+  softDeletedAt?: Prisma.SortOrder
+  softDeletedByUserId?: Prisma.SortOrder
+  softDeleteReason?: Prisma.SortOrder
+  operationalVersion?: Prisma.SortOrder
   version?: Prisma.SortOrder
   adoptedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -560,6 +879,7 @@ export type JobPostReviewAggregateMinOrderByAggregateInput = {
 
 export type JobPostReviewAggregateSumOrderByAggregateInput = {
   latestSequence?: Prisma.SortOrder
+  operationalVersion?: Prisma.SortOrder
   version?: Prisma.SortOrder
 }
 
@@ -684,6 +1004,72 @@ export type JobPostReviewAggregateUncheckedUpdateOneWithoutPublicJobPostingNeste
   update?: Prisma.XOR<Prisma.XOR<Prisma.JobPostReviewAggregateUpdateToOneWithWhereWithoutPublicJobPostingInput, Prisma.JobPostReviewAggregateUpdateWithoutPublicJobPostingInput>, Prisma.JobPostReviewAggregateUncheckedUpdateWithoutPublicJobPostingInput>
 }
 
+export type EnumJobPostVisibilityStateFieldUpdateOperationsInput = {
+  set?: $Enums.JobPostVisibilityState
+}
+
+export type EnumJobPostApplicationStateFieldUpdateOperationsInput = {
+  set?: $Enums.JobPostApplicationState
+}
+
+export type JobPostReviewAggregateCreateNestedOneWithoutCorrectionRequestsInput = {
+  create?: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutCorrectionRequestsInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutCorrectionRequestsInput>
+  connectOrCreate?: Prisma.JobPostReviewAggregateCreateOrConnectWithoutCorrectionRequestsInput
+  connect?: Prisma.JobPostReviewAggregateWhereUniqueInput
+}
+
+export type JobPostReviewAggregateUpdateOneRequiredWithoutCorrectionRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutCorrectionRequestsInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutCorrectionRequestsInput>
+  connectOrCreate?: Prisma.JobPostReviewAggregateCreateOrConnectWithoutCorrectionRequestsInput
+  upsert?: Prisma.JobPostReviewAggregateUpsertWithoutCorrectionRequestsInput
+  connect?: Prisma.JobPostReviewAggregateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobPostReviewAggregateUpdateToOneWithWhereWithoutCorrectionRequestsInput, Prisma.JobPostReviewAggregateUpdateWithoutCorrectionRequestsInput>, Prisma.JobPostReviewAggregateUncheckedUpdateWithoutCorrectionRequestsInput>
+}
+
+export type JobPostReviewAggregateCreateNestedOneWithoutFeaturedPlacementsInput = {
+  create?: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutFeaturedPlacementsInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutFeaturedPlacementsInput>
+  connectOrCreate?: Prisma.JobPostReviewAggregateCreateOrConnectWithoutFeaturedPlacementsInput
+  connect?: Prisma.JobPostReviewAggregateWhereUniqueInput
+}
+
+export type JobPostReviewAggregateUpdateOneRequiredWithoutFeaturedPlacementsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutFeaturedPlacementsInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutFeaturedPlacementsInput>
+  connectOrCreate?: Prisma.JobPostReviewAggregateCreateOrConnectWithoutFeaturedPlacementsInput
+  upsert?: Prisma.JobPostReviewAggregateUpsertWithoutFeaturedPlacementsInput
+  connect?: Prisma.JobPostReviewAggregateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobPostReviewAggregateUpdateToOneWithWhereWithoutFeaturedPlacementsInput, Prisma.JobPostReviewAggregateUpdateWithoutFeaturedPlacementsInput>, Prisma.JobPostReviewAggregateUncheckedUpdateWithoutFeaturedPlacementsInput>
+}
+
+export type JobPostReviewAggregateCreateNestedOneWithoutEnforcementTargetsInput = {
+  create?: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutEnforcementTargetsInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutEnforcementTargetsInput>
+  connectOrCreate?: Prisma.JobPostReviewAggregateCreateOrConnectWithoutEnforcementTargetsInput
+  connect?: Prisma.JobPostReviewAggregateWhereUniqueInput
+}
+
+export type JobPostReviewAggregateUpdateOneWithoutEnforcementTargetsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutEnforcementTargetsInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutEnforcementTargetsInput>
+  connectOrCreate?: Prisma.JobPostReviewAggregateCreateOrConnectWithoutEnforcementTargetsInput
+  upsert?: Prisma.JobPostReviewAggregateUpsertWithoutEnforcementTargetsInput
+  disconnect?: Prisma.JobPostReviewAggregateWhereInput | boolean
+  delete?: Prisma.JobPostReviewAggregateWhereInput | boolean
+  connect?: Prisma.JobPostReviewAggregateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobPostReviewAggregateUpdateToOneWithWhereWithoutEnforcementTargetsInput, Prisma.JobPostReviewAggregateUpdateWithoutEnforcementTargetsInput>, Prisma.JobPostReviewAggregateUncheckedUpdateWithoutEnforcementTargetsInput>
+}
+
+export type JobPostReviewAggregateCreateNestedOneWithoutOperationalHistoryInput = {
+  create?: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutOperationalHistoryInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutOperationalHistoryInput>
+  connectOrCreate?: Prisma.JobPostReviewAggregateCreateOrConnectWithoutOperationalHistoryInput
+  connect?: Prisma.JobPostReviewAggregateWhereUniqueInput
+}
+
+export type JobPostReviewAggregateUpdateOneRequiredWithoutOperationalHistoryNestedInput = {
+  create?: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutOperationalHistoryInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutOperationalHistoryInput>
+  connectOrCreate?: Prisma.JobPostReviewAggregateCreateOrConnectWithoutOperationalHistoryInput
+  upsert?: Prisma.JobPostReviewAggregateUpsertWithoutOperationalHistoryInput
+  connect?: Prisma.JobPostReviewAggregateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobPostReviewAggregateUpdateToOneWithWhereWithoutOperationalHistoryInput, Prisma.JobPostReviewAggregateUpdateWithoutOperationalHistoryInput>, Prisma.JobPostReviewAggregateUncheckedUpdateWithoutOperationalHistoryInput>
+}
+
 export type JobPostReviewAggregateCreateNestedOneWithoutVersionsInput = {
   create?: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutVersionsInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutVersionsInput>
   connectOrCreate?: Prisma.JobPostReviewAggregateCreateOrConnectWithoutVersionsInput
@@ -767,6 +1153,19 @@ export type JobPostReviewAggregateCreateWithoutClosedByInput = {
   jobId: string
   latestSequence?: number
   closedAt?: Date | string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
@@ -776,6 +1175,10 @@ export type JobPostReviewAggregateCreateWithoutClosedByInput = {
   pendingVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutPendingForAggregateInput
   approvedVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutApprovedForAggregateInput
   publicJobPosting?: Prisma.JobPostingCreateNestedOneWithoutReviewAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetCreateNestedManyWithoutAggregateInput
 }
 
 export type JobPostReviewAggregateUncheckedCreateWithoutClosedByInput = {
@@ -787,11 +1190,28 @@ export type JobPostReviewAggregateUncheckedCreateWithoutClosedByInput = {
   approvedVersionId?: string | null
   publicJobPostingId?: string | null
   closedAt?: Date | string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
   versions?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedCreateNestedManyWithoutAggregateInput
 }
 
 export type JobPostReviewAggregateCreateOrConnectWithoutClosedByInput = {
@@ -833,6 +1253,19 @@ export type JobPostReviewAggregateScalarWhereInput = {
   publicJobPostingId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
   closedAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
   closedByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFilter<"JobPostReviewAggregate"> | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFilter<"JobPostReviewAggregate"> | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
+  hiddenByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  hiddenReason?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  archivedAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
+  archivedByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  applicationClosedAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
+  applicationClosedByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  softDeletedAt?: Prisma.DateTimeNullableFilter<"JobPostReviewAggregate"> | Date | string | null
+  softDeletedByUserId?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  softDeleteReason?: Prisma.StringNullableFilter<"JobPostReviewAggregate"> | string | null
+  operationalVersion?: Prisma.IntFilter<"JobPostReviewAggregate"> | number
   version?: Prisma.IntFilter<"JobPostReviewAggregate"> | number
   adoptedAt?: Prisma.DateTimeFilter<"JobPostReviewAggregate"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"JobPostReviewAggregate"> | Date | string
@@ -844,6 +1277,19 @@ export type JobPostReviewAggregateCreateWithoutCompanyInput = {
   jobId: string
   latestSequence?: number
   closedAt?: Date | string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
@@ -853,6 +1299,10 @@ export type JobPostReviewAggregateCreateWithoutCompanyInput = {
   pendingVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutPendingForAggregateInput
   approvedVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutApprovedForAggregateInput
   publicJobPosting?: Prisma.JobPostingCreateNestedOneWithoutReviewAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetCreateNestedManyWithoutAggregateInput
 }
 
 export type JobPostReviewAggregateUncheckedCreateWithoutCompanyInput = {
@@ -864,11 +1314,28 @@ export type JobPostReviewAggregateUncheckedCreateWithoutCompanyInput = {
   publicJobPostingId?: string | null
   closedAt?: Date | string | null
   closedByUserId?: string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
   versions?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedCreateNestedManyWithoutAggregateInput
 }
 
 export type JobPostReviewAggregateCreateOrConnectWithoutCompanyInput = {
@@ -902,6 +1369,19 @@ export type JobPostReviewAggregateCreateWithoutPublicJobPostingInput = {
   jobId: string
   latestSequence?: number
   closedAt?: Date | string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
@@ -911,6 +1391,10 @@ export type JobPostReviewAggregateCreateWithoutPublicJobPostingInput = {
   versions?: Prisma.JobPostReviewVersionCreateNestedManyWithoutAggregateInput
   pendingVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutPendingForAggregateInput
   approvedVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutApprovedForAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetCreateNestedManyWithoutAggregateInput
 }
 
 export type JobPostReviewAggregateUncheckedCreateWithoutPublicJobPostingInput = {
@@ -922,11 +1406,28 @@ export type JobPostReviewAggregateUncheckedCreateWithoutPublicJobPostingInput = 
   approvedVersionId?: string | null
   closedAt?: Date | string | null
   closedByUserId?: string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
   versions?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedCreateNestedManyWithoutAggregateInput
 }
 
 export type JobPostReviewAggregateCreateOrConnectWithoutPublicJobPostingInput = {
@@ -950,6 +1451,19 @@ export type JobPostReviewAggregateUpdateWithoutPublicJobPostingInput = {
   jobId?: Prisma.StringFieldUpdateOperationsInput | string
   latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -959,6 +1473,10 @@ export type JobPostReviewAggregateUpdateWithoutPublicJobPostingInput = {
   versions?: Prisma.JobPostReviewVersionUpdateManyWithoutAggregateNestedInput
   pendingVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutPendingForAggregateNestedInput
   approvedVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutApprovedForAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUpdateManyWithoutAggregateNestedInput
 }
 
 export type JobPostReviewAggregateUncheckedUpdateWithoutPublicJobPostingInput = {
@@ -970,11 +1488,620 @@ export type JobPostReviewAggregateUncheckedUpdateWithoutPublicJobPostingInput = 
   approvedVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   closedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   versions?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedUpdateManyWithoutAggregateNestedInput
+}
+
+export type JobPostReviewAggregateCreateWithoutCorrectionRequestsInput = {
+  id?: string
+  jobId: string
+  latestSequence?: number
+  closedAt?: Date | string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
+  version?: number
+  adoptedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  company: Prisma.CompanyCreateNestedOneWithoutJobPostReviewAggregatesInput
+  closedBy?: Prisma.UserAccountCreateNestedOneWithoutClosedJobPostReviewAggregatesInput
+  versions?: Prisma.JobPostReviewVersionCreateNestedManyWithoutAggregateInput
+  pendingVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutPendingForAggregateInput
+  approvedVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutApprovedForAggregateInput
+  publicJobPosting?: Prisma.JobPostingCreateNestedOneWithoutReviewAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetCreateNestedManyWithoutAggregateInput
+}
+
+export type JobPostReviewAggregateUncheckedCreateWithoutCorrectionRequestsInput = {
+  id?: string
+  jobId: string
+  companyId: string
+  latestSequence?: number
+  pendingVersionId?: string | null
+  approvedVersionId?: string | null
+  publicJobPostingId?: string | null
+  closedAt?: Date | string | null
+  closedByUserId?: string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
+  version?: number
+  adoptedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  versions?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedCreateNestedManyWithoutAggregateInput
+}
+
+export type JobPostReviewAggregateCreateOrConnectWithoutCorrectionRequestsInput = {
+  where: Prisma.JobPostReviewAggregateWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutCorrectionRequestsInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutCorrectionRequestsInput>
+}
+
+export type JobPostReviewAggregateUpsertWithoutCorrectionRequestsInput = {
+  update: Prisma.XOR<Prisma.JobPostReviewAggregateUpdateWithoutCorrectionRequestsInput, Prisma.JobPostReviewAggregateUncheckedUpdateWithoutCorrectionRequestsInput>
+  create: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutCorrectionRequestsInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutCorrectionRequestsInput>
+  where?: Prisma.JobPostReviewAggregateWhereInput
+}
+
+export type JobPostReviewAggregateUpdateToOneWithWhereWithoutCorrectionRequestsInput = {
+  where?: Prisma.JobPostReviewAggregateWhereInput
+  data: Prisma.XOR<Prisma.JobPostReviewAggregateUpdateWithoutCorrectionRequestsInput, Prisma.JobPostReviewAggregateUncheckedUpdateWithoutCorrectionRequestsInput>
+}
+
+export type JobPostReviewAggregateUpdateWithoutCorrectionRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
+  latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  company?: Prisma.CompanyUpdateOneRequiredWithoutJobPostReviewAggregatesNestedInput
+  closedBy?: Prisma.UserAccountUpdateOneWithoutClosedJobPostReviewAggregatesNestedInput
+  versions?: Prisma.JobPostReviewVersionUpdateManyWithoutAggregateNestedInput
+  pendingVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutPendingForAggregateNestedInput
+  approvedVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutApprovedForAggregateNestedInput
+  publicJobPosting?: Prisma.JobPostingUpdateOneWithoutReviewAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUpdateManyWithoutAggregateNestedInput
+}
+
+export type JobPostReviewAggregateUncheckedUpdateWithoutCorrectionRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
+  pendingVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicJobPostingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  closedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  versions?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedUpdateManyWithoutAggregateNestedInput
+}
+
+export type JobPostReviewAggregateCreateWithoutFeaturedPlacementsInput = {
+  id?: string
+  jobId: string
+  latestSequence?: number
+  closedAt?: Date | string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
+  version?: number
+  adoptedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  company: Prisma.CompanyCreateNestedOneWithoutJobPostReviewAggregatesInput
+  closedBy?: Prisma.UserAccountCreateNestedOneWithoutClosedJobPostReviewAggregatesInput
+  versions?: Prisma.JobPostReviewVersionCreateNestedManyWithoutAggregateInput
+  pendingVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutPendingForAggregateInput
+  approvedVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutApprovedForAggregateInput
+  publicJobPosting?: Prisma.JobPostingCreateNestedOneWithoutReviewAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetCreateNestedManyWithoutAggregateInput
+}
+
+export type JobPostReviewAggregateUncheckedCreateWithoutFeaturedPlacementsInput = {
+  id?: string
+  jobId: string
+  companyId: string
+  latestSequence?: number
+  pendingVersionId?: string | null
+  approvedVersionId?: string | null
+  publicJobPostingId?: string | null
+  closedAt?: Date | string | null
+  closedByUserId?: string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
+  version?: number
+  adoptedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  versions?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedCreateNestedManyWithoutAggregateInput
+}
+
+export type JobPostReviewAggregateCreateOrConnectWithoutFeaturedPlacementsInput = {
+  where: Prisma.JobPostReviewAggregateWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutFeaturedPlacementsInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutFeaturedPlacementsInput>
+}
+
+export type JobPostReviewAggregateUpsertWithoutFeaturedPlacementsInput = {
+  update: Prisma.XOR<Prisma.JobPostReviewAggregateUpdateWithoutFeaturedPlacementsInput, Prisma.JobPostReviewAggregateUncheckedUpdateWithoutFeaturedPlacementsInput>
+  create: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutFeaturedPlacementsInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutFeaturedPlacementsInput>
+  where?: Prisma.JobPostReviewAggregateWhereInput
+}
+
+export type JobPostReviewAggregateUpdateToOneWithWhereWithoutFeaturedPlacementsInput = {
+  where?: Prisma.JobPostReviewAggregateWhereInput
+  data: Prisma.XOR<Prisma.JobPostReviewAggregateUpdateWithoutFeaturedPlacementsInput, Prisma.JobPostReviewAggregateUncheckedUpdateWithoutFeaturedPlacementsInput>
+}
+
+export type JobPostReviewAggregateUpdateWithoutFeaturedPlacementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
+  latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  company?: Prisma.CompanyUpdateOneRequiredWithoutJobPostReviewAggregatesNestedInput
+  closedBy?: Prisma.UserAccountUpdateOneWithoutClosedJobPostReviewAggregatesNestedInput
+  versions?: Prisma.JobPostReviewVersionUpdateManyWithoutAggregateNestedInput
+  pendingVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutPendingForAggregateNestedInput
+  approvedVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutApprovedForAggregateNestedInput
+  publicJobPosting?: Prisma.JobPostingUpdateOneWithoutReviewAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUpdateManyWithoutAggregateNestedInput
+}
+
+export type JobPostReviewAggregateUncheckedUpdateWithoutFeaturedPlacementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
+  pendingVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicJobPostingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  closedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  versions?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedUpdateManyWithoutAggregateNestedInput
+}
+
+export type JobPostReviewAggregateCreateWithoutEnforcementTargetsInput = {
+  id?: string
+  jobId: string
+  latestSequence?: number
+  closedAt?: Date | string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
+  version?: number
+  adoptedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  company: Prisma.CompanyCreateNestedOneWithoutJobPostReviewAggregatesInput
+  closedBy?: Prisma.UserAccountCreateNestedOneWithoutClosedJobPostReviewAggregatesInput
+  versions?: Prisma.JobPostReviewVersionCreateNestedManyWithoutAggregateInput
+  pendingVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutPendingForAggregateInput
+  approvedVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutApprovedForAggregateInput
+  publicJobPosting?: Prisma.JobPostingCreateNestedOneWithoutReviewAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryCreateNestedManyWithoutAggregateInput
+}
+
+export type JobPostReviewAggregateUncheckedCreateWithoutEnforcementTargetsInput = {
+  id?: string
+  jobId: string
+  companyId: string
+  latestSequence?: number
+  pendingVersionId?: string | null
+  approvedVersionId?: string | null
+  publicJobPostingId?: string | null
+  closedAt?: Date | string | null
+  closedByUserId?: string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
+  version?: number
+  adoptedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  versions?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedCreateNestedManyWithoutAggregateInput
+}
+
+export type JobPostReviewAggregateCreateOrConnectWithoutEnforcementTargetsInput = {
+  where: Prisma.JobPostReviewAggregateWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutEnforcementTargetsInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutEnforcementTargetsInput>
+}
+
+export type JobPostReviewAggregateUpsertWithoutEnforcementTargetsInput = {
+  update: Prisma.XOR<Prisma.JobPostReviewAggregateUpdateWithoutEnforcementTargetsInput, Prisma.JobPostReviewAggregateUncheckedUpdateWithoutEnforcementTargetsInput>
+  create: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutEnforcementTargetsInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutEnforcementTargetsInput>
+  where?: Prisma.JobPostReviewAggregateWhereInput
+}
+
+export type JobPostReviewAggregateUpdateToOneWithWhereWithoutEnforcementTargetsInput = {
+  where?: Prisma.JobPostReviewAggregateWhereInput
+  data: Prisma.XOR<Prisma.JobPostReviewAggregateUpdateWithoutEnforcementTargetsInput, Prisma.JobPostReviewAggregateUncheckedUpdateWithoutEnforcementTargetsInput>
+}
+
+export type JobPostReviewAggregateUpdateWithoutEnforcementTargetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
+  latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  company?: Prisma.CompanyUpdateOneRequiredWithoutJobPostReviewAggregatesNestedInput
+  closedBy?: Prisma.UserAccountUpdateOneWithoutClosedJobPostReviewAggregatesNestedInput
+  versions?: Prisma.JobPostReviewVersionUpdateManyWithoutAggregateNestedInput
+  pendingVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutPendingForAggregateNestedInput
+  approvedVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutApprovedForAggregateNestedInput
+  publicJobPosting?: Prisma.JobPostingUpdateOneWithoutReviewAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUpdateManyWithoutAggregateNestedInput
+}
+
+export type JobPostReviewAggregateUncheckedUpdateWithoutEnforcementTargetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
+  pendingVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicJobPostingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  closedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  versions?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedUpdateManyWithoutAggregateNestedInput
+}
+
+export type JobPostReviewAggregateCreateWithoutOperationalHistoryInput = {
+  id?: string
+  jobId: string
+  latestSequence?: number
+  closedAt?: Date | string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
+  version?: number
+  adoptedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  company: Prisma.CompanyCreateNestedOneWithoutJobPostReviewAggregatesInput
+  closedBy?: Prisma.UserAccountCreateNestedOneWithoutClosedJobPostReviewAggregatesInput
+  versions?: Prisma.JobPostReviewVersionCreateNestedManyWithoutAggregateInput
+  pendingVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutPendingForAggregateInput
+  approvedVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutApprovedForAggregateInput
+  publicJobPosting?: Prisma.JobPostingCreateNestedOneWithoutReviewAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetCreateNestedManyWithoutAggregateInput
+}
+
+export type JobPostReviewAggregateUncheckedCreateWithoutOperationalHistoryInput = {
+  id?: string
+  jobId: string
+  companyId: string
+  latestSequence?: number
+  pendingVersionId?: string | null
+  approvedVersionId?: string | null
+  publicJobPostingId?: string | null
+  closedAt?: Date | string | null
+  closedByUserId?: string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
+  version?: number
+  adoptedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  versions?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedCreateNestedManyWithoutAggregateInput
+}
+
+export type JobPostReviewAggregateCreateOrConnectWithoutOperationalHistoryInput = {
+  where: Prisma.JobPostReviewAggregateWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutOperationalHistoryInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutOperationalHistoryInput>
+}
+
+export type JobPostReviewAggregateUpsertWithoutOperationalHistoryInput = {
+  update: Prisma.XOR<Prisma.JobPostReviewAggregateUpdateWithoutOperationalHistoryInput, Prisma.JobPostReviewAggregateUncheckedUpdateWithoutOperationalHistoryInput>
+  create: Prisma.XOR<Prisma.JobPostReviewAggregateCreateWithoutOperationalHistoryInput, Prisma.JobPostReviewAggregateUncheckedCreateWithoutOperationalHistoryInput>
+  where?: Prisma.JobPostReviewAggregateWhereInput
+}
+
+export type JobPostReviewAggregateUpdateToOneWithWhereWithoutOperationalHistoryInput = {
+  where?: Prisma.JobPostReviewAggregateWhereInput
+  data: Prisma.XOR<Prisma.JobPostReviewAggregateUpdateWithoutOperationalHistoryInput, Prisma.JobPostReviewAggregateUncheckedUpdateWithoutOperationalHistoryInput>
+}
+
+export type JobPostReviewAggregateUpdateWithoutOperationalHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
+  latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  company?: Prisma.CompanyUpdateOneRequiredWithoutJobPostReviewAggregatesNestedInput
+  closedBy?: Prisma.UserAccountUpdateOneWithoutClosedJobPostReviewAggregatesNestedInput
+  versions?: Prisma.JobPostReviewVersionUpdateManyWithoutAggregateNestedInput
+  pendingVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutPendingForAggregateNestedInput
+  approvedVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutApprovedForAggregateNestedInput
+  publicJobPosting?: Prisma.JobPostingUpdateOneWithoutReviewAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUpdateManyWithoutAggregateNestedInput
+}
+
+export type JobPostReviewAggregateUncheckedUpdateWithoutOperationalHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
+  pendingVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicJobPostingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  closedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  versions?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedUpdateManyWithoutAggregateNestedInput
 }
 
 export type JobPostReviewAggregateCreateWithoutVersionsInput = {
@@ -982,6 +2109,19 @@ export type JobPostReviewAggregateCreateWithoutVersionsInput = {
   jobId: string
   latestSequence?: number
   closedAt?: Date | string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
@@ -991,6 +2131,10 @@ export type JobPostReviewAggregateCreateWithoutVersionsInput = {
   pendingVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutPendingForAggregateInput
   approvedVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutApprovedForAggregateInput
   publicJobPosting?: Prisma.JobPostingCreateNestedOneWithoutReviewAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetCreateNestedManyWithoutAggregateInput
 }
 
 export type JobPostReviewAggregateUncheckedCreateWithoutVersionsInput = {
@@ -1003,10 +2147,27 @@ export type JobPostReviewAggregateUncheckedCreateWithoutVersionsInput = {
   publicJobPostingId?: string | null
   closedAt?: Date | string | null
   closedByUserId?: string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedCreateNestedManyWithoutAggregateInput
 }
 
 export type JobPostReviewAggregateCreateOrConnectWithoutVersionsInput = {
@@ -1019,6 +2180,19 @@ export type JobPostReviewAggregateCreateWithoutPendingVersionInput = {
   jobId: string
   latestSequence?: number
   closedAt?: Date | string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
@@ -1028,6 +2202,10 @@ export type JobPostReviewAggregateCreateWithoutPendingVersionInput = {
   versions?: Prisma.JobPostReviewVersionCreateNestedManyWithoutAggregateInput
   approvedVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutApprovedForAggregateInput
   publicJobPosting?: Prisma.JobPostingCreateNestedOneWithoutReviewAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetCreateNestedManyWithoutAggregateInput
 }
 
 export type JobPostReviewAggregateUncheckedCreateWithoutPendingVersionInput = {
@@ -1039,11 +2217,28 @@ export type JobPostReviewAggregateUncheckedCreateWithoutPendingVersionInput = {
   publicJobPostingId?: string | null
   closedAt?: Date | string | null
   closedByUserId?: string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
   versions?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedCreateNestedManyWithoutAggregateInput
 }
 
 export type JobPostReviewAggregateCreateOrConnectWithoutPendingVersionInput = {
@@ -1056,6 +2251,19 @@ export type JobPostReviewAggregateCreateWithoutApprovedVersionInput = {
   jobId: string
   latestSequence?: number
   closedAt?: Date | string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
@@ -1065,6 +2273,10 @@ export type JobPostReviewAggregateCreateWithoutApprovedVersionInput = {
   versions?: Prisma.JobPostReviewVersionCreateNestedManyWithoutAggregateInput
   pendingVersion?: Prisma.JobPostReviewVersionCreateNestedOneWithoutPendingForAggregateInput
   publicJobPosting?: Prisma.JobPostingCreateNestedOneWithoutReviewAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetCreateNestedManyWithoutAggregateInput
 }
 
 export type JobPostReviewAggregateUncheckedCreateWithoutApprovedVersionInput = {
@@ -1076,11 +2288,28 @@ export type JobPostReviewAggregateUncheckedCreateWithoutApprovedVersionInput = {
   publicJobPostingId?: string | null
   closedAt?: Date | string | null
   closedByUserId?: string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
   versions?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutAggregateInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedCreateNestedManyWithoutAggregateInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedCreateNestedManyWithoutAggregateInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedCreateNestedManyWithoutAggregateInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedCreateNestedManyWithoutAggregateInput
 }
 
 export type JobPostReviewAggregateCreateOrConnectWithoutApprovedVersionInput = {
@@ -1104,6 +2333,19 @@ export type JobPostReviewAggregateUpdateWithoutVersionsInput = {
   jobId?: Prisma.StringFieldUpdateOperationsInput | string
   latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1113,6 +2355,10 @@ export type JobPostReviewAggregateUpdateWithoutVersionsInput = {
   pendingVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutPendingForAggregateNestedInput
   approvedVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutApprovedForAggregateNestedInput
   publicJobPosting?: Prisma.JobPostingUpdateOneWithoutReviewAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUpdateManyWithoutAggregateNestedInput
 }
 
 export type JobPostReviewAggregateUncheckedUpdateWithoutVersionsInput = {
@@ -1125,10 +2371,27 @@ export type JobPostReviewAggregateUncheckedUpdateWithoutVersionsInput = {
   publicJobPostingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   closedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedUpdateManyWithoutAggregateNestedInput
 }
 
 export type JobPostReviewAggregateUpsertWithoutPendingVersionInput = {
@@ -1147,6 +2410,19 @@ export type JobPostReviewAggregateUpdateWithoutPendingVersionInput = {
   jobId?: Prisma.StringFieldUpdateOperationsInput | string
   latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1156,6 +2432,10 @@ export type JobPostReviewAggregateUpdateWithoutPendingVersionInput = {
   versions?: Prisma.JobPostReviewVersionUpdateManyWithoutAggregateNestedInput
   approvedVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutApprovedForAggregateNestedInput
   publicJobPosting?: Prisma.JobPostingUpdateOneWithoutReviewAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUpdateManyWithoutAggregateNestedInput
 }
 
 export type JobPostReviewAggregateUncheckedUpdateWithoutPendingVersionInput = {
@@ -1167,11 +2447,28 @@ export type JobPostReviewAggregateUncheckedUpdateWithoutPendingVersionInput = {
   publicJobPostingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   closedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   versions?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedUpdateManyWithoutAggregateNestedInput
 }
 
 export type JobPostReviewAggregateUpsertWithoutApprovedVersionInput = {
@@ -1190,6 +2487,19 @@ export type JobPostReviewAggregateUpdateWithoutApprovedVersionInput = {
   jobId?: Prisma.StringFieldUpdateOperationsInput | string
   latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1199,6 +2509,10 @@ export type JobPostReviewAggregateUpdateWithoutApprovedVersionInput = {
   versions?: Prisma.JobPostReviewVersionUpdateManyWithoutAggregateNestedInput
   pendingVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutPendingForAggregateNestedInput
   publicJobPosting?: Prisma.JobPostingUpdateOneWithoutReviewAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUpdateManyWithoutAggregateNestedInput
 }
 
 export type JobPostReviewAggregateUncheckedUpdateWithoutApprovedVersionInput = {
@@ -1210,11 +2524,28 @@ export type JobPostReviewAggregateUncheckedUpdateWithoutApprovedVersionInput = {
   publicJobPostingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   closedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   versions?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedUpdateManyWithoutAggregateNestedInput
 }
 
 export type JobPostReviewAggregateCreateManyClosedByInput = {
@@ -1226,6 +2557,19 @@ export type JobPostReviewAggregateCreateManyClosedByInput = {
   approvedVersionId?: string | null
   publicJobPostingId?: string | null
   closedAt?: Date | string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
@@ -1237,6 +2581,19 @@ export type JobPostReviewAggregateUpdateWithoutClosedByInput = {
   jobId?: Prisma.StringFieldUpdateOperationsInput | string
   latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1246,6 +2603,10 @@ export type JobPostReviewAggregateUpdateWithoutClosedByInput = {
   pendingVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutPendingForAggregateNestedInput
   approvedVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutApprovedForAggregateNestedInput
   publicJobPosting?: Prisma.JobPostingUpdateOneWithoutReviewAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUpdateManyWithoutAggregateNestedInput
 }
 
 export type JobPostReviewAggregateUncheckedUpdateWithoutClosedByInput = {
@@ -1257,11 +2618,28 @@ export type JobPostReviewAggregateUncheckedUpdateWithoutClosedByInput = {
   approvedVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicJobPostingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   versions?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedUpdateManyWithoutAggregateNestedInput
 }
 
 export type JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByInput = {
@@ -1273,6 +2651,19 @@ export type JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByInput = {
   approvedVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicJobPostingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1288,6 +2679,19 @@ export type JobPostReviewAggregateCreateManyCompanyInput = {
   publicJobPostingId?: string | null
   closedAt?: Date | string | null
   closedByUserId?: string | null
+  visibilityState?: $Enums.JobPostVisibilityState
+  applicationState?: $Enums.JobPostApplicationState
+  hiddenAt?: Date | string | null
+  hiddenByUserId?: string | null
+  hiddenReason?: string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+  applicationClosedAt?: Date | string | null
+  applicationClosedByUserId?: string | null
+  softDeletedAt?: Date | string | null
+  softDeletedByUserId?: string | null
+  softDeleteReason?: string | null
+  operationalVersion?: number
   version?: number
   adoptedAt?: Date | string
   createdAt?: Date | string
@@ -1299,6 +2703,19 @@ export type JobPostReviewAggregateUpdateWithoutCompanyInput = {
   jobId?: Prisma.StringFieldUpdateOperationsInput | string
   latestSequence?: Prisma.IntFieldUpdateOperationsInput | number
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1308,6 +2725,10 @@ export type JobPostReviewAggregateUpdateWithoutCompanyInput = {
   pendingVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutPendingForAggregateNestedInput
   approvedVersion?: Prisma.JobPostReviewVersionUpdateOneWithoutApprovedForAggregateNestedInput
   publicJobPosting?: Prisma.JobPostingUpdateOneWithoutReviewAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUpdateManyWithoutAggregateNestedInput
 }
 
 export type JobPostReviewAggregateUncheckedUpdateWithoutCompanyInput = {
@@ -1319,11 +2740,28 @@ export type JobPostReviewAggregateUncheckedUpdateWithoutCompanyInput = {
   publicJobPostingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   closedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   versions?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutAggregateNestedInput
+  correctionRequests?: Prisma.JobPostRevisionRequestUncheckedUpdateManyWithoutAggregateNestedInput
+  featuredPlacements?: Prisma.JobPostFeaturedPlacementUncheckedUpdateManyWithoutAggregateNestedInput
+  operationalHistory?: Prisma.JobPostOperationalHistoryUncheckedUpdateManyWithoutAggregateNestedInput
+  enforcementTargets?: Prisma.JobPostEnforcementTargetUncheckedUpdateManyWithoutAggregateNestedInput
 }
 
 export type JobPostReviewAggregateUncheckedUpdateManyWithoutCompanyInput = {
@@ -1335,6 +2773,19 @@ export type JobPostReviewAggregateUncheckedUpdateManyWithoutCompanyInput = {
   publicJobPostingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   closedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibilityState?: Prisma.EnumJobPostVisibilityStateFieldUpdateOperationsInput | $Enums.JobPostVisibilityState
+  applicationState?: Prisma.EnumJobPostApplicationStateFieldUpdateOperationsInput | $Enums.JobPostApplicationState
+  hiddenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hiddenByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiddenReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicationClosedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationClosedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  softDeletedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  softDeleteReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operationalVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   adoptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1348,10 +2799,18 @@ export type JobPostReviewAggregateUncheckedUpdateManyWithoutCompanyInput = {
 
 export type JobPostReviewAggregateCountOutputType = {
   versions: number
+  correctionRequests: number
+  featuredPlacements: number
+  operationalHistory: number
+  enforcementTargets: number
 }
 
 export type JobPostReviewAggregateCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   versions?: boolean | JobPostReviewAggregateCountOutputTypeCountVersionsArgs
+  correctionRequests?: boolean | JobPostReviewAggregateCountOutputTypeCountCorrectionRequestsArgs
+  featuredPlacements?: boolean | JobPostReviewAggregateCountOutputTypeCountFeaturedPlacementsArgs
+  operationalHistory?: boolean | JobPostReviewAggregateCountOutputTypeCountOperationalHistoryArgs
+  enforcementTargets?: boolean | JobPostReviewAggregateCountOutputTypeCountEnforcementTargetsArgs
 }
 
 /**
@@ -1371,6 +2830,34 @@ export type JobPostReviewAggregateCountOutputTypeCountVersionsArgs<ExtArgs exten
   where?: Prisma.JobPostReviewVersionWhereInput
 }
 
+/**
+ * JobPostReviewAggregateCountOutputType without action
+ */
+export type JobPostReviewAggregateCountOutputTypeCountCorrectionRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.JobPostRevisionRequestWhereInput
+}
+
+/**
+ * JobPostReviewAggregateCountOutputType without action
+ */
+export type JobPostReviewAggregateCountOutputTypeCountFeaturedPlacementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.JobPostFeaturedPlacementWhereInput
+}
+
+/**
+ * JobPostReviewAggregateCountOutputType without action
+ */
+export type JobPostReviewAggregateCountOutputTypeCountOperationalHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.JobPostOperationalHistoryWhereInput
+}
+
+/**
+ * JobPostReviewAggregateCountOutputType without action
+ */
+export type JobPostReviewAggregateCountOutputTypeCountEnforcementTargetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.JobPostEnforcementTargetWhereInput
+}
+
 
 export type JobPostReviewAggregateSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1382,6 +2869,19 @@ export type JobPostReviewAggregateSelect<ExtArgs extends runtime.Types.Extension
   publicJobPostingId?: boolean
   closedAt?: boolean
   closedByUserId?: boolean
+  visibilityState?: boolean
+  applicationState?: boolean
+  hiddenAt?: boolean
+  hiddenByUserId?: boolean
+  hiddenReason?: boolean
+  archivedAt?: boolean
+  archivedByUserId?: boolean
+  applicationClosedAt?: boolean
+  applicationClosedByUserId?: boolean
+  softDeletedAt?: boolean
+  softDeletedByUserId?: boolean
+  softDeleteReason?: boolean
+  operationalVersion?: boolean
   version?: boolean
   adoptedAt?: boolean
   createdAt?: boolean
@@ -1392,6 +2892,10 @@ export type JobPostReviewAggregateSelect<ExtArgs extends runtime.Types.Extension
   pendingVersion?: boolean | Prisma.JobPostReviewAggregate$pendingVersionArgs<ExtArgs>
   approvedVersion?: boolean | Prisma.JobPostReviewAggregate$approvedVersionArgs<ExtArgs>
   publicJobPosting?: boolean | Prisma.JobPostReviewAggregate$publicJobPostingArgs<ExtArgs>
+  correctionRequests?: boolean | Prisma.JobPostReviewAggregate$correctionRequestsArgs<ExtArgs>
+  featuredPlacements?: boolean | Prisma.JobPostReviewAggregate$featuredPlacementsArgs<ExtArgs>
+  operationalHistory?: boolean | Prisma.JobPostReviewAggregate$operationalHistoryArgs<ExtArgs>
+  enforcementTargets?: boolean | Prisma.JobPostReviewAggregate$enforcementTargetsArgs<ExtArgs>
   _count?: boolean | Prisma.JobPostReviewAggregateCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["jobPostReviewAggregate"]>
 
@@ -1405,6 +2909,19 @@ export type JobPostReviewAggregateSelectCreateManyAndReturn<ExtArgs extends runt
   publicJobPostingId?: boolean
   closedAt?: boolean
   closedByUserId?: boolean
+  visibilityState?: boolean
+  applicationState?: boolean
+  hiddenAt?: boolean
+  hiddenByUserId?: boolean
+  hiddenReason?: boolean
+  archivedAt?: boolean
+  archivedByUserId?: boolean
+  applicationClosedAt?: boolean
+  applicationClosedByUserId?: boolean
+  softDeletedAt?: boolean
+  softDeletedByUserId?: boolean
+  softDeleteReason?: boolean
+  operationalVersion?: boolean
   version?: boolean
   adoptedAt?: boolean
   createdAt?: boolean
@@ -1426,6 +2943,19 @@ export type JobPostReviewAggregateSelectUpdateManyAndReturn<ExtArgs extends runt
   publicJobPostingId?: boolean
   closedAt?: boolean
   closedByUserId?: boolean
+  visibilityState?: boolean
+  applicationState?: boolean
+  hiddenAt?: boolean
+  hiddenByUserId?: boolean
+  hiddenReason?: boolean
+  archivedAt?: boolean
+  archivedByUserId?: boolean
+  applicationClosedAt?: boolean
+  applicationClosedByUserId?: boolean
+  softDeletedAt?: boolean
+  softDeletedByUserId?: boolean
+  softDeleteReason?: boolean
+  operationalVersion?: boolean
   version?: boolean
   adoptedAt?: boolean
   createdAt?: boolean
@@ -1447,13 +2977,26 @@ export type JobPostReviewAggregateSelectScalar = {
   publicJobPostingId?: boolean
   closedAt?: boolean
   closedByUserId?: boolean
+  visibilityState?: boolean
+  applicationState?: boolean
+  hiddenAt?: boolean
+  hiddenByUserId?: boolean
+  hiddenReason?: boolean
+  archivedAt?: boolean
+  archivedByUserId?: boolean
+  applicationClosedAt?: boolean
+  applicationClosedByUserId?: boolean
+  softDeletedAt?: boolean
+  softDeletedByUserId?: boolean
+  softDeleteReason?: boolean
+  operationalVersion?: boolean
   version?: boolean
   adoptedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type JobPostReviewAggregateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobId" | "companyId" | "latestSequence" | "pendingVersionId" | "approvedVersionId" | "publicJobPostingId" | "closedAt" | "closedByUserId" | "version" | "adoptedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["jobPostReviewAggregate"]>
+export type JobPostReviewAggregateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobId" | "companyId" | "latestSequence" | "pendingVersionId" | "approvedVersionId" | "publicJobPostingId" | "closedAt" | "closedByUserId" | "visibilityState" | "applicationState" | "hiddenAt" | "hiddenByUserId" | "hiddenReason" | "archivedAt" | "archivedByUserId" | "applicationClosedAt" | "applicationClosedByUserId" | "softDeletedAt" | "softDeletedByUserId" | "softDeleteReason" | "operationalVersion" | "version" | "adoptedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["jobPostReviewAggregate"]>
 export type JobPostReviewAggregateInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   closedBy?: boolean | Prisma.JobPostReviewAggregate$closedByArgs<ExtArgs>
@@ -1461,6 +3004,10 @@ export type JobPostReviewAggregateInclude<ExtArgs extends runtime.Types.Extensio
   pendingVersion?: boolean | Prisma.JobPostReviewAggregate$pendingVersionArgs<ExtArgs>
   approvedVersion?: boolean | Prisma.JobPostReviewAggregate$approvedVersionArgs<ExtArgs>
   publicJobPosting?: boolean | Prisma.JobPostReviewAggregate$publicJobPostingArgs<ExtArgs>
+  correctionRequests?: boolean | Prisma.JobPostReviewAggregate$correctionRequestsArgs<ExtArgs>
+  featuredPlacements?: boolean | Prisma.JobPostReviewAggregate$featuredPlacementsArgs<ExtArgs>
+  operationalHistory?: boolean | Prisma.JobPostReviewAggregate$operationalHistoryArgs<ExtArgs>
+  enforcementTargets?: boolean | Prisma.JobPostReviewAggregate$enforcementTargetsArgs<ExtArgs>
   _count?: boolean | Prisma.JobPostReviewAggregateCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type JobPostReviewAggregateIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1487,6 +3034,10 @@ export type $JobPostReviewAggregatePayload<ExtArgs extends runtime.Types.Extensi
     pendingVersion: Prisma.$JobPostReviewVersionPayload<ExtArgs> | null
     approvedVersion: Prisma.$JobPostReviewVersionPayload<ExtArgs> | null
     publicJobPosting: Prisma.$JobPostingPayload<ExtArgs> | null
+    correctionRequests: Prisma.$JobPostRevisionRequestPayload<ExtArgs>[]
+    featuredPlacements: Prisma.$JobPostFeaturedPlacementPayload<ExtArgs>[]
+    operationalHistory: Prisma.$JobPostOperationalHistoryPayload<ExtArgs>[]
+    enforcementTargets: Prisma.$JobPostEnforcementTargetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1498,6 +3049,19 @@ export type $JobPostReviewAggregatePayload<ExtArgs extends runtime.Types.Extensi
     publicJobPostingId: string | null
     closedAt: Date | null
     closedByUserId: string | null
+    visibilityState: $Enums.JobPostVisibilityState
+    applicationState: $Enums.JobPostApplicationState
+    hiddenAt: Date | null
+    hiddenByUserId: string | null
+    hiddenReason: string | null
+    archivedAt: Date | null
+    archivedByUserId: string | null
+    applicationClosedAt: Date | null
+    applicationClosedByUserId: string | null
+    softDeletedAt: Date | null
+    softDeletedByUserId: string | null
+    softDeleteReason: string | null
+    operationalVersion: number
     version: number
     adoptedAt: Date
     createdAt: Date
@@ -1902,6 +3466,10 @@ export interface Prisma__JobPostReviewAggregateClient<T, Null = never, ExtArgs e
   pendingVersion<T extends Prisma.JobPostReviewAggregate$pendingVersionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPostReviewAggregate$pendingVersionArgs<ExtArgs>>): Prisma.Prisma__JobPostReviewVersionClient<runtime.Types.Result.GetResult<Prisma.$JobPostReviewVersionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   approvedVersion<T extends Prisma.JobPostReviewAggregate$approvedVersionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPostReviewAggregate$approvedVersionArgs<ExtArgs>>): Prisma.Prisma__JobPostReviewVersionClient<runtime.Types.Result.GetResult<Prisma.$JobPostReviewVersionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   publicJobPosting<T extends Prisma.JobPostReviewAggregate$publicJobPostingArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPostReviewAggregate$publicJobPostingArgs<ExtArgs>>): Prisma.Prisma__JobPostingClient<runtime.Types.Result.GetResult<Prisma.$JobPostingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  correctionRequests<T extends Prisma.JobPostReviewAggregate$correctionRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPostReviewAggregate$correctionRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostRevisionRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  featuredPlacements<T extends Prisma.JobPostReviewAggregate$featuredPlacementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPostReviewAggregate$featuredPlacementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostFeaturedPlacementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  operationalHistory<T extends Prisma.JobPostReviewAggregate$operationalHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPostReviewAggregate$operationalHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostOperationalHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  enforcementTargets<T extends Prisma.JobPostReviewAggregate$enforcementTargetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPostReviewAggregate$enforcementTargetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostEnforcementTargetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1940,6 +3508,19 @@ export interface JobPostReviewAggregateFieldRefs {
   readonly publicJobPostingId: Prisma.FieldRef<"JobPostReviewAggregate", 'String'>
   readonly closedAt: Prisma.FieldRef<"JobPostReviewAggregate", 'DateTime'>
   readonly closedByUserId: Prisma.FieldRef<"JobPostReviewAggregate", 'String'>
+  readonly visibilityState: Prisma.FieldRef<"JobPostReviewAggregate", 'JobPostVisibilityState'>
+  readonly applicationState: Prisma.FieldRef<"JobPostReviewAggregate", 'JobPostApplicationState'>
+  readonly hiddenAt: Prisma.FieldRef<"JobPostReviewAggregate", 'DateTime'>
+  readonly hiddenByUserId: Prisma.FieldRef<"JobPostReviewAggregate", 'String'>
+  readonly hiddenReason: Prisma.FieldRef<"JobPostReviewAggregate", 'String'>
+  readonly archivedAt: Prisma.FieldRef<"JobPostReviewAggregate", 'DateTime'>
+  readonly archivedByUserId: Prisma.FieldRef<"JobPostReviewAggregate", 'String'>
+  readonly applicationClosedAt: Prisma.FieldRef<"JobPostReviewAggregate", 'DateTime'>
+  readonly applicationClosedByUserId: Prisma.FieldRef<"JobPostReviewAggregate", 'String'>
+  readonly softDeletedAt: Prisma.FieldRef<"JobPostReviewAggregate", 'DateTime'>
+  readonly softDeletedByUserId: Prisma.FieldRef<"JobPostReviewAggregate", 'String'>
+  readonly softDeleteReason: Prisma.FieldRef<"JobPostReviewAggregate", 'String'>
+  readonly operationalVersion: Prisma.FieldRef<"JobPostReviewAggregate", 'Int'>
   readonly version: Prisma.FieldRef<"JobPostReviewAggregate", 'Int'>
   readonly adoptedAt: Prisma.FieldRef<"JobPostReviewAggregate", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"JobPostReviewAggregate", 'DateTime'>
@@ -2442,6 +4023,102 @@ export type JobPostReviewAggregate$publicJobPostingArgs<ExtArgs extends runtime.
    */
   include?: Prisma.JobPostingInclude<ExtArgs> | null
   where?: Prisma.JobPostingWhereInput
+}
+
+/**
+ * JobPostReviewAggregate.correctionRequests
+ */
+export type JobPostReviewAggregate$correctionRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JobPostRevisionRequest
+   */
+  select?: Prisma.JobPostRevisionRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JobPostRevisionRequest
+   */
+  omit?: Prisma.JobPostRevisionRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JobPostRevisionRequestInclude<ExtArgs> | null
+  where?: Prisma.JobPostRevisionRequestWhereInput
+  orderBy?: Prisma.JobPostRevisionRequestOrderByWithRelationInput | Prisma.JobPostRevisionRequestOrderByWithRelationInput[]
+  cursor?: Prisma.JobPostRevisionRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.JobPostRevisionRequestScalarFieldEnum | Prisma.JobPostRevisionRequestScalarFieldEnum[]
+}
+
+/**
+ * JobPostReviewAggregate.featuredPlacements
+ */
+export type JobPostReviewAggregate$featuredPlacementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JobPostFeaturedPlacement
+   */
+  select?: Prisma.JobPostFeaturedPlacementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JobPostFeaturedPlacement
+   */
+  omit?: Prisma.JobPostFeaturedPlacementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JobPostFeaturedPlacementInclude<ExtArgs> | null
+  where?: Prisma.JobPostFeaturedPlacementWhereInput
+  orderBy?: Prisma.JobPostFeaturedPlacementOrderByWithRelationInput | Prisma.JobPostFeaturedPlacementOrderByWithRelationInput[]
+  cursor?: Prisma.JobPostFeaturedPlacementWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.JobPostFeaturedPlacementScalarFieldEnum | Prisma.JobPostFeaturedPlacementScalarFieldEnum[]
+}
+
+/**
+ * JobPostReviewAggregate.operationalHistory
+ */
+export type JobPostReviewAggregate$operationalHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JobPostOperationalHistory
+   */
+  select?: Prisma.JobPostOperationalHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JobPostOperationalHistory
+   */
+  omit?: Prisma.JobPostOperationalHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JobPostOperationalHistoryInclude<ExtArgs> | null
+  where?: Prisma.JobPostOperationalHistoryWhereInput
+  orderBy?: Prisma.JobPostOperationalHistoryOrderByWithRelationInput | Prisma.JobPostOperationalHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.JobPostOperationalHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.JobPostOperationalHistoryScalarFieldEnum | Prisma.JobPostOperationalHistoryScalarFieldEnum[]
+}
+
+/**
+ * JobPostReviewAggregate.enforcementTargets
+ */
+export type JobPostReviewAggregate$enforcementTargetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JobPostEnforcementTarget
+   */
+  select?: Prisma.JobPostEnforcementTargetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JobPostEnforcementTarget
+   */
+  omit?: Prisma.JobPostEnforcementTargetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JobPostEnforcementTargetInclude<ExtArgs> | null
+  where?: Prisma.JobPostEnforcementTargetWhereInput
+  orderBy?: Prisma.JobPostEnforcementTargetOrderByWithRelationInput | Prisma.JobPostEnforcementTargetOrderByWithRelationInput[]
+  cursor?: Prisma.JobPostEnforcementTargetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.JobPostEnforcementTargetScalarFieldEnum | Prisma.JobPostEnforcementTargetScalarFieldEnum[]
 }
 
 /**

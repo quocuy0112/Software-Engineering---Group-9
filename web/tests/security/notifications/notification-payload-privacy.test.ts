@@ -26,17 +26,14 @@ describe("notification payload privacy", () => {
     ).toThrow();
   });
 
-  it("only creates encoded internal destinations", () => {
+  it("does not persist destinations supplied by an untrusted context", () => {
     const notification = buildNotification({
       ...base,
       kind: "MESSAGE_RECEIVED",
       contextType: "CONVERSATION",
       contextId: "../../external?next=https://evil.example",
     });
-    expect(notification.href).toBe(
-      "/messages?conversation=..%2F..%2Fexternal%3Fnext%3Dhttps%3A%2F%2Fevil.example",
-    );
-    expect(notification.href).not.toMatch(/^https?:/u);
+    expect(notification.href).toBeNull();
   });
 
   it("keeps actionable administrator alerts free of protected workflow content", () => {

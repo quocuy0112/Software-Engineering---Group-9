@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { TopBar } from "@/frontend/components/layout/top-bar";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 
 export const jobsWorkspaceTabs = [
@@ -20,20 +19,15 @@ export function JobsWorkspaceNav({
   activeTab: JobsWorkspaceTab;
 }) {
   const locale = useWorkspaceLocale();
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
   const labels =
     locale === "vi"
       ? {
-          previousTabs: "Xem các mục phía trước",
-          nextTabs: "Xem các mục tiếp theo",
           search: "Tìm việc",
           saved: "Việc đã lưu",
           applied: "Việc đã ứng tuyển",
           matches: "Việc làm đề xuất",
           settings: "Cài đặt gợi ý việc làm",
-          navigation: "Không gian việc làm",
+          navigation: "Không gian ứng viên",
         }
       : {
           search: "Find jobs",
@@ -41,88 +35,19 @@ export function JobsWorkspaceNav({
           applied: "Applied Jobs",
           matches: "Suggested Jobs",
           settings: "Job Recommendation Settings",
-          navigation: "Jobs workspace",
-          previousTabs: "Show previous tabs",
-          nextTabs: "Show next tabs",
+          navigation: "Candidate workspace",
         };
 
-  useEffect(() => {
-    const scrollElement = scrollRef.current;
-    if (!scrollElement) return;
-
-    const updateScrollControls = () => {
-      const maximumScrollLeft =
-        scrollElement.scrollWidth - scrollElement.clientWidth;
-      setCanScrollLeft(scrollElement.scrollLeft > 1);
-      setCanScrollRight(scrollElement.scrollLeft < maximumScrollLeft - 1);
-    };
-
-    updateScrollControls();
-    const observer =
-      typeof ResizeObserver === "undefined"
-        ? null
-        : new ResizeObserver(updateScrollControls);
-    observer?.observe(scrollElement);
-    window.addEventListener("resize", updateScrollControls);
-    scrollElement.addEventListener("scroll", updateScrollControls, {
-      passive: true,
-    });
-    return () => {
-      observer?.disconnect();
-      window.removeEventListener("resize", updateScrollControls);
-      scrollElement.removeEventListener("scroll", updateScrollControls);
-    };
-  }, [locale]);
-
-  function scrollTabs(direction: -1 | 1) {
-    const scrollElement = scrollRef.current;
-    if (!scrollElement) return;
-    scrollElement.scrollBy({
-      left: direction * Math.max(scrollElement.clientWidth * 0.7, 160),
-      behavior: "smooth",
-    });
-  }
   return (
-    <nav
+    <TopBar
       className="jobs-workspace-nav"
-      aria-label={labels.navigation}
-      data-can-scroll-left={canScrollLeft}
-      data-can-scroll-right={canScrollRight}
-    >
-      <div ref={scrollRef} className="jobs-workspace-nav-scroll">
-        {jobsWorkspaceTabs.map((tab) => (
-          <Link
-            key={tab.id}
-            href={tab.href}
-            aria-current={activeTab === tab.id ? "page" : undefined}
-          >
-            {labels[tab.id]}
-          </Link>
-        ))}
-      </div>
-      <button
-        className="jobs-workspace-nav-control jobs-workspace-nav-control--previous"
-        type="button"
-        aria-label={labels.previousTabs}
-        disabled={!canScrollLeft}
-        onClick={() => scrollTabs(-1)}
-      >
-        <svg aria-hidden="true" viewBox="0 0 24 24">
-          <path d="m14 6-6 6 6 6" />
-        </svg>
-      </button>
-      <button
-        className="jobs-workspace-nav-control jobs-workspace-nav-control--next"
-        type="button"
-        aria-label={labels.nextTabs}
-        disabled={!canScrollRight}
-        onClick={() => scrollTabs(1)}
-      >
-        <svg aria-hidden="true" viewBox="0 0 24 24">
-          <path d="m10 6 6 6-6 6" />
-        </svg>
-      </button>
-    </nav>
+      ariaLabel={labels.navigation}
+      tabs={jobsWorkspaceTabs.map((tab) => ({
+        href: tab.href,
+        label: labels[tab.id],
+        active: activeTab === tab.id,
+      }))}
+    />
   );
 }
 

@@ -178,6 +178,15 @@ export const InAppNotificationAudience = {
 export type InAppNotificationAudience = (typeof InAppNotificationAudience)[keyof typeof InAppNotificationAudience]
 
 
+export const InAppNotificationRecipientRole = {
+  CANDIDATE: 'CANDIDATE',
+  RECRUITER: 'RECRUITER',
+  ADMIN: 'ADMIN'
+} as const
+
+export type InAppNotificationRecipientRole = (typeof InAppNotificationRecipientRole)[keyof typeof InAppNotificationRecipientRole]
+
+
 export const InAppNotificationKind = {
   EMAIL_CHANGE_REQUESTED_ALERT: 'EMAIL_CHANGE_REQUESTED_ALERT',
   PASSWORD_CHANGED: 'PASSWORD_CHANGED',
@@ -223,7 +232,8 @@ export const InAppNotificationKind = {
   DELIVERY_MANUAL_INTERVENTION_REQUIRED: 'DELIVERY_MANUAL_INTERVENTION_REQUIRED',
   JOB_POST_REVIEW_REQUESTED_ADMIN: 'JOB_POST_REVIEW_REQUESTED_ADMIN',
   JOB_POST_APPROVED: 'JOB_POST_APPROVED',
-  JOB_POST_REJECTED: 'JOB_POST_REJECTED'
+  JOB_POST_REJECTED: 'JOB_POST_REJECTED',
+  JOB_POST_CHANGES_REQUESTED: 'JOB_POST_CHANGES_REQUESTED'
 } as const
 
 export type InAppNotificationKind = (typeof InAppNotificationKind)[keyof typeof InAppNotificationKind]
@@ -372,6 +382,63 @@ export const JobPostReviewHistoryAction = {
 } as const
 
 export type JobPostReviewHistoryAction = (typeof JobPostReviewHistoryAction)[keyof typeof JobPostReviewHistoryAction]
+
+
+export const JobPostVisibilityState = {
+  PUBLISHED: 'PUBLISHED',
+  HIDDEN: 'HIDDEN',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type JobPostVisibilityState = (typeof JobPostVisibilityState)[keyof typeof JobPostVisibilityState]
+
+
+export const JobPostApplicationState = {
+  OPEN: 'OPEN',
+  CLOSED: 'CLOSED'
+} as const
+
+export type JobPostApplicationState = (typeof JobPostApplicationState)[keyof typeof JobPostApplicationState]
+
+
+export const JobPostRevisionRequestState = {
+  OPEN: 'OPEN',
+  SATISFIED: 'SATISFIED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type JobPostRevisionRequestState = (typeof JobPostRevisionRequestState)[keyof typeof JobPostRevisionRequestState]
+
+
+export const JobPostFeatureState = {
+  SCHEDULED: 'SCHEDULED',
+  ACTIVE: 'ACTIVE',
+  ENDED: 'ENDED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type JobPostFeatureState = (typeof JobPostFeatureState)[keyof typeof JobPostFeatureState]
+
+
+export const JobPostEnforcementType = {
+  HIDE_JOB: 'HIDE_JOB',
+  CLOSE_APPLICATIONS: 'CLOSE_APPLICATIONS',
+  REQUEST_CHANGES: 'REQUEST_CHANGES',
+  SOFT_DELETE_JOB: 'SOFT_DELETE_JOB',
+  SUSPEND_COMPANY: 'SUSPEND_COMPANY',
+  SUSPEND_RECRUITER: 'SUSPEND_RECRUITER'
+} as const
+
+export type JobPostEnforcementType = (typeof JobPostEnforcementType)[keyof typeof JobPostEnforcementType]
+
+
+export const PlatformAdministratorScope = {
+  JOB_POST_MODERATE: 'JOB_POST_MODERATE',
+  JOB_POST_FEATURE: 'JOB_POST_FEATURE',
+  JOB_POST_ENFORCE: 'JOB_POST_ENFORCE'
+} as const
+
+export type PlatformAdministratorScope = (typeof PlatformAdministratorScope)[keyof typeof PlatformAdministratorScope]
 
 
 export const ApplicationQuestionKind = {

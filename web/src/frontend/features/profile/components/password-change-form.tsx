@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { KeyRound } from "lucide-react";
-import { PasswordVisibilityButton } from "@/frontend/components/ui/password-visibility-button";
+import { PasswordField } from "@/frontend/features/authentication/components/password-field";
 import { usePasswordChange } from "../client/use-password-change";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 import {
@@ -54,11 +54,6 @@ export function PasswordChangeForm({
   const dirty = Object.values(state.values).some(Boolean);
   const [isEditing, setIsEditing] = useState(initiallyEditing);
   useUnsavedChangesGuard(dirty && isEditing);
-  const [visibleFields, setVisibleFields] = useState({
-    currentPassword: false,
-    newPassword: false,
-    newPasswordConfirmation: false,
-  });
   const feedbackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -66,15 +61,6 @@ export function PasswordChangeForm({
   }, [state.feedback]);
 
   const errors = state.feedback?.fieldErrors;
-
-  const toggleVisibility = (
-    field: "currentPassword" | "newPassword" | "newPasswordConfirmation",
-  ) => {
-    setVisibleFields((current) => ({
-      ...current,
-      [field]: !current[field],
-    }));
-  };
 
   return (
     <section
@@ -153,76 +139,42 @@ export function PasswordChangeForm({
               void state.submit();
             }}
           >
-            <label htmlFor="password-change-current">{copy.current}</label>
-            <div className="password-control">
-              <input
-                className="sh-input"
-                id="password-change-current"
-                type={visibleFields.currentPassword ? "text" : "password"}
-                autoComplete="current-password"
-                value={state.values.currentPassword}
-                aria-describedby="password-change-policy"
-                aria-invalid={Boolean(errors?.currentPassword)}
-                onChange={(event) =>
-                  state.updateValue("currentPassword", event.target.value)
-                }
-              />
-              <PasswordVisibilityButton
-                controls="password-change-current"
-                label={`${visibleFields.currentPassword ? copy.hide : copy.show}: ${copy.current}`}
-                visible={visibleFields.currentPassword}
-                onClick={() => toggleVisibility("currentPassword")}
-              />
-            </div>
-
-            <label htmlFor="password-change-new">{copy.next}</label>
-            <div className="password-control">
-              <input
-                className="sh-input"
-                id="password-change-new"
-                type={visibleFields.newPassword ? "text" : "password"}
-                autoComplete="new-password"
-                value={state.values.newPassword}
-                aria-describedby="password-change-policy"
-                aria-invalid={Boolean(errors?.newPassword)}
-                onChange={(event) =>
-                  state.updateValue("newPassword", event.target.value)
-                }
-              />
-              <PasswordVisibilityButton
-                controls="password-change-new"
-                label={`${visibleFields.newPassword ? copy.hide : copy.show}: ${copy.next}`}
-                visible={visibleFields.newPassword}
-                onClick={() => toggleVisibility("newPassword")}
-              />
-            </div>
-
-            <label htmlFor="password-change-confirmation">{copy.confirm}</label>
-            <div className="password-control">
-              <input
-                className="sh-input"
-                id="password-change-confirmation"
-                type={
-                  visibleFields.newPasswordConfirmation ? "text" : "password"
-                }
-                autoComplete="new-password"
-                value={state.values.newPasswordConfirmation}
-                aria-describedby="password-change-policy"
-                aria-invalid={Boolean(errors?.newPasswordConfirmation)}
-                onChange={(event) =>
-                  state.updateValue(
-                    "newPasswordConfirmation",
-                    event.target.value,
-                  )
-                }
-              />
-              <PasswordVisibilityButton
-                controls="password-change-confirmation"
-                label={`${visibleFields.newPasswordConfirmation ? copy.hide : copy.show}: ${copy.confirm}`}
-                visible={visibleFields.newPasswordConfirmation}
-                onClick={() => toggleVisibility("newPasswordConfirmation")}
-              />
-            </div>
+            <PasswordField
+              className="sh-input"
+              id="password-change-current"
+              label={copy.current}
+              autoComplete="current-password"
+              value={state.values.currentPassword}
+              aria-describedby="password-change-policy"
+              aria-invalid={Boolean(errors?.currentPassword)}
+              onChange={(event) =>
+                state.updateValue("currentPassword", event.target.value)
+              }
+            />
+            <PasswordField
+              className="sh-input"
+              id="password-change-new"
+              label={copy.next}
+              autoComplete="new-password"
+              value={state.values.newPassword}
+              aria-describedby="password-change-policy"
+              aria-invalid={Boolean(errors?.newPassword)}
+              onChange={(event) =>
+                state.updateValue("newPassword", event.target.value)
+              }
+            />
+            <PasswordField
+              className="sh-input"
+              id="password-change-confirmation"
+              label={copy.confirm}
+              autoComplete="new-password"
+              value={state.values.newPasswordConfirmation}
+              aria-describedby="password-change-policy"
+              aria-invalid={Boolean(errors?.newPasswordConfirmation)}
+              onChange={(event) =>
+                state.updateValue("newPasswordConfirmation", event.target.value)
+              }
+            />
 
             <button type="submit" disabled={state.submitting || state.locked}>
               {state.submitting

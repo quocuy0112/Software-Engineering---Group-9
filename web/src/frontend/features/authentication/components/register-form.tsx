@@ -9,6 +9,7 @@ import {
   type RegistrationInput,
 } from "@/shared/contracts/identity/registration";
 import { PasswordField } from "./password-field";
+import { PasswordRequirementChecklist } from "./password-requirement-checklist";
 
 const GENERIC_REGISTRATION_ERROR =
   "Registration is temporarily unavailable. Please try again.";
@@ -19,6 +20,7 @@ export function RegisterForm() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
     setError,
   } = useForm<RegistrationInput>({
@@ -30,6 +32,7 @@ export function RegisterForm() {
       passwordConfirmation: "",
     },
   });
+  const password = watch("password");
   const submit = handleSubmit(async (values) => {
     setServerStatus("");
     try {
@@ -99,6 +102,7 @@ export function RegisterForm() {
         autoComplete="new-password"
         {...register("password")}
       />
+      <PasswordRequirementChecklist value={password} />
       <PasswordField
         label="Confirm password"
         error={errors.passwordConfirmation?.message}

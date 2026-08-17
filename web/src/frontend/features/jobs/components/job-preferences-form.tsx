@@ -209,10 +209,7 @@ export function JobPreferencesForm({
   }
 
   return (
-    <form
-      className="job-preferences-form"
-      onSubmit={(event) => void submit(event)}
-    >
+    <>
       <div className="job-preferences-banner">
         <span aria-hidden="true">✦</span>
         <div>
@@ -220,220 +217,229 @@ export function JobPreferencesForm({
           <p>{copy.bannerDescription}</p>
         </div>
       </div>
-      <p className="job-preferences-required">
-        <span>*</span> {copy.required}
-      </p>
-      {error ? (
-        <div className="job-preferences-message is-error" role="alert">
-          {error}
-        </div>
-      ) : null}
-      {status ? (
-        <div className="job-preferences-message is-success" role="status">
-          {status}
-        </div>
-      ) : null}
-
-      <fieldset>
-        <legend>{copy.personal}</legend>
-        <div className="preference-field">
-          <span className="preference-label">{copy.gender}</span>
-          <div className="preference-radio-group">
-            {[
-              ["female", copy.female],
-              ["male", copy.male],
-              ["undisclosed", copy.undisclosed],
-            ].map(([value, label]) => (
-              <label key={value}>
-                <input
-                  type="radio"
-                  name="gender"
-                  value={value}
-                  checked={form.gender === value}
-                  onChange={() =>
-                    setForm((current) => ({
-                      ...current,
-                      gender: value as JobPreferences["gender"],
-                    }))
-                  }
-                />
-                {label}
-              </label>
-            ))}
+      <form
+        className="job-preferences-form"
+        onSubmit={(event) => void submit(event)}
+      >
+        <p className="job-preferences-required">
+          <span>*</span> {copy.required}
+        </p>
+        {error ? (
+          <div className="job-preferences-message is-error" role="alert">
+            {error}
           </div>
-        </div>
-      </fieldset>
+        ) : null}
+        {status ? (
+          <div className="job-preferences-message is-success" role="status">
+            {status}
+          </div>
+        ) : null}
 
-      <fieldset>
-        <legend>{copy.jobNeeds}</legend>
-        <div className="preference-field">
-          <SearchableChipSelect
-            id="professional-positions"
-            label={copy.professionalPosition}
-            placeholder={copy.professionalPositionPlaceholder}
-            options={positionOptions(availablePositions)}
-            selectedValues={form.professionalPositions}
-            maximum={5}
-            required
-            onChange={(values) =>
-              setForm((current) => ({
-                ...current,
-                professionalPositions: values,
-              }))
-            }
-          />
-        </div>
+        <fieldset>
+          <legend>{copy.personal}</legend>
+          <div className="preference-field">
+            <span className="preference-label">{copy.gender}</span>
+            <div className="preference-radio-group">
+              {[
+                ["female", copy.female],
+                ["male", copy.male],
+                ["undisclosed", copy.undisclosed],
+              ].map(([value, label]) => (
+                <label key={value}>
+                  <input
+                    type="radio"
+                    name="gender"
+                    value={value}
+                    checked={form.gender === value}
+                    onChange={() =>
+                      setForm((current) => ({
+                        ...current,
+                        gender: value as JobPreferences["gender"],
+                      }))
+                    }
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+          </div>
+        </fieldset>
 
-        <div className="preference-field">
-          <SearchableChipSelect
-            id="custom-positions"
-            label={copy.customPosition}
-            placeholder={copy.customPositionPlaceholder}
-            options={[]}
-            selectedValues={form.customPositions}
-            maximum={5}
-            allowCustom
-            helperText={copy.customPositionHelper}
-            onChange={(values) =>
-              setForm((current) => ({
-                ...current,
-                customPositions: values,
-              }))
-            }
-          />
-        </div>
-
-        <div className="preference-field">
-          <SearchableChipSelect
-            id="skills"
-            label={copy.skills}
-            placeholder={copy.skillsPlaceholder}
-            options={valueOptions(skillOptions)}
-            selectedValues={form.skills}
-            maximum={20}
-            required
-            onChange={(values) =>
-              setForm((current) => ({
-                ...current,
-                skills: values,
-              }))
-            }
-          />
-        </div>
-
-        <div className="preference-field">
-          <label className="preference-label" htmlFor="experience-level">
-            {copy.experience} <span>*</span>
-          </label>
-          <select
-            id="experience-level"
-            className="preference-select"
-            value={form.experienceLevel}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                experienceLevel: event.target
-                  .value as JobPreferences["experienceLevel"],
-              }))
-            }
-          >
-            {jobExperiencePreferenceOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {copy.experienceLabels[option.value]}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="preference-field">
-          <label className="preference-label" htmlFor="desired-salary">
-            {copy.desiredSalary} <span>*</span>
-          </label>
-          <div className="preference-input-suffix">
-            <input
-              id="desired-salary"
-              inputMode="numeric"
-              value={formatSalaryInput(form.desiredSalaryMin, locale)}
-              placeholder="15,000,000"
-              onChange={(event) =>
+        <fieldset>
+          <legend>{copy.jobNeeds}</legend>
+          <div className="preference-field">
+            <SearchableChipSelect
+              id="professional-positions"
+              label={copy.professionalPosition}
+              placeholder={copy.professionalPositionPlaceholder}
+              options={positionOptions(availablePositions)}
+              selectedValues={form.professionalPositions}
+              maximum={5}
+              required
+              onChange={(values) =>
                 setForm((current) => ({
                   ...current,
-                  desiredSalaryMin: event.target.value.replace(/[^\d]/gu, ""),
+                  professionalPositions: values,
                 }))
               }
             />
-            <span>VND</span>
           </div>
+
+          <div className="preference-field">
+            <SearchableChipSelect
+              id="custom-positions"
+              label={copy.customPosition}
+              placeholder={copy.customPositionPlaceholder}
+              options={[]}
+              selectedValues={form.customPositions}
+              maximum={5}
+              allowCustom
+              helperText={copy.customPositionHelper}
+              onChange={(values) =>
+                setForm((current) => ({
+                  ...current,
+                  customPositions: values,
+                }))
+              }
+            />
+          </div>
+
+          <div className="preference-field">
+            <SearchableChipSelect
+              id="skills"
+              label={copy.skills}
+              placeholder={copy.skillsPlaceholder}
+              options={valueOptions(skillOptions)}
+              selectedValues={form.skills}
+              maximum={20}
+              required
+              onChange={(values) =>
+                setForm((current) => ({
+                  ...current,
+                  skills: values,
+                }))
+              }
+            />
+          </div>
+
+          <div className="preference-field">
+            <label className="preference-label" htmlFor="experience-level">
+              {copy.experience} <span>*</span>
+            </label>
+            <select
+              id="experience-level"
+              className="preference-select"
+              value={form.experienceLevel}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  experienceLevel: event.target
+                    .value as JobPreferences["experienceLevel"],
+                }))
+              }
+            >
+              {jobExperiencePreferenceOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {copy.experienceLabels[option.value]}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="preference-field">
+            <label className="preference-label" htmlFor="desired-salary">
+              {copy.desiredSalary} <span>*</span>
+            </label>
+            <div className="preference-input-suffix">
+              <input
+                id="desired-salary"
+                inputMode="numeric"
+                value={formatSalaryInput(form.desiredSalaryMin, locale)}
+                placeholder="15,000,000"
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    desiredSalaryMin: event.target.value.replace(/[^\d]/gu, ""),
+                  }))
+                }
+              />
+              <span>VND</span>
+            </div>
+          </div>
+
+          <div className="preference-field">
+            <SearchableChipSelect
+              id="work-locations"
+              label={copy.locations}
+              placeholder={copy.locationsPlaceholder}
+              options={valueOptions(VIETNAM_PROVINCES_63)}
+              selectedValues={form.workLocations}
+              maximum={63}
+              required
+              onChange={(values) =>
+                setForm((current) => ({
+                  ...current,
+                  workLocations: values,
+                }))
+              }
+            />
+          </div>
+          <label className="preference-checkbox">
+            <input
+              type="checkbox"
+              checked={form.openToRelocation}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  openToRelocation: event.target.checked,
+                }))
+              }
+            />
+            {copy.relocation}
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>{copy.consent}</legend>
+          <label className="preference-checkbox">
+            <input
+              type="checkbox"
+              required
+              checked={form.aiAnalysisConsent}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  aiAnalysisConsent: event.target.checked,
+                }))
+              }
+            />
+            {copy.aiConsent} <span>*</span>
+          </label>
+          <label className="preference-checkbox">
+            <input
+              type="checkbox"
+              checked={form.jobUpdateNotificationConsent}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  jobUpdateNotificationConsent: event.target.checked,
+                }))
+              }
+            />
+            {copy.notificationConsent}
+          </label>
+        </fieldset>
+
+        <div className="job-preferences-actions">
+          <button
+            className="dashboard-hero-cta"
+            type="submit"
+            disabled={pending}
+          >
+            {pending ? copy.updating : copy.update}
+          </button>
         </div>
-
-        <div className="preference-field">
-          <SearchableChipSelect
-            id="work-locations"
-            label={copy.locations}
-            placeholder={copy.locationsPlaceholder}
-            options={valueOptions(VIETNAM_PROVINCES_63)}
-            selectedValues={form.workLocations}
-            maximum={63}
-            required
-            onChange={(values) =>
-              setForm((current) => ({
-                ...current,
-                workLocations: values,
-              }))
-            }
-          />
-        </div>
-        <label className="preference-checkbox">
-          <input
-            type="checkbox"
-            checked={form.openToRelocation}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                openToRelocation: event.target.checked,
-              }))
-            }
-          />
-          {copy.relocation}
-        </label>
-      </fieldset>
-
-      <fieldset>
-        <legend>{copy.consent}</legend>
-        <label className="preference-checkbox">
-          <input
-            type="checkbox"
-            required
-            checked={form.aiAnalysisConsent}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                aiAnalysisConsent: event.target.checked,
-              }))
-            }
-          />
-          {copy.aiConsent} <span>*</span>
-        </label>
-        <label className="preference-checkbox">
-          <input
-            type="checkbox"
-            checked={form.jobUpdateNotificationConsent}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                jobUpdateNotificationConsent: event.target.checked,
-              }))
-            }
-          />
-          {copy.notificationConsent}
-        </label>
-      </fieldset>
-
-      <div className="job-preferences-actions">
-        <button className="dashboard-hero-cta" type="submit" disabled={pending}>
-          {pending ? copy.updating : copy.update}
-        </button>
-      </div>
-    </form>
+      </form>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import type { SVGProps } from "react";
 
 export type JobMetaIconName =
   | "location"
+  | "person"
   | "experience"
   | "deadline"
   | "level"
@@ -42,6 +43,12 @@ export function JobMetaIcon({
             {...common}
             d="M9 7V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8V7M4 12h16M10 12v1h4v-1"
           />
+        </>
+      ) : null}
+      {name === "person" ? (
+        <>
+          <circle {...common} cx="12" cy="8" r="3.5" />
+          <path {...common} d="M4.5 20c.6-3.5 3.3-5.5 7.5-5.5s6.9 2 7.5 5.5" />
         </>
       ) : null}
       {name === "deadline" ? (

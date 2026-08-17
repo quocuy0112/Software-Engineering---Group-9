@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { JobHeroCard } from "@/frontend/components/ui/job-hero-card";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
 import { formatSalary } from "@/shared/utils/jobs/job-display";
 import { ApplyFormSection } from "./apply-form-section";
 import { CompanyLogo, JobDetailSidebar } from "./job-detail-sidebar";
 import { JobDetailOverview, JobDetailSections } from "./job-detail-sections";
 import { JobMetaIcon } from "./job-meta-icon";
-import { QuickSkillChips } from "./quick-skill-chips";
 import { RelatedJobsCarousel } from "./related-jobs-carousel";
 import { SaveJobAction } from "./save-job-action";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
@@ -115,6 +115,7 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
       applied: job.actions.applied,
     });
   }, [job.actions.applied, job.actions.saved, job.id, registerJob]);
+
   useEffect(() => {
     function syncApplyState() {
       setApplyOpen(shouldOpenApplyFromLocation());
@@ -158,82 +159,38 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
 
       <div className="job-detail-layout job-detail-layout--redesign job-detail-layout--board">
         <main className="job-detail-main job-detail-main--redesign job-detail-main--board">
-          <header className="job-detail-hero job-detail-hero--redesign">
-            <div className="job-detail-header-topline">
-              <Link className="job-detail-back" href="/jobs">
-                <span aria-hidden="true">←</span> Back to jobs
-              </Link>
+          <JobHeroCard
+            className="job-detail-hero"
+            company={job.company}
+            companyLogo={<CompanyLogo company={job.company} large />}
+            verified={job.isVerified}
+            status={stateLabel[job.state]}
+            title={job.title}
+            stats={[
+              {
+                icon: <JobMetaIcon name="location" />,
+                label: "Location",
+                value: job.location,
+              },
+              {
+                icon: <JobMetaIcon name="experience" />,
+                label: "Experience",
+                value:
+                  job.experienceMinYears !== undefined
+                    ? job.experienceMinYears + "+ years"
+                    : "No experience required",
+              },
+              {
+                icon: <JobMetaIcon name="deadline" />,
+                label: "Application deadline",
+                value: job.applicationDeadline
+                  ? jobDate.format(new Date(job.applicationDeadline))
+                  : "Open until filled",
+              },
+            ]}
+            pitch={job.summary}
+            salaryRange={
               <span
-                className="job-state"
-                aria-label={"Job status: " + stateLabel[job.state]}
-              >
-                {stateLabel[job.state]}
-              </span>
-            </div>
-
-            <div className="job-detail-company-lockup">
-              <CompanyLogo company={job.company} large />
-              <div>
-                <p className="job-company-name">{job.company.displayName}</p>
-                {job.isVerified ? (
-                  <span className="job-verified-inline">
-                    <span aria-hidden="true">✓</span> Verified SmartHire
-                    employer
-                  </span>
-                ) : null}
-              </div>
-            </div>
-
-            <p className="job-detail-eyebrow">A ROLE WORTH YOUR NEXT MOVE</p>
-            <h1>{job.title}</h1>
-            <div
-              className="job-detail-quick-info"
-              aria-label="Key job information"
-            >
-              <div className="job-detail-quick-info-item">
-                <span className="job-detail-quick-info-icon" aria-hidden="true">
-                  <JobMetaIcon name="location" />
-                </span>
-                <span>
-                  <span className="job-detail-quick-info-label">Location</span>
-                  <strong>{job.location}</strong>
-                </span>
-              </div>
-              <div className="job-detail-quick-info-item">
-                <span className="job-detail-quick-info-icon" aria-hidden="true">
-                  <JobMetaIcon name="experience" />
-                </span>
-                <span>
-                  <span className="job-detail-quick-info-label">
-                    Experience
-                  </span>
-                  <strong>
-                    {job.experienceMinYears !== undefined
-                      ? job.experienceMinYears + "+ years"
-                      : "No experience required"}
-                  </strong>
-                </span>
-              </div>
-              <div className="job-detail-quick-info-item">
-                <span className="job-detail-quick-info-icon" aria-hidden="true">
-                  <JobMetaIcon name="deadline" />
-                </span>
-                <span>
-                  <span className="job-detail-quick-info-label">
-                    Application deadline
-                  </span>
-                  <strong>
-                    {job.applicationDeadline
-                      ? jobDate.format(new Date(job.applicationDeadline))
-                      : "Open until filled"}
-                  </strong>
-                </span>
-              </div>
-            </div>
-            <p className="job-detail-summary">{job.summary}</p>
-
-            <div className="job-detail-salary-line">
-              <strong
                 className={
                   job.salary?.isNegotiable
                     ? "job-salary--negotiable"
@@ -241,21 +198,19 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
                 }
               >
                 {formatSalary(job.salary)}
-              </strong>
-            </div>
-
-            <div className="job-detail-action-row" aria-label="Job actions">
+              </span>
+            }
+            actions={
               <DetailActionButtons
                 job={job}
                 applied={applied}
                 applyOpen={applyOpen}
                 onApply={() => setApplyVisibility(!applyOpen)}
               />
-            </div>
-          </header>
+            }
+          />
 
           <JobDetailOverview job={job} />
-          <QuickSkillChips job={job} />
           <WhyJoinUsSection job={job} />
           <JobDetailSections job={job} includeOverview={false} />
 

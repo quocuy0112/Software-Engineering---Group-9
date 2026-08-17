@@ -24,8 +24,12 @@ if (invalid.length) {
 
 const allowedDuplicateVersions = new Set([
   "022_admin_user_management_refinement|022_realtime_messaging",
+  // Legacy migrations created concurrently on separate feature branches.
+  // Prisma identifies migrations by the full directory name, so preserve those
+  // immutable names and document each intentional duplicate explicitly.
   "034_notification_locale_payload|034_submitted_candidates",
   "035_actionable_admin_notifications|035_candidate_hybrid_ranking",
+  "038_admin_job_post_management|038_ai_assessment_v5_consistency",
 ]);
 const versionedNames = names
   .filter((name) => !allowedLegacyMigrations.has(name))

@@ -289,7 +289,8 @@ export function LiveJobSearchExperience({
   return (
     <>
       <div className="jobs-fixed-region">
-        <header className="page-heading jobs-heading">
+        <JobsWorkspaceNav activeTab="search" />
+        <header className="jobs-workspace-heading jobs-workspace-heading--wide">
           <div>
             <p className="workspace-kicker">{copy.kicker}</p>
             <h1 id="workspace-page-title">{copy.title}</h1>
@@ -307,7 +308,6 @@ export function LiveJobSearchExperience({
             </span>
           ) : null}
         </header>
-        <JobsWorkspaceNav activeTab="search" />
       </div>
 
       <div className="jobs-grid">
@@ -404,7 +404,7 @@ export function LiveJobSearchExperience({
                             <li key={number}>
                               <button
                                 className={`job-pagination-page${
-                                  number === result.page ? " is-current" : ""
+                                  number === result.page ? "is-current" : ""
                                 }`}
                                 type="button"
                                 aria-current={

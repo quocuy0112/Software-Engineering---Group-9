@@ -1,6 +1,7 @@
 import "@/frontend/styles/workspace.css";
 import "@/frontend/styles/responsive.css";
 import "@/frontend/features/jobs/styles/job-board.css";
+import "@/frontend/features/jobs/styles/job-detail-reference.css";
 import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
 import { WorkspaceShell } from "@/frontend/features/dashboard/components/workspace-shell";
 import { JobBoardHeader } from "@/frontend/features/jobs/components/job-board-header";
@@ -12,7 +13,6 @@ export default async function JobsLayout({
   const context = await getWorkspaceContext();
 
   if (context) {
-
     return (
       <WorkspaceShell
         initialRecruiterStatus={context.initialRecruiterStatus}
