@@ -18,10 +18,10 @@
 
 **Purpose**: Add the one reviewed presentation dependency and establish the typed Feature 019 transport boundary before backend or frontend behavior.
 
-- [ ] T001 Add exact `@dnd-kit/core@6.3.1` dependency without `@dnd-kit/sortable` and update the lock entry in `web/package.json` and `package-lock.json`
-- [ ] T002 [P] Add failing strict-schema tests for all nine stages, labels, role capabilities, board metadata/pages/cards, transition commands/outcomes, and conflict problems in `web/tests/shared/applications/recruitment-pipeline-contracts.test.ts`
-- [ ] T003 [P] Add failing OpenAPI-to-runtime parity tests for the three reviewed pipeline operations, required headers, bounded pages, and the closed `StageConflict` shape in `web/tests/backend/contract/applications/recruitment-pipeline-openapi-parity.test.ts`
-- [ ] T004 Implement and export the Zod/type contracts matching `contracts/recruitment-pipeline.openapi.yaml` in `web/src/shared/contracts/applications/recruitment-pipeline.ts` and `web/src/shared/contracts/applications/index.ts`
+- [X] T001 Add exact `@dnd-kit/core@6.3.1` dependency without `@dnd-kit/sortable` and update the lock entry in `web/package.json` and `package-lock.json`
+- [X] T002 [P] Add failing strict-schema tests for all nine stages, labels, role capabilities, board metadata/pages/cards, transition commands/outcomes, and conflict problems in `web/tests/shared/applications/recruitment-pipeline-contracts.test.ts`
+- [X] T003 [P] Add failing OpenAPI-to-runtime parity tests for the three reviewed pipeline operations, required headers, bounded pages, and the closed `StageConflict` shape in `web/tests/backend/contract/applications/recruitment-pipeline-openapi-parity.test.ts`
+- [X] T004 Implement and export the Zod/type contracts matching `contracts/recruitment-pipeline.openapi.yaml` in `web/src/shared/contracts/applications/recruitment-pipeline.ts` and `web/src/shared/contracts/applications/index.ts`
 
 **Checkpoint**: Feature 019 inputs and outputs are strict, shared, and aligned with the reviewed OpenAPI contract.
 
@@ -33,20 +33,20 @@
 
 **CRITICAL**: This phase blocks every user story. Consumers must never query `JobApplication.jobPostingId` with an unresolved catalogue identifier.
 
-- [ ] T005 [P] Expand exhaustive allowed, disallowed, same-stage, and terminal-source transition coverage for all nine canonical stages in `web/tests/backend/unit/jobs/application-stage-policy.test.ts`
-- [ ] T006 [P] Add failing resolver tests for direct persisted IDs, `JobPostReviewAggregate.jobId -> publicJobPostingId`, duplicate/absent mappings, company mismatches, ACTIVE/CLOSED jobs, and removed jobs in `web/tests/backend/integration/applications/recruiter-job-context.test.ts`
-- [ ] T007 [P] Add failing authorization-matrix tests for active/inactive accounts, active/suspended/removed memberships, verified/inactive companies, OWNER read-only capabilities, mutable roles, cross-company denial, and multi-company membership in `web/tests/security/applications/recruitment-pipeline-authorization.test.ts`
-- [ ] T008 [P] Add failing regression tests proving ranked, submitted, scoring-summary, rescore, and document consumers use the resolved canonical job while retaining the requested job key externally in `web/tests/backend/integration/applications/recruiter-job-identity-consumers.test.ts`
-- [ ] T009 Extend authorization result types and deterministic direct-or-review-aggregate canonical resolution with requested job ID, canonical job ID, company, title, and lifecycle in `web/src/backend/applications/authorization/recruiter-application-authorization.ts`
-- [ ] T010 Enforce active account, active membership, active verified company, company consistency, ACTIVE/CLOSED lifecycle, neutral unavailable results, and distinct view/mutation capabilities in `web/src/backend/applications/authorization/recruiter-application-authorization.ts`
-- [ ] T011 [P] Replace unresolved selector-ID database lookups with authorized `jobPostingId` while retaining the requested response context in `web/src/backend/applications/services/ranked-candidate-list.ts`
-- [ ] T012 [P] Replace unresolved selector-ID database lookups with authorized `jobPostingId` in `web/src/backend/applications/services/list-submitted-candidates.ts`
-- [ ] T013 [P] Query scoring aggregates by canonical job IDs and map results back to requested campaign IDs in `web/src/backend/applications/services/campaign-scoring-stats.ts`
-- [ ] T014 [P] Bind document authorization and lookup to the resolved canonical job/application pair in `web/src/backend/applications/services/open-application-document.ts`
-- [ ] T015 [P] Update job rescore request/status authorization and persistence queries to use canonical job identity in `web/src/backend/scoring/services/job-rescore-service.ts`
-- [ ] T016 [P] Adapt application-level scoring/detail/priority authorization consumers to the strengthened result contract without broadening access in `web/src/backend/scoring/services/scoring-detail-service.ts`, `web/src/backend/scoring/services/application-scoring-service.ts`, `web/src/backend/scoring/services/ai-retry-service.ts`, and `web/src/backend/scoring/services/manual-priority-service.ts`
-- [ ] T017 Update application ownership checks to compare `JobApplication.jobPostingId` with the resolved canonical job and expose current state only after authorization in `web/src/backend/applications/authorization/recruiter-application-authorization.ts`
-- [ ] T018 [P] Extend boundary tests to require centralized job/application authorization and prohibit client, route, scoring, or document code from introducing another job-identity resolver in `web/tests/architecture/applications/application-boundaries.test.ts`
+- [X] T005 [P] Expand exhaustive allowed, disallowed, same-stage, and terminal-source transition coverage for all nine canonical stages in `web/tests/backend/unit/jobs/application-stage-policy.test.ts`
+- [X] T006 [P] Add failing resolver tests for direct persisted IDs, `JobPostReviewAggregate.jobId -> publicJobPostingId`, duplicate/absent mappings, company mismatches, ACTIVE/CLOSED jobs, and removed jobs in `web/tests/backend/integration/applications/recruiter-job-context.test.ts`
+- [X] T007 [P] Add failing authorization-matrix tests for active/inactive accounts, active/suspended/removed memberships, verified/inactive companies, OWNER read-only capabilities, mutable roles, cross-company denial, and multi-company membership in `web/tests/security/applications/recruitment-pipeline-authorization.test.ts`
+- [X] T008 [P] Add failing regression tests proving ranked, submitted, scoring-summary, rescore, and document consumers use the resolved canonical job while retaining the requested job key externally in `web/tests/backend/integration/applications/recruiter-job-identity-consumers.test.ts`
+- [X] T009 Extend authorization result types and deterministic direct-or-review-aggregate canonical resolution with requested job ID, canonical job ID, company, title, and lifecycle in `web/src/backend/applications/authorization/recruiter-application-authorization.ts`
+- [X] T010 Enforce active account, active membership, active verified company, company consistency, ACTIVE/CLOSED lifecycle, neutral unavailable results, and distinct view/mutation capabilities in `web/src/backend/applications/authorization/recruiter-application-authorization.ts`
+- [X] T011 [P] Replace unresolved selector-ID database lookups with authorized `jobPostingId` while retaining the requested response context in `web/src/backend/applications/services/ranked-candidate-list.ts`
+- [X] T012 [P] Replace unresolved selector-ID database lookups with authorized `jobPostingId` in `web/src/backend/applications/services/list-submitted-candidates.ts`
+- [X] T013 [P] Query scoring aggregates by canonical job IDs and map results back to requested campaign IDs in `web/src/backend/applications/services/campaign-scoring-stats.ts`
+- [X] T014 [P] Bind document authorization and lookup to the resolved canonical job/application pair in `web/src/backend/applications/services/open-application-document.ts`
+- [X] T015 [P] Update job rescore request/status authorization and persistence queries to use canonical job identity in `web/src/backend/scoring/services/job-rescore-service.ts`
+- [X] T016 [P] Adapt application-level scoring/detail/priority authorization consumers to the strengthened result contract without broadening access in `web/src/backend/scoring/services/scoring-detail-service.ts`, `web/src/backend/scoring/services/application-scoring-service.ts`, `web/src/backend/scoring/services/ai-retry-service.ts`, and `web/src/backend/scoring/services/manual-priority-service.ts`
+- [X] T017 Update application ownership checks to compare `JobApplication.jobPostingId` with the resolved canonical job and expose current state only after authorization in `web/src/backend/applications/authorization/recruiter-application-authorization.ts`
+- [X] T018 [P] Extend boundary tests to require centralized job/application authorization and prohibit client, route, scoring, or document code from introducing another job-identity resolver in `web/tests/architecture/applications/application-boundaries.test.ts`
 
 **Checkpoint**: One authorized job context supplies the canonical company and `JobPosting.id` for all application consumers; OWNER has view capability only.
 
@@ -60,26 +60,26 @@
 
 ### Tests for User Story 1
 
-- [ ] T019 [P] [US1] Add failing repository tests for all-nine grouped counts, deterministic `submittedAt DESC, id DESC` pages, signed cursor job/stage binding, page limits, no duplicates/gaps, and complete 10,000-record traversal in `web/tests/backend/integration/applications/recruitment-pipeline-repository.test.ts`
-- [ ] T020 [P] [US1] Add failing board-service tests for least-privilege cards, server-calculated allowed destinations, OWNER empty destinations, optional/missing scoring, document availability, zero-count stages, and matching count/page visibility predicates in `web/tests/backend/unit/applications/recruitment-pipeline-board.test.ts`
-- [ ] T021 [P] [US1] Add failing GET contract tests for metadata and stage-page success, strict bounds/cursors, no-store behavior, active/closed jobs, and neutral unavailable responses in `web/tests/backend/contract/applications/recruitment-pipeline-read-routes.contract.test.ts`
-- [ ] T022 [P] [US1] Add failing component tests for list/board switching, nine columns/counts, initial/job-empty/column-empty/error/retry states, incremental loading, optional score summaries, and existing detail/document actions in `web/tests/frontend/applications/recruitment-pipeline-board.test.tsx`
-- [ ] T023 [P] [US1] Add failing accessibility tests for labelled view switching, column landmarks/headings, keyboard-operable Load more, readable card identity, non-color state cues, and OWNER read-only presentation in `web/tests/frontend/accessibility/applications/recruitment-pipeline-board.accessibility.test.tsx`
+- [X] T019 [P] [US1] Add failing repository tests for all-nine grouped counts, deterministic `submittedAt DESC, id DESC` pages, signed cursor job/stage binding, page limits, no duplicates/gaps, and complete 10,000-record traversal in `web/tests/backend/integration/applications/recruitment-pipeline-repository.test.ts`
+- [X] T020 [P] [US1] Add failing board-service tests for least-privilege cards, server-calculated allowed destinations, OWNER empty destinations, optional/missing scoring, document availability, zero-count stages, and matching count/page visibility predicates in `web/tests/backend/unit/applications/recruitment-pipeline-board.test.ts`
+- [X] T021 [P] [US1] Add failing GET contract tests for metadata and stage-page success, strict bounds/cursors, no-store behavior, active/closed jobs, and neutral unavailable responses in `web/tests/backend/contract/applications/recruitment-pipeline-read-routes.contract.test.ts`
+- [X] T022 [P] [US1] Add failing component tests for list/board switching, nine columns/counts, initial/job-empty/column-empty/error/retry states, incremental loading, optional score summaries, and existing detail/document actions in `web/tests/frontend/applications/recruitment-pipeline-board.test.tsx`
+- [X] T023 [P] [US1] Add failing accessibility tests for labelled view switching, column landmarks/headings, keyboard-operable Load more, readable card identity, non-color state cues, and OWNER read-only presentation in `web/tests/frontend/accessibility/applications/recruitment-pipeline-board.accessibility.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T024 [US1] Add grouped stage-count and bounded stage-page methods plus least-privilege projection types to `web/src/backend/repositories/applications/application-repository.ts`
-- [ ] T025 [US1] Implement indexed grouped counts, optional score/document projection, deterministic ordering, signed canonical-job/stage cursors, and de-duplicated bounded pages in `web/src/backend/repositories/applications/prisma-application-repository.ts`
-- [ ] T026 [US1] Implement authorized metadata and single-stage page orchestration without mutation logic in `web/src/backend/applications/services/recruitment-pipeline-board.ts`
-- [ ] T027 [P] [US1] Add the thin authorized no-store metadata GET handler in `web/src/app/api/recruiter/jobs/[jobId]/applications/pipeline/route.ts`
-- [ ] T028 [P] [US1] Add the thin authorized no-store bounded stage-page GET handler in `web/src/app/api/recruiter/jobs/[jobId]/applications/pipeline/[stage]/route.ts`
-- [ ] T029 [P] [US1] Create the accessible ranked-list/Pipeline-board view shell with conditional mounting in `web/src/frontend/features/recruiter-applications/recruiter-candidate-workspace.tsx`
-- [ ] T030 [US1] Implement metadata, independent per-stage page/cursor loading, request cancellation, merge de-duplication, retry, and unavailable-cache clearing in `web/src/frontend/features/recruiter-applications/use-recruitment-pipeline.ts`
-- [ ] T031 [P] [US1] Implement a canonical stage column with count, empty state, bounded cards, and keyboard-operable Load more in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-column.tsx`
-- [ ] T032 [P] [US1] Implement the minimal application card with stage/version, candidate/submission identity, optional score, and authorized detail/document entry points in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-card.tsx`
-- [ ] T033 [US1] Compose metadata and nine independently loaded columns with loading, empty, unavailable, and recoverable error states in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-board.tsx`
-- [ ] T034 [US1] Integrate the view shell into the selected-job branch while preserving the current selector, ranking list, score drawer, rescore controls, breadcrumbs, and detail flow in `web/src/frontend/features/recruiter-applications/recruiter-candidates-page.tsx` and `web/src/frontend/features/recruiter-applications/candidate-score-drawer.tsx`
-- [ ] T035 [US1] Add responsive horizontal board/column/card layout, truncation, visible focus, and non-color loading/error/permission states without replacing existing workspace styling in `web/src/frontend/styles/recruiter-workspace-full.css`
+- [X] T024 [US1] Add grouped stage-count and bounded stage-page methods plus least-privilege projection types to `web/src/backend/repositories/applications/application-repository.ts`
+- [X] T025 [US1] Implement indexed grouped counts, optional score/document projection, deterministic ordering, signed canonical-job/stage cursors, and de-duplicated bounded pages in `web/src/backend/repositories/applications/prisma-application-repository.ts`
+- [X] T026 [US1] Implement authorized metadata and single-stage page orchestration without mutation logic in `web/src/backend/applications/services/recruitment-pipeline-board.ts`
+- [X] T027 [P] [US1] Add the thin authorized no-store metadata GET handler in `web/src/app/api/recruiter/jobs/[jobId]/applications/pipeline/route.ts`
+- [X] T028 [P] [US1] Add the thin authorized no-store bounded stage-page GET handler in `web/src/app/api/recruiter/jobs/[jobId]/applications/pipeline/[stage]/route.ts`
+- [X] T029 [P] [US1] Create the accessible ranked-list/Pipeline-board view shell with conditional mounting in `web/src/frontend/features/recruiter-applications/recruiter-candidate-workspace.tsx`
+- [X] T030 [US1] Implement metadata, independent per-stage page/cursor loading, request cancellation, merge de-duplication, retry, and unavailable-cache clearing in `web/src/frontend/features/recruiter-applications/use-recruitment-pipeline.ts`
+- [X] T031 [P] [US1] Implement a canonical stage column with count, empty state, bounded cards, and keyboard-operable Load more in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-column.tsx`
+- [X] T032 [P] [US1] Implement the minimal application card with stage/version, candidate/submission identity, optional score, and authorized detail/document entry points in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-card.tsx`
+- [X] T033 [US1] Compose metadata and nine independently loaded columns with loading, empty, unavailable, and recoverable error states in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-board.tsx`
+- [X] T034 [US1] Integrate the view shell into the selected-job branch while preserving the current selector, ranking list, score drawer, rescore controls, breadcrumbs, and detail flow in `web/src/frontend/features/recruiter-applications/recruiter-candidates-page.tsx` and `web/src/frontend/features/recruiter-applications/candidate-score-drawer.tsx`
+- [X] T035 [US1] Add responsive horizontal board/column/card layout, truncation, visible focus, and non-color loading/error/permission states without replacing existing workspace styling in `web/src/frontend/styles/recruiter-workspace-full.css`
 
 **Checkpoint**: User Story 1 is independently demonstrable as a secure, read-only-capable, scalable board; it is not yet a releasable P0 workflow.
 
@@ -93,21 +93,21 @@
 
 ### Tests for User Story 2
 
-- [ ] T036 [P] [US2] Add failing service tests for the complete ordinary transition matrix, same-stage/terminal rejection, mutable-role matrix, OWNER denial, canonical job/application binding, stageVersion compare-and-set, serializable rollback, history/audit fields, and unchanged scoring in `web/tests/backend/integration/applications/application-stage-authority.test.ts`
-- [ ] T037 [P] [US2] Add failing PATCH contract/security tests for account/session, same-origin and CSRF boundaries, required Idempotency-Key, strict payloads, neutral target denial, and authoritative outcome/error mapping in `web/tests/backend/contract/applications/recruitment-pipeline-stage-route.contract.test.ts`
-- [ ] T038 [P] [US2] Add failing pointer and explicit-control component tests for allowed drops, invalid/current-column drops, Escape cancellation, pending state, authoritative success, and no ordinary confirmation dialog in `web/tests/frontend/applications/recruitment-pipeline-movement.test.tsx`
-- [ ] T039 [P] [US2] Add failing keyboard/accessibility tests for card identification, Change Stage invocation, destination selection, DnD instructions/announcements, cancellation, focus restoration, and non-color feedback in `web/tests/frontend/accessibility/applications/recruitment-pipeline-movement.accessibility.test.tsx`
+- [X] T036 [P] [US2] Add failing service tests for the complete ordinary transition matrix, same-stage/terminal rejection, mutable-role matrix, OWNER denial, canonical job/application binding, stageVersion compare-and-set, serializable rollback, history/audit fields, and unchanged scoring in `web/tests/backend/integration/applications/application-stage-authority.test.ts`
+- [X] T037 [P] [US2] Add failing PATCH contract/security tests for account/session, same-origin and CSRF boundaries, required Idempotency-Key, strict payloads, neutral target denial, and authoritative outcome/error mapping in `web/tests/backend/contract/applications/recruitment-pipeline-stage-route.contract.test.ts`
+- [X] T038 [P] [US2] Add failing pointer and explicit-control component tests for allowed drops, invalid/current-column drops, Escape cancellation, pending state, authoritative success, and no ordinary confirmation dialog in `web/tests/frontend/applications/recruitment-pipeline-movement.test.tsx`
+- [X] T039 [P] [US2] Add failing keyboard/accessibility tests for card identification, Change Stage invocation, destination selection, DnD instructions/announcements, cancellation, focus restoration, and non-color feedback in `web/tests/frontend/accessibility/applications/recruitment-pipeline-movement.accessibility.test.tsx`
 
 ### Implementation for User Story 2
 
-- [ ] T040 [US2] Extend `ApplicationStageService.transition` as the sole ordinary-mutation authority with selected-job/application ownership, mutable-role enforcement, canonical policy validation, expected stageVersion, serializable compare-and-set, stage history, audit, and scoring-field isolation in `web/src/backend/services/jobs/application-stage-service.ts`
-- [ ] T041 [US2] Add the thin `requireAccountRequest`-protected job-scoped PATCH handler using shared contracts and the authoritative service in `web/src/app/api/recruiter/jobs/[jobId]/applications/[applicationId]/stage/route.ts`
-- [ ] T042 [US2] Implement the shared destination selector and ordinary-command boundary without consequential confirmation in `web/src/frontend/features/recruiter-applications/application-stage-change-dialog.tsx`
-- [ ] T043 [US2] Add command submission, pending-card tracking, server-outcome application, and error classification to `web/src/frontend/features/recruiter-applications/use-recruitment-pipeline.ts`
-- [ ] T044 [US2] Isolate `@dnd-kit/core` pointer/keyboard sensors, droppable allowed destinations, drag overlay, invalid-drop handling, and Escape cancellation in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-board.tsx`
-- [ ] T045 [US2] Add a visible Change Stage control that invokes the same command path as drag and exposes only server-returned destinations in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-card.tsx`
-- [ ] T046 [US2] Remove mutation controls for OWNER while keeping authorized detail access and preserve server authority for manipulated requests in `web/src/frontend/features/recruiter-applications/recruiter-candidate-workspace.tsx` and `web/src/frontend/features/recruiter-applications/candidate-ranking-list.tsx`
-- [ ] T047 [US2] Add distinct drag, allowed/invalid destination, pending, success, and error treatments with visible text/icons and focus styling in `web/src/frontend/styles/recruiter-workspace-full.css`
+- [X] T040 [US2] Extend `ApplicationStageService.transition` as the sole ordinary-mutation authority with selected-job/application ownership, mutable-role enforcement, canonical policy validation, expected stageVersion, serializable compare-and-set, stage history, audit, and scoring-field isolation in `web/src/backend/services/jobs/application-stage-service.ts`
+- [X] T041 [US2] Add the thin `requireAccountRequest`-protected job-scoped PATCH handler using shared contracts and the authoritative service in `web/src/app/api/recruiter/jobs/[jobId]/applications/[applicationId]/stage/route.ts`
+- [X] T042 [US2] Implement the shared destination selector and ordinary-command boundary without consequential confirmation in `web/src/frontend/features/recruiter-applications/application-stage-change-dialog.tsx`
+- [X] T043 [US2] Add command submission, pending-card tracking, server-outcome application, and error classification to `web/src/frontend/features/recruiter-applications/use-recruitment-pipeline.ts`
+- [X] T044 [US2] Isolate `@dnd-kit/core` pointer/keyboard sensors, droppable allowed destinations, drag overlay, invalid-drop handling, and Escape cancellation in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-board.tsx`
+- [X] T045 [US2] Add a visible Change Stage control that invokes the same command path as drag and exposes only server-returned destinations in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-card.tsx`
+- [X] T046 [US2] Remove mutation controls for OWNER while keeping authorized detail access and preserve server authority for manipulated requests in `web/src/frontend/features/recruiter-applications/recruiter-candidate-workspace.tsx` and `web/src/frontend/features/recruiter-applications/candidate-ranking-list.tsx`
+- [X] T047 [US2] Add distinct drag, allowed/invalid destination, pending, success, and error treatments with visible text/icons and focus styling in `web/src/frontend/styles/recruiter-workspace-full.css`
 
 **Checkpoint**: Ordinary movement works through both interaction modes with one server-authoritative state policy.
 
@@ -121,19 +121,19 @@
 
 ### Tests for User Story 3
 
-- [ ] T048 [P] [US3] Add failing service tests for the six rejection reasons, required confirmations, optional 2,000-character private note, `OFFERED -> OFFER_DECLINED` reason/terminal rule, `OFFERED -> HIRED` confirmation, role limits, and cancelled/invalid no-side-effect behavior in `web/tests/backend/integration/applications/consequential-stage-decisions.test.ts`
-- [ ] T049 [P] [US3] Add failing security tests proving candidate acceptance endpoints, scoring workers/results, AI recommendations, OWNER, and unaffiliated actors cannot invoke or indirectly cause recruiter-controlled transitions in `web/tests/security/applications/human-controlled-pipeline.test.ts`
-- [ ] T050 [P] [US3] Add failing component tests for reason validation, explicit confirmation, cancellation, drag-to-Hired interception, no candidate-acceptance prerequisite, and terminal-result feedback in `web/tests/frontend/applications/consequential-stage-decisions.test.tsx`
-- [ ] T051 [P] [US3] Add failing privacy tests proving recruiter-private notes are absent from candidate application/history responses, in-app/email payloads, errors, metrics, and ordinary logs in `web/tests/security/applications/rejection-note-privacy.test.ts`
+- [X] T048 [P] [US3] Add failing service tests for the six rejection reasons, required confirmations, optional 2,000-character private note, `OFFERED -> OFFER_DECLINED` reason/terminal rule, `OFFERED -> HIRED` confirmation, role limits, and cancelled/invalid no-side-effect behavior in `web/tests/backend/integration/applications/consequential-stage-decisions.test.ts`
+- [X] T049 [P] [US3] Add failing security tests proving candidate acceptance endpoints, scoring workers/results, AI recommendations, OWNER, and unaffiliated actors cannot invoke or indirectly cause recruiter-controlled transitions in `web/tests/security/applications/human-controlled-pipeline.test.ts`
+- [X] T050 [P] [US3] Add failing component tests for reason validation, explicit confirmation, cancellation, drag-to-Hired interception, no candidate-acceptance prerequisite, and terminal-result feedback in `web/tests/frontend/applications/consequential-stage-decisions.test.tsx`
+- [X] T051 [P] [US3] Add failing privacy tests proving recruiter-private notes are absent from candidate application/history responses, in-app/email payloads, errors, metrics, and ordinary logs in `web/tests/security/applications/rejection-note-privacy.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T052 [US3] Add the existing six-value rejection allowlist, required confirmation, normalized reason snapshot, and optional private-note handling to the authoritative transition in `web/src/backend/services/jobs/application-stage-service.ts`
-- [ ] T053 [US3] Add confirmed `OFFERED -> OFFER_DECLINED` bounded-reason enforcement and confirmed `OFFERED -> HIRED` enforcement without querying candidate acceptance in `web/src/backend/services/jobs/application-stage-service.ts`
-- [ ] T054 [US3] Persist safe reason/audit metadata while excluding `internalNoteEncrypted` from candidate-visible projections, notification inputs, errors, and logs in `web/src/backend/services/jobs/application-stage-service.ts`
-- [ ] T055 [P] [US3] Implement the shared rejection/offer-decline/hiring confirmation UI, including reason controls and a separate Hired confirmation action, in `web/src/frontend/features/recruiter-applications/application-stage-change-dialog.tsx`
-- [ ] T056 [P] [US3] Adapt the existing rejection and stage-confirmation modals to the shared command semantics without retaining independent transition rules in `web/src/frontend/features/recruiter-applications/reject-candidate-modal.tsx` and `web/src/frontend/features/recruiter-applications/stage-transition-confirm-modal.tsx`
-- [ ] T057 [US3] Route consequential drag/control intents through confirmation before mutation and restore focus/state on cancellation or validation failure in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-board.tsx` and `web/src/frontend/features/recruiter-applications/use-recruitment-pipeline.ts`
+- [X] T052 [US3] Add the existing six-value rejection allowlist, required confirmation, normalized reason snapshot, and optional private-note handling to the authoritative transition in `web/src/backend/services/jobs/application-stage-service.ts`
+- [X] T053 [US3] Add confirmed `OFFERED -> OFFER_DECLINED` bounded-reason enforcement and confirmed `OFFERED -> HIRED` enforcement without querying candidate acceptance in `web/src/backend/services/jobs/application-stage-service.ts`
+- [X] T054 [US3] Persist safe reason/audit metadata while excluding `internalNoteEncrypted` from candidate-visible projections, notification inputs, errors, and logs in `web/src/backend/services/jobs/application-stage-service.ts`
+- [X] T055 [P] [US3] Implement the shared rejection/offer-decline/hiring confirmation UI, including reason controls and a separate Hired confirmation action, in `web/src/frontend/features/recruiter-applications/application-stage-change-dialog.tsx`
+- [X] T056 [P] [US3] Adapt the existing rejection and stage-confirmation modals to the shared command semantics without retaining independent transition rules in `web/src/frontend/features/recruiter-applications/reject-candidate-modal.tsx` and `web/src/frontend/features/recruiter-applications/stage-transition-confirm-modal.tsx`
+- [X] T057 [US3] Route consequential drag/control intents through confirmation before mutation and restore focus/state on cancellation or validation failure in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-board.tsx` and `web/src/frontend/features/recruiter-applications/use-recruitment-pipeline.ts`
 
 **Checkpoint**: Every consequential decision is explicit, human-controlled, role-limited, validated, auditable, and privacy-safe.
 
@@ -147,19 +147,19 @@
 
 ### Tests for User Story 4
 
-- [ ] T058 [P] [US4] Add failing idempotency tests for normalized command digests, exact replay, and same-key changed-payload conflicts including changed target, reason, internal note, confirmation, or bound job context; cover lost-response retry, simultaneous identical attempts, and a genuinely new later decision in `web/tests/backend/integration/applications/application-stage-idempotency.test.ts`
-- [ ] T059 [P] [US4] Add failing concurrency tests for different same-version destinations, serializable/unique-constraint races, stale stageVersion, one history/audit success, and no loser side effects in `web/tests/backend/integration/applications/application-stage-concurrency.test.ts`
-- [ ] T060 [P] [US4] Add failing route tests for the three reviewed 409 codes and optional authorized-only `{stage, stageVersion}` current state in `web/tests/backend/contract/applications/recruitment-pipeline-conflict.contract.test.ts`
-- [ ] T061 [P] [US4] Add failing client tests for optimistic success, rollback, targeted source/destination/count refresh, exact-key retry, new-key rotation, stale reconciliation, unavailable-board clearing, and focus/live feedback in `web/tests/frontend/applications/recruitment-pipeline-recovery.test.tsx`
+- [X] T058 [P] [US4] Add failing idempotency tests for normalized command digests, exact replay, and same-key changed-payload conflicts including changed target, reason, internal note, confirmation, or bound job context; cover lost-response retry, simultaneous identical attempts, and a genuinely new later decision in `web/tests/backend/integration/applications/application-stage-idempotency.test.ts`
+- [X] T059 [P] [US4] Add failing concurrency tests for different same-version destinations, serializable/unique-constraint races, stale stageVersion, one history/audit success, and no loser side effects in `web/tests/backend/integration/applications/application-stage-concurrency.test.ts`
+- [X] T060 [P] [US4] Add failing route tests for the three reviewed 409 codes and optional authorized-only `{stage, stageVersion}` current state in `web/tests/backend/contract/applications/recruitment-pipeline-conflict.contract.test.ts`
+- [X] T061 [P] [US4] Add failing client tests for optimistic success, rollback, targeted source/destination/count refresh, exact-key retry, new-key rotation, stale reconciliation, unavailable-board clearing, and focus/live feedback in `web/tests/frontend/applications/recruitment-pipeline-recovery.test.tsx`
 
 ### Implementation for User Story 4
 
-- [ ] T062 [US4] Compute and persist the bounded normalized actor/requested-and-canonical-job/application/version/target/reason/internal-note/confirmation command digest and command source in ApplicationStageEvent.metadata, and support exact-replay outcome reconstruction in `web/src/backend/services/jobs/application-stage-service.ts`
-- [ ] T063 [US4] Convert idempotency/application-version uniqueness and serialization races into verified replay or conflict outcomes without duplicate history/audit success in `web/src/backend/services/jobs/application-stage-service.ts`
-- [ ] T064 [US4] Return reviewed conflict codes and expose current stage/version only after job/application authorization in `web/src/app/api/recruiter/jobs/[jobId]/applications/[applicationId]/stage/route.ts`
-- [ ] T065 [US4] Add operation-scoped original/target/version/payload/idempotency state, optimistic ordinary moves, exact retry reuse, and new-command key rotation in `web/src/frontend/features/recruiter-applications/use-recruitment-pipeline.ts`
-- [ ] T066 [US4] Reconcile authoritative metadata and affected pages after success/conflict/failure, remove duplicate card copies, roll back unpersisted moves, and clear all cached board data on unavailable responses in `web/src/frontend/features/recruiter-applications/use-recruitment-pipeline.ts`
-- [ ] T067 [US4] Restore focus to the reconciled card or meaningful column/control and announce pending, success, cancelled, stale, authorization, network, and server outcomes in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-board.tsx`
+- [X] T062 [US4] Compute and persist the bounded normalized actor/requested-and-canonical-job/application/version/target/reason/internal-note/confirmation command digest and command source in ApplicationStageEvent.metadata, and support exact-replay outcome reconstruction in `web/src/backend/services/jobs/application-stage-service.ts`
+- [X] T063 [US4] Convert idempotency/application-version uniqueness and serialization races into verified replay or conflict outcomes without duplicate history/audit success in `web/src/backend/services/jobs/application-stage-service.ts`
+- [X] T064 [US4] Return reviewed conflict codes and expose current stage/version only after job/application authorization in `web/src/app/api/recruiter/jobs/[jobId]/applications/[applicationId]/stage/route.ts`
+- [X] T065 [US4] Add operation-scoped original/target/version/payload/idempotency state, optimistic ordinary moves, exact retry reuse, and new-command key rotation in `web/src/frontend/features/recruiter-applications/use-recruitment-pipeline.ts`
+- [X] T066 [US4] Reconcile authoritative metadata and affected pages after success/conflict/failure, remove duplicate card copies, roll back unpersisted moves, and clear all cached board data on unavailable responses in `web/src/frontend/features/recruiter-applications/use-recruitment-pipeline.ts`
+- [X] T067 [US4] Restore focus to the reconciled card or meaningful column/control and announce pending, success, cancelled, stale, authorization, network, and server outcomes in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-board.tsx`
 
 **Checkpoint**: Concurrent and failed operations cannot silently overwrite decisions or leave an unpersisted visual state.
 
@@ -173,15 +173,15 @@
 
 ### Tests for User Story 5
 
-- [ ] T068 [P] [US5] Add failing integration tests for in-app notification on every committed stage, ordinary email preference behavior, mandatory Hired email, exact-retry/concurrency deduplication, and no notification on invalid/cancelled/failed transitions in `web/tests/backend/integration/applications/application-stage-notifications.test.ts`
-- [ ] T069 [P] [US5] Extend candidate payload/log privacy coverage for stage reasons, private notes, idempotency keys, and candidate/company identifiers in `web/tests/security/notifications/application-stage-notification-privacy.test.ts`
-- [ ] T070 [P] [US5] Add a documented representative test for committed in-app notification visibility at P95 <= 5 seconds and outbox-provider failure isolation in `web/tests/performance/applications/application-stage-notification-performance.test.ts`
+- [X] T068 [P] [US5] Add failing integration tests for in-app notification on every committed stage, ordinary email preference behavior, mandatory Hired email, exact-retry/concurrency deduplication, and no notification on invalid/cancelled/failed transitions in `web/tests/backend/integration/applications/application-stage-notifications.test.ts`
+- [X] T069 [P] [US5] Extend candidate payload/log privacy coverage for stage reasons, private notes, idempotency keys, and candidate/company identifiers in `web/tests/security/notifications/application-stage-notification-privacy.test.ts`
+- [X] T070 [P] [US5] Add a documented representative test for committed in-app notification visibility at P95 <= 5 seconds and outbox-provider failure isolation in `web/tests/performance/applications/application-stage-notification-performance.test.ts`
 
 ### Implementation for User Story 5
 
-- [ ] T071 [US5] Create the existing `APPLICATION_STAGE_CHANGED` in-app notification intent inside the authoritative serializable stage transaction using `createInAppNotification` in `web/src/backend/services/jobs/application-stage-service.ts`
-- [ ] T072 [US5] Enqueue the existing `application-stage-changed.v1` email conditionally for ordinary stages and unconditionally for HIRED without direct provider delivery in `web/src/backend/services/jobs/application-stage-service.ts`
-- [ ] T073 [US5] Bind in-app and email-outbox deduplication keys to the committed application stage event/version while leaving provider delivery and retry with the existing unchanged outbox worker in `web/src/backend/services/jobs/application-stage-service.ts`
+- [X] T071 [US5] Create the existing `APPLICATION_STAGE_CHANGED` in-app notification intent inside the authoritative serializable stage transaction using `createInAppNotification` in `web/src/backend/services/jobs/application-stage-service.ts`
+- [X] T072 [US5] Enqueue the existing `application-stage-changed.v1` email conditionally for ordinary stages and unconditionally for HIRED without direct provider delivery in `web/src/backend/services/jobs/application-stage-service.ts`
+- [X] T073 [US5] Bind in-app and email-outbox deduplication keys to the committed application stage event/version while leaving provider delivery and retry with the existing unchanged outbox worker in `web/src/backend/services/jobs/application-stage-service.ts`
 
 **Checkpoint**: Candidate communication is complete, duplicate-safe, preference-correct, and isolated from external delivery failures.
 
@@ -191,15 +191,15 @@
 
 **Purpose**: Remove divergent legacy mutation behavior, prove architectural boundaries and performance targets, and run the complete P0 regression gate.
 
-- [ ] T074 [P] Add failing parity tests proving generic-stage, interview, and reject entry points share role, CSRF, idempotency, reason, history/audit, and notification outcomes in `web/tests/backend/contract/applications/application-stage-compatibility.contract.test.ts`
-- [ ] T075 Convert `RecruiterApplicationDecisionService` into interview/rejection command adapters over `ApplicationStageService` with no independent policy, persistence, idempotency, or notification logic in `web/src/backend/applications/services/recruiter-application-decision-service.ts`
-- [ ] T076 Apply `requireAccountRequest`, shared contracts, and authoritative service delegation to legacy handlers in `web/src/app/api/recruiter/applications/[applicationId]/stage/route.ts`, `web/src/app/api/recruiter/applications/[applicationId]/decisions/interview/route.ts`, and `web/src/app/api/recruiter/applications/[applicationId]/decisions/reject/route.ts`
-- [ ] T077 Point existing ranking interview/rejection actions at the job-scoped authoritative command and enforce OWNER read-only rendering in `web/src/frontend/features/recruiter-applications/candidate-ranking-list.tsx`, `web/src/frontend/features/recruiter-applications/reject-candidate-modal.tsx`, and `web/src/frontend/features/recruiter-applications/stage-transition-confirm-modal.tsx`
-- [ ] T078 [P] Extend architecture tests to prohibit board-specific persistence/notification authorities, client-side Prisma/provider access, raw candidate/private-note logging, and DnD imports outside the presentation boundary in `web/tests/architecture/applications/application-boundaries.test.ts`
-- [ ] T079 [P] Add representative 10,000-application and concurrent-actor performance coverage for P95 board usability <= 2 seconds, move feedback <= 500 ms, persistence <= 2 seconds, bounded rendered cards/payloads, percentiles, errors, and environment evidence in `web/tests/performance/applications/recruitment-pipeline-performance.test.ts`
-- [ ] T080 [P] Add a focused Playwright workflow covering job selection, list/board switch, pointer move, keyboard Change Stage, rejection, Hired confirmation, stale conflict, closed job, and unavailable clearing in `web/tests/system/e2e/recruitment-pipeline-kanban/recruitment-pipeline-kanban.spec.ts`
-- [ ] T081 Run the targeted Feature 019, application, scoring, notification, and job-post-review suites specified in `spec-kit/specs/019-recruitment-pipeline-kanban-board/quickstart.md` and resolve regressions only in files touched by Feature 019
-- [ ] T082 Run Prisma validation, typecheck, lint, production build, focused Playwright smoke, and the full regression gate from `spec-kit/specs/019-recruitment-pipeline-kanban-board/quickstart.md`; confirm no Prisma migration, no non-canonical stage, no new domain/notification/scoring subsystem, and no out-of-scope capability was introduced
+- [X] T074 [P] Add failing parity tests proving generic-stage, interview, and reject entry points share role, CSRF, idempotency, reason, history/audit, and notification outcomes in `web/tests/backend/contract/applications/application-stage-compatibility.contract.test.ts`
+- [X] T075 Convert `RecruiterApplicationDecisionService` into interview/rejection command adapters over `ApplicationStageService` with no independent policy, persistence, idempotency, or notification logic in `web/src/backend/applications/services/recruiter-application-decision-service.ts`
+- [X] T076 Apply `requireAccountRequest`, shared contracts, and authoritative service delegation to legacy handlers in `web/src/app/api/recruiter/applications/[applicationId]/stage/route.ts`, `web/src/app/api/recruiter/applications/[applicationId]/decisions/interview/route.ts`, and `web/src/app/api/recruiter/applications/[applicationId]/decisions/reject/route.ts`
+- [X] T077 Point existing ranking interview/rejection actions at the job-scoped authoritative command and enforce OWNER read-only rendering in `web/src/frontend/features/recruiter-applications/candidate-ranking-list.tsx`, `web/src/frontend/features/recruiter-applications/reject-candidate-modal.tsx`, and `web/src/frontend/features/recruiter-applications/stage-transition-confirm-modal.tsx`
+- [X] T078 [P] Extend architecture tests to prohibit board-specific persistence/notification authorities, client-side Prisma/provider access, raw candidate/private-note logging, and DnD imports outside the presentation boundary in `web/tests/architecture/applications/application-boundaries.test.ts`
+- [X] T079 [P] Add representative 10,000-application and concurrent-actor performance coverage for P95 board usability <= 2 seconds, move feedback <= 500 ms, persistence <= 2 seconds, bounded rendered cards/payloads, percentiles, errors, and environment evidence in `web/tests/performance/applications/recruitment-pipeline-performance.test.ts`
+- [X] T080 [P] Add a focused Playwright workflow covering job selection, list/board switch, pointer move, keyboard Change Stage, rejection, Hired confirmation, stale conflict, closed job, and unavailable clearing in `web/tests/system/e2e/recruitment-pipeline-kanban/recruitment-pipeline-kanban.spec.ts`
+- [X] T081 Run the targeted Feature 019, application, scoring, notification, and job-post-review suites specified in `spec-kit/specs/019-recruitment-pipeline-kanban-board/quickstart.md` and resolve regressions only in files touched by Feature 019
+- [X] T082 Run Prisma validation, typecheck, lint, production build, focused Playwright smoke, and the full regression gate from `spec-kit/specs/019-recruitment-pipeline-kanban-board/quickstart.md`; confirm no Prisma migration, no non-canonical stage, no new domain/notification/scoring subsystem, and no out-of-scope capability was introduced
 
 **Checkpoint**: All five P1 stories form one constitution-complete, regression-validated P0 Kanban workflow.
 

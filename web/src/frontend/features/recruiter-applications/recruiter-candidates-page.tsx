@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import type { RecruiterJob } from "@/shared/contracts/recruiter-job-posting";
 import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
-import { CandidateRankingList } from "./candidate-ranking-list";
+import { RecruiterCandidateWorkspace } from "./recruiter-candidate-workspace";
 import { CampaignDistributionBar } from "./campaign-distribution-bar";
 import {
   useCampaignScoringStats,
@@ -313,7 +313,7 @@ export function RecruiterCandidatesPage({
 
   if (selectedJob) {
     return (
-      <CandidateRankingList
+      <RecruiterCandidateWorkspace
         jobId={selectedJob.id}
         jobTitle={selectedJob.title}
         backHref={recruiterRoutes.candidates}

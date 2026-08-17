@@ -3022,3 +3022,16 @@
   .ranking-pager { align-self: flex-end; }
   .ai-ranking-modal__facts { grid-template-columns: 1fr; }
 }
+
+.candidate-workspace-view-switch { display: flex; gap: .5rem; padding: 1rem 0; }
+.candidate-workspace-view-switch button[aria-pressed="true"] { background: var(--color-primary, #2563eb); color: #fff; }
+.recruitment-pipeline { min-width: 0; }
+.recruitment-pipeline__header { display: flex; justify-content: space-between; gap: 1rem; align-items: start; }
+.recruitment-pipeline__columns { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(18rem, 22rem); gap: 1rem; overflow-x: auto; padding: 1rem 0 2rem; }
+.pipeline-column { background: #f6f7f9; border: 1px solid #d7dbe2; border-radius: .75rem; min-height: 18rem; padding: .75rem; }
+.pipeline-column > header { display: flex; align-items: center; justify-content: space-between; }
+.pipeline-column__cards { display: grid; gap: .75rem; }
+.pipeline-card { background: #fff; border: 1px solid #cbd1da; border-radius: .5rem; display: grid; gap: .35rem; padding: .75rem; }
+.pipeline-card__actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.pipeline-column button:focus-visible, .pipeline-card a:focus-visible, .candidate-workspace-view-switch button:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
+@media (max-width: 700px) { .recruitment-pipeline__header { display: block; } .recruitment-pipeline__columns { grid-auto-columns: minmax(16rem, 85vw); } }
