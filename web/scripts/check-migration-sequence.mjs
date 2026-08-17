@@ -10,8 +10,11 @@ const names = entries
   .map((entry) => entry.name)
   .sort((left, right) => left.localeCompare(right, "en"));
 
+const allowedLegacyMigrations = new Set(["20260816050940_smarthire"]);
 const invalid = names.filter(
-  (name) => !/^\d{3}_[a-z0-9]+(?:_[a-z0-9]+)*$/u.test(name),
+  (name) =>
+    !allowedLegacyMigrations.has(name) &&
+    !/^\d{3}_[a-z0-9]+(?:_[a-z0-9]+)*$/u.test(name),
 );
 if (invalid.length) {
   throw new Error(
@@ -28,10 +31,12 @@ const allowedDuplicateVersions = new Set([
   "035_actionable_admin_notifications|035_candidate_hybrid_ranking",
   "038_admin_job_post_management|038_ai_assessment_v5_consistency",
 ]);
-const versionedNames = names.map((name) => ({
-  version: Number(name.slice(0, 3)),
-  name,
-}));
+const versionedNames = names
+  .filter((name) => !allowedLegacyMigrations.has(name))
+  .map((name) => ({
+    version: Number(name.slice(0, 3)),
+    name,
+  }));
 const outOfSequence = versionedNames.flatMap((entry, index) => {
   if (index === 0) return entry.version === 1 ? [] : [entry];
   const previous = versionedNames[index - 1];

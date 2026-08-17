@@ -71,6 +71,15 @@ function DetailActionButtons({
         <span className="job-closed-state">Applications closed</span>
       )}
 
+      {job.actions.authenticated && job.state === "ACTIVE" ? (
+        <Link
+          className="job-secondary-button job-detail-match-button"
+          href={`/cv-match-check/new?jobId=${encodeURIComponent(job.id)}`}
+        >
+          Check CV fit privately
+        </Link>
+      ) : null}
+
       {job.actions.authenticated && job.actions.canSave ? (
         <SaveJobAction
           jobId={job.id}

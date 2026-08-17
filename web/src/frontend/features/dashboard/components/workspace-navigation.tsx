@@ -33,6 +33,7 @@ export function WorkspaceNavigation({
           savedJobs: "Việc đã lưu",
           appliedJobs: "Việc đã ứng tuyển",
           suggestedJobs: "Việc làm đề xuất",
+          cvMatchCheck: "Kiểm tra độ phù hợp CV",
           recommendationSettings: "Cài đặt gợi ý việc làm",
         }
       : {
@@ -50,11 +51,13 @@ export function WorkspaceNavigation({
           savedJobs: "Saved Jobs",
           appliedJobs: "Applied Jobs",
           suggestedJobs: "Suggested Jobs",
+          cvMatchCheck: "CV Match Check",
           recommendationSettings: "Job Recommendation Settings",
         };
   const destinations = [
     { href: "/dashboard", label: copy.dashboard, icon: "dashboard" },
     { href: "/jobs", label: copy.jobs, icon: "jobs" },
+    { href: "/cv-match-check", label: copy.cvMatchCheck, icon: "cv-match" },
     { href: "/messages", label: copy.messages, icon: "messages" },
     { href: "/connections", label: copy.connections, icon: "connections" },
     { href: "/support", label: copy.support, icon: "support" },
@@ -158,7 +161,9 @@ export function WorkspaceNavigation({
                 {destination.href === "/jobs" && active ? (
                   <div className="workspace-navigation-subnav">
                     {jobsSubnav.map((subnav) => {
-                      const subnavActive = pathname === subnav.href;
+                      const subnavActive =
+                        pathname === subnav.href ||
+                        pathname.startsWith(`${subnav.href}/`);
                       return (
                         <Link
                           key={subnav.href}

@@ -30,10 +30,10 @@ describe("CV parser and draft factory", () => {
   });
 
   it("validates the whole parser output, evidence IDs, collections, and byte caps", async () => {
-    const writes: unknown[] = [];
+    const writes: Array<{ proposalPayload: unknown }> = [];
     const service = new CreateCvDraftService({
       saveDraft: async (draft) => {
-        writes.push(draft);
+        writes.push({ proposalPayload: draft.proposalPayload });
         return draft;
       },
     });
@@ -69,7 +69,7 @@ describe("CV parser and draft factory", () => {
   });
 
   it("normalizes a model's current entry when it also supplies an end date", async () => {
-    const writes: any[] = [];
+    const writes: Array<{ proposalPayload: unknown }> = [];
     const base = buildCvFixtureParserOutput();
     const output = {
       ...base,
@@ -83,7 +83,7 @@ describe("CV parser and draft factory", () => {
     };
     const service = new CreateCvDraftService({
       saveDraft: async (draft) => {
-        writes.push(draft);
+        writes.push({ proposalPayload: draft.proposalPayload });
         return draft;
       },
     });
