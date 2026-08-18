@@ -73,7 +73,14 @@ export const privateMatchJobSchema = z
 
 export const privateMatchEvidenceSchema = z
   .object({
-    type: z.enum(["SKILL", "PROJECT", "IMPACT", "EXPERIENCE", "EDUCATION", "OTHER"]),
+    type: z.enum([
+      "SKILL",
+      "PROJECT",
+      "IMPACT",
+      "EXPERIENCE",
+      "EDUCATION",
+      "OTHER",
+    ]),
     quote: z.string().min(1).max(1_000),
     criterion: z.string().min(1).max(300),
     location: z.string().min(1).max(160),
@@ -131,7 +138,10 @@ export const privateAiEvaluationSchema = z
     strengths: z
       .array(
         z
-          .object({ title: z.string().min(1).max(160), evidence: z.string().min(1).max(1_000) })
+          .object({
+            title: z.string().min(1).max(160),
+            evidence: z.string().min(1).max(1_000),
+          })
           .strict(),
       )
       .max(4),
@@ -200,7 +210,8 @@ export const fullPrivateReportSchema = z
     actions: z.array(z.string().min(1).max(500)).max(4),
     canApply: z.boolean(),
     completedAt: isoDateTime,
-    retryInProgress: z.literal(false),
+    // A completed report stays readable while a new immutable AI attempt runs.
+    retryInProgress: z.boolean(),
   })
   .strict();
 
@@ -242,19 +253,27 @@ export const privateMatchResponseSchema = z.discriminatedUnion("view", [
   fullPrivateReportSchema,
 ]);
 
-export type CreatePrivateMatchRequest = z.infer<typeof createPrivateMatchRequestSchema>;
+export type CreatePrivateMatchRequest = z.infer<
+  typeof createPrivateMatchRequestSchema
+>;
 export type PrivateMatchErrorCode = z.infer<typeof privateMatchErrorCodeSchema>;
 export type SourceProvenance = z.infer<typeof sourceProvenanceSchema>;
 export type PrivateMatchCv = z.infer<typeof privateMatchCvSchema>;
 export type PrivateMatchJob = z.infer<typeof privateMatchJobSchema>;
 export type PrivateMatchEvidence = z.infer<typeof privateMatchEvidenceSchema>;
-export type PrivateRequirementMatch = z.infer<typeof privateRequirementMatchSchema>;
+export type PrivateRequirementMatch = z.infer<
+  typeof privateRequirementMatchSchema
+>;
 export type PrivateRequirementGap = z.infer<typeof privateRequirementGapSchema>;
-export type PrivateAutomaticComponent = z.infer<typeof privateAutomaticComponentSchema>;
+export type PrivateAutomaticComponent = z.infer<
+  typeof privateAutomaticComponentSchema
+>;
 export type PrivateAiEvaluation = z.infer<typeof privateAiEvaluationSchema>;
 export type PrivateMatchStatus = z.infer<typeof privateMatchStatusSchema>;
 export type LimitedPrivateReport = z.infer<typeof limitedPrivateReportSchema>;
 export type FullPrivateReport = z.infer<typeof fullPrivateReportSchema>;
 export type PrivateMatchListItem = z.infer<typeof privateMatchListItemSchema>;
-export type PrivateMatchListResponse = z.infer<typeof privateMatchListResponseSchema>;
+export type PrivateMatchListResponse = z.infer<
+  typeof privateMatchListResponseSchema
+>;
 export type PrivateMatchResponse = z.infer<typeof privateMatchResponseSchema>;

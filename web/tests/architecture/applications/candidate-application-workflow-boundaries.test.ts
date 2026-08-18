@@ -40,4 +40,13 @@ describe("candidate application workflow boundaries", () => {
     expect(navigation).toContain('icon: "applications"');
     expect(jobsWorkspace).not.toContain('id: "applied"');
   });
+
+  it("records recruiter review when a recruiter opens a new application", async () => {
+    const rankingList = await source(
+      "src/frontend/features/recruiter-applications/candidate-ranking-list.tsx",
+    );
+    expect(rankingList).toContain('targetStage: "VIEWED"');
+    expect(rankingList).toContain("markViewed");
+    expect(rankingList).toContain('method: "PATCH"');
+  });
 });

@@ -3,14 +3,16 @@
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
+  AlignLeft,
   BriefcaseBusiness,
   Check,
-  FileSearch,
+  Clock3,
   FileText,
-  Gauge,
   LockKeyhole,
+  Search,
   ShieldCheck,
   Sparkles,
+  Star,
   TriangleAlert,
 } from "lucide-react";
 import {
@@ -202,7 +204,7 @@ export function PrivateMatchSetup({
   }
 
   return (
-    <main className="private-match-page">
+    <main className="private-match-page private-match-setup-page">
       <div className="private-match-breadcrumb">
         CV Match Check <span>/</span> New assessment
       </div>
@@ -212,7 +214,9 @@ export function PrivateMatchSetup({
           <p>Get a private, explainable match preview before you apply.</p>
         </div>
       </div>
-      <PrivateMatchStepper activeStep={1} />
+      <div className="private-match-stepper-card">
+        <PrivateMatchStepper activeStep={1} />
+      </div>
 
       <div className="private-match-columns">
         <div className="private-match-main-column">
@@ -231,22 +235,23 @@ export function PrivateMatchSetup({
                 Current job
               </span>
             </div>
-            <div className="private-match-job-panel">
+            <div className="private-match-job-panel private-match-setup-info-row">
               <span className="private-match-large-icon">
                 <BriefcaseBusiness aria-hidden="true" />
               </span>
-              <div>
+              <div className="private-match-info-body">
                 <h3>{selectedJob.title}</h3>
                 <span>
-                  {selectedJob.company} · {selectedJob.location} ·{" "}
+                  {selectedJob.company} {"\u00b7"} {selectedJob.location}{" "}
+                  {"\u00b7"}{" "}
                   {formatWorkArrangement(selectedJob.workArrangement)}
                 </span>
                 <small>
-                  {formatEmploymentType(selectedJob.employmentType)} ·{" "}
+                  {formatEmploymentType(selectedJob.employmentType)} {"\u00b7"}{" "}
                   {formatExperienceRequirement(
                     selectedJob.requiredExperienceYears,
                   )}{" "}
-                  · Source: SmartHire job post
+                  {"\u00b7"} Source: SmartHire job post
                 </small>
               </div>
               <span className="private-match-badge private-match-badge--green">
@@ -286,17 +291,17 @@ export function PrivateMatchSetup({
                 Current CV
               </span>
             </div>
-            <div className="private-match-card-heading">
+            <div className="private-match-card-heading private-match-setup-info-row private-match-setup-info-row--neutral">
               <span className="private-match-large-icon">
                 <FileText aria-hidden="true" />
               </span>
-              <div>
-                <p>{selectedCv.fileName}</p>
+              <div className="private-match-info-body">
+                <h3>{selectedCv.fileName}</h3>
                 <span>
                   {selectedCv.pageCount
                     ? `${selectedCv.pageCount} pages`
                     : "Page count unavailable"}{" "}
-                  · {bytes(selectedCv.byteSize)} ·{" "}
+                  {"\u00b7"} {bytes(selectedCv.byteSize)} {"\u00b7"}{" "}
                   {ready ? "Parsed successfully" : "Parsing in progress"}
                 </span>
               </div>
@@ -307,6 +312,7 @@ export function PrivateMatchSetup({
                     : "private-match-badge--yellow"
                 }`}
               >
+                {ready ? <Check aria-hidden="true" /> : null}
                 {ready ? "Ready" : "Not ready"}
               </span>
             </div>
@@ -321,41 +327,48 @@ export function PrivateMatchSetup({
             aria-labelledby="compare-title"
           >
             <h2 id="compare-title">What the assessment will compare</h2>
-            <div className="private-match-check-grid">
+            <ul
+              className="private-match-check-grid"
+              aria-label="Assessment comparison areas"
+            >
               {[
                 "Required skills and tools",
                 "Evidence quality in the CV",
                 "Years and level of experience",
                 "Preferred skills and context",
               ].map((label) => (
-                <label key={label}>
-                  <input type="checkbox" checked readOnly />
+                <li key={label}>
+                  <span className="private-match-check-mark" aria-hidden="true">
+                    <Check />
+                  </span>
                   <span>{label}</span>
-                </label>
+                </li>
               ))}
-            </div>
+            </ul>
           </section>
 
           <section
             className="private-match-privacy-card"
-            aria-label="Private self-assessment"
+            aria-labelledby="private-self-assessment-title"
           >
-            <div className="private-match-card-heading">
-              <LockKeyhole aria-hidden="true" />
-              <div>
-                <h2>Private self-assessment</h2>
-                <p>
-                  This private result uses the approved 60/40 method. It is not
-                  sent to recruiters and does not affect your application.
-                </p>
+            <div className="private-match-private-box">
+              <div className="private-match-private-heading">
+                <LockKeyhole aria-hidden="true" />
+                <h2 id="private-self-assessment-title">
+                  Private self-assessment
+                </h2>
               </div>
-            </div>
-            <div className="private-match-inset">
-              <ShieldCheck aria-hidden="true" />
-              <span>
-                Sensitive personal attributes are excluded. Delete saved
-                previews anytime from CV Match Check.
-              </span>
+              <p>
+                This private result uses the approved 60/40 method. It is not
+                sent to recruiters and does not affect your application.
+              </p>
+              <div className="private-match-inset">
+                <ShieldCheck aria-hidden="true" />
+                <span>
+                  Sensitive personal attributes are excluded. Delete saved
+                  previews anytime from CV Match Check.
+                </span>
+              </div>
             </div>
           </section>
 
@@ -370,16 +383,16 @@ export function PrivateMatchSetup({
           <section className="private-match-card">
             <h2>Your report will include</h2>
             <ul className="private-match-icon-list">
-              <IconRow icon={<Gauge aria-hidden="true" />}>
+              <IconRow icon={<Clock3 aria-hidden="true" />}>
                 Overall CV-to-job match score
               </IconRow>
-              <IconRow icon={<BriefcaseBusiness aria-hidden="true" />}>
+              <IconRow icon={<AlignLeft aria-hidden="true" />}>
                 Skill and experience breakdown
               </IconRow>
-              <IconRow icon={<FileSearch aria-hidden="true" />}>
+              <IconRow icon={<Search aria-hidden="true" />}>
                 Evidence linked to CV sections
               </IconRow>
-              <IconRow icon={<Sparkles aria-hidden="true" />}>
+              <IconRow icon={<Star aria-hidden="true" />}>
                 Practical improvement suggestions
               </IconRow>
             </ul>
@@ -421,21 +434,21 @@ export function PrivateMatchSetup({
               </p>
             </div>
           </section>
+          <button
+            className="private-match-primary-button private-match-primary-button--wide private-match-setup-cta"
+            type="button"
+            onClick={() => void analyze()}
+            disabled={!ready || create.isPending}
+          >
+            {create.isPending ? (
+              <span className="private-match-spinner" aria-hidden="true" />
+            ) : (
+              <Sparkles aria-hidden="true" />
+            )}
+            {create.isPending ? "Analyzing…" : "Analyze my CV"}
+          </button>
         </aside>
       </div>
-      <button
-        className="private-match-primary-button private-match-primary-button--wide private-match-setup-cta"
-        type="button"
-        onClick={() => void analyze()}
-        disabled={!ready || create.isPending}
-      >
-        {create.isPending ? (
-          <span className="private-match-spinner" aria-hidden="true" />
-        ) : (
-          <Sparkles aria-hidden="true" />
-        )}
-        {create.isPending ? "Analyzing…" : "Analyze my CV"}
-      </button>
     </main>
   );
 }

@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Sparkles,
   TriangleAlert,
+  UserRound,
 } from "lucide-react";
 import type {
   FullPrivateReport,
@@ -196,9 +197,10 @@ export function PrivateMatchReport({
   const mainGap = limited
     ? "Retry AI to produce the approved 60/40 hybrid score."
     : report.aiEvaluation.mainGap;
+  const retryActive = retrying || report.retryInProgress;
 
   return (
-    <main className="private-match-page">
+    <main className="private-match-page private-match-report-page">
       <div className="private-match-breadcrumb">
         CV Match Check <span>/</span> {report.job.title} <span>/</span> Match
         report
@@ -216,18 +218,32 @@ export function PrivateMatchReport({
           </p>
         </div>
         <div className="private-match-action-buttons">
-          {limited ? (
+          {!limited ? (
             <button
-              className="private-match-secondary-button"
+              className="private-match-secondary-button private-match-report-retry"
               type="button"
               onClick={onRetry}
-              disabled={retrying}
+              disabled={!onRetry || retryActive}
             >
               <RefreshCw
                 aria-hidden="true"
-                className={retrying ? "private-match-spin" : ""}
+                className={retryActive ? "private-match-spin" : ""}
               />{" "}
-              {retrying ? "Retrying…" : "Retry AI"}
+              {retryActive ? "Re-running..." : "Re-run AI evaluation"}
+            </button>
+          ) : null}
+          {limited ? (
+            <button
+              className="private-match-secondary-button private-match-report-retry is-prominent"
+              type="button"
+              onClick={onRetry}
+              disabled={!onRetry || retryActive}
+            >
+              <RefreshCw
+                aria-hidden="true"
+                className={retryActive ? "private-match-spin" : ""}
+              />{" "}
+              {retryActive ? "Retrying..." : "Retry AI"}
             </button>
           ) : null}
           {report.canApply ? (
@@ -276,6 +292,7 @@ export function PrivateMatchReport({
             <span
               className={`private-match-badge ${limited ? "private-match-badge--yellow" : "private-match-badge--blue"}`}
             >
+              <UserRound aria-hidden="true" />
               {limited
                 ? "Reduced-capability preview"
                 : "Independent candidate preview"}
@@ -346,7 +363,7 @@ export function PrivateMatchReport({
         <MetricCard
           icon={<ShieldCheck aria-hidden="true" />}
           title="Evidence confidence"
-          score={String(confidence)}
+          score={`${number(confidence)}%`}
           meta={confidenceLabel(confidence).replace(" confidence", "")}
           progress={confidence}
           caption="Confidence is not part of the score"

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Sparkles } from "lucide-react";
 import { useEffect } from "react";
 import { JobHeroCard } from "@/frontend/components/ui/job-hero-card";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
@@ -59,8 +60,11 @@ function DetailActionButtons({
         <Link
           className="job-secondary-button job-detail-match-button"
           href={`/cv-match-check/new?jobId=${encodeURIComponent(job.id)}`}
+          aria-label="Check CV fit privately. Results are visible only to you and are not shared with recruiters."
         >
-          Check CV fit privately
+          <Sparkles aria-hidden="true" />
+          <span>Check CV fit privately</span>
+          <span className="job-detail-match-private-label">Private</span>
         </Link>
       ) : null}
 

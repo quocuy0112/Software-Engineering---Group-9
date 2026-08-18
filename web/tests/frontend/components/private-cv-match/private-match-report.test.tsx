@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { PrivateMatchReady } from "@/frontend/features/private-cv-match/components/private-match-ready";
@@ -177,6 +177,28 @@ describe("PrivateMatchReport", () => {
     expect(screen.getByText("Private and fair by design")).toBeVisible();
   });
 
+  it("uses the caution treatment for a low match band", () => {
+    const lowReport: FullPrivateReport = {
+      ...fullReport,
+      hybridScore: 42.1,
+      matchBand: "LOW_MATCH",
+    };
+
+    render(<PrivateMatchReady report={lowReport} onOpen={vi.fn()} />);
+
+    expect(
+      document.querySelector(
+        ".private-match-ready-banner.is-caution .private-match-hero-icon",
+      ),
+    ).toBeTruthy();
+    expect(screen.getByText("May need more evidence")).toBeVisible();
+    expect(
+      screen.getByRole("heading", {
+        name: "Your CV may need more evidence for this role",
+      }),
+    ).toBeVisible();
+  });
+
   it("keeps normal header content in three non-overlapping boxes and stacks evidence", () => {
     render(<PrivateMatchReport checkId="check-1" report={fullReport} />);
 
@@ -222,6 +244,34 @@ describe("PrivateMatchReport", () => {
     expect(screen.getByText("Impact")).toBeVisible();
     expect(screen.getByText("Kafka", { selector: "strong" })).toBeVisible();
     expect(screen.getByText("Add a concrete project example.")).toBeVisible();
+  });
+
+  it("allows a completed hybrid report to start a fresh AI evaluation", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <PrivateMatchReport
+        checkId="check-1"
+        report={fullReport}
+        onRetry={onRetry}
+      />,
+    );
+
+    const retryButton = screen.getByRole("button", {
+      name: "Re-run AI evaluation",
+    });
+    fireEvent.click(retryButton);
+    expect(onRetry).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <PrivateMatchReport
+        checkId="check-1"
+        report={{ ...fullReport, retryInProgress: true }}
+        onRetry={onRetry}
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Re-running..." }),
+    ).toBeDisabled();
   });
 
   it("renders limited mode as deterministic-only throughout the report", () => {

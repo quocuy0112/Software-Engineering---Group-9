@@ -44,6 +44,8 @@
     "cv:worker:probe": "npm run cv:worker:probe --workspace @smarthire/web",
     "candidate-match:worker": "npm run candidate-match:worker --workspace @smarthire/web",
     "candidate-match:worker:probe": "npm run candidate-match:worker:probe --workspace @smarthire/web",
+    "applications:intake": "npm run applications:intake --workspace @smarthire/web",
+    "applications:intake:watch": "npm run applications:intake:watch --workspace @smarthire/web",
     "candidate-match:migration:verify": "npm run candidate-match:migration:verify --workspace @smarthire/web",
     "cv:scanner:check": "npm run cv:scanner:check --workspace @smarthire/web",
     "ocr:up": "docker compose up -d --build ocr-engine",

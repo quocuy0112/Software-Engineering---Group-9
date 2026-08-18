@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   AlertCircle,
@@ -176,6 +176,29 @@ export function PrivateMatchPageClient({ checkId }: { checkId: string }) {
   const query = usePrivateCvMatch(checkId);
   const retry = useRetryPrivateCvMatch(checkId);
   const [opened, setOpened] = useState(false);
+  const [retryRequested, setRetryRequested] = useState(false);
+  const [retryWasRunning, setRetryWasRunning] = useState(false);
+  const data: PrivateMatchResponse | undefined = query.data;
+
+  useEffect(() => {
+    if (
+      retryRequested &&
+      data?.view === "LIMITED_REPORT" &&
+      data.retryInProgress
+    ) {
+      setRetryWasRunning(true);
+    }
+  }, [data, retryRequested]);
+
+  const retryAi = async () => {
+    setRetryRequested(true);
+    setRetryWasRunning(false);
+    try {
+      await retry.mutateAsync();
+    } catch {
+      // The mutation error is rendered next to the retry control.
+    }
+  };
 
   if (query.isPending) return <LoadingScreen />;
   if (query.isError) {
@@ -184,7 +207,6 @@ export function PrivateMatchPageClient({ checkId }: { checkId: string }) {
     }
     return <NetworkErrorScreen onRetry={() => void query.refetch()} />;
   }
-  const data: PrivateMatchResponse | undefined = query.data;
   if (!data) return <LoadingScreen />;
   if (data.view === "STATUS") {
     if (data.state === "FAILED") {
@@ -201,13 +223,29 @@ export function PrivateMatchPageClient({ checkId }: { checkId: string }) {
       <PrivateMatchLimitedReport
         checkId={checkId}
         report={data}
-        onRetry={() => void retry.mutateAsync()}
+        onRetry={() => void retryAi()}
         retrying={retry.isPending}
-        retryError={retry.error}
+        retryError={
+          retry.error
+            ? privateMatchErrorMessage(retry.error)
+            : retryRequested && retryWasRunning && !data.retryInProgress
+              ? "AI evaluation is still unavailable. Your deterministic report remains available; try again later."
+              : undefined
+        }
       />
     );
   }
-  return <PrivateMatchReport checkId={checkId} report={data} />;
+  return (
+    <PrivateMatchReport
+      checkId={checkId}
+      report={data}
+      onRetry={() => void retryAi()}
+      retrying={retry.isPending}
+      retryError={
+        retry.error ? privateMatchErrorMessage(retry.error) : undefined
+      }
+    />
+  );
 }
 
 export { privateMatchErrorMessage };

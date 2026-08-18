@@ -1,105 +1,20 @@
 "use client";
-
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { ArrowRight, Check, CheckCircle2, Clock3, Eye, FileText, LoaderCircle, TriangleAlert } from "lucide-react";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
-import {
-  applicationTrackerSchema,
-  type ApplicationTracker,
-} from "@/shared/contracts/candidate-applications";
-
-function statusLabel(status: string) {
-  if (status === "COMPLETE") return "Complete";
-  if (status === "ACTIVE") return "In progress";
-  if (status === "ATTENTION_REQUIRED") return "Needs attention";
-  return "Waiting";
-}
-
-export function ApplicationProcessing({
-  initialTracker,
-  csrfProof,
-}: {
-  initialTracker: ApplicationTracker;
-  csrfProof: string;
-}) {
-  const [tracker, setTracker] = useState(initialTracker);
-  const [retrying, setRetrying] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const applicationId = tracker.applicationId;
-
-  const poll = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/candidate/applications/${encodeURIComponent(applicationId)}`, {
-        cache: "no-store",
-        credentials: "same-origin",
-        headers: { Accept: "application/json" },
-      });
-      if (!response.ok) return;
-      const next = applicationTrackerSchema.parse(await response.json());
-      setTracker((current) => next.intake.progressPercent >= current.intake.progressPercent ? next : current);
-    } catch {
-      // A transient polling error should not erase the last persisted state.
-    }
-  }, [applicationId]);
-
-  useEffect(() => {
-    let timer: number | undefined;
-    let mounted = true;
-    const schedule = () => {
-      if (!mounted || document.hidden) return;
-      timer = window.setTimeout(async () => {
-        if (!mounted || document.hidden) return;
-        await poll();
-        schedule();
-      }, 4_000);
-    };
-    const onVisibility = () => {
-      if (document.hidden) {
-        if (timer !== undefined) window.clearTimeout(timer);
-        timer = undefined;
-      } else {
-        schedule();
-      }
-    };
-    schedule();
-    document.addEventListener("visibilitychange", onVisibility);
-    return () => {
-      mounted = false;
-      if (timer !== undefined) window.clearTimeout(timer);
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
-  }, [poll]);
-
-  async function retry() {
-    setRetrying(true);
-    setError(null);
-    try {
-      const response = await mutateWithCurrentCsrf(
-        `/api/candidate/applications/${encodeURIComponent(applicationId)}/processing/retry`,
-        { method: "POST" },
-        csrfProof,
-      );
-      const body: unknown = await response.json().catch(() => null);
-      if (!response.ok) throw new Error("The intake check could not be retried.");
-      setTracker(applicationTrackerSchema.parse(body));
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "The intake check could not be retried.");
-    } finally {
-      setRetrying(false);
-    }
-  }
-
-  return (
-    <section className="candidate-application-flow candidate-application-processing" aria-labelledby="processing-title">
-      <header className="candidate-application-flow__header"><div><p className="workspace-kicker">Application received</p><h1 id="processing-title">We’re checking your files</h1><p>{tracker.job.title} · {tracker.job.companyName}</p></div><Link href="/jobs/applied" className="job-secondary-link">Applications</Link></header>
-      <div className="candidate-application-progress" role="progressbar" aria-label="Application intake progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={tracker.intake.progressPercent}><span style={{ width: `${tracker.intake.progressPercent}%` }} /></div>
-      <p className="candidate-application-progress-label">{tracker.intake.progressPercent}% complete</p>
-      {error ? <p className="candidate-application-error" role="alert">{error}</p> : null}
-      <ol className="candidate-application-intake-steps">
-        {tracker.intake.steps.map((step) => <li key={step.code} className={`intake-step intake-step--${step.status.toLowerCase()}`}><span aria-hidden="true">{step.status === "COMPLETE" ? "✓" : step.status === "ATTENTION_REQUIRED" ? "!" : "•"}</span><div><strong>{step.code === "APPLICATION_RECEIVED" ? "Application received" : step.code === "CHECKING_FILES" ? "Checking files" : "Sent to the recruiter"}</strong><small>{statusLabel(step.status)}</small></div></li>)}
-      </ol>
-      {tracker.intake.state === "ATTENTION_REQUIRED" ? <div className="candidate-application-warning" role="alert"><strong>One of the files needs attention.</strong><p>We couldn’t finish the technical check. Your application stage remains submitted.</p><button type="button" className="sh-button" disabled={retrying} onClick={() => void retry()}>{retrying ? "Retrying…" : "Retry file checks"}</button></div> : null}
-      {tracker.intake.state === "SENT_TO_RECRUITER" ? <div className="candidate-application-success" role="status"><h2>Your application is with the recruiter</h2><p>The technical checks are complete. Your canonical application stage is still shown on the tracker.</p><Link className="sh-button" href={`/jobs/applied/${encodeURIComponent(applicationId)}`}>View application status</Link></div> : <p className="candidate-application-muted">You can leave this page. Your progress is saved and will continue in the background.</p>}
-    </section>
-  );
+import { applicationTrackerSchema, type ApplicationTracker } from "@/shared/contracts/candidate-applications";
+function date(value: string | null) { return value ? new Intl.DateTimeFormat("en", { hour: "2-digit", minute: "2-digit" }).format(new Date(value)) : null; }
+function size(bytes: number) { return `${Math.max(1, Math.round(bytes / 1024))} KB`; }
+function stepDetail(code: string) { return code === "APPLICATION_RECEIVED" ? "Your application has been received." : code === "CHECKING_FILES" ? "We are checking readability and standardizing your files." : "Your application will be available to the recruiter."; }
+export function ApplicationProcessing({ initialTracker, csrfProof }: { initialTracker: ApplicationTracker; csrfProof: string }) {
+ const [tracker, setTracker] = useState(initialTracker); const [retrying, setRetrying] = useState(false); const [error, setError] = useState<string | null>(null); const applicationId = tracker.applicationId;
+ const poll = useCallback(async () => { try { const response = await fetch(`/api/candidate/applications/${encodeURIComponent(applicationId)}`, { cache: "no-store", credentials: "same-origin", headers: { Accept: "application/json" } }); if (!response.ok) return; const next = applicationTrackerSchema.parse(await response.json()); setTracker(current => next.intake.progressPercent >= current.intake.progressPercent ? next : current); } catch { /* Keep the last persisted state during a transient poll failure. */ } }, [applicationId]);
+ useEffect(() => { let timer: number | undefined; let mounted = true; const schedule = () => { if (!mounted || document.hidden) return; timer = window.setTimeout(async () => { await poll(); schedule(); }, 4000); }; const visibility = () => { if (document.hidden && timer) window.clearTimeout(timer); else schedule(); }; schedule(); document.addEventListener("visibilitychange", visibility); return () => { mounted = false; if (timer) window.clearTimeout(timer); document.removeEventListener("visibilitychange", visibility); }; }, [poll]);
+ async function retry() { setRetrying(true); setError(null); try { const response = await mutateWithCurrentCsrf(`/api/candidate/applications/${encodeURIComponent(applicationId)}/processing/retry`, { method: "POST" }, csrfProof); if (!response.ok) throw new Error("The intake check could not be retried."); setTracker(applicationTrackerSchema.parse(await response.json())); } catch (caught) { setError(caught instanceof Error ? caught.message : "The intake check could not be retried."); } finally { setRetrying(false); } }
+ return <main className="application-ui" aria-labelledby="processing-title"><header className="application-ui__header"><div><nav className="application-ui__breadcrumb" aria-label="Breadcrumb"><Link href="/jobs/applied">Applications</Link><span>/</span><span>{tracker.job.title}</span><span>/</span><span>Processing status</span></nav><h1 id="processing-title">Your application is being processed</h1><p>Your application has been received. You can leave this page and return later.</p></div></header>
+ <section className="application-ui-processing-hero"><span className="application-ui-processing-hero__icon"><LoaderCircle aria-hidden="true" /></span><div><span>PROCESSING</span><h2>The system is checking the submitted files</h2><p>This is a file-readability and standardization check, not a self-scoring step.</p><div className="application-ui-progress" role="progressbar" aria-label="Application intake progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={tracker.intake.progressPercent}><i style={{ width: `${tracker.intake.progressPercent}%` }} /></div><strong>{tracker.intake.progressPercent}% complete</strong><small>Usually completed in under 1 minute</small></div></section>
+ {error ? <p className="application-ui-alert application-ui-alert--error" role="alert">{error}</p> : null}
+ <div className="application-ui__columns"><div className="application-ui__main"><section className="application-ui-card"><h2>Application intake progress</h2><ol className="application-ui-intake-list">{tracker.intake.steps.map(step => { const icon = step.status === "COMPLETE" ? <Check aria-hidden="true" /> : step.status === "ACTIVE" ? <LoaderCircle aria-hidden="true" /> : <Clock3 aria-hidden="true" />; return <li key={step.code} className={`is-${step.status.toLowerCase()}`}><span>{icon}</span><div><strong>{step.code === "APPLICATION_RECEIVED" ? "Application received" : step.code === "CHECKING_FILES" ? "Checking files" : "Send to recruiter"}</strong><p>{stepDetail(step.code)}</p></div><small>{step.status === "ACTIVE" ? "Processing" : step.status === "PENDING" ? "Next" : date(step.timestamp) ?? "Complete"}</small></li>; })}</ol>{tracker.intake.state === "ATTENTION_REQUIRED" ? <button type="button" className="application-ui-button application-ui-button--secondary" onClick={() => void retry()} disabled={retrying}><TriangleAlert aria-hidden="true" />{retrying ? "Retrying…" : "Retry file checks"}</button> : null}</section><section className="application-ui-card"><h2>Received files</h2><ul className="application-ui-file-list">{tracker.files.map(file => <li key={file.versionId}><span className="application-ui-file-icon"><FileText aria-hidden="true" /></span><span><strong>{file.displayName}</strong><small>{size(file.byteSize)}</small></span><em>Received</em></li>)}</ul></section></div><aside className="application-ui__sidebar"><section className="application-ui-card"><span className="application-ui-eyebrow">APPLICATION</span><h2>{tracker.job.title}</h2><p>{tracker.job.companyName}</p><code>Application ID: {tracker.applicationId}</code><small>Submitted {new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short" }).format(new Date(tracker.submittedAt))}</small></section><section className="application-ui-card"><h2>What you will see</h2><ul className="application-ui-icon-list"><li><Eye aria-hidden="true" />Application receipt status</li><li><Eye aria-hidden="true" />Main stages of the recruitment process</li><li><Eye aria-hidden="true" />Requests for more information from the recruiter</li></ul></section><section className="application-ui-private-note"><TriangleAlert aria-hidden="true" /><div><strong>Internal information is not shown</strong><p>Match scores, AI scores, rankings, and recruiter notes are not shown in the candidate portal.</p><small>The recruiter always makes the final hiring decision.</small></div></section></aside></div>
+ <div className="application-ui-confirm-strip"><CheckCircle2 aria-hidden="true" />You do not need to keep this page open. We will notify you when the status changes.</div><Link className="application-ui-button application-ui-button--primary application-ui-button--wide" href={`/jobs/applied/${encodeURIComponent(applicationId)}`}>View application status <ArrowRight aria-hidden="true" /></Link></main>;
 }

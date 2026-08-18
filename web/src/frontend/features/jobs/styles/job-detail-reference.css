@@ -191,6 +191,42 @@
   font-weight: 600;
 }
 
+.job-detail-board-page .job-detail-match-button {
+  min-height: 46px;
+  gap: 8px;
+  padding: 11px 14px;
+  border-color: #cdd9ff;
+  border-radius: 10px;
+  color: #2347c9;
+  background: #f4f6ff;
+  font-size: 14.5px;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.job-detail-board-page .job-detail-match-button > svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+
+.job-detail-board-page .job-detail-match-private-label {
+  padding: 2px 6px;
+  border-radius: 999px;
+  color: #3d56b7;
+  background: #e4eaff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.job-detail-board-page .job-detail-match-button:hover,
+.job-detail-board-page .job-detail-match-button:focus-visible {
+  border-color: #8fa8ff;
+  color: #173daf;
+  background: #eaf0ff;
+}
+
 .job-detail-board-page
   .job-detail-primary-actions
   .job-save-button[aria-pressed="true"] {

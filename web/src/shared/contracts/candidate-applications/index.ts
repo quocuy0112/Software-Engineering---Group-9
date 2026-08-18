@@ -126,6 +126,10 @@ export const applicationReviewSchema = z
         title: z.string().trim().min(1).max(200),
         companyName: z.string().trim().min(1).max(160),
         location: z.string().trim().min(1).max(300),
+        employmentType: z.string().trim().min(1).max(80),
+        experienceLevel: z.string().trim().min(1).max(80),
+        workArrangement: z.string().trim().min(1).max(80),
+        applicationDeadline: isoDateTime.nullable(),
         isOpen: z.boolean(),
       })
       .strict(),
@@ -258,6 +262,10 @@ export const applicationTrackerSchema = z
         companyName: z.string().trim().min(1).max(160),
         companyLogoUrl: z.string().url().nullable(),
         location: z.string().trim().min(1).max(300),
+        employmentType: z.string().trim().min(1).max(80),
+        experienceLevel: z.string().trim().min(1).max(80),
+        workArrangement: z.string().trim().min(1).max(80),
+        applicationDeadline: isoDateTime.nullable(),
         jobAvailable: z.boolean(),
       })
       .strict(),

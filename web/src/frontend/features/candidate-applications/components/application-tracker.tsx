@@ -1,146 +1,25 @@
 "use client";
-
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { ArrowRight, Building2, Check, CheckCircle2, Clock3, FileText, LockKeyhole, MessageCircle, SearchCheck, ShieldCheck, ToggleLeft, ToggleRight } from "lucide-react";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
-import {
-  applicationTrackerSchema,
-  notificationPreferenceSchema,
-  type ApplicationTracker,
-} from "@/shared/contracts/candidate-applications";
-
-const publicStages = [
-  ["APPLICATION_SUBMITTED", "Application submitted"],
-  ["UNDER_REVIEW", "Under review"],
-  ["INTERVIEW", "Interview"],
-  ["OUTCOME", "Outcome"],
-] as const;
-
-function date(value: string) {
-  return new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
-}
-
-export function ApplicationTracker({
-  initialTracker,
-  csrfProof,
-}: {
-  initialTracker: ApplicationTracker;
-  csrfProof: string;
-}) {
-  const [tracker, setTracker] = useState(initialTracker);
-  const [pending, setPending] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const applicationId = tracker.applicationId;
-
-  const poll = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/candidate/applications/${encodeURIComponent(applicationId)}`, { cache: "no-store", credentials: "same-origin", headers: { Accept: "application/json" } });
-      if (!response.ok) return;
-      const next = applicationTrackerSchema.parse(await response.json());
-      setTracker((current) => next.stageVersion >= current.stageVersion && next.intake.progressPercent >= current.intake.progressPercent ? next : current);
-    } catch {
-      // Keep the last safe server projection visible during transient failures.
-    }
-  }, [applicationId]);
-
-  useEffect(() => {
-    let timer: number | undefined;
-    let mounted = true;
-    const schedule = () => {
-      if (!mounted || document.hidden) return;
-      timer = window.setTimeout(async () => {
-        if (!mounted || document.hidden) return;
-        await poll();
-        schedule();
-      }, 4_000);
-    };
-    const onVisibility = () => {
-      if (document.hidden) {
-        if (timer !== undefined) window.clearTimeout(timer);
-        timer = undefined;
-      } else {
-        schedule();
-      }
-    };
-    schedule();
-    document.addEventListener("visibilitychange", onVisibility);
-    return () => {
-      mounted = false;
-      if (timer !== undefined) window.clearTimeout(timer);
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
-  }, [poll]);
-
-  async function setPreference(field: "emailEnabled" | "inAppEnabled", value: boolean) {
-    setPending(field);
-    setError(null);
-    const current = tracker.notificationPreference;
-    try {
-      const response = await mutateWithCurrentCsrf(
-        `/api/candidate/applications/${encodeURIComponent(applicationId)}/notification-preferences`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            emailEnabled: field === "emailEnabled" ? value : current.emailEnabled,
-            inAppEnabled: field === "inAppEnabled" ? value : current.inAppEnabled,
-            expectedVersion: current.version,
-          }),
-        },
-        csrfProof,
-      );
-      const body: unknown = await response.json().catch(() => null);
-      if (!response.ok) throw new Error("Notification settings could not be updated. Refresh and try again.");
-      const preference = notificationPreferenceSchema.parse(body);
-      setTracker((currentTracker) => ({ ...currentTracker, notificationPreference: preference }));
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Notification settings could not be updated.");
-    } finally {
-      setPending(null);
-    }
-  }
-
-  async function withdraw() {
-    if (!tracker.canWithdraw || pending) return;
-    if (!window.confirm("Withdraw this application? This cannot be undone.")) return;
-    setPending("withdraw");
-    setError(null);
-    try {
-      const response = await mutateWithCurrentCsrf(
-        `/api/candidate/applications/${encodeURIComponent(applicationId)}/withdraw`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "idempotency-key": crypto.randomUUID() },
-          body: JSON.stringify({ expectedVersion: tracker.stageVersion, confirmed: true }),
-        },
-        csrfProof,
-      );
-      const body: unknown = await response.json().catch(() => null);
-      if (!response.ok) throw new Error("This application could not be withdrawn. Refresh and try again.");
-      await poll();
-      void body;
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "This application could not be withdrawn.");
-    } finally {
-      setPending(null);
-    }
-  }
-
-  const activeIndex = Math.max(0, publicStages.findIndex(([stage]) => stage === tracker.publicStage));
-  return (
-    <section className="candidate-application-flow candidate-application-tracker" aria-labelledby="application-tracker-title">
-      <header className="candidate-application-flow__header"><div><p className="workspace-kicker">Application tracker</p><h1 id="application-tracker-title">{tracker.job.title}</h1><p>{tracker.job.companyName} · {tracker.job.location}</p><p className="candidate-application-muted">Application ID {tracker.applicationId} · Submitted {date(tracker.submittedAt)}</p></div><Link href="/jobs/applied" className="job-secondary-link">Back to applications</Link></header>
-      {error ? <p className="candidate-application-error" role="alert">{error}</p> : null}
-      <ol className="candidate-application-stage-stepper" aria-label="Application stage">
-        {publicStages.map(([stage, label], index) => <li key={stage} className={index <= activeIndex ? "is-active" : undefined}><span>{index + 1}</span>{label}</li>)}
-      </ol>
-      {tracker.publicOutcome === "WITHDRAWN" ? <p className="candidate-application-warning" role="status">You withdrew this application. Its canonical stage remains {tracker.canonicalStage}.</p> : null}
-      <div className="candidate-application-tracker-grid">
-        <section className="candidate-application-panel" aria-labelledby="recent-updates-heading"><p className="workspace-kicker">Recent updates</p><h2 id="recent-updates-heading">Application timeline</h2>{tracker.updates.length ? <ol className="candidate-application-timeline">{tracker.updates.map((update) => <li key={update.id}><span aria-hidden="true" /> <div><strong>{update.title}</strong><time dateTime={update.occurredAt}>{date(update.occurredAt)}</time></div></li>)}</ol> : <p className="candidate-application-muted">No public updates yet.</p>}</section>
-        <aside className="candidate-application-panel"><p className="workspace-kicker">Submitted files</p><h2>Application details</h2><ul className="candidate-application-file-list">{tracker.files.map((file) => <li key={file.versionId}><strong>{file.displayName}</strong><span>{file.mimeType} · {Math.ceil(file.byteSize / 1024)} KB</span></li>)}</ul><p className="candidate-application-muted">Private match scores, rankings, employer notes, and other candidates are not part of the candidate tracker.</p></aside>
-        <aside className="candidate-application-panel"><p className="workspace-kicker">Notifications</p><h2>For this application</h2><label className="candidate-application-toggle"><input type="checkbox" checked={tracker.notificationPreference.emailEnabled} disabled={pending !== null} onChange={(event) => void setPreference("emailEnabled", event.target.checked)} /> Email</label><label className="candidate-application-toggle"><input type="checkbox" checked={tracker.notificationPreference.inAppEnabled} disabled={pending !== null} onChange={(event) => void setPreference("inAppEnabled", event.target.checked)} /> In-app notifications</label></aside>
-      </div>
-      {tracker.canWithdraw ? <footer className="candidate-application-withdraw"><button type="button" className="job-secondary-button" disabled={pending !== null} onClick={() => void withdraw()}>{pending === "withdraw" ? "Withdrawing…" : "Withdraw application"}</button><span>You can withdraw before the interview stage.</span></footer> : null}
-    </section>
-  );
+import { applicationTrackerSchema, notificationPreferenceSchema, type ApplicationTracker } from "@/shared/contracts/candidate-applications";
+const stages = [["APPLICATION_SUBMITTED", "Application submitted"], ["UNDER_REVIEW", "Under review"], ["INTERVIEW", "Interview"], ["OUTCOME", "Outcome"]] as const;
+function date(value: string) { return new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value)); }
+function label(value: string) { return value.toLowerCase().replaceAll("_", " ").replace(/\b\w/g, (character) => character.toUpperCase()); }
+function stageCopy(stage: ApplicationTracker["publicStage"], outcome: ApplicationTracker["publicOutcome"]) { if (outcome === "WITHDRAWN") return ["Application withdrawn", "You withdrew this application. The recruitment team has been notified."]; if (stage === "APPLICATION_SUBMITTED") return ["Application submitted", "Your application has been received and is ready for the recruiter’s review."]; if (stage === "UNDER_REVIEW") return ["Under recruiter review", "The recruiter is reviewing your submitted application."]; if (stage === "INTERVIEW") return ["Interview stage", "The recruiter has moved your application to the interview stage."]; return ["Recruitment outcome", "The recruiter has published an update for this application."]; }
+function updateDescription(kind: string) { return kind === "SUBMITTED" ? "Your application was successfully submitted." : kind === "UNDER_REVIEW" ? "The recruiter has started reviewing your application." : kind === "INTERVIEW" ? "The recruiter has moved your application forward." : kind === "WITHDRAWN" ? "Your application is no longer active." : "The recruitment status has been updated."; }
+export function ApplicationTracker({ initialTracker, csrfProof }: { initialTracker: ApplicationTracker; csrfProof: string }) {
+ const [tracker, setTracker] = useState(initialTracker); const [pending, setPending] = useState<string | null>(null); const [error, setError] = useState<string | null>(null); const applicationId = tracker.applicationId;
+ const poll = useCallback(async () => { try { const response = await fetch(`/api/candidate/applications/${encodeURIComponent(applicationId)}`, { cache: "no-store", credentials: "same-origin", headers: { Accept: "application/json" } }); if (!response.ok) return; const next = applicationTrackerSchema.parse(await response.json()); setTracker(current => next.stageVersion >= current.stageVersion && next.intake.progressPercent >= current.intake.progressPercent ? next : current); } catch { /* Preserve the last safe projection during a transient poll failure. */ } }, [applicationId]);
+ useEffect(() => { let timer: number | undefined; let mounted = true; const schedule = () => { if (!mounted || document.hidden) return; timer = window.setTimeout(async () => { await poll(); schedule(); }, 4000); }; const visibility = () => { if (document.hidden && timer) window.clearTimeout(timer); else schedule(); }; schedule(); document.addEventListener("visibilitychange", visibility); return () => { mounted = false; if (timer) window.clearTimeout(timer); document.removeEventListener("visibilitychange", visibility); }; }, [poll]);
+ async function setPreference(field: "emailEnabled" | "inAppEnabled", value: boolean) { setPending(field); setError(null); const current = tracker.notificationPreference; try { const response = await mutateWithCurrentCsrf(`/api/candidate/applications/${encodeURIComponent(applicationId)}/notification-preferences`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ emailEnabled: field === "emailEnabled" ? value : current.emailEnabled, inAppEnabled: field === "inAppEnabled" ? value : current.inAppEnabled, expectedVersion: current.version }) }, csrfProof); if (!response.ok) throw new Error("Notification settings could not be updated. Refresh and try again."); const preference = notificationPreferenceSchema.parse(await response.json()); setTracker(currentTracker => ({ ...currentTracker, notificationPreference: preference })); } catch (caught) { setError(caught instanceof Error ? caught.message : "Notification settings could not be updated."); } finally { setPending(null); } }
+ async function withdraw() { if (!tracker.canWithdraw || pending || !window.confirm("Withdraw this application? This cannot be undone.")) return; setPending("withdraw"); setError(null); try { const response = await mutateWithCurrentCsrf(`/api/candidate/applications/${encodeURIComponent(applicationId)}/withdraw`, { method: "POST", headers: { "Content-Type": "application/json", "idempotency-key": crypto.randomUUID() }, body: JSON.stringify({ expectedVersion: tracker.stageVersion, confirmed: true }) }, csrfProof); if (!response.ok) throw new Error("This application could not be withdrawn. Refresh and try again."); await poll(); } catch (caught) { setError(caught instanceof Error ? caught.message : "This application could not be withdrawn."); } finally { setPending(null); } }
+ const activeIndex = Math.max(0, stages.findIndex(([stage]) => stage === tracker.publicStage)); const [headline, description] = stageCopy(tracker.publicStage, tracker.publicOutcome);
+ return <main className="application-ui" aria-labelledby="application-tracker-title"><header className="application-ui__header"><div><nav className="application-ui__breadcrumb" aria-label="Breadcrumb"><Link href="/jobs/applied">Applications</Link><span>/</span><span>{tracker.job.title}</span></nav><h1 id="application-tracker-title">My application</h1><p>Follow official updates from the recruiter.</p></div><Link className="application-ui-button application-ui-button--secondary" href="/support"><MessageCircle aria-hidden="true" />Contact support</Link></header>
+ {error ? <p className="application-ui-alert application-ui-alert--error" role="alert">{error}</p> : null}
+ <section className="application-ui-status-hero"><span className="application-ui-status-hero__icon">{tracker.publicOutcome === "WITHDRAWN" ? <Clock3 aria-hidden="true" /> : <SearchCheck aria-hidden="true" />}</span><div><span>CURRENT STATUS</span><h2>{headline}</h2><p>{description}</p></div><aside><small>Latest update</small><strong>{date(tracker.lastUpdatedAt)}</strong><code>Application ID: {applicationId}</code></aside></section>
+ <section className="application-ui-card"><h2>Recruitment progress</h2><ol className="application-ui-stage-progress">{stages.map(([stage, label], index) => { const complete = index < activeIndex; const active = index === activeIndex; return <li key={stage} className={complete ? "is-complete" : active ? "is-active" : ""}><span>{complete ? <Check aria-hidden="true" /> : index + 1}</span><strong>{label}</strong><small>{complete ? "Complete" : active ? "Processing" : "Not started"}</small></li>; })}</ol></section>
+ <div className="application-ui__columns"><div className="application-ui__main"><section className="application-ui-card"><h2>Recent updates</h2>{tracker.updates.length ? <ol className="application-ui-timeline">{[...tracker.updates].reverse().map(update => <li key={update.id}><span><CheckCircle2 aria-hidden="true" /></span><div><strong>{update.title}</strong><p>{updateDescription(update.kind)}</p><time dateTime={update.occurredAt}>{date(update.occurredAt)}</time></div></li>)}</ol> : <p className="application-ui-muted">No public updates yet.</p>}</section><section className="application-ui-card"><div className="application-ui-card__heading"><h2>Submitted files</h2><span className="application-ui-lock"><LockKeyhole aria-hidden="true" />Version locked</span></div><ul className="application-ui-file-list">{tracker.files.map(file => <li key={file.versionId}><span className="application-ui-file-icon"><FileText aria-hidden="true" /></span><span><strong>{file.displayName}</strong><small>{Math.ceil(file.byteSize / 1024)} KB</small></span><span className="application-ui-muted">View unavailable</span></li>)}</ul></section><section className="application-ui-disclosure application-ui-disclosure--compact"><ShieldCheck aria-hidden="true" /><div><strong>Screening status: Completed.</strong> Match scores, AI scores, rankings, and internal recruiter notes remain private.</div></section></div>
+ <aside className="application-ui__sidebar"><section className="application-ui-card application-ui-job-card"><Building2 aria-hidden="true" /><h2>{tracker.job.title}</h2><p>{tracker.job.companyName}</p><small>{tracker.job.location} · {label(tracker.job.workArrangement)}</small><div className="application-ui-tags"><span>{label(tracker.job.employmentType)}</span><span>{label(tracker.job.experienceLevel)}</span></div><hr /><small>Submitted {date(tracker.submittedAt)}</small><code>Application ID: {applicationId}</code></section><section className="application-ui-card"><h2>Status notifications</h2><button type="button" className="application-ui-toggle" disabled={pending !== null} onClick={() => void setPreference("emailEnabled", !tracker.notificationPreference.emailEnabled)}><span><strong>Email</strong><small>{tracker.notificationPreference.emailEnabled ? "Enabled" : "Disabled"}</small></span>{tracker.notificationPreference.emailEnabled ? <ToggleRight aria-hidden="true" /> : <ToggleLeft aria-hidden="true" />}</button><button type="button" className="application-ui-toggle" disabled={pending !== null} onClick={() => void setPreference("inAppEnabled", !tracker.notificationPreference.inAppEnabled)}><span><strong>In-app notifications</strong><small>{tracker.notificationPreference.inAppEnabled ? "Enabled" : "Disabled"}</small></span>{tracker.notificationPreference.inAppEnabled ? <ToggleRight aria-hidden="true" /> : <ToggleLeft aria-hidden="true" />}</button></section><div className="application-ui-actions-stack"><a className="application-ui-button application-ui-button--primary" href="#submitted-files">View submitted application <ArrowRight aria-hidden="true" /></a>{tracker.canWithdraw ? <button type="button" className="application-ui-button application-ui-button--secondary" disabled={pending !== null} onClick={() => void withdraw()}>{pending === "withdraw" ? "Withdrawing…" : "Withdraw application"}</button> : <p className="application-ui-withdraw-note">Withdrawal is no longer available once an application reaches the interview stage.</p>}</div></aside></div></main>;
 }

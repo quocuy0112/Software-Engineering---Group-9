@@ -64,7 +64,8 @@ export function usePrivateCvMatch(checkId: string) {
       return data?.view === "STATUS" &&
         (data.state === "QUEUED" || data.state === "ANALYZING")
         ? 4_000
-        : data?.view === "LIMITED_REPORT" && data.retryInProgress
+        : (data?.view === "LIMITED_REPORT" || data?.view === "FULL_REPORT") &&
+            data.retryInProgress
           ? 4_000
           : false;
     },

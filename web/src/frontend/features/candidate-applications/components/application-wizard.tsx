@@ -52,6 +52,9 @@ export function ApplicationWizard({
   const [cvs, setCvs] = useState(() => [...initialCvs]);
   const [step, setStep] = useState<WizardStep>(initialStep);
   const [selectedCvId, setSelectedCvId] = useState(initialDraft.cv?.versionId ?? "");
+  const [cvMode, setCvMode] = useState<"PROFILE" | "UPLOAD">(
+    initialDraft.cv ? "PROFILE" : "UPLOAD",
+  );
   const [phone, setPhone] = useState(initialDraft.personalInformation.phone);
   const [coverMode, setCoverMode] = useState<"TEXT" | "FILE">(
     initialDraft.coverLetter?.kind === "FILE" ? "FILE" : "TEXT",
@@ -156,6 +159,7 @@ export function ApplicationWizard({
       const saved = candidateCvSummarySchema.parse(body);
       setCvs((current) => [saved, ...current.filter((cv) => cv.id !== saved.id)]);
       setSelectedCvId(saved.id);
+      setCvMode("UPLOAD");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "The CV could not be uploaded.");
     } finally {
@@ -213,9 +217,9 @@ export function ApplicationWizard({
     <section className="candidate-application-flow" aria-labelledby="application-flow-title">
       <header className="candidate-application-flow__header">
         <div>
-          <p className="workspace-kicker">Application</p>
-          <h1 id="application-flow-title">Apply for {job.title}</h1>
-          <p>{job.companyName} · {job.location}</p>
+          <nav className="application-ui__breadcrumb" aria-label="Breadcrumb"><Link href="/jobs">Jobs</Link><span>/</span><Link href={`/jobs/${encodeURIComponent(slug)}`}>{job.title}</Link><span>/</span><span>Apply</span></nav>
+          <h1 id="application-flow-title">Apply – {job.title}</h1>
+          <p>Complete your information and files before reviewing your application.</p>
         </div>
         <Link href="/jobs" className="job-secondary-link">Back to jobs</Link>
       </header>
@@ -279,36 +283,27 @@ export function ApplicationWizard({
           <section className="candidate-application-panel" aria-labelledby="application-files-title">
             <p className="workspace-kicker">Step 2</p>
             <h2 id="application-files-title">Application files</h2>
-            <label className="candidate-application-field">
-              <span>CV <strong aria-hidden="true">*</strong></span>
-              <select
-                value={selectedCvId}
-                onChange={(event) => setSelectedCvId(event.target.value)}
-                disabled={pending !== null}
-                required
-              >
-                <option value="">Choose a confirmed CV</option>
-                {cvs.map((cv) => <option key={cv.id} value={cv.id}>{cv.displayName} ({cv.fileName})</option>)}
-              </select>
-            </label>
-            <label className="candidate-application-upload">
-              <span>Upload a new CV</span>
-              <input type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadCv(file); event.currentTarget.value = ""; }} disabled={pending !== null} />
-              <small>PDF, DOC, or DOCX · maximum 5 MB</small>
-            </label>
+            <fieldset className="candidate-application-cover">
+              <legend>CV <span aria-hidden="true">*</span></legend>
+              <div className="candidate-application-choice-row">
+                <label><input type="radio" name="cv-kind" checked={cvMode === "PROFILE"} onChange={() => setCvMode("PROFILE")} />Choose from your profile</label>
+                <label><input type="radio" name="cv-kind" checked={cvMode === "UPLOAD"} onChange={() => { setCvMode("UPLOAD"); setSelectedCvId(""); }} />Upload a new file</label>
+              </div>
+              {cvMode === "PROFILE" ? <label className="candidate-application-field"><span>Confirmed CVs</span><select value={selectedCvId} onChange={(event) => setSelectedCvId(event.target.value)} disabled={pending !== null} required><option value="">Choose a confirmed CV</option>{cvs.map((cv) => <option key={cv.id} value={cv.id}>{cv.displayName} ({cv.fileName}) · updated {new Date(cv.confirmedAt).toLocaleDateString()}</option>)}</select></label> : <label className="candidate-application-upload"><span>Drag a file here or click to choose</span><input type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadCv(file); event.currentTarget.value = ""; }} disabled={pending !== null} /><small>PDF, DOC, or DOCX · maximum 5 MB</small></label>}
+            </fieldset>
             {selectedCv ? <p className="candidate-application-file-note">Selected: {selectedCv.displayName} · confirmed {new Date(selectedCv.confirmedAt).toLocaleDateString()}</p> : null}
 
             <fieldset className="candidate-application-cover">
               <legend>Cover letter <span>(optional)</span></legend>
               <div className="candidate-application-choice-row">
-                <label><input type="radio" name="cover-letter-kind" checked={coverMode === "TEXT"} onChange={() => setCoverMode("TEXT")} /> Type inline</label>
-                <label><input type="radio" name="cover-letter-kind" checked={coverMode === "FILE"} onChange={() => setCoverMode("FILE")} /> Upload a file</label>
+                <label><input type="radio" name="cover-letter-kind" checked={coverMode === "TEXT"} onChange={() => { setCoverMode("TEXT"); if (draft.coverLetter?.kind === "FILE") setDraft((current) => ({ ...current, coverLetter: null })); }} />Write inline</label>
+                <label><input type="radio" name="cover-letter-kind" checked={coverMode === "FILE"} onChange={() => { setCoverMode("FILE"); setCoverText(""); if (draft.coverLetter?.kind === "TEXT") setDraft((current) => ({ ...current, coverLetter: null })); }} />Upload a file</label>
               </div>
               {coverMode === "TEXT" ? (
                 <textarea value={coverText} maxLength={10_000} rows={8} onChange={(event) => setCoverText(event.target.value)} placeholder="Tell the recruiter why this role interests you." />
               ) : (
                 <>
-                  <label className="candidate-application-upload"><span>Cover letter file</span><input type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadCoverLetter(file); event.currentTarget.value = ""; }} disabled={pending !== null} /><small>PDF, DOC, or DOCX · maximum 5 MB</small></label>
+                  <label className="candidate-application-upload"><span>Drag a file here or click to choose</span><input type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadCoverLetter(file); event.currentTarget.value = ""; }} disabled={pending !== null} /><small>PDF, DOC, or DOCX · maximum 5 MB</small></label>
                   {draft.coverLetter?.kind === "FILE" ? <p className="candidate-application-file-note">Selected: {draft.coverLetter.file.displayName}</p> : <p className="candidate-application-muted">No cover letter file selected.</p>}
                 </>
               )}

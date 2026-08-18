@@ -67,6 +67,7 @@
     "applications:migration:verify": "node scripts/verify-application-migration.mjs",
     "applications:retention": "node scripts/run-application-retention-worker.mjs",
     "applications:intake": "node --conditions=react-server --import tsx scripts/run-application-intake-worker.mjs",
+    "applications:intake:watch": "node --conditions=react-server --import tsx scripts/run-application-intake-worker.mjs --watch",
     "applications:scoring": "node --conditions=react-server --import tsx scripts/run-application-scoring-worker.mjs",
     "applications:scoring:reconcile": "node scripts/reconcile-initial-application-scoring.mjs",
     "applications:repair-documents": "node --conditions=react-server --import tsx scripts/repair-application-documents.ts",

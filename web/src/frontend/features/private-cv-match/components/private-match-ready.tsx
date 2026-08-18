@@ -2,11 +2,12 @@
 
 import {
   BadgeCheck,
+  ChartNoAxesColumn,
   BriefcaseBusiness,
   CheckCircle2,
-  FileSearch,
   FileText,
   LockKeyhole,
+  List,
   ShieldCheck,
   Sparkles,
   TriangleAlert,
@@ -40,7 +41,7 @@ function previewBand(report: FullPrivateReport | LimitedPrivateReport) {
   if (report.view === "LIMITED_REPORT") return "AI evaluation unavailable";
   if (report.matchBand === "HIGH_MATCH") return "Strong potential match";
   if (report.matchBand === "MEDIUM_MATCH") return "Good potential match";
-  return "Low potential match";
+  return "May need more evidence";
 }
 
 function headline(report: FullPrivateReport | LimitedPrivateReport) {
@@ -62,8 +63,9 @@ export function PrivateMatchReady({
 }) {
   const limited = report.view === "LIMITED_REPORT";
   const score = limited ? report.automatic.score : report.hybridScore;
+  const caution = limited || report.matchBand === "LOW_MATCH";
   return (
-    <main className="private-match-page">
+    <main className="private-match-page private-match-ready-page">
       <div className="private-match-breadcrumb">
         CV Match Check <span>/</span> Analysis
       </div>
@@ -78,18 +80,25 @@ export function PrivateMatchReady({
         <PrivateMatchStatusBadge state="completed" />
       </div>
       <section
-        className={`private-match-ready-banner ${limited ? "is-limited" : ""}`}
+        className={`private-match-ready-banner ${limited ? "is-limited" : ""} ${caution ? "is-caution" : ""}`}
       >
         <div className="private-match-ready-copy">
-          {limited ? (
-            <TriangleAlert aria-hidden="true" />
-          ) : (
-            <CheckCircle2 aria-hidden="true" />
-          )}
-          <div>
+          <div className="private-match-hero-icon">
+            {caution ? (
+              <TriangleAlert aria-hidden="true" />
+            ) : (
+              <CheckCircle2 aria-hidden="true" />
+            )}
+          </div>
+          <div className="private-match-ready-body">
             <span
-              className={`private-match-badge ${limited ? "private-match-badge--yellow" : "private-match-badge--green"}`}
+              className={`private-match-ready-status ${limited ? "private-match-ready-status--warning" : ""}`}
             >
+              {limited ? (
+                <TriangleAlert aria-hidden="true" />
+              ) : (
+                <CheckCircle2 aria-hidden="true" />
+              )}
               {limited ? "Reduced-capability preview" : "Analysis complete"}
             </span>
             <h2>{headline(report)}</h2>
@@ -99,18 +108,22 @@ export function PrivateMatchReady({
                 : "SmartHire compared your CV evidence with the job requirements. Open the report to see matched skills, gaps and practical improvements."}
             </p>
             <span className="private-match-private-line">
-              <LockKeyhole aria-hidden="true" /> Private preview · Not shared
+              <LockKeyhole aria-hidden="true" /> Private preview • Not shared
               with the employer
             </span>
           </div>
         </div>
         <div className="private-match-preview-score">
-          <span>{limited ? "DETERMINISTIC MATCH" : "PREVIEW MATCH SCORE"}</span>
-          <strong>
-            {score}
-            <small>/100</small>
-          </strong>
-          <b>{previewBand(report)}</b>
+          <div className="private-match-score-label">
+            {limited ? "DETERMINISTIC MATCH" : "PREVIEW MATCH SCORE"}
+          </div>
+          <div className="private-match-score-value">{score}</div>
+          <div className="private-match-score-out">out of 100</div>
+          <div
+            className={`private-match-score-tag ${caution ? "private-match-score-tag--caution" : ""}`}
+          >
+            {previewBand(report)}
+          </div>
         </div>
       </section>
 
@@ -126,11 +139,13 @@ export function PrivateMatchReady({
           <section className="private-match-card">
             <h2>Sources used for this report</h2>
             <div className="private-match-source-row">
-              <FileText aria-hidden="true" />
+              <span className="private-match-source-icon">
+                <FileText aria-hidden="true" />
+              </span>
               <div>
                 <strong>{report.cv.fileName}</strong>
                 <p>
-                  Parsed successfully · Updated {date(report.cv.confirmedAt)}
+                  Parsed successfully • Updated {date(report.cv.confirmedAt)}
                 </p>
               </div>
               <span className="private-match-badge private-match-badge--green">
@@ -138,21 +153,26 @@ export function PrivateMatchReady({
               </span>
             </div>
             <div className="private-match-source-row">
-              <BriefcaseIcon />
+              <span className="private-match-source-icon">
+                <BriefcaseBusiness aria-hidden="true" />
+              </span>
               <div>
                 <strong>{report.job.title}</strong>
                 <p>
-                  {report.job.company} · Job description version{" "}
+                  {report.job.company} • Job description version{" "}
                   {report.job.jdVersion}
                 </p>
               </div>
               <span className="private-match-badge private-match-badge--blue">
+                <CheckCircle2 aria-hidden="true" />
                 Current JD
               </span>
             </div>
           </section>
           <section className="private-match-guidance-banner">
-            <ShieldCheck aria-hidden="true" />
+            <span className="private-match-guidance-icon">
+              <ShieldCheck aria-hidden="true" />
+            </span>
             <div>
               <strong>This is guidance, not a hiring decision</strong>
               <p>
@@ -170,21 +190,27 @@ export function PrivateMatchReady({
             <h2>Inside your report</h2>
             <ul className="private-match-preview-list">
               <li>
-                <FileSearch aria-hidden="true" />
+                <span className="private-match-inside-icon">
+                  <List aria-hidden="true" />
+                </span>
                 <div>
                   <strong>Requirement evidence</strong>
-                  <span>See what your CV supports.</span>
+                  <span>See what matched and what is missing.</span>
                 </div>
               </li>
               <li>
-                <GaugeIcon />
+                <span className="private-match-inside-icon">
+                  <ChartNoAxesColumn aria-hidden="true" />
+                </span>
                 <div>
                   <strong>Explainable score</strong>
                   <span>Review categories, weights and formula.</span>
                 </div>
               </li>
               <li>
-                <Sparkles aria-hidden="true" />
+                <span className="private-match-inside-icon">
+                  <Sparkles aria-hidden="true" />
+                </span>
                 <div>
                   <strong>Improvement plan</strong>
                   <span>Get focused actions before applying.</span>
@@ -208,21 +234,5 @@ export function PrivateMatchReady({
         </aside>
       </div>
     </main>
-  );
-}
-
-function BriefcaseIcon() {
-  return (
-    <span className="private-match-inline-icon" aria-hidden="true">
-      <BriefcaseBusiness />
-    </span>
-  );
-}
-
-function GaugeIcon() {
-  return (
-    <span className="private-match-inline-icon" aria-hidden="true">
-      %
-    </span>
   );
 }

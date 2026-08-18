@@ -276,6 +276,10 @@ function tracker(row: CandidateApplicationTrackerRow): ApplicationTracker {
         text(object(row.jobSnapshot).companyName) ?? row.jobPosting.company.displayName,
       companyLogoUrl: row.jobPosting.company.logoUrl,
       location: text(object(row.jobSnapshot).location) ?? row.jobPosting.location,
+      employmentType: row.jobPosting.employmentType,
+      experienceLevel: row.jobPosting.experienceLevel,
+      workArrangement: row.jobPosting.workArrangement,
+      applicationDeadline: row.jobPosting.applicationDeadline?.toISOString() ?? null,
       jobAvailable:
         row.jobPosting.status === "ACTIVE" && row.jobPosting.removedAt === null,
     },

@@ -205,6 +205,13 @@ function start(name, command) {
       "server.ts",
     ],
     "email:worker": ["--import", "tsx", "scripts/run-email-worker.mjs"],
+    "application-intake:worker": [
+      "--conditions=react-server",
+      "--import",
+      "tsx",
+      "scripts/run-application-intake-worker.mjs",
+      "--watch",
+    ],
   }[command];
 
   if (!commandArgs)
@@ -370,6 +377,7 @@ async function main() {
   );
   start("web", "dev:web");
   start("email worker", "email:worker");
+  start("application intake worker", "application-intake:worker");
 
   void workerBuild.then(async (result) => {
     if (!result.ok) {

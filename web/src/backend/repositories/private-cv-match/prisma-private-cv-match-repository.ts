@@ -493,13 +493,15 @@ export class PrivateCvMatchRepository {
           leaseExpiresAt: null,
         },
       });
-      const data = attempt.check.currentAttemptId
-        ? { state: "LIMITED" as const }
-        : { state: "LIMITED" as const, currentAttemptId: input.attemptId };
-      await repository.database.privateCvMatchCheck.updateMany({
-        where: { id: attempt.checkId, inaccessibleAt: null, deletedAt: null },
-        data,
-      });
+      // A failed manual re-run must not replace a safely published hybrid
+      // report. Only the first failed attempt promotes the check to limited
+      // mode; later failures remain in immutable attempt history.
+      if (!attempt.check.currentAttemptId) {
+        await repository.database.privateCvMatchCheck.updateMany({
+          where: { id: attempt.checkId, inaccessibleAt: null, deletedAt: null },
+          data: { state: "LIMITED", currentAttemptId: input.attemptId },
+        });
+      }
       return attempt;
     });
   }
@@ -571,9 +573,8 @@ export class PrivateCvMatchRepository {
     if (!check) throw new Error("PRIVATE_CHECK_UNAVAILABLE");
     if (
       check.attempts.length > 0 ||
-      check.state !== "LIMITED" ||
       !check.currentAttempt ||
-      check.currentAttempt.state !== "LIMITED" ||
+      !["LIMITED", "READY"].includes(check.currentAttempt.state) ||
       !check.currentAttempt.deterministicResultId
     ) {
       throw new Error("PRIVATE_RETRY_NOT_ALLOWED");
