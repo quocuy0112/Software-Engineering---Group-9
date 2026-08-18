@@ -17,6 +17,12 @@ export function ModerationReportList() {
       pagination={<Pagination rowsPerPageOptions={[25, 50, 100]} />}
       sort={{ field: "priority", order: "ASC" }}
       filters={[
+        <TextInput
+          key="q"
+          source="q"
+          label="Report or target reference"
+          alwaysOn
+        />,
         <SelectInput
           key="targetType"
           source="targetType"
@@ -44,6 +50,7 @@ export function ModerationReportList() {
           key="state"
           source="state"
           choices={choices(["PENDING_REVIEW", "RESOLVED", "DISMISSED"])}
+          emptyText="All statuses"
         />,
         <TextInput key="company" source="company" />,
         <TextInput key="age" source="age" label="Minimum age (hours)" />,

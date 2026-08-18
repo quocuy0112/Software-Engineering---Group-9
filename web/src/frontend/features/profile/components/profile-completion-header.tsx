@@ -5,13 +5,18 @@ import { Camera, ArrowRight } from "lucide-react";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 import { ProgressBar } from "@/frontend/components/ui/design-system";
 import {
+  getProfileBasicsMissingRequirement,
   getProfileCompletion,
   type ProfileCompletionSection,
 } from "../lib/profile-completeness";
 
 type ProfileCompletionLocale = "vi" | "en";
 
-export { getProfileCompletion, type ProfileCompletionSection };
+export {
+  getProfileBasicsMissingRequirement,
+  getProfileCompletion,
+  type ProfileCompletionSection,
+};
 
 function profileCompletionCopy(locale: ProfileCompletionLocale) {
   return locale === "vi"

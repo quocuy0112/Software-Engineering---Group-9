@@ -112,28 +112,34 @@ export function CvScalarReview({
               aria-describedby={decisionError ? decisionErrorId : undefined}
               tabIndex={decisionError ? -1 : undefined}
             >
-              <legend>
+              <legend className={styles.srOnly}>
                 {copy.decisionFor} {cvFieldLabel(locale, proposal.field)}
               </legend>
+              <p className={styles.decisionTitle} aria-hidden="true">
+                {copy.decisionFor} {cvFieldLabel(locale, proposal.field)}
+              </p>
               <p className={styles.decisionHint}>
                 {hasCurrentValue ? copy.alreadyValue : copy.emptyValue}
               </p>
-              {availableActions.map((action) => (
-                <label key={action}>
-                  <input
-                    type="radio"
-                    name={`decision-${proposal.proposalId}`}
-                    value={action}
-                    checked={
-                      decisionsById.get(proposal.proposalId)?.action === action
-                    }
-                    onChange={() =>
-                      onDecisionChange(proposal.proposalId, action)
-                    }
-                  />
-                  {cvActionLabel(locale, action)}
-                </label>
-              ))}
+              <div className={styles.actionOptions}>
+                {availableActions.map((action) => (
+                  <label key={action}>
+                    <input
+                      type="radio"
+                      name={`decision-${proposal.proposalId}`}
+                      value={action}
+                      checked={
+                        decisionsById.get(proposal.proposalId)?.action ===
+                        action
+                      }
+                      onChange={() =>
+                        onDecisionChange(proposal.proposalId, action)
+                      }
+                    />
+                    {cvActionLabel(locale, action)}
+                  </label>
+                ))}
+              </div>
               {decisionError ? (
                 <p className={styles.fieldError} id={decisionErrorId}>
                   {decisionError}

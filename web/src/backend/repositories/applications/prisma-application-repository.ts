@@ -103,7 +103,11 @@ function sharedPhone(value: unknown): string | null {
 }
 
 function previewSupported(mediaType: string): boolean {
-  return mediaType === "application/pdf";
+  return [
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ].includes(mediaType);
 }
 
 function decodeCoverLetterText(value: string): string {
@@ -461,6 +465,8 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort, R
       },
       select: {
         id: true,
+        stage: true,
+        stageVersion: true,
         candidateUserId: true,
         selectedCvId: true,
         jobPostingId: true,
@@ -508,6 +514,8 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort, R
       return {
         applicationId: application.id,
         jobId: application.jobPostingId,
+        stage: application.stage,
+        stageVersion: application.stageVersion,
         kind: "cover-letter",
         fileName: null,
         mediaType: "text/plain",
@@ -525,6 +533,8 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort, R
     return {
       applicationId: application.id,
       jobId: application.jobPostingId,
+      stage: application.stage,
+      stageVersion: application.stageVersion,
       kind: input.kind,
       fileName: await originalFilename({
         db: this.db,

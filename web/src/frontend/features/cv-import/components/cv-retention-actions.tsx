@@ -8,7 +8,12 @@ import {
   type CvDeletionOutcome,
 } from "@/shared/contracts/cv-import/consent-retention";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
-import { cvCopy, cvFormatDate, type CvLocale } from "../i18n/cv-import-copy";
+import {
+  cvCopy,
+  cvFormatDate,
+  cvRetentionDaysLeft,
+  type CvLocale,
+} from "../i18n/cv-import-copy";
 import styles from "./cv-retention-actions.module.css";
 
 export type CvRetentionActionResource = Readonly<{
@@ -43,6 +48,13 @@ function outcomeMessage(
     return `${copy.expired} ${shortDate(locale, resource.deleteAfter) ?? (locale === "vi" ? "hạn lưu giữ" : "its retention deadline")}.`;
   }
   return copy.temporary;
+}
+
+function daysUntil(value: string | null): number | null {
+  if (!value) return null;
+  const target = new Date(value).getTime();
+  if (Number.isNaN(target)) return null;
+  return Math.max(0, Math.ceil((target - Date.now()) / 86_400_000));
 }
 
 export function CvRetentionActions({
@@ -158,6 +170,7 @@ export function CvRetentionActions({
     : resource;
   const expiry = shortDate(locale, current.expiresAt);
   const cleanup = shortDate(locale, current.deleteAfter);
+  const daysLeft = daysUntil(current.expiresAt);
 
   return (
     <section
@@ -168,36 +181,50 @@ export function CvRetentionActions({
       aria-labelledby="cv-retention-heading"
     >
       <h2 id="cv-retention-heading">{copy.heading}</h2>
-      <dl className={styles.deadlines}>
-        {expiry ? (
-          <div>
-            <dt>{copy.expiry}</dt>
-            <dd>{expiry}</dd>
-          </div>
-        ) : null}
-        {cleanup ? (
-          <div>
-            <dt>{copy.cleanup}</dt>
-            <dd>{cleanup}</dd>
-          </div>
-        ) : null}
-      </dl>
-      <p
-        className={styles.status}
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        {error ?? outcomeMessage(locale, current)}
-      </p>
-      <div className={styles.actions}>
-        {canDelete &&
-        !["CANCELLED", "DELETED", "EXPIRED"].includes(current.status) ? (
-          <button ref={trigger} type="button" onClick={() => setOpen(true)}>
-            {copy.cancelDelete}
-          </button>
-        ) : null}
-        <Link href="/profile">{cvCopy(locale).common.openProfile}</Link>
+      <div className={styles.card}>
+        <dl className={styles.deadlines}>
+          {expiry ? (
+            <div className={styles.expiryBlock}>
+              <dt>
+                <span className={styles.expiryIcon} aria-hidden="true">
+                  ⌛
+                </span>
+                {copy.expiry}
+              </dt>
+              <dd>
+                <span>{expiry}</span>
+                {daysLeft !== null ? (
+                  <span className={styles.daysLeft}>
+                    {cvRetentionDaysLeft(locale, daysLeft)}
+                  </span>
+                ) : null}
+              </dd>
+            </div>
+          ) : null}
+          {cleanup ? (
+            <div className={styles.cleanup}>
+              <dt>{copy.cleanup}</dt>
+              <dd>{cleanup}</dd>
+            </div>
+          ) : null}
+        </dl>
+        <p
+          className={styles.status}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {error ?? outcomeMessage(locale, current)}
+        </p>
+        <div className={styles.actions}>
+          {canDelete &&
+          !["CANCELLED", "DELETED", "EXPIRED"].includes(current.status) ? (
+            <button ref={trigger} type="button" onClick={() => setOpen(true)}>
+              {copy.cancelDelete}
+            </button>
+          ) : null}
+          <Link href="/profile">{cvCopy(locale).common.openProfile}</Link>
+        </div>
       </div>
 
       {open ? (

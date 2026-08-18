@@ -11,6 +11,8 @@ import {
   candidateApplicationSummarySchema,
   notificationPreferenceSchema,
   publicOutcomeForCanonicalStage,
+  publicUpdateKindForCanonicalStage,
+  publicUpdateTitleForCanonicalStage,
   publicStageForCanonicalStage,
   type ApplicationIntake,
   type ApplicationPublicUpdate,
@@ -166,38 +168,52 @@ function stageUpdate(
   if (stage === "APPLIED") return null;
   const publicStage = publicStageForCanonicalStage(stage);
   const kind =
-    publicStage === "UNDER_REVIEW"
-      ? "UNDER_REVIEW"
-      : publicStage === "INTERVIEW"
-        ? "INTERVIEW"
-        : "OUTCOME";
-  const title =
-    publicStage === "UNDER_REVIEW"
-      ? "Application under review"
-      : publicStage === "INTERVIEW"
-        ? "Interview stage reached"
-        : "Application outcome updated";
+    publicUpdateKindForCanonicalStage(stage);
+  const title = publicUpdateTitleForCanonicalStage(stage);
   return applicationPublicUpdateSchema.parse({
     id: event.id,
     kind,
     publicStage,
     publicOutcome: publicOutcomeForCanonicalStage(stage),
+    canonicalStage: stage,
     title,
     occurredAt: event.occurredAt.toISOString(),
   });
 }
 
 function publicUpdates(row: CandidateApplicationTrackerRow) {
+  const stageEventsById = new Map(
+    row.stageEvents.map((event) => [event.id, event]),
+  );
   const updates = row.publicUpdates.flatMap((update) => {
-    const title = publicUpdateTitle(update.kind);
+    const title = update.title.trim() || publicUpdateTitle(update.kind);
     if (!title) return [];
+    const sourceEvent = update.sourceEventReference
+      ? stageEventsById.get(update.sourceEventReference)
+      : undefined;
+    const canonicalStage = sourceEvent
+      ? applicationStageSchema.parse(sourceEvent.toStage)
+      : update.kind === "SUBMITTED"
+        ? "APPLIED"
+        : null;
+    const publicStage = canonicalStage
+      ? publicStageForCanonicalStage(canonicalStage)
+      : update.publicStage;
+    const publicOutcome = canonicalStage
+      ? publicOutcomeForCanonicalStage(canonicalStage)
+      : update.publicOutcome;
     return [
       applicationPublicUpdateSchema.parse({
         id: update.id,
-        kind: update.kind,
-        publicStage: update.publicStage,
-        publicOutcome: update.publicOutcome,
-        title,
+        kind: canonicalStage
+          ? publicUpdateKindForCanonicalStage(canonicalStage)
+          : update.kind,
+        publicStage,
+        publicOutcome,
+        canonicalStage,
+        title: canonicalStage
+          ? publicUpdateTitleForCanonicalStage(canonicalStage)
+          : title,
         occurredAt: update.effectiveAt.toISOString(),
       }),
     ];
@@ -266,6 +282,9 @@ function tracker(row: CandidateApplicationTrackerRow): ApplicationTracker {
     row.withdrawalOutcome === "CANDIDATE_WITHDRAWN"
       ? "WITHDRAWN"
       : publicOutcomeForCanonicalStage(canonicalStage);
+  const currentStageEvent = [...row.stageEvents]
+    .reverse()
+    .find((event) => applicationStageSchema.parse(event.toStage) === canonicalStage);
   return applicationTrackerSchema.parse({
     applicationId: row.id,
     job: {
@@ -286,6 +305,9 @@ function tracker(row: CandidateApplicationTrackerRow): ApplicationTracker {
     publicStage: publicStageForCanonicalStage(canonicalStage),
     publicOutcome,
     canonicalStage,
+    transitionFromStage: currentStageEvent?.fromStage
+      ? applicationStageSchema.parse(currentStageEvent.fromStage)
+      : null,
     stageVersion: row.stageVersion,
     submittedAt: row.submittedAt.toISOString(),
     lastUpdatedAt: new Date(

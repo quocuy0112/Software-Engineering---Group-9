@@ -524,7 +524,7 @@ function ReviewDetail() {
                     href={record.company.protectedVerificationHref}
                     underline="hover"
                   >
-                    Open protected verification viewer
+                    View company verification requests
                   </Link>
                 )}
               </Stack>

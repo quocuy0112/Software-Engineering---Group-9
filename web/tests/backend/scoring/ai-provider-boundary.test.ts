@@ -5,6 +5,7 @@ import {
   cvAiAssessmentJsonSchema,
   SUGGESTED_QUESTIONS_UNAVAILABLE_MESSAGE,
 } from "@/backend/scoring/domain/cv-ai-assessment";
+import { AiAssessmentProviderError } from "@/backend/scoring/providers/ai-assessment-provider-port";
 import { aiFixture } from "./fixtures";
 
 const input = {
@@ -212,6 +213,38 @@ describe("approved AI provider boundary", () => {
         input,
       ),
     ).rejects.toMatchObject({ code: "AI_PROVIDER_MALFORMED" });
+  });
+
+  it("recovers from a transient malformed response without requiring a recruiter retry", async () => {
+    let calls = 0;
+    const result = await new ApprovedAiAssessmentAdapter(async () => {
+      calls += 1;
+      return calls === 1 ? { score: 88 } : validV5();
+    }).assess(input);
+
+    expect(calls).toBe(2);
+    expect(result).toMatchObject({
+      score: 92,
+      confidenceLevel: "HIGH",
+    });
+  });
+
+  it("does not let malformed model output open the shared worker circuit", async () => {
+    let calls = 0;
+    const adapter = new ApprovedAiAssessmentAdapter(async () => {
+      calls += 1;
+      if (calls <= 5)
+        throw new AiAssessmentProviderError("AI_PROVIDER_MALFORMED");
+      return validV5();
+    });
+
+    for (let attempt = 0; attempt < 5; attempt += 1)
+      await expect(adapter.assess(input)).rejects.toMatchObject({
+        code: "AI_PROVIDER_MALFORMED",
+      });
+
+    await expect(adapter.assess(input)).resolves.toMatchObject({ score: 92 });
+    expect(calls).toBe(6);
   });
 
   it("redacts contact data before the provider boundary", async () => {

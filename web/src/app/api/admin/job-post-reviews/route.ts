@@ -25,6 +25,7 @@ function listQuery(request: Request) {
     page: numeric("page") ?? 1,
     perPage: numeric("perPage") ?? 25,
     state: value("state") || undefined,
+    q: value("q") || undefined,
     assignment:
       typeof assignment === "string" && assignment
         ? assignment.toUpperCase()

@@ -398,6 +398,8 @@ export class PrismaSupportRepository {
         ? input.filter.assigneeId
         : undefined;
     const minimumAgeHours = Number(input.filter.age ?? NaN);
+    const q = typeof input.filter.q === "string" ? input.filter.q.trim() : "";
+    const tokens = q.split(/\s+/u).filter(Boolean).slice(0, 8);
     const supportedStates: SupportState[] = [...activeStates, "CLOSED"];
     const supportedCategories: SupportCategory[] = [
       "ACCOUNT_ACCESS",
@@ -428,6 +430,25 @@ export class PrismaSupportRepository {
       conditions.push(
         Prisma.sql`c."createdAt" <= ${new Date(Date.now() - minimumAgeHours * 60 * 60_000)}`,
       );
+    }
+    if (q) {
+      conditions.push(Prisma.sql`(
+        c."id" = ${q}
+        OR c."requesterUserId" = ${q}
+        OR c."currentAssigneeUserId" = ${q}
+        OR EXISTS (
+          SELECT 1 FROM "user" u
+          WHERE u."id" = c."requesterUserId"
+          AND ${Prisma.join(
+            tokens.map((token) => Prisma.sql`u."name" ILIKE ${`%${token}%`}`),
+            " AND ",
+          )}
+        )
+        OR ${Prisma.join(
+          tokens.map((token) => Prisma.sql`c."subject" ILIKE ${`%${token}%`}`),
+          " AND ",
+        )}
+      )`);
     }
     const where = Prisma.join(conditions, " AND ");
     const offset = (input.page - 1) * input.perPage;

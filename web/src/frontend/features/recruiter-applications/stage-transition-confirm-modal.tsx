@@ -27,6 +27,7 @@ export function StageTransitionConfirmModal({
   const csrfProof = useCsrfProof();
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const autoShortlist = candidate.stage === "VIEWED";
   const confirm = async () => {
     setSaving(true);
     setError(null);
@@ -77,6 +78,9 @@ export function StageTransitionConfirmModal({
           <span>
             This transition is made by you, not by AI. The action is recorded in
             stage history and the candidate is notified.
+            {autoShortlist
+              ? " Because this candidate is Viewed, the action records Shortlisted before Interviewing."
+              : ""}
           </span>
         </>
       }
@@ -85,17 +89,36 @@ export function StageTransitionConfirmModal({
       onConfirm={() => void confirm()}
       confirmDisabled={saving}
     >
-      <div className="ai-ranking-stage-change">
-        <div>
-          <small>Current stage</small>
-          <strong>{stageLabel(candidate.stage)}</strong>
+      {autoShortlist ? (
+        <div className="ai-ranking-stage-change">
+          <div>
+            <small>Current stage</small>
+            <strong>Viewed</strong>
+          </div>
+          <ArrowRight aria-hidden="true" />
+          <div>
+            <small>Recorded stage</small>
+            <strong>Shortlisted</strong>
+          </div>
+          <ArrowRight aria-hidden="true" />
+          <div>
+            <small>Next stage</small>
+            <strong>Interviewing</strong>
+          </div>
         </div>
-        <ArrowRight aria-hidden="true" />
-        <div>
-          <small>Next stage</small>
-          <strong>Interviewing</strong>
+      ) : (
+        <div className="ai-ranking-stage-change">
+          <div>
+            <small>Current stage</small>
+            <strong>{stageLabel(candidate.stage)}</strong>
+          </div>
+          <ArrowRight aria-hidden="true" />
+          <div>
+            <small>Next stage</small>
+            <strong>Interviewing</strong>
+          </div>
         </div>
-      </div>
+      )}
       {error ? (
         <p className="ai-ranking-error" role="alert">
           {error}

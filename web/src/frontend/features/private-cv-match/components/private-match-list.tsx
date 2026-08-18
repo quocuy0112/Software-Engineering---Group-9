@@ -3,14 +3,23 @@
 import Link from "next/link";
 import { useState } from "react";
 import {
+  ArrowRight,
   BriefcaseBusiness,
+  CalendarDays,
+  Clock3,
   FileText,
+  LockKeyhole,
+  MapPin,
   Plus,
   RefreshCw,
   ShieldCheck,
+  Sparkles,
+  Target,
   TriangleAlert,
+  Zap,
 } from "lucide-react";
 import type { PrivateMatchListItem } from "@/shared/contracts/private-cv-match";
+import { PageHeader } from "@/frontend/components/layout/page-header";
 import {
   privateMatchErrorMessage,
   usePrivateCvMatchList,
@@ -39,14 +48,6 @@ function statusCopy(state: PrivateMatchListItem["state"]) {
     default:
       return { label: "Queued", className: "private-match-badge--blue" };
   }
-}
-
-function scoreCopy(item: PrivateMatchListItem) {
-  if (item.hybridScore !== null) return `${item.hybridScore}/100`;
-  if (item.state === "LIMITED" && item.deterministicScore !== null) {
-    return `Automatic ${item.deterministicScore}/100`;
-  }
-  return "—";
 }
 
 function ListSkeleton() {
@@ -85,34 +86,53 @@ function ListItem({
       <span className="private-match-list-icon" aria-hidden="true">
         <BriefcaseBusiness />
       </span>
-      <Link
-        className="private-match-list-main"
-        href={`/cv-match-check/${encodeURIComponent(item.checkId)}`}
-      >
-        <strong>{item.job.title}</strong>
-        <span>
-          {item.job.company} · {item.job.location}
-        </span>
-        <small>
-          <FileText aria-hidden="true" /> {item.cv.fileName} · v
-          {item.cv.version}
-        </small>
-      </Link>
-      <div className="private-match-list-score">
-        <span className={`private-match-badge ${status.className}`}>
-          {status.label}
-        </span>
-        <strong>{scoreCopy(item)}</strong>
-        <small>
-          Created {dateFormatter.format(new Date(item.createdAt))} · Expires in{" "}
-          {daysUntil(item.expiresAt)} days
-        </small>
+      <div className="private-match-list-main">
+        <div className="private-match-list-title">
+          <Link href={`/cv-match-check/${encodeURIComponent(item.checkId)}`}>
+            {item.job.title}
+          </Link>
+          <span className={`private-match-badge ${status.className}`}>
+            <i aria-hidden="true" />
+            {status.label}
+          </span>
+        </div>
+        <div className="private-match-list-job-meta">
+          <span>{item.job.company}</span>
+          <span aria-hidden="true">·</span>
+          <span>
+            <MapPin aria-hidden="true" />
+            {item.job.location}
+          </span>
+        </div>
+        <div className="private-match-list-check-meta">
+          <span className="private-match-file-chip">
+            <FileText aria-hidden="true" />
+            <span>{item.cv.fileName}</span>
+            <small>v{item.cv.version}</small>
+          </span>
+          <span>
+            <CalendarDays aria-hidden="true" />
+            Created {dateFormatter.format(new Date(item.createdAt))}
+          </span>
+          <span className="private-match-expiry-meta">
+            <Clock3 aria-hidden="true" />
+            Expires in {daysUntil(item.expiresAt)} days
+          </span>
+        </div>
       </div>
-      <PrivateMatchDeleteControl
-        checkId={item.checkId}
-        compact
-        onDeleted={onDeleted}
-      />
+      <div className="private-match-list-actions">
+        <Link
+          className="private-match-preview-link"
+          href={`/cv-match-check/${encodeURIComponent(item.checkId)}`}
+        >
+          View preview <ArrowRight aria-hidden="true" />
+        </Link>
+        <PrivateMatchDeleteControl
+          checkId={item.checkId}
+          compact
+          onDeleted={onDeleted}
+        />
+      </div>
     </article>
   );
 }
@@ -124,24 +144,32 @@ export function PrivateMatchList() {
     query.data?.items.filter((item) => !removedIds.has(item.checkId)) ?? [];
   return (
     <main className="private-match-page">
-      <div className="private-match-breadcrumb">CV Match Check</div>
-      <div className="private-match-title-row private-match-list-title-row">
-        <div>
-          <h1>CV Match Check</h1>
-          <p>Review your private CV-to-job previews before you apply.</p>
-        </div>
-        <Link
-          className="private-match-primary-button"
-          href="/cv-match-check/new"
-        >
-          <Plus aria-hidden="true" /> New private check
-        </Link>
-      </div>
+      <PageHeader
+        className="private-match-page-header"
+        eyebrow="Candidate workspace"
+        title="CV Match Check"
+        subtitle="Review your private CV-to-job previews before you apply."
+        rightSlot={
+          <Link
+            className="private-match-primary-button"
+            href="/cv-match-check/new"
+          >
+            <Plus aria-hidden="true" /> New private check
+          </Link>
+        }
+      />
 
       <section className="private-match-card private-match-list-intro">
-        <ShieldCheck aria-hidden="true" />
+        <span className="private-match-list-intro-icon" aria-hidden="true">
+          <ShieldCheck />
+        </span>
         <div>
-          <h2>Your private previews</h2>
+          <div className="private-match-list-intro-title">
+            <h2>Your private previews</h2>
+            <span className="private-match-list-private-badge">
+              <LockKeyhole aria-hidden="true" /> 100% Private
+            </span>
+          </div>
           <p>
             Only you can see these reports. They never change a recruiter&apos;s
             ranking or your application.
@@ -177,14 +205,46 @@ export function PrivateMatchList() {
             className="private-match-primary-button"
             href="/cv-match-check/new"
           >
-            <Plus aria-hidden="true" /> Start a new check
+            <Sparkles aria-hidden="true" /> Start a new check
+            <ArrowRight aria-hidden="true" />
           </Link>
+          <div className="private-match-empty-benefits">
+            <div>
+              <span className="private-match-empty-benefit-icon is-amber">
+                <Zap aria-hidden="true" />
+              </span>
+              <p>Instant preview</p>
+              <small>Deep match breakdown in seconds</small>
+            </div>
+            <div>
+              <span className="private-match-empty-benefit-icon is-blue">
+                <Target aria-hidden="true" />
+              </span>
+              <p>High precision</p>
+              <small>Skill-by-skill evaluation</small>
+            </div>
+            <div>
+              <span className="private-match-empty-benefit-icon is-green">
+                <ShieldCheck aria-hidden="true" />
+              </span>
+              <p>Completely private</p>
+              <small>No data shared with employers</small>
+            </div>
+          </div>
         </section>
       ) : (
         <section aria-labelledby="saved-checks-heading">
           <div className="private-match-list-heading">
             <h2 id="saved-checks-heading">Saved CV match checks</h2>
-            <span>{items.length} of 50 retained previews</span>
+            <span className="private-match-storage-meter">
+              <span>Storage</span>
+              <strong>{items.length}</strong>
+              <i aria-hidden="true">/</i>
+              <b>50</b>
+              <em aria-hidden="true">
+                <i style={{ width: `${(items.length / 50) * 100}%` }} />
+              </em>
+            </span>
           </div>
           <div className="private-match-list">
             {items.map((item) => (
@@ -206,7 +266,7 @@ export function PrivateMatchList() {
 function GaugeIcon() {
   return (
     <span className="private-match-list-empty-icon" aria-hidden="true">
-      %
+      <span>%</span>
     </span>
   );
 }

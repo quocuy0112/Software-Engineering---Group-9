@@ -15,6 +15,8 @@ export type PipelineStageRepositoryPage = Readonly<{
 export type ApplicationDocumentRecord = Readonly<{
   applicationId: string;
   jobId: string;
+  stage?: ApplicationStage;
+  stageVersion?: number;
   kind: "cv" | "cover-letter";
   fileName: string | null;
   mediaType: string | null;

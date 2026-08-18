@@ -289,7 +289,7 @@ export type PrivateAutomaticMatchResultWhereInput = {
   calculatedAt?: Prisma.DateTimeFilter<"PrivateAutomaticMatchResult"> | Date | string
   mayBeIncomplete?: Prisma.BoolFilter<"PrivateAutomaticMatchResult"> | boolean
   attempt?: Prisma.XOR<Prisma.PrivateCvMatchAttemptScalarRelationFilter, Prisma.PrivateCvMatchAttemptWhereInput>
-  attemptPointer?: Prisma.XOR<Prisma.PrivateCvMatchAttemptNullableScalarRelationFilter, Prisma.PrivateCvMatchAttemptWhereInput> | null
+  attemptPointers?: Prisma.PrivateCvMatchAttemptListRelationFilter
   evidence?: Prisma.PrivateMatchEvidenceListRelationFilter
 }
 
@@ -308,7 +308,7 @@ export type PrivateAutomaticMatchResultOrderByWithRelationInput = {
   calculatedAt?: Prisma.SortOrder
   mayBeIncomplete?: Prisma.SortOrder
   attempt?: Prisma.PrivateCvMatchAttemptOrderByWithRelationInput
-  attemptPointer?: Prisma.PrivateCvMatchAttemptOrderByWithRelationInput
+  attemptPointers?: Prisma.PrivateCvMatchAttemptOrderByRelationAggregateInput
   evidence?: Prisma.PrivateMatchEvidenceOrderByRelationAggregateInput
 }
 
@@ -330,7 +330,7 @@ export type PrivateAutomaticMatchResultWhereUniqueInput = Prisma.AtLeast<{
   calculatedAt?: Prisma.DateTimeFilter<"PrivateAutomaticMatchResult"> | Date | string
   mayBeIncomplete?: Prisma.BoolFilter<"PrivateAutomaticMatchResult"> | boolean
   attempt?: Prisma.XOR<Prisma.PrivateCvMatchAttemptScalarRelationFilter, Prisma.PrivateCvMatchAttemptWhereInput>
-  attemptPointer?: Prisma.XOR<Prisma.PrivateCvMatchAttemptNullableScalarRelationFilter, Prisma.PrivateCvMatchAttemptWhereInput> | null
+  attemptPointers?: Prisma.PrivateCvMatchAttemptListRelationFilter
   evidence?: Prisma.PrivateMatchEvidenceListRelationFilter
 }, "id" | "attemptId">
 
@@ -388,7 +388,7 @@ export type PrivateAutomaticMatchResultCreateInput = {
   calculatedAt: Date | string
   mayBeIncomplete?: boolean
   attempt: Prisma.PrivateCvMatchAttemptCreateNestedOneWithoutDeterministicResultByAttemptInput
-  attemptPointer?: Prisma.PrivateCvMatchAttemptCreateNestedOneWithoutDeterministicResultInput
+  attemptPointers?: Prisma.PrivateCvMatchAttemptCreateNestedManyWithoutDeterministicResultInput
   evidence?: Prisma.PrivateMatchEvidenceCreateNestedManyWithoutAutomaticResultInput
 }
 
@@ -406,7 +406,7 @@ export type PrivateAutomaticMatchResultUncheckedCreateInput = {
   parserProvenance: Prisma.JsonNullValueInput | runtime.InputJsonValue
   calculatedAt: Date | string
   mayBeIncomplete?: boolean
-  attemptPointer?: Prisma.PrivateCvMatchAttemptUncheckedCreateNestedOneWithoutDeterministicResultInput
+  attemptPointers?: Prisma.PrivateCvMatchAttemptUncheckedCreateNestedManyWithoutDeterministicResultInput
   evidence?: Prisma.PrivateMatchEvidenceUncheckedCreateNestedManyWithoutAutomaticResultInput
 }
 
@@ -424,7 +424,7 @@ export type PrivateAutomaticMatchResultUpdateInput = {
   calculatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mayBeIncomplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
   attempt?: Prisma.PrivateCvMatchAttemptUpdateOneRequiredWithoutDeterministicResultByAttemptNestedInput
-  attemptPointer?: Prisma.PrivateCvMatchAttemptUpdateOneWithoutDeterministicResultNestedInput
+  attemptPointers?: Prisma.PrivateCvMatchAttemptUpdateManyWithoutDeterministicResultNestedInput
   evidence?: Prisma.PrivateMatchEvidenceUpdateManyWithoutAutomaticResultNestedInput
 }
 
@@ -442,7 +442,7 @@ export type PrivateAutomaticMatchResultUncheckedUpdateInput = {
   parserProvenance?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   calculatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mayBeIncomplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  attemptPointer?: Prisma.PrivateCvMatchAttemptUncheckedUpdateOneWithoutDeterministicResultNestedInput
+  attemptPointers?: Prisma.PrivateCvMatchAttemptUncheckedUpdateManyWithoutDeterministicResultNestedInput
   evidence?: Prisma.PrivateMatchEvidenceUncheckedUpdateManyWithoutAutomaticResultNestedInput
 }
 
@@ -569,9 +569,9 @@ export type PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptInput = {
   connect?: Prisma.PrivateAutomaticMatchResultWhereUniqueInput
 }
 
-export type PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptPointerInput = {
-  create?: Prisma.XOR<Prisma.PrivateAutomaticMatchResultCreateWithoutAttemptPointerInput, Prisma.PrivateAutomaticMatchResultUncheckedCreateWithoutAttemptPointerInput>
-  connectOrCreate?: Prisma.PrivateAutomaticMatchResultCreateOrConnectWithoutAttemptPointerInput
+export type PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptPointersInput = {
+  create?: Prisma.XOR<Prisma.PrivateAutomaticMatchResultCreateWithoutAttemptPointersInput, Prisma.PrivateAutomaticMatchResultUncheckedCreateWithoutAttemptPointersInput>
+  connectOrCreate?: Prisma.PrivateAutomaticMatchResultCreateOrConnectWithoutAttemptPointersInput
   connect?: Prisma.PrivateAutomaticMatchResultWhereUniqueInput
 }
 
@@ -591,14 +591,14 @@ export type PrivateAutomaticMatchResultUpdateOneWithoutAttemptNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PrivateAutomaticMatchResultUpdateToOneWithWhereWithoutAttemptInput, Prisma.PrivateAutomaticMatchResultUpdateWithoutAttemptInput>, Prisma.PrivateAutomaticMatchResultUncheckedUpdateWithoutAttemptInput>
 }
 
-export type PrivateAutomaticMatchResultUpdateOneWithoutAttemptPointerNestedInput = {
-  create?: Prisma.XOR<Prisma.PrivateAutomaticMatchResultCreateWithoutAttemptPointerInput, Prisma.PrivateAutomaticMatchResultUncheckedCreateWithoutAttemptPointerInput>
-  connectOrCreate?: Prisma.PrivateAutomaticMatchResultCreateOrConnectWithoutAttemptPointerInput
-  upsert?: Prisma.PrivateAutomaticMatchResultUpsertWithoutAttemptPointerInput
+export type PrivateAutomaticMatchResultUpdateOneWithoutAttemptPointersNestedInput = {
+  create?: Prisma.XOR<Prisma.PrivateAutomaticMatchResultCreateWithoutAttemptPointersInput, Prisma.PrivateAutomaticMatchResultUncheckedCreateWithoutAttemptPointersInput>
+  connectOrCreate?: Prisma.PrivateAutomaticMatchResultCreateOrConnectWithoutAttemptPointersInput
+  upsert?: Prisma.PrivateAutomaticMatchResultUpsertWithoutAttemptPointersInput
   disconnect?: Prisma.PrivateAutomaticMatchResultWhereInput | boolean
   delete?: Prisma.PrivateAutomaticMatchResultWhereInput | boolean
   connect?: Prisma.PrivateAutomaticMatchResultWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PrivateAutomaticMatchResultUpdateToOneWithWhereWithoutAttemptPointerInput, Prisma.PrivateAutomaticMatchResultUpdateWithoutAttemptPointerInput>, Prisma.PrivateAutomaticMatchResultUncheckedUpdateWithoutAttemptPointerInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PrivateAutomaticMatchResultUpdateToOneWithWhereWithoutAttemptPointersInput, Prisma.PrivateAutomaticMatchResultUpdateWithoutAttemptPointersInput>, Prisma.PrivateAutomaticMatchResultUncheckedUpdateWithoutAttemptPointersInput>
 }
 
 export type PrivateAutomaticMatchResultUncheckedUpdateOneWithoutAttemptNestedInput = {
@@ -646,7 +646,7 @@ export type PrivateAutomaticMatchResultCreateWithoutAttemptInput = {
   parserProvenance: Prisma.JsonNullValueInput | runtime.InputJsonValue
   calculatedAt: Date | string
   mayBeIncomplete?: boolean
-  attemptPointer?: Prisma.PrivateCvMatchAttemptCreateNestedOneWithoutDeterministicResultInput
+  attemptPointers?: Prisma.PrivateCvMatchAttemptCreateNestedManyWithoutDeterministicResultInput
   evidence?: Prisma.PrivateMatchEvidenceCreateNestedManyWithoutAutomaticResultInput
 }
 
@@ -663,7 +663,7 @@ export type PrivateAutomaticMatchResultUncheckedCreateWithoutAttemptInput = {
   parserProvenance: Prisma.JsonNullValueInput | runtime.InputJsonValue
   calculatedAt: Date | string
   mayBeIncomplete?: boolean
-  attemptPointer?: Prisma.PrivateCvMatchAttemptUncheckedCreateNestedOneWithoutDeterministicResultInput
+  attemptPointers?: Prisma.PrivateCvMatchAttemptUncheckedCreateNestedManyWithoutDeterministicResultInput
   evidence?: Prisma.PrivateMatchEvidenceUncheckedCreateNestedManyWithoutAutomaticResultInput
 }
 
@@ -672,7 +672,7 @@ export type PrivateAutomaticMatchResultCreateOrConnectWithoutAttemptInput = {
   create: Prisma.XOR<Prisma.PrivateAutomaticMatchResultCreateWithoutAttemptInput, Prisma.PrivateAutomaticMatchResultUncheckedCreateWithoutAttemptInput>
 }
 
-export type PrivateAutomaticMatchResultCreateWithoutAttemptPointerInput = {
+export type PrivateAutomaticMatchResultCreateWithoutAttemptPointersInput = {
   id?: string
   score: runtime.Decimal | runtime.DecimalJsLike | number | string
   weight?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -689,7 +689,7 @@ export type PrivateAutomaticMatchResultCreateWithoutAttemptPointerInput = {
   evidence?: Prisma.PrivateMatchEvidenceCreateNestedManyWithoutAutomaticResultInput
 }
 
-export type PrivateAutomaticMatchResultUncheckedCreateWithoutAttemptPointerInput = {
+export type PrivateAutomaticMatchResultUncheckedCreateWithoutAttemptPointersInput = {
   id?: string
   attemptId: string
   score: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -706,9 +706,9 @@ export type PrivateAutomaticMatchResultUncheckedCreateWithoutAttemptPointerInput
   evidence?: Prisma.PrivateMatchEvidenceUncheckedCreateNestedManyWithoutAutomaticResultInput
 }
 
-export type PrivateAutomaticMatchResultCreateOrConnectWithoutAttemptPointerInput = {
+export type PrivateAutomaticMatchResultCreateOrConnectWithoutAttemptPointersInput = {
   where: Prisma.PrivateAutomaticMatchResultWhereUniqueInput
-  create: Prisma.XOR<Prisma.PrivateAutomaticMatchResultCreateWithoutAttemptPointerInput, Prisma.PrivateAutomaticMatchResultUncheckedCreateWithoutAttemptPointerInput>
+  create: Prisma.XOR<Prisma.PrivateAutomaticMatchResultCreateWithoutAttemptPointersInput, Prisma.PrivateAutomaticMatchResultUncheckedCreateWithoutAttemptPointersInput>
 }
 
 export type PrivateAutomaticMatchResultUpsertWithoutAttemptInput = {
@@ -735,7 +735,7 @@ export type PrivateAutomaticMatchResultUpdateWithoutAttemptInput = {
   parserProvenance?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   calculatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mayBeIncomplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  attemptPointer?: Prisma.PrivateCvMatchAttemptUpdateOneWithoutDeterministicResultNestedInput
+  attemptPointers?: Prisma.PrivateCvMatchAttemptUpdateManyWithoutDeterministicResultNestedInput
   evidence?: Prisma.PrivateMatchEvidenceUpdateManyWithoutAutomaticResultNestedInput
 }
 
@@ -752,22 +752,22 @@ export type PrivateAutomaticMatchResultUncheckedUpdateWithoutAttemptInput = {
   parserProvenance?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   calculatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mayBeIncomplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  attemptPointer?: Prisma.PrivateCvMatchAttemptUncheckedUpdateOneWithoutDeterministicResultNestedInput
+  attemptPointers?: Prisma.PrivateCvMatchAttemptUncheckedUpdateManyWithoutDeterministicResultNestedInput
   evidence?: Prisma.PrivateMatchEvidenceUncheckedUpdateManyWithoutAutomaticResultNestedInput
 }
 
-export type PrivateAutomaticMatchResultUpsertWithoutAttemptPointerInput = {
-  update: Prisma.XOR<Prisma.PrivateAutomaticMatchResultUpdateWithoutAttemptPointerInput, Prisma.PrivateAutomaticMatchResultUncheckedUpdateWithoutAttemptPointerInput>
-  create: Prisma.XOR<Prisma.PrivateAutomaticMatchResultCreateWithoutAttemptPointerInput, Prisma.PrivateAutomaticMatchResultUncheckedCreateWithoutAttemptPointerInput>
+export type PrivateAutomaticMatchResultUpsertWithoutAttemptPointersInput = {
+  update: Prisma.XOR<Prisma.PrivateAutomaticMatchResultUpdateWithoutAttemptPointersInput, Prisma.PrivateAutomaticMatchResultUncheckedUpdateWithoutAttemptPointersInput>
+  create: Prisma.XOR<Prisma.PrivateAutomaticMatchResultCreateWithoutAttemptPointersInput, Prisma.PrivateAutomaticMatchResultUncheckedCreateWithoutAttemptPointersInput>
   where?: Prisma.PrivateAutomaticMatchResultWhereInput
 }
 
-export type PrivateAutomaticMatchResultUpdateToOneWithWhereWithoutAttemptPointerInput = {
+export type PrivateAutomaticMatchResultUpdateToOneWithWhereWithoutAttemptPointersInput = {
   where?: Prisma.PrivateAutomaticMatchResultWhereInput
-  data: Prisma.XOR<Prisma.PrivateAutomaticMatchResultUpdateWithoutAttemptPointerInput, Prisma.PrivateAutomaticMatchResultUncheckedUpdateWithoutAttemptPointerInput>
+  data: Prisma.XOR<Prisma.PrivateAutomaticMatchResultUpdateWithoutAttemptPointersInput, Prisma.PrivateAutomaticMatchResultUncheckedUpdateWithoutAttemptPointersInput>
 }
 
-export type PrivateAutomaticMatchResultUpdateWithoutAttemptPointerInput = {
+export type PrivateAutomaticMatchResultUpdateWithoutAttemptPointersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   score?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   weight?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -784,7 +784,7 @@ export type PrivateAutomaticMatchResultUpdateWithoutAttemptPointerInput = {
   evidence?: Prisma.PrivateMatchEvidenceUpdateManyWithoutAutomaticResultNestedInput
 }
 
-export type PrivateAutomaticMatchResultUncheckedUpdateWithoutAttemptPointerInput = {
+export type PrivateAutomaticMatchResultUncheckedUpdateWithoutAttemptPointersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   attemptId?: Prisma.StringFieldUpdateOperationsInput | string
   score?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -815,7 +815,7 @@ export type PrivateAutomaticMatchResultCreateWithoutEvidenceInput = {
   calculatedAt: Date | string
   mayBeIncomplete?: boolean
   attempt: Prisma.PrivateCvMatchAttemptCreateNestedOneWithoutDeterministicResultByAttemptInput
-  attemptPointer?: Prisma.PrivateCvMatchAttemptCreateNestedOneWithoutDeterministicResultInput
+  attemptPointers?: Prisma.PrivateCvMatchAttemptCreateNestedManyWithoutDeterministicResultInput
 }
 
 export type PrivateAutomaticMatchResultUncheckedCreateWithoutEvidenceInput = {
@@ -832,7 +832,7 @@ export type PrivateAutomaticMatchResultUncheckedCreateWithoutEvidenceInput = {
   parserProvenance: Prisma.JsonNullValueInput | runtime.InputJsonValue
   calculatedAt: Date | string
   mayBeIncomplete?: boolean
-  attemptPointer?: Prisma.PrivateCvMatchAttemptUncheckedCreateNestedOneWithoutDeterministicResultInput
+  attemptPointers?: Prisma.PrivateCvMatchAttemptUncheckedCreateNestedManyWithoutDeterministicResultInput
 }
 
 export type PrivateAutomaticMatchResultCreateOrConnectWithoutEvidenceInput = {
@@ -865,7 +865,7 @@ export type PrivateAutomaticMatchResultUpdateWithoutEvidenceInput = {
   calculatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mayBeIncomplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
   attempt?: Prisma.PrivateCvMatchAttemptUpdateOneRequiredWithoutDeterministicResultByAttemptNestedInput
-  attemptPointer?: Prisma.PrivateCvMatchAttemptUpdateOneWithoutDeterministicResultNestedInput
+  attemptPointers?: Prisma.PrivateCvMatchAttemptUpdateManyWithoutDeterministicResultNestedInput
 }
 
 export type PrivateAutomaticMatchResultUncheckedUpdateWithoutEvidenceInput = {
@@ -882,7 +882,7 @@ export type PrivateAutomaticMatchResultUncheckedUpdateWithoutEvidenceInput = {
   parserProvenance?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   calculatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mayBeIncomplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  attemptPointer?: Prisma.PrivateCvMatchAttemptUncheckedUpdateOneWithoutDeterministicResultNestedInput
+  attemptPointers?: Prisma.PrivateCvMatchAttemptUncheckedUpdateManyWithoutDeterministicResultNestedInput
 }
 
 
@@ -891,10 +891,12 @@ export type PrivateAutomaticMatchResultUncheckedUpdateWithoutEvidenceInput = {
  */
 
 export type PrivateAutomaticMatchResultCountOutputType = {
+  attemptPointers: number
   evidence: number
 }
 
 export type PrivateAutomaticMatchResultCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  attemptPointers?: boolean | PrivateAutomaticMatchResultCountOutputTypeCountAttemptPointersArgs
   evidence?: boolean | PrivateAutomaticMatchResultCountOutputTypeCountEvidenceArgs
 }
 
@@ -906,6 +908,13 @@ export type PrivateAutomaticMatchResultCountOutputTypeDefaultArgs<ExtArgs extend
    * Select specific fields to fetch from the PrivateAutomaticMatchResultCountOutputType
    */
   select?: Prisma.PrivateAutomaticMatchResultCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * PrivateAutomaticMatchResultCountOutputType without action
+ */
+export type PrivateAutomaticMatchResultCountOutputTypeCountAttemptPointersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PrivateCvMatchAttemptWhereInput
 }
 
 /**
@@ -931,7 +940,7 @@ export type PrivateAutomaticMatchResultSelect<ExtArgs extends runtime.Types.Exte
   calculatedAt?: boolean
   mayBeIncomplete?: boolean
   attempt?: boolean | Prisma.PrivateCvMatchAttemptDefaultArgs<ExtArgs>
-  attemptPointer?: boolean | Prisma.PrivateAutomaticMatchResult$attemptPointerArgs<ExtArgs>
+  attemptPointers?: boolean | Prisma.PrivateAutomaticMatchResult$attemptPointersArgs<ExtArgs>
   evidence?: boolean | Prisma.PrivateAutomaticMatchResult$evidenceArgs<ExtArgs>
   _count?: boolean | Prisma.PrivateAutomaticMatchResultCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["privateAutomaticMatchResult"]>
@@ -989,7 +998,7 @@ export type PrivateAutomaticMatchResultSelectScalar = {
 export type PrivateAutomaticMatchResultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "attemptId" | "score" | "weight" | "weightedContribution" | "matchedRequirements" | "gaps" | "requiredExperience" | "detectedExperience" | "evidenceCoverage" | "parserProvenance" | "calculatedAt" | "mayBeIncomplete", ExtArgs["result"]["privateAutomaticMatchResult"]>
 export type PrivateAutomaticMatchResultInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attempt?: boolean | Prisma.PrivateCvMatchAttemptDefaultArgs<ExtArgs>
-  attemptPointer?: boolean | Prisma.PrivateAutomaticMatchResult$attemptPointerArgs<ExtArgs>
+  attemptPointers?: boolean | Prisma.PrivateAutomaticMatchResult$attemptPointersArgs<ExtArgs>
   evidence?: boolean | Prisma.PrivateAutomaticMatchResult$evidenceArgs<ExtArgs>
   _count?: boolean | Prisma.PrivateAutomaticMatchResultCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1004,7 +1013,7 @@ export type $PrivateAutomaticMatchResultPayload<ExtArgs extends runtime.Types.Ex
   name: "PrivateAutomaticMatchResult"
   objects: {
     attempt: Prisma.$PrivateCvMatchAttemptPayload<ExtArgs>
-    attemptPointer: Prisma.$PrivateCvMatchAttemptPayload<ExtArgs> | null
+    attemptPointers: Prisma.$PrivateCvMatchAttemptPayload<ExtArgs>[]
     evidence: Prisma.$PrivateMatchEvidencePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1416,7 +1425,7 @@ readonly fields: PrivateAutomaticMatchResultFieldRefs;
 export interface Prisma__PrivateAutomaticMatchResultClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   attempt<T extends Prisma.PrivateCvMatchAttemptDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PrivateCvMatchAttemptDefaultArgs<ExtArgs>>): Prisma.Prisma__PrivateCvMatchAttemptClient<runtime.Types.Result.GetResult<Prisma.$PrivateCvMatchAttemptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  attemptPointer<T extends Prisma.PrivateAutomaticMatchResult$attemptPointerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PrivateAutomaticMatchResult$attemptPointerArgs<ExtArgs>>): Prisma.Prisma__PrivateCvMatchAttemptClient<runtime.Types.Result.GetResult<Prisma.$PrivateCvMatchAttemptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  attemptPointers<T extends Prisma.PrivateAutomaticMatchResult$attemptPointersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PrivateAutomaticMatchResult$attemptPointersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrivateCvMatchAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   evidence<T extends Prisma.PrivateAutomaticMatchResult$evidenceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PrivateAutomaticMatchResult$evidenceArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrivateMatchEvidencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1861,9 +1870,9 @@ export type PrivateAutomaticMatchResultDeleteManyArgs<ExtArgs extends runtime.Ty
 }
 
 /**
- * PrivateAutomaticMatchResult.attemptPointer
+ * PrivateAutomaticMatchResult.attemptPointers
  */
-export type PrivateAutomaticMatchResult$attemptPointerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type PrivateAutomaticMatchResult$attemptPointersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the PrivateCvMatchAttempt
    */
@@ -1877,6 +1886,11 @@ export type PrivateAutomaticMatchResult$attemptPointerArgs<ExtArgs extends runti
    */
   include?: Prisma.PrivateCvMatchAttemptInclude<ExtArgs> | null
   where?: Prisma.PrivateCvMatchAttemptWhereInput
+  orderBy?: Prisma.PrivateCvMatchAttemptOrderByWithRelationInput | Prisma.PrivateCvMatchAttemptOrderByWithRelationInput[]
+  cursor?: Prisma.PrivateCvMatchAttemptWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PrivateCvMatchAttemptScalarFieldEnum | Prisma.PrivateCvMatchAttemptScalarFieldEnum[]
 }
 
 /**

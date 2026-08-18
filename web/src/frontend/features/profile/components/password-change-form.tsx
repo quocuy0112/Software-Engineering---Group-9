@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { KeyRound } from "lucide-react";
+import { CircleCheck, KeyRound } from "lucide-react";
 import { PasswordField } from "@/frontend/features/authentication/components/password-field";
+import { Modal } from "@/frontend/components/ui/modal";
 import { usePasswordChange } from "../client/use-password-change";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 import {
@@ -12,9 +13,9 @@ import {
 
 export function PasswordChangeForm({
   csrfProof,
-  initiallyEditing = true,
 }: {
   csrfProof: string;
+  /** Kept for former callers; the form now always opens for input. */
   initiallyEditing?: boolean;
 }) {
   const locale = useWorkspaceLocale();
@@ -34,6 +35,13 @@ export function PasswordChangeForm({
           changing: "Đang đổi mật khẩu...",
           locked: (seconds: number) => `Thử lại sau ${seconds} giây`,
           change: "Đổi mật khẩu",
+          protected: "Mật khẩu được bảo vệ",
+          protectedCopy:
+            "Cập nhật mật khẩu khi bạn cần làm mới quyền truy cập trên các thiết bị.",
+          identityTitle: "Xác nhận danh tính",
+          identityDescription:
+            "Nhập mật khẩu hiện tại để hoàn tất việc đổi mật khẩu.",
+          identityConfirm: "Xác nhận và đổi mật khẩu",
         }
       : {
           kicker: "CREDENTIAL SECURITY",
@@ -49,11 +57,19 @@ export function PasswordChangeForm({
           changing: "Changing password...",
           locked: (seconds: number) => `Try again in ${seconds} seconds`,
           change: "Change password",
+          protected: "Password protected",
+          protectedCopy:
+            "Update your password whenever you need to refresh access across devices.",
+          identityTitle: "Confirm your identity",
+          identityDescription:
+            "Enter your current password to complete this password change.",
+          identityConfirm: "Confirm and change password",
         };
   const state = usePasswordChange(csrfProof);
   const dirty = Object.values(state.values).some(Boolean);
-  const [isEditing, setIsEditing] = useState(initiallyEditing);
-  useUnsavedChangesGuard(dirty && isEditing);
+  const [isCurrentPasswordPromptOpen, setIsCurrentPasswordPromptOpen] =
+    useState(false);
+  useUnsavedChangesGuard(dirty);
   const feedbackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -61,6 +77,19 @@ export function PasswordChangeForm({
   }, [state.feedback]);
 
   const errors = state.feedback?.fieldErrors;
+
+  const requestPasswordChange = () => {
+    if (!state.values.currentPassword) {
+      setIsCurrentPasswordPromptOpen(true);
+      return;
+    }
+    void state.submit();
+  };
+
+  const confirmPasswordChange = async () => {
+    const changed = await state.submit();
+    if (changed) setIsCurrentPasswordPromptOpen(false);
+  };
 
   return (
     <section
@@ -74,128 +103,142 @@ export function PasswordChangeForm({
         <div>
           <p className="panel-kicker">{copy.kicker}</p>
           <h2 id="password-change-title">{copy.title}</h2>
-          {isEditing ? <UnsavedChangesIndicator dirty={dirty} /> : null}
+          <UnsavedChangesIndicator dirty={dirty} />
         </div>
       </div>
-      {!isEditing ? (
-        <div className="security-readonly-summary">
-          <div className="security-readonly-status">
-            <span className="security-status-dot" aria-hidden="true" />
-            <div>
-              <strong>Password protected</strong>
-              <p>Update your password whenever you need to refresh access.</p>
-            </div>
-          </div>
-          <button
-            className="profile-section-edit-button"
-            type="button"
-            onClick={() => setIsEditing(true)}
-          >
-            Change password
-          </button>
+      <div className="security-password-protected">
+        <span className="security-status-dot" aria-hidden="true" />
+        <div>
+          <strong>{copy.protected}</strong>
+          <p>{copy.protectedCopy}</p>
         </div>
-      ) : (
-        <>
-          <p className="security-panel-copy" id="password-change-policy">
-            {copy.policy}
-          </p>
-          <div
-            ref={feedbackRef}
-            className="password-change-feedback"
-            role={
-              state.feedback
-                ? state.feedback.kind === "error"
-                  ? "alert"
-                  : "status"
-                : undefined
-            }
-            aria-live="polite"
-            aria-atomic="true"
-            tabIndex={state.feedback ? -1 : undefined}
-            data-feedback-kind={state.feedback?.kind}
-          >
-            {state.feedback ? (
-              <>
-                <strong>{state.feedback.message}</strong>
-                {state.retryAfterSeconds > 0 ? (
-                  <span>{copy.retry(state.retryAfterSeconds)}</span>
-                ) : null}
-                {errors ? (
-                  <ul>
-                    {Object.values(errors)
-                      .flat()
-                      .map((message) => (
-                        <li key={message}>{message}</li>
-                      ))}
-                  </ul>
-                ) : null}
-              </>
+      </div>
+      <p
+        className="security-panel-copy security-password-policy"
+        id="password-change-policy"
+      >
+        {copy.policy}
+      </p>
+      <div
+        ref={feedbackRef}
+        className="password-change-feedback"
+        role={
+          state.feedback
+            ? state.feedback.kind === "error"
+              ? "alert"
+              : "status"
+            : undefined
+        }
+        aria-live="polite"
+        aria-atomic="true"
+        tabIndex={state.feedback ? -1 : undefined}
+        data-feedback-kind={state.feedback?.kind}
+      >
+        {state.feedback ? (
+          <>
+            <strong>{state.feedback.message}</strong>
+            {state.retryAfterSeconds > 0 ? (
+              <span>{copy.retry(state.retryAfterSeconds)}</span>
             ) : null}
-          </div>
-          <form
-            className="password-change-form"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void state.submit();
-            }}
-          >
-            <PasswordField
-              className="sh-input"
-              id="password-change-current"
-              label={copy.current}
-              autoComplete="current-password"
-              value={state.values.currentPassword}
-              aria-describedby="password-change-policy"
-              aria-invalid={Boolean(errors?.currentPassword)}
-              onChange={(event) =>
-                state.updateValue("currentPassword", event.target.value)
-              }
-            />
-            <PasswordField
-              className="sh-input"
-              id="password-change-new"
-              label={copy.next}
-              autoComplete="new-password"
-              value={state.values.newPassword}
-              aria-describedby="password-change-policy"
-              aria-invalid={Boolean(errors?.newPassword)}
-              onChange={(event) =>
-                state.updateValue("newPassword", event.target.value)
-              }
-            />
-            <PasswordField
-              className="sh-input"
-              id="password-change-confirmation"
-              label={copy.confirm}
-              autoComplete="new-password"
-              value={state.values.newPasswordConfirmation}
-              aria-describedby="password-change-policy"
-              aria-invalid={Boolean(errors?.newPasswordConfirmation)}
-              onChange={(event) =>
-                state.updateValue("newPasswordConfirmation", event.target.value)
-              }
-            />
+            {errors ? (
+              <ul>
+                {Object.values(errors)
+                  .flat()
+                  .map((message) => (
+                    <li key={message}>{message}</li>
+                  ))}
+              </ul>
+            ) : null}
+          </>
+        ) : null}
+      </div>
+      <form
+        className="password-change-form"
+        onSubmit={(event) => {
+          event.preventDefault();
+          requestPasswordChange();
+        }}
+      >
+        <PasswordField
+          className="sh-input"
+          id="password-change-new"
+          label={copy.next}
+          autoComplete="new-password"
+          value={state.values.newPassword}
+          aria-describedby="password-change-policy"
+          aria-invalid={Boolean(errors?.newPassword)}
+          onChange={(event) =>
+            state.updateValue("newPassword", event.target.value)
+          }
+        />
+        <PasswordField
+          className="sh-input"
+          id="password-change-confirmation"
+          label={copy.confirm}
+          autoComplete="new-password"
+          value={state.values.newPasswordConfirmation}
+          aria-describedby="password-change-policy"
+          aria-invalid={Boolean(errors?.newPasswordConfirmation)}
+          onChange={(event) =>
+            state.updateValue("newPasswordConfirmation", event.target.value)
+          }
+        />
 
-            <button type="submit" disabled={state.submitting || state.locked}>
-              {state.submitting
-                ? copy.changing
-                : state.locked
-                  ? copy.locked(state.retryAfterSeconds)
-                  : copy.change}
-            </button>
-          </form>
+        <button
+          className="security-primary-action"
+          type="submit"
+          disabled={state.submitting || state.locked}
+        >
+          <CircleCheck aria-hidden="true" />
+          <span>
+            {state.submitting
+              ? copy.changing
+              : state.locked
+                ? copy.locked(state.retryAfterSeconds)
+                : copy.change}
+          </span>
+        </button>
+      </form>
+      <Modal
+        open={isCurrentPasswordPromptOpen}
+        title={copy.identityTitle}
+        description={copy.identityDescription}
+        icon={<KeyRound size={20} />}
+        busy={state.submitting}
+        onClose={() => setIsCurrentPasswordPromptOpen(false)}
+      >
+        <form
+          className="password-change-current-password-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void confirmPasswordChange();
+          }}
+        >
+          <PasswordField
+            className="sh-input"
+            id="password-change-current"
+            label={copy.current}
+            autoComplete="current-password"
+            data-autofocus
+            value={state.values.currentPassword}
+            aria-describedby="password-change-policy"
+            aria-invalid={Boolean(errors?.currentPassword)}
+            onChange={(event) =>
+              state.updateValue("currentPassword", event.target.value)
+            }
+          />
           <button
-            className="profile-section-secondary-button security-cancel-button"
-            type="button"
-            onClick={() => {
-              state.clear();
-              setIsEditing(false);
-            }}
+            className="security-primary-action"
+            type="submit"
+            disabled={state.submitting || state.locked}
           >
-            Cancel
+            <CircleCheck aria-hidden="true" />
+            <span>
+              {state.submitting ? copy.changing : copy.identityConfirm}
+            </span>
           </button>
-        </>
-      )}
+        </form>
+      </Modal>
     </section>
   );
 }

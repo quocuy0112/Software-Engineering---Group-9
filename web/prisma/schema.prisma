@@ -401,6 +401,7 @@ enum ApplicationPublicOutcome {
   HIRED
   OFFER_DECLINED
   REJECTED
+  WAITLISTED
   WITHDRAWN
 }
 
@@ -2340,6 +2341,7 @@ model JobPostReviewVersion {
   reviewAggregateId        String
   sequence                 Int
   snapshot                 Json
+  normalizedTitleSearch    String                     @default("")
   snapshotSchemaVersion    String                     @db.VarChar(32)
   snapshotSha256           String                     @db.Char(64)
   state                    JobPostReviewState         @default(PENDING_REVIEW)
@@ -2519,7 +2521,7 @@ model PrivateCvMatchAttempt {
   attemptNumber         Int
   trigger               PrivateCvMatchAttemptTrigger
   state                 PrivateCvMatchAttemptState @default(QUEUED)
-  deterministicResultId String?                   @unique
+  deterministicResultId String?
   aiResultId            String?                   @unique
   hybridScore           Decimal?                  @db.Decimal(5, 1)
   matchBand             String?                   @db.VarChar(32)
@@ -2542,6 +2544,7 @@ model PrivateCvMatchAttempt {
   currentForCheck       PrivateCvMatchCheck?      @relation("PrivateCurrentAttempt")
 
   @@unique([checkId, attemptNumber], map: "PrivateCvMatchAttempt_check_attempt_key")
+  @@index([deterministicResultId], map: "PrivateCvMatchAttempt_deterministic_result_idx")
   @@index([state, leaseExpiresAt, id], map: "PrivateCvMatchAttempt_work_idx")
   @@index([checkId, createdAt, id], map: "PrivateCvMatchAttempt_check_created_idx")
 }
@@ -2561,7 +2564,7 @@ model PrivateAutomaticMatchResult {
   calculatedAt          DateTime
   mayBeIncomplete       Boolean                   @default(false)
   attempt               PrivateCvMatchAttempt     @relation("PrivateAttemptAutomatic", fields: [attemptId], references: [id], onDelete: Cascade)
-  attemptPointer        PrivateCvMatchAttempt?    @relation("PrivateAttemptAutomaticPointer")
+  attemptPointers       PrivateCvMatchAttempt[]  @relation("PrivateAttemptAutomaticPointer")
   evidence              PrivateMatchEvidence[]
 
   @@index([calculatedAt, id], map: "PrivateAutomaticMatchResult_calculated_idx")

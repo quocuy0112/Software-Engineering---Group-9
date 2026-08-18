@@ -1,50 +1,60 @@
 .root {
-  border-inline-start: 0.25rem solid var(--color-border, #64748b);
-  color: var(--color-text-muted, #334155);
   display: grid;
-  font-size: 0.875rem;
-  gap: 0.5rem;
-  padding: 0.75rem;
+  gap: 8px;
+  padding: 12px 14px;
+  border-inline-start: 3px solid #12946b;
+  border-radius: 0 10px 10px 0;
+  color: #2f6b52;
+  background: #e7f7f1;
+  font-size: 12px;
+  font-family: var(--sh-profile-font-body);
+  line-height: 1.5;
 }
-
 .details {
   display: grid;
-  gap: 0.35rem;
+  gap: 4px;
   margin: 0;
 }
-
 .details > div {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: 6px;
 }
-
+.details dt {
+  font-weight: 600;
+}
 .details dd {
   margin: 0;
 }
-
 .unavailable,
 .context {
   margin: 0;
 }
-
 .technicalDetails {
-  padding: 0.5rem 0.65rem;
-  border: 1px solid var(--sh-color-border-subtle);
-  border-radius: var(--sh-radius-sm);
-  background: var(--sh-color-surface-tinted);
+  padding: 8px 10px;
+  border: 1px solid #bfe4d2;
+  border-radius: 9px;
+  background: #fff;
+  color: #2f6b52;
 }
-
 .technicalDetails summary {
-  font-weight: var(--sh-font-weight-semibold);
+  font-weight: 600;
   cursor: pointer;
 }
-
 .technicalDetails p {
-  margin: 0.4rem 0 0;
+  margin: 6px 0 0;
   overflow-wrap: anywhere;
 }
-
+.root [role="alert"] {
+  padding: 9px 10px;
+  border-inline-start: 3px solid #c9820f;
+  border-radius: 0 8px 8px 0;
+  color: #8a6414;
+  background: #fbf1e1;
+}
+.root [role="alert"] p {
+  margin: 3px 0 0;
+}
 @media (prefers-reduced-motion: reduce) {
   .root {
     scroll-behavior: auto;

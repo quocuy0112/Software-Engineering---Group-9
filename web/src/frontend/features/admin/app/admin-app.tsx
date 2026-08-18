@@ -1,12 +1,5 @@
 "use client";
-import {
-  Admin,
-  List,
-  Datagrid,
-  TextField,
-  Resource,
-  memoryStore,
-} from "react-admin";
+import { Admin, Resource, memoryStore } from "react-admin";
 import { createTheme, ScopedCssBaseline } from "@mui/material";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
@@ -35,6 +28,8 @@ import { JobPostReviewList } from "../job-post-reviews/job-post-review-list";
 import { JobPostReviewShow } from "../job-post-reviews/job-post-review-show";
 import { JobPostManagementList } from "../job-post-management/job-post-management-list";
 import { JobPostManagementShow } from "../job-post-management/job-post-management-show";
+import { CompanyDetailShow } from "../companies/company-detail-show";
+import { CompanyList } from "../companies/company-list";
 
 const theme = createTheme({
   palette: { mode: "light", primary: { main: "#155eef" } },
@@ -66,18 +61,6 @@ const theme = createTheme({
 const store = memoryStore();
 const queryClient = createAdminQueryClient();
 
-function SafeList() {
-  return (
-    <List perPage={25} pagination={false}>
-      <Datagrid bulkActionButtons={false} rowClick="show">
-        <TextField source="id" />
-        <TextField source="displayName" />
-        <TextField source="state" />
-      </Datagrid>
-    </List>
-  );
-}
-
 export function AdminApp() {
   return (
     <ScopedCssBaseline enableColorScheme>
@@ -106,13 +89,23 @@ export function AdminApp() {
             list={JobPostReviewList}
             show={JobPostReviewShow}
           />
-          <Resource name="job-postings" options={{ label: "Job Post Management" }} icon={FactCheckOutlinedIcon} list={JobPostManagementList} show={JobPostManagementShow} />
+          <Resource
+            name="job-postings"
+            options={{ label: "Job Post Management" }}
+            icon={FactCheckOutlinedIcon}
+            list={JobPostManagementList}
+            show={JobPostManagementShow}
+          />
           <Resource
             name="accounts"
             list={AccountList}
             show={AccountDetailShow}
           />
-          <Resource name="companies" list={SafeList} />
+          <Resource
+            name="companies"
+            list={CompanyList}
+            show={CompanyDetailShow}
+          />
           <Resource
             name="company-memberships"
             list={CompanyMembershipList}

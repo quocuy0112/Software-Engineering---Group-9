@@ -11,8 +11,7 @@ import {
   TextInput,
 } from "react-admin";
 
-const choices = (values: string[]) =>
-  values.map((id) => ({ id, name: id }));
+const choices = (values: string[]) => values.map((id) => ({ id, name: id }));
 
 export function MessagingReportList() {
   return (
@@ -22,6 +21,12 @@ export function MessagingReportList() {
       pagination={<Pagination rowsPerPageOptions={[25, 50, 100]} />}
       sort={{ field: "createdAt", order: "ASC" }}
       filters={[
+        <TextInput
+          key="q"
+          source="q"
+          label="Report reference or account name"
+          alwaysOn
+        />,
         <SelectInput
           key="targetType"
           source="targetType"
@@ -44,14 +49,11 @@ export function MessagingReportList() {
           key="state"
           source="state"
           choices={choices(["PENDING_REVIEW", "RESOLVED", "DISMISSED"])}
+          emptyText="All statuses"
         />,
         <TextInput key="reporterId" source="reporterId" />,
         <TextInput key="targetId" source="targetId" />,
-        <TextInput
-          key="age"
-          source="age"
-          label="Minimum age (hours)"
-        />,
+        <TextInput key="age" source="age" label="Minimum age (hours)" />,
         <TextInput
           key="assigneeId"
           source="assigneeId"

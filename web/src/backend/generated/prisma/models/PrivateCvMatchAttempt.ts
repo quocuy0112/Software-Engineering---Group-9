@@ -379,7 +379,6 @@ export type PrivateCvMatchAttemptOrderByWithRelationInput = {
 
 export type PrivateCvMatchAttemptWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  deterministicResultId?: string
   aiResultId?: string
   checkId_attemptNumber?: Prisma.PrivateCvMatchAttemptCheckIdAttemptNumberCompoundUniqueInput
   AND?: Prisma.PrivateCvMatchAttemptWhereInput | Prisma.PrivateCvMatchAttemptWhereInput[]
@@ -389,6 +388,7 @@ export type PrivateCvMatchAttemptWhereUniqueInput = Prisma.AtLeast<{
   attemptNumber?: Prisma.IntFilter<"PrivateCvMatchAttempt"> | number
   trigger?: Prisma.EnumPrivateCvMatchAttemptTriggerFilter<"PrivateCvMatchAttempt"> | $Enums.PrivateCvMatchAttemptTrigger
   state?: Prisma.EnumPrivateCvMatchAttemptStateFilter<"PrivateCvMatchAttempt"> | $Enums.PrivateCvMatchAttemptState
+  deterministicResultId?: Prisma.StringNullableFilter<"PrivateCvMatchAttempt"> | string | null
   hybridScore?: Prisma.DecimalNullableFilter<"PrivateCvMatchAttempt"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   matchBand?: Prisma.StringNullableFilter<"PrivateCvMatchAttempt"> | string | null
   startedAt?: Prisma.DateTimeNullableFilter<"PrivateCvMatchAttempt"> | Date | string | null
@@ -408,7 +408,7 @@ export type PrivateCvMatchAttemptWhereUniqueInput = Prisma.AtLeast<{
   deterministicResult?: Prisma.XOR<Prisma.PrivateAutomaticMatchResultNullableScalarRelationFilter, Prisma.PrivateAutomaticMatchResultWhereInput> | null
   aiResult?: Prisma.XOR<Prisma.PrivateAiEvaluationResultNullableScalarRelationFilter, Prisma.PrivateAiEvaluationResultWhereInput> | null
   currentForCheck?: Prisma.XOR<Prisma.PrivateCvMatchCheckNullableScalarRelationFilter, Prisma.PrivateCvMatchCheckWhereInput> | null
-}, "id" | "deterministicResultId" | "aiResultId" | "checkId_attemptNumber">
+}, "id" | "aiResultId" | "checkId_attemptNumber">
 
 export type PrivateCvMatchAttemptOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -485,7 +485,7 @@ export type PrivateCvMatchAttemptCreateInput = {
   check: Prisma.PrivateCvMatchCheckCreateNestedOneWithoutAttemptsInput
   deterministicResultByAttempt?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptInput
   aiResultByAttempt?: Prisma.PrivateAiEvaluationResultCreateNestedOneWithoutAttemptInput
-  deterministicResult?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptPointerInput
+  deterministicResult?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptPointersInput
   aiResult?: Prisma.PrivateAiEvaluationResultCreateNestedOneWithoutAttemptPointerInput
   currentForCheck?: Prisma.PrivateCvMatchCheckCreateNestedOneWithoutCurrentAttemptInput
 }
@@ -537,7 +537,7 @@ export type PrivateCvMatchAttemptUpdateInput = {
   check?: Prisma.PrivateCvMatchCheckUpdateOneRequiredWithoutAttemptsNestedInput
   deterministicResultByAttempt?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptNestedInput
   aiResultByAttempt?: Prisma.PrivateAiEvaluationResultUpdateOneWithoutAttemptNestedInput
-  deterministicResult?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptPointerNestedInput
+  deterministicResult?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptPointersNestedInput
   aiResult?: Prisma.PrivateAiEvaluationResultUpdateOneWithoutAttemptPointerNestedInput
   currentForCheck?: Prisma.PrivateCvMatchCheckUpdateOneWithoutCurrentAttemptNestedInput
 }
@@ -810,16 +810,18 @@ export type PrivateCvMatchAttemptCreateNestedOneWithoutDeterministicResultByAtte
   connect?: Prisma.PrivateCvMatchAttemptWhereUniqueInput
 }
 
-export type PrivateCvMatchAttemptCreateNestedOneWithoutDeterministicResultInput = {
-  create?: Prisma.XOR<Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultInput, Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultInput>
-  connectOrCreate?: Prisma.PrivateCvMatchAttemptCreateOrConnectWithoutDeterministicResultInput
-  connect?: Prisma.PrivateCvMatchAttemptWhereUniqueInput
+export type PrivateCvMatchAttemptCreateNestedManyWithoutDeterministicResultInput = {
+  create?: Prisma.XOR<Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultInput, Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultInput> | Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultInput[] | Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultInput[]
+  connectOrCreate?: Prisma.PrivateCvMatchAttemptCreateOrConnectWithoutDeterministicResultInput | Prisma.PrivateCvMatchAttemptCreateOrConnectWithoutDeterministicResultInput[]
+  createMany?: Prisma.PrivateCvMatchAttemptCreateManyDeterministicResultInputEnvelope
+  connect?: Prisma.PrivateCvMatchAttemptWhereUniqueInput | Prisma.PrivateCvMatchAttemptWhereUniqueInput[]
 }
 
-export type PrivateCvMatchAttemptUncheckedCreateNestedOneWithoutDeterministicResultInput = {
-  create?: Prisma.XOR<Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultInput, Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultInput>
-  connectOrCreate?: Prisma.PrivateCvMatchAttemptCreateOrConnectWithoutDeterministicResultInput
-  connect?: Prisma.PrivateCvMatchAttemptWhereUniqueInput
+export type PrivateCvMatchAttemptUncheckedCreateNestedManyWithoutDeterministicResultInput = {
+  create?: Prisma.XOR<Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultInput, Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultInput> | Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultInput[] | Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultInput[]
+  connectOrCreate?: Prisma.PrivateCvMatchAttemptCreateOrConnectWithoutDeterministicResultInput | Prisma.PrivateCvMatchAttemptCreateOrConnectWithoutDeterministicResultInput[]
+  createMany?: Prisma.PrivateCvMatchAttemptCreateManyDeterministicResultInputEnvelope
+  connect?: Prisma.PrivateCvMatchAttemptWhereUniqueInput | Prisma.PrivateCvMatchAttemptWhereUniqueInput[]
 }
 
 export type PrivateCvMatchAttemptUpdateOneRequiredWithoutDeterministicResultByAttemptNestedInput = {
@@ -830,24 +832,32 @@ export type PrivateCvMatchAttemptUpdateOneRequiredWithoutDeterministicResultByAt
   update?: Prisma.XOR<Prisma.XOR<Prisma.PrivateCvMatchAttemptUpdateToOneWithWhereWithoutDeterministicResultByAttemptInput, Prisma.PrivateCvMatchAttemptUpdateWithoutDeterministicResultByAttemptInput>, Prisma.PrivateCvMatchAttemptUncheckedUpdateWithoutDeterministicResultByAttemptInput>
 }
 
-export type PrivateCvMatchAttemptUpdateOneWithoutDeterministicResultNestedInput = {
-  create?: Prisma.XOR<Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultInput, Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultInput>
-  connectOrCreate?: Prisma.PrivateCvMatchAttemptCreateOrConnectWithoutDeterministicResultInput
-  upsert?: Prisma.PrivateCvMatchAttemptUpsertWithoutDeterministicResultInput
-  disconnect?: Prisma.PrivateCvMatchAttemptWhereInput | boolean
-  delete?: Prisma.PrivateCvMatchAttemptWhereInput | boolean
-  connect?: Prisma.PrivateCvMatchAttemptWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PrivateCvMatchAttemptUpdateToOneWithWhereWithoutDeterministicResultInput, Prisma.PrivateCvMatchAttemptUpdateWithoutDeterministicResultInput>, Prisma.PrivateCvMatchAttemptUncheckedUpdateWithoutDeterministicResultInput>
+export type PrivateCvMatchAttemptUpdateManyWithoutDeterministicResultNestedInput = {
+  create?: Prisma.XOR<Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultInput, Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultInput> | Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultInput[] | Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultInput[]
+  connectOrCreate?: Prisma.PrivateCvMatchAttemptCreateOrConnectWithoutDeterministicResultInput | Prisma.PrivateCvMatchAttemptCreateOrConnectWithoutDeterministicResultInput[]
+  upsert?: Prisma.PrivateCvMatchAttemptUpsertWithWhereUniqueWithoutDeterministicResultInput | Prisma.PrivateCvMatchAttemptUpsertWithWhereUniqueWithoutDeterministicResultInput[]
+  createMany?: Prisma.PrivateCvMatchAttemptCreateManyDeterministicResultInputEnvelope
+  set?: Prisma.PrivateCvMatchAttemptWhereUniqueInput | Prisma.PrivateCvMatchAttemptWhereUniqueInput[]
+  disconnect?: Prisma.PrivateCvMatchAttemptWhereUniqueInput | Prisma.PrivateCvMatchAttemptWhereUniqueInput[]
+  delete?: Prisma.PrivateCvMatchAttemptWhereUniqueInput | Prisma.PrivateCvMatchAttemptWhereUniqueInput[]
+  connect?: Prisma.PrivateCvMatchAttemptWhereUniqueInput | Prisma.PrivateCvMatchAttemptWhereUniqueInput[]
+  update?: Prisma.PrivateCvMatchAttemptUpdateWithWhereUniqueWithoutDeterministicResultInput | Prisma.PrivateCvMatchAttemptUpdateWithWhereUniqueWithoutDeterministicResultInput[]
+  updateMany?: Prisma.PrivateCvMatchAttemptUpdateManyWithWhereWithoutDeterministicResultInput | Prisma.PrivateCvMatchAttemptUpdateManyWithWhereWithoutDeterministicResultInput[]
+  deleteMany?: Prisma.PrivateCvMatchAttemptScalarWhereInput | Prisma.PrivateCvMatchAttemptScalarWhereInput[]
 }
 
-export type PrivateCvMatchAttemptUncheckedUpdateOneWithoutDeterministicResultNestedInput = {
-  create?: Prisma.XOR<Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultInput, Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultInput>
-  connectOrCreate?: Prisma.PrivateCvMatchAttemptCreateOrConnectWithoutDeterministicResultInput
-  upsert?: Prisma.PrivateCvMatchAttemptUpsertWithoutDeterministicResultInput
-  disconnect?: Prisma.PrivateCvMatchAttemptWhereInput | boolean
-  delete?: Prisma.PrivateCvMatchAttemptWhereInput | boolean
-  connect?: Prisma.PrivateCvMatchAttemptWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PrivateCvMatchAttemptUpdateToOneWithWhereWithoutDeterministicResultInput, Prisma.PrivateCvMatchAttemptUpdateWithoutDeterministicResultInput>, Prisma.PrivateCvMatchAttemptUncheckedUpdateWithoutDeterministicResultInput>
+export type PrivateCvMatchAttemptUncheckedUpdateManyWithoutDeterministicResultNestedInput = {
+  create?: Prisma.XOR<Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultInput, Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultInput> | Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultInput[] | Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultInput[]
+  connectOrCreate?: Prisma.PrivateCvMatchAttemptCreateOrConnectWithoutDeterministicResultInput | Prisma.PrivateCvMatchAttemptCreateOrConnectWithoutDeterministicResultInput[]
+  upsert?: Prisma.PrivateCvMatchAttemptUpsertWithWhereUniqueWithoutDeterministicResultInput | Prisma.PrivateCvMatchAttemptUpsertWithWhereUniqueWithoutDeterministicResultInput[]
+  createMany?: Prisma.PrivateCvMatchAttemptCreateManyDeterministicResultInputEnvelope
+  set?: Prisma.PrivateCvMatchAttemptWhereUniqueInput | Prisma.PrivateCvMatchAttemptWhereUniqueInput[]
+  disconnect?: Prisma.PrivateCvMatchAttemptWhereUniqueInput | Prisma.PrivateCvMatchAttemptWhereUniqueInput[]
+  delete?: Prisma.PrivateCvMatchAttemptWhereUniqueInput | Prisma.PrivateCvMatchAttemptWhereUniqueInput[]
+  connect?: Prisma.PrivateCvMatchAttemptWhereUniqueInput | Prisma.PrivateCvMatchAttemptWhereUniqueInput[]
+  update?: Prisma.PrivateCvMatchAttemptUpdateWithWhereUniqueWithoutDeterministicResultInput | Prisma.PrivateCvMatchAttemptUpdateWithWhereUniqueWithoutDeterministicResultInput[]
+  updateMany?: Prisma.PrivateCvMatchAttemptUpdateManyWithWhereWithoutDeterministicResultInput | Prisma.PrivateCvMatchAttemptUpdateManyWithWhereWithoutDeterministicResultInput[]
+  deleteMany?: Prisma.PrivateCvMatchAttemptScalarWhereInput | Prisma.PrivateCvMatchAttemptScalarWhereInput[]
 }
 
 export type PrivateCvMatchAttemptCreateNestedOneWithoutAiResultByAttemptInput = {
@@ -916,7 +926,7 @@ export type PrivateCvMatchAttemptCreateWithoutCheckInput = {
   createdAt?: Date | string
   deterministicResultByAttempt?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptInput
   aiResultByAttempt?: Prisma.PrivateAiEvaluationResultCreateNestedOneWithoutAttemptInput
-  deterministicResult?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptPointerInput
+  deterministicResult?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptPointersInput
   aiResult?: Prisma.PrivateAiEvaluationResultCreateNestedOneWithoutAttemptPointerInput
   currentForCheck?: Prisma.PrivateCvMatchCheckCreateNestedOneWithoutCurrentAttemptInput
 }
@@ -977,7 +987,7 @@ export type PrivateCvMatchAttemptCreateWithoutCurrentForCheckInput = {
   check: Prisma.PrivateCvMatchCheckCreateNestedOneWithoutAttemptsInput
   deterministicResultByAttempt?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptInput
   aiResultByAttempt?: Prisma.PrivateAiEvaluationResultCreateNestedOneWithoutAttemptInput
-  deterministicResult?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptPointerInput
+  deterministicResult?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptPointersInput
   aiResult?: Prisma.PrivateAiEvaluationResultCreateNestedOneWithoutAttemptPointerInput
 }
 
@@ -1085,7 +1095,7 @@ export type PrivateCvMatchAttemptUpdateWithoutCurrentForCheckInput = {
   check?: Prisma.PrivateCvMatchCheckUpdateOneRequiredWithoutAttemptsNestedInput
   deterministicResultByAttempt?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptNestedInput
   aiResultByAttempt?: Prisma.PrivateAiEvaluationResultUpdateOneWithoutAttemptNestedInput
-  deterministicResult?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptPointerNestedInput
+  deterministicResult?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptPointersNestedInput
   aiResult?: Prisma.PrivateAiEvaluationResultUpdateOneWithoutAttemptPointerNestedInput
 }
 
@@ -1134,7 +1144,7 @@ export type PrivateCvMatchAttemptCreateWithoutDeterministicResultByAttemptInput 
   createdAt?: Date | string
   check: Prisma.PrivateCvMatchCheckCreateNestedOneWithoutAttemptsInput
   aiResultByAttempt?: Prisma.PrivateAiEvaluationResultCreateNestedOneWithoutAttemptInput
-  deterministicResult?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptPointerInput
+  deterministicResult?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptPointersInput
   aiResult?: Prisma.PrivateAiEvaluationResultCreateNestedOneWithoutAttemptPointerInput
   currentForCheck?: Prisma.PrivateCvMatchCheckCreateNestedOneWithoutCurrentAttemptInput
 }
@@ -1224,6 +1234,11 @@ export type PrivateCvMatchAttemptCreateOrConnectWithoutDeterministicResultInput 
   create: Prisma.XOR<Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultInput, Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultInput>
 }
 
+export type PrivateCvMatchAttemptCreateManyDeterministicResultInputEnvelope = {
+  data: Prisma.PrivateCvMatchAttemptCreateManyDeterministicResultInput | Prisma.PrivateCvMatchAttemptCreateManyDeterministicResultInput[]
+  skipDuplicates?: boolean
+}
+
 export type PrivateCvMatchAttemptUpsertWithoutDeterministicResultByAttemptInput = {
   update: Prisma.XOR<Prisma.PrivateCvMatchAttemptUpdateWithoutDeterministicResultByAttemptInput, Prisma.PrivateCvMatchAttemptUncheckedUpdateWithoutDeterministicResultByAttemptInput>
   create: Prisma.XOR<Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultByAttemptInput, Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultByAttemptInput>
@@ -1255,7 +1270,7 @@ export type PrivateCvMatchAttemptUpdateWithoutDeterministicResultByAttemptInput 
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   check?: Prisma.PrivateCvMatchCheckUpdateOneRequiredWithoutAttemptsNestedInput
   aiResultByAttempt?: Prisma.PrivateAiEvaluationResultUpdateOneWithoutAttemptNestedInput
-  deterministicResult?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptPointerNestedInput
+  deterministicResult?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptPointersNestedInput
   aiResult?: Prisma.PrivateAiEvaluationResultUpdateOneWithoutAttemptPointerNestedInput
   currentForCheck?: Prisma.PrivateCvMatchCheckUpdateOneWithoutCurrentAttemptNestedInput
 }
@@ -1285,65 +1300,20 @@ export type PrivateCvMatchAttemptUncheckedUpdateWithoutDeterministicResultByAtte
   currentForCheck?: Prisma.PrivateCvMatchCheckUncheckedUpdateOneWithoutCurrentAttemptNestedInput
 }
 
-export type PrivateCvMatchAttemptUpsertWithoutDeterministicResultInput = {
+export type PrivateCvMatchAttemptUpsertWithWhereUniqueWithoutDeterministicResultInput = {
+  where: Prisma.PrivateCvMatchAttemptWhereUniqueInput
   update: Prisma.XOR<Prisma.PrivateCvMatchAttemptUpdateWithoutDeterministicResultInput, Prisma.PrivateCvMatchAttemptUncheckedUpdateWithoutDeterministicResultInput>
   create: Prisma.XOR<Prisma.PrivateCvMatchAttemptCreateWithoutDeterministicResultInput, Prisma.PrivateCvMatchAttemptUncheckedCreateWithoutDeterministicResultInput>
-  where?: Prisma.PrivateCvMatchAttemptWhereInput
 }
 
-export type PrivateCvMatchAttemptUpdateToOneWithWhereWithoutDeterministicResultInput = {
-  where?: Prisma.PrivateCvMatchAttemptWhereInput
+export type PrivateCvMatchAttemptUpdateWithWhereUniqueWithoutDeterministicResultInput = {
+  where: Prisma.PrivateCvMatchAttemptWhereUniqueInput
   data: Prisma.XOR<Prisma.PrivateCvMatchAttemptUpdateWithoutDeterministicResultInput, Prisma.PrivateCvMatchAttemptUncheckedUpdateWithoutDeterministicResultInput>
 }
 
-export type PrivateCvMatchAttemptUpdateWithoutDeterministicResultInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  attemptNumber?: Prisma.IntFieldUpdateOperationsInput | number
-  trigger?: Prisma.EnumPrivateCvMatchAttemptTriggerFieldUpdateOperationsInput | $Enums.PrivateCvMatchAttemptTrigger
-  state?: Prisma.EnumPrivateCvMatchAttemptStateFieldUpdateOperationsInput | $Enums.PrivateCvMatchAttemptState
-  hybridScore?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  matchBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  promptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  inputPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  scoringPolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
-  leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  check?: Prisma.PrivateCvMatchCheckUpdateOneRequiredWithoutAttemptsNestedInput
-  deterministicResultByAttempt?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptNestedInput
-  aiResultByAttempt?: Prisma.PrivateAiEvaluationResultUpdateOneWithoutAttemptNestedInput
-  aiResult?: Prisma.PrivateAiEvaluationResultUpdateOneWithoutAttemptPointerNestedInput
-  currentForCheck?: Prisma.PrivateCvMatchCheckUpdateOneWithoutCurrentAttemptNestedInput
-}
-
-export type PrivateCvMatchAttemptUncheckedUpdateWithoutDeterministicResultInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  checkId?: Prisma.StringFieldUpdateOperationsInput | string
-  attemptNumber?: Prisma.IntFieldUpdateOperationsInput | number
-  trigger?: Prisma.EnumPrivateCvMatchAttemptTriggerFieldUpdateOperationsInput | $Enums.PrivateCvMatchAttemptTrigger
-  state?: Prisma.EnumPrivateCvMatchAttemptStateFieldUpdateOperationsInput | $Enums.PrivateCvMatchAttemptState
-  aiResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  hybridScore?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  matchBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  promptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  inputPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  scoringPolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
-  leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deterministicResultByAttempt?: Prisma.PrivateAutomaticMatchResultUncheckedUpdateOneWithoutAttemptNestedInput
-  aiResultByAttempt?: Prisma.PrivateAiEvaluationResultUncheckedUpdateOneWithoutAttemptNestedInput
-  currentForCheck?: Prisma.PrivateCvMatchCheckUncheckedUpdateOneWithoutCurrentAttemptNestedInput
+export type PrivateCvMatchAttemptUpdateManyWithWhereWithoutDeterministicResultInput = {
+  where: Prisma.PrivateCvMatchAttemptScalarWhereInput
+  data: Prisma.XOR<Prisma.PrivateCvMatchAttemptUpdateManyMutationInput, Prisma.PrivateCvMatchAttemptUncheckedUpdateManyWithoutDeterministicResultInput>
 }
 
 export type PrivateCvMatchAttemptCreateWithoutAiResultByAttemptInput = {
@@ -1366,7 +1336,7 @@ export type PrivateCvMatchAttemptCreateWithoutAiResultByAttemptInput = {
   createdAt?: Date | string
   check: Prisma.PrivateCvMatchCheckCreateNestedOneWithoutAttemptsInput
   deterministicResultByAttempt?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptInput
-  deterministicResult?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptPointerInput
+  deterministicResult?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptPointersInput
   aiResult?: Prisma.PrivateAiEvaluationResultCreateNestedOneWithoutAttemptPointerInput
   currentForCheck?: Prisma.PrivateCvMatchCheckCreateNestedOneWithoutCurrentAttemptInput
 }
@@ -1422,7 +1392,7 @@ export type PrivateCvMatchAttemptCreateWithoutAiResultInput = {
   check: Prisma.PrivateCvMatchCheckCreateNestedOneWithoutAttemptsInput
   deterministicResultByAttempt?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptInput
   aiResultByAttempt?: Prisma.PrivateAiEvaluationResultCreateNestedOneWithoutAttemptInput
-  deterministicResult?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptPointerInput
+  deterministicResult?: Prisma.PrivateAutomaticMatchResultCreateNestedOneWithoutAttemptPointersInput
   currentForCheck?: Prisma.PrivateCvMatchCheckCreateNestedOneWithoutCurrentAttemptInput
 }
 
@@ -1487,7 +1457,7 @@ export type PrivateCvMatchAttemptUpdateWithoutAiResultByAttemptInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   check?: Prisma.PrivateCvMatchCheckUpdateOneRequiredWithoutAttemptsNestedInput
   deterministicResultByAttempt?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptNestedInput
-  deterministicResult?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptPointerNestedInput
+  deterministicResult?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptPointersNestedInput
   aiResult?: Prisma.PrivateAiEvaluationResultUpdateOneWithoutAttemptPointerNestedInput
   currentForCheck?: Prisma.PrivateCvMatchCheckUpdateOneWithoutCurrentAttemptNestedInput
 }
@@ -1549,7 +1519,7 @@ export type PrivateCvMatchAttemptUpdateWithoutAiResultInput = {
   check?: Prisma.PrivateCvMatchCheckUpdateOneRequiredWithoutAttemptsNestedInput
   deterministicResultByAttempt?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptNestedInput
   aiResultByAttempt?: Prisma.PrivateAiEvaluationResultUpdateOneWithoutAttemptNestedInput
-  deterministicResult?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptPointerNestedInput
+  deterministicResult?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptPointersNestedInput
   currentForCheck?: Prisma.PrivateCvMatchCheckUpdateOneWithoutCurrentAttemptNestedInput
 }
 
@@ -1620,7 +1590,7 @@ export type PrivateCvMatchAttemptUpdateWithoutCheckInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deterministicResultByAttempt?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptNestedInput
   aiResultByAttempt?: Prisma.PrivateAiEvaluationResultUpdateOneWithoutAttemptNestedInput
-  deterministicResult?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptPointerNestedInput
+  deterministicResult?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptPointersNestedInput
   aiResult?: Prisma.PrivateAiEvaluationResultUpdateOneWithoutAttemptPointerNestedInput
   currentForCheck?: Prisma.PrivateCvMatchCheckUpdateOneWithoutCurrentAttemptNestedInput
 }
@@ -1656,6 +1626,100 @@ export type PrivateCvMatchAttemptUncheckedUpdateManyWithoutCheckInput = {
   trigger?: Prisma.EnumPrivateCvMatchAttemptTriggerFieldUpdateOperationsInput | $Enums.PrivateCvMatchAttemptTrigger
   state?: Prisma.EnumPrivateCvMatchAttemptStateFieldUpdateOperationsInput | $Enums.PrivateCvMatchAttemptState
   deterministicResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hybridScore?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  matchBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inputPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringPolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PrivateCvMatchAttemptCreateManyDeterministicResultInput = {
+  id?: string
+  checkId: string
+  attemptNumber: number
+  trigger: $Enums.PrivateCvMatchAttemptTrigger
+  state?: $Enums.PrivateCvMatchAttemptState
+  aiResultId?: string | null
+  hybridScore?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  matchBand?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  failureCode?: string | null
+  provider?: string | null
+  model?: string | null
+  promptVersion?: string | null
+  inputPolicyVersion?: string | null
+  scoringPolicyVersion: string
+  leaseOwner?: string | null
+  leaseExpiresAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type PrivateCvMatchAttemptUpdateWithoutDeterministicResultInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  trigger?: Prisma.EnumPrivateCvMatchAttemptTriggerFieldUpdateOperationsInput | $Enums.PrivateCvMatchAttemptTrigger
+  state?: Prisma.EnumPrivateCvMatchAttemptStateFieldUpdateOperationsInput | $Enums.PrivateCvMatchAttemptState
+  hybridScore?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  matchBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inputPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringPolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  check?: Prisma.PrivateCvMatchCheckUpdateOneRequiredWithoutAttemptsNestedInput
+  deterministicResultByAttempt?: Prisma.PrivateAutomaticMatchResultUpdateOneWithoutAttemptNestedInput
+  aiResultByAttempt?: Prisma.PrivateAiEvaluationResultUpdateOneWithoutAttemptNestedInput
+  aiResult?: Prisma.PrivateAiEvaluationResultUpdateOneWithoutAttemptPointerNestedInput
+  currentForCheck?: Prisma.PrivateCvMatchCheckUpdateOneWithoutCurrentAttemptNestedInput
+}
+
+export type PrivateCvMatchAttemptUncheckedUpdateWithoutDeterministicResultInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  checkId?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  trigger?: Prisma.EnumPrivateCvMatchAttemptTriggerFieldUpdateOperationsInput | $Enums.PrivateCvMatchAttemptTrigger
+  state?: Prisma.EnumPrivateCvMatchAttemptStateFieldUpdateOperationsInput | $Enums.PrivateCvMatchAttemptState
+  aiResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hybridScore?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  matchBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inputPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scoringPolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deterministicResultByAttempt?: Prisma.PrivateAutomaticMatchResultUncheckedUpdateOneWithoutAttemptNestedInput
+  aiResultByAttempt?: Prisma.PrivateAiEvaluationResultUncheckedUpdateOneWithoutAttemptNestedInput
+  currentForCheck?: Prisma.PrivateCvMatchCheckUncheckedUpdateOneWithoutCurrentAttemptNestedInput
+}
+
+export type PrivateCvMatchAttemptUncheckedUpdateManyWithoutDeterministicResultInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  checkId?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  trigger?: Prisma.EnumPrivateCvMatchAttemptTriggerFieldUpdateOperationsInput | $Enums.PrivateCvMatchAttemptTrigger
+  state?: Prisma.EnumPrivateCvMatchAttemptStateFieldUpdateOperationsInput | $Enums.PrivateCvMatchAttemptState
   aiResultId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hybridScore?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   matchBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null

@@ -155,6 +155,26 @@ export const applicationStageTransitionOutcomeSchema = z
   })
   .strict();
 
+/**
+ * Result of an idempotent recruiter stage acknowledgement. Repeated actions
+ * return the authoritative stage with `changed: false` once the application
+ * has advanced beyond the action's source stage.
+ */
+export const applicationStageActionOutcomeSchema = z
+  .object({
+    applicationId: z.string().min(1).max(128),
+    stage: applicationStageSchema,
+    stageVersion: z.number().int().positive(),
+    lastStageChangedAt: isoDateTime,
+    changed: z.boolean(),
+  })
+  .strict();
+
+export const applicationViewedOutcomeSchema =
+  applicationStageActionOutcomeSchema;
+export const applicationShortlistOutcomeSchema =
+  applicationStageActionOutcomeSchema;
+
 export type CandidateApplicationSummary = z.infer<
   typeof candidateApplicationSummarySchema
 >;
@@ -166,4 +186,10 @@ export type CandidateApplicationStageEvent = z.infer<
 >;
 export type ApplicationStageTransition = z.infer<
   typeof applicationStageTransitionSchema
+>;
+export type ApplicationViewedOutcome = z.infer<
+  typeof applicationViewedOutcomeSchema
+>;
+export type ApplicationShortlistOutcome = z.infer<
+  typeof applicationShortlistOutcomeSchema
 >;

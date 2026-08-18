@@ -8,6 +8,7 @@ import {
   jobReviewSnapshotSha256,
 } from "./job-post-review-policy";
 import { projectJobReviewSnapshot } from "./job-post-publication-projector";
+import { normalizedReviewTitleSearch } from "./job-post-review-search";
 
 export async function adoptActiveJobBaseline(input: {
   job: JobCatalogItem;
@@ -95,6 +96,7 @@ export async function adoptActiveJobBaseline(input: {
         reviewAggregateId: aggregate.id,
         sequence: 1,
         snapshot,
+        normalizedTitleSearch: normalizedReviewTitleSearch(snapshot.title),
         snapshotSchemaVersion: JOB_REVIEW_SNAPSHOT_SCHEMA_VERSION,
         snapshotSha256,
         state: "APPROVED",

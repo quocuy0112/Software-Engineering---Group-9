@@ -22,12 +22,23 @@ export const migrationNameMap = Object.freeze([
     "20260814090000_unified_in_app_notifications",
     "032_unified_in_app_notifications",
   ],
+  [
+    "20260818051344_smarthire",
+    "043_admin_timestamp_defaults_and_indexes",
+  ],
+  [
+    "20260818070000_job_post_review_title_search",
+    "044_job_post_review_title_search",
+  ],
 ]);
 
 // These checksums are kept explicit so history reconciliation can accept only
 // known equivalent migration content, then normalize it to the checksum of
 // the checked-in migration SQL.
 export const migrationChecksumAliases = Object.freeze({
+  "20260818051344_smarthire": Object.freeze([
+    "2b7555ddc2732741b4045d2089070de4468af8ad638a76cd2c5c5ccfe6e684df",
+  ]),
   // The old checked-in 031 SQL replayed objects already owned by 025/026/029/030.
   "031_smarthire": Object.freeze([
     "69c9f9bad3f1bd228d639fd8143cfec7c153c2114c55584a5408913e0ef0a4f7",

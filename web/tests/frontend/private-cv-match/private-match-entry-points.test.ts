@@ -49,6 +49,7 @@ describe("candidate CV Match Check entry points", () => {
       matchesRoute,
       setupRoute,
       setupRouteComponent,
+      jobSearchRoute,
       privateMatchService,
       setup,
       matchLayout,
@@ -71,6 +72,13 @@ describe("candidate CV Match Check entry points", () => {
       ),
       readFile(
         resolve(sourceRoot, "app/private-match-setup-route.tsx"),
+        "utf8",
+      ),
+      readFile(
+        resolve(
+          sourceRoot,
+          "app/api/candidate/private-cv-matches/jobs/route.ts",
+        ),
         "utf8",
       ),
       readFile(
@@ -101,6 +109,8 @@ describe("candidate CV Match Check entry points", () => {
     expect(setupRouteComponent).toContain("initialJobId={requestedJobId}");
     expect(setupRouteComponent).toContain("findEligiblePrivateMatchJob");
     expect(setupRouteComponent).toContain("listEligiblePrivateMatchJobs");
+    expect(jobSearchRoute).toContain("searchEligiblePrivateMatchJobs");
+    expect(jobSearchRoute).toContain("privateMatchJobsResponseSchema");
     expect(setupRoute).not.toContain("readJobWorkspaceSnapshot");
     expect(privateMatchService).toContain("findEligiblePrivateMatchJob");
     expect(privateMatchService).toContain("approvedAt: { not: null }");
@@ -112,9 +122,17 @@ describe("candidate CV Match Check entry points", () => {
     expect(setup).toContain("requestedCvIsUnavailable");
     expect(setup).toContain("Target job description");
     expect(setup).toContain("Current job");
+    expect(setup).toContain("Find a job by keyword or company");
+    expect(setup).toContain("private-match-job-search");
     expect(setup).toContain("Key requirements found");
     expect(setup).toContain("CV to assess");
     expect(setup).toContain("Current CV");
+    expect(setup).toContain("Choose a CV from your profile");
+    expect(setup).toContain("Import a CV from your device");
+    expect(setup).toContain("Choose local file");
+    expect(setup).toContain("/api/account/candidate-cvs");
+    expect(setup).toContain("mutateWithCurrentCsrf");
+    expect(setup).not.toContain("/profile/cv-imports/${");
     expect(setup).not.toContain("<select");
     expect(setup).not.toContain("private-match-compact-select");
     expect(setup).toContain("private-match-setup-cta");
