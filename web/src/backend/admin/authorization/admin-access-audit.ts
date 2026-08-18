@@ -25,3 +25,22 @@ export async function recordAdminAccessDenied(
     context: { reason: reason.slice(0, 160) },
   });
 }
+
+export async function recordCompanyDetailViewed(input: {
+  companyId: string;
+  actorUserId: string;
+  actorSessionId: string;
+}) {
+  return new AuditWriter(prisma).append({
+    occurredAt: new Date(),
+    actorType: "user",
+    actorUserId: input.actorUserId,
+    actorSessionId: input.actorSessionId,
+    action: "admin.company_detail_viewed",
+    targetType: "company",
+    targetId: input.companyId,
+    result: "SUCCESS",
+    correlationId: randomUUID(),
+    context: {},
+  });
+}
