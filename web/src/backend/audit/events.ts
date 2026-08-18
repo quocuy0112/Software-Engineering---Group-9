@@ -50,6 +50,7 @@ export const authenticationAuditAction = z.enum([
   "job.report.denied",
   "job.application.submitted",
   "job.application.stage_changed",
+  "job.application.withdrawn",
   "job.application.denied",
   "job.application.failed",
   "SCORING_RESCORE_REQUESTED",
@@ -209,6 +210,8 @@ const auditContextSchema = z
     companyReference: z.string().max(128).optional(),
     visibility: z.string().max(80).optional(),
     applicationState: z.string().max(80).optional(),
+    outcome: z.string().max(80).optional(),
+    preservedStage: z.string().max(40).optional(),
   })
   .strict();
 

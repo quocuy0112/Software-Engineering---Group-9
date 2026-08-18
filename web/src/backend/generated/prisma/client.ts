@@ -405,6 +405,26 @@ export type SavedJob = Prisma.SavedJobModel
  */
 export type JobReport = Prisma.JobReportModel
 /**
+ * Model CandidateApplicationDraft
+ * 
+ */
+export type CandidateApplicationDraft = Prisma.CandidateApplicationDraftModel
+/**
+ * Model ApplicationIntake
+ * 
+ */
+export type ApplicationIntake = Prisma.ApplicationIntakeModel
+/**
+ * Model ApplicationPublicUpdate
+ * 
+ */
+export type ApplicationPublicUpdate = Prisma.ApplicationPublicUpdateModel
+/**
+ * Model ApplicationNotificationPreference
+ * 
+ */
+export type ApplicationNotificationPreference = Prisma.ApplicationNotificationPreferenceModel
+/**
  * Model JobApplication
  * 
  */

@@ -6,9 +6,7 @@ import {
   type PrivateMatchStatus,
   type PrivateMatchResponse,
 } from "@/shared/contracts/private-cv-match";
-import type {
-  PrivateCheckRecord,
-} from "@/backend/repositories/private-cv-match/prisma-private-cv-match-repository";
+import type { PrivateCheckRecord } from "@/backend/repositories/private-cv-match/prisma-private-cv-match-repository";
 import { jsonRecord } from "./private-match-types";
 
 function numberValue(value: unknown, fallback = 0): number {
@@ -35,7 +33,10 @@ function completedDurationSeconds(
   completedAt: Date | null,
 ): number | null {
   if (!startedAt || !completedAt) return null;
-  return Math.max(0, Math.round((completedAt.getTime() - startedAt.getTime()) / 100) / 10);
+  return Math.max(
+    0,
+    Math.round((completedAt.getTime() - startedAt.getTime()) / 100) / 10,
+  );
 }
 
 function provenance(check: PrivateCheckRecord) {
@@ -58,7 +59,9 @@ function base(check: PrivateCheckRecord) {
     version: number;
     displayName: string;
     fileName: string;
-    mimeType: "application/pdf" | "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    mimeType:
+      | "application/pdf"
+      | "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     byteSize: number;
     pageCount: number | null;
     parseStatus: "READY" | "PARTIAL" | "FAILED";
@@ -89,7 +92,8 @@ function base(check: PrivateCheckRecord) {
       fileName: boundedText(cv.fileName, "candidate-cv", 255),
       mimeType: cv.mimeType,
       byteSize: Math.max(1, numberValue(cv.byteSize)),
-      pageCount: cv.pageCount === null ? null : Math.max(1, numberValue(cv.pageCount)),
+      pageCount:
+        cv.pageCount === null ? null : Math.max(1, numberValue(cv.pageCount)),
       parseStatus: cv.parseStatus ?? "READY",
       confirmedAt: cv.confirmedAt ?? check.createdAt.toISOString(),
     },
@@ -106,7 +110,10 @@ function base(check: PrivateCheckRecord) {
           ? null
           : Math.max(0, numberValue(job.requiredExperienceYears)),
       requirements: arrayValue(job.requirements)
-        .filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+        .filter(
+          (item): item is string =>
+            typeof item === "string" && item.trim().length > 0,
+        )
         .map((item) => item.slice(0, 200))
         .slice(0, 100),
       jdVersion: Number(job.jdVersion) || check.jdVersion,
@@ -115,45 +122,82 @@ function base(check: PrivateCheckRecord) {
   };
 }
 
-function automaticComponent(result: NonNullable<PrivateCheckRecord["currentAttempt"]>["deterministicResultByAttempt"]) {
+function automaticComponent(
+  result: NonNullable<
+    PrivateCheckRecord["currentAttempt"]
+  >["deterministicResultByAttempt"],
+) {
   if (!result) return null;
   const matched = arrayValue(result.matchedRequirements).flatMap((value) => {
     const item = jsonRecord(value as never);
-    if (typeof item.id !== "string" || typeof item.label !== "string") return [];
+    if (typeof item.id !== "string" || typeof item.label !== "string")
+      return [];
     const kind = item.kind === "PREFERRED" ? "PREFERRED" : "REQUIRED";
-    return [{
-      id: item.id.slice(0, 128),
-      label: item.label.slice(0, 200),
-      kind,
-      matched: item.matched === true,
-    }];
+    return [
+      {
+        id: item.id.slice(0, 128),
+        label: item.label.slice(0, 200),
+        kind,
+        matched: item.matched === true,
+      },
+    ];
   });
   const gaps = arrayValue(result.gaps).flatMap((value) => {
     const item = jsonRecord(value as never);
-    if (typeof item.code !== "string" || typeof item.title !== "string") return [];
-    const kind = item.kind === "PREFERRED" || item.kind === "EXPERIENCE" ? item.kind : "REQUIRED";
-    return [{
-      code: item.code.slice(0, 160),
-      title: item.title.slice(0, 300),
-      description: boundedText(item.description, "No direct evidence was found.", 500),
-      kind,
-    }];
+    if (typeof item.code !== "string" || typeof item.title !== "string")
+      return [];
+    const kind =
+      item.kind === "PREFERRED" || item.kind === "EXPERIENCE"
+        ? item.kind
+        : "REQUIRED";
+    return [
+      {
+        code: item.code.slice(0, 160),
+        title: item.title.slice(0, 300),
+        description: boundedText(
+          item.description,
+          "No direct evidence was found.",
+          500,
+        ),
+        kind,
+      },
+    ];
   });
   const criterionLabels = new Map(matched.map((item) => [item.id, item.label]));
   const evidence = result.evidence.flatMap((item) => {
     const location = jsonRecord(item.location);
-    const confidence = numberValue(jsonRecord(item.confidenceMetadata).confidence, 0.5);
-    const type = ["SKILL", "PROJECT", "IMPACT", "EXPERIENCE", "EDUCATION", "OTHER"].includes(item.classification)
+    const confidence = numberValue(
+      jsonRecord(item.confidenceMetadata).confidence,
+      0.5,
+    );
+    const type = [
+      "SKILL",
+      "PROJECT",
+      "IMPACT",
+      "EXPERIENCE",
+      "EDUCATION",
+      "OTHER",
+    ].includes(item.classification)
       ? item.classification
       : "OTHER";
     return item.quote.trim()
-      ? [{
-          type: type as "SKILL" | "PROJECT" | "IMPACT" | "EXPERIENCE" | "EDUCATION" | "OTHER",
-          quote: item.quote.slice(0, 1_000),
-          criterion: (criterionLabels.get(item.criterionId) ?? item.criterionId).slice(0, 300),
-          location: `${boundedText(location.section, "CV body", 120)}${location.page ? ` · p.${numberValue(location.page)}` : ""}`,
-          confidence: Math.min(1, Math.max(0, confidence)),
-        }]
+      ? [
+          {
+            type: type as
+              | "SKILL"
+              | "PROJECT"
+              | "IMPACT"
+              | "EXPERIENCE"
+              | "EDUCATION"
+              | "OTHER",
+            quote: item.quote.slice(0, 1_000),
+            criterion: (
+              criterionLabels.get(item.criterionId) ?? item.criterionId
+            ).slice(0, 300),
+            location: `${boundedText(location.section, "CV body", 120)}${location.page ? ` · p.${numberValue(location.page)}` : ""}`,
+            confidence: Math.min(1, Math.max(0, confidence)),
+          },
+        ]
       : [];
   });
   return {
@@ -161,46 +205,95 @@ function automaticComponent(result: NonNullable<PrivateCheckRecord["currentAttem
     weight: 0.6 as const,
     weightedContribution: numberValue(result.weightedContribution),
     evidenceCoverage: numberValue(result.evidenceCoverage),
-    evidenceConfidence: Math.min(100, Math.max(0, Math.round(numberValue(result.evidenceCoverage) * 0.95))),
+    evidenceConfidence: Math.min(
+      100,
+      Math.max(0, Math.round(numberValue(result.evidenceCoverage) * 0.95)),
+    ),
     matchedRequirements: matched,
     gaps,
-    requiredExperience: result.requiredExperience === null ? null : numberValue(result.requiredExperience),
-    detectedExperience: result.detectedExperience === null ? null : numberValue(result.detectedExperience),
+    requiredExperience:
+      result.requiredExperience === null
+        ? null
+        : numberValue(result.requiredExperience),
+    detectedExperience:
+      result.detectedExperience === null
+        ? null
+        : numberValue(result.detectedExperience),
     evidence,
     parserProvenance: {
-      parserVersion: boundedText(jsonRecord(result.parserProvenance).parserVersion, "private-cv-match-parser-v1", 80),
-      cvStatus: boundedText(jsonRecord(result.parserProvenance).cvStatus, "Parsed successfully", 80),
-      jdStatus: boundedText(jsonRecord(result.parserProvenance).jdStatus, "Current job", 80),
+      parserVersion: boundedText(
+        jsonRecord(result.parserProvenance).parserVersion,
+        "private-cv-match-parser-v1",
+        80,
+      ),
+      cvStatus: boundedText(
+        jsonRecord(result.parserProvenance).cvStatus,
+        "Parsed successfully",
+        80,
+      ),
+      jdStatus: boundedText(
+        jsonRecord(result.parserProvenance).jdStatus,
+        "Current job",
+        80,
+      ),
     },
     mayBeIncomplete: result.mayBeIncomplete,
   };
 }
 
-function aiComponent(result: NonNullable<PrivateCheckRecord["currentAttempt"]>["aiResultByAttempt"]) {
+function aiComponent(
+  result: NonNullable<
+    PrivateCheckRecord["currentAttempt"]
+  >["aiResultByAttempt"],
+) {
   if (!result) return null;
-  const strengths = arrayValue(result.strengths).flatMap((value) => {
-    const item = jsonRecord(value as never);
-    return typeof item.title === "string" && typeof item.evidence === "string"
-      ? [{ title: item.title.slice(0, 160), evidence: item.evidence.slice(0, 1_000) }]
-      : [];
-  }).slice(0, 4);
+  const strengths = arrayValue(result.strengths)
+    .flatMap((value) => {
+      const item = jsonRecord(value as never);
+      return typeof item.title === "string" && typeof item.evidence === "string"
+        ? [
+            {
+              title: item.title.slice(0, 160),
+              evidence: item.evidence.slice(0, 1_000),
+            },
+          ]
+        : [];
+    })
+    .slice(0, 4);
   const actions = arrayValue(result.actions)
-    .filter((value): value is string => typeof value === "string" && value.trim().length > 0)
+    .filter(
+      (value): value is string =>
+        typeof value === "string" && value.trim().length > 0,
+    )
     .map((value) => value.slice(0, 500))
     .slice(0, 4);
   return {
     score: numberValue(result.score),
     weight: 0.4 as const,
     weightedContribution: numberValue(result.weightedContribution),
-    summary: boundedText(result.summary, "The AI evaluation is complete.", 1_000),
+    summary: boundedText(
+      result.summary,
+      "The AI evaluation is complete.",
+      1_000,
+    ),
     strengths,
     mainGap: result.mainGap ? result.mainGap.slice(0, 1_000) : null,
     actions,
-    evidenceConfidence: Math.min(100, Math.max(0, Math.round(result.evidenceConfidence))),
-    evidenceLevel: result.evidenceLevel === "LOW" || result.evidenceLevel === "MEDIUM" ? result.evidenceLevel : "HIGH",
+    evidenceConfidence: Math.min(
+      100,
+      Math.max(0, Math.round(result.evidenceConfidence)),
+    ),
+    evidenceLevel:
+      result.evidenceLevel === "LOW" || result.evidenceLevel === "MEDIUM"
+        ? result.evidenceLevel
+        : "HIGH",
     provider: boundedText(result.provider, "OpenAI", 100),
     model: boundedText(result.model, "gpt-5.4-mini-2026-03-17", 200),
-    promptVersion: boundedText(result.promptVersion, "private-cv-match-prompt-v1", 100),
+    promptVersion: boundedText(
+      result.promptVersion,
+      "private-cv-match-prompt-v1",
+      100,
+    ),
     policyVersion: boundedText(result.policyVersion, "HS-60/40-v1", 100),
     durationMs: Math.max(0, Math.round(result.durationMs)),
     completedAt: result.completedAt.toISOString(),
@@ -209,14 +302,21 @@ function aiComponent(result: NonNullable<PrivateCheckRecord["currentAttempt"]>["
 
 function retryInProgress(check: PrivateCheckRecord): boolean {
   return check.attempts.some(
-    (attempt) => attempt.trigger === "AI_RETRY" && (attempt.state === "QUEUED" || attempt.state === "AI_RUNNING"),
+    (attempt) =>
+      attempt.trigger === "AI_RETRY" &&
+      (attempt.state === "QUEUED" || attempt.state === "AI_RUNNING"),
   );
 }
 
-export function projectPrivateMatchCheck(check: PrivateCheckRecord, now = new Date()): PrivateMatchResponse {
+export function projectPrivateMatchCheck(
+  check: PrivateCheckRecord,
+  now = new Date(),
+): PrivateMatchResponse {
   const common = base(check);
   const attempt = check.currentAttempt;
-  const automatic = automaticComponent(attempt?.deterministicResultByAttempt ?? null);
+  const automatic = automaticComponent(
+    attempt?.deterministicResultByAttempt ?? null,
+  );
   if (attempt?.state === "READY" && automatic && attempt.aiResultByAttempt) {
     const aiEvaluation = aiComponent(attempt.aiResultByAttempt);
     if (aiEvaluation) {
@@ -226,7 +326,11 @@ export function projectPrivateMatchCheck(check: PrivateCheckRecord, now = new Da
         state: "READY",
         mode: "HYBRID",
         hybridScore: numberValue(attempt.hybridScore),
-        matchBand: attempt.matchBand === "HIGH_MATCH" || attempt.matchBand === "MEDIUM_MATCH" ? attempt.matchBand : "LOW_MATCH",
+        matchBand:
+          attempt.matchBand === "HIGH_MATCH" ||
+          attempt.matchBand === "MEDIUM_MATCH"
+            ? attempt.matchBand
+            : "LOW_MATCH",
         automatic,
         aiEvaluation,
         evidenceConfidence: aiEvaluation.evidenceConfidence,
@@ -234,7 +338,7 @@ export function projectPrivateMatchCheck(check: PrivateCheckRecord, now = new Da
         actions: aiEvaluation.actions,
         canApply: true,
         completedAt: (attempt.completedAt ?? now).toISOString(),
-        retryInProgress: false,
+        retryInProgress: retryInProgress(check),
       });
     }
   }
@@ -255,26 +359,46 @@ export function projectPrivateMatchCheck(check: PrivateCheckRecord, now = new Da
       failureCode: attempt.failureCode,
     });
   }
-  const statusState = check.state === "ANALYZING" ? "ANALYZING" : check.state === "FAILED" ? "FAILED" : "QUEUED";
-  const statusAttempt = check.attempts.find((item) => item.state === "FAILED") ?? check.attempts[0];
+  const statusState =
+    check.state === "ANALYZING"
+      ? "ANALYZING"
+      : check.state === "FAILED"
+        ? "FAILED"
+        : "QUEUED";
+  const statusAttempt =
+    check.attempts.find((item) => item.state === "FAILED") ?? check.attempts[0];
   return privateMatchResponseSchema.parse({
     ...common,
     view: "STATUS",
     state: statusState,
     failureCode: statusAttempt?.failureCode ?? null,
-    durationSeconds: completedDurationSeconds(statusAttempt?.startedAt ?? null, statusAttempt?.completedAt ?? null),
+    durationSeconds: completedDurationSeconds(
+      statusAttempt?.startedAt ?? null,
+      statusAttempt?.completedAt ?? null,
+    ),
   });
 }
 
-export function projectPrivateMatchStatus(check: PrivateCheckRecord): PrivateMatchStatus {
+export function projectPrivateMatchStatus(
+  check: PrivateCheckRecord,
+): PrivateMatchStatus {
   const common = base(check);
-  const attempt = check.attempts.find((item) => item.state === "FAILED") ?? check.attempts[0];
-  const state = check.state === "FAILED" ? "FAILED" : check.state === "ANALYZING" ? "ANALYZING" : "QUEUED";
+  const attempt =
+    check.attempts.find((item) => item.state === "FAILED") ?? check.attempts[0];
+  const state =
+    check.state === "FAILED"
+      ? "FAILED"
+      : check.state === "ANALYZING"
+        ? "ANALYZING"
+        : "QUEUED";
   return privateMatchStatusSchema.parse({
     ...common,
     view: "STATUS",
     state,
     failureCode: attempt?.failureCode ?? null,
-    durationSeconds: completedDurationSeconds(attempt?.startedAt ?? null, attempt?.completedAt ?? null),
+    durationSeconds: completedDurationSeconds(
+      attempt?.startedAt ?? null,
+      attempt?.completedAt ?? null,
+    ),
   });
 }

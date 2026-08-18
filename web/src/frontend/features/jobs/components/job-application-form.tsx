@@ -231,7 +231,7 @@ export function JobApplicationAction({
   return (
     <Link
       className="sh-button job-card-apply-button"
-      href={"/jobs/" + (jobSlug ?? jobId) + "?apply=true"}
+      href={"/jobs/" + (jobSlug ?? jobId) + "/apply"}
       aria-label="Apply now"
       onClick={onActivate}
     >

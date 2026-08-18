@@ -48,9 +48,11 @@ describe("candidate CV Match Check entry points", () => {
       jobDetail,
       matchesRoute,
       setupRoute,
+      setupRouteComponent,
       privateMatchService,
       setup,
       matchLayout,
+      workspaceLayout,
     ] = await Promise.all([
       readFile(
         resolve(
@@ -65,6 +67,10 @@ describe("candidate CV Match Check entry points", () => {
       ),
       readFile(
         resolve(sourceRoot, "app/(workspace)/cv-match-check/new/page.tsx"),
+        "utf8",
+      ),
+      readFile(
+        resolve(sourceRoot, "app/private-match-setup-route.tsx"),
         "utf8",
       ),
       readFile(
@@ -85,14 +91,16 @@ describe("candidate CV Match Check entry points", () => {
         resolve(sourceRoot, "app/(workspace)/cv-match-check/layout.tsx"),
         "utf8",
       ),
+      readFile(resolve(sourceRoot, "app/(workspace)/layout.tsx"), "utf8"),
     ]);
 
     expect(jobDetail).toContain("Check CV fit privately");
     expect(jobDetail).toContain("/cv-match-check/new?jobId=");
     expect(matchesRoute).toContain("PrivateMatchList");
-    expect(setupRoute).toContain("initialJobId={requestedJobId}");
-    expect(setupRoute).toContain("findEligiblePrivateMatchJob");
-    expect(setupRoute).toContain("listEligiblePrivateMatchJobs");
+    expect(setupRoute).toContain("PrivateMatchSetupRoute");
+    expect(setupRouteComponent).toContain("initialJobId={requestedJobId}");
+    expect(setupRouteComponent).toContain("findEligiblePrivateMatchJob");
+    expect(setupRouteComponent).toContain("listEligiblePrivateMatchJobs");
     expect(setupRoute).not.toContain("readJobWorkspaceSnapshot");
     expect(privateMatchService).toContain("findEligiblePrivateMatchJob");
     expect(privateMatchService).toContain("approvedAt: { not: null }");
@@ -101,10 +109,55 @@ describe("candidate CV Match Check entry points", () => {
     );
     expect(setup).toContain("initialJobId");
     expect(setup).toContain("requestedJobIsUnavailable");
+    expect(setup).toContain("requestedCvIsUnavailable");
+    expect(setup).toContain("Target job description");
+    expect(setup).toContain("Current job");
+    expect(setup).toContain("Key requirements found");
+    expect(setup).toContain("CV to assess");
+    expect(setup).toContain("Current CV");
+    expect(setup).not.toContain("<select");
+    expect(setup).not.toContain("private-match-compact-select");
+    expect(setup).toContain("private-match-setup-cta");
+    expect(setup).toContain(
+      "router.push(`/cv-match-check/${encodeURIComponent(result.checkId)}`)",
+    );
     expect(setup).not.toContain(
       "jobs.find((job) => job.jobId === jobId) ?? jobs[0]",
     );
     expect(matchLayout).toContain("AppProviders");
     expect(matchLayout).toContain("<AppProviders>{children}</AppProviders>");
+    expect(workspaceLayout).toContain("WorkspaceShell");
+    expect(workspaceLayout).toContain('initialWorkspaceMode="candidate"');
+  });
+
+  it("serves the approved setup at the Jobs route through the shared shell", async () => {
+    const [jobsMatchRoute, jobsMatchLayout, jobsLayout] = await Promise.all([
+      readFile(resolve(sourceRoot, "app/jobs/matches/new/page.tsx"), "utf8"),
+      readFile(resolve(sourceRoot, "app/jobs/matches/new/layout.tsx"), "utf8"),
+      readFile(resolve(sourceRoot, "app/jobs/layout.tsx"), "utf8"),
+    ]);
+
+    expect(jobsMatchRoute).toContain("PrivateMatchSetupRoute");
+    expect(jobsMatchLayout).toContain("AppProviders");
+    expect(jobsLayout).toContain("WorkspaceShell");
+    expect(jobsLayout).toContain('initialWorkspaceMode="candidate"');
+  });
+
+  it("serves the report from the Jobs route through the shared matches layout", async () => {
+    const [reportRoute, matchesLayout, jobsLayout] = await Promise.all([
+      readFile(
+        resolve(sourceRoot, "app/jobs/matches/[checkId]/page.tsx"),
+        "utf8",
+      ),
+      readFile(resolve(sourceRoot, "app/jobs/matches/layout.tsx"), "utf8"),
+      readFile(resolve(sourceRoot, "app/jobs/layout.tsx"), "utf8"),
+    ]);
+
+    expect(reportRoute).toContain("redirect(`/cv-match-check/");
+    expect(reportRoute).not.toContain("PrivateMatchPageClient");
+    expect(matchesLayout).toContain("AppProviders");
+    expect(matchesLayout).toContain("private-cv-match.css");
+    expect(jobsLayout).toContain("WorkspaceShell");
+    expect(jobsLayout).toContain('initialWorkspaceMode="candidate"');
   });
 });

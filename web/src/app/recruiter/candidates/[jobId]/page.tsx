@@ -19,5 +19,11 @@ export default async function RecruiterCandidateRankingPage({
   const { jobId } = await params;
   if (!data.jobs.some((job) => job.id === jobId)) notFound();
 
-  return <RecruiterCandidatesPage jobs={data.jobs} selectedJobId={jobId} />;
+  return (
+    <RecruiterCandidatesPage
+      jobs={data.jobs}
+      selectedJobId={jobId}
+      csrfProof={context.csrfProof}
+    />
+  );
 }

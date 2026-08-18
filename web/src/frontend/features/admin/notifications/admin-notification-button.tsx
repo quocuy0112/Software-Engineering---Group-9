@@ -22,6 +22,7 @@ import {
   useNotify,
   useRefresh,
   useUpdate,
+  useRedirect,
 } from "react-admin";
 import type { NotificationItem } from "@/shared/contracts/notifications";
 import type { AdminDataProvider } from "../app/data-provider";
@@ -35,6 +36,7 @@ export function AdminNotificationButton() {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const [markingAll, setMarkingAll] = useState(false);
   const notify = useNotify();
+  const redirect = useRedirect();
   const refresh = useRefresh();
   const dataProvider = useDataProvider<AdminDataProvider>();
   const [update, updateState] = useUpdate<NotificationItem>();

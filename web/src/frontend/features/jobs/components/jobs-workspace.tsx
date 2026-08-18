@@ -6,7 +6,6 @@ import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspa
 export const jobsWorkspaceTabs = [
   { id: "search", href: "/jobs" },
   { id: "saved", href: "/jobs/saved" },
-  { id: "applied", href: "/jobs/applied" },
   { id: "matches", href: "/jobs/matches" },
   { id: "settings", href: "/jobs/settings" },
 ] as const;
@@ -24,7 +23,6 @@ export function JobsWorkspaceNav({
       ? {
           search: "Tìm việc",
           saved: "Việc đã lưu",
-          applied: "Việc đã ứng tuyển",
           matches: "Việc làm đề xuất",
           settings: "Cài đặt gợi ý việc làm",
           navigation: "Không gian ứng viên",
@@ -32,7 +30,6 @@ export function JobsWorkspaceNav({
       : {
           search: "Find jobs",
           saved: "Saved Jobs",
-          applied: "Applied Jobs",
           matches: "Suggested Jobs",
           settings: "Job Recommendation Settings",
           navigation: "Candidate workspace",
@@ -55,12 +52,12 @@ export function JobsWorkspace({
   activeTab,
   children,
 }: {
-  activeTab: Exclude<JobsWorkspaceTab, "search">;
+  activeTab?: Exclude<JobsWorkspaceTab, "search">;
   children: React.ReactNode;
 }) {
   return (
     <div className="jobs-workspace-page">
-      <JobsWorkspaceNav activeTab={activeTab} />
+      {activeTab ? <JobsWorkspaceNav activeTab={activeTab} /> : null}
       {children}
     </div>
   );

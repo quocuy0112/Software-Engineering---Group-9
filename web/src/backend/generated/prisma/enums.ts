@@ -486,6 +486,56 @@ export const ApplicationStage = {
 export type ApplicationStage = (typeof ApplicationStage)[keyof typeof ApplicationStage]
 
 
+export const ApplicationWithdrawalOutcome = {
+  CANDIDATE_WITHDRAWN: 'CANDIDATE_WITHDRAWN'
+} as const
+
+export type ApplicationWithdrawalOutcome = (typeof ApplicationWithdrawalOutcome)[keyof typeof ApplicationWithdrawalOutcome]
+
+
+export const ApplicationIntakeState = {
+  RECEIVED: 'RECEIVED',
+  CHECKING_FILES: 'CHECKING_FILES',
+  SENT_TO_RECRUITER: 'SENT_TO_RECRUITER',
+  ATTENTION_REQUIRED: 'ATTENTION_REQUIRED'
+} as const
+
+export type ApplicationIntakeState = (typeof ApplicationIntakeState)[keyof typeof ApplicationIntakeState]
+
+
+export const ApplicationPublicUpdateKind = {
+  SUBMITTED: 'SUBMITTED',
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  INTERVIEW: 'INTERVIEW',
+  OUTCOME: 'OUTCOME',
+  WITHDRAWN: 'WITHDRAWN',
+  TECHNICAL_UPDATE: 'TECHNICAL_UPDATE'
+} as const
+
+export type ApplicationPublicUpdateKind = (typeof ApplicationPublicUpdateKind)[keyof typeof ApplicationPublicUpdateKind]
+
+
+export const ApplicationPublicStage = {
+  APPLICATION_SUBMITTED: 'APPLICATION_SUBMITTED',
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  INTERVIEW: 'INTERVIEW',
+  OUTCOME: 'OUTCOME'
+} as const
+
+export type ApplicationPublicStage = (typeof ApplicationPublicStage)[keyof typeof ApplicationPublicStage]
+
+
+export const ApplicationPublicOutcome = {
+  OFFERED: 'OFFERED',
+  HIRED: 'HIRED',
+  OFFER_DECLINED: 'OFFER_DECLINED',
+  REJECTED: 'REJECTED',
+  WITHDRAWN: 'WITHDRAWN'
+} as const
+
+export type ApplicationPublicOutcome = (typeof ApplicationPublicOutcome)[keyof typeof ApplicationPublicOutcome]
+
+
 export const ApplicationScoringStatus = {
   NOT_REQUESTED: 'NOT_REQUESTED',
   PENDING: 'PENDING',

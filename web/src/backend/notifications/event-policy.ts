@@ -507,38 +507,12 @@ const policies = {
   },
 } satisfies Record<NotificationKind, Policy>;
 
-const hrefForContext = (
-  kind: NotificationKind,
-  contextType?: NotificationContextType,
-  contextId?: string,
-) => {
-  if (!contextType || !contextId) return null;
-  if (contextType === "ACCOUNT") return "/profile/security";
-  if (contextType === "MEMBERSHIP") return recruiterRoutes.jobPostings;
-  if (contextType === "APPLICATION")
-    return kind === "APPLICATION_RECEIVED"
-      ? recruiterRoutes.jobPostings
-      : `/jobs/applied/${encodeURIComponent(contextId)}`;
-  if (contextType === "VERIFICATION_REQUEST")
-    return "/dashboard/employer-verification";
-  if (contextType === "SUPPORT_CASE") return "/support";
-  if (contextType === "CONNECTION_PROPOSAL" || contextType === "CONNECTION")
-    return "/connections";
-  if (contextType === "CONVERSATION")
-    return `/messages?conversation=${encodeURIComponent(contextId)}`;
-  if (contextType === "JOB_POST_REVIEW")
-    return kind === "JOB_POST_REVIEW_REQUESTED_ADMIN"
-      ? `/admin/job-post-reviews/${encodeURIComponent(contextId)}`
-      : `${recruiterRoutes.jobPostings}?review=${encodeURIComponent(contextId)}`;
-  return null;
-};
-
 export type BuiltNotification = {
   kind: NotificationKind;
   category: NotificationCategory;
   severity: NotificationSeverity;
   audience: "USER" | "ADMIN";
-  recipientRole: NotificationRecipientRole;
+  recipientRole?: NotificationRecipientRole;
   title: string;
   summary: string;
   href: string | null;

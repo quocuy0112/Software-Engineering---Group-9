@@ -14,7 +14,7 @@ export async function POST(request: Request, context: { params: Promise<{ applic
     return NextResponse.json(result, { headers: noStore });
   } catch (error) {
     const unavailable = error instanceof Error && error.message === "APPLICATION_UNAVAILABLE";
-    const conflict = error instanceof Error && (error.message === "DECISION_CONFLICT" || error.message === "INVALID_DECISION_STAGE");
+    const conflict = error instanceof Error && (error.message === "DECISION_CONFLICT" || error.message === "INVALID_DECISION_STAGE" || error.message === "APPLICATION_WITHDRAWAL_BLOCKED");
     return NextResponse.json({ code: unavailable ? "UNAVAILABLE" : conflict ? "CONFLICT" : "INVALID_REQUEST", message: unavailable ? "The application is not available." : conflict ? "This decision is no longer valid. Refresh the application." : "Choose a standardized rejection reason and confirm the decision." }, { status: unavailable ? 404 : conflict ? 409 : 400, headers: noStore });
   }
 }

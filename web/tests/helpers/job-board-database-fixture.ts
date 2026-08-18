@@ -23,6 +23,7 @@ export async function createJobBoardDatabaseFixture(
       publicDescription: "A disposable company used by integration tests.",
       publicLocation: "Hồ Chí Minh",
       verifiedAt: new Date(now.getTime() - 30 * 24 * 60 * 60_000),
+      verificationState: "ACTIVE",
     },
   });
 

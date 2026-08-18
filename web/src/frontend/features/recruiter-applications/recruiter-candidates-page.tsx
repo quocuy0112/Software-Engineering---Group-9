@@ -235,9 +235,11 @@ const CampaignCard = memo(function CampaignCard({
 export function RecruiterCandidatesPage({
   jobs,
   selectedJobId,
+  csrfProof,
 }: {
   jobs: RecruiterJob[];
   selectedJobId?: string;
+  csrfProof?: string;
 }) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"ALL" | "active" | "closed">("ALL");
@@ -317,6 +319,7 @@ export function RecruiterCandidatesPage({
         jobId={selectedJob.id}
         jobTitle={selectedJob.title}
         backHref={recruiterRoutes.candidates}
+        csrfProof={csrfProof}
       />
     );
   }

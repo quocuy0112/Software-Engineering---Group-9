@@ -369,6 +369,41 @@ enum ApplicationStage {
   WAITLISTED
 }
 
+enum ApplicationWithdrawalOutcome {
+  CANDIDATE_WITHDRAWN
+}
+
+enum ApplicationIntakeState {
+  RECEIVED
+  CHECKING_FILES
+  SENT_TO_RECRUITER
+  ATTENTION_REQUIRED
+}
+
+enum ApplicationPublicUpdateKind {
+  SUBMITTED
+  UNDER_REVIEW
+  INTERVIEW
+  OUTCOME
+  WITHDRAWN
+  TECHNICAL_UPDATE
+}
+
+enum ApplicationPublicStage {
+  APPLICATION_SUBMITTED
+  UNDER_REVIEW
+  INTERVIEW
+  OUTCOME
+}
+
+enum ApplicationPublicOutcome {
+  OFFERED
+  HIRED
+  OFFER_DECLINED
+  REJECTED
+  WITHDRAWN
+}
+
 enum ApplicationScoringStatus {
   NOT_REQUESTED
   PENDING
@@ -1157,6 +1192,7 @@ model CandidateIdentity {
   profile         CandidateProfile?
   cvs             CandidateCv[]
   jobApplications JobApplication[]
+  applicationDrafts CandidateApplicationDraft[]
 }
 
 model CandidateProfile {
@@ -2146,6 +2182,7 @@ model JobPosting {
   savedBy                  SavedJob[]
   reports                  JobReport[]
   applications             JobApplication[]
+  candidateApplicationDrafts CandidateApplicationDraft[]
   reviewAggregate          JobPostReviewAggregate?
   applicationArtifactPromotions ApplicationArtifactPromotion[]
   scoringOperations        ScoringOperation[]
@@ -2432,6 +2469,7 @@ model CandidateCv {
   updatedAt       DateTime          @updatedAt
   candidate       CandidateIdentity @relation(fields: [candidateUserId], references: [userId], onDelete: Restrict)
   applications    JobApplication[]
+  applicationDrafts CandidateApplicationDraft[] @relation("CandidateApplicationDraftCv")
   applicationDocuments ApplicationDocument[] @relation("ApplicationDocumentSourceCv")
 
   @@index([candidateUserId, confirmedAt, archivedAt])
@@ -2613,6 +2651,77 @@ model JobReport {
   @@index([reporterUserId, createdAt(sort: Desc)])
 }
 
+model CandidateApplicationDraft {
+  id                  String         @id @default(cuid())
+  candidateUserId     String
+  jobPostingId        String
+  revision            Int            @default(1)
+  personalInfoDraft   Json
+  selectedCvId        String?
+  coverLetterDraft    Json?
+  messageDraft        String?        @db.Text
+  confirmationAccepted Boolean       @default(false)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  expiresAt           DateTime
+  candidate           CandidateIdentity @relation(fields: [candidateUserId], references: [userId], onDelete: Cascade)
+  jobPosting          JobPosting     @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+  selectedCv          CandidateCv?   @relation("CandidateApplicationDraftCv", fields: [selectedCvId], references: [id], onDelete: SetNull)
+
+  @@unique([candidateUserId, jobPostingId])
+  @@index([expiresAt, id])
+  @@index([candidateUserId, updatedAt(sort: Desc)])
+}
+
+model ApplicationIntake {
+  id              String                @id @default(cuid())
+  applicationId   String                @unique
+  state           ApplicationIntakeState @default(RECEIVED)
+  progressPercent Int                   @default(0)
+  receivedAt      DateTime              @default(now())
+  checkingStartedAt DateTime?
+  sentAt          DateTime?
+  failureCode     String?               @db.VarChar(80)
+  leaseOwner      String?               @db.VarChar(128)
+  leaseExpiresAt  DateTime?
+  attemptCount    Int                   @default(0)
+  version         Int                   @default(1)
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  application     JobApplication        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([state, leaseExpiresAt, updatedAt])
+  @@index([receivedAt, id])
+}
+
+model ApplicationPublicUpdate {
+  id             String                    @id @default(cuid())
+  applicationId  String
+  kind           ApplicationPublicUpdateKind
+  publicStage    ApplicationPublicStage?
+  publicOutcome  ApplicationPublicOutcome?
+  title          String                    @db.VarChar(160)
+  variables      Json?
+  effectiveAt    DateTime                  @default(now())
+  deduplicationKey String                  @unique @db.VarChar(255)
+  sourceEventReference String?             @db.VarChar(128)
+  createdAt      DateTime                  @default(now())
+  application    JobApplication            @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId, effectiveAt(sort: Desc), id(sort: Desc)])
+}
+
+model ApplicationNotificationPreference {
+  id            String         @id @default(cuid())
+  applicationId String         @unique
+  emailEnabled  Boolean        @default(true)
+  inAppEnabled  Boolean        @default(true)
+  version       Int            @default(1)
+  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime       @default(now())
+  application   JobApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
 model JobApplication {
   id                      String                        @id @default(cuid())
   candidateUserId         String
@@ -2627,6 +2736,12 @@ model JobApplication {
   stageVersion            Int                           @default(1)
   lastStageChangedAt      DateTime                      @default(now())
   coverLetter             String?
+  submissionMessage       String?                       @db.Text
+  withdrawalOutcome       ApplicationWithdrawalOutcome?
+  withdrawnAt             DateTime?
+  withdrawnByUserId       String?
+  withdrawalVersion       Int?
+  activeProcessingStoppedAt DateTime?
   profileSnapshot         Json
   cvSnapshot              Json
   jobSnapshot             Json
@@ -2663,6 +2778,9 @@ model JobApplication {
   aiAssessments           AiAssessment[]
   scoringWorkItems        ScoringWorkItem[]
   aiAssessmentAttempts    AiAssessmentAttempt[]
+  intake                  ApplicationIntake?
+  publicUpdates           ApplicationPublicUpdate[]
+  notificationPreference  ApplicationNotificationPreference?
 
   @@unique([candidateUserId, jobPostingId])
   @@unique([candidateUserId, idempotencyKey])

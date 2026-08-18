@@ -225,7 +225,7 @@ export function JobCardBody({ job }: { job: JobCardData }) {
 }
 
 function SignInApplyLink({ job }: { job: JobCardData }) {
-  const returnTo = "/jobs/" + job.slug + "?apply=true";
+  const returnTo = "/jobs/" + job.slug + "/apply";
   return (
     <Link
       className="sh-button job-card-apply-button"
@@ -258,7 +258,7 @@ export function ApplyButton({ job }: { job: JobCardData }) {
   return (
     <Link
       className="sh-button job-card-apply-button"
-      href={"/jobs/" + job.slug + "?apply=true"}
+      href={"/jobs/" + job.slug + "/apply"}
     >
       Apply
     </Link>

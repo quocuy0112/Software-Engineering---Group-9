@@ -1,7 +1,6 @@
 "use client";
 
 import type { LimitedPrivateReport } from "@/shared/contracts/private-cv-match";
-import { privateMatchErrorMessage } from "../client/use-private-cv-match";
 import { PrivateMatchReport } from "./private-match-report";
 
 export function PrivateMatchLimitedReport({
@@ -15,7 +14,15 @@ export function PrivateMatchLimitedReport({
   report: LimitedPrivateReport;
   onRetry: () => void;
   retrying?: boolean;
-  retryError?: unknown;
+  retryError?: string;
 }) {
-  return <PrivateMatchReport checkId={checkId} report={report} onRetry={onRetry} retrying={retrying || report.retryInProgress} retryError={retryError ? privateMatchErrorMessage(retryError) : undefined} />;
+  return (
+    <PrivateMatchReport
+      checkId={checkId}
+      report={report}
+      onRetry={onRetry}
+      retrying={retrying || report.retryInProgress}
+      retryError={retryError}
+    />
+  );
 }

@@ -46,6 +46,24 @@ paths:
         '403': { $ref: '#/components/responses/Forbidden' }
         '409': { $ref: '#/components/responses/Conflict' }
   /api/candidate/applications:
+    get:
+      operationId: listCandidateApplications
+      parameters:
+        - name: cursor
+          in: query
+          required: false
+          schema: { type: string, minLength: 1, maxLength: 128 }
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100, default: 24 }
+      responses:
+        '200':
+          description: Candidate-safe application summaries
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CandidateApplicationListResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
     post:
       operationId: submitApplication
       parameters:
@@ -146,6 +164,51 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/candidate/applications/{applicationId}/processing/retry:
+    post:
+      operationId: retryApplicationIntake
+      parameters:
+        - $ref: '#/components/parameters/ApplicationId'
+        - $ref: '#/components/parameters/CsrfToken'
+      responses:
+        '200':
+          description: Persisted candidate-safe intake projection after retry
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApplicationTracker' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/candidate/application-drafts/cover-letter:
+    post:
+      operationId: uploadApplicationDraftCoverLetter
+      parameters:
+        - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [draftId, expectedRevision, file]
+              properties:
+                draftId: { type: string, minLength: 1, maxLength: 128 }
+                expectedRevision: { type: integer, minimum: 1 }
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Draft with the validated cover-letter file variant
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApplicationDraft' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '409': { $ref: '#/components/responses/Conflict' }
   /api/candidate/private-cv-matches:
     get:
@@ -273,37 +336,69 @@ components:
       additionalProperties: false
       required: [versionId, displayName, mimeType, byteSize, parseStatus]
       properties:
-        versionId: { type: string }
-        displayName: { type: string, maxLength: 255 }
-        mimeType: { type: string, enum: [application/pdf, application/vnd.openxmlformats-officedocument.wordprocessingml.document] }
+        versionId: { type: string, minLength: 1, maxLength: 128 }
+        displayName: { type: string, minLength: 1, maxLength: 200 }
+        fileName: { type: string, minLength: 1, maxLength: 255 }
+        mimeType: { type: string, enum: [application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document] }
         byteSize: { type: integer, minimum: 1, maximum: 5000000 }
-        pageCount: { type: [integer, 'null'], minimum: 1 }
-        parseStatus: { type: string, enum: [READY, PARTIAL, FAILED] }
+        version: { type: integer, minimum: 1 }
+        parseStatus: { type: string, enum: [READY, PARTIAL, FAILED, NOT_APPLICABLE] }
+        confirmedAt: { type: string, format: date-time }
+    CandidatePersonalInfo:
+      type: object
+      additionalProperties: false
+      required: [fullName, email, phone]
+      properties:
+        fullName: { type: string, minLength: 1, maxLength: 150 }
+        email: { type: string, format: email, maxLength: 254 }
+        phone: { type: string, maxLength: 20 }
+    CoverLetterTextDraft:
+      type: object
+      additionalProperties: false
+      required: [kind, text]
+      properties:
+        kind: { const: TEXT }
+        text: { type: string, minLength: 1, maxLength: 10000 }
+    CoverLetterFileDraft:
+      type: object
+      additionalProperties: false
+      required: [kind, file]
+      properties:
+        kind: { const: FILE }
+        file: { $ref: '#/components/schemas/FileDescriptor' }
+    CoverLetterDraft:
+      oneOf:
+        - $ref: '#/components/schemas/CoverLetterTextDraft'
+        - $ref: '#/components/schemas/CoverLetterFileDraft'
+      discriminator:
+        propertyName: kind
     ApplicationDraft:
       type: object
       additionalProperties: false
-      required: [draftId, jobId, revision, personalInformation, cv, coverLetter, message, updatedAt, expiresAt]
+      required: [draftId, jobId, revision, personalInformation, cv, coverLetter, message, confirmationAccepted, updatedAt, expiresAt]
       properties:
-        draftId: { type: string }
-        jobId: { type: string }
+        draftId: { type: string, minLength: 1, maxLength: 128 }
+        jobId: { type: string, minLength: 1, maxLength: 128 }
         revision: { type: integer, minimum: 1 }
-        personalInformation: { type: object, additionalProperties: true }
-        cv: { $ref: '#/components/schemas/FileDescriptor' }
-        coverLetter: { type: [object, 'null'], additionalProperties: true }
+        personalInformation: { $ref: '#/components/schemas/CandidatePersonalInfo' }
+        cv: { oneOf: [{ $ref: '#/components/schemas/FileDescriptor' }, { type: 'null' }] }
+        coverLetter: { oneOf: [{ $ref: '#/components/schemas/CoverLetterDraft' }, { type: 'null' }] }
         message: { type: [string, 'null'], maxLength: 2000 }
+        confirmationAccepted: { type: boolean }
         updatedAt: { type: string, format: date-time }
         expiresAt: { type: string, format: date-time }
     SaveDraftCommand:
       type: object
       additionalProperties: false
-      required: [jobId, expectedRevision, personalInformation, cvVersionId]
+      required: [jobId, expectedRevision, personalInformation, cvVersionId, coverLetter, message, confirmationAccepted]
       properties:
-        jobId: { type: string }
+        jobId: { type: string, minLength: 1, maxLength: 128 }
         expectedRevision: { type: [integer, 'null'], minimum: 1 }
-        personalInformation: { type: object, additionalProperties: true }
-        cvVersionId: { type: string }
-        coverLetter: { type: [object, 'null'], additionalProperties: true }
+        personalInformation: { $ref: '#/components/schemas/CandidatePersonalInfo' }
+        cvVersionId: { type: [string, 'null'], minLength: 1, maxLength: 128 }
+        coverLetter: { oneOf: [{ $ref: '#/components/schemas/CoverLetterDraft' }, { type: 'null' }] }
         message: { type: [string, 'null'], maxLength: 2000 }
+        confirmationAccepted: { type: boolean }
     IntakeStep:
       type: object
       additionalProperties: false
@@ -315,10 +410,13 @@ components:
     ApplicationIntake:
       type: object
       additionalProperties: false
-      required: [progressPercent, steps]
+      required: [state, progressPercent, steps, failureCode, updatedAt]
       properties:
+        state: { type: string, enum: [RECEIVED, CHECKING_FILES, SENT_TO_RECRUITER, ATTENTION_REQUIRED] }
         progressPercent: { type: integer, minimum: 0, maximum: 100 }
         steps: { type: array, minItems: 3, maxItems: 3, items: { $ref: '#/components/schemas/IntakeStep' } }
+        failureCode: { type: [string, 'null'], minLength: 1, maxLength: 80 }
+        updatedAt: { type: string, format: date-time }
     ApplicationReceipt:
       type: object
       additionalProperties: false
@@ -336,6 +434,8 @@ components:
       properties:
         id: { type: string }
         kind: { type: string, enum: [SUBMITTED, UNDER_REVIEW, INTERVIEW, OUTCOME, WITHDRAWN, TECHNICAL_UPDATE] }
+        publicStage: { type: [string, 'null'], enum: [APPLICATION_SUBMITTED, UNDER_REVIEW, INTERVIEW, OUTCOME, null] }
+        publicOutcome: { type: [string, 'null'], enum: [OFFERED, HIRED, OFFER_DECLINED, REJECTED, WITHDRAWN, null] }
         title: { type: string, maxLength: 160 }
         occurredAt: { type: string, format: date-time }
     NotificationPreference:
@@ -350,11 +450,25 @@ components:
     ApplicationTracker:
       type: object
       additionalProperties: false
-      required: [applicationId, publicStage, publicOutcome, lastUpdatedAt, stageVersion, intake, updates, files, notificationPreference, canWithdraw]
+      required: [applicationId, job, publicStage, publicOutcome, canonicalStage, stageVersion, submittedAt, lastUpdatedAt, intake, updates, files, notificationPreference, canWithdraw]
       properties:
-        applicationId: { type: string }
+        applicationId: { type: string, minLength: 1, maxLength: 128 }
+        job:
+          type: object
+          additionalProperties: false
+          required: [jobId, slug, title, companyName, companyLogoUrl, location, jobAvailable]
+          properties:
+            jobId: { type: string, minLength: 1, maxLength: 128 }
+            slug: { type: [string, 'null'], maxLength: 220 }
+            title: { type: string, minLength: 1, maxLength: 200 }
+            companyName: { type: string, minLength: 1, maxLength: 160 }
+            companyLogoUrl: { type: [string, 'null'], format: uri }
+            location: { type: string, minLength: 1, maxLength: 300 }
+            jobAvailable: { type: boolean }
         publicStage: { type: string, enum: [APPLICATION_SUBMITTED, UNDER_REVIEW, INTERVIEW, OUTCOME] }
         publicOutcome: { type: [string, 'null'], enum: [OFFERED, HIRED, OFFER_DECLINED, REJECTED, WITHDRAWN, null] }
+        canonicalStage: { type: string, enum: [APPLIED, VIEWED, SHORTLISTED, INTERVIEWING, OFFERED, HIRED, OFFER_DECLINED, REJECTED, WAITLISTED] }
+        submittedAt: { type: string, format: date-time }
         lastUpdatedAt: { type: string, format: date-time }
         stageVersion: { type: integer, minimum: 1 }
         intake: { $ref: '#/components/schemas/ApplicationIntake' }
@@ -362,6 +476,32 @@ components:
         files: { type: array, minItems: 1, items: { $ref: '#/components/schemas/FileDescriptor' } }
         notificationPreference: { $ref: '#/components/schemas/NotificationPreference' }
         canWithdraw: { type: boolean }
+    CandidateApplicationSummary:
+      type: object
+      additionalProperties: false
+      required: [applicationId, jobId, jobSlug, jobTitle, companyName, companyLogoUrl, location, publicStage, publicOutcome, canonicalStage, stageVersion, submittedAt, lastUpdatedAt, jobAvailable]
+      properties:
+        applicationId: { type: string, minLength: 1, maxLength: 128 }
+        jobId: { type: string, minLength: 1, maxLength: 128 }
+        jobSlug: { type: [string, 'null'], maxLength: 220 }
+        jobTitle: { type: string, minLength: 1, maxLength: 200 }
+        companyName: { type: string, minLength: 1, maxLength: 160 }
+        companyLogoUrl: { type: [string, 'null'], format: uri }
+        location: { type: string, minLength: 1, maxLength: 300 }
+        publicStage: { type: string, enum: [APPLICATION_SUBMITTED, UNDER_REVIEW, INTERVIEW, OUTCOME] }
+        publicOutcome: { type: [string, 'null'], enum: [OFFERED, HIRED, OFFER_DECLINED, REJECTED, WITHDRAWN, null] }
+        canonicalStage: { type: string, enum: [APPLIED, VIEWED, SHORTLISTED, INTERVIEWING, OFFERED, HIRED, OFFER_DECLINED, REJECTED, WAITLISTED] }
+        stageVersion: { type: integer, minimum: 1 }
+        submittedAt: { type: string, format: date-time }
+        lastUpdatedAt: { type: string, format: date-time }
+        jobAvailable: { type: boolean }
+    CandidateApplicationListResponse:
+      type: object
+      additionalProperties: false
+      required: [applications, nextCursor]
+      properties:
+        applications: { type: array, maxItems: 100, items: { $ref: '#/components/schemas/CandidateApplicationSummary' } }
+        nextCursor: { type: [string, 'null'], maxLength: 128 }
     WithdrawalOutcome:
       type: object
       additionalProperties: false

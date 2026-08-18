@@ -224,6 +224,15 @@ export function DocumentsTab({
   const hasError = Object.values(previews).some(
     (state) => state.status === "error",
   );
+  const limitedKinds = (
+    Object.entries(previews) as Array<[DocumentKind, PreviewState]>
+  )
+    .filter(
+      ([, state]) =>
+        state.status === "ready" && state.document.previewStatus === "LIMITED",
+    )
+    .map(([kind]) => kind);
+  const hasLimitedPreview = limitedKinds.length > 0;
   const failedKinds = (
     Object.entries(previews) as Array<[DocumentKind, PreviewState]>
   )
@@ -237,7 +246,13 @@ export function DocumentsTab({
           ? "CV parsing failed"
           : "Cover letter parsing failed"
         : "Parsing failed"
-      : "Parsed successfully";
+      : hasLimitedPreview
+        ? limitedKinds.length === 1
+          ? limitedKinds[0] === "cv"
+            ? "CV preview is limited"
+            : "Cover letter preview is limited"
+          : "Document previews are limited"
+        : "Parsed successfully";
   const parserVersion =
     Object.values(previews).find(
       (state): state is Extract<PreviewState, { status: "ready" }> =>
@@ -271,13 +286,21 @@ export function DocumentsTab({
         className={
           "document-parser-status" +
           (isLoading ? " is-loading" : "") +
-          (hasError ? " is-error" : isLoading ? "" : " is-success")
+          (hasError
+            ? " is-error"
+            : isLoading
+              ? ""
+              : hasLimitedPreview
+                ? " is-limited"
+                : " is-success")
         }
       >
         <span className="document-parser-status__icon" aria-hidden="true">
           {isLoading ? (
             <LoaderCircle className="is-spinning" />
           ) : hasError ? (
+            <AlertTriangle />
+          ) : hasLimitedPreview ? (
             <AlertTriangle />
           ) : (
             <CheckCircle2 />
@@ -286,6 +309,12 @@ export function DocumentsTab({
         <div>
           <span>Document parsing status</span>
           <strong>{statusLabel + " · " + parserVersion}</strong>
+          {hasLimitedPreview ? (
+            <p>
+              Original files are still available. Open or download them to
+              review content that could not be extracted.
+            </p>
+          ) : null}
         </div>
         <div className="document-parser-status__time">
           <span>
@@ -366,6 +395,15 @@ function StructuredDocumentPreviewRenderer({
 }) {
   return (
     <div className="document-structured-paper">
+      {document.previewStatus === "LIMITED" ? (
+        <div className="document-preview-limited-note" role="status">
+          <AlertTriangle aria-hidden="true" />
+          <span>
+            A complete text preview was unavailable. Open the original file to
+            review it.
+          </span>
+        </div>
+      ) : null}
       {document.content.kind === "cv" ? (
         <StructuredCvPaper content={document.content} />
       ) : (

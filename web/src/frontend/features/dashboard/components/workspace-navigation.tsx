@@ -31,7 +31,7 @@ export function WorkspaceNavigation({
           signOut: "Đăng xuất",
           signingOut: "Đang đăng xuất…",
           savedJobs: "Việc đã lưu",
-          appliedJobs: "Việc đã ứng tuyển",
+          applications: "Việc đã ứng tuyển",
           suggestedJobs: "Việc làm đề xuất",
           cvMatchCheck: "Kiểm tra độ phù hợp CV",
           recommendationSettings: "Cài đặt gợi ý việc làm",
@@ -49,7 +49,7 @@ export function WorkspaceNavigation({
           signOut: "Sign out",
           signingOut: "Signing out…",
           savedJobs: "Saved Jobs",
-          appliedJobs: "Applied Jobs",
+          applications: "Applications",
           suggestedJobs: "Suggested Jobs",
           cvMatchCheck: "CV Match Check",
           recommendationSettings: "Job Recommendation Settings",
@@ -57,6 +57,7 @@ export function WorkspaceNavigation({
   const destinations = [
     { href: "/dashboard", label: copy.dashboard, icon: "dashboard" },
     { href: "/jobs", label: copy.jobs, icon: "jobs" },
+    { href: "/jobs/applied", label: copy.applications, icon: "applications" },
     { href: "/cv-match-check", label: copy.cvMatchCheck, icon: "cv-match" },
     { href: "/messages", label: copy.messages, icon: "messages" },
     { href: "/connections", label: copy.connections, icon: "connections" },
@@ -65,7 +66,6 @@ export function WorkspaceNavigation({
   ] as const;
   const jobsSubnav = [
     { href: "/jobs/saved", label: copy.savedJobs },
-    { href: "/jobs/applied", label: copy.appliedJobs },
     { href: "/jobs/matches", label: copy.suggestedJobs },
     { href: "/jobs/settings", label: copy.recommendationSettings },
   ] as const;
@@ -141,9 +141,12 @@ export function WorkspaceNavigation({
         <div className="workspace-navigation-scroll">
           {destinations.map((destination) => {
             const active =
-              pathname === destination.href ||
-              (destination.href !== "/dashboard" &&
-                pathname.startsWith(destination.href));
+              destination.href === "/jobs"
+                ? pathname === "/jobs" ||
+                  (pathname.startsWith("/jobs/") &&
+                    !pathname.startsWith("/jobs/applied"))
+                : pathname === destination.href ||
+                  pathname.startsWith(`${destination.href}/`);
             return (
               <div key={destination.href} className="workspace-navigation-item">
                 <Link

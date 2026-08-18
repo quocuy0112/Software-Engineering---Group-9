@@ -30,6 +30,8 @@ const allowedDuplicateVersions = new Set([
   "034_notification_locale_payload|034_submitted_candidates",
   "035_actionable_admin_notifications|035_candidate_hybrid_ranking",
   "038_admin_job_post_management|038_ai_assessment_v5_consistency",
+  "039_candidate_application_private_match|039_job_post_management_correction_invariant",
+  "040_notification_recipient_role_and_job_post_changes|040_private_match_trigger_identifier_fix",
 ]);
 const versionedNames = names
   .filter((name) => !allowedLegacyMigrations.has(name))
