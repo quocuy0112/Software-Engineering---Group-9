@@ -36,7 +36,7 @@ export function RecruitmentPipelineCard({ card, jobId, onChangeStage, dragOverla
       <span>Stage version {card.stageVersion}</span>
       {card.score ? <span>{card.score.final === null ? card.score.state.replaceAll("_", " ") : `${card.score.final}% ${card.score.band?.label ?? "score"}`}</span> : <span>Score not calculated</span>}
       <div className="pipeline-card__actions">
-        {canDrag ? <button type="button" {...attributes} onPointerDown={(event) => { event.stopPropagation(); listeners?.onPointerDown?.(event); }} onKeyDown={(event) => listeners?.onKeyDown?.(event)} aria-label={`Drag ${card.candidate.displayName} to another stage`}>Drag card</button> : null}
+        {canDrag ? <button type="button" className="sr-only" {...attributes} onPointerDown={(event) => { event.stopPropagation(); listeners?.onPointerDown?.(event); }} onKeyDown={(event) => listeners?.onKeyDown?.(event)} aria-label={`Drag ${card.candidate.displayName} to another stage`}>Drag card</button> : null}
         {card.documents.cvAvailable ? <a href={`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(card.applicationId)}/documents/cv`} target="_blank" rel="noreferrer">Open CV</a> : null}
         {card.documents.coverLetterAvailable ? <a href={`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(card.applicationId)}/documents/cover-letter`} target="_blank" rel="noreferrer">Cover letter</a> : null}
         {card.allowedDestinations.length > 0 && onChangeStage ? <button type="button" onClick={(event) => { event.stopPropagation(); onChangeStage(card); }}>Change Stage</button> : null}

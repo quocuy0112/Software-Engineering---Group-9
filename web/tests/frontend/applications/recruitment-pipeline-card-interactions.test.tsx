@@ -72,6 +72,8 @@ describe("RecruitmentPipelineCard interactions", () => {
       name: "Drag Ada Candidate to another stage",
     });
 
+    expect(handle).toHaveClass("sr-only");
+
     fireEvent.keyDown(handle, { key: "Enter" });
 
     expect(keyDown).toHaveBeenCalledOnce();
