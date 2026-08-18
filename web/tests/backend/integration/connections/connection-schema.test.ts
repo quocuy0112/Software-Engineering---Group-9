@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 describe("professional connection migration constraints", () => {
   const sql = readFileSync(
-    "prisma/migrations/026_professional_connection_proposals/migration.sql",
+    "prisma/migrations/027_professional_connection_proposals/migration.sql",
     "utf8",
   );
   it("uses canonical unordered pairs and partial uniqueness", () => {

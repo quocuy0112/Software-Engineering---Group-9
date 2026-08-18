@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 const schema = readFileSync("prisma/schema.prisma", "utf8");
 const retryMigration = readFileSync(
-  "prisma/migrations/044_private_match_retry_deterministic_pointer/migration.sql",
+  "prisma/migrations/051_private_match_retry_deterministic_pointer/migration.sql",
   "utf8",
 );
 

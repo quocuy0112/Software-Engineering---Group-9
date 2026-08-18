@@ -351,7 +351,7 @@ web/
 |-- server.ts
 |-- prisma/
 |   |-- schema.prisma
-|   `-- migrations/022_realtime_messaging/migration.sql
+|   `-- migrations/023_realtime_messaging/migration.sql
 |-- src/
 |   |-- app/
 |   |   |-- (workspace)/messages/page.tsx

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const migration = readFileSync(
-  "prisma/migrations/036_job_post_review_authority/migration.sql",
+  "prisma/migrations/038_job_post_review_authority/migration.sql",
   "utf8",
 );
 

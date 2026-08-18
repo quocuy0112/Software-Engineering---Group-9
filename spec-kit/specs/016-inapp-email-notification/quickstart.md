@@ -86,7 +86,7 @@ Validated on 2026-08-14 against local PostgreSQL and the production Next.js buil
 
 ## Actionable Administrator Extension Validation (2026-08-15)
 
-- Migration `035_actionable_admin_notifications` adds seven allow-listed event kinds plus an explicit `USER`/`ADMIN` audience and backfills existing administrator verification notifications from their safe audience variable.
+- Migration `036_actionable_admin_notifications` adds seven allow-listed event kinds plus an explicit `USER`/`ADMIN` audience and backfills existing administrator verification notifications from their safe audience variable.
 - Workspace list/count/read mutations exclude `ADMIN` audience rows; administrator routes retain current-grant enforcement and can read both ordinary account notifications and administrator alerts.
 - Active-grant fan-out, assigned-support routing, inactive-assignee fallback, per-recipient idempotency, safe copy, support/report producers, verification escalation, and manual delivery intervention passed 9 focused files and 41 tests.
 - The complete Feature 016 suite passed 21 files and 49 tests; the complete support suite passed 12 files and 29 tests; the complete administrator-management suite passed 68 files and 183 tests.

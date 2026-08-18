@@ -154,7 +154,7 @@ spec-kit/specs/017-admin-management-job-posting/
 web/
 |-- prisma/
 |   |-- schema.prisma
-|   `-- migrations/036_job_post_review_authority/migration.sql
+|   `-- migrations/038_job_post_review_authority/migration.sql
 |-- scripts/
 |   |-- migrate-json-job-reviews.mjs
 |   |-- verify-job-post-review-migration.mjs
