@@ -81,6 +81,24 @@ unfiltered by review state (and verification applicant eligibility) so a
 decision changes only the displayed state; administrators can narrow either
 list explicitly with its status filter.
 
+## Reference and Name Search
+
+Verification Requests and Job Post Reviews expose an always-visible React Admin
+search field. It accepts stable references and tolerant, case-insensitive name
+terms: verification request, applicant, company, or tax-code references plus
+applicant/company names for verification; review, job, or company references
+plus job/company names for job-post reviews.
+
+The backend normalizes whitespace, Unicode case, and Vietnamese diacritics,
+then tokenizes the search input. Every token must occur in one searchable name
+field, so `Web De` matches `Web Developer` without requiring a full exact
+phrase. Identifier and tax-code matches remain exact. Job-post review titles
+are projected to a persisted normalized search column instead of querying the
+JSON snapshot directly. A migration and idempotent backfill populate the column
+for existing review versions; newly submitted versions populate it at write
+time. The validated filter is applied at the repository query boundary before
+pagination.
+
 ## Complexity Tracking
 
 No constitutional violations or new infrastructure are required.

@@ -73,7 +73,41 @@ export class PrismaVerificationRepository {
       pageSize: input.pageSize,
     });
     const taxCode = filter.taxCode ?? filter.taxIdentifier;
+    const nameTokens =
+      filter.q?.split(/\s+/u).filter(Boolean).slice(0, 8) ?? [];
     const where: Prisma.RecruiterVerificationRequestWhereInput = {
+      ...(filter.q
+        ? {
+            OR: [
+              { id: filter.q },
+              { applicantUserId: filter.q },
+              { targetCompanyId: filter.q },
+              { normalizedTaxIdentifier: filter.q },
+              ...(nameTokens.length
+                ? [
+                    {
+                      AND: nameTokens.map((token) => ({
+                        submittedCompanyName: {
+                          contains: token,
+                          mode: "insensitive" as const,
+                        },
+                      })),
+                    },
+                    {
+                      AND: nameTokens.map((token) => ({
+                        applicant: {
+                          name: {
+                            contains: token,
+                            mode: "insensitive" as const,
+                          },
+                        },
+                      })),
+                    },
+                  ]
+                : []),
+            ],
+          }
+        : {}),
       ...(filter.state ? { state: filter.state } : {}),
       applicant: {
         state:

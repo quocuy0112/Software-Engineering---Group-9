@@ -26,6 +26,10 @@
 - [x] T016 [US2] Add an always-visible membership search for membership, company, and account references/names, retaining the existing role/state filters in `web/src/frontend/features/admin/memberships/company-membership-list.tsx` and repository query.
 - [x] T017 [US2] Retain processed verification requests and job-post reviews in their administrator lists by default, with explicit status filters for queue narrowing.
 - [x] T018 [US2] Improve the Moderation Report show presentation with responsive React Admin/MUI status, detail, note, enforcement, action, and history panels in `web/src/frontend/features/admin/moderation/moderation-review-show.tsx`.
+- [x] T019 [US2] Add always-visible reference and case-insensitive name search to Verification Requests and Job Post Reviews.
+- [x] T020 [US2] Persist and backfill normalized Job Post Review titles, use token-based title matching, and cover case/partial-title search in repository support and unit tests.
+- [x] T021 [US2] Add always-visible exact-reference and tokenized-name search to Moderation, Messaging, Support, and Connection Proposal administrator lists.
+- [x] T022 [US2] Make the all-status default explicit for administrator report, support, and proposal lists so resolved or rejected records remain visible.
 
 ## Phase 4: Validation
 

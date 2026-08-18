@@ -138,6 +138,7 @@ const closedProvider = {
       }
     } else if (resource === "verification-requests") {
       for (const key of [
+        "q",
         "state",
         "applicantEligibility",
         "company",

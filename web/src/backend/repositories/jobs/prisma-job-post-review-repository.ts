@@ -7,6 +7,7 @@ import type { JobReviewSnapshot } from "@/shared/contracts/recruiter-job-posting
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
 import { createInAppNotification } from "@/backend/notifications/notification-service";
 import { projectJobReviewSnapshot } from "@/backend/jobs/review/job-post-publication-projector";
+import { reviewSearchTokens } from "@/backend/jobs/review/job-post-review-search";
 
 type ReviewDb = typeof prisma | Prisma.TransactionClient;
 
@@ -101,12 +102,51 @@ export class PrismaJobPostReviewRepository {
     page: number;
     perPage: number;
     state?: "PENDING_REVIEW" | "APPROVED" | "REJECTED";
+    q?: string;
     companyId?: string;
     assignedAdminUserId?: string | null;
     submittedBefore?: Date;
     sequence?: number;
   }) {
+    const tokens = input.q ? reviewSearchTokens(input.q) : [];
+    const companyNameTokens = input.q
+      ? input.q.trim().split(/\s+/u).filter(Boolean).slice(0, 8)
+      : [];
     const where: Prisma.JobPostReviewVersionWhereInput = {
+      ...(input.q
+        ? {
+            OR: [
+              { id: input.q },
+              { aggregate: { jobId: input.q } },
+              { aggregate: { companyId: input.q } },
+              ...(companyNameTokens.length
+                ? [
+                    {
+                      AND: companyNameTokens.map((token) => ({
+                        aggregate: {
+                          company: {
+                            displayName: {
+                              contains: token,
+                              mode: "insensitive" as const,
+                            },
+                          },
+                        },
+                      })),
+                    },
+                  ]
+                : []),
+              ...(tokens.length
+                ? [
+                    {
+                      AND: tokens.map((token) => ({
+                        normalizedTitleSearch: { contains: token },
+                      })),
+                    },
+                  ]
+                : []),
+            ],
+          }
+        : {}),
       ...(input.state ? { state: input.state } : {}),
       ...(input.companyId ? { aggregate: { companyId: input.companyId } } : {}),
       ...(input.assignedAdminUserId !== undefined
@@ -153,6 +193,7 @@ export class PrismaJobPostReviewRepository {
     submittedAt: Date;
     correlationId: string;
     historyAction: "SUBMITTED" | "RESUBMITTED";
+    normalizedTitleSearch: string;
   }) {
     const version = await this.db.jobPostReviewVersion.create({
       data: {
@@ -160,6 +201,7 @@ export class PrismaJobPostReviewRepository {
         reviewAggregateId: input.aggregateId,
         sequence: input.sequence,
         snapshot: input.snapshot,
+        normalizedTitleSearch: input.normalizedTitleSearch,
         snapshotSchemaVersion: input.snapshotSchemaVersion,
         snapshotSha256: input.snapshotSha256,
         submittedByUserId: input.submittedByUserId,

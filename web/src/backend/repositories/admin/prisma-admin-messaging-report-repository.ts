@@ -58,7 +58,43 @@ export class PrismaAdminMessagingReportRepository {
       typeof input.filter.age === "number"
         ? Number(input.filter.age)
         : Number.NaN;
+    const q = typeof input.filter.q === "string" ? input.filter.q.trim() : "";
+    const tokens = q.split(/\s+/u).filter(Boolean).slice(0, 8);
     const where: Prisma.MessagingReportWhereInput = {
+      ...(q
+        ? {
+            OR: [
+              { id: q },
+              { reporterUserId: q },
+              { targetUserId: q },
+              { assignedAdminUserId: q },
+              ...(tokens.length
+                ? [
+                    {
+                      AND: tokens.map((token) => ({
+                        reporter: {
+                          name: {
+                            contains: token,
+                            mode: "insensitive" as const,
+                          },
+                        },
+                      })),
+                    },
+                    {
+                      AND: tokens.map((token) => ({
+                        target: {
+                          name: {
+                            contains: token,
+                            mode: "insensitive" as const,
+                          },
+                        },
+                      })),
+                    },
+                  ]
+                : []),
+            ],
+          }
+        : {}),
       ...(typeof input.filter.targetType === "string"
         ? { targetType: input.filter.targetType as never }
         : {}),

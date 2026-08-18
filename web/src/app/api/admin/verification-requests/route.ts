@@ -15,6 +15,7 @@ export async function GET(request: Request) {
       throw new Error("VALIDATION_FAILED");
     }
     for (const name of [
+      "q",
       "state",
       "applicantEligibility",
       "company",

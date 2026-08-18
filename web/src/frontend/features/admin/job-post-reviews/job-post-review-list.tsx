@@ -2,6 +2,12 @@
 import { Datagrid, List, SelectInput, TextField, TextInput } from "react-admin";
 
 const filters = [
+  <TextInput
+    key="q"
+    source="q"
+    label="Review, job, company reference, or name"
+    alwaysOn
+  />,
   <SelectInput
     key="state"
     source="state"

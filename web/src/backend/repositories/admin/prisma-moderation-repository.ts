@@ -15,6 +15,18 @@ export class PrismaModerationRepository {
         ? Number(input.filter.age)
         : Number.NaN;
     const where = {
+      ...(typeof input.filter.q === "string" && input.filter.q.trim()
+        ? {
+            OR: [
+              { id: input.filter.q.trim() },
+              { reporterUserId: input.filter.q.trim() },
+              { targetReference: input.filter.q.trim() },
+              { companyReference: input.filter.q.trim() },
+              { jobReference: input.filter.q.trim() },
+              { applicationReference: input.filter.q.trim() },
+            ],
+          }
+        : {}),
       ...(typeof input.filter.targetType === "string"
         ? { targetType: input.filter.targetType as never }
         : {}),

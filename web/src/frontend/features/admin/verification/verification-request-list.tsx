@@ -16,6 +16,12 @@ export function VerificationRequestList() {
       pagination={<Pagination rowsPerPageOptions={[25, 50, 100]} />}
       sort={{ field: "createdAt", order: "ASC" }}
       filters={[
+        <TextInput
+          key="q"
+          source="q"
+          label="Request reference, tax code, or name"
+          alwaysOn
+        />,
         <SelectInput
           key="state"
           source="state"

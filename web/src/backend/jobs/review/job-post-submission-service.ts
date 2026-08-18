@@ -11,6 +11,7 @@ import {
   jobReviewSnapshotSha256,
 } from "./job-post-review-policy";
 import { projectJobReviewSnapshot } from "./job-post-publication-projector";
+import { normalizedReviewTitleSearch } from "./job-post-review-search";
 import { JobPostReviewError } from "./job-post-review-errors";
 
 const requestHash = (value: string) =>
@@ -152,6 +153,7 @@ export class JobPostSubmissionService {
         reviewId,
         sequence,
         snapshot,
+        normalizedTitleSearch: normalizedReviewTitleSearch(snapshot.title),
         snapshotSchemaVersion: JOB_REVIEW_SNAPSHOT_SCHEMA_VERSION,
         snapshotSha256,
         submittedByUserId: input.actorUserId,

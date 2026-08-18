@@ -1302,6 +1302,7 @@ export const JobPostReviewVersionScalarFieldEnum = {
   reviewAggregateId: 'reviewAggregateId',
   sequence: 'sequence',
   snapshot: 'snapshot',
+  normalizedTitleSearch: 'normalizedTitleSearch',
   snapshotSchemaVersion: 'snapshotSchemaVersion',
   snapshotSha256: 'snapshotSha256',
   state: 'state',

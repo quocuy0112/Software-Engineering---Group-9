@@ -58,6 +58,7 @@ export class JobPostReviewService {
       page: input.page,
       perPage: input.perPage,
       state: input.state,
+      q: input.q,
       companyId: input.companyId,
       assignedAdminUserId:
         input.assignment === "UNASSIGNED"

@@ -100,6 +100,7 @@ export const verificationQueueFilterSchema = z
     applicantEligibility: z
       .enum(["ACTIVE_ONLY", "SUSPENDED_ONLY", "ANY"])
       .default("ANY"),
+    q: z.string().trim().min(1).max(160).optional(),
     company: z.string().trim().max(160).optional(),
     targetCompanyId: z.string().trim().min(1).max(128).optional(),
     taxCode: z
