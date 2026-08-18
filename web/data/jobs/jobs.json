@@ -542588,5 +542588,98 @@
       "viewCount": 0,
       "applicantCount": 0
     }
+  },
+  {
+    "id": "job-9cbd990f-193e-4256-892a-e6e154b09503",
+    "slug": "web-developer-ho-chi-minh-city-54b09503",
+    "companyId": "cmsyan8w50013t0f0xld6nwuf",
+    "industry": "Web Design",
+    "industryCode": "web-design",
+    "subIndustry": "Software & Technology Services",
+    "title": "Web Developer",
+    "shortPitch": "Intern Web developer",
+    "categoryIds": [
+      "Fullstack"
+    ],
+    "categoryFamily": "Technology",
+    "skillTags": [
+      "React"
+    ],
+    "location": {
+      "city": "Ho Chi Minh City",
+      "district": "26b Đường 11",
+      "isNationwideRemote": true
+    },
+    "salary": {
+      "min": 39,
+      "max": 59,
+      "currency": "VND",
+      "period": "month",
+      "isNegotiable": true
+    },
+    "experience": {
+      "minYears": 5,
+      "label": "5+ years"
+    },
+    "level": "senior",
+    "employmentType": "full_time",
+    "workArrangement": "remote",
+    "workOnSaturday": true,
+    "education": "Bachelor's degree",
+    "age": "30",
+    "numberOfHires": 4,
+    "status": "draft",
+    "approvalComment": null,
+    "isUrgent": false,
+    "isVerified": false,
+    "postedAt": "2026-08-18T06:43:32.207Z",
+    "updatedAt": "2026-08-18T06:47:16.883Z",
+    "applyDeadline": "2026-09-30T23:59:59.000Z",
+    "description": {
+      "overview": "You can deal to increase your salary.\nIf you work for good, some offer will be gift.",
+      "topReasonsToJoin": [
+        "Top 1",
+        "Top 2",
+        "Top 3"
+      ],
+      "responsibilities": [
+        "Join my company brother"
+      ],
+      "requirements": [
+        "React, TypeScript, NodeJS, Python, Java,...."
+      ],
+      "benefits": [
+        {
+          "icon": "award",
+          "label": "Recognition programs and quarterly awards"
+        },
+        {
+          "icon": "gift",
+          "label": "Holiday and Tet bonus"
+        },
+        {
+          "icon": "calendar",
+          "label": "16-18 days of paid annual leave"
+        },
+        {
+          "icon": "dollar-sign",
+          "label": "13th month salary and performance bonus"
+        },
+        {
+          "icon": "smile",
+          "label": "Flexible working hours and hybrid option"
+        }
+      ],
+      "generalInfo": {
+        "reportsTo": "Head of Engineering",
+        "department": "Design & Coder",
+        "workingHours": "8H",
+        "workAddress": "18H"
+      }
+    },
+    "stats": {
+      "viewCount": 0,
+      "applicantCount": 0
+    }
   }
 ]
