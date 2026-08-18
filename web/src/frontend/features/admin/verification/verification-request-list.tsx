@@ -28,6 +28,7 @@ export function VerificationRequestList() {
             "CANCELLED",
             "EXPIRED",
           ].map((id) => ({ id, name: id }))}
+          emptyText="All statuses"
         />,
         <TextInput key="company" source="company" />,
         <TextInput
@@ -43,6 +44,7 @@ export function VerificationRequestList() {
             id,
             name: id,
           }))}
+          emptyText="All applicant accounts"
         />,
         <SelectInput
           key="assignment"

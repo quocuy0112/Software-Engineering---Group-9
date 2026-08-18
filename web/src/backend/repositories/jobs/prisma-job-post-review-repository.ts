@@ -107,7 +107,7 @@ export class PrismaJobPostReviewRepository {
     sequence?: number;
   }) {
     const where: Prisma.JobPostReviewVersionWhereInput = {
-      state: input.state ?? "PENDING_REVIEW",
+      ...(input.state ? { state: input.state } : {}),
       ...(input.companyId ? { aggregate: { companyId: input.companyId } } : {}),
       ...(input.assignedAdminUserId !== undefined
         ? { assignedAdminUserId: input.assignedAdminUserId }

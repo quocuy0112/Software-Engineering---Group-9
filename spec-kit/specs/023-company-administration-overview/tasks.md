@@ -23,6 +23,8 @@
 - [x] T013 [US2] Repair job-post-review verification navigation with a hash route and canonical `targetCompanyId` filter across `web/src/backend/jobs/review/job-post-review-service.ts`, verification-list transport, contract, and repository files.
 - [x] T014 [US2] Improve the Company Membership show presentation with responsive React Admin/MUI panels, status cues, history, and a sticky action area in `web/src/frontend/features/admin/memberships/membership-lifecycle-panel.tsx`.
 - [x] T015 [US2] Improve the Account Detail show presentation with responsive React Admin/MUI summary, activity, authority, evidence, moderation, and history panels in `web/src/frontend/features/admin/accounts/account-detail-show.tsx`.
+- [x] T016 [US2] Add an always-visible membership search for membership, company, and account references/names, retaining the existing role/state filters in `web/src/frontend/features/admin/memberships/company-membership-list.tsx` and repository query.
+- [x] T017 [US2] Retain processed verification requests and job-post reviews in their administrator lists by default, with explicit status filters for queue narrowing.
 
 ## Phase 4: Validation
 

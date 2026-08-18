@@ -28,13 +28,13 @@ Add a secure, read-only Company overview to the existing administrator console. 
 
 ## Constitution Check
 
-| Gate | Status | Evidence |
-|---|---|---|
-| Security and privacy | PASS | Admin boundary guards the endpoint; projection omits documents, tax ID, email, and notes. |
-| State and audit integrity | PASS | Successful reads write one minimal immutable access audit; no business state changes. |
-| Scope discipline | PASS | The feature is read-only; suspension, ownership, and verification overrides remain excluded. |
-| Accessible quality | PASS | Responsive MUI layout, text-labelled states, empty/error/warning feedback, keyboard-native controls. |
-| Architecture | PASS | Route Handler delegates to admin service and Prisma repository; React Admin stays presentation-only. |
+| Gate                      | Status | Evidence                                                                                             |
+| ------------------------- | ------ | ---------------------------------------------------------------------------------------------------- |
+| Security and privacy      | PASS   | Admin boundary guards the endpoint; projection omits documents, tax ID, email, and notes.            |
+| State and audit integrity | PASS   | Successful reads write one minimal immutable access audit; no business state changes.                |
+| Scope discipline          | PASS   | The feature is read-only; suspension, ownership, and verification overrides remain excluded.         |
+| Accessible quality        | PASS   | Responsive MUI layout, text-labelled states, empty/error/warning feedback, keyboard-native controls. |
+| Architecture              | PASS   | Route Handler delegates to admin service and Prisma repository; React Admin stays presentation-only. |
 
 ## Design
 
@@ -72,6 +72,14 @@ route and pass a `targetCompanyId` filter. The verification list validates and
 applies that canonical ID at the route, contract, data-provider, and repository
 boundaries. The destination remains the request list; protected evidence opens
 only after an administrator selects a specific request.
+
+## Review History Retention
+
+Verification requests and job-post reviews remain visible in their respective
+administrator lists after a decision. The default list query is intentionally
+unfiltered by review state (and verification applicant eligibility) so a
+decision changes only the displayed state; administrators can narrow either
+list explicitly with its status filter.
 
 ## Complexity Tracking
 

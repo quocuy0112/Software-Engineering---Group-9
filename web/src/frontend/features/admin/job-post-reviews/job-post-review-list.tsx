@@ -11,6 +11,7 @@ const filters = [
       { id: "APPROVED", name: "Approved" },
       { id: "REJECTED", name: "Rejected" },
     ]}
+    emptyText="All statuses"
   />,
   <SelectInput
     key="assignment"

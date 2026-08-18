@@ -74,7 +74,7 @@ export class PrismaVerificationRepository {
     });
     const taxCode = filter.taxCode ?? filter.taxIdentifier;
     const where: Prisma.RecruiterVerificationRequestWhereInput = {
-      state: filter.state,
+      ...(filter.state ? { state: filter.state } : {}),
       applicant: {
         state:
           filter.applicantEligibility === "ACTIVE_ONLY"
