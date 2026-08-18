@@ -53,15 +53,15 @@ describe("candidate recruitment stage projection", () => {
     }
   });
 
-  it("keeps waitlisting as a shortlist-only branch", () => {
-    expect(canTransitionApplicationStage("SHORTLISTED", "WAITLISTED")).toBe(
-      true,
-    );
-    expect(canTransitionApplicationStage("APPLIED", "WAITLISTED")).toBe(false);
-    expect(canTransitionApplicationStage("VIEWED", "WAITLISTED")).toBe(false);
-    expect(canTransitionApplicationStage("INTERVIEWING", "WAITLISTED")).toBe(
-      false,
-    );
+  it("allows waitlisting from every active stage", () => {
+    for (const stage of [
+      "APPLIED",
+      "VIEWED",
+      "SHORTLISTED",
+      "INTERVIEWING",
+    ] as const) {
+      expect(canTransitionApplicationStage(stage, "WAITLISTED")).toBe(true);
+    }
   });
 
   it("accepts only the two candidate offer responses", () => {

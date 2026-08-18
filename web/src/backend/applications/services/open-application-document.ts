@@ -76,7 +76,10 @@ export class OpenApplicationDocumentService {
       input.applicationId,
     );
     if (!auth.authorized) throw new OpenApplicationDocumentError("UNAVAILABLE");
-    const document = await this.repository.findDocument(input);
+    const document = await this.repository.findDocument({
+      ...input,
+      jobId: auth.jobPostingId,
+    });
     if (!document) throw new OpenApplicationDocumentError("UNAVAILABLE");
     if (input.preview && !document.previewSupported) {
       throw new OpenApplicationDocumentError("PREVIEW_UNAVAILABLE");

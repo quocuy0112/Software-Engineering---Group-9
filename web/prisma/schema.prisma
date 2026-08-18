@@ -2341,6 +2341,7 @@ model JobPostReviewVersion {
   reviewAggregateId        String
   sequence                 Int
   snapshot                 Json
+  normalizedTitleSearch    String                     @default("")
   snapshotSchemaVersion    String                     @db.VarChar(32)
   snapshotSha256           String                     @db.Char(64)
   state                    JobPostReviewState         @default(PENDING_REVIEW)

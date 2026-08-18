@@ -43,11 +43,7 @@ export function canTransitionApplicationStage(
     );
   }
 
-  // Waiting is the explicit no-slot branch from the shortlist. It must not
-  // fabricate a waitlist outcome from an application the recruiter has not
-  // yet reviewed.
-  if (to === "WAITLISTED") return from === "SHORTLISTED";
-  if (to === "REJECTED") return true;
+  if (to === "REJECTED" || to === "WAITLISTED") return true;
 
   const fromIndex = activeStages.indexOf(from as (typeof activeStages)[number]);
   const toIndex = activeStages.indexOf(to as (typeof activeStages)[number]);

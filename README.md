@@ -292,7 +292,6 @@ docker compose ps
 | Candidate application    | `http://localhost:3001`                   | Active                                                                          |
 | Messaging workspace      | `http://localhost:3001/messages`          | Active after authentication                                                     |
 | Platform Admin console   | `http://console.admin.localhost:3001`     | Active for authorized administrators                                            |
-| Recruiter console origin | `http://console.recruiter.localhost:3001` | Reserved boundary; full Recruiter Manager UI is not part of the current release |
 | Health endpoint          | `http://localhost:3001/api/health`        | Public operational health                                                       |
 
 The application validates exact hosts — do not use the admin console through the Candidate hostname.

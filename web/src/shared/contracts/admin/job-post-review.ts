@@ -65,6 +65,7 @@ export const jobPostReviewListQuerySchema = z
     perPage: z.number().int().min(1).max(100),
     state: jobPostReviewStateSchema.optional(),
     assignment: z.enum(["ANY", "UNASSIGNED", "MINE"]).optional(),
+    q: z.string().trim().min(1).max(160).optional(),
     companyId: z.string().min(1).max(128).optional(),
     minimumAgeHours: z.number().int().min(0).max(8_760).optional(),
     sequence: z.number().int().positive().optional(),

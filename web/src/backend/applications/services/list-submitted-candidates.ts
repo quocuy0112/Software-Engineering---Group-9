@@ -31,7 +31,7 @@ export class ListSubmittedCandidatesService {
       throw new Error("APPLICATION_UNAVAILABLE");
     }
     return (await this.repo()).listSubmittedCandidates({
-      jobId: input.jobId,
+      jobId: authorization.jobPostingId || input.jobId,
       limit: Math.min(Math.max(input.limit ?? 25, 1), 100),
       cursor: input.cursor,
       now: input.now,

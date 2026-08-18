@@ -1,0 +1,528 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Recruitment Pipeline API
+  version: 019.1.0
+  description: >-
+    Job-scoped Recruiter pipeline read and authoritative stage-transition
+    contracts. The jobId path value is the existing Recruiter-facing job
+    reference and is resolved server-side to exactly one authorized persisted
+    JobPosting.
+servers:
+  - url: /
+paths:
+  /api/recruiter/jobs/{jobId}/applications/pipeline:
+    get:
+      operationId: getRecruitmentPipelineBoard
+      summary: Get selected-job pipeline metadata and all stage counts
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      responses:
+        "200":
+          description: Authorized Active or Closed job pipeline
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PipelineBoardMetadata"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/AccountUnavailable"
+        "404":
+          $ref: "#/components/responses/Unavailable"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+
+  /api/recruiter/jobs/{jobId}/applications/pipeline/{stage}:
+    get:
+      operationId: getRecruitmentPipelineStage
+      summary: Get one bounded, cursor-paged pipeline column
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+        - $ref: "#/components/parameters/Stage"
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+      responses:
+        "200":
+          description: One authoritative stage page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PipelineStagePage"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/AccountUnavailable"
+        "404":
+          $ref: "#/components/responses/Unavailable"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+
+  /api/recruiter/jobs/{jobId}/applications/{applicationId}/stage:
+    patch:
+      operationId: transitionRecruitmentPipelineStage
+      summary: Commit one authoritative application stage transition
+      description: >-
+        The server resolves and authorizes jobId, verifies that applicationId
+        belongs to the same canonical job/company, validates stageVersion and
+        transition policy, and commits history, audit, and notification intent
+        transactionally. Rejected, Offer Declined, and Hired require confirmed
+        true. Hired never depends on candidate acceptance and always queues the
+        hiring confirmation email.
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+        - $ref: "#/components/parameters/ApplicationId"
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: >-
+            Stable for every retry of the same logical command; a different
+            later decision uses a new key.
+          schema:
+            type: string
+            minLength: 16
+            maxLength: 128
+        - name: X-CSRF-Token
+          in: header
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StageTransitionCommand"
+      responses:
+        "200":
+          description: Newly committed or exactly replayed transition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StageTransitionOutcome"
+        "400":
+          description: Invalid transition input, missing confirmation, or missing/invalid reason
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          description: Invalid mutation boundary such as CSRF; tenant/role target denial remains neutral 404
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "404":
+          $ref: "#/components/responses/Unavailable"
+        "409":
+          description: Stale version, invalid state transition, or changed-payload idempotency-key reuse
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StageConflict"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+
+components:
+  parameters:
+    JobId:
+      name: jobId
+      in: path
+      required: true
+      description: Existing Recruiter-facing selected job reference
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+    ApplicationId:
+      name: applicationId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+    Stage:
+      name: stage
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/ApplicationStage"
+
+  schemas:
+    ApplicationStage:
+      type: string
+      enum:
+        - APPLIED
+        - VIEWED
+        - SHORTLISTED
+        - INTERVIEWING
+        - OFFERED
+        - HIRED
+        - OFFER_DECLINED
+        - REJECTED
+        - WAITLISTED
+
+    MembershipRole:
+      type: string
+      enum: [OWNER, HR_MANAGER, RECRUITER, HIRING_MANAGER]
+
+    PipelinePermissions:
+      type: object
+      additionalProperties: false
+      required:
+        - role
+        - canView
+        - canMoveStages
+        - canReject
+        - canRecordOfferDeclined
+        - canConfirmHired
+      properties:
+        role:
+          $ref: "#/components/schemas/MembershipRole"
+        canView:
+          const: true
+        canMoveStages:
+          type: boolean
+        canReject:
+          type: boolean
+        canRecordOfferDeclined:
+          type: boolean
+        canConfirmHired:
+          type: boolean
+
+    StageCount:
+      type: object
+      additionalProperties: false
+      required: [stage, label, count]
+      properties:
+        stage:
+          $ref: "#/components/schemas/ApplicationStage"
+        label:
+          type: string
+          enum:
+            - Applied
+            - Viewed
+            - Shortlisted
+            - Interviewing
+            - Offered
+            - Hired
+            - Offer Declined
+            - Rejected
+            - Waitlisted
+        count:
+          type: integer
+          minimum: 0
+          maximum: 10000
+
+    PipelineBoardMetadata:
+      type: object
+      additionalProperties: false
+      required: [job, permissions, stages, observedAt]
+      properties:
+        job:
+          type: object
+          additionalProperties: false
+          required: [jobId, title, status]
+          properties:
+            jobId:
+              type: string
+              description: Recruiter-facing job reference; canonical database ID is not required by the client
+            title:
+              type: string
+              minLength: 1
+              maxLength: 200
+            status:
+              type: string
+              enum: [ACTIVE, CLOSED]
+        permissions:
+          $ref: "#/components/schemas/PipelinePermissions"
+        stages:
+          type: array
+          minItems: 9
+          maxItems: 9
+          items:
+            $ref: "#/components/schemas/StageCount"
+        observedAt:
+          type: string
+          format: date-time
+
+    ScoreBand:
+      type: object
+      additionalProperties: false
+      required: [code, label]
+      properties:
+        code:
+          type: string
+          enum: [HIGH_MATCH, MEDIUM_MATCH, LOW_MATCH]
+        label:
+          type: string
+          enum: [Strong match, Review needed, Low match]
+
+    OptionalScore:
+      oneOf:
+        - type: "null"
+        - type: object
+          additionalProperties: false
+          required: [state, final, band]
+          properties:
+            state:
+              type: string
+              enum: [NOT_CALCULATED, PENDING, PROCESSING, SCORED, UNAVAILABLE]
+            final:
+              type: [number, "null"]
+              minimum: 0
+              maximum: 100
+            band:
+              oneOf:
+                - type: "null"
+                - $ref: "#/components/schemas/ScoreBand"
+
+    PipelineApplicationCard:
+      type: object
+      additionalProperties: false
+      required:
+        - applicationId
+        - candidate
+        - submittedAt
+        - stage
+        - stageVersion
+        - documents
+        - score
+        - allowedDestinations
+      properties:
+        applicationId:
+          type: string
+          minLength: 1
+          maxLength: 128
+        candidate:
+          type: object
+          additionalProperties: false
+          required: [displayName, avatarUrl]
+          properties:
+            displayName:
+              type: string
+              minLength: 1
+              maxLength: 200
+            avatarUrl:
+              type: [string, "null"]
+              format: uri
+        submittedAt:
+          type: string
+          format: date-time
+        stage:
+          $ref: "#/components/schemas/ApplicationStage"
+        stageVersion:
+          type: integer
+          minimum: 1
+        documents:
+          type: object
+          additionalProperties: false
+          required: [cvAvailable, coverLetterAvailable]
+          properties:
+            cvAvailable:
+              type: boolean
+            coverLetterAvailable:
+              type: boolean
+        score:
+          $ref: "#/components/schemas/OptionalScore"
+        allowedDestinations:
+          type: array
+          uniqueItems: true
+          maxItems: 8
+          items:
+            $ref: "#/components/schemas/ApplicationStage"
+
+    PipelineStagePage:
+      type: object
+      additionalProperties: false
+      required: [stage, items, nextCursor, observedAt]
+      properties:
+        stage:
+          $ref: "#/components/schemas/ApplicationStage"
+        items:
+          type: array
+          maxItems: 100
+          items:
+            $ref: "#/components/schemas/PipelineApplicationCard"
+        nextCursor:
+          type: [string, "null"]
+          maxLength: 512
+        observedAt:
+          type: string
+          format: date-time
+
+    RejectionReasonCode:
+      type: string
+      enum:
+        - REQUIRED_TECHNICAL_EXPERIENCE_NOT_DEMONSTRATED
+        - INSUFFICIENT_EXPERIENCE
+        - REQUIRED_SKILLS_NOT_DEMONSTRATED
+        - POSITION_FILLED
+        - APPLICATION_WITHDRAWN_BY_CANDIDATE
+        - OTHER_JOB_RELATED_REASON
+
+    StageTransitionCommand:
+      type: object
+      additionalProperties: false
+      required: [targetStage, expectedStageVersion]
+      properties:
+        targetStage:
+          $ref: "#/components/schemas/ApplicationStage"
+        expectedStageVersion:
+          type: integer
+          minimum: 1
+        confirmed:
+          type: boolean
+          description: Must be true for REJECTED, OFFER_DECLINED, and HIRED
+        reasonCode:
+          type: string
+          minLength: 1
+          maxLength: 80
+          description: >-
+            REJECTED accepts only RejectionReasonCode values. OFFER_DECLINED
+            requires the current domain's bounded reason. Other transitions do
+            not use a reason unless an existing domain rule requires it.
+        internalNote:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          description: Optional Recruiter-private note for REJECTED only
+
+    StageTransitionOutcome:
+      type: object
+      additionalProperties: false
+      required:
+        - applicationId
+        - fromStage
+        - stage
+        - stageVersion
+        - lastStageChangedAt
+        - stageEventId
+        - replayed
+        - allowedDestinations
+      properties:
+        applicationId:
+          type: string
+        fromStage:
+          $ref: "#/components/schemas/ApplicationStage"
+        stage:
+          $ref: "#/components/schemas/ApplicationStage"
+        stageVersion:
+          type: integer
+          minimum: 2
+        lastStageChangedAt:
+          type: string
+          format: date-time
+        stageEventId:
+          type: string
+        replayed:
+          type: boolean
+        allowedDestinations:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/ApplicationStage"
+
+    Problem:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum:
+            - INVALID_REQUEST
+            - VALIDATION_ERROR
+            - AUTHENTICATION_REQUIRED
+            - ACCOUNT_UNAVAILABLE
+            - REQUEST_FORBIDDEN
+            - APPLICATION_UNAVAILABLE
+            - APPLICATION_STAGE_CONFLICT
+            - APPLICATION_STAGE_TRANSITION_INVALID
+            - APPLICATION_STAGE_REASON_REQUIRED
+            - APPLICATION_STAGE_REASON_INVALID
+            - APPLICATION_STAGE_CONFIRMATION_REQUIRED
+            - IDEMPOTENCY_KEY_REQUIRED
+            - IDEMPOTENCY_CONFLICT
+            - JOB_SERVICE_UNAVAILABLE
+        message:
+          type: string
+          minLength: 1
+          maxLength: 200
+
+    StageConflict:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum:
+            - APPLICATION_STAGE_CONFLICT
+            - APPLICATION_STAGE_TRANSITION_INVALID
+            - IDEMPOTENCY_CONFLICT
+        message:
+          type: string
+          minLength: 1
+          maxLength: 200
+        current:
+          type: object
+          additionalProperties: false
+          required: [stage, stageVersion]
+          properties:
+            stage:
+              $ref: "#/components/schemas/ApplicationStage"
+            stageVersion:
+              type: integer
+              minimum: 1
+          description: Current state is present only after application authorization succeeds.
+
+  responses:
+    InvalidRequest:
+      description: Invalid bounded request or cursor
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    Unauthenticated:
+      description: No valid current Better Auth session
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    AccountUnavailable:
+      description: Authenticated account is not active
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    Unavailable:
+      description: Neutral missing, unauthorized, cross-company, removed, or unresolvable target
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    ServiceUnavailable:
+      description: Safe transient failure with no successful mutation claimed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Problem"

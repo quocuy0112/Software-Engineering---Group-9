@@ -38,6 +38,7 @@ export type JobPostReviewVersionMinAggregateOutputType = {
   id: string | null
   reviewAggregateId: string | null
   sequence: number | null
+  normalizedTitleSearch: string | null
   snapshotSchemaVersion: string | null
   snapshotSha256: string | null
   state: $Enums.JobPostReviewState | null
@@ -63,6 +64,7 @@ export type JobPostReviewVersionMaxAggregateOutputType = {
   id: string | null
   reviewAggregateId: string | null
   sequence: number | null
+  normalizedTitleSearch: string | null
   snapshotSchemaVersion: string | null
   snapshotSha256: string | null
   state: $Enums.JobPostReviewState | null
@@ -89,6 +91,7 @@ export type JobPostReviewVersionCountAggregateOutputType = {
   reviewAggregateId: number
   sequence: number
   snapshot: number
+  normalizedTitleSearch: number
   snapshotSchemaVersion: number
   snapshotSha256: number
   state: number
@@ -124,6 +127,7 @@ export type JobPostReviewVersionMinAggregateInputType = {
   id?: true
   reviewAggregateId?: true
   sequence?: true
+  normalizedTitleSearch?: true
   snapshotSchemaVersion?: true
   snapshotSha256?: true
   state?: true
@@ -149,6 +153,7 @@ export type JobPostReviewVersionMaxAggregateInputType = {
   id?: true
   reviewAggregateId?: true
   sequence?: true
+  normalizedTitleSearch?: true
   snapshotSchemaVersion?: true
   snapshotSha256?: true
   state?: true
@@ -175,6 +180,7 @@ export type JobPostReviewVersionCountAggregateInputType = {
   reviewAggregateId?: true
   sequence?: true
   snapshot?: true
+  normalizedTitleSearch?: true
   snapshotSchemaVersion?: true
   snapshotSha256?: true
   state?: true
@@ -288,6 +294,7 @@ export type JobPostReviewVersionGroupByOutputType = {
   reviewAggregateId: string
   sequence: number
   snapshot: runtime.JsonValue
+  normalizedTitleSearch: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state: $Enums.JobPostReviewState
@@ -337,6 +344,7 @@ export type JobPostReviewVersionWhereInput = {
   reviewAggregateId?: Prisma.StringFilter<"JobPostReviewVersion"> | string
   sequence?: Prisma.IntFilter<"JobPostReviewVersion"> | number
   snapshot?: Prisma.JsonFilter<"JobPostReviewVersion">
+  normalizedTitleSearch?: Prisma.StringFilter<"JobPostReviewVersion"> | string
   snapshotSchemaVersion?: Prisma.StringFilter<"JobPostReviewVersion"> | string
   snapshotSha256?: Prisma.StringFilter<"JobPostReviewVersion"> | string
   state?: Prisma.EnumJobPostReviewStateFilter<"JobPostReviewVersion"> | $Enums.JobPostReviewState
@@ -372,6 +380,7 @@ export type JobPostReviewVersionOrderByWithRelationInput = {
   reviewAggregateId?: Prisma.SortOrder
   sequence?: Prisma.SortOrder
   snapshot?: Prisma.SortOrder
+  normalizedTitleSearch?: Prisma.SortOrder
   snapshotSchemaVersion?: Prisma.SortOrder
   snapshotSha256?: Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -414,6 +423,7 @@ export type JobPostReviewVersionWhereUniqueInput = Prisma.AtLeast<{
   reviewAggregateId?: Prisma.StringFilter<"JobPostReviewVersion"> | string
   sequence?: Prisma.IntFilter<"JobPostReviewVersion"> | number
   snapshot?: Prisma.JsonFilter<"JobPostReviewVersion">
+  normalizedTitleSearch?: Prisma.StringFilter<"JobPostReviewVersion"> | string
   snapshotSchemaVersion?: Prisma.StringFilter<"JobPostReviewVersion"> | string
   snapshotSha256?: Prisma.StringFilter<"JobPostReviewVersion"> | string
   state?: Prisma.EnumJobPostReviewStateFilter<"JobPostReviewVersion"> | $Enums.JobPostReviewState
@@ -448,6 +458,7 @@ export type JobPostReviewVersionOrderByWithAggregationInput = {
   reviewAggregateId?: Prisma.SortOrder
   sequence?: Prisma.SortOrder
   snapshot?: Prisma.SortOrder
+  normalizedTitleSearch?: Prisma.SortOrder
   snapshotSchemaVersion?: Prisma.SortOrder
   snapshotSha256?: Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -482,6 +493,7 @@ export type JobPostReviewVersionScalarWhereWithAggregatesInput = {
   reviewAggregateId?: Prisma.StringWithAggregatesFilter<"JobPostReviewVersion"> | string
   sequence?: Prisma.IntWithAggregatesFilter<"JobPostReviewVersion"> | number
   snapshot?: Prisma.JsonWithAggregatesFilter<"JobPostReviewVersion">
+  normalizedTitleSearch?: Prisma.StringWithAggregatesFilter<"JobPostReviewVersion"> | string
   snapshotSchemaVersion?: Prisma.StringWithAggregatesFilter<"JobPostReviewVersion"> | string
   snapshotSha256?: Prisma.StringWithAggregatesFilter<"JobPostReviewVersion"> | string
   state?: Prisma.EnumJobPostReviewStateWithAggregatesFilter<"JobPostReviewVersion"> | $Enums.JobPostReviewState
@@ -507,6 +519,7 @@ export type JobPostReviewVersionCreateInput = {
   id?: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -538,6 +551,7 @@ export type JobPostReviewVersionUncheckedCreateInput = {
   reviewAggregateId: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -567,6 +581,7 @@ export type JobPostReviewVersionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -598,6 +613,7 @@ export type JobPostReviewVersionUncheckedUpdateInput = {
   reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -628,6 +644,7 @@ export type JobPostReviewVersionCreateManyInput = {
   reviewAggregateId: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -653,6 +670,7 @@ export type JobPostReviewVersionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -675,6 +693,7 @@ export type JobPostReviewVersionUncheckedUpdateManyInput = {
   reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -731,6 +750,7 @@ export type JobPostReviewVersionCountOrderByAggregateInput = {
   reviewAggregateId?: Prisma.SortOrder
   sequence?: Prisma.SortOrder
   snapshot?: Prisma.SortOrder
+  normalizedTitleSearch?: Prisma.SortOrder
   snapshotSchemaVersion?: Prisma.SortOrder
   snapshotSha256?: Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -760,6 +780,7 @@ export type JobPostReviewVersionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   reviewAggregateId?: Prisma.SortOrder
   sequence?: Prisma.SortOrder
+  normalizedTitleSearch?: Prisma.SortOrder
   snapshotSchemaVersion?: Prisma.SortOrder
   snapshotSha256?: Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -785,6 +806,7 @@ export type JobPostReviewVersionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   reviewAggregateId?: Prisma.SortOrder
   sequence?: Prisma.SortOrder
+  normalizedTitleSearch?: Prisma.SortOrder
   snapshotSchemaVersion?: Prisma.SortOrder
   snapshotSha256?: Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -1097,6 +1119,7 @@ export type JobPostReviewVersionCreateWithoutSubmittedByInput = {
   id?: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1127,6 +1150,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutSubmittedByInput = {
   reviewAggregateId: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1165,6 +1189,7 @@ export type JobPostReviewVersionCreateWithoutAssignedAdminInput = {
   id?: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1195,6 +1220,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutAssignedAdminInput = {
   reviewAggregateId: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1233,6 +1259,7 @@ export type JobPostReviewVersionCreateWithoutDecidedByAdminInput = {
   id?: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1263,6 +1290,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutDecidedByAdminInput = {
   reviewAggregateId: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1321,6 +1349,7 @@ export type JobPostReviewVersionScalarWhereInput = {
   reviewAggregateId?: Prisma.StringFilter<"JobPostReviewVersion"> | string
   sequence?: Prisma.IntFilter<"JobPostReviewVersion"> | number
   snapshot?: Prisma.JsonFilter<"JobPostReviewVersion">
+  normalizedTitleSearch?: Prisma.StringFilter<"JobPostReviewVersion"> | string
   snapshotSchemaVersion?: Prisma.StringFilter<"JobPostReviewVersion"> | string
   snapshotSha256?: Prisma.StringFilter<"JobPostReviewVersion"> | string
   state?: Prisma.EnumJobPostReviewStateFilter<"JobPostReviewVersion"> | $Enums.JobPostReviewState
@@ -1378,6 +1407,7 @@ export type JobPostReviewVersionCreateWithoutSubmittedMembershipInput = {
   id?: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1408,6 +1438,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutSubmittedMembershipInput =
   reviewAggregateId: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1462,6 +1493,7 @@ export type JobPostReviewVersionCreateWithoutAggregateInput = {
   id?: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1491,6 +1523,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutAggregateInput = {
   id?: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1530,6 +1563,7 @@ export type JobPostReviewVersionCreateWithoutPendingForAggregateInput = {
   id?: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1560,6 +1594,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutPendingForAggregateInput =
   reviewAggregateId: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1593,6 +1628,7 @@ export type JobPostReviewVersionCreateWithoutApprovedForAggregateInput = {
   id?: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1623,6 +1659,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutApprovedForAggregateInput 
   reviewAggregateId: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1683,6 +1720,7 @@ export type JobPostReviewVersionUpdateWithoutPendingForAggregateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -1713,6 +1751,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutPendingForAggregateInput =
   reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -1752,6 +1791,7 @@ export type JobPostReviewVersionUpdateWithoutApprovedForAggregateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -1782,6 +1822,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutApprovedForAggregateInput 
   reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -1810,6 +1851,7 @@ export type JobPostReviewVersionCreateWithoutHistoryInput = {
   id?: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1840,6 +1882,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutHistoryInput = {
   reviewAggregateId: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1884,6 +1927,7 @@ export type JobPostReviewVersionUpdateWithoutHistoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -1914,6 +1958,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutHistoryInput = {
   reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -1942,6 +1987,7 @@ export type JobPostReviewVersionCreateWithoutPrivateNotesInput = {
   id?: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -1972,6 +2018,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutPrivateNotesInput = {
   reviewAggregateId: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -2016,6 +2063,7 @@ export type JobPostReviewVersionUpdateWithoutPrivateNotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2046,6 +2094,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutPrivateNotesInput = {
   reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2075,6 +2124,7 @@ export type JobPostReviewVersionCreateManySubmittedByInput = {
   reviewAggregateId: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -2100,6 +2150,7 @@ export type JobPostReviewVersionCreateManyAssignedAdminInput = {
   reviewAggregateId: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -2125,6 +2176,7 @@ export type JobPostReviewVersionCreateManyDecidedByAdminInput = {
   reviewAggregateId: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -2149,6 +2201,7 @@ export type JobPostReviewVersionUpdateWithoutSubmittedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2179,6 +2232,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutSubmittedByInput = {
   reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2208,6 +2262,7 @@ export type JobPostReviewVersionUncheckedUpdateManyWithoutSubmittedByInput = {
   reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2232,6 +2287,7 @@ export type JobPostReviewVersionUpdateWithoutAssignedAdminInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2262,6 +2318,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutAssignedAdminInput = {
   reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2291,6 +2348,7 @@ export type JobPostReviewVersionUncheckedUpdateManyWithoutAssignedAdminInput = {
   reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2315,6 +2373,7 @@ export type JobPostReviewVersionUpdateWithoutDecidedByAdminInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2345,6 +2404,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutDecidedByAdminInput = {
   reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2374,6 +2434,7 @@ export type JobPostReviewVersionUncheckedUpdateManyWithoutDecidedByAdminInput = 
   reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2399,6 +2460,7 @@ export type JobPostReviewVersionCreateManySubmittedMembershipInput = {
   reviewAggregateId: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -2423,6 +2485,7 @@ export type JobPostReviewVersionUpdateWithoutSubmittedMembershipInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2453,6 +2516,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutSubmittedMembershipInput =
   reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2482,6 +2546,7 @@ export type JobPostReviewVersionUncheckedUpdateManyWithoutSubmittedMembershipInp
   reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2506,6 +2571,7 @@ export type JobPostReviewVersionCreateManyAggregateInput = {
   id?: string
   sequence: number
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
   snapshotSchemaVersion: string
   snapshotSha256: string
   state?: $Enums.JobPostReviewState
@@ -2531,6 +2597,7 @@ export type JobPostReviewVersionUpdateWithoutAggregateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2560,6 +2627,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutAggregateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2589,6 +2657,7 @@ export type JobPostReviewVersionUncheckedUpdateManyWithoutAggregateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sequence?: Prisma.IntFieldUpdateOperationsInput | number
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
   snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
@@ -2655,6 +2724,7 @@ export type JobPostReviewVersionSelect<ExtArgs extends runtime.Types.Extensions.
   reviewAggregateId?: boolean
   sequence?: boolean
   snapshot?: boolean
+  normalizedTitleSearch?: boolean
   snapshotSchemaVersion?: boolean
   snapshotSha256?: boolean
   state?: boolean
@@ -2691,6 +2761,7 @@ export type JobPostReviewVersionSelectCreateManyAndReturn<ExtArgs extends runtim
   reviewAggregateId?: boolean
   sequence?: boolean
   snapshot?: boolean
+  normalizedTitleSearch?: boolean
   snapshotSchemaVersion?: boolean
   snapshotSha256?: boolean
   state?: boolean
@@ -2722,6 +2793,7 @@ export type JobPostReviewVersionSelectUpdateManyAndReturn<ExtArgs extends runtim
   reviewAggregateId?: boolean
   sequence?: boolean
   snapshot?: boolean
+  normalizedTitleSearch?: boolean
   snapshotSchemaVersion?: boolean
   snapshotSha256?: boolean
   state?: boolean
@@ -2753,6 +2825,7 @@ export type JobPostReviewVersionSelectScalar = {
   reviewAggregateId?: boolean
   sequence?: boolean
   snapshot?: boolean
+  normalizedTitleSearch?: boolean
   snapshotSchemaVersion?: boolean
   snapshotSha256?: boolean
   state?: boolean
@@ -2774,7 +2847,7 @@ export type JobPostReviewVersionSelectScalar = {
   updatedAt?: boolean
 }
 
-export type JobPostReviewVersionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reviewAggregateId" | "sequence" | "snapshot" | "snapshotSchemaVersion" | "snapshotSha256" | "state" | "submittedByUserId" | "submittedMembershipId" | "submissionIdempotencyKey" | "submissionRequestHash" | "submittedAt" | "assignedAdminUserId" | "assignedAt" | "decidedByAdminUserId" | "decidedAt" | "publishedAt" | "reasonCode" | "publicExplanation" | "decisionCorrelationId" | "importedBaseline" | "createdAt" | "updatedAt", ExtArgs["result"]["jobPostReviewVersion"]>
+export type JobPostReviewVersionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reviewAggregateId" | "sequence" | "snapshot" | "normalizedTitleSearch" | "snapshotSchemaVersion" | "snapshotSha256" | "state" | "submittedByUserId" | "submittedMembershipId" | "submissionIdempotencyKey" | "submissionRequestHash" | "submittedAt" | "assignedAdminUserId" | "assignedAt" | "decidedByAdminUserId" | "decidedAt" | "publishedAt" | "reasonCode" | "publicExplanation" | "decisionCorrelationId" | "importedBaseline" | "createdAt" | "updatedAt", ExtArgs["result"]["jobPostReviewVersion"]>
 export type JobPostReviewVersionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   aggregate?: boolean | Prisma.JobPostReviewAggregateDefaultArgs<ExtArgs>
   pendingForAggregate?: boolean | Prisma.JobPostReviewVersion$pendingForAggregateArgs<ExtArgs>
@@ -2820,6 +2893,7 @@ export type $JobPostReviewVersionPayload<ExtArgs extends runtime.Types.Extension
     reviewAggregateId: string
     sequence: number
     snapshot: runtime.JsonValue
+    normalizedTitleSearch: string
     snapshotSchemaVersion: string
     snapshotSha256: string
     state: $Enums.JobPostReviewState
@@ -3275,6 +3349,7 @@ export interface JobPostReviewVersionFieldRefs {
   readonly reviewAggregateId: Prisma.FieldRef<"JobPostReviewVersion", 'String'>
   readonly sequence: Prisma.FieldRef<"JobPostReviewVersion", 'Int'>
   readonly snapshot: Prisma.FieldRef<"JobPostReviewVersion", 'Json'>
+  readonly normalizedTitleSearch: Prisma.FieldRef<"JobPostReviewVersion", 'String'>
   readonly snapshotSchemaVersion: Prisma.FieldRef<"JobPostReviewVersion", 'String'>
   readonly snapshotSha256: Prisma.FieldRef<"JobPostReviewVersion", 'String'>
   readonly state: Prisma.FieldRef<"JobPostReviewVersion", 'JobPostReviewState'>

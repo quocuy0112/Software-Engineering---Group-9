@@ -59,9 +59,11 @@ check(
   await canAccess("web/.local/mail", constants.W_OK),
   "email capture directory is writable",
 );
-const lockfiles = (await readdir(root, { recursive: true })).filter(
-  (path) =>
-    !path.includes("node_modules") && path.endsWith("package-lock.json"),
+// This check is intentionally limited to the repository root.  A recursive
+// scan visits ignored tool caches (for example .pytest_cache), which can be
+// temporarily locked on Windows and are irrelevant to the root lockfile.
+const lockfiles = (await readdir(root)).filter(
+  (path) => path === "package-lock.json",
 );
 check(
   lockfiles.length === 1 && lockfiles[0] === "package-lock.json",

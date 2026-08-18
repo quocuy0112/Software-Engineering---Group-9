@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export * from "./recruitment-pipeline";
+
 const isoDateTime = z.string().datetime();
 
 export const applicationDocumentKindSchema = z.enum(["cv", "cover-letter"]);
