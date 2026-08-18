@@ -20,6 +20,8 @@
 - [X] T008 [US2] Replace the generic company list with `web/src/frontend/features/admin/companies/company-list.tsx` and display only server-returned identity fields.
 - [X] T009 [US2] Return display name with the company list projection in `web/src/backend/repositories/admin/prisma-admin-membership-repository.ts`.
 - [X] T012 [US2] Add Accounts-style always-visible search and verification/created-date filters in `web/src/frontend/features/admin/companies/company-list.tsx` and apply them in `web/src/backend/repositories/admin/prisma-admin-membership-repository.ts`.
+- [X] T013 [US2] Repair job-post-review verification navigation with a hash route and canonical `targetCompanyId` filter across `web/src/backend/jobs/review/job-post-review-service.ts`, verification-list transport, contract, and repository files.
+- [X] T014 [US2] Improve the Company Membership show presentation with responsive React Admin/MUI panels, status cues, history, and a sticky action area in `web/src/frontend/features/admin/memberships/membership-lifecycle-panel.tsx`.
 
 ## Phase 4: Validation
 

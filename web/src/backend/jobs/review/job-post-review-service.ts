@@ -166,7 +166,7 @@ export class JobPostReviewService {
         displayName: row.aggregate.company.displayName,
         verificationState: row.aggregate.company.verificationState,
         active: companyActive,
-        protectedVerificationHref: `/admin/verification-requests?company=${encodeURIComponent(row.aggregate.company.id)}`,
+        protectedVerificationHref: `/#/verification-requests?filter=${encodeURIComponent(JSON.stringify({ targetCompanyId: row.aggregate.company.id }))}`,
       },
       submitter: {
         accountId: row.submittedBy?.id ?? "imported-baseline",

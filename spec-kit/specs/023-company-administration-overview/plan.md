@@ -65,6 +65,14 @@ web/
 
 **Structure Decision**: Reuse the existing admin membership service/repository because company and membership read ownership already resides there; add only the read projection and access-audit concern.
 
+## Navigation Repair
+
+The Job Post Review company-verification link must target the React Admin hash
+route and pass a `targetCompanyId` filter. The verification list validates and
+applies that canonical ID at the route, contract, data-provider, and repository
+boundaries. The destination remains the request list; protected evidence opens
+only after an administrator selects a specific request.
+
 ## Complexity Tracking
 
 No constitutional violations or new infrastructure are required.

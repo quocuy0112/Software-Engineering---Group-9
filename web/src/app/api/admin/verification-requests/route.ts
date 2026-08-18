@@ -18,6 +18,7 @@ export async function GET(request: Request) {
       "state",
       "applicantEligibility",
       "company",
+      "targetCompanyId",
       "taxCode",
       "submittedFrom",
       "submittedTo",
@@ -27,8 +28,14 @@ export async function GET(request: Request) {
       if (query.has(name)) filter[name] = query.get(name);
     }
     const page = Number(query.get("page") ?? 1);
-    const pageSize = Number(query.get("pageSize") ?? query.get("perPage") ?? 25);
-    if (!Number.isInteger(page) || page < 1 || ![25, 50, 100].includes(pageSize))
+    const pageSize = Number(
+      query.get("pageSize") ?? query.get("perPage") ?? 25,
+    );
+    if (
+      !Number.isInteger(page) ||
+      page < 1 ||
+      ![25, 50, 100].includes(pageSize)
+    )
       throw new Error("VALIDATION_FAILED");
     return adminJson(
       await new VerificationReviewService().listQueue({

@@ -30,6 +30,11 @@ export function VerificationRequestList() {
           ].map((id) => ({ id, name: id }))}
         />,
         <TextInput key="company" source="company" />,
+        <TextInput
+          key="targetCompanyId"
+          source="targetCompanyId"
+          label="Target company reference"
+        />,
         <TextInput key="taxCode" source="taxCode" />,
         <SelectInput
           key="applicantEligibility"

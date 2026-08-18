@@ -141,6 +141,7 @@ const closedProvider = {
         "state",
         "applicantEligibility",
         "company",
+        "targetCompanyId",
         "taxCode",
         "submittedFrom",
         "submittedTo",

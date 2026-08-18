@@ -32,7 +32,8 @@ function evidenceSafetyState(item: {
     item.previewStatus,
   ];
   if (values.some((value) => value === "FAIL")) return "FAIL" as const;
-  if (values.some((value) => value === "INDETERMINATE")) return "ERROR" as const;
+  if (values.some((value) => value === "INDETERMINATE"))
+    return "ERROR" as const;
   if (values.every((value) => value === "PASS")) return "PASS" as const;
   return "PENDING" as const;
 }
@@ -89,6 +90,9 @@ export class PrismaVerificationRepository {
               mode: "insensitive",
             },
           }
+        : {}),
+      ...(filter.targetCompanyId
+        ? { targetCompanyId: filter.targetCompanyId }
         : {}),
       ...(taxCode ? { normalizedTaxIdentifier: taxCode } : {}),
       ...(filter.applicantId ? { applicantUserId: filter.applicantId } : {}),
@@ -171,7 +175,8 @@ export class PrismaVerificationRepository {
         item.id === row.currentEvidenceId &&
         item.submissionVersion === row.currentSubmissionVersion &&
         safetyState === "PASS" &&
-        (!row.targetCompany || row.targetCompany.verificationState === "ACTIVE");
+        (!row.targetCompany ||
+          row.targetCompany.verificationState === "ACTIVE");
       return {
         id: item.id,
         version: item.submissionVersion,
@@ -190,8 +195,10 @@ export class PrismaVerificationRepository {
         }),
       };
     });
-    const current = metadata.find((item) => item.id === currentEvidence?.id) ?? null;
-    const applicantActive = row.applicant.state === "ACTIVE" && !row.applicant.deletedAt;
+    const current =
+      metadata.find((item) => item.id === currentEvidence?.id) ?? null;
+    const applicantActive =
+      row.applicant.state === "ACTIVE" && !row.applicant.deletedAt;
     const prerequisiteAvailable =
       !row.targetCompanyId ||
       (prerequisite?.state === "AVAILABLE" &&
@@ -234,7 +241,7 @@ export class PrismaVerificationRepository {
         taxCode: row.normalizedTaxIdentifier,
         targetKind: row.targetCompanyId ? "EXISTING_COMPANY" : "NEW_COMPANY",
         prerequisiteState: row.targetCompanyId
-          ? prerequisite?.state ?? "UNAVAILABLE"
+          ? (prerequisite?.state ?? "UNAVAILABLE")
           : "NOT_REQUIRED",
       },
       evidence: current,
@@ -250,7 +257,7 @@ export class PrismaVerificationRepository {
         category: decision.rejectionCategory,
         applicantComment:
           decision.resultingState === "REJECTED"
-            ? row.adminComment ?? null
+            ? (row.adminComment ?? null)
             : null,
         decidedAt: decision.decidedAt.toISOString(),
         reviewerRef: decision.actorAdminUserId,
@@ -286,6 +293,9 @@ export class PrismaVerificationRepository {
               mode: "insensitive" as const,
             },
           }
+        : {}),
+      ...(typeof input.filter.targetCompanyId === "string"
+        ? { targetCompanyId: input.filter.targetCompanyId }
         : {}),
       ...(typeof input.filter.taxIdentifier === "string"
         ? { normalizedTaxIdentifier: input.filter.taxIdentifier }
@@ -408,17 +418,14 @@ export class PrismaVerificationRepository {
               stale:
                 row.businessFacts.lookupSnapshot.expiresAt.getTime() <=
                 Date.now(),
-              legalName:
-                row.businessFacts.lookupSnapshot.registryLegalName,
+              legalName: row.businessFacts.lookupSnapshot.registryLegalName,
               registeredAddress:
                 row.businessFacts.lookupSnapshot.registryRegisteredAddress,
               establishedAt:
                 row.businessFacts.lookupSnapshot.registryEstablishedAt?.toISOString() ??
                 null,
-              legalStatus:
-                row.businessFacts.lookupSnapshot.registryLegalStatus,
-              entityType:
-                row.businessFacts.lookupSnapshot.registryEntityType,
+              legalStatus: row.businessFacts.lookupSnapshot.registryLegalStatus,
+              entityType: row.businessFacts.lookupSnapshot.registryEntityType,
               representativeName:
                 row.businessFacts.lookupSnapshot.registryRepresentativeName,
             },
