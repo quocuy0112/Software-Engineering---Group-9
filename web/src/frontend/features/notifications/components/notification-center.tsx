@@ -127,43 +127,57 @@ function NotificationCenterContent({
           ) : (
             <ul className="notification-list">
               {items.map((item) => (
-                <li key={item.id}>
-                  <button
-                    type="button"
+                <li
+                  key={item.id}
+                  className="notification-item-wrapper"
+                  data-read={Boolean(item.readAt)}
+                  data-severity={item.severity}
+                >
+                  <div
                     className="notification-item"
                     data-read={Boolean(item.readAt)}
                     data-severity={item.severity}
                     onClick={() => void openItem(item)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        void openItem(item);
+                      }
+                    }}
                   >
-                    <span className="notification-item__meta">
-                      <span>{copy.severities[item.severity]}</span>
-                      <span>{item.readAt ? copy.read : copy.unread}</span>
-                    </span>
-                    <strong>{item.title}</strong>
-                    <span>{item.summary}</span>
-                    <time dateTime={item.lastOccurredAt}>
-                      {notificationTime(item.lastOccurredAt, locale)}
-                    </time>
-                  </button>
-                  <div className="notification-item__actions">
                     {!item.readAt ? (
-                      <button
-                        type="button"
-                        onClick={() => markItemRead(item)}
-                        aria-label={`Mark ${item.title} as read`}
-                      >
-                        Mark as read
-                      </button>
+                      <span className="notification-item__accent" aria-hidden="true" />
                     ) : null}
-                    {item.href ? (
-                      <button
-                        type="button"
-                        onClick={() => void openItem(item)}
-                        aria-label={`View details for ${item.title}`}
-                      >
-                        View details
-                      </button>
-                    ) : null}
+                    <div className="notification-item__meta">
+                      <span className="notification-item__severity">
+                        {copy.severities[item.severity]}
+                      </span>
+                      <span className="notification-item__status">
+                        {item.readAt ? copy.read : copy.unread}
+                      </span>
+                    </div>
+                    <strong className="notification-item__title">{item.title}</strong>
+                    <span className="notification-item__summary">{item.summary}</span>
+                    <div className="notification-item__footer">
+                      <time dateTime={item.lastOccurredAt}>
+                        {notificationTime(item.lastOccurredAt, locale)}
+                      </time>
+                      {!item.readAt ? (
+                        <button
+                          type="button"
+                          className="notification-item__mark-read"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            markItemRead(item);
+                          }}
+                          aria-label={`Mark ${item.title} as read`}
+                        >
+                          {copy.markAsRead}
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
                 </li>
               ))}

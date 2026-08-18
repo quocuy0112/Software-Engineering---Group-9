@@ -187,7 +187,8 @@ function dashboardCopy(locale: "vi" | "en") {
       jobsCopy: "Tìm, lọc, lưu hoặc ứng tuyển vào các vị trí đang mở.",
       browseJobs: "Tìm việc",
       matchTitle: "Kiểm tra độ phù hợp CV",
-      matchCopy: "Xem CV của bạn phù hợp với một công việc đến đâu trước khi ứng tuyển. Báo cáo chỉ mình bạn xem.",
+      matchCopy:
+        "Xem CV của bạn phù hợp với một công việc đến đâu trước khi ứng tuyển. Báo cáo chỉ mình bạn xem.",
       openMatch: "Kiểm tra CV",
       securityTitle: "Bảo mật tài khoản",
       securityCopy:
@@ -233,7 +234,8 @@ function dashboardCopy(locale: "vi" | "en") {
     jobsCopy: "Search and filter active roles, then save or apply when ready.",
     browseJobs: "Browse jobs",
     matchTitle: "CV Match Check",
-    matchCopy: "See how well one version of your CV fits a job before you apply. Your report stays private.",
+    matchCopy:
+      "See how well one version of your CV fits a job before you apply. Your report stays private.",
     openMatch: "Check my CV",
     securityTitle: "Account security",
     securityCopy:
@@ -263,7 +265,7 @@ function profileStepCopy(
       avatar: { label: "Thêm ảnh hồ sơ", hint: "Tải lên ảnh hồ sơ rõ nét" },
       basics: {
         label: "Thêm tiêu đề và phần giới thiệu",
-        hint: "Dùng tiêu đề từ 20 ký tự và phần giới thiệu từ 120 ký tự",
+        hint: "Dùng tiêu đề từ 10 ký tự và phần giới thiệu từ 50 ký tự",
       },
       skills: { label: "Thêm kỹ năng nổi bật", hint: "Thêm ít nhất 3 kỹ năng" },
       experience: {
@@ -288,7 +290,7 @@ function profileStepCopy(
     },
     basics: {
       label: "Add a headline and summary",
-      hint: "Use a 20+ character headline and 120+ character summary",
+      hint: "Use a 10+ character headline and 50+ character summary",
     },
     skills: {
       label: "Add your strongest skills",

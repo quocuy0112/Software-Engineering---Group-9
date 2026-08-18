@@ -5,7 +5,10 @@ import { ArrowRight, Camera } from "lucide-react";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 import { ProgressBar } from "@/frontend/components/ui/design-system";
 import { Button } from "@/frontend/components/ui/button";
-import { getProfileCompletion } from "./profile-completion-header";
+import {
+  getProfileBasicsMissingRequirement,
+  getProfileCompletion,
+} from "./profile-completion-header";
 
 type Locale = "vi" | "en";
 
@@ -31,6 +34,8 @@ function copyFor(locale: Locale) {
         missing: (label: string) => `Còn thiếu: ${label}`,
         avatar: "Ảnh đại diện",
         basics: "tóm tắt",
+        headline: "tiêu đề nghề nghiệp",
+        headlineAndSummary: "tiêu đề nghề nghiệp và phần tóm tắt",
         skills: "kỹ năng",
         experience: "kinh nghiệm",
         education: "học vấn",
@@ -47,6 +52,8 @@ function copyFor(locale: Locale) {
         missing: (label: string) => `Missing: ${label}`,
         avatar: "profile photo",
         basics: "summary",
+        headline: "headline",
+        headlineAndSummary: "headline and summary",
         skills: "skills",
         experience: "experience",
         education: "education",
@@ -73,9 +80,15 @@ export function ProfileIdentityHeader({
   const completion = getProfileCompletion(profile, avatar);
   const displayName = accountName?.trim() || "SmartHire candidate";
   const headline = profile.basics.headline?.trim() || copy.fallbackHeadline;
+  const basicsMissingRequirement = getProfileBasicsMissingRequirement(profile);
   const labels = {
     avatar: copy.avatar,
-    basics: copy.basics,
+    basics:
+      basicsMissingRequirement === "headline"
+        ? copy.headline
+        : basicsMissingRequirement === "headlineAndSummary"
+          ? copy.headlineAndSummary
+          : copy.basics,
     skills: copy.skills,
     experience: copy.experience,
     education: copy.education,

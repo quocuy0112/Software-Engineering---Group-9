@@ -207,7 +207,12 @@
 /* posting gate — checklist gọn thay vì lặp câu */
 .gateCard {
   background: var(--sh-color-warning-bg, #fbf1e1);
-  border: 1px solid #f0dfb8;
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--sh-color-warning, #c9820f) 32%,
+      var(--sh-color-border-subtle, #e5e8f2)
+    );
   border-radius: 16px;
   padding: 20px 24px;
   margin-bottom: 20px;
@@ -231,7 +236,7 @@
 
 .gateSub {
   font-size: 12.5px;
-  color: #8a6414;
+  color: var(--sh-color-text-secondary, #6c7288);
   margin-bottom: 14px;
 }
 
@@ -254,8 +259,13 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #ffffff;
-  border: 1.5px solid #e2c27a;
+  background: var(--sh-color-surface-card, #ffffff);
+  border: 1.5px solid
+    color-mix(
+      in srgb,
+      var(--sh-color-warning, #c9820f) 45%,
+      var(--sh-color-border-subtle, #e5e8f2)
+    );
   color: var(--sh-color-warning, #c9820f);
   display: flex;
   align-items: center;
@@ -365,7 +375,7 @@
   overflow: hidden;
   border: 1px solid var(--sh-color-border-subtle, #e5e8f2);
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--sh-color-surface-subtle, #f3f4f8);
   color: var(--sh-color-text-muted, #9aa0b4);
   font-size: 10px;
   font-weight: 800;
@@ -405,7 +415,7 @@
   font-family: inherit;
   font-size: 13.5px;
   color: var(--sh-color-text-primary, #10142b);
-  background: #ffffff;
+  background: var(--sh-color-surface-subtle, #ffffff);
   transition:
     border-color var(--sh-motion-fast) ease,
     box-shadow var(--sh-motion-fast) ease;
@@ -426,6 +436,17 @@
 .field.error input,
 .field.error textarea {
   border-color: var(--sh-color-error, #d9534f);
+  background: color-mix(
+    in srgb,
+    var(--sh-color-error-bg, #fdf2f2) 36%,
+    var(--sh-color-surface-subtle, #ffffff)
+  );
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--sh-color-text-muted, #9aa0b4);
+  opacity: 1;
 }
 
 .fieldError {
@@ -455,7 +476,7 @@
   width: 56px;
   height: 56px;
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--sh-color-surface-card, #ffffff);
   border: 1px solid var(--sh-color-border-subtle, #e5e8f2);
   display: flex;
   align-items: center;
@@ -513,7 +534,7 @@
   font-size: 12.5px;
   font-weight: 700;
   color: var(--sh-color-brand-primary, #4453e8);
-  background: #ffffff;
+  background: var(--sh-color-surface-card, #ffffff);
   border: 1px solid var(--sh-color-brand-primary, #4453e8);
   padding: 8px 14px;
   border-radius: 9px;
@@ -577,7 +598,7 @@
   border-radius: 10px;
   padding: 10px 16px;
   color: var(--sh-color-brand-primary, #4453e8);
-  background: #ffffff;
+  background: var(--sh-color-surface-card, #ffffff);
   font-size: 13px;
   font-weight: 800;
   cursor: pointer;

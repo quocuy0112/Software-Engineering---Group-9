@@ -12,6 +12,8 @@ export const notificationCopy = {
     loadMore: "Tải thêm",
     unread: "Chưa đọc",
     read: "Đã đọc",
+    readAction: "Đọc",
+    markAsRead: "Đánh dấu đã đọc",
     loading: "Đang tải thông báo…",
     severities: {
       CRITICAL: "Nghiêm trọng",
@@ -31,6 +33,8 @@ export const notificationCopy = {
     loadMore: "Load more",
     unread: "Unread",
     read: "Read",
+    readAction: "Read",
+    markAsRead: "Mark as read",
     loading: "Loading notifications…",
     severities: {
       CRITICAL: "Critical",

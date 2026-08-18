@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
+import { Camera, Check, CircleHelp, Info, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
 import { profileAvatarResponseSchema } from "@/shared/contracts/account/profile-avatar";
 import { Button } from "@/frontend/components/ui/button";
@@ -146,6 +147,7 @@ export function ProfileAvatarEditor({
         open={open}
         title={copy.title}
         description={copy.description}
+        icon={<Info />}
         onClose={() => onOpenChange?.(false)}
       >
         <div className="candidate-avatar-modal">
@@ -277,18 +279,27 @@ export function ProfileAvatarEditor({
       </div>
 
       <div className="profile-avatar-editor">
-        <div className="profile-avatar-preview">
-          {preview ? (
-            <Image
-              src={preview}
-              alt={copy.preview}
-              width={384}
-              height={384}
-              unoptimized
-            />
-          ) : (
-            <span aria-hidden="true">{initials(accountName)}</span>
-          )}
+        <div className="profile-avatar-preview-wrap">
+          <div className="profile-avatar-preview">
+            {preview ? (
+              <Image
+                src={preview}
+                alt={copy.preview}
+                width={384}
+                height={384}
+                unoptimized
+              />
+            ) : (
+              <span aria-hidden="true">{initials(accountName)}</span>
+            )}
+          </div>
+          <label
+            className="profile-avatar-camera"
+            htmlFor="profile-avatar-file"
+            title={copy.choose}
+          >
+            <Camera aria-hidden="true" />
+          </label>
         </div>
 
         <div className="profile-avatar-controls">
@@ -304,7 +315,8 @@ export function ProfileAvatarEditor({
             className="profile-avatar-file-label"
             htmlFor="profile-avatar-file"
           >
-            {preview ? copy.another : copy.choose}
+            <UploadCloud aria-hidden="true" />
+            <span>{preview ? copy.another : copy.choose}</span>
           </label>
 
           <div className="profile-avatar-actions">
@@ -314,7 +326,8 @@ export function ProfileAvatarEditor({
               disabled={!source || busy}
               onClick={() => void save()}
             >
-              {busy ? copy.saving : copy.save}
+              <Check aria-hidden="true" />
+              <span>{busy ? copy.saving : copy.save}</span>
             </button>
             {avatar ? (
               <button
@@ -327,7 +340,10 @@ export function ProfileAvatarEditor({
               </button>
             ) : null}
           </div>
-          <p className="profile-avatar-help">{copy.help}</p>
+          <p className="profile-avatar-help">
+            <CircleHelp aria-hidden="true" />
+            <span>{copy.help}</span>
+          </p>
           <div
             className="profile-avatar-feedback"
             data-tone={feedbackTone}

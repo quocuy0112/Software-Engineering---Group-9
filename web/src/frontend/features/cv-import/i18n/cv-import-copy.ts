@@ -532,6 +532,32 @@ export function cvFormatDateTime(
   });
 }
 
+export function cvImportStatusPageCopy(locale: CvLocale) {
+  return locale === "vi"
+    ? {
+        backLink: "Quay lại Nhập CV",
+        eyebrow: "Xử lý CV riêng tư",
+        title: "Trạng thái nhập CV",
+        subtitle:
+          "Theo dõi từng giai đoạn xử lý, thực hiện hành động cần thiết và mở phần xem xét khi bản nháp riêng tư đã sẵn sàng.",
+        privacyBadge: "Riêng tư · tạm thời",
+        statusPrefix: "Trạng thái hiện tại: ",
+      }
+    : {
+        backLink: "Back to CV imports",
+        eyebrow: "Private CV processing",
+        title: "CV import status",
+        subtitle:
+          "Follow each processing stage, handle any required action, and open the review when your private draft is ready.",
+        privacyBadge: "Private · temporary",
+        statusPrefix: "Current status: ",
+      };
+}
+
+export function cvRetentionDaysLeft(locale: CvLocale, days: number) {
+  return locale === "vi" ? `Còn ${days} ngày` : `${days} days left`;
+}
+
 export function cvKnownError(locale: CvLocale, message: string, code?: string) {
   if (locale === "en") return message;
   const byCode: Record<string, string> = {

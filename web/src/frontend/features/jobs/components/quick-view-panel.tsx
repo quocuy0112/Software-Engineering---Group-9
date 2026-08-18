@@ -2,12 +2,24 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef } from "react";
+import {
+  BadgeCheck,
+  BriefcaseBusiness,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  CircleHelp,
+  MapPin,
+  Sparkles,
+  WalletCards,
+  X,
+} from "lucide-react";
 import type { JobCard } from "@/shared/contracts/jobs/discovery";
 import { formatSalary } from "@/shared/utils/jobs/job-display";
 import { JobApplicationAction } from "./job-application-form";
 import { QuickSkillChips } from "./quick-skill-chips";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
-import { SaveJobAction } from "./save-job-action";
+import { SaveBookmarkIcon, SaveJobAction } from "./save-job-action";
 import { jobWhyHighlights } from "./job-detail-data";
 import { CompanyAvatar } from "./company-avatar";
 
@@ -106,7 +118,7 @@ export function QuickViewPanel({
             aria-label="Close quick view"
             onClick={onClose}
           >
-            ×
+            <X aria-hidden="true" />
           </button>
         </header>
 
@@ -120,17 +132,21 @@ export function QuickViewPanel({
               loading="eager"
             />
             <div>
-              <p className="job-company-name">{job.company.displayName}</p>
-              <span className="job-verified-inline">
-                <span aria-hidden="true">✓</span> Verified company
-              </span>
+              <div className="job-quick-view-company-meta">
+                <p className="job-company-name">{job.company.displayName}</p>
+                <span className="job-verified-inline">
+                  <BadgeCheck aria-hidden="true" /> Verified company
+                </span>
+              </div>
+              <h2 id="quick-view-title">{job.title}</h2>
             </div>
           </div>
 
-          <h2 id="quick-view-title">{job.title}</h2>
           <dl className="job-quick-view-meta">
             <div>
-              <dt>Salary</dt>
+              <dt>
+                <WalletCards aria-hidden="true" /> Salary
+              </dt>
               <dd
                 className={
                   job.salary?.isNegotiable
@@ -142,11 +158,15 @@ export function QuickViewPanel({
               </dd>
             </div>
             <div>
-              <dt>Location</dt>
+              <dt>
+                <MapPin aria-hidden="true" /> Location
+              </dt>
               <dd>{job.location}</dd>
             </div>
             <div>
-              <dt>Experience</dt>
+              <dt>
+                <BriefcaseBusiness aria-hidden="true" /> Experience
+              </dt>
               <dd>{experienceLabel(job.experienceLevel)}</dd>
             </div>
           </dl>
@@ -157,9 +177,9 @@ export function QuickViewPanel({
           >
             <div className="job-quick-view-block-heading">
               <p className="panel-kicker" id="quick-skills-heading">
-                Quick skill chips
+                Required skills
               </p>
-              <span aria-hidden="true">◎</span>
+              <CircleHelp aria-hidden="true" />
             </div>
             <QuickSkillChips job={job} compact />
           </section>
@@ -169,18 +189,27 @@ export function QuickViewPanel({
             aria-labelledby="quick-reasons-heading"
           >
             <div className="job-quick-view-block-heading">
-              <h3 id="quick-reasons-heading">Why you&apos;ll love it</h3>
-              <span aria-hidden="true">✦</span>
+              <h3 id="quick-reasons-heading">
+                <Sparkles aria-hidden="true" /> Why you&apos;ll love it
+              </h3>
             </div>
             <ul className="job-quick-view-reasons">
               {highlights.map((highlight) => (
                 <li key={highlight}>
-                  <span aria-hidden="true">✓</span>
+                  <Check aria-hidden="true" />
                   {highlight}
                 </li>
               ))}
             </ul>
           </section>
+
+          <Link
+            className="job-quick-view-full-link"
+            href={"/jobs/" + job.slug}
+            onClick={onClose}
+          >
+            View full job details <ChevronRight aria-hidden="true" />
+          </Link>
         </div>
 
         <footer className="job-quick-view-footer job-quick-view-footer--redesign">
@@ -219,23 +248,17 @@ export function QuickViewPanel({
               />
             ) : (
               <Link
-                className="job-secondary-button"
+                className="job-secondary-button job-save-button"
                 href={
                   "/login?returnTo=" + encodeURIComponent("/jobs/" + job.slug)
                 }
                 onClick={onClose}
               >
-                <span aria-hidden="true">♡</span> Save
+                <SaveBookmarkIcon />
+                <span>Save</span>
               </Link>
             )}
           </div>
-          <Link
-            className="job-quick-view-full-link"
-            href={"/jobs/" + job.slug}
-            onClick={onClose}
-          >
-            View full details <span aria-hidden="true">→</span>
-          </Link>
           <div
             className="job-quick-view-navigation"
             aria-label="Quick view navigation"
@@ -247,7 +270,7 @@ export function QuickViewPanel({
               disabled={index <= 0}
               onClick={() => onJobChange(jobs[index - 1]!.id)}
             >
-              ←
+              <ChevronLeft aria-hidden="true" />
             </button>
             <button
               className="job-icon-button"
@@ -256,7 +279,7 @@ export function QuickViewPanel({
               disabled={index >= jobs.length - 1}
               onClick={() => onJobChange(jobs[index + 1]!.id)}
             >
-              →
+              <ChevronRight aria-hidden="true" />
             </button>
           </div>
         </footer>

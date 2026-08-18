@@ -38,7 +38,8 @@
 }
 
 .candidate-profile-page .profile-navigation .sh-topbar__tabs {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
+  max-width: 100%;
   padding: 4px;
   border: 1px solid var(--sh-profile-border);
   border-radius: var(--sh-profile-radius-lg);
@@ -1226,6 +1227,76 @@
   box-shadow: none;
 }
 
+/* Avatar upload modal: the account action is intentionally a compact guided
+   flow, matching the workspace cards rather than a dense settings form. */
+.candidate-profile-page .sh-modal:has(.candidate-avatar-modal) {
+  width: min(100%, 680px);
+  padding: 26px 28px 24px;
+  border-radius: 18px;
+  font-family: var(--sh-font-family);
+}
+
+.candidate-profile-page
+  .sh-modal:has(.candidate-avatar-modal)
+  .sh-modal-heading {
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.candidate-profile-page .sh-modal:has(.candidate-avatar-modal) .sh-modal-icon {
+  width: 48px;
+  height: 48px;
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--sh-color-brand-primary) 14%,
+      var(--sh-color-border-subtle)
+    );
+  border-radius: 14px;
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+}
+
+.candidate-profile-page
+  .sh-modal:has(.candidate-avatar-modal)
+  .sh-modal-icon
+  svg {
+  width: 23px;
+  height: 23px;
+}
+
+.candidate-profile-page
+  .sh-modal:has(.candidate-avatar-modal)
+  .sh-modal-heading
+  h2 {
+  color: var(--sh-color-text-primary);
+  font-family: var(--sh-font-family);
+  font-size: 20px;
+  font-weight: var(--sh-font-weight-bold);
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+}
+
+.candidate-profile-page
+  .sh-modal:has(.candidate-avatar-modal)
+  .sh-modal-heading
+  p {
+  max-width: 510px;
+  margin-top: 4px;
+  color: var(--sh-color-text-secondary);
+  font-family: var(--sh-font-family);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.candidate-profile-page
+  .sh-modal:has(.candidate-avatar-modal)
+  .sh-modal-content {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--sh-color-border-subtle);
+}
+
 .candidate-profile-page .candidate-avatar-modal .profile-avatar-copy {
   display: none;
 }
@@ -1233,7 +1304,7 @@
 .candidate-profile-page .candidate-avatar-modal .profile-avatar-editor {
   display: grid;
   grid-template-columns: 112px minmax(0, 1fr);
-  gap: 16px;
+  gap: 28px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -1246,6 +1317,17 @@
   background: var(--sh-profile-primary-light);
 }
 
+.candidate-profile-page .candidate-avatar-modal .profile-avatar-preview-wrap {
+  width: 112px;
+}
+
+.candidate-profile-page .candidate-avatar-modal .profile-avatar-camera {
+  width: 36px;
+  height: 36px;
+  right: -3px;
+  bottom: -3px;
+}
+
 .candidate-profile-page .candidate-avatar-modal .profile-avatar-file-label {
   display: inline-flex;
   min-height: 42px;
@@ -1254,10 +1336,12 @@
   border: 1px solid
     color-mix(in srgb, var(--sh-profile-primary) 46%, var(--sh-profile-border));
   border-radius: var(--sh-profile-radius-sm);
-  color: var(--sh-profile-primary-dark);
-  background: var(--sh-profile-surface);
-  font-size: 13px;
-  font-weight: 600;
+  gap: 8px;
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+  font-family: var(--sh-font-family);
+  font-size: 14px;
+  font-weight: var(--sh-font-weight-semibold);
   box-shadow: 0 1px 2px
     color-mix(in srgb, var(--sh-profile-primary-dark) 8%, transparent);
 }
@@ -1306,16 +1390,17 @@
   border-radius: var(--sh-profile-radius-sm);
   color: var(--sh-color-text-inverse);
   background: var(--sh-profile-primary);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
+  gap: 8px;
+  font-family: var(--sh-font-family);
+  font-size: 14px;
+  font-weight: var(--sh-font-weight-semibold);
   cursor: pointer;
 }
 
 .candidate-profile-page .candidate-avatar-modal .profile-avatar-save:disabled {
   border-color: var(--sh-profile-border);
   color: var(--sh-profile-text-faint);
-  background: var(--sh-profile-gray-light);
+  background: color-mix(in srgb, var(--sh-color-brand-primary) 42%, #fff);
   cursor: not-allowed;
 }
 
@@ -1329,7 +1414,9 @@
 .candidate-profile-page .candidate-avatar-modal .profile-avatar-feedback {
   grid-column: auto;
   margin: 0;
-  color: var(--sh-profile-text-faint);
+  gap: 7px;
+  color: var(--sh-color-text-muted);
+  font-family: var(--sh-font-family);
   font-size: 12px;
   line-height: 1.45;
 }
@@ -1435,6 +1522,10 @@
   }
 
   .candidate-profile-page .candidate-avatar-modal .profile-avatar-preview {
+    width: 96px;
+  }
+
+  .candidate-profile-page .candidate-avatar-modal .profile-avatar-preview-wrap {
     width: 96px;
   }
 }

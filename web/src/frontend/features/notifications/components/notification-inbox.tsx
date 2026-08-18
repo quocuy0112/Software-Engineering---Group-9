@@ -62,85 +62,100 @@ function NotificationInboxContent({
 
   return (
     <section className="notification-inbox" aria-labelledby="notification-inbox-title">
-      <header className="notification-inbox__header">
-        <div>
-          <p className="notification-inbox__eyebrow">SmartHire</p>
-          <h1 id="notification-inbox-title">{copy.title}</h1>
-        </div>
-        <button
-          type="button"
-          onClick={() =>
-            markAllRead.mutateAsync({}).catch(() => toast.error(copy.error))
-          }
-        >
-          {copy.markAll}
-        </button>
-      </header>
-      <div className="notification-filters" aria-label={copy.title}>
-        {(["all", "unread", "read"] as const).map((value) => (
+      <div className="notification-inbox__card">
+        <header className="notification-inbox__header">
+          <div className="notification-inbox__title-group">
+            <span className="notification-inbox__eyebrow">SMARTHIRE</span>
+            <h1 id="notification-inbox-title">{copy.title}</h1>
+          </div>
           <button
             type="button"
-            key={value}
-            aria-pressed={state === value}
-            onClick={() => setState(value)}
+            className="notification-inbox__mark-all"
+            disabled={items.length === 0 || items.every((item) => Boolean(item.readAt)) || markAllRead.isPending}
+            onClick={() =>
+              markAllRead.mutateAsync({}).catch(() => toast.error(copy.error))
+            }
           >
-            {value === "all" ? copy.label : value === "unread" ? copy.unread : copy.read}
+            {copy.markAll}
           </button>
-        ))}
-      </div>
-      {pages.isPending ? (
-        <p className="notification-state" aria-busy="true">{copy.loading}</p>
-      ) : pages.isError ? (
-        <div className="notification-state" role="alert">
-          <p>{copy.error}</p>
-          <button type="button" onClick={() => void pages.refetch()}>{copy.retry}</button>
+        </header>
+        <div className="notification-filters" aria-label={copy.title}>
+          {(["all", "unread", "read"] as const).map((value) => (
+            <button
+              type="button"
+              key={value}
+              aria-pressed={state === value}
+              className="notification-filter-btn"
+              onClick={() => setState(value)}
+            >
+              {value === "all" ? copy.label : value === "unread" ? copy.unread : copy.read}
+            </button>
+          ))}
         </div>
-      ) : items.length === 0 ? (
-        <p className="notification-state">{copy.empty}</p>
-      ) : (
-        <ul className="notification-inbox__list">
-          {items.map((item) => (
-            <li key={item.id} data-read={Boolean(item.readAt)} data-severity={item.severity}>
-              <button
-                type="button"
-                className="notification-inbox__open"
-                onClick={() => void openItem(item)}
+        {pages.isPending ? (
+          <p className="notification-state" aria-busy="true">{copy.loading}</p>
+        ) : pages.isError ? (
+          <div className="notification-state" role="alert">
+            <p>{copy.error}</p>
+            <button type="button" onClick={() => void pages.refetch()}>{copy.retry}</button>
+          </div>
+        ) : items.length === 0 ? (
+          <p className="notification-state">{copy.empty}</p>
+        ) : (
+          <ul className="notification-inbox__list">
+            {items.map((item) => (
+              <li
+                key={item.id}
+                data-read={Boolean(item.readAt)}
+                data-severity={item.severity}
+                className="notification-inbox__item"
               >
-                <span className="notification-item__meta">
-                  <span>{copy.severities[item.severity]}</span>
-                  <span>{item.readAt ? copy.read : copy.unread}</span>
-                </span>
-                <h2>{item.title}</h2>
-                <p>{item.summary}</p>
-                <time dateTime={item.lastOccurredAt}>{notificationTime(item.lastOccurredAt, locale)}</time>
-              </button>
-              {!item.readAt ? (
+                {!item.readAt ? (
+                  <span className="notification-inbox__accent" aria-hidden="true" />
+                ) : null}
                 <button
                   type="button"
-                  className="notification-inbox__mark-read"
-                  onClick={() =>
-                    markRead
-                      .mutateAsync({ notificationId: item.id })
-                      .catch(() => toast.error(copy.error))
-                  }
+                  className="notification-inbox__open"
+                  onClick={() => void openItem(item)}
                 >
-                  {copy.read}
+                  <div className="notification-item__meta">
+                    <span className="notification-item__severity">{copy.severities[item.severity]}</span>
+                    <span className="notification-item__status">{item.readAt ? copy.read : copy.unread}</span>
+                  </div>
+                  <h2>{item.title}</h2>
+                  <p>{item.summary}</p>
+                  <time dateTime={item.lastOccurredAt}>{notificationTime(item.lastOccurredAt, locale)}</time>
                 </button>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-      )}
-      {pages.hasNextPage ? (
-        <button
-          className="notification-load-more"
-          type="button"
-          disabled={pages.isFetchingNextPage}
-          onClick={() => void pages.fetchNextPage()}
-        >
-          {copy.loadMore}
-        </button>
-      ) : null}
+                {!item.readAt ? (
+                  <div className="notification-inbox__action-col">
+                    <button
+                      type="button"
+                      className="notification-inbox__mark-read"
+                      onClick={() =>
+                        markRead
+                          .mutateAsync({ notificationId: item.id })
+                          .catch(() => toast.error(copy.error))
+                      }
+                    >
+                      {copy.readAction}
+                    </button>
+                  </div>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        )}
+        {pages.hasNextPage ? (
+          <button
+            className="notification-load-more"
+            type="button"
+            disabled={pages.isFetchingNextPage}
+            onClick={() => void pages.fetchNextPage()}
+          >
+            {copy.loadMore}
+          </button>
+        ) : null}
+      </div>
     </section>
   );
 }

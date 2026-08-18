@@ -1,39 +1,87 @@
 .root {
   display: grid;
   min-width: 0;
-  gap: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--color-border, #94a3b8);
-  border-radius: 0.75rem;
+  gap: 14px;
 }
 
-.binding {
+.card {
   display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-lg);
+  background: var(--sh-color-surface-card);
+  box-shadow: none;
+}
+
+.root h2 {
   margin: 0;
-  gap: 0.65rem;
+  color: var(--sh-color-text-primary);
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.35;
 }
 
-.binding div {
-  display: grid;
-  grid-template-columns: minmax(5rem, 0.3fr) minmax(0, 1fr);
-  gap: 0.75rem;
+.summaryRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.binding dt {
-  font-weight: 750;
+.providerIcon {
+  display: inline-grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 12px;
+  color: var(--sh-color-success);
+  background: var(--sh-color-success-bg);
+  font-size: 12px;
+  font-weight: 800;
 }
 
-.binding dd {
+.summaryCopy {
   min-width: 0;
-  margin: 0;
-  overflow-wrap: anywhere;
+}
+
+.summaryCopy strong {
+  display: block;
+  color: var(--sh-color-text-primary);
+  font-size: 15px;
+  font-weight: var(--sh-font-weight-semibold);
+}
+
+.summaryCopy p {
+  margin: 2px 0 0;
+  color: var(--sh-color-text-secondary);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.bodyText {
+  margin: 2px 0;
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-body-sm);
+  line-height: 1.65;
 }
 
 .technicalDetails {
-  padding: 0.75rem;
+  width: fit-content;
+  max-width: 100%;
+  padding: 8px 14px;
   border: 1px solid var(--sh-color-border-subtle);
   border-radius: var(--sh-radius-sm);
-  background: var(--sh-color-surface-tinted);
+  background: var(--sh-color-surface-card);
 }
 
 .technicalDetails summary {
@@ -64,8 +112,10 @@
 
 .grant,
 .granted {
+  justify-items: end;
+  padding-top: 4px;
   display: grid;
-  gap: 0.85rem;
+  gap: var(--sh-space-3);
 }
 
 .grant label {
@@ -196,8 +246,17 @@
 }
 
 .caveat {
-  padding-inline-start: 0.75rem;
-  border-inline-start: 0.3rem solid var(--color-warning, #a16207);
+  padding: 13px 16px;
+  border-inline-start: 3px solid var(--sh-color-warning);
+  border-radius: var(--sh-radius-sm);
+  color: color-mix(
+    in srgb,
+    var(--sh-color-warning) 82%,
+    var(--sh-color-text-primary)
+  );
+  background: var(--sh-color-warning-bg);
+  font-size: var(--sh-font-size-body-sm);
+  line-height: var(--sh-line-height-body-sm);
 }
 
 .explanation {
@@ -205,13 +264,16 @@
 }
 
 .status {
-  min-height: 1.5rem;
-  padding: 0.65rem 0.75rem;
-  border-inline-start: 4px solid var(--sh-color-info);
-  border-radius: var(--sh-radius-sm);
+  flex: 0 0 auto;
+  min-height: auto;
+  margin-left: auto;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--sh-radius-full);
   color: var(--sh-color-info);
   background: var(--sh-color-info-bg);
-  font-weight: 650;
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-semibold);
   transition:
     border-color 200ms ease,
     color 200ms ease,
@@ -219,19 +281,17 @@
 }
 
 .status[data-tone="pending"] {
-  border-color: var(--sh-color-warning);
   color: var(--sh-color-warning);
   background: var(--sh-color-warning-bg);
 }
 
 .status[data-tone="success"] {
-  border-color: var(--sh-color-success);
   color: var(--sh-color-success);
   background: var(--sh-color-success-bg);
+  font-weight: var(--sh-font-weight-semibold);
 }
 
 .status[data-tone="error"] {
-  border-color: var(--sh-color-error);
   color: var(--sh-color-error);
   background: var(--sh-color-error-bg);
 }
@@ -243,9 +303,16 @@
 }
 
 @media (max-width: 32rem) {
-  .binding div {
-    grid-template-columns: 1fr;
-    gap: 0.2rem;
+  .card {
+    padding: var(--sh-space-4);
+  }
+  .summaryRow {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .status {
+    margin-left: 52px;
   }
 
   .grant button,
