@@ -232,9 +232,9 @@ const messagingDefaults = [
   ["MESSAGING_DISCONNECT_GRACE_MS", "2000"],
 ];
 const jobCatalogueDefaults = [
-  ["JOB_CATALOGUE_MODE", "readonly"],
+  ["JOB_CATALOGUE_MODE", "writer"],
   ["JOB_CATALOGUE_PATH", "data/jobs/jobs.json"],
-  ["JOB_CATALOGUE_WRITER_HOST_ID", ""],
+  ["JOB_CATALOGUE_WRITER_HOST_ID", "local-dev-writer"],
   ["JOB_CATALOGUE_LEASE_TTL_MS", "30000"],
 ];
 const renderDefaults = (defaults) =>

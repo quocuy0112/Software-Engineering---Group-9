@@ -29,6 +29,15 @@ const companiesRepository =
 const applicationsRepository =
   configuredJsonJobCatalogueRepository("applications.json");
 const MAX_COMPANY_LOGO_BYTES = 800 * 1024;
+
+function isCatalogueWriterConfigured() {
+  return (
+    process.env.NODE_ENV === "test" ||
+    (process.env.JOB_CATALOGUE_MODE === "writer" &&
+      Boolean(process.env.JOB_CATALOGUE_WRITER_HOST_ID?.trim()))
+  );
+}
+
 type CompanyProfileField =
   RecruiterCompanySettings["missingProfileFields"][number];
 
@@ -823,9 +832,6 @@ export async function updateRecruiterCompanySettings(
       website: editable.website,
       description: editable.description,
     });
-    await companiesRepository.mutate(() =>
-      replaceOrAppendRawCompany(rawCompanies, updated),
-    );
     if (company.databaseBacked && company.databaseId) {
       await prisma.company.update({
         where: { id: company.databaseId },
@@ -841,6 +847,11 @@ export async function updateRecruiterCompanySettings(
           publicLocation: updated.address,
         },
       });
+    }
+    if (!company.databaseBacked || isCatalogueWriterConfigured()) {
+      await companiesRepository.mutate(() =>
+        replaceOrAppendRawCompany(rawCompanies, updated),
+      );
     }
     return settingsFromCompany({
       ...updated,
