@@ -10,6 +10,7 @@ import {
 } from "@/backend/applications/services/open-application-document";
 import {
   buildStructuredDocumentContent,
+  DOCUMENT_PDF_PREVIEW_VERSION,
   DOCUMENT_PREVIEW_PARSER_VERSION,
 } from "@/backend/applications/services/document-preview-parser";
 import {
@@ -60,13 +61,14 @@ function cacheKey(input: {
   kind: DocumentKind;
   contentVersion: string | null | undefined;
   scoringVersion: string;
+  previewVersion: string;
 }) {
   return [
     input.applicationId,
     input.kind,
     input.contentVersion ?? "unknown-content",
     input.scoringVersion,
-    DOCUMENT_PREVIEW_PARSER_VERSION,
+    input.previewVersion,
   ].join(":");
 }
 
@@ -173,11 +175,16 @@ export async function GET(
       kind,
       preview: false,
     });
+    const previewVersion =
+      result.document.mediaType === "application/pdf"
+        ? DOCUMENT_PDF_PREVIEW_VERSION
+        : DOCUMENT_PREVIEW_PARSER_VERSION;
     const key = cacheKey({
       applicationId,
       kind,
       contentVersion: result.document.contentVersion,
       scoringVersion: cacheVersion(request),
+      previewVersion,
     });
     const cached = getCachedDocumentPreview(key);
     if (cached) {
@@ -188,6 +195,22 @@ export async function GET(
         }),
         { headers: noStore },
       );
+    }
+
+    if (result.document.mediaType === "application/pdf") {
+      const preview = structuredDocumentPreviewSchema.parse({
+        kind,
+        previewStatus: "ORIGINAL",
+        fileName: result.document.fileName,
+        mediaType: result.document.mediaType,
+        pageCount: null,
+        parserVersion: DOCUMENT_PDF_PREVIEW_VERSION,
+        processingMilliseconds: Math.max(0, Date.now() - startedAt),
+        cacheHit: false,
+        content: buildStructuredDocumentContent({ kind, segments: [] }),
+      });
+      setCachedDocumentPreview(key, preview);
+      return NextResponse.json(preview, { headers: noStore });
     }
 
     let segments;

@@ -10,6 +10,7 @@ import {
 } from "@/shared/contracts/applications/document-preview";
 
 export const DOCUMENT_PREVIEW_PARSER_VERSION = "structured-preview-v3";
+export const DOCUMENT_PDF_PREVIEW_VERSION = "native-pdf-preview-v1";
 
 type PreviewSegment = Pick<ExtractedSegment, "id" | "kind" | "text">;
 

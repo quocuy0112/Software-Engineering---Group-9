@@ -5,11 +5,11 @@ import type { AutomaticMatch } from "@/shared/contracts/scoring";
 
 const cvPreview = {
   kind: "cv" as const,
-  previewStatus: "PARSED" as const,
+  previewStatus: "ORIGINAL" as const,
   fileName: "candidate-cv.pdf",
   mediaType: "application/pdf",
-  pageCount: 1,
-  parserVersion: "structured-preview-v3",
+  pageCount: null,
+  parserVersion: "native-pdf-preview-v1",
   processingMilliseconds: 12,
   cacheHit: false,
   content: {
@@ -48,6 +48,15 @@ const coverLetterPreview = {
   },
 };
 
+const coverLetterPdfPreview = {
+  ...coverLetterPreview,
+  previewStatus: "ORIGINAL" as const,
+  fileName: "cover-letter.pdf",
+  mediaType: "application/pdf",
+  pageCount: null,
+  parserVersion: "native-pdf-preview-v1",
+};
+
 const automatic = {
   cvParse: {
     snapshotVersion: "candidate-cv-v1",
@@ -84,6 +93,41 @@ describe("DocumentsTab", () => {
     expect(screen.getByText("cover-letter.docx")).toBeInTheDocument();
   });
 
+  it("renders an uploaded PDF in the inline document preview", async () => {
+    const fetchMock = vi.fn(async (input: string | URL) => {
+      const payload = String(input).includes("cover-letter")
+        ? coverLetterPdfPreview
+        : cvPreview;
+      return new Response(JSON.stringify(payload), { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <DocumentsTab
+        jobId="job-pdf"
+        applicationId="application-pdf"
+        automatic={automatic}
+      />,
+    );
+
+    const cvIframe = await screen.findByTitle("CV PDF preview");
+    const coverLetterIframe = await screen.findByTitle(
+      "Cover letter PDF preview",
+    );
+    expect(cvIframe.getAttribute("src")).toMatch(/^blob:/u);
+    expect(coverLetterIframe.getAttribute("src")).toMatch(/^blob:/u);
+    expect(fetchMock.mock.calls.map(([input]) => String(input))).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining(
+          "/api/recruiter/jobs/job-pdf/applications/application-pdf/documents/cv",
+        ),
+        expect.stringContaining(
+          "/api/recruiter/jobs/job-pdf/applications/application-pdf/documents/cover-letter",
+        ),
+      ]),
+    );
+  });
+
   it("does not reload document previews when scoring data changes after rescore", async () => {
     const fetchMock = vi.fn(async (input: string | URL) => {
       const payload = String(input).includes("cover-letter")
@@ -101,7 +145,7 @@ describe("DocumentsTab", () => {
       />,
     );
     await screen.findByText("Dear Hiring Manager,");
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
 
     view.rerender(
       <DocumentsTab
@@ -117,6 +161,6 @@ describe("DocumentsTab", () => {
       />,
     );
 
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
   });
 });
