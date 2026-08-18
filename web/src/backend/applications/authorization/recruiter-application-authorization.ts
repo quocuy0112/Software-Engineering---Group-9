@@ -102,7 +102,7 @@ function authorized(
   membership: MembershipRow,
 ): RecruiterAuthorizationResult {
   const membershipRole = membership.role as RecruiterRole;
-  const canMutate = membershipRole !== "OWNER";
+  const canMutate = recruiterApplicationMutationRoleAllowed(membershipRole);
   return {
     authorized: true,
     requestedJobId,
@@ -298,5 +298,5 @@ export function recruiterApplicationRoleAllowed(role: string): boolean {
 }
 
 export function recruiterApplicationMutationRoleAllowed(role: string): boolean {
-  return recruiterApplicationRoleAllowed(role) && role !== "OWNER";
+  return recruiterApplicationRoleAllowed(role);
 }

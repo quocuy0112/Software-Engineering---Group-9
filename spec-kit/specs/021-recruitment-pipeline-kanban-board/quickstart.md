@@ -74,9 +74,9 @@ npm run email:worker --workspace @smarthire/web
 
 ### 2. Role matrix and tenant isolation
 
-1. As `OWNER`, verify the board and authorized details are readable but stage controls are absent/read-only.
-2. Attempt the mutation endpoint directly as `OWNER`; expect neutral denial and no state/history/audit-success/notification change.
-3. Repeat a valid move as `HR_MANAGER`, `RECRUITER`, and `HIRING_MANAGER`; expect success.
+1. As `OWNER`, verify the board, authorized details, and stage controls are available.
+2. Perform a valid mutation as `OWNER`; expect the authoritative state, history, audit, and notification updates.
+3. Repeat a valid move as `OWNER`, `HR_MANAGER`, `RECRUITER`, and `HIRING_MANAGER`; expect success.
 4. With a user belonging to two companies, alter the selected job/application pairing; expect no cross-company data or successful write.
 
 ### 3. Pointer and non-drag movement

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { RecruitmentPipelineBoard } from "@/frontend/features/recruiter-applications/recruitment-pipeline-board";
 
 vi.mock("@/frontend/features/recruiter-applications/use-recruitment-pipeline", () => ({
-  useRecruitmentPipeline: () => ({ metadata: { job: { jobId: "job-1", title: "Engineer", status: "ACTIVE" }, permissions: { role: "OWNER", canView: true, canMoveStages: false, canReject: false, canRecordOfferDeclined: false, canConfirmHired: false }, stages: ["Applied", "Viewed", "Shortlisted", "Interviewing", "Offered", "Hired", "Offer Declined", "Rejected", "Waitlisted"].map((label, index) => ({ stage: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING", "OFFERED", "HIRED", "OFFER_DECLINED", "REJECTED", "WAITLISTED"][index], label, count: 0 })), observedAt: new Date().toISOString() }, columns: {}, loading: false, error: null, loadStage: vi.fn(), loadMore: vi.fn(), retry: vi.fn() }),
+  useRecruitmentPipeline: () => ({ metadata: { job: { jobId: "job-1", title: "Engineer", status: "ACTIVE" }, permissions: { role: "OWNER", canView: true, canMoveStages: true, canReject: true, canRecordOfferDeclined: true, canConfirmHired: true }, stages: ["Applied", "Viewed", "Shortlisted", "Interviewing", "Offered", "Hired", "Offer Declined", "Rejected", "Waitlisted"].map((label, index) => ({ stage: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING", "OFFERED", "HIRED", "OFFER_DECLINED", "REJECTED", "WAITLISTED"][index], label, count: 0 })), observedAt: new Date().toISOString() }, columns: {}, loading: false, error: null, loadStage: vi.fn(), loadMore: vi.fn(), retry: vi.fn() }),
 }));
 
 describe("RecruitmentPipelineBoard", () => {

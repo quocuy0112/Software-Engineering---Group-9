@@ -40,7 +40,7 @@ function authorizationFor(rows: unknown[]) {
 }
 
 describe("recruitment pipeline authorization matrix", () => {
-  it("allows all four roles to view but keeps OWNER read-only", async () => {
+  it("allows OWNER and recruiter roles to manage the pipeline", async () => {
     const roles: Role[] = ["OWNER", "HR_MANAGER", "RECRUITER", "HIRING_MANAGER"];
     const results = await authorizationFor(roles.map((role) => row(role))).authorizeJobs(
       "user-1",
@@ -50,7 +50,7 @@ describe("recruitment pipeline authorization matrix", () => {
     expect(results).toHaveLength(4);
     for (const result of results) {
       expect(result).toMatchObject({ authorized: true, canView: true });
-      const mutable = result.membershipRole !== "OWNER";
+      const mutable = true;
       expect(result.canMoveStages).toBe(mutable);
       expect(result.canReject).toBe(mutable);
       expect(result.canRecordOfferDeclined).toBe(mutable);

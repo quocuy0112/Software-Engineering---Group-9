@@ -14,7 +14,7 @@
 
 ### Session 2026-08-16
 
-- Q: Which company roles may use the pipeline? → A: `OWNER` may view the board but is read-only; `HR_MANAGER`, `RECRUITER`, and `HIRING_MANAGER` may view, move stages, reject, and explicitly confirm `HIRED` within their authorized company scope.
+- Q: Which company roles may use the pipeline? → A: `OWNER`, `HR_MANAGER`, `RECRUITER`, and `HIRING_MANAGER` may view, move stages, reject, and explicitly confirm `HIRED` within their authorized company scope.
 - Q: Must SmartHire contain a recorded candidate offer acceptance before an application can become `HIRED`? → A: No. Acceptance may occur inside or outside SmartHire, but only an explicit authorized recruiter-side confirmation may set `HIRED`; candidate activity and AI output cannot do so.
 - Q: Does the first Kanban combine applications from multiple jobs? → A: No. Feature 019 is job-scoped; a company-wide multi-job board is outside scope.
 - Q: What happens to the pipeline when the selected job is closed or later becomes unavailable? → A: Closing a job does not erase or freeze its existing application pipeline; authorized members may continue viewing it and permitted roles may continue valid stage decisions. If the job is removed, cannot be resolved uniquely, or is no longer authorized, the board fails safely and does not present its stale application data as current.
@@ -177,8 +177,8 @@ A transition to the same stage is not a stage change. Reopening a terminal appli
 - **FR-006**: A user with memberships in multiple companies MUST operate only within the company that owns the explicitly resolved selected job.
 - **FR-007**: Unknown or unauthorized job/application requests MUST return a neutral failure without disclosing candidate identity, application existence, stage, score, document, or company-private information.
 - **FR-008**: `OWNER`, `HR_MANAGER`, `RECRUITER`, and `HIRING_MANAGER` MUST be able to view the authorized job board.
-- **FR-009**: Only `HR_MANAGER`, `RECRUITER`, and `HIRING_MANAGER` MUST be able to request stage mutations, rejection, offer decline, or hiring confirmation.
-- **FR-010**: `OWNER` MUST remain read-only for recruitment-pipeline decisions, and server authorization MUST reject any owner mutation regardless of client presentation.
+- **FR-009**: `OWNER`, `HR_MANAGER`, `RECRUITER`, and `HIRING_MANAGER` MAY request stage mutations, rejection, offer decline, or hiring confirmation within their authorized company scope.
+- **FR-010**: `OWNER`, `HR_MANAGER`, `RECRUITER`, and `HIRING_MANAGER` MAY perform recruitment-pipeline decisions within their authorized company scope; server authorization MUST reject unaffiliated or inactive actors regardless of client presentation.
 - **FR-011**: The board MUST use exactly Applied, Viewed, Shortlisted, Interviewing, Offered, Hired, Offer Declined, Rejected, and Waitlisted as the canonical application stages.
 - **FR-012**: Labels such as New, Screened, or Under Review MUST NOT replace a canonical label or become additional recruitment states.
 - **FR-013**: The board MUST display all nine canonical columns, including understandable empty-column states, and group each accessible application into exactly one column according to authoritative recruitment stage; for a job with up to 10,000 applications, every authorized application MUST remain discoverable and actionable even when data is revealed incrementally.
@@ -201,10 +201,10 @@ A transition to the same stage is not a stage change. Reopening a terminal appli
 - **FR-030**: After a stale or failed update, the board MUST visibly reconcile the card with the latest authorized server state and provide understandable recovery guidance.
 - **FR-031**: If a card is moved optimistically, the visual state MUST be confirmed by the authoritative persisted result or visibly restored/reconciled when persistence fails.
 - **FR-032**: Cancelling a confirmation MUST create no stage change, history event, audit-success result, or candidate notification.
-- **FR-033**: Moving to `REJECTED` MUST require an explicit action by `HR_MANAGER`, `RECRUITER`, or `HIRING_MANAGER`, one clear confirmation, and exactly one reason from the existing allowlist: Required technical experience not demonstrated, Insufficient experience, Required skills not demonstrated, Position filled, Application withdrawn by candidate, or Other job-related reason.
+- **FR-033**: Moving to `REJECTED` MUST require an explicit action by `OWNER`, `HR_MANAGER`, `RECRUITER`, or `HIRING_MANAGER`, one clear confirmation, and exactly one reason from the existing allowlist: Required technical experience not demonstrated, Insufficient experience, Required skills not demonstrated, Position filled, Application withdrawn by candidate, or Other job-related reason.
 - **FR-034**: Rejection history and audit information MUST preserve the required reason, while any permitted recruiter-private note MUST remain unavailable to candidates and candidate communications.
-- **FR-035**: Moving from `OFFERED` to terminal `OFFER_DECLINED` MUST be recorded by an authorized `HR_MANAGER`, `RECRUITER`, or `HIRING_MANAGER`, preserve the reason requirement defined by the current recruitment domain, and remain explicitly human-controlled, validated, company-scoped, and auditable. Feature 019 MUST NOT require or create a candidate-side offer-response workflow for this record.
-- **FR-036**: Only `HR_MANAGER`, `RECRUITER`, or `HIRING_MANAGER` MAY confirm `OFFERED → HIRED`; `OWNER` MUST NOT confirm hiring.
+- **FR-035**: Moving from `OFFERED` to terminal `OFFER_DECLINED` MUST be recorded by an authorized `OWNER`, `HR_MANAGER`, `RECRUITER`, or `HIRING_MANAGER`, preserve the reason requirement defined by the current recruitment domain, and remain explicitly human-controlled, validated, company-scoped, and auditable. Feature 019 MUST NOT require or create a candidate-side offer-response workflow for this record.
+- **FR-036**: `OWNER`, `HR_MANAGER`, `RECRUITER`, or `HIRING_MANAGER` MAY confirm `OFFERED → HIRED` within their authorized company scope.
 - **FR-037**: Dragging a card toward `HIRED` MUST NOT silently finalize hiring; a separate explicit recruiter-side hiring confirmation action MUST occur before commitment.
 - **FR-038**: A recorded SmartHire candidate offer acceptance MUST NOT be required for an otherwise valid authorized hiring confirmation, because acceptance may occur through an external or offline channel.
 - **FR-039**: Candidate offer acceptance, other candidate activity after application submission, AI output, score, score band, confidence, recommendation, or automated processing MUST NOT independently make a recruiter-controlled pipeline decision or set HIRED, REJECTED, or otherwise progress an existing application through recruiter-controlled stages without an authorized human recruitment decision.
@@ -241,7 +241,7 @@ A transition to the same stage is not a stage change. Reopening a terminal appli
 ### Measurable Outcomes
 
 - **SC-001**: For selected authorized jobs ranging from zero through 10,000 applications, 100% of applications remain discoverable in exactly one of the nine canonical columns, with zero non-canonical recruitment states created.
-- **SC-002**: Authorization tests demonstrate zero cross-company application disclosures or successful cross-company/owner-read-only mutations across all supported membership and multi-company scenarios.
+- **SC-002**: Authorization tests demonstrate zero cross-company application disclosures or successful cross-company mutations across all supported membership and multi-company scenarios.
 - **SC-003**: A correctly selected job with existing persisted applications returns those applications in 100% of job-identity compatibility scenarios; invalid, ambiguous, stale, and mismatched mappings disclose no application data.
 - **SC-004**: At least 95% of authorized board openings, including the documented 10,000-application job workload, make the pipeline usable within two seconds without requiring all cards to render before interaction.
 - **SC-005**: At least 95% of card moves provide visible feedback within 500 milliseconds, and at least 95% of valid stage changes reach a confirmed persisted result within two seconds under documented representative conditions.
