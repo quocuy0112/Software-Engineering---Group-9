@@ -25,6 +25,7 @@
 - [x] T015 [US2] Improve the Account Detail show presentation with responsive React Admin/MUI summary, activity, authority, evidence, moderation, and history panels in `web/src/frontend/features/admin/accounts/account-detail-show.tsx`.
 - [x] T016 [US2] Add an always-visible membership search for membership, company, and account references/names, retaining the existing role/state filters in `web/src/frontend/features/admin/memberships/company-membership-list.tsx` and repository query.
 - [x] T017 [US2] Retain processed verification requests and job-post reviews in their administrator lists by default, with explicit status filters for queue narrowing.
+- [x] T018 [US2] Improve the Moderation Report show presentation with responsive React Admin/MUI status, detail, note, enforcement, action, and history panels in `web/src/frontend/features/admin/moderation/moderation-review-show.tsx`.
 
 ## Phase 4: Validation
 
