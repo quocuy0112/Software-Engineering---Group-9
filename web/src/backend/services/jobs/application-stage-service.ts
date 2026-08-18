@@ -35,6 +35,7 @@ const consequentialStages = new Set<ApplicationStage>([
 ]);
 
 const allowedRoles = new Set([
+  "OWNER",
   "HR_MANAGER",
   "RECRUITER",
   "HIRING_MANAGER",
@@ -278,7 +279,6 @@ export class ApplicationStageService {
             });
             const hasDatabaseRecruiterMembership =
               membership?.status === "ACTIVE" &&
-              membership.role !== "OWNER" &&
               allowedRoles.has(membership.role);
             // Legacy catalog-backed jobs are authorized through the same
             // bridge used by recruiter candidate/scoring reads. Keep the

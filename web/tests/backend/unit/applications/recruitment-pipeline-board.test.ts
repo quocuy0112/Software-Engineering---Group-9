@@ -4,7 +4,7 @@ import { RecruitmentPipelineBoardService } from "@/backend/applications/services
 const stages = ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING", "OFFERED", "HIRED", "OFFER_DECLINED", "REJECTED", "WAITLISTED"] as const;
 
 function authorization(role: "OWNER" | "RECRUITER") {
-  const mutable = role !== "OWNER";
+  const mutable = true;
   return { authorized: true, requestedJobId: "catalogue-1", jobPostingId: "job-1", jobId: "job-1", companyId: "company-1", jobTitle: "Engineer", jobStatus: "CLOSED", membershipRole: role, canView: true, canMoveStages: mutable, canReject: mutable, canRecordOfferDeclined: mutable, canConfirmHired: mutable } as const;
 }
 
@@ -14,7 +14,7 @@ describe("RecruitmentPipelineBoardService", () => {
     const service = new RecruitmentPipelineBoardService(repository as never, { authorizeJob: vi.fn().mockResolvedValue(authorization("OWNER")) } as never);
     const result = await service.metadata({ userId: "user-1", jobId: "catalogue-1", now: new Date("2026-01-01T00:00:00Z") });
     expect(result.stages).toHaveLength(9);
-    expect(result.permissions).toMatchObject({ role: "OWNER", canMoveStages: false });
+    expect(result.permissions).toMatchObject({ role: "OWNER", canMoveStages: true });
     expect(repository.countPipelineStages).toHaveBeenCalledWith("job-1");
   });
 

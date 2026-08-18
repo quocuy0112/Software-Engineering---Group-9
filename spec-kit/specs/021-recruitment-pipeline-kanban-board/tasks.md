@@ -35,7 +35,7 @@
 
 - [X] T005 [P] Expand exhaustive allowed, disallowed, same-stage, and terminal-source transition coverage for all nine canonical stages in `web/tests/backend/unit/jobs/application-stage-policy.test.ts`
 - [X] T006 [P] Add failing resolver tests for direct persisted IDs, `JobPostReviewAggregate.jobId -> publicJobPostingId`, duplicate/absent mappings, company mismatches, ACTIVE/CLOSED jobs, and removed jobs in `web/tests/backend/integration/applications/recruiter-job-context.test.ts`
-- [X] T007 [P] Add failing authorization-matrix tests for active/inactive accounts, active/suspended/removed memberships, verified/inactive companies, OWNER read-only capabilities, mutable roles, cross-company denial, and multi-company membership in `web/tests/security/applications/recruitment-pipeline-authorization.test.ts`
+- [X] T007 [P] Add authorization-matrix tests for active/inactive accounts, active/suspended/removed memberships, verified/inactive companies, OWNER pipeline capabilities, cross-company denial, and multi-company membership in `web/tests/security/applications/recruitment-pipeline-authorization.test.ts`
 - [X] T008 [P] Add failing regression tests proving ranked, submitted, scoring-summary, rescore, and document consumers use the resolved canonical job while retaining the requested job key externally in `web/tests/backend/integration/applications/recruiter-job-identity-consumers.test.ts`
 - [X] T009 Extend authorization result types and deterministic direct-or-review-aggregate canonical resolution with requested job ID, canonical job ID, company, title, and lifecycle in `web/src/backend/applications/authorization/recruiter-application-authorization.ts`
 - [X] T010 Enforce active account, active membership, active verified company, company consistency, ACTIVE/CLOSED lifecycle, neutral unavailable results, and distinct view/mutation capabilities in `web/src/backend/applications/authorization/recruiter-application-authorization.ts`
@@ -61,10 +61,10 @@
 ### Tests for User Story 1
 
 - [X] T019 [P] [US1] Add failing repository tests for all-nine grouped counts, deterministic `submittedAt DESC, id DESC` pages, signed cursor job/stage binding, page limits, no duplicates/gaps, and complete 10,000-record traversal in `web/tests/backend/integration/applications/recruitment-pipeline-repository.test.ts`
-- [X] T020 [P] [US1] Add failing board-service tests for least-privilege cards, server-calculated allowed destinations, OWNER empty destinations, optional/missing scoring, document availability, zero-count stages, and matching count/page visibility predicates in `web/tests/backend/unit/applications/recruitment-pipeline-board.test.ts`
+- [X] T020 [P] [US1] Add board-service tests for least-privilege cards, server-calculated allowed destinations, OWNER destinations, optional/missing scoring, document availability, zero-count stages, and matching count/page visibility predicates in `web/tests/backend/unit/applications/recruitment-pipeline-board.test.ts`
 - [X] T021 [P] [US1] Add failing GET contract tests for metadata and stage-page success, strict bounds/cursors, no-store behavior, active/closed jobs, and neutral unavailable responses in `web/tests/backend/contract/applications/recruitment-pipeline-read-routes.contract.test.ts`
 - [X] T022 [P] [US1] Add failing component tests for list/board switching, nine columns/counts, initial/job-empty/column-empty/error/retry states, incremental loading, optional score summaries, and existing detail/document actions in `web/tests/frontend/applications/recruitment-pipeline-board.test.tsx`
-- [X] T023 [P] [US1] Add failing accessibility tests for labelled view switching, column landmarks/headings, keyboard-operable Load more, readable card identity, non-color state cues, and OWNER read-only presentation in `web/tests/frontend/accessibility/applications/recruitment-pipeline-board.accessibility.test.tsx`
+- [X] T023 [P] [US1] Add accessibility tests for labelled view switching, column landmarks/headings, keyboard-operable Load more, readable card identity, non-color state cues, and OWNER pipeline controls in `web/tests/frontend/accessibility/applications/recruitment-pipeline-board.accessibility.test.tsx`
 
 ### Implementation for User Story 1
 
@@ -87,7 +87,7 @@
 
 ## Phase 4: User Story 2 - Move Applications Through Ordinary Stages (Priority: P1)
 
-**Goal**: HR_MANAGER, RECRUITER, and HIRING_MANAGER can perform valid ordinary stage moves by pointer or explicit non-drag control, while OWNER and invalid transitions are rejected server-side.
+**Goal**: OWNER, HR_MANAGER, RECRUITER, and HIRING_MANAGER can perform valid ordinary stage moves by pointer or explicit non-drag control, while invalid transitions are rejected server-side.
 
 **Independent Test**: Exercise every allowed and disallowed ordinary transition from every non-terminal/terminal source through drag-and-drop, the Change Stage control, and direct requests; verify one persisted stage/history/audit result, unchanged scoring, no unnecessary confirmation, and equivalent keyboard behavior.
 
@@ -106,7 +106,7 @@
 - [X] T043 [US2] Add command submission, pending-card tracking, server-outcome application, and error classification to `web/src/frontend/features/recruiter-applications/use-recruitment-pipeline.ts`
 - [X] T044 [US2] Isolate `@dnd-kit/core` pointer/keyboard sensors, droppable allowed destinations, drag overlay, invalid-drop handling, and Escape cancellation in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-board.tsx`
 - [X] T045 [US2] Add a visible Change Stage control that invokes the same command path as drag and exposes only server-returned destinations in `web/src/frontend/features/recruiter-applications/recruitment-pipeline-card.tsx`
-- [X] T046 [US2] Remove mutation controls for OWNER while keeping authorized detail access and preserve server authority for manipulated requests in `web/src/frontend/features/recruiter-applications/recruiter-candidate-workspace.tsx` and `web/src/frontend/features/recruiter-applications/candidate-ranking-list.tsx`
+- [X] T046 [US2] Expose server-authorized mutation controls to OWNER while preserving server authority for manipulated requests in `web/src/frontend/features/recruiter-applications/recruiter-candidate-workspace.tsx` and `web/src/frontend/features/recruiter-applications/candidate-ranking-list.tsx`
 - [X] T047 [US2] Add distinct drag, allowed/invalid destination, pending, success, and error treatments with visible text/icons and focus styling in `web/src/frontend/styles/recruiter-workspace-full.css`
 
 **Checkpoint**: Ordinary movement works through both interaction modes with one server-authoritative state policy.
@@ -194,7 +194,7 @@
 - [X] T074 [P] Add failing parity tests proving generic-stage, interview, and reject entry points share role, CSRF, idempotency, reason, history/audit, and notification outcomes in `web/tests/backend/contract/applications/application-stage-compatibility.contract.test.ts`
 - [X] T075 Convert `RecruiterApplicationDecisionService` into interview/rejection command adapters over `ApplicationStageService` with no independent policy, persistence, idempotency, or notification logic in `web/src/backend/applications/services/recruiter-application-decision-service.ts`
 - [X] T076 Apply `requireAccountRequest`, shared contracts, and authoritative service delegation to legacy handlers in `web/src/app/api/recruiter/applications/[applicationId]/stage/route.ts`, `web/src/app/api/recruiter/applications/[applicationId]/decisions/interview/route.ts`, and `web/src/app/api/recruiter/applications/[applicationId]/decisions/reject/route.ts`
-- [X] T077 Point existing ranking interview/rejection actions at the job-scoped authoritative command and enforce OWNER read-only rendering in `web/src/frontend/features/recruiter-applications/candidate-ranking-list.tsx`, `web/src/frontend/features/recruiter-applications/reject-candidate-modal.tsx`, and `web/src/frontend/features/recruiter-applications/stage-transition-confirm-modal.tsx`
+- [X] T077 Point existing ranking interview/rejection actions at the job-scoped authoritative command and enforce server-authorized rendering in `web/src/frontend/features/recruiter-applications/candidate-ranking-list.tsx`, `web/src/frontend/features/recruiter-applications/reject-candidate-modal.tsx`, and `web/src/frontend/features/recruiter-applications/stage-transition-confirm-modal.tsx`
 - [X] T078 [P] Extend architecture tests to prohibit board-specific persistence/notification authorities, client-side Prisma/provider access, raw candidate/private-note logging, and DnD imports outside the presentation boundary in `web/tests/architecture/applications/application-boundaries.test.ts`
 - [X] T079 [P] Add representative 10,000-application and concurrent-actor performance coverage for P95 board usability <= 2 seconds, move feedback <= 500 ms, persistence <= 2 seconds, bounded rendered cards/payloads, percentiles, errors, and environment evidence in `web/tests/performance/applications/recruitment-pipeline-performance.test.ts`
 - [X] T080 [P] Add a focused Playwright workflow covering job selection, list/board switch, pointer move, keyboard Change Stage, rejection, Hired confirmation, stale conflict, closed job, and unavailable clearing in `web/tests/system/e2e/recruitment-pipeline-kanban/recruitment-pipeline-kanban.spec.ts`
@@ -301,7 +301,7 @@ T068-T070 can be written in parallel. After all stories pass, T074, T078, T079, 
 |-------------------------|------------------|-------|
 | FR-001-FR-002 | Existing workspace, one selected ACTIVE/CLOSED job | T006, T010, T022, T029-T035 |
 | FR-003-FR-007 | Canonical job identity, ownership, neutral failure, and tenant isolation | T006-T018, T021, T037, T064 |
-| FR-008-FR-010 | View/mutation role matrix and OWNER read-only behavior | T007, T010, T020, T036-T037, T046, T048-T049 |
+| FR-008-FR-010 | View/mutation role matrix and OWNER pipeline capability | T007, T010, T020, T036-T037, T046, T048-T049 |
 | FR-011-FR-012 | Exactly nine canonical stages and labels | T002-T005, T019-T020, T031-T033 |
 | FR-013-FR-018 | Counts, discoverability, cards, details, optional scoring, and board states | T019-T035, T079 |
 | FR-019-FR-020 | Pointer DnD, explicit non-drag movement, and keyboard operation | T038-T047, T055-T057, T061, T067, T080 |

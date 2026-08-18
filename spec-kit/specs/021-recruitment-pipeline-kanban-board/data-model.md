@@ -33,7 +33,7 @@ Feature permission rules:
 
 | Role | Read board | Ordinary move | Reject | Offer Declined | Confirm Hired |
 |------|------------|---------------|--------|----------------|---------------|
-| OWNER | Yes | No | No | No | No |
+| OWNER | Yes | Yes | Yes | Yes | Yes |
 | HR_MANAGER | Yes | Yes | Yes | Yes | Yes |
 | RECRUITER | Yes | Yes | Yes | Yes | Yes |
 | HIRING_MANAGER | Yes | Yes | Yes | Yes | Yes |
