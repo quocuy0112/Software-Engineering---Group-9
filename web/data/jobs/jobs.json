@@ -542681,5 +542681,94 @@
       "viewCount": 0,
       "applicantCount": 0
     }
+  },
+  {
+    "id": "job-49854718-763c-454f-bf9d-5c45def6d44e",
+    "slug": "game-developer-ho-chi-minh-city-def6d44e",
+    "companyId": "cmsyan8w50013t0f0xld6nwuf",
+    "industry": "Game",
+    "industryCode": "game",
+    "subIndustry": "Software & Technology Services",
+    "title": "Game developer",
+    "shortPitch": "Game developer",
+    "categoryIds": [
+      "Fullstack"
+    ],
+    "categoryFamily": "technology",
+    "skillTags": [
+      "Java"
+    ],
+    "location": {
+      "city": "Ho Chi Minh City",
+      "district": "HN",
+      "isNationwideRemote": true
+    },
+    "salary": {
+      "min": 19,
+      "max": 59,
+      "currency": "VND",
+      "period": "month",
+      "isNegotiable": true
+    },
+    "experience": {
+      "minYears": 2,
+      "label": "1-3 years"
+    },
+    "level": "manager",
+    "employmentType": "full_time",
+    "workArrangement": "remote",
+    "workOnSaturday": true,
+    "education": "Bachelor's degree",
+    "age": "28",
+    "numberOfHires": 5,
+    "status": "draft",
+    "approvalComment": null,
+    "isUrgent": false,
+    "isVerified": false,
+    "postedAt": "2026-08-18T07:56:29.616Z",
+    "updatedAt": "2026-08-18T07:59:06.906Z",
+    "applyDeadline": "2026-10-23T23:59:59.000Z",
+    "description": {
+      "overview": "Can you do it, i need new employee!!",
+      "topReasonsToJoin": [
+        "Top2",
+        "Top4",
+        "Top6"
+      ],
+      "responsibilities": [
+        "Join my company bro, please, please!"
+      ],
+      "requirements": [
+        "Java, Python, AI coding"
+      ],
+      "benefits": [
+        {
+          "icon": "award",
+          "label": "Recognition programs and quarterly awards"
+        },
+        {
+          "icon": "car",
+          "label": "Parking allowance / shuttle bus support"
+        },
+        {
+          "icon": "trending-up",
+          "label": "Clear career development and promotion path"
+        },
+        {
+          "icon": "briefcase",
+          "label": "Laptop and equipment provided"
+        }
+      ],
+      "generalInfo": {
+        "reportsTo": "ADMIN Thành",
+        "department": "Game Dev",
+        "workingHours": "9H",
+        "workAddress": "16H"
+      }
+    },
+    "stats": {
+      "viewCount": 0,
+      "applicantCount": 0
+    }
   }
 ]
