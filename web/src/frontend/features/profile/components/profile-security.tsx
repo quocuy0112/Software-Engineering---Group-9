@@ -32,7 +32,7 @@ export function ProfileSecurity({
       ) : (
         <TotpEnrollment onEnabled={() => setEnabled(true)} />
       )}
-      <PasswordChangeForm csrfProof={csrfProof} initiallyEditing={false} />
+      <PasswordChangeForm csrfProof={csrfProof} />
     </div>
   );
 }

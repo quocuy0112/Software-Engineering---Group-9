@@ -10,7 +10,7 @@ import { CompanyLogo, JobDetailSidebar } from "./job-detail-sidebar";
 import { JobDetailOverview, JobDetailSections } from "./job-detail-sections";
 import { JobMetaIcon } from "./job-meta-icon";
 import { RelatedJobsCarousel } from "./related-jobs-carousel";
-import { SaveJobAction } from "./save-job-action";
+import { SaveBookmarkIcon, SaveJobAction } from "./save-job-action";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 import { WhyJoinUsSection } from "./why-join-us-section";
 
@@ -77,10 +77,11 @@ function DetailActionButtons({
         />
       ) : (
         <Link
-          className="job-secondary-button"
+          className="job-secondary-button job-save-button"
           href={"/login?returnTo=" + returnTo}
         >
-          <span aria-hidden="true">♡</span> Save
+          <SaveBookmarkIcon />
+          <span>Save</span>
         </Link>
       )}
     </div>
@@ -90,8 +91,7 @@ function DetailActionButtons({
 export function JobDetailPage({ job }: { job: JobDetail }) {
   const shared = useOptionalJobInteraction();
   const applied =
-    job.actions.applied ||
-    Boolean(shared?.records[job.id]?.applied);
+    job.actions.applied || Boolean(shared?.records[job.id]?.applied);
   const registerJob = shared?.registerJob;
 
   useEffect(() => {
@@ -156,12 +156,7 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
                 {formatSalary(job.salary)}
               </span>
             }
-            actions={
-              <DetailActionButtons
-                job={job}
-                applied={applied}
-              />
-            }
+            actions={<DetailActionButtons job={job} applied={applied} />}
           />
 
           <JobDetailOverview job={job} />

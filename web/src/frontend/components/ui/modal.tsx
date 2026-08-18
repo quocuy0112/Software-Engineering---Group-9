@@ -8,6 +8,7 @@ export function Modal({
   description,
   tone = "standard",
   busy = false,
+  icon,
   onClose,
   children,
 }: {
@@ -16,6 +17,7 @@ export function Modal({
   description?: string;
   tone?: "standard" | "destructive";
   busy?: boolean;
+  icon?: ReactNode;
   onClose: () => void;
   children: ReactNode;
 }) {
@@ -104,7 +106,7 @@ export function Modal({
       >
         <div className="sh-modal-heading">
           <span className="sh-modal-icon" aria-hidden="true">
-            {tone === "destructive" ? "!" : "i"}
+            {icon ?? (tone === "destructive" ? "!" : "i")}
           </span>
           <div>
             <h2 id={titleId}>{title}</h2>

@@ -68,48 +68,52 @@ export default async function CvDraftReviewPage({
   const vi = context.initialLocale === "vi";
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
-        <Link
-          className={styles.backLink}
-          href={`/profile/cv-imports/${resource.uploadId}`}
-        >
-          <span aria-hidden="true">←</span>{" "}
-          {vi ? "Quay lại trạng thái nhập" : "Back to import status"}
-        </Link>
-        <div className={styles.context}>
-          <p>
-            {vi ? "NHẬP CV DO NGƯỜI DÙNG XEM XÉT" : "HUMAN-REVIEWED IMPORT"}
-          </p>
-          <strong>
-            {vi
-              ? "Bạn vẫn kiểm soát mọi thay đổi hồ sơ."
-              : "You remain in control of every profile change."}
-          </strong>
-        </div>
-      </header>
-      <ProfileNavigation active="cv-imports" />
-      <div className={styles.content}>
-        {resource.receipt ? (
-          <CvConfirmationReceipt receipt={resource.receipt} />
-        ) : initial ? (
-          <CvDraftReview csrfProof={context.csrfProof} initial={initial} />
-        ) : (
-          <section
-            className={styles.unavailable}
-            aria-labelledby="review-unavailable-heading"
+      <div className={styles.workspace}>
+        <header className={styles.header}>
+          <Link
+            className={styles.backLink}
+            href={`/profile/cv-imports/${resource.uploadId}`}
           >
-            <span aria-hidden="true">i</span>
-            <div>
-              <h1 id="review-unavailable-heading">
-                {vi ? "Không thể xem xét CV" : "CV review is not available"}
-              </h1>
-              <p role="status">
-                {vi ? "Trạng thái nhập hiện tại: " : "Current import status: "}
-                {cvStatusLabel(context.initialLocale, resource.status)}.
-              </p>
-            </div>
-          </section>
-        )}
+            <span aria-hidden="true">←</span>{" "}
+            {vi ? "Quay lại trạng thái nhập" : "Back to import status"}
+          </Link>
+          <div className={styles.context}>
+            <p>
+              {vi ? "NHẬP CV DO NGƯỜI DÙNG XEM XÉT" : "HUMAN-REVIEWED IMPORT"}
+            </p>
+            <strong>
+              {vi
+                ? "Bạn vẫn kiểm soát mọi thay đổi hồ sơ."
+                : "You remain in control of every profile change."}
+            </strong>
+          </div>
+        </header>
+        <ProfileNavigation active="cv-imports" />
+        <div className={styles.content}>
+          {resource.receipt ? (
+            <CvConfirmationReceipt receipt={resource.receipt} />
+          ) : initial ? (
+            <CvDraftReview csrfProof={context.csrfProof} initial={initial} />
+          ) : (
+            <section
+              className={styles.unavailable}
+              aria-labelledby="review-unavailable-heading"
+            >
+              <span aria-hidden="true">i</span>
+              <div>
+                <h1 id="review-unavailable-heading">
+                  {vi ? "Không thể xem xét CV" : "CV review is not available"}
+                </h1>
+                <p role="status">
+                  {vi
+                    ? "Trạng thái nhập hiện tại: "
+                    : "Current import status: "}
+                  {cvStatusLabel(context.initialLocale, resource.status)}.
+                </p>
+              </div>
+            </section>
+          )}
+        </div>
       </div>
     </main>
   );

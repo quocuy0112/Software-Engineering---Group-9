@@ -108,99 +108,108 @@ export function CvProcessingConsent({
       <h2 id="cv-processing-consent-heading" ref={heading} tabIndex={-1}>
         {copy.heading}
       </h2>
-      <dl className={styles.binding}>
-        <div>
-          <dt>{copy.provider}</dt>
-          <dd>{notice.providerDisplayName}</dd>
-        </div>
-        <div>
-          <dt>{copy.purpose}</dt>
-          <dd>
-            {locale === "vi"
-              ? "Tạo bản nháp xem xét CV riêng bằng cách trích xuất dữ kiện nghề nghiệp"
-              : notice.processingPurpose}
-          </dd>
-        </div>
-      </dl>
-      <details className={styles.technicalDetails}>
-        <summary>
-          {locale === "vi"
-            ? "Chi tiết kỹ thuật và phiên bản"
-            : "Technical and version details"}
-        </summary>
-        <dl>
-          <div>
-            <dt>{copy.versions}</dt>
-            <dd>
-              {locale === "vi" ? "Đồng ý" : "Consent"}{" "}
-              {CV_EXTERNAL_CONSENT_TEXT_VERSION};{" "}
-              {locale === "vi" ? "thông báo xử lý" : "processing notice"}{" "}
-              {CV_PROCESSING_NOTICES.EXTERNAL_OPENAI.noticeVersion}
-            </dd>
+      <div className={styles.card}>
+        <div className={styles.summaryRow}>
+          <span className={styles.providerIcon} aria-hidden="true">
+            AI
+          </span>
+          <div className={styles.summaryCopy}>
+            <span className={styles.visuallyHidden} aria-hidden="true">
+              {copy.provider}
+            </span>
+            <strong>{notice.providerDisplayName}</strong>
+            <p>
+              <span className={styles.visuallyHidden} aria-hidden="true">
+                {copy.purpose}
+              </span>
+              <span>
+                {locale === "vi"
+                  ? "Tạo bản nháp xem xét CV riêng bằng cách trích xuất dữ kiện nghề nghiệp"
+                  : notice.processingPurpose}
+              </span>
+            </p>
           </div>
-        </dl>
-      </details>
-
-      {notice.granted ? (
-        <div className={styles.granted}>
-          <p>{noticeText || notice.noticeText}</p>
-          <button
-            className={styles.revokeButton}
-            type="button"
-            disabled={!canRevoke || Boolean(busy) || sessionExpired}
-            aria-busy={busy === "revoke"}
-            onClick={() => void revoke()}
+          <p
+            className={styles.status}
+            data-tone={feedbackTone}
+            role={feedbackTone === "error" ? "alert" : "status"}
+            aria-live={feedbackTone === "error" ? "assertive" : "polite"}
+            aria-atomic="true"
           >
-            {busy === "revoke"
-              ? copy.revoking
-              : locale === "vi"
-                ? "Thu hồi quyền xử lý trong tương lai"
-                : "Revoke consent for future processing"}
-          </button>
-          {!canRevoke ? (
-            <p className={styles.explanation}>{copy.noRevocation}</p>
-          ) : null}
+            {message}
+          </p>
         </div>
-      ) : (
-        <div className={styles.grant}>
-          <label>
-            <input
-              type="checkbox"
-              checked={accepted}
-              disabled={!canGrant || Boolean(busy) || sessionExpired}
-              onChange={(event) => setAccepted(event.currentTarget.checked)}
-            />
-            <span>{locale === "vi" ? copy.agree : notice.noticeText}</span>
-          </label>
-          <button
-            className={styles.grantButton}
-            type="button"
-            disabled={!canGrant || !accepted || Boolean(busy) || sessionExpired}
-            aria-busy={busy === "grant"}
-            onClick={() => void grant()}
-          >
-            {busy === "grant"
-              ? copy.granting
-              : locale === "vi"
-                ? "Cấp quyền xử lý bên ngoài"
-                : "Grant external processing consent"}
-          </button>
-          {!canGrant ? (
-            <p className={styles.explanation}>{copy.unavailable}</p>
-          ) : null}
-        </div>
-      )}
-
-      <p className={styles.caveat}>{copy.caveat}</p>
-      <p
-        className={styles.status}
-        data-tone={feedbackTone}
-        role={feedbackTone === "error" ? "alert" : "status"}
-        aria-live={feedbackTone === "error" ? "assertive" : "polite"}
-        aria-atomic="true"
-      >
-        {message}
-      </p>
+        <details className={styles.technicalDetails}>
+          <summary>
+            {locale === "vi"
+              ? "Chi tiết kỹ thuật và phiên bản"
+              : "Technical and version details"}
+          </summary>
+          <dl>
+            <div>
+              <dt>{copy.versions}</dt>
+              <dd>
+                {locale === "vi" ? "Đồng ý" : "Consent"}{" "}
+                {CV_EXTERNAL_CONSENT_TEXT_VERSION};{" "}
+                {locale === "vi" ? "thông báo xử lý" : "processing notice"}{" "}
+                {CV_PROCESSING_NOTICES.EXTERNAL_OPENAI.noticeVersion}
+              </dd>
+            </div>
+          </dl>
+        </details>
+        <p className={styles.bodyText}>{noticeText || notice.noticeText}</p>
+        <p className={styles.caveat}>{copy.caveat}</p>
+        {notice.granted ? (
+          <div className={styles.granted}>
+            <button
+              className={styles.revokeButton}
+              type="button"
+              disabled={!canRevoke || Boolean(busy) || sessionExpired}
+              aria-busy={busy === "revoke"}
+              onClick={() => void revoke()}
+            >
+              {busy === "revoke"
+                ? copy.revoking
+                : locale === "vi"
+                  ? "Thu hồi quyền xử lý trong tương lai"
+                  : "Revoke consent for future processing"}
+            </button>
+            {!canRevoke ? (
+              <p className={styles.explanation}>{copy.noRevocation}</p>
+            ) : null}
+          </div>
+        ) : (
+          <div className={styles.grant}>
+            <label>
+              <input
+                type="checkbox"
+                checked={accepted}
+                disabled={!canGrant || Boolean(busy) || sessionExpired}
+                onChange={(event) => setAccepted(event.currentTarget.checked)}
+              />
+              <span>{locale === "vi" ? copy.agree : notice.noticeText}</span>
+            </label>
+            <button
+              className={styles.grantButton}
+              type="button"
+              disabled={
+                !canGrant || !accepted || Boolean(busy) || sessionExpired
+              }
+              aria-busy={busy === "grant"}
+              onClick={() => void grant()}
+            >
+              {busy === "grant"
+                ? copy.granting
+                : locale === "vi"
+                  ? "Cấp quyền xử lý bên ngoài"
+                  : "Grant external processing consent"}
+            </button>
+            {!canGrant ? (
+              <p className={styles.explanation}>{copy.unavailable}</p>
+            ) : null}
+          </div>
+        )}
+      </div>
     </section>
   );
 }

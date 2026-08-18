@@ -41,6 +41,7 @@ const copy: JobsLiveCopy = {
   nextPage: "Next page",
   lastPage: "Last page",
   page: "Page",
+  perPage: "Per page:",
   empty: "No jobs match these criteria",
   emptyCopy: "Try widening one or more criteria.",
   clear: "Clear filters",
