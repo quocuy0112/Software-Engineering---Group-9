@@ -1,6 +1,6 @@
 # Tasks: Recruitment Pipeline Kanban Board
 
-**Input**: Design documents from `spec-kit/specs/019-recruitment-pipeline-kanban-board/`
+**Input**: Design documents from `spec-kit/specs/021-recruitment-pipeline-kanban-board/`
 
 **Prerequisites**: `spec.md`, `plan.md`, `research.md`, `data-model.md`, `quickstart.md`, `contracts/recruitment-pipeline.openapi.yaml`
 
@@ -198,8 +198,8 @@
 - [X] T078 [P] Extend architecture tests to prohibit board-specific persistence/notification authorities, client-side Prisma/provider access, raw candidate/private-note logging, and DnD imports outside the presentation boundary in `web/tests/architecture/applications/application-boundaries.test.ts`
 - [X] T079 [P] Add representative 10,000-application and concurrent-actor performance coverage for P95 board usability <= 2 seconds, move feedback <= 500 ms, persistence <= 2 seconds, bounded rendered cards/payloads, percentiles, errors, and environment evidence in `web/tests/performance/applications/recruitment-pipeline-performance.test.ts`
 - [X] T080 [P] Add a focused Playwright workflow covering job selection, list/board switch, pointer move, keyboard Change Stage, rejection, Hired confirmation, stale conflict, closed job, and unavailable clearing in `web/tests/system/e2e/recruitment-pipeline-kanban/recruitment-pipeline-kanban.spec.ts`
-- [X] T081 Run the targeted Feature 019, application, scoring, notification, and job-post-review suites specified in `spec-kit/specs/019-recruitment-pipeline-kanban-board/quickstart.md` and resolve regressions only in files touched by Feature 019
-- [X] T082 Run Prisma validation, typecheck, lint, production build, focused Playwright smoke, and the full regression gate from `spec-kit/specs/019-recruitment-pipeline-kanban-board/quickstart.md`; confirm no Prisma migration, no non-canonical stage, no new domain/notification/scoring subsystem, and no out-of-scope capability was introduced
+- [X] T081 Run the targeted Feature 019, application, scoring, notification, and job-post-review suites specified in `spec-kit/specs/021-recruitment-pipeline-kanban-board/quickstart.md` and resolve regressions only in files touched by Feature 019
+- [X] T082 Run Prisma validation, typecheck, lint, production build, focused Playwright smoke, and the full regression gate from `spec-kit/specs/021-recruitment-pipeline-kanban-board/quickstart.md`; confirm no Prisma migration, no non-canonical stage, no new domain/notification/scoring subsystem, and no out-of-scope capability was introduced
 
 **Checkpoint**: All five P1 stories form one constitution-complete, regression-validated P0 Kanban workflow.
 

@@ -1,8 +1,8 @@
 # Feature Specification: Recruitment Pipeline Kanban Board
 
-**Feature Branch**: `019-recruitment-pipeline-kanban-board`
+**Feature Branch**: `021-recruitment-pipeline-kanban-board`
 
-**Feature Directory**: `019-recruitment-pipeline-kanban-board`
+**Feature Directory**: `021-recruitment-pipeline-kanban-board`
 
 **Created**: 2026-08-16
 
