@@ -5,9 +5,9 @@
 **Reviewed by:** Nguyễn Gia Quốc Uy<br>
 **Edited by:** Nguyễn Minh Khôi
 
-**Architecture scope:** Backend and worker components that implement Features 001–005.
+**Architecture scope:** Backend and worker components that implement the currently implemented SmartHire baseline, including the admin lifecycle worker.
 
-**C4 modeling note:** The frontend and backend are not separate deployable containers. Level 3A is the **backend logical component view** of the same `Next.js Web Application` shown at Level 2. The `App Router and React UI` component is included only to show the in-container ingress relationship; its internal UI components are documented in the Frontend Component Diagram. Level 3B separately decomposes the CV Worker, Image Search Worker, and OCR Engine containers.
+**C4 modeling note:** The frontend and backend are not separate deployable containers. Level 3A is the **backend logical component view** of the same `Next.js Web Application` shown at Level 2; it decomposes the container's **server-side services & API routes** (Next.js App Router Route Handlers and their supporting services). The `App Router and React UI` component is included only to show the in-container ingress relationship; its internal UI components are documented in the Frontend Component Diagram. Level 3B separately decomposes the CV Worker, Image Search Worker, OCR Engine, and Admin Worker containers.
 
 ## Level 3A — Web Application Components
 
@@ -21,30 +21,39 @@ graph TD
       direction TB
 
       Presentation["App Router and React UI\nNext.js Pages, Server/Client Components"]
-      RouteHandlers["Route Handlers\nNext.js App Router"]
-      RequestSecurity["Request Security Boundary\nBetter Auth session, CSRF/origin,\ncapability, Zod"]
 
-      IdentityServices["Identity & Account Services\nRegistration, login, 2FA,\nrecovery, session, preferences"]
-      ProfileServices["Candidate Profile Services\nRead and update Profile aggregate"]
-      JobServices["Job Discovery Services\nDeterministic search, save,\napply and report job"]
-      StageServices["Application Stage Management\nMembership-authorized recruiter API\ntransitions candidate application stages"]
-      CvServices["CV Import Services\nAdmission, consent, upload,\nreview, retry, confirmation"]
-      ImageServices["Image Search Services\nAdmission, capability, status,\nconsent, consume, merge criteria"]
+      subgraph ServerSide["Server-side Services & API Routes\nNext.js App Router Route Handlers\nand supporting backend services"]
+        direction TB
 
-      AuthGateway["Better Auth Gateway\nOwns browser session\nand authentication operations"]
-      Persistence["Persistence Layer / Prisma Data Access\nRepository abstractions plus current\nservice-owned Prisma transactions"]
-      RepositorySupport["Service-located Policies & Helpers\nJob policy/types/normalization, CV errors,\nprofile validation and CandidateCv projection"]
-      StorageAdapters["Private Storage Adapters\nSelect filesystem or S3, enforce\nencryption/integrity contract"]
-      SharedContracts["Shared Contracts\nZod and TypeScript — schemas\nshared across server/client/worker"]
+        RouteHandlers["Route Handlers\nNext.js App Router"]
+        RequestSecurity["Request Security Boundary\nBetter Auth session, CSRF/origin,\ncapability, Zod"]
+
+        IdentityServices["Identity & Account Services\nRegistration, login, 2FA,\nrecovery, session, preferences"]
+        ProfileServices["Candidate Profile Services\nRead and update Profile aggregate"]
+        JobServices["Job Discovery Services\nDeterministic search, save,\napply and report job"]
+        StageServices["Application Stage Management\nMembership-authorized recruiter API\ntransitions candidate application stages"]
+        CvServices["CV Import Services\nAdmission, consent, upload,\nreview, retry, confirmation"]
+        ImageServices["Image Search Services\nAdmission, capability, status,\nconsent, consume, merge criteria"]
+        VerificationServices["Business Verification Services\nRegistry lookup, company email\nchallenge, evidence submission,\ndecision review"]
+        AdminServices["Admin Services\nAccount/membership management,\nmoderation, job-post review,\nnotifications, support, connections"]
+
+        AuthGateway["Better Auth Gateway\nOwns browser session\nand authentication operations"]
+        Persistence["Persistence Layer / Prisma Data Access\nRepository abstractions plus current\nservice-owned Prisma transactions"]
+        RepositorySupport["Service-located Policies & Helpers\nJob policy/types/normalization, CV errors,\nprofile validation and CandidateCv projection"]
+        StorageAdapters["Private Storage Adapters\nSelect filesystem or S3, enforce\nencryption/integrity contract"]
+        SharedContracts["Shared Contracts\nZod and TypeScript — schemas\nshared across server/client/worker"]
+      end
     end
 
     subgraph DataStores["Data Stores"]
         PostgreSQL[("PostgreSQL\nContainer\nPostgreSQL 16 — business\ndata and durable work")]
         CVLocalStorage[("Local CV Artifact Store\nLogical data store\nEncrypted filesystem — default")]
         SearchLocalStorage[("Local Search Artifact Store\nLogical data store\nEncrypted filesystem — default")]
+        AdminEvidence[("Local Admin Evidence Store\nLogical data store\nEncrypted filesystem — default")]
     end
 
     AWSStorage["AWS S3/KMS\nExternal — optional\nBackend implemented, requires\nexternal infrastructure/config"]
+    BusinessRegistry["VietQR Business Registry\nExternal — optional\nEnabled by business registry\nprovider configuration"]
 
     User -->|"HTTPS"| Presentation
     RecruiterActor -->|"HTTPS — application-stage command"| RouteHandlers
@@ -60,6 +69,8 @@ graph TD
     RouteHandlers -->|"Invoke membership-authorized\napplication-stage transition"| StageServices
     RouteHandlers -->|"Invoke CV use case\nusing validated context"| CvServices
     RouteHandlers -->|"Invoke image-search use case\nusing validated context"| ImageServices
+    RouteHandlers -->|"Invoke verification use case\nusing validated context"| VerificationServices
+    RouteHandlers -->|"Invoke admin use case\nusing validated context"| AdminServices
 
     IdentityServices -->|"Authentication and session management"| AuthGateway
     IdentityServices -->|"Read/write account, token, audit"| Persistence
@@ -68,9 +79,12 @@ graph TD
     StageServices -->|"Service-owned Prisma transaction:\nstage event, notification work, outbox, audit"| Persistence
     CvServices -->|"Repository access and current\nservice-owned Prisma transactions"| Persistence
     ImageServices -->|"Repository access and current\nservice-owned Prisma transactions"| Persistence
+    VerificationServices -->|"Repository access and service-owned\nPrisma transactions"| Persistence
+    AdminServices -->|"Repository access and service-owned\nPrisma transactions"| Persistence
     Persistence -.->|"Repository implementations import/call\nselected service-located policies, errors,\nvalidation and projection helpers"| RepositorySupport
     CvServices -->|"Store/read CV artifact"| StorageAdapters
     ImageServices -->|"Store/read search artifact"| StorageAdapters
+    VerificationServices -->|"Store/read verification evidence"| StorageAdapters
 
     RouteHandlers -->|"Validate transport schema"| SharedContracts
     IdentityServices -->|"Validate use-case data"| SharedContracts
@@ -79,20 +93,24 @@ graph TD
     StageServices -->|"Validate stage transition contract"| SharedContracts
     CvServices -->|"Validate CV contract"| SharedContracts
     ImageServices -->|"Validate image-search contract"| SharedContracts
+    VerificationServices -->|"Validate verification contract"| SharedContracts
+    AdminServices -->|"Validate admin contract"| SharedContracts
     RepositorySupport -->|"Use shared schemas/types\nwhere applicable"| SharedContracts
 
     AuthGateway -->|"PostgreSQL wire protocol via Prisma —\nread/write auth-owned tables"| PostgreSQL
     Persistence -->|"PostgreSQL wire protocol via Prisma —\nrepository and service-owned query/transaction"| PostgreSQL
     StorageAdapters -->|"Filesystem API —\nwhen CV uses filesystem"| CVLocalStorage
     StorageAdapters -->|"Filesystem API — when image\nsearch uses filesystem"| SearchLocalStorage
+    StorageAdapters -->|"Filesystem API — when evidence\nuses filesystem"| AdminEvidence
     StorageAdapters -.->|"AWS S3 API / HTTPS —\nwhen adapter is s3"| AWSStorage
+    VerificationServices -.->|"HTTPS — business registry\nlookup when provider enabled"| BusinessRegistry
 
     classDef container fill:#f8fafc,stroke:#475569,stroke-width:1.2px,color:#0f172a;
     classDef person fill:#eef2ff,stroke:#1d4ed8,stroke-width:1.2px,color:#1e3a8a;
     classDef external fill:#fff7e6,stroke:#8a5a00,stroke-width:1.2px,color:#0f172a,stroke-dasharray: 5 5;
-    class PostgreSQL,CVLocalStorage,SearchLocalStorage container;
+    class PostgreSQL,CVLocalStorage,SearchLocalStorage,AdminEvidence container;
     class User,RecruiterActor person;
-    class AWSStorage external;
+    class AWSStorage,BusinessRegistry external;
 ```
 
 ### Component descriptions — 3A
@@ -112,6 +130,12 @@ graph TD
 - **Responsibilities:** Render pages, maintain interactive state in the browser, send commands/queries to Route Handlers, and perform server-rendered queries directly to Identity, Profile, and Job services for SSR/RSC portions.
 - **Technology:** Next.js Pages, Server/Client Components.
 - **Relationships:** Calls `Route Handlers`, `Identity & Account Services`, `Candidate Profile Services`, and `Job Discovery Services`. Server-rendered pages call the service groups in process; client-side commands go through Route Handlers.
+
+#### Server-side Services & API Routes (component group)
+
+- **Responsibilities:** The in-container backend surface of the `Next.js Web Application` — the Next.js App Router Route Handlers (the HTTP API routes) plus the supporting backend services they invoke. This group is the backend interface that the Frontend Component Diagram references; it is decomposed in full below.
+- **Technology:** Next.js App Router, TypeScript, Prisma, Zod.
+- **Relationships:** Contains `Route Handlers`, `Request Security Boundary`, the application service groups, and the shared backend infrastructure (`Better Auth Gateway`, `Persistence Layer / Prisma Data Access`, `Private Storage Adapters`, `Shared Contracts`).
 
 #### Route Handlers
 
@@ -161,6 +185,18 @@ graph TD
 - **Technology:** TypeScript.
 - **Relationships:** Writes lifecycle, rate-limit, and capability state through `Persistence Layer / Prisma Data Access`, stores/reads search artifacts via `Private Storage Adapters`, and validates image-search contracts via `Shared Contracts`.
 
+#### Business Verification Services
+
+- **Responsibilities:** Recruiter/company verification preparation — business-registry lookup with rate limiting and caching, company-email challenge/confirmation, evidence submission, and verification decision review.
+- **Technology:** TypeScript.
+- **Relationships:** Reads/writes preparation, challenge, evidence, and verification state through `Persistence Layer / Prisma Data Access`, stores/reads verification evidence via `Private Storage Adapters`, calls the optional `VietQR Business Registry` over HTTPS when the provider is enabled, and validates verification contracts via `Shared Contracts`.
+
+#### Admin Services
+
+- **Responsibilities:** Administrator-facing operations — account and company-membership management, moderation and messaging-report review, job-post review/management, in-app and security notifications, support-case handling, and professional-connection proposal review.
+- **Technology:** TypeScript.
+- **Relationships:** Reads/writes admin, audit, notification, support, and connection state through `Persistence Layer / Prisma Data Access` and validates admin contracts via `Shared Contracts`.
+
 #### Better Auth Gateway
 
 - **Responsibilities:** Owns browser session and authentication operations.
@@ -171,7 +207,7 @@ graph TD
 
 - **Responsibilities:** Represent current Prisma-backed persistence across all domains. This includes repository abstractions where implemented and direct/service-owned Prisma queries and transactions where the current source keeps persistence inside a service.
 - **Technology:** Prisma 7.
-- **Relationships:** Used by Identity/Profile/Job/Application Stage/CV/Image services and queries/transactions on `PostgreSQL` via Prisma. Repository implementations also import selected modules under `web/src/backend/services/`, represented by `Service-located Policies & Helpers`; therefore neither persistence style nor the physical source dependency is uniformly Service → Repository.
+- **Relationships:** Used by Identity/Profile/Job/Application Stage/CV/Image/Verification/Admin services and queries/transactions on `PostgreSQL` via Prisma. Repository implementations also import selected modules under `web/src/backend/services/`, represented by `Service-located Policies & Helpers`; therefore neither persistence style nor the physical source dependency is uniformly Service → Repository.
 
 #### Service-located Policies & Helpers
 
@@ -181,9 +217,9 @@ graph TD
 
 #### Private Storage Adapters
 
-- **Responsibilities:** Select filesystem or S3 and enforce encryption/integrity contract for CV and search artifacts.
+- **Responsibilities:** Select filesystem or S3 and enforce encryption/integrity contract for CV, search, and admin evidence artifacts.
 - **Technology:** TypeScript ports/adapters.
-- **Relationships:** Called by `CV Import Services` and `Image Search Services`; reads/writes `Local CV Artifact Store` and `Local Search Artifact Store` via Filesystem API when using filesystem adapter (default); reads/writes `AWS S3/KMS` via AWS S3 API/HTTPS only when adapter is `s3` (not yet provisioned in the repository).
+- **Relationships:** Called by `CV Import Services`, `Image Search Services`, and `Business Verification Services`; reads/writes `Local CV Artifact Store`, `Local Search Artifact Store`, and `Local Admin Evidence Store` via Filesystem API when using filesystem adapter (default); reads/writes `AWS S3/KMS` via AWS S3 API/HTTPS only when adapter is `s3` (not yet provisioned in the repository).
 
 #### Shared Contracts
 
@@ -196,15 +232,20 @@ graph TD
 - **Responsibilities:** Store business data and durable work (outbox, CV import jobs, image-search jobs).
 - **Relationships:** Accessed by `Better Auth Gateway` and `Persistence Layer / Prisma Data Access` via Prisma.
 
-#### Local CV Artifact Store / Local Search Artifact Store
+#### Local CV Artifact Store / Local Search Artifact Store / Local Admin Evidence Store
 
-- **Responsibilities:** Store CV / search artifacts when storage adapter is filesystem (default).
+- **Responsibilities:** Store CV, search, and verification-evidence artifacts when the storage adapter is filesystem (default).
 - **Relationships:** Accessed by `Private Storage Adapters` via Filesystem API.
 
 #### AWS S3/KMS — optional
 
 - **Responsibilities:** Alternative backend storage implemented at adapter level but not yet provisioned in the repository.
 - **Relationships:** Called by `Private Storage Adapters` only when adapter is configured as `s3`.
+
+#### VietQR Business Registry — optional
+
+- **Responsibilities:** Public business-registry lookup used during recruiter/company verification preparation.
+- **Relationships:** Called by `Business Verification Services` over HTTPS only when the business registry provider is enabled.
 
 ## Level 3B — Worker and OCR Engine Components
 
@@ -237,9 +278,20 @@ graph TD
         OcrStartup["OCR Engine Startup & Model Integrity\nLoad manifest, verify model digests,\ninitialize and warm runtime"]
     end
 
+    subgraph AdminWorkerBoundary["Admin Worker\n[Container]"]
+        direction TB
+        AdminRuntime["Admin Worker Runtime & Loop Scheduler\nNode.js — periodic lifecycle loops\n(snapshot, verification, retention, support,\nconnections, job-post)"]
+        AdminVerification["Verification & Evidence Safety\nClamAV adapter — scan evidence\nfail-closed; verification deadlines"]
+        AdminNotifications["Notification & Reconciliation\nSecurity/verification notifications,\nin-app retention, outbox reconcile"]
+        AdminRetention["Evidence & Rationale Retention\nDelete expired evidence and\nprivileged-action rationales"]
+        AdminSupport["Support & Connections Lifecycle\nClose due support cases, expire\nprofessional-connection proposals"]
+        AdminJobPost["Job-Post Lifecycle\nAuto-archive published jobs past\ntheir application deadline"]
+    end
+
     PostgreSQL[("PostgreSQL\nWork state, lease, consent,\naudit, deletion evidence")]
     CVLocalStorage[("Local CV Artifact Store\nCV source/derivative — filesystem")]
     SearchLocalStorage[("Local Search Artifact Store\nEphemeral artifact — filesystem")]
+    AdminEvidence[("Local Admin Evidence Store\nVerification evidence — filesystem")]
     ClamAV["Malware Scanner\nContainer — Private Unix socket"]
     AWSStorage["AWS S3/KMS\nExternal — optional, implemented"]
     OpenAI["OpenAI Responses API\nExternal — optional, consent-gated"]
@@ -289,13 +341,31 @@ graph TD
 
     ClamAV -.->|"HTTPS — update signatures\nusing freshclam"| ClamAVUpdates
 
+    AdminRuntime -->|"Orchestrate verification\nand evidence safety"| AdminVerification
+    AdminRuntime -->|"Orchestrate notification\nand reconciliation"| AdminNotifications
+    AdminRuntime -->|"Orchestrate retention"| AdminRetention
+    AdminRuntime -->|"Orchestrate support and\nconnections lifecycle"| AdminSupport
+    AdminRuntime -->|"Orchestrate job-post\nlifecycle"| AdminJobPost
+
+    AdminRuntime -->|"PostgreSQL wire protocol via Prisma —\nread/write lifecycle state"| PostgreSQL
+    AdminVerification -->|"PostgreSQL wire protocol via Prisma —\nclaim/update verification work"| PostgreSQL
+    AdminNotifications -->|"PostgreSQL wire protocol via Prisma —\nreconcile notifications/outbox"| PostgreSQL
+    AdminRetention -->|"PostgreSQL wire protocol via Prisma —\nclaim due evidence/rationales"| PostgreSQL
+    AdminSupport -->|"PostgreSQL wire protocol via Prisma —\nclose/purge due cases"| PostgreSQL
+    AdminJobPost -->|"PostgreSQL wire protocol via Prisma —\narchive expired jobs"| PostgreSQL
+    AdminVerification -->|"Unix socket — scan evidence"| ClamAV
+    AdminVerification -->|"Read/delete evidence\nwhen using filesystem"| AdminEvidence
+    AdminRetention -->|"Delete evidence\nwhen using filesystem"| AdminEvidence
+    AdminVerification -.->|"AWS S3 API / HTTPS —\nwhen adapter is s3"| AWSStorage
+    AdminRetention -.->|"AWS S3 API / HTTPS —\nwhen adapter is s3"| AWSStorage
+
     OcrStartup -->|"Initialize and warm after\nmanifest/artifact verification"| OcrRuntime
     OcrApi -->|"Compare caller's expected digest\nwith already loaded manifest state"| OcrRuntime
     OcrApi -->|"Call recognition"| OcrRuntime
 
     classDef container fill:#f8fafc,stroke:#475569,stroke-width:1.2px,color:#0f172a;
     classDef external fill:#fff7e6,stroke:#8a5a00,stroke-width:1.2px,color:#0f172a,stroke-dasharray: 5 5;
-    class PostgreSQL,CVLocalStorage,SearchLocalStorage,ClamAV container;
+    class PostgreSQL,CVLocalStorage,SearchLocalStorage,AdminEvidence,ClamAV container;
     class AWSStorage,OpenAI,ClamAVUpdates external;
 ```
 
@@ -377,4 +447,40 @@ graph TD
 #### Malware Scanner
 
 - **Responsibilities:** Scan files/images via Unix socket for both workers.
-- **Relationships:** Called by `CV Scan Stage` and `Malware Scan Stage`; updates signatures from `ClamAV Definition Service` via HTTPS (`freshclam`).
+- **Relationships:** Called by `CV Scan Stage`, `Malware Scan Stage`, and `Verification & Evidence Safety`; updates signatures from `ClamAV Definition Service` via HTTPS (`freshclam`).
+
+#### Admin Worker Runtime & Loop Scheduler
+
+- **Responsibilities:** Run the periodic admin lifecycle loops — dashboard snapshot, verification, evidence safety, notifications, retention, support, connections, and job-post archival — with per-loop intervals and a readiness probe.
+- **Technology:** Node.js.
+- **Relationships:** Orchestrates the internal lifecycle stages and claims/updates work on `PostgreSQL` via Prisma.
+
+#### Verification & Evidence Safety
+
+- **Responsibilities:** Safety-scan recruiter verification evidence fail-closed and enforce verification deadlines, admin-inbox reconciliation, and business-verification preparation cleanup.
+- **Technology:** ClamAV adapter, evidence storage adapters.
+- **Relationships:** Calls `Malware Scanner` via Unix socket; reads/deletes evidence from `Local Admin Evidence Store` (or optional S3); writes verification state and notifications to `PostgreSQL`.
+
+#### Notification & Reconciliation
+
+- **Responsibilities:** Dispatch due security/verification notifications, reconcile in-app and email delivery channels, and retain/delete expired notifications.
+- **Technology:** Node.js, Prisma.
+- **Relationships:** Writes notification and email-outbox work to `PostgreSQL`.
+
+#### Evidence & Rationale Retention
+
+- **Responsibilities:** Delete expired verification evidence and privileged-action rationales on their retention deadlines.
+- **Technology:** Node.js, evidence storage adapters.
+- **Relationships:** Claims due rows on `PostgreSQL`; deletes evidence from `Local Admin Evidence Store` (or optional S3).
+
+#### Support & Connections Lifecycle
+
+- **Responsibilities:** Close due support cases, requeue invalid assignments, purge retained content, and expire/reconcile professional-connection proposals.
+- **Technology:** Node.js, Prisma.
+- **Relationships:** Reads/writes support and connection state on `PostgreSQL`; publishes realtime invalidation events in-process.
+
+#### Job-Post Lifecycle
+
+- **Responsibilities:** Auto-archive published job posts once their application deadline passes.
+- **Technology:** Node.js, Prisma.
+- **Relationships:** Updates job-post aggregate and operational history on `PostgreSQL`.

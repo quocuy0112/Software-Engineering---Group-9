@@ -14,6 +14,7 @@ const endpoints: Record<string, string> = {
     "/api/admin/professional-connection-proposals",
   notifications: "/api/admin/notifications",
   "job-post-reviews": "/api/admin/job-post-reviews",
+  "job-postings": "/api/admin/job-postings",
 };
 
 export function adminApiErrorDetails(body: unknown) {

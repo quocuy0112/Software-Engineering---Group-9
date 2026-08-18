@@ -298,6 +298,16 @@ export class PrismaJobPostReviewRepository {
       },
     });
     if (aggregate.count !== 1) throw new Error("STALE_CONFLICT");
+    if (input.command.command === "APPROVE") {
+      await this.db.jobPostRevisionRequest.updateMany({
+        where: { aggregateId: input.aggregateId, state: "OPEN" },
+        data: {
+          state: "SATISFIED",
+          satisfiedAt: input.now,
+          submittedRevisionId: input.reviewId,
+        },
+      });
+    }
     const decided = await this.db.jobPostReviewVersion.updateMany({
       where: {
         id: input.reviewId,

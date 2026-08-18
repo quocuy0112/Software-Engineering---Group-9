@@ -55,6 +55,20 @@ export function formatEmailTimestamp(value: string): string {
   }).format(date);
 }
 
+export function formatVerificationEmailTimestamp(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  const datePart = new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeZone: "UTC",
+  }).format(date);
+  const timePart = new Intl.DateTimeFormat("en-US", {
+    timeStyle: "short",
+    timeZone: "UTC",
+  }).format(date);
+  return `${datePart}, at ${timePart}`;
+}
+
 export function reasonCategoryLabel(code: string): string {
   return REASON_CATEGORY_LABELS[code] ?? code;
 }

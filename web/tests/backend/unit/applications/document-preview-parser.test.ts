@@ -1,7 +1,30 @@
 import { describe, expect, it } from "vitest";
 import { buildStructuredDocumentContent } from "@/backend/applications/services/document-preview-parser";
+import { structuredDocumentPreviewSchema } from "@/shared/contracts/applications/document-preview";
 
 describe("structured application document previews", () => {
+  it("keeps a document available with a limited preview when extraction is empty", () => {
+    const content = buildStructuredDocumentContent({
+      kind: "cover-letter",
+      segments: [],
+    });
+    const preview = structuredDocumentPreviewSchema.parse({
+      kind: "cover-letter",
+      previewStatus: "LIMITED",
+      fileName: "cover-letter.docx",
+      mediaType:
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      pageCount: null,
+      parserVersion: "document-preview-v1",
+      processingMilliseconds: 0,
+      cacheHit: false,
+      content,
+    });
+
+    expect(preview.previewStatus).toBe("LIMITED");
+    expect(preview.content.kind).toBe("cover-letter");
+  });
+
   it("renders the application profile snapshot as structured CV content", () => {
     const content = buildStructuredDocumentContent({
       kind: "cv",

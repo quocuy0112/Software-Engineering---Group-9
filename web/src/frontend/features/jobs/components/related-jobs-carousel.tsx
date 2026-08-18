@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
+import { RelatedJobRow } from "@/frontend/components/ui/related-job-row";
 import type { JobCard } from "@/shared/contracts/jobs/discovery";
 import {
   formatRelativeTime,
   formatSalary,
 } from "@/shared/utils/jobs/job-display";
-import { SaveJobAction } from "./save-job-action";
 import { CompanyLogo } from "./job-detail-sidebar";
+import { SaveJobAction } from "./save-job-action";
 
 function relatedBadge(job: JobCard) {
   if (job.isUrgent) return "New";
@@ -18,7 +19,7 @@ function relatedBadge(job: JobCard) {
 
 function HeartIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
       <path d="M20.8 8.8c0 5.3-8.8 10.4-8.8 10.4S3.2 14.1 3.2 8.8A4.6 4.6 0 0 1 12 6.3a4.6 4.6 0 0 1 8.8 2.5Z" />
     </svg>
   );
@@ -85,50 +86,21 @@ export function RelatedJobsCarousel({
           {rankedJobs.map((job) => {
             const badge = relatedBadge(job);
             return (
-              <article className="job-related-list-item" key={job.id}>
-                <Link
-                  className="job-related-list-logo"
-                  href={"/jobs/" + job.slug}
-                  aria-label={job.company.displayName + " - " + job.title}
-                >
-                  <CompanyLogo company={job.company} />
-                </Link>
-
-                <div className="job-related-list-content">
-                  <div className="job-related-list-title-row">
-                    <h3>
-                      <Link href={"/jobs/" + job.slug}>{job.title}</Link>
-                    </h3>
-                    {badge ? (
-                      <span className="job-related-badge">{badge}</span>
-                    ) : null}
-                  </div>
-                  <p className="job-related-list-company">
-                    {job.company.displayName}
-                  </p>
-                  <div className="job-related-list-meta">
-                    <span>{job.location}</span>
-                    <span aria-hidden="true">·</span>
-                    <time dateTime={job.updatedAt ?? job.publishedAt}>
-                      Updated{" "}
-                      {formatRelativeTime(job.updatedAt ?? job.publishedAt)}
-                    </time>
-                  </div>
-                </div>
-
-                <div className="job-related-list-side">
-                  <strong
-                    className={
-                      job.salary?.isNegotiable
-                        ? "job-salary--negotiable"
-                        : undefined
-                    }
-                  >
-                    {formatSalary(job.salary)}
-                  </strong>
-                  <RelatedJobSave job={job} />
-                </div>
-              </article>
+              <RelatedJobRow
+                key={job.id}
+                href={`/jobs/${job.slug}`}
+                avatarLabel={job.company.displayName.slice(0, 2).toUpperCase()}
+                avatar={<CompanyLogo company={job.company} />}
+                title={job.title}
+                isNew={badge === "New"}
+                badgeLabel={badge ?? undefined}
+                company={job.company.displayName}
+                location={job.location}
+                updatedAt={`Updated ${formatRelativeTime(job.updatedAt ?? job.publishedAt)}`}
+                salaryRange={formatSalary(job.salary)}
+                saved={job.actions.saved}
+                saveAction={<RelatedJobSave job={job} />}
+              />
             );
           })}
         </div>

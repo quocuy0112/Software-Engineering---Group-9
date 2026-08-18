@@ -178,6 +178,15 @@ export const InAppNotificationAudience = {
 export type InAppNotificationAudience = (typeof InAppNotificationAudience)[keyof typeof InAppNotificationAudience]
 
 
+export const InAppNotificationRecipientRole = {
+  CANDIDATE: 'CANDIDATE',
+  RECRUITER: 'RECRUITER',
+  ADMIN: 'ADMIN'
+} as const
+
+export type InAppNotificationRecipientRole = (typeof InAppNotificationRecipientRole)[keyof typeof InAppNotificationRecipientRole]
+
+
 export const InAppNotificationKind = {
   EMAIL_CHANGE_REQUESTED_ALERT: 'EMAIL_CHANGE_REQUESTED_ALERT',
   PASSWORD_CHANGED: 'PASSWORD_CHANGED',
@@ -223,7 +232,8 @@ export const InAppNotificationKind = {
   DELIVERY_MANUAL_INTERVENTION_REQUIRED: 'DELIVERY_MANUAL_INTERVENTION_REQUIRED',
   JOB_POST_REVIEW_REQUESTED_ADMIN: 'JOB_POST_REVIEW_REQUESTED_ADMIN',
   JOB_POST_APPROVED: 'JOB_POST_APPROVED',
-  JOB_POST_REJECTED: 'JOB_POST_REJECTED'
+  JOB_POST_REJECTED: 'JOB_POST_REJECTED',
+  JOB_POST_CHANGES_REQUESTED: 'JOB_POST_CHANGES_REQUESTED'
 } as const
 
 export type InAppNotificationKind = (typeof InAppNotificationKind)[keyof typeof InAppNotificationKind]
@@ -374,6 +384,63 @@ export const JobPostReviewHistoryAction = {
 export type JobPostReviewHistoryAction = (typeof JobPostReviewHistoryAction)[keyof typeof JobPostReviewHistoryAction]
 
 
+export const JobPostVisibilityState = {
+  PUBLISHED: 'PUBLISHED',
+  HIDDEN: 'HIDDEN',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type JobPostVisibilityState = (typeof JobPostVisibilityState)[keyof typeof JobPostVisibilityState]
+
+
+export const JobPostApplicationState = {
+  OPEN: 'OPEN',
+  CLOSED: 'CLOSED'
+} as const
+
+export type JobPostApplicationState = (typeof JobPostApplicationState)[keyof typeof JobPostApplicationState]
+
+
+export const JobPostRevisionRequestState = {
+  OPEN: 'OPEN',
+  SATISFIED: 'SATISFIED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type JobPostRevisionRequestState = (typeof JobPostRevisionRequestState)[keyof typeof JobPostRevisionRequestState]
+
+
+export const JobPostFeatureState = {
+  SCHEDULED: 'SCHEDULED',
+  ACTIVE: 'ACTIVE',
+  ENDED: 'ENDED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type JobPostFeatureState = (typeof JobPostFeatureState)[keyof typeof JobPostFeatureState]
+
+
+export const JobPostEnforcementType = {
+  HIDE_JOB: 'HIDE_JOB',
+  CLOSE_APPLICATIONS: 'CLOSE_APPLICATIONS',
+  REQUEST_CHANGES: 'REQUEST_CHANGES',
+  SOFT_DELETE_JOB: 'SOFT_DELETE_JOB',
+  SUSPEND_COMPANY: 'SUSPEND_COMPANY',
+  SUSPEND_RECRUITER: 'SUSPEND_RECRUITER'
+} as const
+
+export type JobPostEnforcementType = (typeof JobPostEnforcementType)[keyof typeof JobPostEnforcementType]
+
+
+export const PlatformAdministratorScope = {
+  JOB_POST_MODERATE: 'JOB_POST_MODERATE',
+  JOB_POST_FEATURE: 'JOB_POST_FEATURE',
+  JOB_POST_ENFORCE: 'JOB_POST_ENFORCE'
+} as const
+
+export type PlatformAdministratorScope = (typeof PlatformAdministratorScope)[keyof typeof PlatformAdministratorScope]
+
+
 export const ApplicationQuestionKind = {
   TEXT: 'TEXT',
   BOOLEAN: 'BOOLEAN',
@@ -417,6 +484,56 @@ export const ApplicationStage = {
 } as const
 
 export type ApplicationStage = (typeof ApplicationStage)[keyof typeof ApplicationStage]
+
+
+export const ApplicationWithdrawalOutcome = {
+  CANDIDATE_WITHDRAWN: 'CANDIDATE_WITHDRAWN'
+} as const
+
+export type ApplicationWithdrawalOutcome = (typeof ApplicationWithdrawalOutcome)[keyof typeof ApplicationWithdrawalOutcome]
+
+
+export const ApplicationIntakeState = {
+  RECEIVED: 'RECEIVED',
+  CHECKING_FILES: 'CHECKING_FILES',
+  SENT_TO_RECRUITER: 'SENT_TO_RECRUITER',
+  ATTENTION_REQUIRED: 'ATTENTION_REQUIRED'
+} as const
+
+export type ApplicationIntakeState = (typeof ApplicationIntakeState)[keyof typeof ApplicationIntakeState]
+
+
+export const ApplicationPublicUpdateKind = {
+  SUBMITTED: 'SUBMITTED',
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  INTERVIEW: 'INTERVIEW',
+  OUTCOME: 'OUTCOME',
+  WITHDRAWN: 'WITHDRAWN',
+  TECHNICAL_UPDATE: 'TECHNICAL_UPDATE'
+} as const
+
+export type ApplicationPublicUpdateKind = (typeof ApplicationPublicUpdateKind)[keyof typeof ApplicationPublicUpdateKind]
+
+
+export const ApplicationPublicStage = {
+  APPLICATION_SUBMITTED: 'APPLICATION_SUBMITTED',
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  INTERVIEW: 'INTERVIEW',
+  OUTCOME: 'OUTCOME'
+} as const
+
+export type ApplicationPublicStage = (typeof ApplicationPublicStage)[keyof typeof ApplicationPublicStage]
+
+
+export const ApplicationPublicOutcome = {
+  OFFERED: 'OFFERED',
+  HIRED: 'HIRED',
+  OFFER_DECLINED: 'OFFER_DECLINED',
+  REJECTED: 'REJECTED',
+  WITHDRAWN: 'WITHDRAWN'
+} as const
+
+export type ApplicationPublicOutcome = (typeof ApplicationPublicOutcome)[keyof typeof ApplicationPublicOutcome]
 
 
 export const ApplicationScoringStatus = {
@@ -543,6 +660,51 @@ export const ScoringWorkItemState = {
 } as const
 
 export type ScoringWorkItemState = (typeof ScoringWorkItemState)[keyof typeof ScoringWorkItemState]
+
+
+export const PrivateCvMatchCheckState = {
+  QUEUED: 'QUEUED',
+  ANALYZING: 'ANALYZING',
+  LIMITED: 'LIMITED',
+  READY: 'READY',
+  FAILED: 'FAILED',
+  INACCESSIBLE: 'INACCESSIBLE'
+} as const
+
+export type PrivateCvMatchCheckState = (typeof PrivateCvMatchCheckState)[keyof typeof PrivateCvMatchCheckState]
+
+
+export const PrivateCvMatchAttemptTrigger = {
+  INITIAL: 'INITIAL',
+  AI_RETRY: 'AI_RETRY'
+} as const
+
+export type PrivateCvMatchAttemptTrigger = (typeof PrivateCvMatchAttemptTrigger)[keyof typeof PrivateCvMatchAttemptTrigger]
+
+
+export const PrivateCvMatchAttemptState = {
+  QUEUED: 'QUEUED',
+  AUTOMATIC_RUNNING: 'AUTOMATIC_RUNNING',
+  AUTOMATIC_READY: 'AUTOMATIC_READY',
+  AI_RUNNING: 'AI_RUNNING',
+  READY: 'READY',
+  LIMITED: 'LIMITED',
+  FAILED: 'FAILED'
+} as const
+
+export type PrivateCvMatchAttemptState = (typeof PrivateCvMatchAttemptState)[keyof typeof PrivateCvMatchAttemptState]
+
+
+export const PrivateMatchEvidenceClassification = {
+  SKILL: 'SKILL',
+  PROJECT: 'PROJECT',
+  IMPACT: 'IMPACT',
+  EXPERIENCE: 'EXPERIENCE',
+  EDUCATION: 'EDUCATION',
+  OTHER: 'OTHER'
+} as const
+
+export type PrivateMatchEvidenceClassification = (typeof PrivateMatchEvidenceClassification)[keyof typeof PrivateMatchEvidenceClassification]
 
 
 export const ManualPriorityValue = {

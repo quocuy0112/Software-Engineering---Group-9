@@ -21,6 +21,10 @@ import {
   ordinaryApplicationTransitions,
 } from "./application-stage-policy";
 import { createInAppNotification } from "@/backend/notifications/notification-service";
+import {
+  publicOutcomeForCanonicalStage,
+  publicStageForCanonicalStage,
+} from "@/shared/contracts/candidate-applications";
 
 const consequentialStages = new Set<ApplicationStage>([
   "REJECTED",
@@ -205,18 +209,38 @@ export class ApplicationStageService {
     try {
       return await this.db.$transaction(
         async (tx) => {
-        const application = await tx.jobApplication.findUnique({
-          where: { id: applicationId },
-          select: {
-            id: true,
-            jobPostingId: true,
-            stage: true,
-            stageVersion: true,
-            candidateUserId: true,
-            candidate: { select: { user: { select: { preferences: { select: { applicationUpdatesEmail: true } } } } } },
-            jobPosting: { select: { companyId: true, title: true, company: { select: { displayName: true } } } },
-          },
-        });
+          const application = await tx.jobApplication.findUnique({
+            where: { id: applicationId },
+            select: {
+              id: true,
+              jobPostingId: true,
+              stage: true,
+              stageVersion: true,
+              withdrawalOutcome: true,
+              candidateUserId: true,
+              candidate: {
+                select: {
+                  user: {
+                    select: {
+                      preferences: {
+                        select: { applicationUpdatesEmail: true },
+                      },
+                    },
+                  },
+                },
+              },
+              jobPosting: {
+                select: {
+                  companyId: true,
+                  title: true,
+                  company: { select: { displayName: true } },
+                },
+              },
+              notificationPreference: {
+                select: { emailEnabled: true, inAppEnabled: true },
+              },
+            },
+          });
         if (!application || (authorized && application.jobPostingId !== authorized.jobPostingId)) {
           throw new JobServiceError(404, { code: "APPLICATION_UNAVAILABLE", message: "This application is unavailable." });
         }
@@ -259,17 +283,41 @@ export class ApplicationStageService {
         if (application.stageVersion !== command.expectedStageVersion) {
           throw new JobServiceError(409, { code: "APPLICATION_STAGE_CONFLICT", message: "This application changed. Refresh it and try again." });
         }
+        if (application.withdrawalOutcome) {
+          throw new JobServiceError(409, {
+            code: "APPLICATION_WITHDRAWAL_BLOCKED",
+            message: "This application has been withdrawn.",
+          });
+        }
         if (!canTransitionApplicationStage(fromStage, command.targetStage)) {
           throw new JobServiceError(409, { code: "APPLICATION_STAGE_TRANSITION_INVALID", message: "This stage change is not allowed." });
         }
 
         const nextVersion = application.stageVersion + 1;
         const updated = await tx.jobApplication.updateMany({
-          where: { id: application.id, jobPostingId: application.jobPostingId, stage: fromStage, stageVersion: command.expectedStageVersion },
-          data: { stage: command.targetStage, stageVersion: { increment: 1 }, lastStageChangedAt: now },
+          where: {
+            id: application.id,
+            jobPostingId: application.jobPostingId,
+            stage: fromStage,
+            stageVersion: command.expectedStageVersion,
+            withdrawalOutcome: null,
+          },
+          data: {
+            stage: command.targetStage,
+            stageVersion: { increment: 1 },
+            lastStageChangedAt: now,
+          },
         });
         if (updated.count !== 1) throw new JobServiceError(409, { code: "APPLICATION_STAGE_CONFLICT", message: "This application changed. Refresh it and try again." });
 
+        const inAppUpdatesEnabled =
+          application.notificationPreference?.inAppEnabled ?? true;
+        const emailUpdatesEnabled =
+          application.notificationPreference?.emailEnabled ??
+          application.candidate.user.preferences?.applicationUpdatesEmail ??
+          true;
+        const emailRequired = command.targetStage === "HIRED" || emailUpdatesEnabled;
+        const notificationRequired = inAppUpdatesEnabled || emailRequired;
         const reasonLabelSnapshot = command.targetStage === "REJECTED" && command.reasonCode ? rejectionLabels[command.reasonCode] : command.reasonCode;
         const event = await tx.applicationStageEvent.create({
           data: {
@@ -285,27 +333,52 @@ export class ApplicationStageService {
             candidateVisible: true,
             occurredAt: now,
             applicationVersion: nextVersion,
-            notificationRequired: true,
-            notificationStatus: "PENDING",
+            notificationRequired,
+            notificationStatus: notificationRequired ? "PENDING" : "NOT_REQUIRED",
             idempotencyKey,
             decisionKind: command.targetStage === "REJECTED" ? "REJECT" : command.targetStage === "INTERVIEWING" ? "MOVE_TO_INTERVIEW" : null,
             metadata: { v: 2, source, commandDigest: digest, requestedJobId, canonicalJobId: application.jobPostingId, confirmed: command.confirmed },
           },
         });
 
-        await createInAppNotification(tx, {
-          recipientUserId: application.candidateUserId,
-          kind: "APPLICATION_STAGE_CHANGED",
-          deduplicationKey: `application:${application.id}:stage:${nextVersion}:candidate`,
-          correlationId: event.id,
-          occurredAt: now,
-          contextType: "APPLICATION",
-          contextId: application.id,
-          variables: { stage: command.targetStage },
+        const publicStage = publicStageForCanonicalStage(command.targetStage);
+        const publicKind =
+          publicStage === "UNDER_REVIEW"
+            ? "UNDER_REVIEW"
+            : publicStage === "INTERVIEW"
+              ? "INTERVIEW"
+              : "OUTCOME";
+        await tx.applicationPublicUpdate.create({
+          data: {
+            applicationId: application.id,
+            kind: publicKind,
+            publicStage,
+            publicOutcome: publicOutcomeForCanonicalStage(command.targetStage),
+            title:
+              publicStage === "UNDER_REVIEW"
+                ? "Application under review"
+                : publicStage === "INTERVIEW"
+                  ? "Interview stage reached"
+                  : "Application outcome updated",
+            effectiveAt: now,
+            deduplicationKey: `application:${application.id}:public:stage:${nextVersion}`,
+            sourceEventReference: event.id,
+          },
         });
 
-        const emailUpdatesEnabled = application.candidate.user.preferences?.applicationUpdatesEmail ?? true;
-        const emailRequired = command.targetStage === "HIRED" || emailUpdatesEnabled;
+        if (inAppUpdatesEnabled) {
+          await createInAppNotification(tx, {
+            recipientUserId: application.candidateUserId,
+            kind: "APPLICATION_STAGE_CHANGED",
+            deduplicationKey: `application:${application.id}:stage:${nextVersion}:candidate`,
+            correlationId: event.id,
+            occurredAt: now,
+            contextType: "APPLICATION",
+            contextId: application.id,
+            variables: { stage: command.targetStage },
+          });
+        }
+
         if (emailRequired) {
           await tx.emailOutbox.create({
             data: {
@@ -329,7 +402,14 @@ export class ApplicationStageService {
           targetId: application.id,
           result: "SUCCESS",
           correlationId: event.id,
-          context: { fromStage, toStage: command.targetStage, applicationVersion: nextVersion, reason: command.reasonCode ?? undefined, notificationWorkCount: emailRequired ? 2 : 1 },
+          context: {
+            fromStage,
+            toStage: command.targetStage,
+            applicationVersion: nextVersion,
+            reason: command.reasonCode ?? undefined,
+            notificationWorkCount:
+              Number(inAppUpdatesEnabled) + Number(emailRequired),
+          },
         });
 
         if (!boundary) {
@@ -346,7 +426,16 @@ export class ApplicationStageService {
         error && typeof error === "object" && "code" in error
           ? String(error.code)
           : null;
-      if (!boundary || !["P2002", "P2034"].includes(prismaCode ?? "")) {
+      if (!boundary) {
+        if (prismaCode === "P2034") {
+          throw new JobServiceError(409, {
+            code: "APPLICATION_STAGE_CONFLICT",
+            message: "This application changed. Refresh it and try again.",
+          });
+        }
+        throw error;
+      }
+      if (!["P2002", "P2034"].includes(prismaCode ?? "")) {
         throw error;
       }
 

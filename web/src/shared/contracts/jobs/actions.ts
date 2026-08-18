@@ -151,6 +151,7 @@ export const applicationSubmissionSchema = z
     contactSnapshot: applicationContactSnapshotSchema.optional(),
     answers: z.array(applicationAnswerInputSchema).max(20),
     coverLetter: applicationCoverLetterInputSchema.nullable(),
+    message: z.string().trim().max(2_000).nullable().optional(),
     consentVersion: z.string().min(1).max(64),
     consentAccepted: z.literal(true),
     aiAnalysisConsent: z.boolean().optional(),

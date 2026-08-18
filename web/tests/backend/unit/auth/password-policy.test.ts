@@ -6,9 +6,9 @@ import type { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-
 import type { PrismaRateLimitRepository } from "@/backend/repositories/rate-limit/prisma-rate-limit-repository";
 
 describe("SmartHire password operation boundary", () => {
-  it("accepts Unicode and spaces within 12–128 characters", async () => {
+  it("accepts Unicode and spaces when all composition requirements are met", async () => {
     await expect(
-      new PasswordPolicy().evaluate("Đúng mật khẩu dài 2026"),
+      new PasswordPolicy().evaluate("Đúng Mật khẩu dài! 2026"),
     ).resolves.toEqual({ accepted: true });
   });
   it("rejects short, oversized, control-character, and compromised passwords", async () => {
@@ -41,7 +41,7 @@ describe("SmartHire password operation boundary", () => {
       { append } as unknown as PrismaAuditRepository,
     );
     expect(
-      await policy.evaluate("valid password 2026", {
+      await policy.evaluate("Valid password! 2026", {
         subject: "private@example.test",
         correlationId: "correlation-123",
       }),

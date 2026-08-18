@@ -88,8 +88,8 @@ describe("Feature 006 email renderer registry", () => {
         nextAction: "WAIT_FOR_REVIEW",
       },
     });
-    expect(rendered.text).toContain("request-1");
-    expect(rendered.text).toContain("awaiting administrator review");
+    expect(rendered.text).toContain("Aug 10, 2026, at 12:00 AM");
+    expect(rendered.text).toContain("employer verification");
     expect(rendered.text).not.toContain("WAIT_FOR_REVIEW");
     for (const value of forbidden)
       expect(rendered.text.toLowerCase()).not.toContain(value);

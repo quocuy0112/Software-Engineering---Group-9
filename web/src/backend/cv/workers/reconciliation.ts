@@ -144,29 +144,39 @@ export class CvStorageReconciliation {
       ...(input.cursor ? { cursor: input.cursor } : {}),
     });
     const locators = inventory.items.map((item) => String(item.locator));
-    // The local CV storage adapter is also used by the application-document
-    // promotion path.  Reconciliation must treat both namespaces as owned
-    // objects; otherwise a valid application CV is classified as an
-    // untracked CV artifact and deleted after the orphan grace period.
-    const [trackedCvArtifacts, trackedApplicationDocuments, trackedPromotions] =
-      locators.length
-        ? await Promise.all([
-            prisma.cvStoredArtifact.findMany({
-              where: { storageLocator: { in: locators } },
-              select: { storageLocator: true },
-            }),
-            prisma.applicationDocument.findMany({
-              where: { storageKeyEncrypted: { in: locators }, deletedAt: null },
-              select: { storageKeyEncrypted: true },
-            }),
-            prisma.applicationArtifactPromotion.findMany({
-              where: { storageKeyEncrypted: { in: locators }, deletedAt: null },
-              select: { storageKeyEncrypted: true },
-            }),
-          ])
-        : [[], [], []];
+    // The local CV storage adapter is also used by CandidateCv materialized
+    // copies and the application-document promotion path. Reconciliation
+    // must treat all four namespaces as owned objects; otherwise a valid
+    // candidate CV is classified as an untracked artifact and deleted after
+    // the orphan grace period, leaving CandidateCv.storageKey dangling.
+    const [
+      trackedCvArtifacts,
+      trackedCandidateCvs,
+      trackedApplicationDocuments,
+      trackedPromotions,
+    ] = locators.length
+      ? await Promise.all([
+          prisma.cvStoredArtifact.findMany({
+            where: { storageLocator: { in: locators } },
+            select: { storageLocator: true },
+          }),
+          prisma.candidateCv.findMany({
+            where: { storageKey: { in: locators } },
+            select: { storageKey: true },
+          }),
+          prisma.applicationDocument.findMany({
+            where: { storageKeyEncrypted: { in: locators }, deletedAt: null },
+            select: { storageKeyEncrypted: true },
+          }),
+          prisma.applicationArtifactPromotion.findMany({
+            where: { storageKeyEncrypted: { in: locators }, deletedAt: null },
+            select: { storageKeyEncrypted: true },
+          }),
+        ])
+      : [[], [], [], []];
     const trackedLocators = new Set([
       ...trackedCvArtifacts.map((item) => item.storageLocator),
+      ...trackedCandidateCvs.map((item) => item.storageKey),
       ...trackedApplicationDocuments.map((item) => item.storageKeyEncrypted),
       ...trackedPromotions.map((item) => item.storageKeyEncrypted),
     ]);

@@ -2,7 +2,7 @@ import { JobsWorkspace } from "@/frontend/features/jobs/components/jobs-workspac
 
 export default function AppliedJobsLoading() {
   return (
-    <JobsWorkspace activeTab="applied">
+    <JobsWorkspace>
       <main className="jobs-page job-redesign-page" aria-busy="true">
         <div
           className="job-panel job-feedback job-feedback-info job-loading-state"

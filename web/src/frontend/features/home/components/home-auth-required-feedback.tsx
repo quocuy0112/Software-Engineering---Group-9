@@ -16,13 +16,15 @@ export function HomeAuthRequiredFeedback({
   label: string;
 }) {
   return (
-    <Link
-      className="home-save-link"
-      href={safeHomeLoginHref(returnTo)}
-      aria-label={label}
-      data-tooltip={label}
-    >
-      <HomeSaveIcon />
-    </Link>
+    <span className="home-save-action">
+      <Link
+        className="home-save-link"
+        href={safeHomeLoginHref(returnTo)}
+        aria-label={label}
+        data-tooltip={label}
+      >
+        <HomeSaveIcon />
+      </Link>
+    </span>
   );
 }

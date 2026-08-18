@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
@@ -94,6 +95,20 @@ export function jobTextSearchHref(href: string, query: string) {
   if (value) parameters.set("q", value.slice(0, 200));
   else parameters.delete("q");
   return parameters.size ? `/jobs?${parameters.toString()}` : "/jobs";
+}
+
+function BeforeAfterDemo({ vi }: { vi: boolean }) {
+  return (
+    <div className="image-search-demo" aria-hidden="true">
+      <span className="image-search-demo-poster">POSTER</span>
+      <span className="image-search-demo-arrow">→</span>
+      <span className="image-search-demo-chips">
+        <span>{vi ? "Vai trò" : "Role"}</span>
+        <span>{vi ? "Địa điểm" : "Location"}</span>
+        <span>{vi ? "Kinh nghiệm" : "Experience"}</span>
+      </span>
+    </div>
+  );
 }
 
 export function GlobalImageSearch({ csrfProof }: { csrfProof?: string } = {}) {
@@ -209,93 +224,114 @@ export function GlobalImageSearch({ csrfProof }: { csrfProof?: string } = {}) {
           </span>
         </button>
       </form>
-      {showPanel ? (
-        <div
-          ref={panel}
-          id="global-image-search-panel"
-          className="global-image-search-panel"
-          role="dialog"
-          aria-modal="false"
-          aria-label={
-            vi ? "Tìm việc bằng hình ảnh" : "Search jobs from an image"
-          }
-        >
-          <div className="global-image-search-panel-heading">
-            <div>
-              <strong>
-                {vi ? "Tìm việc bằng hình ảnh" : "Search jobs from an image"}
-              </strong>
-              <p>
-                {vi
-                  ? "Chuyển áp phích tuyển dụng thành các bộ lọc có thể chỉnh sửa."
-                  : "Turn a job poster into editable search filters."}
-              </p>
-            </div>
-            <button
-              className="global-image-search-close"
-              type="button"
-              aria-label={vi ? "Đóng tìm kiếm hình ảnh" : "Close image search"}
-              disabled={busy}
-              onClick={closePanel}
+      {showPanel
+        ? createPortal(
+            <div
+              className="global-image-search-overlay"
+              onMouseDown={(event) => {
+                if (event.target === event.currentTarget && !busy) {
+                  closePanel();
+                }
+              }}
             >
-              <span aria-hidden="true">&#215;</span>
-            </button>
-          </div>
-          <ImageSearchPrivacyNotice />
-          <ImageSearchConsent
-            selected={externalConsent}
-            onChange={(selected) => {
-              if (!selected && busy) void search.revokeConsent();
-              setExternalConsent(selected);
-            }}
-          />
-          <ImageSearchInput
-            disabled={!externalConsent || busy}
-            onSelect={(file) => {
-              setPanelOpen(true);
-              void search.start(file).finally(() => setExternalConsent(false));
-            }}
-          />
-          {!externalConsent ? (
-            <p className="image-search-consent-required" role="status">
-              {vi
-                ? "Đồng ý với thông báo xử lý văn bản trước khi chọn hình ảnh."
-                : "Agree to the text-processing notice before choosing an image."}
-            </p>
-          ) : null}
-          {busy ? (
-            <ImageSearchProgress
-              progress={search.progress}
-              onCancel={() => {
-                setExternalConsent(false);
-                void search.cancel();
-              }}
-            />
-          ) : null}
-          {search.intent ? (
-            <ImageSearchProposals
-              intent={search.intent}
-              onClear={() => {
-                setExternalConsent(false);
-                search.clear();
-              }}
-              onApply={(intent) =>
-                window.location.assign(applyImageSearchIntent(criteria, intent))
-              }
-            />
-          ) : null}
-          <ImageSearchRecovery
-            error={search.error}
-            fallbackReason={search.fallbackReason}
-            retryAt={search.retryAt}
-            onRetry={() => {
-              setExternalConsent(false);
-              search.clear();
-            }}
-            onManual={() => window.location.assign("/jobs")}
-          />
-        </div>
-      ) : null}
+              <div
+                ref={panel}
+                id="global-image-search-panel"
+                className="global-image-search-panel"
+                role="dialog"
+                aria-modal="true"
+                aria-label={
+                  vi ? "Tìm việc bằng hình ảnh" : "Search jobs from an image"
+                }
+              >
+                <div className="global-image-search-panel-heading">
+                  <div>
+                    <strong>
+                      {vi
+                        ? "Tìm việc bằng hình ảnh"
+                        : "Search jobs from an image"}
+                    </strong>
+                    <p>
+                      {vi
+                        ? "Chuyển áp phích tuyển dụng thành các bộ lọc có thể chỉnh sửa."
+                        : "Turn a job poster into editable search filters."}
+                    </p>
+                  </div>
+                  <button
+                    className="global-image-search-close"
+                    type="button"
+                    aria-label={
+                      vi ? "Đóng tìm kiếm hình ảnh" : "Close image search"
+                    }
+                    disabled={busy}
+                    onClick={closePanel}
+                  >
+                    <span aria-hidden="true">&#215;</span>
+                  </button>
+                </div>
+                <BeforeAfterDemo vi={vi} />
+                <ImageSearchPrivacyNotice />
+                <ImageSearchConsent
+                  selected={externalConsent}
+                  onChange={(selected) => {
+                    if (!selected && busy) void search.revokeConsent();
+                    setExternalConsent(selected);
+                  }}
+                />
+                <ImageSearchInput
+                  disabled={!externalConsent || busy}
+                  onSelect={(file) => {
+                    setPanelOpen(true);
+                    void search
+                      .start(file)
+                      .finally(() => setExternalConsent(false));
+                  }}
+                />
+                {!externalConsent ? (
+                  <p className="image-search-consent-required" role="status">
+                    {vi
+                      ? "Đồng ý với thông báo xử lý văn bản trước khi chọn hình ảnh."
+                      : "Agree to the text-processing notice before choosing an image."}
+                  </p>
+                ) : null}
+                {busy ? (
+                  <ImageSearchProgress
+                    progress={search.progress}
+                    onCancel={() => {
+                      setExternalConsent(false);
+                      void search.cancel();
+                    }}
+                  />
+                ) : null}
+                {search.intent ? (
+                  <ImageSearchProposals
+                    intent={search.intent}
+                    onClear={() => {
+                      setExternalConsent(false);
+                      search.clear();
+                    }}
+                    onApply={(intent) =>
+                      window.location.assign(
+                        applyImageSearchIntent(criteria, intent),
+                      )
+                    }
+                  />
+                ) : null}
+                <ImageSearchRecovery
+                  error={search.error}
+                  fallbackReason={search.fallbackReason}
+                  retryAt={search.retryAt}
+                  onRetry={() => {
+                    setExternalConsent(false);
+                    search.clear();
+                  }}
+                  onManual={() => window.location.assign("/jobs")}
+                />
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

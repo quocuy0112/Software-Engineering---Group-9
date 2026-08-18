@@ -5,7 +5,7 @@ import { JobsWorkspace } from "@/frontend/features/jobs/components/jobs-workspac
 
 export default function AppliedJobsError({ reset }: { reset: () => void }) {
   return (
-    <JobsWorkspace activeTab="applied">
+    <JobsWorkspace>
       <main className="jobs-page job-redesign-page">
         <section
           className="job-panel job-feedback job-feedback-danger applied-applications-error"

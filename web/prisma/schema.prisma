@@ -134,6 +134,14 @@ enum InAppNotificationAudience {
   ADMIN
 }
 
+/// Immutable audience selected when the event was emitted.  This preserves the
+/// meaning of a notification for accounts that later gain or lose another role.
+enum InAppNotificationRecipientRole {
+  CANDIDATE
+  RECRUITER
+  ADMIN
+}
+
 enum InAppNotificationKind {
   EMAIL_CHANGE_REQUESTED_ALERT
   PASSWORD_CHANGED
@@ -180,6 +188,7 @@ enum InAppNotificationKind {
   JOB_POST_REVIEW_REQUESTED_ADMIN
   JOB_POST_APPROVED
   JOB_POST_REJECTED
+  JOB_POST_CHANGES_REQUESTED
 }
 
 enum PreferenceLanguage {
@@ -288,6 +297,45 @@ enum JobPostReviewHistoryAction {
   CLOSED
 }
 
+enum JobPostVisibilityState {
+  PUBLISHED
+  HIDDEN
+  ARCHIVED
+}
+
+enum JobPostApplicationState {
+  OPEN
+  CLOSED
+}
+
+enum JobPostRevisionRequestState {
+  OPEN
+  SATISFIED
+  CANCELLED
+}
+
+enum JobPostFeatureState {
+  SCHEDULED
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+enum JobPostEnforcementType {
+  HIDE_JOB
+  CLOSE_APPLICATIONS
+  REQUEST_CHANGES
+  SOFT_DELETE_JOB
+  SUSPEND_COMPANY
+  SUSPEND_RECRUITER
+}
+
+enum PlatformAdministratorScope {
+  JOB_POST_MODERATE
+  JOB_POST_FEATURE
+  JOB_POST_ENFORCE
+}
+
 enum ApplicationQuestionKind {
   TEXT
   BOOLEAN
@@ -319,6 +367,41 @@ enum ApplicationStage {
   OFFER_DECLINED
   REJECTED
   WAITLISTED
+}
+
+enum ApplicationWithdrawalOutcome {
+  CANDIDATE_WITHDRAWN
+}
+
+enum ApplicationIntakeState {
+  RECEIVED
+  CHECKING_FILES
+  SENT_TO_RECRUITER
+  ATTENTION_REQUIRED
+}
+
+enum ApplicationPublicUpdateKind {
+  SUBMITTED
+  UNDER_REVIEW
+  INTERVIEW
+  OUTCOME
+  WITHDRAWN
+  TECHNICAL_UPDATE
+}
+
+enum ApplicationPublicStage {
+  APPLICATION_SUBMITTED
+  UNDER_REVIEW
+  INTERVIEW
+  OUTCOME
+}
+
+enum ApplicationPublicOutcome {
+  OFFERED
+  HIRED
+  OFFER_DECLINED
+  REJECTED
+  WITHDRAWN
 }
 
 enum ApplicationScoringStatus {
@@ -406,6 +489,39 @@ enum ScoringWorkItemState {
   DETERMINISTIC_ONLY
   FAILED
   SUPERSEDED
+}
+
+enum PrivateCvMatchCheckState {
+  QUEUED
+  ANALYZING
+  LIMITED
+  READY
+  FAILED
+  INACCESSIBLE
+}
+
+enum PrivateCvMatchAttemptTrigger {
+  INITIAL
+  AI_RETRY
+}
+
+enum PrivateCvMatchAttemptState {
+  QUEUED
+  AUTOMATIC_RUNNING
+  AUTOMATIC_READY
+  AI_RUNNING
+  READY
+  LIMITED
+  FAILED
+}
+
+enum PrivateMatchEvidenceClassification {
+  SKILL
+  PROJECT
+  IMPACT
+  EXPERIENCE
+  EDUCATION
+  OTHER
 }
 
 enum ManualPriorityValue {
@@ -1076,6 +1192,7 @@ model CandidateIdentity {
   profile         CandidateProfile?
   cvs             CandidateCv[]
   jobApplications JobApplication[]
+  applicationDrafts CandidateApplicationDraft[]
 }
 
 model CandidateProfile {
@@ -1452,6 +1569,7 @@ model InAppNotification {
   category         InAppNotificationCategory
   severity         InAppNotificationSeverity
   audience         InAppNotificationAudience     @default(USER)
+  recipientRole    InAppNotificationRecipientRole @default(CANDIDATE)
   title            String                        @db.VarChar(120)
   summary          String                        @db.VarChar(500)
   variables        Json?
@@ -1471,6 +1589,7 @@ model InAppNotification {
   @@index([recipientUserId, lastOccurredAt(sort: Desc), id(sort: Desc)])
   @@index([recipientUserId, readAt, expiresAt])
   @@index([recipientUserId, audience, readAt, expiresAt])
+  @@index([recipientUserId, recipientRole, readAt, expiresAt])
   @@index([recipientUserId, contextType, contextId, readAt], map: "InAppNotification_recipientUserId_contextType_contextId_readAt_")
   @@index([expiresAt, id])
 }
@@ -1559,9 +1678,20 @@ model PlatformAdministratorGrant {
   updatedAt      DateTime                    @updatedAt
   user           UserAccount                 @relation(fields: [userId], references: [id], onDelete: Restrict)
   sessionPolicy  AdministratorSessionPolicy?
+  scopes         PlatformAdministratorGrantScopeAssignment[]
 
   @@unique([userId])
   @@index([state, expiresAt])
+}
+
+model PlatformAdministratorGrantScopeAssignment {
+  grantId   String
+  scope     PlatformAdministratorScope
+  createdAt DateTime @default(now())
+  grant     PlatformAdministratorGrant @relation(fields: [grantId], references: [id], onDelete: Cascade)
+
+  @@id([grantId, scope])
+  @@index([scope, grantId])
 }
 
 model AdministratorSessionPolicy {
@@ -1979,6 +2109,7 @@ model ModerationReport {
   reporter               UserAccount               @relation("ModerationReporter", fields: [reporterUserId], references: [id], onDelete: Restrict)
   history                ModerationReportHistory[]
   notes                  ModerationPrivateNote[]
+  enforcementLinks       ModerationReportEnforcementLink[]
 
   @@index([state, priority, createdAt, id])
   @@index([reporterUserId, createdAt(sort: Desc)])
@@ -2051,6 +2182,7 @@ model JobPosting {
   savedBy                  SavedJob[]
   reports                  JobReport[]
   applications             JobApplication[]
+  candidateApplicationDrafts CandidateApplicationDraft[]
   reviewAggregate          JobPostReviewAggregate?
   applicationArtifactPromotions ApplicationArtifactPromotion[]
   scoringOperations        ScoringOperation[]
@@ -2076,6 +2208,19 @@ model JobPostReviewAggregate {
   publicJobPostingId String?                @unique
   closedAt           DateTime?
   closedByUserId     String?
+  visibilityState    JobPostVisibilityState  @default(PUBLISHED)
+  applicationState   JobPostApplicationState @default(OPEN)
+  hiddenAt           DateTime?
+  hiddenByUserId     String?
+  hiddenReason       String?                 @db.VarChar(1000)
+  archivedAt         DateTime?
+  archivedByUserId   String?
+  applicationClosedAt DateTime?
+  applicationClosedByUserId String?
+  softDeletedAt      DateTime?
+  softDeletedByUserId String?
+  softDeleteReason   String?                 @db.VarChar(1000)
+  operationalVersion Int                     @default(1)
   version            Int                    @default(1)
   adoptedAt          DateTime               @default(now())
   createdAt          DateTime               @default(now())
@@ -2086,9 +2231,108 @@ model JobPostReviewAggregate {
   pendingVersion     JobPostReviewVersion?  @relation("JobPostReviewPendingVersion", fields: [pendingVersionId], references: [id], onDelete: Restrict)
   approvedVersion    JobPostReviewVersion?  @relation("JobPostReviewApprovedVersion", fields: [approvedVersionId], references: [id], onDelete: Restrict)
   publicJobPosting   JobPosting?            @relation(fields: [publicJobPostingId], references: [id], onDelete: Restrict)
+  correctionRequests JobPostRevisionRequest[]
+  featuredPlacements JobPostFeaturedPlacement[]
+  operationalHistory JobPostOperationalHistory[]
+  enforcementTargets JobPostEnforcementTarget[]
 
   @@index([companyId, updatedAt(sort: Desc), id])
   @@index([pendingVersionId, version])
+}
+
+model JobPostRevisionRequest {
+  id                     String                      @id @default(cuid())
+  aggregateId            String
+  liveVersionId          String
+  requestedByAdminUserId String
+  publicExplanation      String                      @db.VarChar(1000)
+  hideImmediately        Boolean                     @default(false)
+  state                  JobPostRevisionRequestState @default(OPEN)
+  submittedRevisionId    String?                     @unique
+  createdAt              DateTime                    @default(now())
+  satisfiedAt            DateTime?
+  cancelledAt            DateTime?
+  aggregate              JobPostReviewAggregate      @relation(fields: [aggregateId], references: [id], onDelete: Restrict)
+
+  @@index([aggregateId, state, createdAt])
+}
+
+model JobPostFeaturedPlacement {
+  id                     String              @id @default(cuid())
+  aggregateId            String
+  placement              String              @db.VarChar(64)
+  priority               Int
+  startsAt               DateTime
+  endsAt                 DateTime
+  state                  JobPostFeatureState @default(SCHEDULED)
+  reason                 String              @db.VarChar(1000)
+  createdByAdminUserId   String
+  cancelledByAdminUserId String?
+  cancelledAt            DateTime?
+  version                Int                 @default(1)
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
+  aggregate              JobPostReviewAggregate @relation(fields: [aggregateId], references: [id], onDelete: Restrict)
+
+  @@index([placement, startsAt, endsAt])
+  @@index([aggregateId, state, startsAt])
+}
+
+model JobPostEnforcementAction {
+  id              String                  @id @default(cuid())
+  correlationId   String                  @unique @db.VarChar(128)
+  type            JobPostEnforcementType
+  actorAdminUserId String
+  actorSessionId  String?
+  reason          String                  @db.VarChar(1000)
+  publicExplanation String?               @db.VarChar(1000)
+  occurredAt      DateTime                @default(now())
+  targets         JobPostEnforcementTarget[]
+  reportLinks     ModerationReportEnforcementLink[]
+
+  @@index([actorAdminUserId, occurredAt])
+}
+
+model JobPostEnforcementTarget {
+  id                  String                   @id @default(cuid())
+  enforcementActionId String
+  aggregateId         String?
+  targetType          String                   @db.VarChar(32)
+  targetReference     String                   @db.VarChar(128)
+  priorState          Json?
+  resultingState      Json?
+  enforcementAction   JobPostEnforcementAction @relation(fields: [enforcementActionId], references: [id], onDelete: Cascade)
+  aggregate           JobPostReviewAggregate?  @relation(fields: [aggregateId], references: [id], onDelete: Restrict)
+
+  @@index([aggregateId])
+  @@index([targetType, targetReference])
+}
+
+model ModerationReportEnforcementLink {
+  moderationReportId  String
+  enforcementActionId String
+  createdAt           DateTime                 @default(now())
+  moderationReport    ModerationReport         @relation(fields: [moderationReportId], references: [id], onDelete: Restrict)
+  enforcementAction   JobPostEnforcementAction @relation(fields: [enforcementActionId], references: [id], onDelete: Restrict)
+
+  @@id([moderationReportId, enforcementActionId])
+  @@index([enforcementActionId])
+}
+
+model JobPostOperationalHistory {
+  id              String                 @id @default(cuid())
+  aggregateId     String
+  action          String                 @db.VarChar(64)
+  actorUserId     String?
+  correlationId   String                 @db.VarChar(128)
+  priorState      Json?
+  resultingState  Json?
+  reason          String?                @db.VarChar(1000)
+  version         Int
+  occurredAt      DateTime               @default(now())
+  aggregate       JobPostReviewAggregate @relation(fields: [aggregateId], references: [id], onDelete: Restrict)
+
+  @@index([aggregateId, occurredAt, id])
 }
 
 model JobPostReviewVersion {
@@ -2225,9 +2469,155 @@ model CandidateCv {
   updatedAt       DateTime          @updatedAt
   candidate       CandidateIdentity @relation(fields: [candidateUserId], references: [userId], onDelete: Restrict)
   applications    JobApplication[]
+  applicationDrafts CandidateApplicationDraft[] @relation("CandidateApplicationDraftCv")
   applicationDocuments ApplicationDocument[] @relation("ApplicationDocumentSourceCv")
 
   @@index([candidateUserId, confirmedAt, archivedAt])
+}
+
+/// Candidate-private CV match data deliberately has no relations to the
+/// application, company, recruiter, job, or CV tables. The identifiers are
+/// immutable provenance values, not authorization paths. Candidate ownership
+/// is enforced by the private repository on every read and mutation.
+model PrivateCvMatchCheck {
+  id                    String                    @id @default(cuid())
+  candidateUserId       String                    @db.VarChar(128)
+  cvVersionId           String                    @db.VarChar(128)
+  cvVersion             Int
+  cvDigest              String                    @db.Char(64)
+  jobPostingId          String                    @db.VarChar(128)
+  jdVersion             Int
+  jdDigest              String                    @db.Char(64)
+  scoringConfigVersion  String                    @db.VarChar(64)
+  creationDedupeKey     String?                   @unique @db.Char(64)
+  cvSnapshot            Json
+  jdSnapshot            Json
+  cvTextSnapshot        String?                   @db.Text
+  currentAttemptId      String?                   @unique
+  state                 PrivateCvMatchCheckState   @default(QUEUED)
+  createdAt             DateTime                  @default(now())
+  expiresAt             DateTime
+  inaccessibleAt        DateTime?
+  deleteAfter           DateTime?
+  deletedAt             DateTime?
+  deleteLeaseOwner      String?                   @db.VarChar(128)
+  deleteLeaseExpiresAt  DateTime?
+  deleteAttempts        Int                       @default(0)
+  deleteFailureCode     String?                   @db.VarChar(80)
+  attempts              PrivateCvMatchAttempt[]   @relation("PrivateCheckAttempts")
+  currentAttempt        PrivateCvMatchAttempt?    @relation("PrivateCurrentAttempt", fields: [currentAttemptId], references: [id], onDelete: Restrict)
+  commandReceipts       PrivateCvMatchCommandReceipt[]
+
+  @@index([candidateUserId, createdAt(sort: Desc), id(sort: Desc)], map: "PrivateCvMatchCheck_candidate_created_idx")
+  @@index([expiresAt, inaccessibleAt], map: "PrivateCvMatchCheck_expiry_idx")
+  @@index([deleteAfter, deletedAt], map: "PrivateCvMatchCheck_cleanup_idx")
+}
+
+model PrivateCvMatchAttempt {
+  id                    String                    @id @default(cuid())
+  checkId               String
+  attemptNumber         Int
+  trigger               PrivateCvMatchAttemptTrigger
+  state                 PrivateCvMatchAttemptState @default(QUEUED)
+  deterministicResultId String?                   @unique
+  aiResultId            String?                   @unique
+  hybridScore           Decimal?                  @db.Decimal(5, 1)
+  matchBand             String?                   @db.VarChar(32)
+  startedAt             DateTime?
+  completedAt           DateTime?
+  failureCode           String?                   @db.VarChar(80)
+  provider              String?                   @db.VarChar(100)
+  model                 String?                   @db.VarChar(200)
+  promptVersion         String?                   @db.VarChar(100)
+  inputPolicyVersion    String?                   @db.VarChar(100)
+  scoringPolicyVersion  String                    @db.VarChar(64)
+  leaseOwner            String?                   @db.VarChar(128)
+  leaseExpiresAt        DateTime?
+  createdAt             DateTime                  @default(now())
+  check                 PrivateCvMatchCheck        @relation("PrivateCheckAttempts", fields: [checkId], references: [id], onDelete: Cascade)
+  deterministicResultByAttempt PrivateAutomaticMatchResult? @relation("PrivateAttemptAutomatic")
+  aiResultByAttempt       PrivateAiEvaluationResult? @relation("PrivateAttemptAi")
+  deterministicResult     PrivateAutomaticMatchResult? @relation("PrivateAttemptAutomaticPointer", fields: [deterministicResultId], references: [id], onDelete: SetNull)
+  aiResult                PrivateAiEvaluationResult? @relation("PrivateAttemptAiPointer", fields: [aiResultId], references: [id], onDelete: SetNull)
+  currentForCheck       PrivateCvMatchCheck?      @relation("PrivateCurrentAttempt")
+
+  @@unique([checkId, attemptNumber], map: "PrivateCvMatchAttempt_check_attempt_key")
+  @@index([state, leaseExpiresAt, id], map: "PrivateCvMatchAttempt_work_idx")
+  @@index([checkId, createdAt, id], map: "PrivateCvMatchAttempt_check_created_idx")
+}
+
+model PrivateAutomaticMatchResult {
+  id                    String                    @id @default(cuid())
+  attemptId             String                    @unique
+  score                 Decimal                   @db.Decimal(5, 2)
+  weight                Decimal                   @default(0.60) @db.Decimal(3, 2)
+  weightedContribution  Decimal                   @db.Decimal(5, 2)
+  matchedRequirements   Json
+  gaps                  Json
+  requiredExperience    Decimal?                  @db.Decimal(5, 2)
+  detectedExperience    Decimal?                  @db.Decimal(5, 2)
+  evidenceCoverage      Decimal                   @db.Decimal(5, 2)
+  parserProvenance      Json
+  calculatedAt          DateTime
+  mayBeIncomplete       Boolean                   @default(false)
+  attempt               PrivateCvMatchAttempt     @relation("PrivateAttemptAutomatic", fields: [attemptId], references: [id], onDelete: Cascade)
+  attemptPointer        PrivateCvMatchAttempt?    @relation("PrivateAttemptAutomaticPointer")
+  evidence              PrivateMatchEvidence[]
+
+  @@index([calculatedAt, id], map: "PrivateAutomaticMatchResult_calculated_idx")
+}
+
+model PrivateAiEvaluationResult {
+  id                    String                    @id @default(cuid())
+  attemptId             String                    @unique
+  score                 Decimal                   @db.Decimal(5, 2)
+  weight                Decimal                   @default(0.40) @db.Decimal(3, 2)
+  weightedContribution  Decimal                   @db.Decimal(5, 2)
+  summary               String                    @db.Text
+  strengths             Json
+  mainGap               String?                   @db.VarChar(1000)
+  actions               Json
+  evidenceConfidence    Int
+  evidenceLevel         String                    @db.VarChar(16)
+  provider              String                    @db.VarChar(100)
+  model                 String                    @db.VarChar(200)
+  promptVersion         String                    @db.VarChar(100)
+  policyVersion         String                    @db.VarChar(100)
+  durationMs            Int
+  completedAt           DateTime
+  attempt               PrivateCvMatchAttempt     @relation("PrivateAttemptAi", fields: [attemptId], references: [id], onDelete: Cascade)
+  attemptPointer        PrivateCvMatchAttempt?    @relation("PrivateAttemptAiPointer")
+
+  @@index([completedAt, id], map: "PrivateAiEvaluationResult_completed_idx")
+}
+
+model PrivateMatchEvidence {
+  id                    String                    @id @default(cuid())
+  automaticResultId     String
+  criterionId           String                    @db.VarChar(128)
+  criterionVersion      String                    @db.VarChar(64)
+  classification        PrivateMatchEvidenceClassification
+  quote                 String                    @db.VarChar(1000)
+  location              Json
+  confidenceMetadata    Json
+  exclusionFlags        Json
+  automaticResult       PrivateAutomaticMatchResult @relation(fields: [automaticResultId], references: [id], onDelete: Cascade)
+
+  @@index([automaticResultId, classification, id], map: "PrivateMatchEvidence_result_idx")
+}
+
+model PrivateCvMatchCommandReceipt {
+  id                    String                    @id @default(cuid())
+  candidateUserId       String                    @db.VarChar(128)
+  idempotencyKey        String                    @db.VarChar(128)
+  commandKind           String                    @db.VarChar(32)
+  requestDigest         String                    @db.Char(64)
+  checkId               String
+  createdAt             DateTime                  @default(now())
+  check                 PrivateCvMatchCheck       @relation(fields: [checkId], references: [id], onDelete: Cascade)
+
+  @@unique([candidateUserId, idempotencyKey], map: "PrivateCvMatchCommandReceipt_actor_key")
+  @@index([checkId, createdAt, id], map: "PrivateCvMatchCommandReceipt_check_idx")
 }
 
 model SavedJob {
@@ -2261,6 +2651,77 @@ model JobReport {
   @@index([reporterUserId, createdAt(sort: Desc)])
 }
 
+model CandidateApplicationDraft {
+  id                  String         @id @default(cuid())
+  candidateUserId     String
+  jobPostingId        String
+  revision            Int            @default(1)
+  personalInfoDraft   Json
+  selectedCvId        String?
+  coverLetterDraft    Json?
+  messageDraft        String?        @db.Text
+  confirmationAccepted Boolean       @default(false)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  expiresAt           DateTime
+  candidate           CandidateIdentity @relation(fields: [candidateUserId], references: [userId], onDelete: Cascade)
+  jobPosting          JobPosting     @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+  selectedCv          CandidateCv?   @relation("CandidateApplicationDraftCv", fields: [selectedCvId], references: [id], onDelete: SetNull)
+
+  @@unique([candidateUserId, jobPostingId])
+  @@index([expiresAt, id])
+  @@index([candidateUserId, updatedAt(sort: Desc)])
+}
+
+model ApplicationIntake {
+  id              String                @id @default(cuid())
+  applicationId   String                @unique
+  state           ApplicationIntakeState @default(RECEIVED)
+  progressPercent Int                   @default(0)
+  receivedAt      DateTime              @default(now())
+  checkingStartedAt DateTime?
+  sentAt          DateTime?
+  failureCode     String?               @db.VarChar(80)
+  leaseOwner      String?               @db.VarChar(128)
+  leaseExpiresAt  DateTime?
+  attemptCount    Int                   @default(0)
+  version         Int                   @default(1)
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  application     JobApplication        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([state, leaseExpiresAt, updatedAt])
+  @@index([receivedAt, id])
+}
+
+model ApplicationPublicUpdate {
+  id             String                    @id @default(cuid())
+  applicationId  String
+  kind           ApplicationPublicUpdateKind
+  publicStage    ApplicationPublicStage?
+  publicOutcome  ApplicationPublicOutcome?
+  title          String                    @db.VarChar(160)
+  variables      Json?
+  effectiveAt    DateTime                  @default(now())
+  deduplicationKey String                  @unique @db.VarChar(255)
+  sourceEventReference String?             @db.VarChar(128)
+  createdAt      DateTime                  @default(now())
+  application    JobApplication            @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId, effectiveAt(sort: Desc), id(sort: Desc)])
+}
+
+model ApplicationNotificationPreference {
+  id            String         @id @default(cuid())
+  applicationId String         @unique
+  emailEnabled  Boolean        @default(true)
+  inAppEnabled  Boolean        @default(true)
+  version       Int            @default(1)
+  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime       @default(now())
+  application   JobApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
 model JobApplication {
   id                      String                        @id @default(cuid())
   candidateUserId         String
@@ -2275,6 +2736,12 @@ model JobApplication {
   stageVersion            Int                           @default(1)
   lastStageChangedAt      DateTime                      @default(now())
   coverLetter             String?
+  submissionMessage       String?                       @db.Text
+  withdrawalOutcome       ApplicationWithdrawalOutcome?
+  withdrawnAt             DateTime?
+  withdrawnByUserId       String?
+  withdrawalVersion       Int?
+  activeProcessingStoppedAt DateTime?
   profileSnapshot         Json
   cvSnapshot              Json
   jobSnapshot             Json
@@ -2311,6 +2778,9 @@ model JobApplication {
   aiAssessments           AiAssessment[]
   scoringWorkItems        ScoringWorkItem[]
   aiAssessmentAttempts    AiAssessmentAttempt[]
+  intake                  ApplicationIntake?
+  publicUpdates           ApplicationPublicUpdate[]
+  notificationPreference  ApplicationNotificationPreference?
 
   @@unique([candidateUserId, jobPostingId])
   @@unique([candidateUserId, idempotencyKey])

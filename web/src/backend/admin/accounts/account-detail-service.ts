@@ -48,6 +48,9 @@ export class AccountDetailService {
       type: recruiter ? "RECRUITER" : "CANDIDATE",
       status: result.account.state,
       version: result.account.version,
+      hasCandidateIdentity: result.account.isCandidate,
+      activeMembershipCount: result.account.recruiterCompanyIds.length,
+      hasActiveAdministratorGrant: result.protectedAdministrator,
       counts: recruiter ? recruiterActivity : candidateActivity,
     });
     return accountDetailSchema.parse({

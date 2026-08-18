@@ -5,14 +5,19 @@ import type {
   NotificationContextType,
   NotificationKind,
   NotificationSeverity,
+  NotificationRecipientRole,
 } from "@/shared/contracts/notifications";
 import { notificationKindSchema } from "@/shared/contracts/notifications";
-import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
 
 export const notificationVariablesSchema = z
   .object({
     companyName: z.string().trim().min(1).max(120).optional(),
+    jobId: z.string().trim().min(1).max(128).optional(),
     audience: z.enum(["USER", "ADMIN"]).optional(),
+    recipientRole: z.enum(["CANDIDATE", "RECRUITER", "ADMIN"]).optional(),
+    safeReason: z
+      .enum(["POLICY_VIOLATION", "QUALITY_ISSUE", "DUPLICATE"])
+      .optional(),
     stage: z.string().trim().min(1).max(64).optional(),
     state: z.string().trim().min(1).max(64).optional(),
     count: z.number().int().min(1).max(999).optional(),
@@ -491,39 +496,23 @@ const policies = {
       "Your job post needs revision before it can be submitted again.",
     ),
   },
+  JOB_POST_CHANGES_REQUESTED: {
+    category: "MODERATION",
+    severity: "MEDIUM",
+    title: { vi: "Bài đăng cần chỉnh sửa", en: "Your post needs changes" },
+    summary: generic(
+      "Quản trị viên yêu cầu bạn chỉnh sửa bài đăng trước khi gửi lại.",
+      "An administrator requested changes before this post can be submitted again.",
+    ),
+  },
 } satisfies Record<NotificationKind, Policy>;
-
-const hrefForContext = (
-  kind: NotificationKind,
-  contextType?: NotificationContextType,
-  contextId?: string,
-) => {
-  if (!contextType || !contextId) return null;
-  if (contextType === "ACCOUNT") return "/profile/security";
-  if (contextType === "MEMBERSHIP") return recruiterRoutes.jobPostings;
-  if (contextType === "APPLICATION")
-    return kind === "APPLICATION_RECEIVED"
-      ? recruiterRoutes.jobPostings
-      : `/jobs/applied/${encodeURIComponent(contextId)}`;
-  if (contextType === "VERIFICATION_REQUEST")
-    return "/dashboard/employer-verification";
-  if (contextType === "SUPPORT_CASE") return "/support";
-  if (contextType === "CONNECTION_PROPOSAL" || contextType === "CONNECTION")
-    return "/connections";
-  if (contextType === "CONVERSATION")
-    return `/messages?conversation=${encodeURIComponent(contextId)}`;
-  if (contextType === "JOB_POST_REVIEW")
-    return kind === "JOB_POST_REVIEW_REQUESTED_ADMIN"
-      ? `/admin/job-post-reviews/${encodeURIComponent(contextId)}`
-      : `${recruiterRoutes.jobPostings}?review=${encodeURIComponent(contextId)}`;
-  return null;
-};
 
 export type BuiltNotification = {
   kind: NotificationKind;
   category: NotificationCategory;
   severity: NotificationSeverity;
   audience: "USER" | "ADMIN";
+  recipientRole?: NotificationRecipientRole;
   title: string;
   summary: string;
   href: string | null;
@@ -579,13 +568,18 @@ export function buildNotification(
     category: policy.category,
     severity: policy.severity,
     audience: variables.audience === "ADMIN" ? "ADMIN" : "USER",
+    recipientRole:
+      variables.recipientRole ??
+      (variables.audience === "ADMIN"
+        ? "ADMIN"
+        : kind === "APPLICATION_RECEIVED" ||
+            kind.startsWith("JOB_POST_")
+          ? "RECRUITER"
+          : "CANDIDATE"),
     title,
     summary,
-    href: hrefForContext(
-      kind,
-      contextType ?? undefined,
-      contextId ?? undefined,
-    ),
+    // Context is durable; href is resolved for the current recipient when served.
+    href: null,
     contextType,
     contextId,
     deduplicationKey: input.deduplicationKey,

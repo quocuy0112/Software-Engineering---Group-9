@@ -130,6 +130,7 @@ Exact dependency versions are defined in the root `package-lock.json` and `web/p
 | --------------------- | ------------ | --------------------------------------------------- | --------------------------- |
 | Web application       | Host Node.js | Next.js HTTP plus Socket.IO                         | Supervised by `npm run dev` |
 | Email worker          | Host Node.js | Delivers transactional outbox records               | Supervised by `npm run dev` |
+| Application intake worker | Host Node.js | Verifies submitted files and advances intake state   | Supervised by `npm run dev` |
 | `postgres`            | Docker       | Authoritative PostgreSQL database                   | `unless-stopped`            |
 | `clamav`              | Docker       | Malware scanner and FreshClam updater               | `unless-stopped`            |
 | `ocr-engine`          | Docker       | Private Unix-socket OCR service                     | `unless-stopped`            |
@@ -194,6 +195,8 @@ PostgreSQL, `psql`, Python OCR dependencies, and ClamAV do not need to be instal
 | Command                             | Purpose                                                            |
 | ----------------------------------- | ------------------------------------------------------------------ |
 | `npm run email:worker`              | Run only the email outbox worker on the host                       |
+| `npm run applications:intake`       | Drain currently queued application intake checks                  |
+| `npm run applications:intake:watch` | Run the application intake worker continuously                     |
 | `npm run cv:worker:probe`           | Probe CV worker configuration/runtime boundaries                   |
 | `npm run cv:scanner:check`          | Check the configured scanner boundary                              |
 | `npm run ocr:up`                    | Build/start only the OCR engine                                    |

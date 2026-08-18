@@ -1,0 +1,487 @@
+/*
+ * Job detail reference layer
+ *
+ * This file is deliberately imported after job-board.css. It isolates the
+ * approved public-job-detail composition from the older job-board variants.
+ */
+.job-detail-board-page {
+  width: min(1180px, 100%);
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 70px;
+  color: #101b39;
+  background: #f4f7ff;
+  font-family: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+}
+
+.job-detail-board-page .job-detail-layout--board {
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 20px;
+}
+
+.job-detail-board-page .job-detail-main--board,
+.job-detail-board-page .job-detail-sidebar--board {
+  gap: 16px;
+}
+
+.job-detail-board-page .job-detail-hero--redesign,
+.job-detail-board-page .job-detail-section-card,
+.job-detail-board-page .job-related-section,
+.job-detail-sidebar--board .job-sidebar-card--redesign {
+  border: 1px solid #dce5f8;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgb(16 27 57 / 4%),
+    0 8px 24px rgb(16 27 57 / 6%);
+}
+
+.job-detail-board-page .job-detail-hero--redesign {
+  overflow: hidden;
+  margin: 0;
+  padding: 24px 26px;
+  border-left: 4px solid #2954e5;
+}
+
+.job-detail-board-page .job-detail-hero--redesign::before {
+  display: none;
+}
+
+.job-detail-board-page .job-detail-breadcrumb {
+  margin: 0 0 18px;
+  color: #5c6a8c;
+  font-size: 13px;
+}
+
+.job-detail-board-page .job-detail-header-topline {
+  margin-bottom: 18px;
+}
+
+.job-detail-board-page .job-detail-hero--redesign .job-detail-back {
+  min-height: 0;
+  margin: 0;
+}
+
+.job-detail-board-page .job-detail-company-lockup {
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.job-detail-board-page .job-company-logo.is-large,
+.job-detail-sidebar--board .job-sidebar-company-logo.is-large {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  color: #122b8c;
+  background: #dee8ff;
+  font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif;
+  font-size: 16px;
+}
+
+.job-detail-board-page .job-company-name,
+.job-detail-sidebar--board .job-company-accordion-name {
+  margin: 0 0 6px;
+  color: #122b8c;
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.job-detail-board-page .job-detail-eyebrow,
+.job-detail-board-page .panel-kicker {
+  font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.job-detail-board-page .job-detail-hero--redesign h1 {
+  margin: 0 0 20px;
+  color: #101b39;
+  font-family: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.job-detail-board-page .job-detail-quick-info {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.job-detail-board-page .job-detail-quick-info-item,
+.job-detail-board-page .sh-stat-chip {
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #eef1f9;
+  box-shadow: none;
+}
+
+.job-detail-board-page .job-detail-quick-info-icon,
+.job-detail-board-page .sh-stat-chip__icon {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+  color: #122b8c;
+  background: #dee8ff;
+}
+
+.job-detail-board-page .job-detail-summary {
+  margin: 0 0 16px;
+  color: #5c6a8c;
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+.job-detail-board-page .job-detail-salary-line {
+  margin: 0 0 22px;
+}
+
+.job-detail-board-page .job-detail-salary-line strong {
+  color: #2954e5;
+  font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.job-detail-board-page .job-detail-action-row,
+.job-detail-board-page .job-detail-primary-actions {
+  display: flex;
+  width: auto;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  margin: 0;
+}
+
+.job-detail-board-page .job-detail-primary-actions > *,
+.job-detail-board-page .job-detail-primary-actions .job-save-control,
+.job-detail-board-page .job-detail-primary-actions .job-save-button {
+  width: auto !important;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+.job-detail-board-page .job-detail-board-apply-button {
+  min-width: 193px;
+  min-height: 0;
+  padding: 14px 26px;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  background: #2954e5;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.job-detail-board-page .job-detail-primary-actions .job-save-button {
+  min-width: 173px;
+  min-height: 0;
+  padding: 13px 22px;
+  border: 1.5px solid #dce5f8;
+  border-radius: 10px;
+  color: #101b39;
+  background: #fff;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.job-detail-board-page .job-detail-match-button {
+  min-height: 46px;
+  gap: 8px;
+  padding: 11px 14px;
+  border-color: #cdd9ff;
+  border-radius: 10px;
+  color: #2347c9;
+  background: #f4f6ff;
+  font-size: 14.5px;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.job-detail-board-page .job-detail-match-button > svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+
+.job-detail-board-page .job-detail-match-private-label {
+  padding: 2px 6px;
+  border-radius: 999px;
+  color: #3d56b7;
+  background: #e4eaff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.job-detail-board-page .job-detail-match-button:hover,
+.job-detail-board-page .job-detail-match-button:focus-visible {
+  border-color: #8fa8ff;
+  color: #173daf;
+  background: #eaf0ff;
+}
+
+.job-detail-board-page
+  .job-detail-primary-actions
+  .job-save-button[aria-pressed="true"] {
+  border-color: #2954e5;
+  color: #122b8c;
+  background: #dee8ff;
+}
+
+.job-detail-board-page .job-detail-tab-card {
+  padding: 24px 26px;
+  overflow: visible;
+}
+
+.job-detail-board-page .job-detail-tab-list {
+  gap: 26px;
+  margin: 0 0 20px;
+  overflow: visible;
+  border-bottom-color: #dce5f8;
+}
+
+.job-detail-board-page .job-detail-tab {
+  min-height: 0;
+  padding: 0 0 14px;
+  color: #5c6a8c;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.job-detail-board-page .job-detail-tab.is-active {
+  color: #2954e5;
+}
+
+.job-detail-board-page .job-detail-tab::after {
+  right: 0;
+  left: 0;
+  height: 2px;
+}
+
+.job-detail-board-page .job-detail-tab-description {
+  padding: 0;
+  margin: 0 0 22px;
+  color: #5c6a8c;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.job-detail-board-page .job-detail-tab-panel {
+  padding: 0;
+}
+
+.job-detail-sidebar--board .job-company-accordion {
+  padding: 0;
+  overflow: hidden;
+}
+
+.job-detail-sidebar--board .job-company-accordion-summary {
+  padding: 24px 26px 14px;
+}
+
+.job-detail-sidebar--board .job-company-accordion-identity {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 14px;
+  padding: 0 26px 22px;
+}
+
+.job-detail-sidebar--board .job-company-accordion-copy {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+}
+
+.job-detail-board-page .job-verified-inline {
+  min-height: 0;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 999px;
+  color: #0a7f62;
+  background: #dcf6ee;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.job-detail-sidebar--board .job-company-accordion-copy .job-verified-inline {
+  width: max-content;
+  max-width: none;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.job-detail-sidebar--board .job-company-accordion-content {
+  padding: 0 26px 24px;
+}
+
+.job-detail-sidebar--board
+  .job-company-accordion[data-expanded="false"]
+  .job-company-accordion-content {
+  padding: 0;
+  border-top: 0;
+}
+
+.job-detail-sidebar--board
+  .job-sidebar-card--redesign:not(.job-company-accordion) {
+  padding: 24px 26px;
+}
+
+/* Similar jobs uses the same heading treatment as the HTML reference. */
+.job-detail-sidebar--board .job-similar-jobs-card .panel-kicker {
+  margin: 0 0 6px;
+  color: #2954e5;
+  font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.job-detail-sidebar--board .job-similar-jobs-card h2 {
+  margin: 0;
+  color: #101b39;
+  font-family: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.job-detail-board-page .job-related-section {
+  padding: 24px 26px;
+}
+
+.job-detail-board-page .job-related-heading .panel-kicker {
+  margin: 0 0 6px;
+  color: #2954e5;
+  font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.job-detail-board-page .job-related-heading h2 {
+  margin: 0;
+  color: #101b39;
+  font-family: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+/* Job-search filter heading follows the same display hierarchy. */
+.job-advanced-heading .panel-kicker {
+  margin: 0 0 6px;
+  color: #2954e5;
+  font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.job-advanced-heading h2 {
+  margin: 0;
+  color: #101b39;
+  font-family: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+/* Grid cards use a legible bookmark as their primary Save action. */
+.job-redesign-card.job-card--grid
+  .job-card-grid-actions
+  .job-save-control
+  .job-heart-button,
+.job-redesign-card.job-card--grid .job-card-grid-actions > .job-heart-button {
+  width: 52px;
+  min-width: 52px;
+  height: 52px;
+  border-color: #2954e5;
+  color: #fff;
+  background: #2954e5;
+}
+
+.job-redesign-card.job-card--grid
+  .job-card-grid-actions
+  .job-save-control
+  .job-heart-button:hover,
+.job-redesign-card.job-card--grid
+  .job-card-grid-actions
+  > .job-heart-button:hover,
+.job-redesign-card.job-card--grid
+  .job-card-grid-actions
+  .job-save-control
+  .job-heart-button:focus-visible,
+.job-redesign-card.job-card--grid
+  .job-card-grid-actions
+  > .job-heart-button:focus-visible {
+  border-color: #122b8c;
+  color: #fff;
+  background: #122b8c;
+  transform: none;
+}
+
+.job-redesign-card.job-card--grid .job-card-grid-actions .job-heart-button svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.2;
+}
+
+@media (max-width: 900px) {
+  .job-detail-board-page .job-detail-layout--board,
+  .job-detail-board-page .job-detail-quick-info {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .job-detail-board-page {
+    padding: 20px 16px 48px;
+  }
+
+  .job-detail-board-page .job-detail-primary-actions {
+    width: 100%;
+  }
+
+  .job-detail-board-page .job-detail-primary-actions > *,
+  .job-detail-board-page .job-detail-primary-actions .job-save-control,
+  .job-detail-board-page .job-detail-primary-actions .job-save-button {
+    width: 100% !important;
+  }
+
+  .job-detail-board-page .job-detail-tab-card {
+    padding: 20px 16px;
+  }
+
+  .job-detail-sidebar--board .job-company-accordion-summary {
+    padding: 20px 16px 14px;
+  }
+
+  .job-detail-sidebar--board .job-company-accordion-identity,
+  .job-detail-sidebar--board .job-company-accordion-content {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .job-detail-sidebar--board .job-company-accordion-copy .job-verified-inline {
+    max-width: 100%;
+    white-space: normal;
+  }
+}

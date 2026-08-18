@@ -1,10 +1,10 @@
-import { CandidateApplicationService } from "@/backend/services/jobs/candidate-application-service";
+import { CandidateApplicationTrackingService } from "@/backend/candidate-applications/candidate-application-tracking-service";
+import { candidateApplicationError } from "@/backend/candidate-applications/candidate-application-errors";
 import {
   jobErrorResponse,
   jobJson,
   requireJobActor,
 } from "@/backend/security/job-request-boundary";
-import { candidateApplicationDetailSchema } from "@/shared/contracts/jobs/applications";
 
 export async function GET(
   request: Request,
@@ -12,12 +12,12 @@ export async function GET(
 ) {
   try {
     const actor = await requireJobActor(request, { mutation: false });
-    const result = await new CandidateApplicationService().detail(
+    const result = await new CandidateApplicationTrackingService().get(
       actor,
       (await context.params).applicationId,
     );
-    return jobJson(candidateApplicationDetailSchema.parse(result));
+    return jobJson(result);
   } catch (error) {
-    return jobErrorResponse(error);
+    return jobErrorResponse(candidateApplicationError(error));
   }
 }

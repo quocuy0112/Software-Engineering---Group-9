@@ -87,6 +87,12 @@ export type RecruiterCompanyView = Omit<
 export type RecruiterJob = JobCatalogItem & {
   company: RecruiterCompanyView;
   review?: RecruiterReviewProjection;
+  correctionRequest?: {
+    id: string;
+    publicExplanation: string;
+    hideImmediately: boolean;
+    createdAt: string;
+  };
 };
 
 export type RecruiterJobManagementData = {

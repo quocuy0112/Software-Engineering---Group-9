@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Sparkles } from "lucide-react";
+import { useEffect } from "react";
+import { JobHeroCard } from "@/frontend/components/ui/job-hero-card";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
 import { formatSalary } from "@/shared/utils/jobs/job-display";
-import { ApplyFormSection } from "./apply-form-section";
 import { CompanyLogo, JobDetailSidebar } from "./job-detail-sidebar";
 import { JobDetailOverview, JobDetailSections } from "./job-detail-sections";
 import { JobMetaIcon } from "./job-meta-icon";
-import { QuickSkillChips } from "./quick-skill-chips";
 import { RelatedJobsCarousel } from "./related-jobs-carousel";
 import { SaveJobAction } from "./save-job-action";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
@@ -22,27 +22,15 @@ const stateLabel = {
 
 const jobDate = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" });
 
-function shouldOpenApplyFromLocation() {
-  const params = new URLSearchParams(window.location.search);
-  return (
-    window.location.hash.toLowerCase() === "#apply" ||
-    params.get("apply") === "true" ||
-    params.get("openApply") === "true"
-  );
-}
-
 function DetailActionButtons({
   job,
   applied,
-  applyOpen,
-  onApply,
 }: {
   job: JobDetail;
   applied: boolean;
-  applyOpen: boolean;
-  onApply: () => void;
 }) {
-  const returnTo = encodeURIComponent("/jobs/" + job.slug);
+  const applyPath = "/jobs/" + job.slug + "/apply";
+  const returnTo = encodeURIComponent(applyPath);
 
   return (
     <div className="job-detail-primary-actions">
@@ -50,15 +38,12 @@ function DetailActionButtons({
         applied ? (
           <span className="job-applied-state">✓ Applied</span>
         ) : job.actions.authenticated ? (
-          <button
+          <Link
             className="sh-button job-detail-apply-button job-detail-board-apply-button"
-            type="button"
-            aria-expanded={applyOpen}
-            aria-controls="apply"
-            onClick={onApply}
+            href={applyPath}
           >
-            {applyOpen ? "Hide application form" : "Apply now"}
-          </button>
+            Apply now
+          </Link>
         ) : (
           <Link
             className="sh-button job-detail-apply-button job-detail-board-apply-button"
@@ -70,6 +55,18 @@ function DetailActionButtons({
       ) : (
         <span className="job-closed-state">Applications closed</span>
       )}
+
+      {job.actions.authenticated && job.state === "ACTIVE" ? (
+        <Link
+          className="job-secondary-button job-detail-match-button"
+          href={`/cv-match-check/new?jobId=${encodeURIComponent(job.id)}`}
+          aria-label="Check CV fit privately. Results are visible only to you and are not shared with recruiters."
+        >
+          <Sparkles aria-hidden="true" />
+          <span>Check CV fit privately</span>
+          <span className="job-detail-match-private-label">Private</span>
+        </Link>
+      ) : null}
 
       {job.actions.authenticated && job.actions.canSave ? (
         <SaveJobAction
@@ -92,11 +89,8 @@ function DetailActionButtons({
 
 export function JobDetailPage({ job }: { job: JobDetail }) {
   const shared = useOptionalJobInteraction();
-  const [applyOpen, setApplyOpen] = useState(false);
-  const [submittedHere, setSubmittedHere] = useState(false);
   const applied =
     job.actions.applied ||
-    submittedHere ||
     Boolean(shared?.records[job.id]?.applied);
   const registerJob = shared?.registerJob;
 
@@ -106,34 +100,6 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
       applied: job.actions.applied,
     });
   }, [job.actions.applied, job.actions.saved, job.id, registerJob]);
-  useEffect(() => {
-    function syncApplyState() {
-      setApplyOpen(shouldOpenApplyFromLocation());
-    }
-
-    syncApplyState();
-    window.addEventListener("hashchange", syncApplyState);
-    window.addEventListener("popstate", syncApplyState);
-    return () => {
-      window.removeEventListener("hashchange", syncApplyState);
-      window.removeEventListener("popstate", syncApplyState);
-    };
-  }, []);
-
-  function setApplyVisibility(next: boolean) {
-    setApplyOpen(next);
-    const url = new URL(window.location.href);
-    if (next) {
-      url.searchParams.set("apply", "true");
-      url.searchParams.delete("openApply");
-      url.hash = "";
-    } else {
-      url.hash = "";
-      url.searchParams.delete("apply");
-      url.searchParams.delete("openApply");
-    }
-    window.history.replaceState(null, "", url);
-  }
 
   return (
     <article className="jobs-detail-page job-redesign-detail job-detail-board-page">
@@ -149,82 +115,38 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
 
       <div className="job-detail-layout job-detail-layout--redesign job-detail-layout--board">
         <main className="job-detail-main job-detail-main--redesign job-detail-main--board">
-          <header className="job-detail-hero job-detail-hero--redesign">
-            <div className="job-detail-header-topline">
-              <Link className="job-detail-back" href="/jobs">
-                <span aria-hidden="true">←</span> Back to jobs
-              </Link>
+          <JobHeroCard
+            className="job-detail-hero"
+            company={job.company}
+            companyLogo={<CompanyLogo company={job.company} large />}
+            verified={job.isVerified}
+            status={stateLabel[job.state]}
+            title={job.title}
+            stats={[
+              {
+                icon: <JobMetaIcon name="location" />,
+                label: "Location",
+                value: job.location,
+              },
+              {
+                icon: <JobMetaIcon name="experience" />,
+                label: "Experience",
+                value:
+                  job.experienceMinYears !== undefined
+                    ? job.experienceMinYears + "+ years"
+                    : "No experience required",
+              },
+              {
+                icon: <JobMetaIcon name="deadline" />,
+                label: "Application deadline",
+                value: job.applicationDeadline
+                  ? jobDate.format(new Date(job.applicationDeadline))
+                  : "Open until filled",
+              },
+            ]}
+            pitch={job.summary}
+            salaryRange={
               <span
-                className="job-state"
-                aria-label={"Job status: " + stateLabel[job.state]}
-              >
-                {stateLabel[job.state]}
-              </span>
-            </div>
-
-            <div className="job-detail-company-lockup">
-              <CompanyLogo company={job.company} large />
-              <div>
-                <p className="job-company-name">{job.company.displayName}</p>
-                {job.isVerified ? (
-                  <span className="job-verified-inline">
-                    <span aria-hidden="true">✓</span> Verified SmartHire
-                    employer
-                  </span>
-                ) : null}
-              </div>
-            </div>
-
-            <p className="job-detail-eyebrow">A ROLE WORTH YOUR NEXT MOVE</p>
-            <h1>{job.title}</h1>
-            <div
-              className="job-detail-quick-info"
-              aria-label="Key job information"
-            >
-              <div className="job-detail-quick-info-item">
-                <span className="job-detail-quick-info-icon" aria-hidden="true">
-                  <JobMetaIcon name="location" />
-                </span>
-                <span>
-                  <span className="job-detail-quick-info-label">Location</span>
-                  <strong>{job.location}</strong>
-                </span>
-              </div>
-              <div className="job-detail-quick-info-item">
-                <span className="job-detail-quick-info-icon" aria-hidden="true">
-                  <JobMetaIcon name="experience" />
-                </span>
-                <span>
-                  <span className="job-detail-quick-info-label">
-                    Experience
-                  </span>
-                  <strong>
-                    {job.experienceMinYears !== undefined
-                      ? job.experienceMinYears + "+ years"
-                      : "No experience required"}
-                  </strong>
-                </span>
-              </div>
-              <div className="job-detail-quick-info-item">
-                <span className="job-detail-quick-info-icon" aria-hidden="true">
-                  <JobMetaIcon name="deadline" />
-                </span>
-                <span>
-                  <span className="job-detail-quick-info-label">
-                    Application deadline
-                  </span>
-                  <strong>
-                    {job.applicationDeadline
-                      ? jobDate.format(new Date(job.applicationDeadline))
-                      : "Open until filled"}
-                  </strong>
-                </span>
-              </div>
-            </div>
-            <p className="job-detail-summary">{job.summary}</p>
-
-            <div className="job-detail-salary-line">
-              <strong
                 className={
                   job.salary?.isNegotiable
                     ? "job-salary--negotiable"
@@ -232,32 +154,20 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
                 }
               >
                 {formatSalary(job.salary)}
-              </strong>
-            </div>
-
-            <div className="job-detail-action-row" aria-label="Job actions">
+              </span>
+            }
+            actions={
               <DetailActionButtons
                 job={job}
                 applied={applied}
-                applyOpen={applyOpen}
-                onApply={() => setApplyVisibility(!applyOpen)}
               />
-            </div>
-          </header>
+            }
+          />
 
           <JobDetailOverview job={job} />
-          <QuickSkillChips job={job} />
           <WhyJoinUsSection job={job} />
           <JobDetailSections job={job} includeOverview={false} />
 
-          <ApplyFormSection
-            jobId={job.id}
-            jobTitle={job.title}
-            open={applyOpen}
-            applied={applied}
-            onOpenChange={setApplyVisibility}
-            onSubmitted={() => setSubmittedHere(true)}
-          />
           <RelatedJobsCarousel jobs={job.relatedJobs ?? []} />
         </main>
 

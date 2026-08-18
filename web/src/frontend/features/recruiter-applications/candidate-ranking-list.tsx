@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import type { RankedApplicationRow } from "@/shared/contracts/scoring";
 import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
+import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
+import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import {
   useRankedCandidates,
   type RankedCandidateQuery,
@@ -374,12 +376,16 @@ export function CandidateRankingList({
   jobTitle,
   onBack,
   backHref,
+  csrfProof,
 }: {
   jobId: string;
   jobTitle: string;
   onBack?: () => void;
   backHref?: string;
+  csrfProof?: string;
 }) {
+  const contextCsrfProof = useCsrfProof();
+  const effectiveCsrfProof = csrfProof ?? contextCsrfProof;
   const [query, setQuery] = useState<RankedCandidateQuery>(defaultQuery);
   const [pageSize, setPageSize] = useState(10);
   const [searchDraft, setSearchDraft] = useState("");
@@ -427,10 +433,42 @@ export function CandidateRankingList({
     setMessage(nextMessage);
     ranking.refresh();
   };
+  const markViewed = async (row: RankedApplicationRow) => {
+    if (!effectiveCsrfProof || row.stage !== "APPLIED") return;
+    try {
+      const response = await mutateWithCurrentCsrf(
+        `/api/recruiter/applications/${encodeURIComponent(row.applicationId)}/stage`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            targetStage: "VIEWED",
+            expectedVersion: row.stageVersion,
+          }),
+        },
+        effectiveCsrfProof,
+      );
+      // A concurrent recruiter may have marked it first. Refresh in both the
+      // success and conflict cases so the list reflects the authoritative stage.
+      if (response.ok) {
+        setSelected((current) =>
+          current?.applicationId === row.applicationId
+            ? { ...current, stage: "VIEWED", stageVersion: row.stageVersion + 1 }
+            : current,
+        );
+        ranking.refresh();
+      } else if (response.status === 409) {
+        ranking.refresh();
+      }
+    } catch {
+      // Opening the candidate remains available if the acknowledgement fails.
+    }
+  };
   const openRow = (row: RankedApplicationRow, rank: number) => {
     setMessage(null);
     setSelected(row);
     setSelectedRank(rank);
+    void markViewed(row);
   };
   const setScoreRange = (range: string) => {
     if (!range)

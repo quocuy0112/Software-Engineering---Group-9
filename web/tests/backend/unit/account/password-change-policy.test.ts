@@ -20,9 +20,9 @@ async function evaluate(
 }
 
 describe("password-change policy", () => {
-  it("counts Unicode code points and accepts spaces at 12 and 128", async () => {
-    expect(await evaluate("🔐".repeat(12))).toEqual({ accepted: true });
-    expect(await evaluate("🔐".repeat(128))).toEqual({ accepted: true });
+  it("counts Unicode code points and accepts valid composition at 12 and 128", async () => {
+    expect(await evaluate(`A1!${"a".repeat(9)}`)).toEqual({ accepted: true });
+    expect(await evaluate(`A1!${"a".repeat(125)}`)).toEqual({ accepted: true });
     expect(await evaluate("🔐".repeat(11))).toMatchObject({
       accepted: false,
       code: "PASSWORD_POLICY",
@@ -31,14 +31,19 @@ describe("password-change policy", () => {
       accepted: false,
       code: "PASSWORD_POLICY",
     });
-    expect(await evaluate("a calm pass phrase")).toEqual({ accepted: true });
+    expect(await evaluate("A calm password! 2026")).toEqual({ accepted: true });
   });
 
-  it("adds no uppercase/lowercase/digit/symbol composition rule", async () => {
-    expect(await evaluate("all lowercase words only")).toEqual({
-      accepted: true,
+  it("requires uppercase, digit, and special-character composition", async () => {
+    expect(await evaluate("all lowercase words only!")).toMatchObject({
+      code: "PASSWORD_POLICY",
     });
-    expect(await evaluate("CHỈ TOÀN CHỮ HOA")).toEqual({ accepted: true });
+    expect(await evaluate("ALL UPPERCASE WORDS 2026")).toMatchObject({
+      code: "PASSWORD_POLICY",
+    });
+    expect(await evaluate("Uppercase without number!")).toMatchObject({
+      code: "PASSWORD_POLICY",
+    });
   });
 
   it("rejects mismatch, common/compromised values, and current reuse", async () => {

@@ -50,6 +50,7 @@ export const authenticationAuditAction = z.enum([
   "job.report.denied",
   "job.application.submitted",
   "job.application.stage_changed",
+  "job.application.withdrawn",
   "job.application.denied",
   "job.application.failed",
   "SCORING_RESCORE_REQUESTED",
@@ -143,6 +144,16 @@ export const authenticationAuditAction = z.enum([
   "job_post_review.rejected",
   "job_post_review.approval_blocked",
   "job_post_review.closed",
+  "job_post_management.hide",
+  "job_post_management.restore",
+  "job_post_management.close_applications",
+  "job_post_management.reopen_applications",
+  "job_post_management.archive",
+  "job_post_management.soft_delete",
+  "job_post_management.request_changes",
+  "job_post_management.feature",
+  "job_post_management.unfeature",
+  "job_post_management.enforce",
 ]);
 
 const auditContextSchema = z
@@ -197,6 +208,10 @@ const auditContextSchema = z
     resultingState: z.string().max(80).optional(),
     targetVersion: z.number().int().nonnegative().optional(),
     companyReference: z.string().max(128).optional(),
+    visibility: z.string().max(80).optional(),
+    applicationState: z.string().max(80).optional(),
+    outcome: z.string().max(80).optional(),
+    preservedStage: z.string().max(40).optional(),
   })
   .strict();
 
