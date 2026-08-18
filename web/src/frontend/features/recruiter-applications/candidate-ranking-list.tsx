@@ -900,6 +900,7 @@ export function CandidateRankingList({
       {modal === "interview" && selected ? (
         <StageTransitionConfirmModal
           candidate={selected}
+          jobId={jobId}
           onCancel={() => setModal(null)}
           onCompleted={() =>
             finishAction(
@@ -911,6 +912,7 @@ export function CandidateRankingList({
       {modal === "reject" && selected ? (
         <RejectCandidateModal
           candidate={selected}
+          jobId={jobId}
           onCancel={() => setModal(null)}
           onCompleted={() =>
             finishAction(
