@@ -38,6 +38,16 @@ const emptyData: RecruiterJobManagementData = {
   companyId: null,
 };
 
+const JOB_POSTINGS_REFRESH_INTERVAL_MS = 5_000;
+
+async function fetchRecruiterJobManagementData() {
+  const response = await fetch("/api/recruiter/job-postings", {
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error("Unable to load job postings.");
+  return response.json() as Promise<RecruiterJobManagementData>;
+}
+
 function Icon({
   name,
 }: {
@@ -323,6 +333,15 @@ function JobPostingCard({
           <span>Applicants</span>
           <Icon name="arrow" />
         </button>
+        <Link
+          href={recruiterRoutes.pipelineForJob(job.id)}
+          className="recruiter-applicant-link recruiter-applicant-link--pipeline"
+          aria-label={`View pipeline for ${title}`}
+        >
+          <WorkspaceNavIcon name="pipeline" />
+          <span>View pipeline</span>
+          <Icon name="arrow" />
+        </Link>
         <div className="recruiter-job-card__actions">
           <button
             type="button"
@@ -546,24 +565,45 @@ export function RecruiterJobPostingManagement({
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    if (initialData) return;
     let cancelled = false;
-    void fetch("/api/recruiter/job-postings", { cache: "no-store" })
-      .then(async (response) => {
-        if (!response.ok) throw new Error("Unable to load job postings.");
-        return response.json() as Promise<RecruiterJobManagementData>;
-      })
-      .then((next) => {
+    let requestInFlight = false;
+
+    const refresh = async (showLoading = false) => {
+      if (cancelled || requestInFlight) return;
+      requestInFlight = true;
+      if (showLoading) setLoading(true);
+      try {
+        const next = await fetchRecruiterJobManagementData();
         if (!cancelled) setData(next);
-      })
-      .catch(() => {
-        if (!cancelled) setData(emptyData);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+      } catch {
+        // Keep the last known data during background refreshes. If the first
+        // request fails, preserve the existing empty-state behavior.
+        if (showLoading && !cancelled) setData(emptyData);
+      } finally {
+        requestInFlight = false;
+        if (showLoading && !cancelled) setLoading(false);
+      }
+    };
+
+    if (!initialData) {
+      void refresh(true);
+    }
+
+    const refreshWhenVisible = () => {
+      if (document.visibilityState !== "hidden") void refresh();
+    };
+    const intervalId = window.setInterval(
+      refreshWhenVisible,
+      JOB_POSTINGS_REFRESH_INTERVAL_MS,
+    );
+    window.addEventListener("focus", refreshWhenVisible);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+
     return () => {
       cancelled = true;
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", refreshWhenVisible);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
     };
   }, [initialData]);
 
@@ -741,6 +781,7 @@ export function RecruiterJobPostingManagement({
         jobId={applicantJob.id}
         jobTitle={applicantJob.title}
         onBack={() => setView("dashboard")}
+        pipelineHref={recruiterRoutes.pipelineForJob(applicantJob.id)}
       />
     );
 
@@ -995,6 +1036,14 @@ export function RecruiterWorkspaceNavigation({
       active:
         pathname === recruiterRoutes.candidates ||
         pathname.startsWith(`${recruiterRoutes.candidates}/`),
+    },
+    {
+      label: "Pipeline",
+      icon: "pipeline",
+      href: recruiterRoutes.pipeline,
+      active:
+        pathname === recruiterRoutes.pipeline ||
+        pathname.startsWith(`${recruiterRoutes.pipeline}/`),
     },
     {
       label: "Company settings",

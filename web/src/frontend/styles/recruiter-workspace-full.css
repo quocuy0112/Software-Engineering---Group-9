@@ -621,6 +621,28 @@
   background: var(--sh-color-error-bg);
   font-size: var(--sh-font-size-body-sm);
 }
+.recruiter-submit-confirmation {
+  display: grid;
+  gap: var(--sh-space-4);
+}
+.recruiter-submit-confirmation__lead {
+  margin: 0;
+  color: var(--sh-color-text-secondary);
+  line-height: var(--sh-line-height-body);
+}
+.recruiter-submit-confirmation__notice {
+  display: grid;
+  gap: var(--sh-space-1);
+  padding: var(--sh-space-3);
+  border: 1px solid color-mix(in srgb, var(--sh-color-info) 24%, var(--sh-color-border-subtle));
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-info);
+  background: var(--sh-color-info-bg);
+  font-size: var(--sh-font-size-body-sm);
+}
+.recruiter-submit-confirmation__notice span {
+  color: var(--sh-color-text-secondary);
+}
 .recruiter-preview {
   min-width: 0;
   position: sticky;
@@ -3074,6 +3096,138 @@
   background: var(--sh-color-brand-primary-hover);
 }
 
+.recruiter-pipeline-page {
+  display: grid;
+  gap: var(--sh-space-5);
+}
+
+.pipeline-page-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sh-space-4);
+}
+
+.pipeline-page-heading h1 {
+  margin: 0;
+  color: var(--sh-color-text-primary);
+}
+
+.pipeline-page-heading p {
+  margin: var(--sh-space-1) 0 0;
+  color: var(--sh-color-text-secondary);
+}
+
+.pipeline-page-heading .recruiter-eyebrow {
+  margin: 0 0 var(--sh-space-1);
+  color: var(--sh-color-brand-primary);
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pipeline-page-back-link {
+  display: inline-flex;
+  min-height: var(--sh-control-height-sm);
+  align-items: center;
+  gap: var(--sh-space-2);
+  padding: 0 var(--sh-space-3);
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-control);
+  font-weight: var(--sh-font-weight-semibold);
+  text-decoration: none;
+}
+
+.pipeline-page-back-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pipeline-page-back-link:hover {
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-info-bg);
+}
+
+.pipeline-job-selector {
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.7fr) minmax(18rem, 1fr);
+  align-items: center;
+  gap: var(--sh-space-4);
+  padding: var(--sh-space-4);
+}
+
+.pipeline-job-selector label {
+  display: grid;
+  gap: var(--sh-space-1);
+  color: var(--sh-color-text-primary);
+  font-weight: var(--sh-font-weight-semibold);
+}
+
+.pipeline-job-selector label small {
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-regular);
+}
+
+.pipeline-job-selector__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pipeline-job-selector select {
+  width: 100%;
+  min-height: var(--sh-control-height);
+  padding: 0 var(--sh-space-8) 0 var(--sh-space-3);
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-control);
+}
+
+.pipeline-job-selector select:focus-visible {
+  border-color: var(--sh-color-border-focus);
+  outline: 3px solid var(--sh-color-focus-ring-bg);
+}
+
+.pipeline-job-selector__control > svg {
+  position: absolute;
+  right: var(--sh-space-3);
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.pipeline-page-empty {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sh-space-3);
+  padding: var(--sh-space-5);
+}
+
+.pipeline-page-empty > svg {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  color: var(--sh-color-text-muted);
+}
+
+.pipeline-page-empty h2,
+.pipeline-page-empty p {
+  margin: 0;
+}
+
+.pipeline-page-empty p {
+  margin-top: var(--sh-space-1);
+  color: var(--sh-color-text-secondary);
+}
+
 .recruitment-pipeline {
   min-width: 0;
   color: var(--sh-color-text-primary);
@@ -3096,7 +3250,13 @@
   color: var(--sh-color-text-secondary);
 }
 
-.recruitment-pipeline__header > strong {
+.recruitment-pipeline__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sh-space-3);
+}
+
+.recruitment-pipeline__header-actions > strong {
   padding: var(--sh-space-2) var(--sh-space-3);
   border: 1px solid var(--sh-color-border-subtle);
   border-radius: var(--sh-radius-full);
@@ -3106,12 +3266,72 @@
   white-space: nowrap;
 }
 
+.recruitment-pipeline__header-actions > button {
+  min-height: var(--sh-control-height-sm);
+  padding: 0 var(--sh-space-3);
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-control);
+  font-weight: var(--sh-font-weight-semibold);
+  cursor: pointer;
+}
+
+.recruitment-pipeline__header-actions > button:hover {
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-info-bg);
+}
+
+.recruitment-pipeline__sections {
+  display: grid;
+  gap: var(--sh-space-6);
+  margin-top: var(--sh-space-5);
+}
+
+.pipeline-section {
+  min-width: 0;
+}
+
+.pipeline-section--outcomes {
+  padding-top: var(--sh-space-5);
+  border-top: 1px solid var(--sh-color-border-default);
+}
+
+.pipeline-section__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sh-space-3);
+}
+
+.pipeline-section__header h2 {
+  margin: 0;
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-heading-sm);
+}
+
+.pipeline-section__header p {
+  margin: var(--sh-space-1) 0 0;
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-body-sm);
+}
+
 .recruitment-pipeline__columns {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--sh-space-4);
   align-items: start;
   padding: var(--sh-space-4) 0 var(--sh-space-8);
+}
+
+.pipeline-section--active .recruitment-pipeline__columns {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.pipeline-section--outcomes .recruitment-pipeline__columns {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .pipeline-column {
@@ -3133,6 +3353,21 @@
   border-color: var(--sh-color-border-focus);
   background: var(--sh-color-info-bg);
   box-shadow: inset 0 0 0 2px var(--sh-color-focus-ring-bg);
+}
+
+.pipeline-column.is-locked {
+  border-style: dashed;
+  background: var(--sh-color-surface-card);
+}
+
+.pipeline-column.is-locked > header {
+  color: var(--sh-color-text-muted);
+}
+
+.pipeline-column.is-locked > header svg {
+  width: 16px;
+  height: 16px;
+  color: var(--sh-color-text-muted);
 }
 
 .pipeline-column > header {
@@ -3185,6 +3420,25 @@
   gap: var(--sh-space-3);
 }
 
+.pipeline-column__empty {
+  display: flex;
+  min-height: 3rem;
+  align-items: center;
+  gap: var(--sh-space-2);
+  padding: var(--sh-space-2);
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-caption);
+  text-align: left;
+}
+
+.pipeline-column__empty svg {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  color: var(--sh-color-text-muted);
+  stroke-width: 1.7;
+}
+
 .pipeline-card {
   display: grid;
   gap: var(--sh-space-1);
@@ -3229,7 +3483,128 @@
   color: var(--sh-color-text-primary);
 }
 
-.pipeline-card > span {
+.pipeline-card__identity {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sh-space-2);
+}
+
+.pipeline-card__identity > strong {
+  min-width: 0;
+  color: var(--sh-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.pipeline-card > time {
+  color: var(--sh-color-text-muted);
+  font-size: var(--sh-font-size-caption);
+}
+
+.pipeline-card__stage-badge {
+  min-height: 24px;
+  padding: 0 var(--sh-space-2);
+  gap: var(--sh-space-1);
+  font-size: 0.6875rem;
+}
+
+/* These stage tokens intentionally mirror the candidate-facing Applications badge. */
+.application-stage-badge {
+  --application-stage-color: var(--sh-color-info);
+  --application-stage-background: var(--sh-color-info-bg);
+  display: inline-flex;
+  min-height: 28px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--sh-radius-full);
+  color: var(--application-stage-color);
+  background: var(--application-stage-background);
+  font-size: 10.5px;
+  font-weight: var(--sh-font-weight-bold);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.application-stage-badge[data-stage="applied"],
+.application-stage-badge[data-stage="viewed"] {
+  border-color: color-mix(in srgb, var(--sh-color-brand-primary) 25%, transparent);
+  --application-stage-color: var(--sh-color-brand-primary);
+  --application-stage-background: var(--sh-color-brand-soft);
+}
+
+.application-stage-badge[data-stage="shortlisted"] {
+  border-color: color-mix(in srgb, var(--sh-profile-teal) 28%, transparent);
+  --application-stage-color: var(--sh-profile-teal-dark);
+  --application-stage-background: var(--sh-profile-teal-light);
+}
+
+.application-stage-badge[data-stage="interviewing"] {
+  border-color: color-mix(in srgb, var(--sh-color-success) 25%, transparent);
+  --application-stage-color: var(--sh-color-success);
+  --application-stage-background: var(--sh-color-success-bg);
+}
+
+.application-stage-badge[data-stage="offered"] {
+  border-color: color-mix(in srgb, var(--sh-profile-purple) 28%, transparent);
+  --application-stage-color: var(--sh-profile-purple-dark);
+  --application-stage-background: var(--sh-profile-purple-light);
+}
+
+.application-stage-badge[data-stage="offer-declined"] {
+  border-color: color-mix(in srgb, var(--sh-color-warning) 25%, transparent);
+  --application-stage-color: var(--sh-color-warning);
+  --application-stage-background: var(--sh-color-warning-bg);
+}
+
+.application-stage-badge[data-stage="hired"] {
+  border-color: color-mix(in srgb, var(--sh-color-success) 25%, transparent);
+  --application-stage-color: var(--sh-color-success);
+  --application-stage-background: var(--sh-color-success-bg);
+}
+
+.application-stage-badge[data-stage="rejected"] {
+  border-color: color-mix(in srgb, var(--sh-color-error) 25%, transparent);
+  --application-stage-color: var(--sh-color-error);
+  --application-stage-background: var(--sh-color-error-bg);
+}
+
+.application-stage-badge[data-stage="waitlisted"] {
+  border-color: var(--sh-color-border-default);
+  --application-stage-color: var(--sh-color-text-secondary);
+  --application-stage-background: var(--sh-color-surface-subtle);
+}
+
+.pipeline-card__stage-badge {
+  min-height: 24px;
+  padding: 3px 7px;
+  font-size: 9px;
+}
+
+.application-stage-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: var(--sh-radius-full);
+  background: currentColor;
+}
+
+.pipeline-card__score {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  margin-top: var(--sh-space-1);
+}
+
+.pipeline-card__score .sh-progress-ring {
+  flex: 0 0 auto;
+}
+
+.pipeline-card__score-unavailable {
   color: var(--sh-color-text-muted);
   font-size: var(--sh-font-size-caption);
 }
@@ -3412,19 +3787,39 @@
   .recruitment-pipeline__columns {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .pipeline-section--active .recruitment-pipeline__columns,
+  .pipeline-section--outcomes .recruitment-pipeline__columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 700px) {
+  .pipeline-page-heading,
   .recruitment-pipeline__header {
     display: block;
   }
 
-  .recruitment-pipeline__header > strong {
+  .pipeline-page-back-link,
+  .recruitment-pipeline__header-actions {
     display: inline-flex;
     margin-top: var(--sh-space-3);
   }
 
+  .pipeline-job-selector {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .recruitment-pipeline__header-actions > strong {
+    display: inline-flex;
+  }
+
   .recruitment-pipeline__columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pipeline-section--active .recruitment-pipeline__columns,
+  .pipeline-section--outcomes .recruitment-pipeline__columns {
     grid-template-columns: minmax(0, 1fr);
   }
 }
