@@ -542323,5 +542323,270 @@
       "viewCount": 0,
       "applicantCount": 0
     }
+  },
+  {
+    "id": "job-ddfec03d-53d1-4c22-b919-479e8d2d4a39",
+    "slug": "i-m-thah-ho-chi-minh-city-8d2d4a39",
+    "companyId": "cmsttfkx1000o3kf0a240bvxd",
+    "industry": "Technology",
+    "industryCode": "technology",
+    "subIndustry": "Software & Technology Services",
+    "title": "i'm thah",
+    "shortPitch": "i'm thanh",
+    "categoryIds": [
+      "frontend"
+    ],
+    "categoryFamily": "technology",
+    "skillTags": [
+      "react"
+    ],
+    "location": {
+      "city": "Ho Chi Minh City",
+      "district": "hcm",
+      "isNationwideRemote": true
+    },
+    "salary": {
+      "min": 29,
+      "max": 45,
+      "currency": "VND",
+      "period": "month",
+      "isNegotiable": true
+    },
+    "experience": {
+      "minYears": 3,
+      "label": "3+ years"
+    },
+    "level": "manager",
+    "employmentType": "full_time",
+    "workArrangement": "remote",
+    "workOnSaturday": true,
+    "education": "Bachelor's degree",
+    "age": "37",
+    "numberOfHires": 2,
+    "status": "draft",
+    "approvalComment": null,
+    "isUrgent": false,
+    "isVerified": false,
+    "postedAt": "2026-08-18T05:03:54.904Z",
+    "updatedAt": "2026-08-18T05:05:20.980Z",
+    "applyDeadline": "2026-08-29T23:59:59.000Z",
+    "description": {
+      "overview": "noready",
+      "topReasonsToJoin": [
+        "hello",
+        "hello 2",
+        "afkald 23"
+      ],
+      "responsibilities": [],
+      "requirements": [
+        "kkhofadfad"
+      ],
+      "benefits": [
+        {
+          "icon": "award",
+          "label": "Recognition programs and quarterly awards"
+        },
+        {
+          "icon": "gift",
+          "label": "Holiday and Tet bonus"
+        },
+        {
+          "icon": "coffee",
+          "label": "Free lunch, coffee and snacks at the office"
+        },
+        {
+          "icon": "calendar",
+          "label": "16-18 days of paid annual leave"
+        }
+      ],
+      "generalInfo": {
+        "reportsTo": "have no it",
+        "department": "khóa",
+        "workingHours": "8h",
+        "workAddress": "18h"
+      }
+    },
+    "stats": {
+      "viewCount": 0,
+      "applicantCount": 0
+    }
+  },
+  {
+    "id": "job-ed5caee4-b32c-4b04-9778-825d2c8307a2",
+    "slug": "i-m-thah-ho-chi-minh-city-2c8307a2",
+    "companyId": "cmsttfkx1000o3kf0a240bvxd",
+    "industry": "Technology",
+    "industryCode": "technology",
+    "subIndustry": "Software & Technology Services",
+    "title": "i'm thah",
+    "shortPitch": "i'm thanh",
+    "categoryIds": [
+      "frontend"
+    ],
+    "categoryFamily": "technology",
+    "skillTags": [
+      "react"
+    ],
+    "location": {
+      "city": "Ho Chi Minh City",
+      "district": "hcm",
+      "isNationwideRemote": true
+    },
+    "salary": {
+      "min": 29,
+      "max": 45,
+      "currency": "VND",
+      "period": "month",
+      "isNegotiable": true
+    },
+    "experience": {
+      "minYears": 3,
+      "label": "3+ years"
+    },
+    "level": "manager",
+    "employmentType": "full_time",
+    "workArrangement": "remote",
+    "workOnSaturday": true,
+    "education": "Bachelor's degree",
+    "age": "37",
+    "numberOfHires": 2,
+    "status": "draft",
+    "approvalComment": null,
+    "isUrgent": false,
+    "isVerified": false,
+    "postedAt": "2026-08-18T05:03:54.904Z",
+    "updatedAt": "2026-08-18T05:05:55.902Z",
+    "applyDeadline": "2026-08-29T23:59:59.000Z",
+    "description": {
+      "overview": "noreadygadgad adga",
+      "topReasonsToJoin": [
+        "hello",
+        "hello 2",
+        "afkald 23"
+      ],
+      "responsibilities": [
+        "adgadga d adgadg"
+      ],
+      "requirements": [
+        "kkhofadfad"
+      ],
+      "benefits": [
+        {
+          "icon": "award",
+          "label": "Recognition programs and quarterly awards"
+        },
+        {
+          "icon": "gift",
+          "label": "Holiday and Tet bonus"
+        },
+        {
+          "icon": "coffee",
+          "label": "Free lunch, coffee and snacks at the office"
+        },
+        {
+          "icon": "calendar",
+          "label": "16-18 days of paid annual leave"
+        }
+      ],
+      "generalInfo": {
+        "reportsTo": "have no it",
+        "department": "khóa",
+        "workingHours": "8h",
+        "workAddress": "18h"
+      }
+    },
+    "stats": {
+      "viewCount": 0,
+      "applicantCount": 0
+    }
+  },
+  {
+    "id": "job-2e706a7a-5607-433f-8e6b-4b7deb1dd1fc",
+    "slug": "i-m-thah-ho-chi-minh-city-eb1dd1fc",
+    "companyId": "cmsttfkx1000o3kf0a240bvxd",
+    "industry": "Technology",
+    "industryCode": "technology",
+    "subIndustry": "Software & Technology Services",
+    "title": "i'm thah",
+    "shortPitch": "i'm thanh",
+    "categoryIds": [
+      "frontend"
+    ],
+    "categoryFamily": "technology",
+    "skillTags": [
+      "react"
+    ],
+    "location": {
+      "city": "Ho Chi Minh City",
+      "district": "hcm",
+      "isNationwideRemote": true
+    },
+    "salary": {
+      "min": 29,
+      "max": 45,
+      "currency": "VND",
+      "period": "month",
+      "isNegotiable": true
+    },
+    "experience": {
+      "minYears": 3,
+      "label": "3+ years"
+    },
+    "level": "manager",
+    "employmentType": "full_time",
+    "workArrangement": "remote",
+    "workOnSaturday": true,
+    "education": "Bachelor's degree",
+    "age": "37",
+    "numberOfHires": 2,
+    "status": "draft",
+    "approvalComment": null,
+    "isUrgent": false,
+    "isVerified": false,
+    "postedAt": "2026-08-18T05:03:54.904Z",
+    "updatedAt": "2026-08-18T05:06:49.285Z",
+    "applyDeadline": "2026-08-29T23:59:59.000Z",
+    "description": {
+      "overview": "noreadygadgad adga",
+      "topReasonsToJoin": [
+        "hello",
+        "hello 2",
+        "afkald 23"
+      ],
+      "responsibilities": [
+        "adgadga d adgadg"
+      ],
+      "requirements": [
+        "kkhofadfad"
+      ],
+      "benefits": [
+        {
+          "icon": "award",
+          "label": "Recognition programs and quarterly awards"
+        },
+        {
+          "icon": "gift",
+          "label": "Holiday and Tet bonus"
+        },
+        {
+          "icon": "coffee",
+          "label": "Free lunch, coffee and snacks at the office"
+        },
+        {
+          "icon": "calendar",
+          "label": "16-18 days of paid annual leave"
+        }
+      ],
+      "generalInfo": {
+        "reportsTo": "have no it",
+        "department": "khóa",
+        "workingHours": "8h",
+        "workAddress": "18h"
+      }
+    },
+    "stats": {
+      "viewCount": 0,
+      "applicantCount": 0
+    }
   }
 ]
