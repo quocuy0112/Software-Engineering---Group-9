@@ -33,4 +33,3 @@
 
 - All team-confirmed role, hiring-confirmation, and job-scope decisions are incorporated with no unresolved clarification marker.
 - The specification intentionally defers job-identity mapping, authoritative mutation consolidation, and drag-and-drop library selection to implementation planning.
-

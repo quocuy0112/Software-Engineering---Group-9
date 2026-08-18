@@ -72,16 +72,157 @@ describe("private CV match repository boundary", () => {
     });
 
     const call = database.privateCvMatchCheck.create.mock.calls[0]?.[0] as {
-      data: { attempts?: { create?: Record<string, unknown> }; [key: string]: unknown };
+      data: {
+        attempts?: { create?: Record<string, unknown> };
+        [key: string]: unknown;
+      };
     };
-    expect(call.data.attempts?.create).toEqual(expect.objectContaining({
-      attemptNumber: 1,
-      trigger: "INITIAL",
-      state: "QUEUED",
-      scoringPolicyVersion: "HS-60/40-v1",
-    }));
+    expect(call.data.attempts?.create).toEqual(
+      expect.objectContaining({
+        attemptNumber: 1,
+        trigger: "INITIAL",
+        state: "QUEUED",
+        scoringPolicyVersion: "HS-60/40-v1",
+      }),
+    );
     expect(call.data).not.toHaveProperty("jobApplicationId");
     expect(call.data).not.toHaveProperty("companyId");
     expect(call.data).not.toHaveProperty("recruiterUserId");
+  });
+
+  it("reuses an accepted AI retry instead of reporting a duplicate conflict", async () => {
+    const now = new Date("2026-08-16T00:00:00.000Z");
+    const activeAttempt = {
+      id: "retry-1",
+      state: "AI_RUNNING",
+      leaseExpiresAt: new Date(now.getTime() + 30_000),
+    };
+    const database = {
+      privateCvMatchCheck: {
+        findFirst: vi.fn().mockResolvedValue({
+          currentAttempt: {
+            id: "attempt-1",
+            state: "READY",
+            deterministicResultId: "automatic-1",
+          },
+          attempts: [activeAttempt],
+          _count: { attempts: 2 },
+        }),
+      },
+      privateCvMatchAttempt: {
+        create: vi.fn(),
+        updateMany: vi.fn(),
+      },
+    };
+    const repository = new PrivateCvMatchRepository(database as never);
+
+    const result = await repository.createAiRetryAttempt({
+      candidateUserId: "candidate-a",
+      checkId: "pmc-1",
+      now,
+      scoringPolicyVersion: "HS-60/40-v1",
+    });
+
+    expect(result).toBe(activeAttempt);
+    expect(database.privateCvMatchAttempt.create).not.toHaveBeenCalled();
+    expect(database.privateCvMatchAttempt.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("allows re-running AI for a completed hybrid report", async () => {
+    const now = new Date("2026-08-16T00:00:00.000Z");
+    const database = {
+      privateCvMatchCheck: {
+        findFirst: vi.fn().mockResolvedValue({
+          state: "READY",
+          currentAttempt: {
+            id: "attempt-1",
+            state: "READY",
+            deterministicResultId: "automatic-1",
+          },
+          attempts: [],
+          _count: { attempts: 2 },
+        }),
+      },
+      privateCvMatchAttempt: {
+        create: vi.fn().mockResolvedValue({ id: "retry-1" }),
+        updateMany: vi.fn(),
+      },
+    };
+    const repository = new PrivateCvMatchRepository(database as never);
+
+    await repository.createAiRetryAttempt({
+      candidateUserId: "candidate-a",
+      checkId: "pmc-1",
+      now,
+      scoringPolicyVersion: "HS-60/40-v1",
+    });
+
+    expect(database.privateCvMatchAttempt.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        checkId: "pmc-1",
+        attemptNumber: 3,
+        trigger: "AI_RETRY",
+        state: "QUEUED",
+        deterministicResultId: "automatic-1",
+      }),
+    });
+  });
+
+  it("requeues an AI retry whose worker lease has expired", async () => {
+    const now = new Date("2026-08-16T00:00:00.000Z");
+    const staleAttempt = {
+      id: "retry-stale",
+      state: "AI_RUNNING",
+      leaseExpiresAt: new Date(now.getTime() - 1_000),
+    };
+    const database = {
+      privateCvMatchCheck: {
+        findFirst: vi.fn().mockResolvedValue({
+          currentAttempt: {
+            id: "attempt-1",
+            state: "LIMITED",
+            deterministicResultId: "automatic-1",
+          },
+          attempts: [staleAttempt],
+          _count: { attempts: 2 },
+        }),
+      },
+      privateCvMatchAttempt: {
+        create: vi.fn(),
+        updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+        findUnique: vi.fn().mockResolvedValue({
+          ...staleAttempt,
+          state: "QUEUED",
+          leaseOwner: null,
+          leaseExpiresAt: null,
+        }),
+      },
+    };
+    const repository = new PrivateCvMatchRepository(database as never);
+
+    await repository.createAiRetryAttempt({
+      candidateUserId: "candidate-a",
+      checkId: "pmc-1",
+      now,
+      scoringPolicyVersion: "HS-60/40-v1",
+    });
+
+    expect(database.privateCvMatchAttempt.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: "retry-stale",
+        state: "AI_RUNNING",
+        OR: [{ leaseExpiresAt: null }, { leaseExpiresAt: { lte: now } }],
+      },
+      data: {
+        state: "QUEUED",
+        completedAt: null,
+        failureCode: null,
+        hybridScore: null,
+        matchBand: null,
+        leaseOwner: null,
+        leaseExpiresAt: null,
+      },
+    });
+    expect(database.privateCvMatchAttempt.create).not.toHaveBeenCalled();
   });
 });

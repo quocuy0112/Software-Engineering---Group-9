@@ -10,7 +10,7 @@ import {
 } from "@/shared/contracts/applications";
 
 const openapi = readFileSync(
-  "../spec-kit/specs/019-recruitment-pipeline-kanban-board/contracts/recruitment-pipeline.openapi.yaml",
+  "../spec-kit/specs/021-recruitment-pipeline-kanban-board/contracts/recruitment-pipeline.openapi.yaml",
   "utf8",
 );
 

@@ -12,7 +12,7 @@ import {
   notificationUnreadCountSchema,
   type NotificationContextType,
 } from "@/shared/contracts/notifications";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { NOTIFICATION_CHANGED_EVENT } from "./use-notification-context-read";
 
 const visibleInterval = () =>
@@ -24,7 +24,9 @@ async function readJson(response: Response) {
   const body = await response.json().catch(() => ({}));
   if (!response.ok)
     throw new Error(
-      typeof body?.code === "string" ? body.code : "NOTIFICATION_REQUEST_FAILED",
+      typeof body?.code === "string"
+        ? body.code
+        : "NOTIFICATION_REQUEST_FAILED",
     );
   return body;
 }
@@ -43,7 +45,8 @@ function useNotificationRefreshEvents() {
     const refresh = () =>
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
     window.addEventListener(NOTIFICATION_CHANGED_EVENT, refresh);
-    return () => window.removeEventListener(NOTIFICATION_CHANGED_EVENT, refresh);
+    return () =>
+      window.removeEventListener(NOTIFICATION_CHANGED_EVENT, refresh);
   }, [queryClient]);
 }
 
@@ -69,7 +72,7 @@ function useNotificationMutation(
 
 export function useNotificationUnreadCount() {
   useNotificationRefreshEvents();
-  return useQuery({
+  const query = useQuery({
     queryKey: ["notifications", "unread-count"],
     queryFn: async () =>
       notificationUnreadCountSchema.parse(
@@ -82,6 +85,19 @@ export function useNotificationUnreadCount() {
       ),
     refetchInterval: visibleInterval,
   });
+  const previousUnreadCount = useRef<number | null>(null);
+  useEffect(() => {
+    const nextUnreadCount = query.data?.unreadCount;
+    if (nextUnreadCount === undefined) return;
+    const previous = previousUnreadCount.current;
+    previousUnreadCount.current = nextUnreadCount;
+    if (previous !== null && nextUnreadCount > previous) {
+      // Let application pages revalidate as soon as a new in-app notification
+      // is observed, rather than waiting for their normal polling interval.
+      window.dispatchEvent(new Event(NOTIFICATION_CHANGED_EVENT));
+    }
+  }, [query.data?.unreadCount]);
+  return query;
 }
 
 export function useNotificationPages(input: {
@@ -91,7 +107,12 @@ export function useNotificationPages(input: {
 }) {
   useNotificationRefreshEvents();
   return useInfiniteQuery({
-    queryKey: ["notifications", "pages", input.limit ?? 20, input.state ?? "all"],
+    queryKey: [
+      "notifications",
+      "pages",
+      input.limit ?? 20,
+      input.state ?? "all",
+    ],
     enabled: input.enabled,
     initialPageParam: null as string | null,
     queryFn: async ({ pageParam }) => {
@@ -117,11 +138,14 @@ export function useNotificationPages(input: {
 export function useNotificationMutations(auth: NotificationMutationAuth) {
   const headers = () => ({ "x-csrf-token": tokenFor(auth) });
   const markRead = useNotificationMutation(({ notificationId }) =>
-    fetch(`/api/notifications/${encodeURIComponent(notificationId ?? "")}/read`, {
-      method: "PATCH",
-      credentials: "same-origin",
-      headers: headers(),
-    }),
+    fetch(
+      `/api/notifications/${encodeURIComponent(notificationId ?? "")}/read`,
+      {
+        method: "PATCH",
+        credentials: "same-origin",
+        headers: headers(),
+      },
+    ),
   );
   const markAllRead = useNotificationMutation(() =>
     fetch("/api/notifications/read-all", {
@@ -130,13 +154,14 @@ export function useNotificationMutations(auth: NotificationMutationAuth) {
       headers: headers(),
     }),
   );
-  const markContextRead = useNotificationMutation(({ contextType, contextId }) =>
-    fetch("/api/notifications/contexts/read", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { ...headers(), "content-type": "application/json" },
-      body: JSON.stringify({ contextType, contextId }),
-    }),
+  const markContextRead = useNotificationMutation(
+    ({ contextType, contextId }) =>
+      fetch("/api/notifications/contexts/read", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { ...headers(), "content-type": "application/json" },
+        body: JSON.stringify({ contextType, contextId }),
+      }),
   );
   return { markRead, markAllRead, markContextRead };
 }

@@ -23,6 +23,8 @@ import {
 import { createInAppNotification } from "@/backend/notifications/notification-service";
 import {
   publicOutcomeForCanonicalStage,
+  publicUpdateKindForCanonicalStage,
+  publicUpdateTitleForCanonicalStage,
   publicStageForCanonicalStage,
 } from "@/shared/contracts/candidate-applications";
 
@@ -30,6 +32,12 @@ const consequentialStages = new Set<ApplicationStage>([
   "REJECTED",
   "OFFER_DECLINED",
   "HIRED",
+]);
+
+const allowedRoles = new Set([
+  "HR_MANAGER",
+  "RECRUITER",
+  "HIRING_MANAGER",
 ]);
 
 const rejectionLabels: Record<string, string> = {
@@ -201,10 +209,12 @@ export class ApplicationStageService {
     const authorized = boundary
       ? await this.authorization.authorizeApplication(actor.userId, boundary.requestedJobId, applicationId)
       : null;
-    if (authorized && (!authorized.authorized || !authorized.canMoveStages)) {
+    if (authorized && (!authorized.authorized || authorized.canMoveStages === false)) {
       throw new JobServiceError(404, { code: "APPLICATION_UNAVAILABLE", message: "This application is unavailable." });
     }
-    const authorizedJobId = authorized?.authorized ? authorized.jobPostingId : null;
+    const authorizedJobId = authorized?.authorized
+      ? authorized.jobPostingId || boundary?.requestedJobId || null
+      : null;
 
     try {
       return await this.db.$transaction(
@@ -241,24 +251,65 @@ export class ApplicationStageService {
               },
             },
           });
-        if (!application || (authorized && application.jobPostingId !== authorized.jobPostingId)) {
-          throw new JobServiceError(404, { code: "APPLICATION_UNAVAILABLE", message: "This application is unavailable." });
-        }
-
-        if (!boundary) {
-          const membership = await tx.companyMembership.findUnique({
-            where: { companyId_userId: { companyId: application.jobPosting.companyId, userId: actor.userId } },
-            select: { role: true, status: true },
-          });
-          if (membership?.status !== "ACTIVE" || membership.role === "OWNER" || !["HR_MANAGER", "RECRUITER", "HIRING_MANAGER"].includes(membership.role)) {
-            throw new JobServiceError(404, { code: "APPLICATION_UNAVAILABLE", message: "This application is unavailable." });
+          const authorizedApplicationJobId = authorized?.authorized
+            ? authorized.jobPostingId || boundary?.requestedJobId || null
+            : null;
+          if (
+            !application ||
+            (authorizedApplicationJobId &&
+              application.jobPostingId &&
+              application.jobPostingId !== authorizedApplicationJobId)
+          ) {
+            throw new JobServiceError(404, {
+              code: "APPLICATION_UNAVAILABLE",
+              message: "This application is unavailable.",
+            });
           }
-        }
+
+          if (!boundary) {
+            const membership = await tx.companyMembership.findUnique({
+              where: {
+                companyId_userId: {
+                  companyId: application.jobPosting.companyId,
+                  userId: actor.userId,
+                },
+              },
+              select: { role: true, status: true },
+            });
+            const hasDatabaseRecruiterMembership =
+              membership?.status === "ACTIVE" &&
+              membership.role !== "OWNER" &&
+              allowedRoles.has(membership.role);
+            // Legacy catalog-backed jobs are authorized through the same
+            // bridge used by recruiter candidate/scoring reads. Keep the
+            // canonical stage writer aligned with that authorization path
+            // when the migrated CompanyMembership row is not available yet.
+            const fallbackAuthorization = hasDatabaseRecruiterMembership
+              ? null
+              : await this.authorization.authorizeApplication(
+                  actor.userId,
+                  application.jobPostingId,
+                  application.id,
+                );
+            const hasCompatibleRecruiterAuthorization =
+              hasDatabaseRecruiterMembership ||
+              Boolean(
+                fallbackAuthorization?.authorized &&
+                  fallbackAuthorization.canMoveStages !== false,
+              );
+            if (!hasCompatibleRecruiterAuthorization) {
+              throw new JobServiceError(404, {
+                code: "APPLICATION_UNAVAILABLE",
+                message: "This application is unavailable.",
+              });
+            }
+          }
 
         const fromStage = applicationStageSchema.parse(application.stage);
         const source = boundary?.source ?? "STAGE_ROUTE";
         const requestedJobId = boundary?.requestedJobId ?? application.jobPostingId;
-        const digest = applicationStageCommandDigest({ actorUserId: actor.userId, requestedJobId, canonicalJobId: application.jobPostingId, applicationId, command, source });
+        const canonicalJobId = application.jobPostingId || requestedJobId;
+        const digest = applicationStageCommandDigest({ actorUserId: actor.userId, requestedJobId, canonicalJobId, applicationId, command, source });
         const idempotencyKey = boundary?.idempotencyKey.trim() || null;
 
         if (idempotencyKey) {
@@ -267,16 +318,32 @@ export class ApplicationStageService {
             if (eventDigest(replay.metadata) !== digest) {
               throw new JobServiceError(409, { code: "IDEMPOTENCY_CONFLICT", message: "This Idempotency-Key was used for a different stage decision." });
             }
-            return stageTransitionOutcomeSchema.parse({
-              applicationId,
-              fromStage: replay.fromStage,
-              stage: replay.toStage,
-              stageVersion: replay.applicationVersion,
-              lastStageChangedAt: replay.occurredAt.toISOString(),
-              stageEventId: replay.id,
-              replayed: true,
-              allowedDestinations: ordinaryApplicationTransitions[replay.toStage],
-            });
+            const replayMetadata =
+              replay.metadata &&
+              typeof replay.metadata === "object" &&
+              !Array.isArray(replay.metadata)
+                ? (replay.metadata as Record<string, unknown>)
+                : null;
+            const replayFromStage =
+              replayMetadata?.autoShortlisted === true &&
+              typeof replayMetadata.initialFromStage === "string"
+                ? applicationStageSchema.parse(replayMetadata.initialFromStage)
+                : replay.fromStage;
+            return {
+              ...stageTransitionOutcomeSchema.parse({
+                applicationId,
+                fromStage: replayFromStage,
+                stage: replay.toStage,
+                stageVersion: replay.applicationVersion,
+                lastStageChangedAt: replay.occurredAt.toISOString(),
+                stageEventId: replay.id,
+                replayed: true,
+                allowedDestinations: ordinaryApplicationTransitions[replay.toStage],
+              }),
+              auditEventId: replay.id,
+              notificationRequired: replay.notificationRequired,
+              notificationStatus: replay.notificationStatus,
+            };
           }
         }
 
@@ -293,22 +360,74 @@ export class ApplicationStageService {
           throw new JobServiceError(409, { code: "APPLICATION_STAGE_TRANSITION_INVALID", message: "This stage change is not allowed." });
         }
 
-        const nextVersion = application.stageVersion + 1;
+        const autoShortlistForInterview =
+          boundary?.source === "INTERVIEW_ADAPTER" &&
+          fromStage === "VIEWED" &&
+          command.targetStage === "INTERVIEWING";
+        const stageVersionIncrement = autoShortlistForInterview ? 2 : 1;
+        const finalAt = autoShortlistForInterview
+          ? new Date(now.getTime() + 1)
+          : now;
+        const nextVersion = application.stageVersion + stageVersionIncrement;
         const updated = await tx.jobApplication.updateMany({
           where: {
             id: application.id,
-            jobPostingId: application.jobPostingId,
+            jobPostingId: canonicalJobId,
             stage: fromStage,
             stageVersion: command.expectedStageVersion,
             withdrawalOutcome: null,
           },
           data: {
             stage: command.targetStage,
-            stageVersion: { increment: 1 },
-            lastStageChangedAt: now,
+            stageVersion: { increment: stageVersionIncrement },
+            lastStageChangedAt: finalAt,
           },
         });
         if (updated.count !== 1) throw new JobServiceError(409, { code: "APPLICATION_STAGE_CONFLICT", message: "This application changed. Refresh it and try again." });
+
+        let shortlistEvent: { id: string };
+        if (autoShortlistForInterview) {
+          shortlistEvent = await tx.applicationStageEvent.create({
+            data: {
+              applicationId: application.id,
+              fromStage: "VIEWED",
+              toStage: "SHORTLISTED",
+              actorUserId: actor.userId,
+              actorType: "RECRUITER",
+              reasonCode: "RECRUITER_AUTO_SHORTLISTED_FOR_INTERVIEW",
+              reasonLabelSnapshot:
+                "Recruiter recorded shortlist before interview",
+              internalNoteEncrypted: null,
+              candidateVisibleReason:
+                "Your application has been shortlisted.",
+              candidateVisible: true,
+              occurredAt: now,
+              applicationVersion: application.stageVersion + 1,
+              metadata: {
+                v: 2,
+                source,
+                autoShortlisted: true,
+                initialFromStage: fromStage,
+              },
+              decisionKind: null,
+              notificationRequired: false,
+              notificationStatus: "NOT_REQUIRED",
+              idempotencyKey: null,
+            },
+          });
+          await tx.applicationPublicUpdate.create({
+            data: {
+              applicationId: application.id,
+              kind: publicUpdateKindForCanonicalStage("SHORTLISTED"),
+              publicStage: publicStageForCanonicalStage("SHORTLISTED"),
+              publicOutcome: publicOutcomeForCanonicalStage("SHORTLISTED"),
+              title: publicUpdateTitleForCanonicalStage("SHORTLISTED"),
+              effectiveAt: now,
+              deduplicationKey: `application:${application.id}:public:stage:${application.stageVersion + 1}`,
+              sourceEventReference: shortlistEvent.id,
+            },
+          });
+        }
 
         const inAppUpdatesEnabled =
           application.notificationPreference?.inAppEnabled ?? true;
@@ -317,12 +436,13 @@ export class ApplicationStageService {
           application.candidate.user.preferences?.applicationUpdatesEmail ??
           true;
         const emailRequired = command.targetStage === "HIRED" || emailUpdatesEnabled;
-        const notificationRequired = inAppUpdatesEnabled || emailRequired;
+        const notificationRequired =
+          autoShortlistForInterview || inAppUpdatesEnabled || emailRequired;
         const reasonLabelSnapshot = command.targetStage === "REJECTED" && command.reasonCode ? rejectionLabels[command.reasonCode] : command.reasonCode;
         const event = await tx.applicationStageEvent.create({
           data: {
             applicationId: application.id,
-            fromStage,
+            fromStage: autoShortlistForInterview ? "SHORTLISTED" : fromStage,
             toStage: command.targetStage,
             actorUserId: actor.userId,
             actorType: "RECRUITER",
@@ -331,36 +451,34 @@ export class ApplicationStageService {
             internalNoteEncrypted: command.internalNote,
             candidateVisibleReason: command.candidateVisibleReason,
             candidateVisible: true,
-            occurredAt: now,
+            occurredAt: finalAt,
             applicationVersion: nextVersion,
             notificationRequired,
             notificationStatus: notificationRequired ? "PENDING" : "NOT_REQUIRED",
             idempotencyKey,
             decisionKind: command.targetStage === "REJECTED" ? "REJECT" : command.targetStage === "INTERVIEWING" ? "MOVE_TO_INTERVIEW" : null,
-            metadata: { v: 2, source, commandDigest: digest, requestedJobId, canonicalJobId: application.jobPostingId, confirmed: command.confirmed },
+            metadata: {
+              v: 2,
+              source,
+              commandDigest: digest,
+              requestedJobId,
+              canonicalJobId,
+              confirmed: command.confirmed,
+              autoShortlisted: autoShortlistForInterview,
+              initialFromStage: autoShortlistForInterview ? fromStage : undefined,
+            },
           },
         });
 
         const publicStage = publicStageForCanonicalStage(command.targetStage);
-        const publicKind =
-          publicStage === "UNDER_REVIEW"
-            ? "UNDER_REVIEW"
-            : publicStage === "INTERVIEW"
-              ? "INTERVIEW"
-              : "OUTCOME";
         await tx.applicationPublicUpdate.create({
           data: {
             applicationId: application.id,
-            kind: publicKind,
+            kind: publicUpdateKindForCanonicalStage(command.targetStage),
             publicStage,
             publicOutcome: publicOutcomeForCanonicalStage(command.targetStage),
-            title:
-              publicStage === "UNDER_REVIEW"
-                ? "Application under review"
-                : publicStage === "INTERVIEW"
-                  ? "Interview stage reached"
-                  : "Application outcome updated",
-            effectiveAt: now,
+            title: publicUpdateTitleForCanonicalStage(command.targetStage),
+            effectiveAt: finalAt,
             deduplicationKey: `application:${application.id}:public:stage:${nextVersion}`,
             sourceEventReference: event.id,
           },
@@ -372,7 +490,7 @@ export class ApplicationStageService {
             kind: "APPLICATION_STAGE_CHANGED",
             deduplicationKey: `application:${application.id}:stage:${nextVersion}:candidate`,
             correlationId: event.id,
-            occurredAt: now,
+            occurredAt: finalAt,
             contextType: "APPLICATION",
             contextId: application.id,
             variables: { stage: command.targetStage },
@@ -392,8 +510,8 @@ export class ApplicationStageService {
           });
         }
 
-        await new PrismaAuditRepository(tx).append({
-          occurredAt: now,
+        const auditEventId = await new PrismaAuditRepository(tx).append({
+          occurredAt: finalAt,
           actorType: "user",
           actorUserId: actor.userId,
           actorSessionId: actor.sessionId,
@@ -412,10 +530,31 @@ export class ApplicationStageService {
           },
         });
 
-        if (!boundary) {
-          return applicationStageTransitionOutcomeSchema.parse({ applicationId: application.id, fromStage, stage: command.targetStage, stageVersion: nextVersion, lastStageChangedAt: now.toISOString(), eventId: event.id });
-        }
-        return stageTransitionOutcomeSchema.parse({ applicationId: application.id, fromStage, stage: command.targetStage, stageVersion: nextVersion, lastStageChangedAt: now.toISOString(), stageEventId: event.id, replayed: false, allowedDestinations: ordinaryApplicationTransitions[command.targetStage] });
+        const outcome = !boundary
+          ? applicationStageTransitionOutcomeSchema.parse({
+              applicationId: application.id,
+              fromStage,
+              stage: command.targetStage,
+              stageVersion: nextVersion,
+              lastStageChangedAt: finalAt.toISOString(),
+              eventId: event.id,
+            })
+          : stageTransitionOutcomeSchema.parse({
+              applicationId: application.id,
+              fromStage,
+              stage: command.targetStage,
+              stageVersion: nextVersion,
+              lastStageChangedAt: finalAt.toISOString(),
+              stageEventId: event.id,
+              replayed: false,
+              allowedDestinations: ordinaryApplicationTransitions[command.targetStage],
+            });
+        return {
+          ...outcome,
+          auditEventId,
+          notificationRequired,
+          notificationStatus: notificationRequired ? "PENDING" : "NOT_REQUIRED",
+        };
         },
         { isolationLevel: "Serializable" },
       );
@@ -458,7 +597,7 @@ export class ApplicationStageService {
       const digest = applicationStageCommandDigest({
         actorUserId: actor.userId,
         requestedJobId: boundary.requestedJobId,
-        canonicalJobId: current.jobPostingId,
+        canonicalJobId: current.jobPostingId || boundary.requestedJobId,
         applicationId,
         command,
         source,
@@ -476,16 +615,32 @@ export class ApplicationStageService {
             message: "This Idempotency-Key was used for a different stage decision.",
           });
         }
-        return stageTransitionOutcomeSchema.parse({
+        const replayMetadata =
+          replay.metadata &&
+          typeof replay.metadata === "object" &&
+          !Array.isArray(replay.metadata)
+            ? (replay.metadata as Record<string, unknown>)
+            : null;
+        const replayFromStage =
+          replayMetadata?.autoShortlisted === true &&
+          typeof replayMetadata.initialFromStage === "string"
+            ? applicationStageSchema.parse(replayMetadata.initialFromStage)
+            : replay.fromStage;
+        return {
+          ...stageTransitionOutcomeSchema.parse({
           applicationId,
-          fromStage: replay.fromStage,
+          fromStage: replayFromStage,
           stage: replay.toStage,
           stageVersion: replay.applicationVersion,
           lastStageChangedAt: replay.occurredAt.toISOString(),
           stageEventId: replay.id,
           replayed: true,
           allowedDestinations: ordinaryApplicationTransitions[replay.toStage],
-        });
+          }),
+          auditEventId: replay.id,
+          notificationRequired: replay.notificationRequired,
+          notificationStatus: replay.notificationStatus,
+        };
       }
 
       throw new JobServiceError(409, {

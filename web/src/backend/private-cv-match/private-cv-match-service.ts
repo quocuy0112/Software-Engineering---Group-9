@@ -2,6 +2,7 @@ import "server-only";
 
 import { createHash, randomUUID } from "node:crypto";
 import { prisma } from "@/backend/database/prisma";
+import { normalizeSearchText } from "@/backend/services/jobs/search-normalization";
 import {
   PrivateCvMatchRepository,
   type PrivateCheckRecord,
@@ -51,7 +52,7 @@ type CandidateCvSource = Readonly<{
   archivedAt: Date | null;
 }>;
 
-type JobSource = Readonly<{
+export type JobSource = Readonly<{
   id: string;
   slug: string;
   title: string;
@@ -132,6 +133,43 @@ function privateMatchJobWhere(now: Date, jobId?: string) {
   };
 }
 
+function privateMatchJobSearchWhere(now: Date, query: string) {
+  const base = privateMatchJobWhere(now);
+  const tokens = normalizeSearchText(query.slice(0, 200))
+    .split(/\s+/u)
+    .filter(Boolean)
+    .slice(0, 8);
+  if (!tokens.length) return base;
+
+  return {
+    ...base,
+    AND: [
+      ...base.AND,
+      ...tokens.map((token) => ({
+        OR: [
+          { normalizedTitle: { contains: token } },
+          { searchDocumentNormalized: { contains: token } },
+          {
+            company: {
+              OR: [
+                {
+                  displayName: {
+                    contains: token,
+                    mode: "insensitive" as const,
+                  },
+                },
+                {
+                  legalName: { contains: token, mode: "insensitive" as const },
+                },
+              ],
+            },
+          },
+        ],
+      })),
+    ],
+  };
+}
+
 export async function findEligiblePrivateMatchJob(
   jobId: string,
   now = new Date(),
@@ -147,6 +185,18 @@ export async function listEligiblePrivateMatchJobs(now = new Date()) {
     where: privateMatchJobWhere(now),
     orderBy: [{ publishedAt: "desc" }, { id: "asc" }],
     take: 200,
+    select: privateMatchJobSelect,
+  });
+}
+
+export async function searchEligiblePrivateMatchJobs(
+  query: string,
+  now = new Date(),
+) {
+  return prisma.jobPosting.findMany({
+    where: privateMatchJobSearchWhere(now, query.slice(0, 200)),
+    orderBy: [{ publishedAt: "desc" }, { id: "asc" }],
+    take: 50,
     select: privateMatchJobSelect,
   });
 }
@@ -268,6 +318,23 @@ function jobSnapshot(row: JobSource): PrivateJdSnapshot {
   };
 }
 
+export function projectPrivateMatchJob(row: JobSource) {
+  const snapshot = jobSnapshot(row);
+  return {
+    jobId: snapshot.jobId,
+    slug: snapshot.slug,
+    title: snapshot.title,
+    company: snapshot.company,
+    location: snapshot.location,
+    employmentType: snapshot.employmentType,
+    workArrangement: snapshot.workArrangement,
+    requiredExperienceYears: snapshot.requiredExperienceYears,
+    requirements: [...snapshot.requirements],
+    jdVersion: snapshot.jdVersion,
+    jdUpdatedAt: snapshot.jdUpdatedAt,
+  };
+}
+
 function errorCode(error: unknown): string {
   return error instanceof Error ? error.message : "PRIVATE_MATCH_CREATE_FAILED";
 }
@@ -282,7 +349,8 @@ function listItem(check: PrivateCheckListRecord) {
   const cv = snapshotRecord(check.cvSnapshot);
   const job = snapshotRecord(check.jdSnapshot);
   const attempt = check.currentAttempt;
-  const deterministic = attempt?.deterministicResultByAttempt;
+  const deterministic =
+    attempt?.deterministicResultByAttempt ?? attempt?.deterministicResult;
   const state =
     check.state === "READY" && attempt?.state === "READY"
       ? "READY"
@@ -572,6 +640,28 @@ export class PrivateCvMatchService {
         error instanceof Error &&
         error.message === "PRIVATE_RETRY_NOT_ALLOWED"
       ) {
+        // The eligibility check and attempt insert run in a transaction, but
+        // two browser tabs can still observe the same report before either
+        // retry commits. Re-read the authoritative check once: if another
+        // request has already installed a live retry, treat this request as
+        // an accepted duplicate instead of surfacing a misleading 409.
+        const current = await this.repository.findOwnedCheck(
+          candidateUserId,
+          checkId,
+          now,
+        );
+        const activeRetry = current?.attempts.some(
+          (attempt) =>
+            attempt.trigger === "AI_RETRY" &&
+            (attempt.state === "QUEUED" ||
+              (attempt.state === "AI_RUNNING" &&
+                attempt.leaseExpiresAt !== null &&
+                attempt.leaseExpiresAt > now)),
+        );
+        if (current && activeRetry) {
+          void this.enqueue(checkId).catch(() => undefined);
+          return { check: current, replay: false };
+        }
         throw privateMatchError("CONFLICT", 409);
       }
       if (

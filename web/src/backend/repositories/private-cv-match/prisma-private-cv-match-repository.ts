@@ -14,6 +14,7 @@ const checkReadInclude = {
   currentAttempt: {
     include: {
       deterministicResultByAttempt: { include: { evidence: true } },
+      deterministicResult: { include: { evidence: true } },
       aiResultByAttempt: true,
     },
   },
@@ -21,6 +22,7 @@ const checkReadInclude = {
     orderBy: [{ attemptNumber: "desc" as const }, { id: "desc" as const }],
     include: {
       deterministicResultByAttempt: { include: { evidence: true } },
+      deterministicResult: { include: { evidence: true } },
       aiResultByAttempt: true,
     },
   },
@@ -30,6 +32,7 @@ const checkListReadInclude = {
   currentAttempt: {
     include: {
       deterministicResultByAttempt: true,
+      deterministicResult: true,
       aiResultByAttempt: true,
     },
   },
@@ -565,20 +568,72 @@ export class PrivateCvMatchRepository {
             trigger: "AI_RETRY",
             state: { in: ["QUEUED", "AI_RUNNING"] },
           },
-          select: { id: true },
+          select: { id: true, state: true, leaseExpiresAt: true },
         },
         _count: { select: { attempts: true } },
       },
     });
     if (!check) throw new Error("PRIVATE_CHECK_UNAVAILABLE");
     if (
-      check.attempts.length > 0 ||
       !check.currentAttempt ||
       !["LIMITED", "READY"].includes(check.currentAttempt.state) ||
       !check.currentAttempt.deterministicResultId
     ) {
       throw new Error("PRIVATE_RETRY_NOT_ALLOWED");
     }
+
+    const activeRetry = check.attempts.find(
+      (attempt) =>
+        attempt.state === "QUEUED" ||
+        (attempt.state === "AI_RUNNING" &&
+          attempt.leaseExpiresAt !== null &&
+          attempt.leaseExpiresAt > input.now),
+    );
+    if (activeRetry) {
+      // A repeated click, another tab, or a request recovered after a
+      // timeout should continue the already accepted retry. The service will
+      // record the new idempotency receipt and kick the worker again instead
+      // of turning a safe duplicate into a user-visible conflict.
+      return activeRetry;
+    }
+
+    const staleRetry = check.attempts.find(
+      (attempt) =>
+        attempt.state === "AI_RUNNING" &&
+        (attempt.leaseExpiresAt === null ||
+          attempt.leaseExpiresAt <= input.now),
+    );
+    if (staleRetry) {
+      // A worker can disappear after claiming an AI retry. Requeue only when
+      // the lease is still expired so a newly reclaimed worker cannot be
+      // overwritten by this request.
+      const recovered = await this.database.privateCvMatchAttempt.updateMany({
+        where: {
+          id: staleRetry.id,
+          state: "AI_RUNNING",
+          OR: [
+            { leaseExpiresAt: null },
+            { leaseExpiresAt: { lte: input.now } },
+          ],
+        },
+        data: {
+          state: "QUEUED",
+          completedAt: null,
+          failureCode: null,
+          hybridScore: null,
+          matchBand: null,
+          leaseOwner: null,
+          leaseExpiresAt: null,
+        },
+      });
+      if (recovered.count === 1) {
+        return this.database.privateCvMatchAttempt.findUnique({
+          where: { id: staleRetry.id },
+        });
+      }
+      throw new Error("PRIVATE_RETRY_NOT_ALLOWED");
+    }
+
     return this.database.privateCvMatchAttempt.create({
       data: {
         id: randomUUID(),

@@ -1,8 +1,8 @@
 # Implementation Plan: Recruitment Pipeline Kanban Board
 
-**Branch**: `019-recruitment-pipeline-kanban-board` | **Date**: 2026-08-16 | **Spec**: [spec.md](./spec.md)
+**Branch**: `021-recruitment-pipeline-kanban-board` | **Date**: 2026-08-16 | **Spec**: [spec.md](./spec.md)
 
-**Input**: Feature specification from `spec-kit/specs/019-recruitment-pipeline-kanban-board/spec.md`
+**Input**: Feature specification from `spec-kit/specs/021-recruitment-pipeline-kanban-board/spec.md`
 
 ## Summary
 
@@ -217,7 +217,7 @@ The request-binding digest fits the existing stage-event `metadata` JSON. Existi
 ### Documentation (this feature)
 
 ```text
-spec-kit/specs/019-recruitment-pipeline-kanban-board/
+spec-kit/specs/021-recruitment-pipeline-kanban-board/
 |-- spec.md
 |-- plan.md
 |-- research.md

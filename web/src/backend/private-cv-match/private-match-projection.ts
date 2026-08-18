@@ -300,11 +300,27 @@ function aiComponent(
   };
 }
 
-function retryInProgress(check: PrivateCheckRecord): boolean {
+function deterministicResult(
+  attempt: NonNullable<PrivateCheckRecord["currentAttempt"]> | null | undefined,
+) {
+  // Initial attempts own the deterministic row through
+  // `deterministicResultByAttempt`. An AI retry reuses that immutable row via
+  // `deterministicResultId`, so its direct relation is `deterministicResult`.
+  return (
+    attempt?.deterministicResultByAttempt ??
+    attempt?.deterministicResult ??
+    null
+  );
+}
+
+function retryInProgress(check: PrivateCheckRecord, now: Date): boolean {
   return check.attempts.some(
     (attempt) =>
       attempt.trigger === "AI_RETRY" &&
-      (attempt.state === "QUEUED" || attempt.state === "AI_RUNNING"),
+      (attempt.state === "QUEUED" ||
+        (attempt.state === "AI_RUNNING" &&
+          attempt.leaseExpiresAt !== null &&
+          attempt.leaseExpiresAt > now)),
   );
 }
 
@@ -314,9 +330,7 @@ export function projectPrivateMatchCheck(
 ): PrivateMatchResponse {
   const common = base(check);
   const attempt = check.currentAttempt;
-  const automatic = automaticComponent(
-    attempt?.deterministicResultByAttempt ?? null,
-  );
+  const automatic = automaticComponent(deterministicResult(attempt));
   if (attempt?.state === "READY" && automatic && attempt.aiResultByAttempt) {
     const aiEvaluation = aiComponent(attempt.aiResultByAttempt);
     if (aiEvaluation) {
@@ -338,7 +352,7 @@ export function projectPrivateMatchCheck(
         actions: aiEvaluation.actions,
         canApply: true,
         completedAt: (attempt.completedAt ?? now).toISOString(),
-        retryInProgress: retryInProgress(check),
+        retryInProgress: retryInProgress(check, now),
       });
     }
   }
@@ -354,7 +368,7 @@ export function projectPrivateMatchCheck(
       matchBand: null,
       canRetryAi: true,
       canApply: true,
-      retryInProgress: retryInProgress(check),
+      retryInProgress: retryInProgress(check, now),
       completedAt: (attempt.completedAt ?? now).toISOString(),
       failureCode: attempt.failureCode,
     });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   AlignLeft,
@@ -9,6 +9,7 @@ import {
   Clock3,
   FileText,
   LockKeyhole,
+  Upload,
   Search,
   ShieldCheck,
   Sparkles,
@@ -19,6 +20,11 @@ import {
   privateMatchErrorMessage,
   useCreatePrivateCvMatch,
 } from "../client/use-private-cv-match";
+import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
+import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
+import { CV_SOURCE_MAX_BYTES } from "@/shared/contracts/cv-import/common";
+import { candidateCvSummarySchema } from "@/shared/contracts/cv-import/candidate-cv";
+import { privateMatchJobsResponseSchema } from "@/shared/contracts/private-cv-match";
 import {
   formatEmploymentType,
   formatExperienceRequirement,
@@ -57,6 +63,24 @@ function bytes(value: number) {
   return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function canImportCv(file: File) {
+  const extension = file.name.toLowerCase().split(".").pop();
+  const mimeType =
+    extension === "pdf"
+      ? "application/pdf"
+      : extension === "docx"
+        ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        : file.type;
+  return (
+    file.size > 0 &&
+    file.size <= CV_SOURCE_MAX_BYTES &&
+    ((mimeType === "application/pdf" && extension === "pdf") ||
+      (mimeType ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" &&
+        extension === "docx"))
+  );
+}
+
 function IconRow({
   icon,
   children,
@@ -85,27 +109,145 @@ export function PrivateMatchSetup({
 }) {
   const router = useRouter();
   const create = useCreatePrivateCvMatch();
+  const csrfProof = useCsrfProof();
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [availableCvs, setAvailableCvs] = useState<
+    readonly PrivateMatchSetupCv[]
+  >(() => cvs);
+  const [selectedJobId, setSelectedJobId] = useState(
+    () => initialJobId ?? jobs[0]?.jobId ?? "",
+  );
+  const [selectedCvId, setSelectedCvId] = useState(
+    () =>
+      initialCvId ??
+      cvs.find((cv) => cv.parseStatus === "READY")?.id ??
+      cvs[0]?.id ??
+      "",
+  );
+  const [jobSearch, setJobSearch] = useState("");
+  const [remoteJobs, setRemoteJobs] = useState<readonly PrivateMatchSetupJob[]>(
+    [],
+  );
+  const [selectedRemoteJob, setSelectedRemoteJob] =
+    useState<PrivateMatchSetupJob | null>(null);
+  const [jobSearchLoading, setJobSearchLoading] = useState(false);
+  const [localFile, setLocalFile] = useState<File | null>(null);
+  const [localUploadState, setLocalUploadState] = useState<
+    "IDLE" | "UPLOADING"
+  >("IDLE");
+  const [localUploadError, setLocalUploadError] = useState<string | null>(null);
+  const [localUploadComplete, setLocalUploadComplete] = useState(false);
   const requestedJobIsUnavailable = Boolean(
     initialJobId && !jobs.some((job) => job.jobId === initialJobId),
   );
   const requestedCvIsUnavailable = Boolean(
     initialCvId && !cvs.some((cv) => cv.id === initialCvId),
   );
-  const selectedJobId = initialJobId ?? jobs[0]?.jobId ?? "";
-  const selectedCvId =
-    initialCvId ??
-    cvs.find((cv) => cv.parseStatus === "READY")?.id ??
-    cvs[0]?.id ??
-    "";
   const selectedJob = useMemo(
-    () => jobs.find((job) => job.jobId === selectedJobId),
-    [jobs, selectedJobId],
+    () =>
+      jobs.find((job) => job.jobId === selectedJobId) ??
+      remoteJobs.find((job) => job.jobId === selectedJobId) ??
+      (selectedRemoteJob?.jobId === selectedJobId
+        ? selectedRemoteJob
+        : undefined),
+    [jobs, remoteJobs, selectedJobId, selectedRemoteJob],
   );
   const selectedCv = useMemo(
-    () => cvs.find((cv) => cv.id === selectedCvId),
-    [cvs, selectedCvId],
+    () => availableCvs.find((cv) => cv.id === selectedCvId),
+    [availableCvs, selectedCvId],
   );
+  useEffect(() => {
+    const query = jobSearch.trim();
+    if (!query) return;
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      setJobSearchLoading(true);
+      void fetch(
+        `/api/candidate/private-cv-matches/jobs?q=${encodeURIComponent(query)}`,
+        { cache: "no-store", headers: { Accept: "application/json" } },
+      )
+        .then(async (response) => {
+          if (!response.ok) throw new Error("JOB_SEARCH_FAILED");
+          return privateMatchJobsResponseSchema.parse(await response.json());
+        })
+        .then((result) => {
+          if (cancelled) return;
+          setRemoteJobs(result.items);
+          setJobSearchLoading(false);
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setRemoteJobs([]);
+          setJobSearchLoading(false);
+        });
+    }, 250);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [jobSearch]);
+
+  const matchingJobs = useMemo(
+    () => (jobSearch.trim() ? remoteJobs : jobs.slice(0, 6)),
+    [jobSearch, jobs, remoteJobs],
+  );
+  const isJobSearchLoading = Boolean(jobSearch.trim()) && jobSearchLoading;
   const ready = selectedCv?.parseStatus === "READY";
+
+  async function importLocalCv() {
+    if (!localFile) return;
+    setLocalUploadError(null);
+    setLocalUploadComplete(false);
+    setLocalUploadState("UPLOADING");
+    try {
+      const form = new FormData();
+      form.append("file", localFile, localFile.name);
+      const response = await mutateWithCurrentCsrf(
+        "/api/account/candidate-cvs",
+        { method: "POST", body: form },
+        csrfProof,
+      );
+      const body: unknown = await response.json().catch(() => null);
+      if (!response.ok) {
+        const message =
+          body &&
+          typeof body === "object" &&
+          !Array.isArray(body) &&
+          typeof (body as { message?: unknown }).message === "string"
+            ? (body as { message: string }).message
+            : "The CV could not be imported.";
+        throw new Error(message);
+      }
+      const saved = candidateCvSummarySchema.parse(body);
+      const mimeType = saved.mimeType;
+      if (
+        mimeType !== "application/pdf" &&
+        mimeType !==
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      ) {
+        throw new Error("Only PDF and DOCX files can be assessed here.");
+      }
+      const nextCv: PrivateMatchSetupCv = {
+        ...saved,
+        mimeType,
+        pageCount: null,
+        parseStatus: "READY",
+      };
+      setAvailableCvs((current) =>
+        [nextCv, ...current.filter((cv) => cv.id !== nextCv.id)].slice(0, 10),
+      );
+      setSelectedCvId(nextCv.id);
+      setLocalUploadComplete(true);
+    } catch (error) {
+      setLocalUploadError(
+        error instanceof Error
+          ? error.message
+          : "The CV could not be imported. Check the file and try again.",
+      );
+    } finally {
+      setLocalUploadState("IDLE");
+    }
+  }
 
   async function analyze() {
     if (!selectedJob || !selectedCv || !ready) return;
@@ -183,7 +325,7 @@ export function PrivateMatchSetup({
     );
   }
 
-  if (!selectedJob || !selectedCv) {
+  if (!selectedJob) {
     return (
       <main
         className="private-match-page private-match-empty"
@@ -234,6 +376,51 @@ export function PrivateMatchSetup({
               <span className="private-match-card-topline-caption">
                 Current job
               </span>
+            </div>
+            <div className="private-match-picker">
+              <label htmlFor="private-match-job-search">
+                Find a job by keyword or company
+              </label>
+              <input
+                id="private-match-job-search"
+                type="search"
+                value={jobSearch}
+                onChange={(event) => setJobSearch(event.currentTarget.value)}
+                placeholder="e.g. React, Product Designer, Acme"
+                autoComplete="off"
+              />
+              <div
+                className="private-match-picker-results"
+                aria-live="polite"
+                aria-label="Matching jobs"
+              >
+                {isJobSearchLoading ? (
+                  <p className="private-match-picker-empty">
+                    Searching eligible jobs…
+                  </p>
+                ) : matchingJobs.length ? (
+                  matchingJobs.map((job) => (
+                    <button
+                      className={`private-match-picker-option ${
+                        job.jobId === selectedJobId ? "is-selected" : ""
+                      }`}
+                      key={job.jobId}
+                      type="button"
+                      onClick={() => {
+                        setSelectedJobId(job.jobId);
+                        setSelectedRemoteJob(job);
+                      }}
+                    >
+                      <strong>{job.title}</strong>
+                      <span>{job.company}</span>
+                    </button>
+                  ))
+                ) : (
+                  <p className="private-match-picker-empty">
+                    No eligible jobs match that keyword or company.
+                  </p>
+                )}
+              </div>
             </div>
             <div className="private-match-job-panel private-match-setup-info-row">
               <span className="private-match-large-icon">
@@ -291,30 +478,144 @@ export function PrivateMatchSetup({
                 Current CV
               </span>
             </div>
-            <div className="private-match-card-heading private-match-setup-info-row private-match-setup-info-row--neutral">
-              <span className="private-match-large-icon">
-                <FileText aria-hidden="true" />
-              </span>
-              <div className="private-match-info-body">
-                <h3>{selectedCv.fileName}</h3>
-                <span>
-                  {selectedCv.pageCount
-                    ? `${selectedCv.pageCount} pages`
-                    : "Page count unavailable"}{" "}
-                  {"\u00b7"} {bytes(selectedCv.byteSize)} {"\u00b7"}{" "}
-                  {ready ? "Parsed successfully" : "Parsing in progress"}
+            {selectedCv ? (
+              <div className="private-match-card-heading private-match-setup-info-row private-match-setup-info-row--neutral">
+                <span className="private-match-large-icon">
+                  <FileText aria-hidden="true" />
+                </span>
+                <div className="private-match-info-body">
+                  <h3>{selectedCv.fileName}</h3>
+                  <span>
+                    {selectedCv.pageCount
+                      ? `${selectedCv.pageCount} pages`
+                      : "Page count unavailable"}{" "}
+                    {"\u00b7"} {bytes(selectedCv.byteSize)} {"\u00b7"}{" "}
+                    {ready ? "Parsed successfully" : "Parsing in progress"}
+                  </span>
+                </div>
+                <span
+                  className={`private-match-badge ${
+                    ready
+                      ? "private-match-badge--green"
+                      : "private-match-badge--yellow"
+                  }`}
+                >
+                  {ready ? <Check aria-hidden="true" /> : null}
+                  {ready ? "Ready" : "Not ready"}
                 </span>
               </div>
-              <span
-                className={`private-match-badge ${
-                  ready
-                    ? "private-match-badge--green"
-                    : "private-match-badge--yellow"
-                }`}
-              >
-                {ready ? <Check aria-hidden="true" /> : null}
-                {ready ? "Ready" : "Not ready"}
-              </span>
+            ) : (
+              <div className="private-match-card-heading private-match-setup-info-row private-match-setup-info-row--neutral">
+                <span className="private-match-large-icon">
+                  <FileText aria-hidden="true" />
+                </span>
+                <div className="private-match-info-body">
+                  <h3>No CV selected yet</h3>
+                  <span>
+                    Choose a profile CV or import one from your device.
+                  </span>
+                </div>
+                <span className="private-match-badge private-match-badge--yellow">
+                  Required
+                </span>
+              </div>
+            )}
+            <fieldset className="private-match-picker private-match-cv-picker">
+              <legend>Choose a CV from your profile</legend>
+              <div className="private-match-picker-results">
+                {availableCvs.length ? (
+                  availableCvs.map((cv) => (
+                    <label
+                      className={`private-match-picker-option ${
+                        cv.id === selectedCvId ? "is-selected" : ""
+                      }`}
+                      key={cv.id}
+                    >
+                      <input
+                        type="radio"
+                        name="private-match-cv"
+                        checked={cv.id === selectedCvId}
+                        onChange={() => setSelectedCvId(cv.id)}
+                      />
+                      <span>
+                        <strong>{cv.displayName}</strong>
+                        <small>
+                          {bytes(cv.byteSize)} ·{" "}
+                          {cv.parseStatus === "READY" ? "Ready" : "Processing"}
+                        </small>
+                      </span>
+                    </label>
+                  ))
+                ) : (
+                  <p className="private-match-picker-empty">
+                    No profile CVs are available yet. You can import a local CV
+                    below without updating your profile.
+                  </p>
+                )}
+              </div>
+            </fieldset>
+            <div className="private-match-local-import">
+              <div>
+                <strong>Import a CV from your device</strong>
+                <p>
+                  PDF or DOCX, up to 5 MB. No skills or headline update is
+                  required; the file is kept for this application.
+                </p>
+              </div>
+              <input
+                ref={fileInput}
+                className="private-match-visually-hidden"
+                type="file"
+                accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0] ?? null;
+                  setLocalUploadError(null);
+                  setLocalUploadComplete(false);
+                  if (file && !canImportCv(file)) {
+                    setLocalFile(null);
+                    setLocalUploadError(
+                      "Choose a PDF or DOCX file up to 5 MB.",
+                    );
+                    return;
+                  }
+                  setLocalFile(file);
+                }}
+              />
+              <div className="private-match-local-import-actions">
+                <button
+                  className="private-match-secondary-button"
+                  type="button"
+                  onClick={() => fileInput.current?.click()}
+                  disabled={localUploadState === "UPLOADING"}
+                >
+                  <Upload aria-hidden="true" /> Choose local file
+                </button>
+                {localFile ? <span>{localFile.name}</span> : null}
+                {localFile ? (
+                  <button
+                    className="private-match-secondary-button"
+                    type="button"
+                    onClick={() => void importLocalCv()}
+                    disabled={localUploadState === "UPLOADING"}
+                  >
+                    {localUploadState === "UPLOADING"
+                      ? "Uploading…"
+                      : "Import CV"}
+                  </button>
+                ) : null}
+              </div>
+              {localUploadState === "UPLOADING" ? (
+                <p role="status" aria-live="polite">
+                  Uploading your CV securely…
+                </p>
+              ) : null}
+              {localUploadError ? <p role="alert">{localUploadError}</p> : null}
+              {localUploadComplete ? (
+                <p role="status">
+                  Your CV is ready and selected for this check. It will be
+                  included for the recruiter when you submit the application.
+                </p>
+              ) : null}
             </div>
             <p className="private-match-caption">
               The assessment uses this CV version only. Your profile data is not

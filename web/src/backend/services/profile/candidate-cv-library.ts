@@ -15,6 +15,7 @@ import {
   type CandidateCvLibrary,
   type CandidateCvSummary,
 } from "@/shared/contracts/cv-import/candidate-cv";
+import { CV_ACCOUNT_MAX_IMPORTS } from "@/shared/contracts/cv-import/common";
 
 function initialDisplayName(originalName: string | null, fallback: string) {
   const value = originalName?.trim() || fallback;
@@ -97,7 +98,7 @@ async function confirmedCvImports(
            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
          )
        ORDER BY upload."confirmedAt" DESC, upload."id" DESC
-       LIMIT 50
+       LIMIT ${CV_ACCOUNT_MAX_IMPORTS}
     `;
     return rows.map((row) => ({
       ...row,
@@ -126,7 +127,7 @@ async function confirmedCvImports(
       },
     },
     orderBy: [{ confirmedAt: "desc" }, { id: "desc" }],
-    take: 50,
+    take: CV_ACCOUNT_MAX_IMPORTS,
     select: {
       id: true,
       declaredMediaType: true,
@@ -334,7 +335,8 @@ export async function listCandidateCvLibrary(
       archivedAt: null,
     },
     orderBy: [{ confirmedAt: "desc" }, { id: "desc" }],
-    take: 50,
+    // Match Check and Profile share the ten-file account quota.
+    take: CV_ACCOUNT_MAX_IMPORTS,
     select: {
       id: true,
       displayName: true,

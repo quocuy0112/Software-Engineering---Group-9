@@ -1148,14 +1148,22 @@
   background: currentColor;
 }
 
+.application-stage-icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  stroke-width: 2.2;
+}
+
 .application-stage-badge[data-stage="applied"],
+.application-stage-badge[data-stage="viewed"],
 .application-stage-badge[data-stage="shortlisted"],
-.application-stage-badge[data-stage="interviewing"] {
+.application-stage-badge[data-stage="interviewing"],
+.application-stage-badge[data-stage="offered"] {
   --application-stage-color: var(--sh-color-brand-primary);
   --application-stage-background: var(--sh-color-brand-soft);
 }
 
-.application-stage-badge[data-stage="offered"],
 .application-stage-badge[data-stage="offer-declined"] {
   --application-stage-color: var(--sh-color-warning);
   --application-stage-background: var(--sh-color-warning-bg);
