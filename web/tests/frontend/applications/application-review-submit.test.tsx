@@ -69,7 +69,7 @@ describe("application review and submit", () => {
     expect(screen.getByText("No cover letter added")).toBeVisible();
     expect(
       screen.getByRole("button", { name: "Submit application" }),
-    ).toBeDisabled();
+    ).toBeEnabled();
 
     const checklist = within(
       screen.getByRole("heading", { name: "Files to be submitted" })
@@ -81,6 +81,11 @@ describe("application review and submit", () => {
     expect(
       checklist.queryByText("Message to the recruiter"),
     ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Submit application" }));
+    expect(
+      screen.getByText("Confirm the application details before submitting."),
+    ).toBeVisible();
 
     fireEvent.click(screen.getByRole("checkbox"));
     expect(

@@ -128,6 +128,32 @@ describe("candidate application wizard", () => {
     expect(continueButton).toBeEnabled();
   });
 
+  it("shows the cover-letter recovery notice on the files step", () => {
+    render(
+      <ApplicationWizard
+        slug="role"
+        job={{
+          id: "job-1",
+          title: "Role",
+          companyName: "Company",
+          location: "Remote",
+        }}
+        initialDraft={draft}
+        initialCvs={[]}
+        csrfProof="csrf-proof"
+        initialStep={2}
+        coverLetterNeedsReupload
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: "Apply – Role" })).toBeVisible();
+    expect(
+      screen.getByText(
+        "This cover letter is no longer available. Upload it again before continuing.",
+      ),
+    ).toBeVisible();
+  });
+
   it("uses one cover-letter mode at a time and limits written text to 2,000 characters", () => {
     render(
       <ApplicationWizard

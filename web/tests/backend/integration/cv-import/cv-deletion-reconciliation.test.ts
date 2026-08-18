@@ -273,9 +273,43 @@ describe("CV deletion and storage reconciliation", () => {
   it("schedules missing references safely and deletes only grace-aged untracked inventory", async () => {
     const fixture = await seed("reconciliation");
     const storage = new ReconciliationStorage();
+    const job = await pool.query<{ id: string }>(
+      `SELECT "id" FROM "JobPosting" ORDER BY "id" LIMIT 1`,
+    );
+    const jobPostingId = job.rows[0]?.id;
+    if (!jobPostingId) throw new Error("reconciliation test requires a job");
+    const draftLocator = "draft_cover_letter_locator_1";
+    const draftCoverLetter = JSON.stringify({
+      kind: "FILE",
+      file: {
+        versionId: "draft-cover-version-1",
+        displayName: "cover.pdf",
+        fileName: "cover.pdf",
+        mimeType: "application/pdf",
+        byteSize: 9,
+        parseStatus: "NOT_APPLICABLE",
+        storageKey: draftLocator,
+        checksumSha256: "a".repeat(64),
+      },
+    });
     const locators = await pool.query<{ storageLocator: string }>(
       `SELECT "storageLocator" FROM "CvStoredArtifact" WHERE "uploadId" = $1 ORDER BY "kind"`,
       [fixture.uploadId],
+    );
+    await pool.query(
+      `INSERT INTO "CandidateApplicationDraft" (
+         "id", "candidateUserId", "jobPostingId", "revision", "personalInfoDraft",
+         "selectedCvId", "coverLetterDraft", "messageDraft", "confirmationAccepted",
+         "createdAt", "updatedAt", "expiresAt"
+       ) VALUES ($1, $2, $3, 1, '{}'::jsonb, NULL, $4::jsonb, NULL, false, $5, $5, $6)`,
+      [
+        `reconciliation-draft-${fixture.accountId}`,
+        fixture.accountId,
+        jobPostingId,
+        draftCoverLetter,
+        initial,
+        new Date(initial.getTime() + 24 * 60 * 60_000),
+      ],
     );
     storage.missing.add(locators.rows[0]!.storageLocator);
     const runAt = new Date(initial.getTime() + 2 * 60 * 60_000);
@@ -291,6 +325,11 @@ describe("CV deletion and storage reconciliation", () => {
         createdAt: initial,
       },
       {
+        locator: sensitiveStorageLocator(draftLocator),
+        bytes: 9,
+        createdAt: initial,
+      },
+      {
         locator: sensitiveStorageLocator("recent_locator_abcdefghijkl"),
         bytes: 8,
         createdAt: runAt,
@@ -303,7 +342,7 @@ describe("CV deletion and storage reconciliation", () => {
     expect(result).toMatchObject({
       referencesChecked: 2,
       missingScheduled: 1,
-      inventoryChecked: 3,
+      inventoryChecked: 4,
       orphansDeleted: 1,
     });
     expect(storage.deleted).toEqual(["orphan_locator_abcdefghijkl"]);

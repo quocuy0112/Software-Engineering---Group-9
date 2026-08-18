@@ -78,6 +78,9 @@ export const applicationContactSnapshotSchema = z
       .string()
       .trim()
       .regex(/^(?:0|\+84)(?:3|5|7|8|9)\d{8}$/u),
+    // Phone and location can be edited for one application. Keep this
+    // optional so legacy direct-application clients remain compatible.
+    location: z.string().trim().max(160).optional(),
   })
   .strict();
 
@@ -130,11 +133,12 @@ export const DIRECT_APPLICATION_CV_ID = "application-upload";
 
 export const applicationCoverLetterInputSchema = z.union([
   z.string().trim().max(5_000),
+  z.object({ kind: z.literal("NONE") }).strict(),
   z
-    .object({ kind: z.literal("NONE") })
-    .strict(),
-  z
-    .object({ kind: z.literal("TEXT"), text: z.string().trim().min(1).max(10_000) })
+    .object({
+      kind: z.literal("TEXT"),
+      text: z.string().trim().min(1).max(10_000),
+    })
     .strict(),
   z
     .object({

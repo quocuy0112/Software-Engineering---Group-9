@@ -49,6 +49,7 @@ export function ApplicationWizard({
   initialCvs,
   csrfProof,
   initialStep = 1,
+  coverLetterNeedsReupload = false,
 }: {
   slug: string;
   job: ApplicationWizardJob;
@@ -56,6 +57,7 @@ export function ApplicationWizard({
   initialCvs: readonly CandidateCvSummary[];
   csrfProof: string;
   initialStep?: WizardStep;
+  coverLetterNeedsReupload?: boolean;
 }) {
   const router = useRouter();
   const copy = applicationCopy(useWorkspaceLocale());
@@ -88,7 +90,11 @@ export function ApplicationWizard({
   // discriminated contract guarantees one active text/file value.
   const [message] = useState(initialDraft.message ?? "");
   const [pending, setPending] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    coverLetterNeedsReupload
+      ? copy.applicationFiles.coverLetterNeedsReupload
+      : null,
+  );
 
   const personalInformation = {
     ...draft.personalInformation,

@@ -118,7 +118,15 @@ export function prepareApplicationSubmission(
   activeConsentVersion: string,
   now: Date,
 ) {
-  if (!context.candidate.name.trim() || !context.candidate.location?.trim()) {
+  // The application wizard permits phone/location overrides for this
+  // application. Use the submitted snapshot when present; otherwise retain
+  // the legacy direct-application profile values.
+  const candidate = {
+    ...context.candidate,
+    phone: command.contactSnapshot?.phone ?? context.candidate.phone,
+    location: command.contactSnapshot?.location ?? context.candidate.location,
+  };
+  if (!candidate.name.trim() || !candidate.location?.trim()) {
     throw new ApplicationRepositoryError("APPLICATION_PROFILE_INCOMPLETE");
   }
   const cv = context.cv;
@@ -205,19 +213,19 @@ export function prepareApplicationSubmission(
     coverLetter: plainText(coverLetterText(command.coverLetter), 10_000),
     profileSnapshot: {
       v: 1,
-      candidateName: context.candidate.name,
-      email: context.candidate.email ?? null,
-      headline: context.candidate.headline!,
-      summary: context.candidate.summary ?? null,
-      phone: context.candidate.phone ?? null,
-      location: context.candidate.location!,
-      skills: context.candidate.skills,
-      experience: context.candidate.experience.map((item) => ({
+      candidateName: candidate.name,
+      email: candidate.email ?? null,
+      headline: candidate.headline!,
+      summary: candidate.summary ?? null,
+      phone: candidate.phone ?? null,
+      location: candidate.location!,
+      skills: candidate.skills,
+      experience: candidate.experience.map((item) => ({
         ...item,
         startDate: iso(item.startDate),
         endDate: iso(item.endDate),
       })),
-      education: context.candidate.education,
+      education: candidate.education,
     },
     cvSnapshot: {
       v: 1,

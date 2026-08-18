@@ -1,7 +1,10 @@
 import "server-only";
 
 import { prisma } from "@/backend/database/prisma";
-import { JobServiceError, type CandidateActor } from "@/backend/services/jobs/job-types";
+import {
+  JobServiceError,
+  type CandidateActor,
+} from "@/backend/services/jobs/job-types";
 import { JobApplicationService } from "@/backend/services/jobs/job-application-service";
 import {
   applicationSubmitCommandSchema,
@@ -21,9 +24,7 @@ import { CandidateApplicationError } from "./candidate-application-errors";
 const activeConsentVersion = "2026-08-01";
 
 function normalizedPhone(value: string) {
-  return value
-    .replace(/[^\d+]/gu, "")
-    .replace(/(?!^)\+/gu, "");
+  return value.replace(/[^\d+]/gu, "").replace(/(?!^)\+/gu, "");
 }
 
 function submissionError(code: string, message: string): never {
@@ -37,10 +38,11 @@ export class CandidateApplicationSubmissionService {
   ) {}
 
   private async receipt(actor: CandidateActor, applicationId: string) {
-    const tracker = await import("./candidate-application-tracking-service").then(
-      ({ CandidateApplicationTrackingService }) =>
-        new CandidateApplicationTrackingService().get(actor, applicationId),
-    );
+    const tracker =
+      await import("./candidate-application-tracking-service").then(
+        ({ CandidateApplicationTrackingService }) =>
+          new CandidateApplicationTrackingService().get(actor, applicationId),
+      );
     return applicationReceiptSchema.parse({
       applicationId: tracker.applicationId,
       submittedAt: tracker.submittedAt,
@@ -70,7 +72,11 @@ export class CandidateApplicationSubmissionService {
       select: { id: true },
     });
     if (replay) return this.receipt(actor, replay.id);
-    const draft = await this.drafts.getForSubmission(actor, command.draftId, now);
+    const draft = await this.drafts.getForSubmission(
+      actor,
+      command.draftId,
+      now,
+    );
     if (draft.revision !== command.expectedRevision) {
       throw new CandidateApplicationError(
         409,
@@ -172,6 +178,7 @@ export class CandidateApplicationSubmissionService {
           fullName: personalInfo.fullName,
           email: personalInfo.email,
           phone,
+          location: personalInfo.currentLocation,
         },
         answers: [],
         coverLetter,
@@ -193,7 +200,8 @@ export class CandidateApplicationSubmissionService {
     if (!result.applicationId) {
       throw new JobServiceError(503, {
         code: "APPLICATION_RECEIPT_UNAVAILABLE",
-        message: "The application was accepted but its receipt is not available yet.",
+        message:
+          "The application was accepted but its receipt is not available yet.",
       });
     }
     // The tracker projection is the single safe receipt shape. It is loaded by

@@ -144,6 +144,31 @@ describe("application submission policy", () => {
     ).not.toThrow();
   });
 
+  it("uses the application contact snapshot for editable phone and location", () => {
+    const result = prepareApplicationSubmission(
+      {
+        ...context,
+        candidate: { ...context.candidate, phone: null, location: null },
+      },
+      {
+        ...command,
+        contactSnapshot: {
+          fullName: "Candidate One",
+          email: "candidate@example.com",
+          phone: "+84918475726",
+          location: "Tan Binh District, Ho Chi Minh City",
+        },
+      },
+      "2026-08-01",
+      now,
+    );
+
+    expect(result.profileSnapshot).toMatchObject({
+      phone: "+84918475726",
+      location: "Tan Binh District, Ho Chi Minh City",
+    });
+  });
+
   it("rejects foreign, unconfirmed, archived, or oversized CVs", () => {
     expect(() =>
       prepareApplicationSubmission(
