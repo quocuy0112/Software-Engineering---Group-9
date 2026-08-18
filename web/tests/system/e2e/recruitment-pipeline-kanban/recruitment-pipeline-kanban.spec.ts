@@ -44,28 +44,79 @@ async function submitStageChange(
   await dialog.getByRole("button", { name: actionName }).click();
 }
 
-async function pointerDragToViewed(page: Page, applicationId: string) {
+async function pointerDragToStage(
+  page: Page,
+  applicationId: string,
+  stage: string,
+) {
   const card = applicationCard(page, applicationId);
-  const handle = card.getByRole("button", { name: /Drag .* to another stage/u });
-  const target = page.getByRole("region", { name: "Viewed" });
-  const sourceBox = await handle.boundingBox();
+  const target = page.getByRole("region", { name: stage });
+  const sourceBox = await card.boundingBox();
   const targetBox = await target.boundingBox();
   expect(sourceBox).not.toBeNull();
   expect(targetBox).not.toBeNull();
   await page.mouse.move(
     sourceBox!.x + sourceBox!.width / 2,
-    sourceBox!.y + Math.min(sourceBox!.height / 2, 40),
+    sourceBox!.y + 18,
   );
   await page.mouse.down();
-  await page.mouse.move(sourceBox!.x + sourceBox!.width / 2 + 12, sourceBox!.y + 40, {
-    steps: 3,
-  });
+  await page.mouse.move(
+    sourceBox!.x + sourceBox!.width / 2 + 12,
+    sourceBox!.y + 38,
+    { steps: 3 },
+  );
   await page.mouse.move(
     targetBox!.x + targetBox!.width / 2,
     targetBox!.y + Math.min(targetBox!.height / 2, 120),
     { steps: 12 },
   );
   await page.mouse.up();
+}
+
+async function expectReadablePipelineTheme(page: Page, expectedTheme: string) {
+  const result = await page.evaluate(() => {
+    function parse(color: string) {
+      const values = color.match(/[\d.]+/gu)?.slice(0, 3).map(Number) ?? [];
+      return values.length === 3 ? values : null;
+    }
+    function luminance(values: number[]) {
+      const channels = values.map((value) => {
+        const channel = value / 255;
+        return channel <= 0.04045
+          ? channel / 12.92
+          : ((channel + 0.055) / 1.055) ** 2.4;
+      });
+      return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+    }
+    function contrast(element: Element, background: Element) {
+      const foreground = parse(getComputedStyle(element).color);
+      const surface = parse(getComputedStyle(background).backgroundColor);
+      if (!foreground || !surface) return 0;
+      const first = luminance(foreground);
+      const second = luminance(surface);
+      return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05);
+    }
+    const column = document.querySelector(".pipeline-column");
+    const card = document.querySelector(".pipeline-card");
+    const title = column?.querySelector("h2");
+    const candidate = card?.querySelector("strong");
+    const metadata = card?.querySelector("span");
+    const button = card?.querySelector("button");
+    if (!column || !card || !title || !candidate || !metadata || !button) {
+      throw new Error("Pipeline theme elements are unavailable");
+    }
+    return {
+      theme: document.documentElement.dataset.theme,
+      contrasts: [
+        contrast(title, column),
+        contrast(candidate, card),
+        contrast(metadata, card),
+        contrast(button, button),
+      ],
+    };
+  });
+  expect(result.theme).toBe(expectedTheme);
+  for (const contrast of result.contrasts) expect(contrast).toBeGreaterThanOrEqual(4.5);
 }
 
 test.describe("Recruitment Pipeline Kanban Board", () => {
@@ -112,15 +163,37 @@ test.describe("Recruitment Pipeline Kanban Board", () => {
       applicationCard(page, fixture.applications.ordinary.id),
     ).toBeVisible();
 
+    const stageOrder = await page.getByRole("region").evaluateAll((regions) =>
+      regions.map((region) => region.querySelector("h2")?.textContent),
+    );
+    expect(stageOrder).toEqual([
+      "Applied",
+      "Viewed",
+      "Shortlisted",
+      "Interviewing",
+      "Offered",
+      "Hired",
+      "Offer Declined",
+      "Rejected",
+      "Waitlisted",
+    ]);
+    const desktopColumns = await page
+      .locator(".recruitment-pipeline__columns")
+      .evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+    expect(desktopColumns).toBe(testInfo.project.name === "desktop-chromium" ? 3 : 1);
+    await expectReadablePipelineTheme(page, "light");
+    await page.getByRole("button", { name: "Switch to dark mode" }).click();
+    await expectReadablePipelineTheme(page, "dark");
+    await page.getByRole("button", { name: "Switch to light mode" }).click();
+    await expectReadablePipelineTheme(page, "light");
+
     if (testInfo.project.name === "desktop-chromium") {
-      await pointerDragToViewed(page, fixture.applications.ordinary.id);
-      const dragDialog = page.getByRole("dialog", {
-        name: `Change Stage for ${fixture.applications.ordinary.candidateName}`,
-      });
-      await expect(dragDialog.getByLabel("Destination stage")).toHaveValue(
-        "VIEWED",
+      await pointerDragToStage(
+        page,
+        fixture.applications.ordinary.id,
+        "Viewed",
       );
-      await dragDialog.getByRole("button", { name: "Change Stage" }).click();
+      await expect(page.getByRole("dialog")).toHaveCount(0);
     } else {
       await submitStageChange(
         page,
@@ -179,11 +252,28 @@ test.describe("Recruitment Pipeline Kanban Board", () => {
       page,
       fixture.applications.rejection.id,
     );
-    await rejectionCard.getByRole("button", { name: "Change Stage" }).click();
+    if (page.viewportSize()?.width && page.viewportSize()!.width > 700) {
+      await pointerDragToStage(
+        page,
+        fixture.applications.rejection.id,
+        "Rejected",
+      );
+    } else {
+      await rejectionCard.getByRole("button", { name: "Change Stage" }).click();
+    }
     const rejectionDialog = page.getByRole("dialog", {
       name: `Change Stage for ${fixture.applications.rejection.candidateName}`,
     });
-    await rejectionDialog.getByLabel("Destination stage").selectOption("REJECTED");
+    if (page.viewportSize()?.width && page.viewportSize()!.width <= 700) {
+      await rejectionDialog.getByLabel("Destination stage").selectOption("REJECTED");
+    } else {
+      await expect(rejectionDialog.getByLabel("Destination stage")).toHaveValue(
+        "REJECTED",
+      );
+    }
+    await expect(
+      rejectionDialog.getByRole("button", { name: "Confirm rejection" }),
+    ).toBeDisabled();
     await rejectionDialog
       .getByLabel("Rejection reason")
       .selectOption("POSITION_FILLED");

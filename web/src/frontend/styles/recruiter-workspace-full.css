@@ -3091,17 +3091,16 @@
 
 .recruitment-pipeline__columns {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(18rem, 22rem);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--sh-space-4);
-  overflow-x: auto;
+  align-items: start;
   padding: var(--sh-space-4) 0 var(--sh-space-8);
-  scrollbar-color: var(--sh-color-border-default)
-    var(--sh-color-surface-subtle);
 }
 
 .pipeline-column {
+  min-width: 0;
   min-height: 18rem;
+  align-self: start;
   padding: var(--sh-space-3);
   border: 1px solid var(--sh-color-border-subtle);
   border-radius: var(--sh-radius-md);
@@ -3178,6 +3177,29 @@
   color: var(--sh-color-text-primary);
   background: var(--sh-color-surface-card);
   box-shadow: var(--sh-shadow-control);
+  transition:
+    background-color var(--sh-motion-fast) ease,
+    border-color var(--sh-motion-fast) ease,
+    box-shadow var(--sh-motion-fast) ease,
+    opacity var(--sh-motion-fast) ease;
+}
+
+.pipeline-card.is-draggable {
+  cursor: grab;
+}
+
+.pipeline-card.is-dragging {
+  border-color: var(--sh-color-border-focus);
+  opacity: 0.45;
+  cursor: grabbing;
+  box-shadow: var(--sh-shadow-floating);
+}
+
+.pipeline-card--overlay {
+  border-color: var(--sh-color-border-focus);
+  cursor: grabbing;
+  box-shadow: var(--sh-shadow-floating);
+  transform: rotate(1deg);
 }
 
 .pipeline-card:hover,
@@ -3219,6 +3241,7 @@
   font-size: var(--sh-font-size-caption);
   font-weight: var(--sh-font-weight-semibold);
   text-decoration: none;
+  cursor: pointer;
 }
 
 .pipeline-card__actions button:hover:not(:disabled),
@@ -3260,38 +3283,13 @@
   background: var(--sh-color-surface-card);
 }
 
-.pipeline-dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 140;
+.pipeline-stage-form {
   display: grid;
-  place-items: center;
-  padding: var(--sh-space-5);
-  background: rgb(2 6 23 / 62%);
-  backdrop-filter: blur(3px);
-}
-
-.pipeline-dialog {
-  display: grid;
-  width: min(34rem, 100%);
-  max-height: min(90vh, 48rem);
   gap: var(--sh-space-4);
-  overflow-y: auto;
-  padding: var(--sh-space-6);
-  border: 1px solid var(--sh-color-border-subtle);
-  border-radius: var(--sh-radius-md);
   color: var(--sh-color-text-primary);
-  background: var(--sh-color-surface-card);
-  box-shadow: var(--sh-shadow-floating);
 }
 
-.pipeline-dialog h2 {
-  margin: 0;
-  color: var(--sh-color-text-primary);
-  font-size: var(--sh-font-size-h3);
-}
-
-.pipeline-dialog label {
+.pipeline-stage-form label {
   display: grid;
   gap: var(--sh-space-2);
   color: var(--sh-color-text-secondary);
@@ -3299,9 +3297,9 @@
   font-weight: var(--sh-font-weight-semibold);
 }
 
-.pipeline-dialog select,
-.pipeline-dialog input,
-.pipeline-dialog textarea {
+.pipeline-stage-form select,
+.pipeline-stage-form input,
+.pipeline-stage-form textarea {
   width: 100%;
   min-width: 0;
   min-height: var(--sh-control-height);
@@ -3313,30 +3311,30 @@
   box-shadow: var(--sh-shadow-control);
 }
 
-.pipeline-dialog textarea {
+.pipeline-stage-form textarea {
   min-height: 7rem;
   resize: vertical;
 }
 
-.pipeline-dialog select:hover,
-.pipeline-dialog input:hover,
-.pipeline-dialog textarea:hover {
+.pipeline-stage-form select:hover,
+.pipeline-stage-form input:hover,
+.pipeline-stage-form textarea:hover {
   border-color: var(--sh-color-text-muted);
 }
 
-.pipeline-dialog select:focus,
-.pipeline-dialog input:focus,
-.pipeline-dialog textarea:focus {
+.pipeline-stage-form select:focus,
+.pipeline-stage-form input:focus,
+.pipeline-stage-form textarea:focus {
   border-color: var(--sh-color-border-focus);
   outline: 3px solid var(--sh-color-focus-ring-bg);
 }
 
-.pipeline-dialog small {
+.pipeline-stage-form small {
   color: var(--sh-color-text-muted);
   font-weight: var(--sh-font-weight-regular);
 }
 
-.pipeline-dialog p[role="note"] {
+.pipeline-stage-form p[role="note"] {
   margin: 0;
   padding: var(--sh-space-3);
   border: 1px solid var(--sh-color-border-subtle);
@@ -3345,15 +3343,11 @@
   background: var(--sh-color-info-bg);
 }
 
-.pipeline-dialog > div:last-child {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--sh-space-2);
+.pipeline-stage-form .sh-modal-actions {
   padding-top: var(--sh-space-2);
 }
 
-.pipeline-dialog button {
+.pipeline-stage-form button {
   min-height: var(--sh-control-height-sm);
   padding: 0 var(--sh-space-4);
   border: 1px solid var(--sh-color-border-default);
@@ -3364,24 +3358,24 @@
   font-weight: var(--sh-font-weight-semibold);
 }
 
-.pipeline-dialog button:last-child:not(:disabled) {
+.pipeline-stage-form button:last-child:not(:disabled) {
   border-color: var(--sh-color-brand-primary);
   color: var(--sh-color-text-inverse);
   background: var(--sh-color-brand-primary);
 }
 
-.pipeline-dialog button:hover:not(:disabled) {
+.pipeline-stage-form button:hover:not(:disabled) {
   border-color: var(--sh-color-brand-primary);
   color: var(--sh-color-brand-primary);
   background: var(--sh-color-info-bg);
 }
 
-.pipeline-dialog button:last-child:hover:not(:disabled) {
+.pipeline-stage-form button:last-child:hover:not(:disabled) {
   color: var(--sh-color-text-inverse);
   background: var(--sh-color-brand-primary-hover);
 }
 
-.pipeline-dialog button:disabled {
+.pipeline-stage-form button:disabled {
   border-color: var(--sh-color-border-subtle);
   color: var(--sh-color-disabled-text);
   background: var(--sh-color-disabled-bg);
@@ -3391,10 +3385,16 @@
 .pipeline-card a:focus-visible,
 .candidate-workspace-view-switch button:focus-visible,
 .pipeline-state button:focus-visible,
-.pipeline-dialog button:focus-visible {
+.pipeline-stage-form button:focus-visible {
   outline: 3px solid var(--sh-color-border-focus);
   outline-offset: 2px;
   box-shadow: 0 0 0 3px var(--sh-color-focus-ring-bg);
+}
+
+@media (max-width: 1100px) {
+  .recruitment-pipeline__columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 700px) {
@@ -3408,14 +3408,6 @@
   }
 
   .recruitment-pipeline__columns {
-    grid-auto-columns: minmax(16rem, 85vw);
-  }
-
-  .pipeline-dialog-backdrop {
-    padding: var(--sh-space-2);
-  }
-
-  .pipeline-dialog {
-    padding: var(--sh-space-4);
+    grid-template-columns: minmax(0, 1fr);
   }
 }

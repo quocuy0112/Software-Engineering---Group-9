@@ -14,7 +14,7 @@ import {
 import type { ApplicationStage, PipelineApplicationCard } from "@/shared/contracts/applications";
 import { RecruitmentPipelineColumn } from "./recruitment-pipeline-column";
 import { RecruitmentPipelineCard } from "./recruitment-pipeline-card";
-import { ApplicationStageChangeDialog } from "./application-stage-change-dialog";
+import { ApplicationStageChangeDialog, stageTransitionNeedsDialog } from "./application-stage-change-dialog";
 import { useRecruitmentPipeline } from "./use-recruitment-pipeline";
 
 export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
@@ -27,7 +27,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
   const restoreFocus = (applicationId: string) => window.setTimeout(() => document.querySelector<HTMLElement>(`[data-application-id="${CSS.escape(applicationId)}"]`)?.focus(), 0);
   const onDragStart = (event: DragStartEvent) => { const card = cards.find((item) => item.applicationId === String(event.active.id)) ?? null; setActiveCard(card); returnFocus.current = document.activeElement as HTMLElement | null; };
   const onDragCancel = () => { setActiveCard(null); setTimeout(() => returnFocus.current?.focus(), 0); };
-  const onDragEnd = (event: DragEndEvent) => { const card = activeCard; setActiveCard(null); const target = event.over?.data.current?.stage as ApplicationStage | undefined; if (!card || !target || target === card.stage || !card.allowedDestinations.includes(target)) { setTimeout(() => returnFocus.current?.focus(), 0); return; } setDialog({ card, target }); };
+  const onDragEnd = (event: DragEndEvent) => { const card = activeCard; setActiveCard(null); const target = event.over?.data.current?.stage as ApplicationStage | undefined; if (!card || !target || target === card.stage || !card.allowedDestinations.includes(target)) { setTimeout(() => returnFocus.current?.focus(), 0); return; } if (stageTransitionNeedsDialog(target)) { setDialog({ card, target }); return; } void state.move(card, target, {}).finally(() => restoreFocus(card.applicationId)); };
   if (state.loading && !state.metadata) return <div className="pipeline-state" role="status">Loading recruitment pipeline…</div>;
   if (state.error || !state.metadata) return <div className="pipeline-state" role="alert"><p>{state.error ?? "The recruitment pipeline is unavailable."}</p><button type="button" onClick={() => void state.retry()}>Retry</button></div>;
   const total = state.metadata.stages.reduce((sum, item) => sum + item.count, 0);
