@@ -8,6 +8,7 @@ import { ensureCandidateCvLibrary } from "@/backend/services/profile/candidate-c
 import type { CandidateActor } from "@/backend/services/jobs/job-types";
 import {
   applicationDraftSchema,
+  applicationCvSourceSchema,
   applicationFileDescriptorSchema,
   applicationReviewSchema,
   candidatePersonalInfoSchema,
@@ -15,6 +16,7 @@ import {
   saveApplicationDraftCommandSchema,
   type ApplicationDraft,
   type ApplicationReview,
+  type ApplicationCvSource,
   type CandidatePersonalInfo,
 } from "@/shared/contracts/candidate-applications";
 import { CandidateApplicationError } from "./candidate-application-errors";
@@ -51,8 +53,16 @@ type DraftDatabase = typeof prisma;
 
 type CandidateContactRow = {
   user: { name: string; email: string };
-  profile: { phone: string | null } | null;
+  profile: {
+    phone: string | null;
+    location: string | null;
+    socialLinks: Array<{ url: string }>;
+  } | null;
 };
+
+const storedPersonalInformationSchema = candidatePersonalInfoSchema
+  .extend({ cvSource: applicationCvSourceSchema.nullable().default(null) })
+  .strict();
 
 function normalizedText(value: string | null | undefined, maximum: number) {
   const normalized = (value ?? "")
@@ -75,8 +85,22 @@ function normalizePersonalInfo(input: CandidatePersonalInfo) {
     fullName: input.fullName.normalize("NFKC").trim(),
     email: input.email.normalize("NFKC").trim(),
     phone: input.phone.normalize("NFKC").trim(),
+    currentLocation: input.currentLocation.normalize("NFKC").trim(),
+    linkedInPortfolio: input.linkedInPortfolio
+      ? input.linkedInPortfolio.normalize("NFKC").trim()
+      : null,
   });
   return value;
+}
+
+function storedPersonalInformation(
+  personalInformation: CandidatePersonalInfo,
+  cvSource: ApplicationCvSource | null,
+) {
+  return storedPersonalInformationSchema.parse({
+    ...personalInformation,
+    cvSource,
+  });
 }
 
 function isSupportedFile(file: {
@@ -177,7 +201,9 @@ function parseStoredCoverLetter(value: unknown) {
   return parsed.success ? parsed.data : null;
 }
 
-export function storedCoverLetter(value: unknown): StoredCoverLetterDraft | null {
+export function storedCoverLetter(
+  value: unknown,
+): StoredCoverLetterDraft | null {
   if (
     !value ||
     typeof value !== "object" ||
@@ -243,11 +269,19 @@ export async function validateStoredCoverLetter(value: unknown) {
   }
 }
 
-function initialPersonalInfo(candidate: CandidateContactRow): CandidatePersonalInfo {
+function initialPersonalInfo(
+  candidate: CandidateContactRow,
+): CandidatePersonalInfo {
+  const profileLink =
+    candidate.profile?.socialLinks.find((link) =>
+      /linkedin|portfolio/iu.test(link.url),
+    ) ?? candidate.profile?.socialLinks[0];
   return normalizePersonalInfo({
     fullName: candidate.user.name,
     email: candidate.user.email,
     phone: candidate.profile?.phone ?? "",
+    currentLocation: candidate.profile?.location ?? "",
+    linkedInPortfolio: profileLink?.url ?? null,
   });
 }
 
@@ -256,13 +290,22 @@ function personalInfoForApplication(
   draftPersonalInfo: unknown,
 ): CandidatePersonalInfo {
   const profileInformation = initialPersonalInfo(candidate);
-  const draftInformation = candidatePersonalInfoSchema.safeParse(draftPersonalInfo);
+  const draftInformation =
+    storedPersonalInformationSchema.safeParse(draftPersonalInfo);
   return normalizePersonalInfo({
     fullName: profileInformation.fullName,
     email: profileInformation.email,
-    // A profile phone remains authoritative when present. If it is missing,
-    // allow the candidate to provide a bounded application-specific value.
-    phone: profileInformation.phone || (draftInformation.success ? draftInformation.data.phone : ""),
+    // Full name and email remain profile-authoritative. Phone is editable for
+    // this application and is stored through the existing draft field.
+    phone: draftInformation.success
+      ? draftInformation.data.phone
+      : profileInformation.phone,
+    currentLocation: draftInformation.success
+      ? draftInformation.data.currentLocation
+      : profileInformation.currentLocation,
+    linkedInPortfolio: draftInformation.success
+      ? draftInformation.data.linkedInPortfolio
+      : profileInformation.linkedInPortfolio,
   });
 }
 
@@ -286,15 +329,17 @@ function draftProjection(row: {
   updatedAt: Date;
   expiresAt: Date;
 }): ApplicationDraft {
-  const personalInformation = candidatePersonalInfoSchema.parse(
+  const storedInformation = storedPersonalInformationSchema.parse(
     row.personalInfoDraft,
   );
+  const { cvSource, ...personalInformation } = storedInformation;
   return applicationDraftSchema.parse({
     draftId: row.id,
     jobId: row.jobPostingId,
     revision: row.revision,
-    personalInformation,
+    personalInformation: candidatePersonalInfoSchema.parse(personalInformation),
     cv: row.selectedCv ? fileDescriptor(row.selectedCv) : null,
+    cvSource: row.selectedCv ? (cvSource ?? "PROFILE") : null,
     coverLetter: parseStoredCoverLetter(row.coverLetterDraft),
     message: row.messageDraft,
     confirmationAccepted: row.confirmationAccepted,
@@ -319,7 +364,16 @@ async function candidateContact(db: DraftDatabase, candidateUserId: string) {
     where: { userId: candidateUserId, user: { state: "ACTIVE" } },
     select: {
       user: { select: { name: true, email: true } },
-      profile: { select: { phone: true } },
+      profile: {
+        select: {
+          phone: true,
+          location: true,
+          socialLinks: {
+            orderBy: { position: "asc" },
+            select: { url: true },
+          },
+        },
+      },
     },
   });
   if (!candidate) {
@@ -359,7 +413,11 @@ export async function validCv(
       storageKey: true,
     },
   });
-  if (!cv || !fileDescriptor(cv) || !/^[a-f0-9]{64}$/iu.test(cv.checksumSha256)) {
+  if (
+    !cv ||
+    !fileDescriptor(cv) ||
+    !/^[a-f0-9]{64}$/iu.test(cv.checksumSha256)
+  ) {
     throw new CandidateApplicationError(
       400,
       "APPLICATION_CV_INELIGIBLE",
@@ -432,6 +490,10 @@ export class ApplicationDraftService {
         slug: true,
         title: true,
         location: true,
+        employmentType: true,
+        experienceLevel: true,
+        workArrangement: true,
+        applicationDeadline: true,
         company: { select: { displayName: true } },
       },
     });
@@ -522,7 +584,9 @@ export class ApplicationDraftService {
         return existing;
       }
       if (existing) {
-        await tx.candidateApplicationDraft.delete({ where: { id: existing.id } });
+        await tx.candidateApplicationDraft.delete({
+          where: { id: existing.id },
+        });
       }
       const requested = await optionalValidCv(
         tx as DraftDatabase,
@@ -549,7 +613,10 @@ export class ApplicationDraftService {
           candidateUserId: actor.userId,
           jobPostingId: jobId,
           revision: 1,
-          personalInfoDraft: initialPersonalInfo(candidate) as Prisma.InputJsonValue,
+          personalInfoDraft: storedPersonalInformation(
+            initialPersonalInfo(candidate),
+            selectedCvId ? "PROFILE" : null,
+          ) as Prisma.InputJsonValue,
           selectedCvId,
           coverLetterDraft: Prisma.JsonNull,
           messageDraft: null,
@@ -586,7 +653,10 @@ export class ApplicationDraftService {
     return draftProjection(row);
   }
 
-  async currentPersonalInfo(actor: CandidateActor, draftPersonalInfo?: unknown) {
+  async currentPersonalInfo(
+    actor: CandidateActor,
+    draftPersonalInfo?: unknown,
+  ) {
     return personalInfoForApplication(
       await candidateContact(this.db, actor.userId),
       draftPersonalInfo,
@@ -637,6 +707,11 @@ export class ApplicationDraftService {
     const selectedCv = command.cvVersionId
       ? await validCv(this.db, actor.userId, command.cvVersionId)
       : null;
+    const cvSource = selectedCv ? (command.cvSource ?? "PROFILE") : null;
+    const personalInfoDraft = storedPersonalInformation(
+      personalInformation,
+      cvSource,
+    );
     const current = await draftRow(this.db, actor.userId, command.jobId);
     let storedCoverLetterValue: Prisma.InputJsonValue | typeof Prisma.JsonNull =
       Prisma.JsonNull;
@@ -657,7 +732,9 @@ export class ApplicationDraftService {
       storedCoverLetterValue = previous as unknown as Prisma.InputJsonValue;
     }
     if (current && current.expiresAt <= now) {
-      await this.db.candidateApplicationDraft.delete({ where: { id: current.id } });
+      await this.db.candidateApplicationDraft.delete({
+        where: { id: current.id },
+      });
     }
     if (
       current &&
@@ -682,7 +759,7 @@ export class ApplicationDraftService {
         },
         data: {
           revision: current.revision + 1,
-          personalInfoDraft: personalInformation as Prisma.InputJsonValue,
+          personalInfoDraft: personalInfoDraft as Prisma.InputJsonValue,
           selectedCvId: selectedCv?.id ?? null,
           coverLetterDraft: storedCoverLetterValue,
           messageDraft: message,
@@ -730,7 +807,7 @@ export class ApplicationDraftService {
         candidateUserId: actor.userId,
         jobPostingId: command.jobId,
         revision,
-        personalInfoDraft: personalInformation as Prisma.InputJsonValue,
+        personalInfoDraft: personalInfoDraft as Prisma.InputJsonValue,
         selectedCvId: selectedCv?.id ?? null,
         coverLetterDraft: storedCoverLetterValue,
         messageDraft: message,
@@ -740,7 +817,7 @@ export class ApplicationDraftService {
       },
       update: {
         revision,
-        personalInfoDraft: personalInformation as Prisma.InputJsonValue,
+        personalInfoDraft: personalInfoDraft as Prisma.InputJsonValue,
         selectedCvId: selectedCv?.id ?? null,
         coverLetterDraft: storedCoverLetterValue,
         messageDraft: message,
@@ -780,7 +857,11 @@ export class ApplicationDraftService {
     return draftProjection(saved);
   }
 
-  async review(actor: CandidateActor, draftId: string, now = new Date()): Promise<ApplicationReview> {
+  async review(
+    actor: CandidateActor,
+    draftId: string,
+    now = new Date(),
+  ): Promise<ApplicationReview> {
     await ensureCandidateCvLibrary(actor.userId, this.db);
     const row = await this.db.candidateApplicationDraft.findFirst({
       where: { id: draftId, candidateUserId: actor.userId },
@@ -815,7 +896,10 @@ export class ApplicationDraftService {
       },
     });
     if (!row || row.expiresAt <= now) {
-      if (row) await this.db.candidateApplicationDraft.delete({ where: { id: row.id } });
+      if (row)
+        await this.db.candidateApplicationDraft.delete({
+          where: { id: row.id },
+        });
       throw new CandidateApplicationError(
         404,
         "APPLICATION_DRAFT_NOT_FOUND",
@@ -827,7 +911,8 @@ export class ApplicationDraftService {
       row.jobPosting.approvedAt !== null &&
       row.jobPosting.publishedAt !== null &&
       row.jobPosting.publishedAt <= now &&
-      (row.jobPosting.applicationDeadline === null || row.jobPosting.applicationDeadline > now) &&
+      (row.jobPosting.applicationDeadline === null ||
+        row.jobPosting.applicationDeadline > now) &&
       row.jobPosting.company.verifiedAt !== null;
     if (!jobOpen) {
       throw new CandidateApplicationError(
@@ -839,6 +924,9 @@ export class ApplicationDraftService {
     const candidate = await candidateContact(this.db, actor.userId);
     const currentInfo = personalInfoForApplication(
       candidate,
+      row.personalInfoDraft,
+    );
+    const storedInfo = storedPersonalInformationSchema.parse(
       row.personalInfoDraft,
     );
     const cv = await validCv(this.db, actor.userId, row.selectedCvId);
@@ -857,7 +945,10 @@ export class ApplicationDraftService {
     }
     const draft = draftProjection({
       ...row,
-      personalInfoDraft: currentInfo,
+      personalInfoDraft: storedPersonalInformation(
+        currentInfo,
+        storedInfo.cvSource,
+      ),
       selectedCv: cv,
     });
     return applicationReviewSchema.parse({
@@ -870,7 +961,8 @@ export class ApplicationDraftService {
         employmentType: row.jobPosting.employmentType,
         experienceLevel: row.jobPosting.experienceLevel,
         workArrangement: row.jobPosting.workArrangement,
-        applicationDeadline: row.jobPosting.applicationDeadline?.toISOString() ?? null,
+        applicationDeadline:
+          row.jobPosting.applicationDeadline?.toISOString() ?? null,
         isOpen: jobOpen,
       },
       draft,
@@ -1048,7 +1140,8 @@ export class ApplicationDraftService {
         );
       }
       const previous = storedCoverLetter(draft.coverLetterDraft);
-      if (previous) await storage.delete(previous.file.storageKey).catch(() => undefined);
+      if (previous)
+        await storage.delete(previous.file.storageKey).catch(() => undefined);
       return draftProjection(updated);
     } catch (error) {
       await storage.delete(stored.locator).catch(() => undefined);

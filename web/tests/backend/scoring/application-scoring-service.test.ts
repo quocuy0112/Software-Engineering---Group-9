@@ -138,6 +138,39 @@ describe("ApplicationScoringService", () => {
     });
   });
 
+  it("keeps a completed score visible while queuing a candidate rescore", async () => {
+    const db = makeDb();
+    const scoring = makeScoring({
+      state: "SCORED",
+      automatic: {
+        resultId: "automatic-1",
+        jdVersion: "jd-v4",
+        configVersion: "hybrid-60-40-v1",
+      },
+    });
+    const rescoreOperation = { ...operation, kind: "JOB_RESCORE" as const };
+    scoring.createOperation.mockResolvedValue(rescoreOperation);
+    scoring.findOperation.mockResolvedValue({
+      ...rescoreOperation,
+      totalCount: 1,
+    });
+    const service = new ApplicationScoringService(
+      db as unknown as typeof prisma,
+      authorization as unknown as RecruiterApplicationAuthorization,
+      scoring as unknown as PrismaScoringRepository,
+    );
+
+    await service.request({
+      userId: "recruiter-1",
+      sessionId: "session-1",
+      applicationId: "application-1",
+      idempotencyKey: "score-application-rescore-1",
+      raw: { confirmed: true },
+    });
+
+    expect(db.jobApplication.update).not.toHaveBeenCalled();
+  });
+
   it("does not queue scoring without candidate consent", async () => {
     const db = makeDb(false);
     const scoring = makeScoring();

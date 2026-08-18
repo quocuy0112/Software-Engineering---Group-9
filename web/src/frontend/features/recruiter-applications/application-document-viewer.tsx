@@ -31,7 +31,8 @@ export function ApplicationDocumentViewer({
       cache: "no-store",
       credentials: "same-origin",
       headers: {
-        Accept: "application/pdf, application/octet-stream, text/plain",
+        Accept:
+          "application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/octet-stream, text/plain",
       },
     })
       .then(async (response) => {
@@ -127,7 +128,7 @@ export function ApplicationDocumentViewer({
               <Download aria-hidden="true" />
               <strong>Original file is ready</strong>
               <p>
-                This Word document cannot be reliably previewed in the browser.
+                This file format cannot be rendered inline in the browser.
                 Download it to view the full CV or cover letter.
               </p>
               <a href={downloadUrl} download={fileName ?? undefined}>

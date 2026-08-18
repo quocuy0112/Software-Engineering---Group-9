@@ -18,7 +18,8 @@ export default async function CandidateApplicationRoute({
 }) {
   const context = await getWorkspaceContext();
   const { slug } = await params;
-  if (!context) redirect(`/login?returnTo=${encodeURIComponent(`/jobs/${slug}/apply`)}`);
+  if (!context)
+    redirect(`/login?returnTo=${encodeURIComponent(`/jobs/${slug}/apply`)}`);
   const rawQuery = await searchParams;
   const query = (name: string) => {
     const value = rawQuery[name];
@@ -36,12 +37,16 @@ export default async function CandidateApplicationRoute({
       query("cvVersionId") ?? null,
     );
   } catch (error) {
-    if (error instanceof CandidateApplicationError && error.code === "APPLICATION_EXISTS") {
+    if (
+      error instanceof CandidateApplicationError &&
+      error.code === "APPLICATION_EXISTS"
+    ) {
       const existing = await service.existingApplication(
         { userId: context.userId, sessionId: context.sessionId },
         job.id,
       );
-      if (existing) redirect(`/jobs/applied/${encodeURIComponent(existing.id)}`);
+      if (existing)
+        redirect(`/jobs/applied/${encodeURIComponent(existing.id)}`);
     }
     throw error;
   }
@@ -51,7 +56,16 @@ export default async function CandidateApplicationRoute({
     <JobsWorkspace>
       <ApplicationWizard
         slug={slug}
-        job={{ id: job.id, title: job.title, companyName: job.company.displayName, location: job.location }}
+        job={{
+          id: job.id,
+          title: job.title,
+          companyName: job.company.displayName,
+          location: job.location,
+          employmentType: job.employmentType,
+          experienceLevel: job.experienceLevel,
+          workArrangement: job.workArrangement,
+          applicationDeadline: job.applicationDeadline?.toISOString() ?? null,
+        }}
         initialDraft={draft}
         initialCvs={cvs.items}
         csrfProof={context.csrfProof}

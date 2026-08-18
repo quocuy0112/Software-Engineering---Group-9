@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   AlertCircle,
@@ -178,6 +178,7 @@ export function PrivateMatchPageClient({ checkId }: { checkId: string }) {
   const [opened, setOpened] = useState(false);
   const [retryRequested, setRetryRequested] = useState(false);
   const [retryWasRunning, setRetryWasRunning] = useState(false);
+  const retrySubmissionInFlight = useRef(false);
   const data: PrivateMatchResponse | undefined = query.data;
 
   useEffect(() => {
@@ -191,12 +192,22 @@ export function PrivateMatchPageClient({ checkId }: { checkId: string }) {
   }, [data, retryRequested]);
 
   const retryAi = async () => {
+    if (
+      retrySubmissionInFlight.current ||
+      retry.isPending ||
+      (data?.view !== "STATUS" && data?.retryInProgress)
+    ) {
+      return;
+    }
+    retrySubmissionInFlight.current = true;
     setRetryRequested(true);
     setRetryWasRunning(false);
     try {
       await retry.mutateAsync();
     } catch {
       // The mutation error is rendered next to the retry control.
+    } finally {
+      retrySubmissionInFlight.current = false;
     }
   };
 

@@ -530,6 +530,7 @@ export const ApplicationPublicOutcome = {
   HIRED: 'HIRED',
   OFFER_DECLINED: 'OFFER_DECLINED',
   REJECTED: 'REJECTED',
+  WAITLISTED: 'WAITLISTED',
   WITHDRAWN: 'WITHDRAWN'
 } as const
 

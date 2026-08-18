@@ -69,11 +69,11 @@ function decodeJson(text: string): unknown {
     return JSON.parse(text);
   } catch {
     const fenced = text.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/iu)?.[1];
-    if (!fenced) throw new AiAssessmentProviderError("AI_PROVIDER_MALFORMED", false, "RESPONSE_JSON_INVALID");
+    if (!fenced) throw new AiAssessmentProviderError("AI_PROVIDER_MALFORMED", true, "RESPONSE_JSON_INVALID");
     try {
       return JSON.parse(fenced);
     } catch {
-      throw new AiAssessmentProviderError("AI_PROVIDER_MALFORMED", false, "RESPONSE_JSON_INVALID");
+      throw new AiAssessmentProviderError("AI_PROVIDER_MALFORMED", true, "RESPONSE_JSON_INVALID");
     }
   }
 }
@@ -199,14 +199,14 @@ async function approvedOpenAiTransport(input: AiAssessmentProviderInput) {
   } catch {
     throw new AiAssessmentProviderError(
       "AI_PROVIDER_MALFORMED",
-      false,
+      true,
       "RESPONSE_BODY_INVALID",
     );
   }
   if (body.status === "incomplete")
     throw new AiAssessmentProviderError(
       "AI_PROVIDER_MALFORMED",
-      false,
+      true,
       `RESPONSE_INCOMPLETE_${String(body.incomplete_details?.reason ?? "UNKNOWN")}`,
     );
   const text = responseText(body);
@@ -216,7 +216,7 @@ async function approvedOpenAiTransport(input: AiAssessmentProviderInput) {
     );
     throw new AiAssessmentProviderError(
       "AI_PROVIDER_MALFORMED",
-      false,
+      refusal ? false : true,
       refusal ? "RESPONSE_REFUSAL" : "RESPONSE_EMPTY_OUTPUT",
     );
   }
@@ -1042,6 +1042,22 @@ function sleep(milliseconds: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
 }
 
+/**
+ * Circuit breaking is useful for provider transport outages, but a malformed
+ * model response is scoped to one generation attempt. Counting every retry
+ * inside one assessment (or every schema validation failure) made one bad CV
+ * response open the shared worker circuit and block the recruiter's next
+ * retry. Only final transport failures are allowed to trip the circuit.
+ */
+function countsTowardsCircuit(code: AiProviderFailureCode): boolean {
+  return [
+    "AI_PROVIDER_TIMEOUT",
+    "AI_PROVIDER_UNAVAILABLE",
+    "AI_PROVIDER_RATE_LIMITED",
+    "AI_PROVIDER_RETRY_EXHAUSTED",
+  ].includes(code);
+}
+
 export class ApprovedAiAssessmentAdapter implements AiAssessmentProviderPort {
   private consecutiveFailures = 0;
   private circuitOpenedAt: number | null = null;
@@ -1057,6 +1073,17 @@ export class ApprovedAiAssessmentAdapter implements AiAssessmentProviderPort {
         scoringProviderConfig.circuitResetMilliseconds
     ) {
       throw new AiAssessmentProviderError("AI_PROVIDER_CIRCUIT_OPEN", true);
+    }
+    if (
+      this.circuitOpenedAt !== null &&
+      Date.now() - this.circuitOpenedAt >=
+        scoringProviderConfig.circuitResetMilliseconds
+    ) {
+      // Allow one half-open probe after the cooldown. A successful probe
+      // clears this state below; a final transport failure starts a fresh
+      // cooldown instead of inheriting the previous attempt count.
+      this.circuitOpenedAt = null;
+      this.consecutiveFailures = 0;
     }
     for (
       let attempt = 1;
@@ -1092,7 +1119,7 @@ export class ApprovedAiAssessmentAdapter implements AiAssessmentProviderPort {
         if (!v4.success)
           throw new AiAssessmentProviderError(
             "AI_PROVIDER_MALFORMED",
-            false,
+            true,
             `RESPONSE_SCHEMA_INVALID:${schemaIssueDiagnostic(v5.error.issues)}`,
           );
         this.consecutiveFailures = 0;
@@ -1103,27 +1130,47 @@ export class ApprovedAiAssessmentAdapter implements AiAssessmentProviderPort {
           error instanceof AiAssessmentProviderError
             ? error
             : new AiAssessmentProviderError("AI_PROVIDER_UNAVAILABLE", true);
-        this.consecutiveFailures += 1;
-        if (
-          this.consecutiveFailures >=
-          scoringProviderConfig.circuitFailureThreshold
-        )
-          this.circuitOpenedAt = Date.now();
         const canRetry =
           providerError.transient &&
           attempt < scoringProviderConfig.maxAttempts;
         if (!canRetry) {
-          if (attempt > 1 && providerError.transient)
-            throw new AiAssessmentProviderError(
+          // A malformed provider response is retryable because generation can
+          // be truncated or otherwise malformed for one request. Preserve its
+          // diagnostic after the bounded retries so the UI does not misreport
+          // a validation failure as a generic transport outage.
+          if (
+            attempt > 1 &&
+            providerError.transient &&
+            providerError.code !== "AI_PROVIDER_MALFORMED"
+          ) {
+            const exhausted = new AiAssessmentProviderError(
               "AI_PROVIDER_RETRY_EXHAUSTED",
               true,
+              providerError.diagnostic,
             );
+            this.recordCircuitFailure(exhausted);
+            throw exhausted;
+          }
+          this.recordCircuitFailure(providerError);
           throw providerError;
         }
         await sleep(Math.min(500 * 2 ** (attempt - 1), 2_000));
       }
     }
     throw new AiAssessmentProviderError("AI_PROVIDER_RETRY_EXHAUSTED", true);
+  }
+
+  private recordCircuitFailure(error: AiAssessmentProviderError) {
+    if (!countsTowardsCircuit(error.code)) return;
+    // One provider operation counts as one failure. Counting each bounded
+    // retry inflated the threshold and caused the next candidate to receive
+    // CIRCUIT_OPEN before the provider had a chance to recover.
+    this.consecutiveFailures += 1;
+    if (
+      this.consecutiveFailures >=
+      scoringProviderConfig.circuitFailureThreshold
+    )
+      this.circuitOpenedAt = Date.now();
   }
 }
 

@@ -2454,6 +2454,180 @@
   line-height: 1.35;
 }
 
+.private-match-setup-page .private-match-picker {
+  margin: 0 0 16px;
+  padding: 14px;
+  border: 1px solid var(--private-match-setup-line-soft);
+  border-radius: 10px;
+  background: #fafbfc;
+}
+
+.private-match-setup-page .private-match-picker > label,
+.private-match-setup-page .private-match-picker > legend {
+  display: block;
+  margin: 0 0 8px;
+  padding: 0;
+  color: var(--private-match-setup-ink-700);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.private-match-setup-page .private-match-picker > input {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 1px solid var(--private-match-setup-line);
+  border-radius: 8px;
+  color: var(--private-match-setup-ink-900);
+  background: #fff;
+  font: inherit;
+}
+
+.private-match-setup-page .private-match-picker > input:focus-visible,
+.private-match-setup-page .private-match-picker-option:focus-within {
+  outline: 3px solid rgb(47 91 255 / 22%);
+  outline-offset: 2px;
+}
+
+.private-match-setup-page .private-match-picker-results {
+  max-height: 320px;
+  overflow-y: auto;
+  display: grid;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.private-match-setup-page .private-match-picker-option {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  border: 1px solid var(--private-match-setup-line);
+  border-radius: 8px;
+  color: var(--private-match-setup-ink-700);
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.private-match-setup-page button.private-match-picker-option:hover,
+.private-match-setup-page .private-match-picker-option.is-selected {
+  border-color: var(--private-match-setup-accent);
+  background: var(--private-match-setup-blue-50);
+}
+
+.private-match-setup-page .private-match-picker-option strong,
+.private-match-setup-page .private-match-picker-option span,
+.private-match-setup-page .private-match-picker-option small {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.private-match-setup-page .private-match-picker-option strong {
+  color: var(--private-match-setup-ink-900);
+  font-size: 13px;
+}
+
+.private-match-setup-page .private-match-picker-option > span,
+.private-match-setup-page .private-match-picker-option small {
+  margin-top: 2px;
+  color: var(--private-match-setup-ink-500);
+  font-size: 12px;
+}
+
+.private-match-setup-page .private-match-picker-option input {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  accent-color: var(--private-match-setup-accent);
+}
+
+.private-match-setup-page .private-match-picker-empty {
+  margin: 0;
+  color: var(--private-match-setup-ink-500);
+  font-size: 12.5px;
+}
+
+.private-match-setup-page .private-match-cv-picker {
+  margin-top: 16px;
+}
+
+.private-match-setup-page .private-match-local-import {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px dashed var(--private-match-setup-line);
+  border-radius: 10px;
+}
+
+.private-match-setup-page .private-match-local-import strong {
+  color: var(--private-match-setup-ink-900);
+  font-size: 13px;
+}
+
+.private-match-setup-page .private-match-local-import p {
+  margin: 5px 0 0;
+  color: var(--private-match-setup-ink-500);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.private-match-setup-page .private-match-local-import p[role="alert"] {
+  color: #b42318;
+}
+
+.private-match-setup-page .private-match-local-import a {
+  color: var(--private-match-setup-accent-hover);
+  font-weight: 700;
+}
+
+.private-match-setup-page .private-match-local-import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 11px;
+}
+
+.private-match-setup-page .private-match-local-import-actions > span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--private-match-setup-ink-500);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.private-match-setup-page
+  .private-match-local-import
+  .private-match-secondary-button {
+  min-height: 36px;
+  padding: 8px 11px;
+  font-size: 12.5px;
+}
+
+.private-match-setup-page
+  .private-match-local-import
+  .private-match-secondary-button
+  svg {
+  width: 14px;
+  height: 14px;
+}
+
+.private-match-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 .private-match-setup-page .private-match-job-panel,
 .private-match-setup-page .private-match-setup-info-row {
   display: flex;
@@ -2979,9 +3153,7 @@
   border: 1px solid var(--private-ready-line);
   border-radius: 14px;
   background: #fff;
-  box-shadow:
-    0 1px 3px rgb(16 24 40 / 6%),
-    0 1px 2px rgb(16 24 40 / 4%);
+  box-shadow: 0 1px 3px rgb(16 24 40 / 6%), 0 1px 2px rgb(16 24 40 / 4%);
 }
 
 .private-match-ready-page .private-match-ready-copy {
@@ -3774,7 +3946,9 @@
   border: 1px solid var(--private-report-line);
   border-radius: 14px;
   background: #fff;
-  box-shadow: 0 1px 3px rgb(16 24 40 / 6%), 0 1px 2px rgb(16 24 40 / 4%);
+  box-shadow:
+    0 1px 3px rgb(16 24 40 / 6%),
+    0 1px 2px rgb(16 24 40 / 4%);
 }
 
 .private-match-report-page .private-match-report-score {

@@ -22,8 +22,8 @@ export type RankingTone =
 
 const pipelineStageLabels: Record<string, string> = {
   APPLIED: "New",
-  VIEWED: "Screened",
-  SHORTLISTED: "Under review",
+  VIEWED: "Viewed",
+  SHORTLISTED: "Shortlisted",
   WAITLISTED: "Needs details",
   INTERVIEWING: "Interviewing",
   OFFERED: "Offer",

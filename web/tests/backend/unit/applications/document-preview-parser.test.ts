@@ -115,6 +115,29 @@ describe("structured application document previews", () => {
     );
   });
 
+  it("recovers cover-letter structure when PDF extraction flattens line breaks", () => {
+    const content = buildStructuredDocumentContent({
+      kind: "cover-letter",
+      segments: [
+        {
+          id: "cover-flat-1",
+          kind: "paragraph",
+          text: "June 1, 2026 Dear Hiring Manager, I am excited to apply for this backend role. My experience building dependable services would let me contribute quickly to your team. Sincerely, Candidate One",
+        },
+      ],
+    });
+
+    if (content.kind !== "cover-letter")
+      throw new Error("Expected cover-letter content");
+    expect(content.date).toBe("June 1, 2026");
+    expect(content.greeting).toBe("Dear Hiring Manager,");
+    expect(content.paragraphs).toEqual([
+      "I am excited to apply for this backend role. My experience building dependable services would let me contribute quickly to your team.",
+    ]);
+    expect(content.closing).toBe("Sincerely,");
+    expect(content.signOff).toBe("Candidate One");
+  });
+
   it("segments a single-line extracted CV into readable sections", () => {
     const content = buildStructuredDocumentContent({
       kind: "cv",

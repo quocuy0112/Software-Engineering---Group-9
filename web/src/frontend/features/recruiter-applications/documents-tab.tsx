@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -59,16 +59,34 @@ function previewCacheKey(
   jobId: string,
   applicationId: string,
   kind: DocumentKind,
-  scoringVersion: string,
 ) {
-  return [jobId, applicationId, kind, scoringVersion].join(":");
+  return [jobId, applicationId, kind].join(":");
+}
+
+function documentSourceLabel(
+  document: StructuredDocumentPreview,
+  kind: DocumentKind,
+) {
+  if (kind === "cover-letter" && document.mediaType === "text/plain") {
+    return "Written text";
+  }
+  if (document.mediaType === "application/pdf") return "PDF attachment";
+  if (
+    document.mediaType ===
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  ) {
+    return "DOCX attachment";
+  }
+  if (document.mediaType === "application/msword") return "DOC attachment";
+  return document.previewStatus === "LIMITED"
+    ? "Limited preview"
+    : "Parsed preview";
 }
 
 async function loadPreview(
   jobId: string,
   applicationId: string,
   kind: DocumentKind,
-  scoringVersion: string,
   signal: AbortSignal,
 ): Promise<PreviewState> {
   const controller = new AbortController();
@@ -80,9 +98,8 @@ async function loadPreview(
   const abort = () => controller.abort();
   signal.addEventListener("abort", abort, { once: true });
   try {
-    const query = new URLSearchParams({ cacheVersion: scoringVersion });
     const response = await fetch(
-      `/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(applicationId)}/documents/${kind}/text?${query.toString()}`,
+      `/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(applicationId)}/documents/${kind}/text`,
       { cache: "no-store", signal: controller.signal },
     );
     const payload = (await response.json().catch(() => null)) as Record<
@@ -138,14 +155,12 @@ export function DocumentsTab({
   automatic,
   openKind,
   openRequest = 0,
-  documentCacheVersion = 0,
 }: {
   jobId: string;
   applicationId: string;
   automatic?: AutomaticMatch | null;
   openKind?: DocumentKind | null;
   openRequest?: number;
-  documentCacheVersion?: number;
 }) {
   const [previews, setPreviews] = useState(initialPreviewState);
   const [retryTokens, setRetryTokens] = useState<Record<DocumentKind, number>>({
@@ -153,19 +168,13 @@ export function DocumentsTab({
     "cover-letter": 0,
   });
   const [viewer, setViewer] = useState<DocumentKind | null>(null);
-  const snapshotVersion = automatic?.cvParse?.snapshotVersion ?? "latest";
-  const scoringVersion = snapshotVersion + ":" + documentCacheVersion;
   const cvRetryToken = retryTokens.cv;
   const coverLetterRetryToken = retryTokens["cover-letter"];
-  const previousScoringVersion = useRef(scoringVersion);
 
   useEffect(() => {
     const controller = new AbortController();
-    const versionChanged = previousScoringVersion.current !== scoringVersion;
-    previousScoringVersion.current = scoringVersion;
-    if (versionChanged) setPreviews(initialPreviewState());
     for (const kind of ["cv", "cover-letter"] as const) {
-      const key = previewCacheKey(jobId, applicationId, kind, scoringVersion);
+      const key = previewCacheKey(jobId, applicationId, kind);
       const retryToken = kind === "cv" ? cvRetryToken : coverLetterRetryToken;
       const cached = retryToken === 0 ? readPreviewCache(key) : null;
       const request = cached
@@ -174,7 +183,6 @@ export function DocumentsTab({
             jobId,
             applicationId,
             kind,
-            scoringVersion,
             controller.signal,
           );
       void request
@@ -192,7 +200,6 @@ export function DocumentsTab({
     jobId,
     cvRetryToken,
     coverLetterRetryToken,
-    scoringVersion,
   ]);
 
   useEffect(() => {
@@ -218,6 +225,7 @@ export function DocumentsTab({
       ).slice(0, 8),
     [automatic],
   );
+  const snapshotVersion = automatic?.cvParse?.snapshotVersion ?? "latest";
   const isLoading = Object.values(previews).some(
     (state) => state.status === "loading",
   );
@@ -388,14 +396,54 @@ function StructuredDocumentPreviewRenderer({
   document,
   kind,
   keywords,
+  onOpenOriginal,
 }: {
   document: StructuredDocumentPreview;
   kind: DocumentKind;
   keywords: string[];
+  onOpenOriginal: () => void;
 }) {
+  const hasContent =
+    document.content.kind === "cv"
+      ? Boolean(
+          document.content.name ||
+            document.content.title ||
+            document.content.summary ||
+            document.content.contact.length ||
+            document.content.experience.length ||
+            document.content.education.length ||
+            document.content.skills.length ||
+            document.content.certifications.length ||
+            document.content.languages.length,
+        )
+      : Boolean(
+          document.content.date ||
+            document.content.greeting ||
+            document.content.paragraphs.length ||
+            document.content.closing ||
+            document.content.signOff,
+        );
+
   return (
     <div className="document-structured-paper">
-      {document.previewStatus === "LIMITED" ? (
+      {document.previewStatus === "LIMITED" && !hasContent ? (
+        <div className="document-preview-limited-empty" role="status">
+          <FileText aria-hidden="true" />
+          <strong>
+            {kind === "cover-letter"
+              ? "Cover letter file attached"
+              : "Original CV attached"}
+          </strong>
+          <p>
+            The file is available, but readable text could not be extracted for
+            this preview.
+          </p>
+          <button type="button" onClick={onOpenOriginal}>
+            View original file
+          </button>
+        </div>
+      ) : null}
+      {document.previewStatus === "LIMITED" && hasContent ? (
         <div className="document-preview-limited-note" role="status">
           <AlertTriangle aria-hidden="true" />
           <span>
@@ -404,14 +452,14 @@ function StructuredDocumentPreviewRenderer({
           </span>
         </div>
       ) : null}
-      {document.content.kind === "cv" ? (
+      {document.content.kind === "cv" && hasContent ? (
         <StructuredCvPaper content={document.content} />
-      ) : (
+      ) : document.content.kind === "cover-letter" && hasContent ? (
         <StructuredCoverLetterPaper
           content={document.content}
           keywords={kind === "cover-letter" ? keywords : []}
         />
-      )}
+      ) : null}
       <span className="document-structured-paper__page">
         {document.pageCount ? "1 / " + document.pageCount : "Parsed preview"}
       </span>
@@ -592,7 +640,11 @@ function StructuredCoverLetterPaper({
           </div>
         </div>
       ) : null}
-      {!content.paragraphs.length && !content.greeting && !content.signOff ? (
+      {!content.date &&
+      !content.paragraphs.length &&
+      !content.greeting &&
+      !content.closing &&
+      !content.signOff ? (
         <div className="document-structured-empty">
           <FileText aria-hidden="true" />
           <p>Structured cover letter fields are unavailable.</p>
@@ -631,6 +683,11 @@ function DocumentCard({
             <FileText aria-hidden="true" /> {title}
           </span>
           <small>{label}</small>
+          {state.status === "ready" ? (
+            <small className="document-preview-card__source">
+              {documentSourceLabel(state.document, kind)}
+            </small>
+          ) : null}
         </div>
         <button
           type="button"
@@ -660,6 +717,7 @@ function DocumentCard({
             document={state.document}
             kind={kind}
             keywords={keywords}
+            onOpenOriginal={onOpenOriginal}
           />
         ) : state.status === "missing" && kind === "cover-letter" ? (
           <div className="document-missing-card">

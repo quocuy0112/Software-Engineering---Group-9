@@ -359,12 +359,9 @@ export class RankedCandidateListService {
               }
             : null,
           allowedActions: {
-            moveToInterview: [
-              "APPLIED",
-              "VIEWED",
-              "SHORTLISTED",
-              "WAITLISTED",
-            ].includes(row.stage)
+            moveToInterview: ["VIEWED", "SHORTLISTED", "WAITLISTED"].includes(
+              row.stage,
+            )
               ? { allowed: true, label: "Move to interview" }
               : {
                   allowed: false,

@@ -1,10 +1,13 @@
 import "server-only";
 
 import type { ApplicationPage } from "@/shared/contracts/applications";
+import type { ApplicationStage } from "@/shared/contracts/jobs/applications";
 
 export type ApplicationDocumentRecord = Readonly<{
   applicationId: string;
   jobId: string;
+  stage?: ApplicationStage;
+  stageVersion?: number;
   kind: "cv" | "cover-letter";
   fileName: string | null;
   mediaType: string | null;

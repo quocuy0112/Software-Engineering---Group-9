@@ -2,6 +2,8 @@ import "server-only";
 
 import { prisma } from "@/backend/database/prisma";
 import { RecruiterApplicationAuthorization } from "@/backend/applications/authorization/recruiter-application-authorization";
+import { ApplicationStageService } from "@/backend/services/jobs/application-stage-service";
+import { JobServiceError } from "@/backend/services/jobs/job-types";
 import { PrismaScoringRepository } from "../repositories/prisma-scoring-repository";
 import { scoringDetailSchema, type ScoringState } from "@/shared/contracts/scoring";
 
@@ -10,14 +12,17 @@ export class ScoringDetailService {
     private readonly db: typeof prisma = prisma,
     private readonly authorization = new RecruiterApplicationAuthorization(),
     private readonly scoring = new PrismaScoringRepository(db),
+    private readonly stageService = new ApplicationStageService(db),
   ) {}
 
-  async get(userId: string, applicationId: string) {
+  async get(userId: string, applicationId: string, sessionId?: string) {
     const application = await this.db.jobApplication.findUnique({
       where: { id: applicationId },
       select: {
         id: true,
         jobPostingId: true,
+        stage: true,
+        stageVersion: true,
         scoringStatus: true,
         scoringOperations: {
           where: {
@@ -44,6 +49,23 @@ export class ScoringDetailService {
       },
     });
     if (!application || !(await this.authorization.authorizeApplication(userId, application.jobPostingId, application.id)).authorized) throw new Error("APPLICATION_UNAVAILABLE");
+
+    if (sessionId && application.stage === "APPLIED") {
+      try {
+        await this.stageService.transition(
+          { userId, sessionId },
+          application.id,
+          { targetStage: "VIEWED", expectedVersion: application.stageVersion },
+        );
+      } catch (error) {
+        // Opening the score drawer and the document previews can issue
+        // concurrent requests. One request may win APPLIED -> VIEWED; the
+        // losing request must still be allowed to show the authorized score.
+        if (!(error instanceof JobServiceError && [404, 409].includes(error.status))) {
+          throw error;
+        }
+      }
+    }
 
     const current = await this.scoring.findCurrent(application.id);
     const activeOperation =

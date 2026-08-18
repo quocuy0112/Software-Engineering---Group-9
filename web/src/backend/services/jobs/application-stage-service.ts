@@ -2,6 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { prisma } from "@/backend/database/prisma";
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
+import { RecruiterApplicationAuthorization } from "@/backend/applications/authorization/recruiter-application-authorization";
 import {
   applicationStageSchema,
   applicationStageTransitionOutcomeSchema,
@@ -14,6 +15,8 @@ import { canTransitionApplicationStage } from "./application-stage-policy";
 import { createInAppNotification } from "@/backend/notifications/notification-service";
 import {
   publicOutcomeForCanonicalStage,
+  publicUpdateKindForCanonicalStage,
+  publicUpdateTitleForCanonicalStage,
   publicStageForCanonicalStage,
 } from "@/shared/contracts/candidate-applications";
 
@@ -34,7 +37,12 @@ function isSerializationConflict(error: unknown) {
 }
 
 export class ApplicationStageService {
-  constructor(private readonly db: typeof prisma = prisma) {}
+  constructor(
+    private readonly db: typeof prisma = prisma,
+    private readonly recruiterAuthorization = new RecruiterApplicationAuthorization(
+      db,
+    ),
+  ) {}
 
   async transition(
     actor: CandidateActor,
@@ -61,6 +69,7 @@ export class ApplicationStageService {
           where: { id: applicationId },
           select: {
             id: true,
+            jobPostingId: true,
             stage: true,
             stageVersion: true,
             withdrawalOutcome: true,
@@ -104,10 +113,22 @@ export class ApplicationStageService {
           },
           select: { role: true, status: true },
         });
-        if (
-          membership?.status !== "ACTIVE" ||
-          !allowedRoles.has(membership.role)
-        ) {
+        const hasDatabaseRecruiterMembership =
+          membership?.status === "ACTIVE" && allowedRoles.has(membership.role);
+        // Legacy catalog-backed jobs are authorized through the same bridge
+        // used by recruiter candidate/scoring reads. Keep the canonical stage
+        // writer aligned with that authorization path when the migrated
+        // CompanyMembership row has not been created yet.
+        const hasCompatibleRecruiterAuthorization =
+          hasDatabaseRecruiterMembership ||
+          (
+            await this.recruiterAuthorization.authorizeApplication(
+              actor.userId,
+              application.jobPostingId,
+              application.id,
+            )
+          ).authorized;
+        if (!hasCompatibleRecruiterAuthorization) {
           throw new JobServiceError(404, {
             code: "APPLICATION_NOT_FOUND",
             message: "This application is unavailable.",
@@ -172,24 +193,13 @@ export class ApplicationStageService {
         });
 
         const publicStage = publicStageForCanonicalStage(command.targetStage);
-        const publicKind =
-          publicStage === "UNDER_REVIEW"
-            ? "UNDER_REVIEW"
-            : publicStage === "INTERVIEW"
-              ? "INTERVIEW"
-              : "OUTCOME";
         await tx.applicationPublicUpdate.create({
           data: {
             applicationId: application.id,
-            kind: publicKind,
+            kind: publicUpdateKindForCanonicalStage(command.targetStage),
             publicStage,
             publicOutcome: publicOutcomeForCanonicalStage(command.targetStage),
-            title:
-              publicStage === "UNDER_REVIEW"
-                ? "Application under review"
-                : publicStage === "INTERVIEW"
-                  ? "Interview stage reached"
-                  : "Application outcome updated",
+            title: publicUpdateTitleForCanonicalStage(command.targetStage),
             effectiveAt: now,
             deduplicationKey: `application:${application.id}:public:stage:${nextVersion}`,
             sourceEventReference: event.id,

@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
   ArrowRight,
   FileText,
+  ListChecks,
   LoaderCircle,
   Mail,
   RefreshCw,
@@ -32,8 +33,10 @@ export function CandidateScoreDrawer({
   candidate,
   onClose,
   onSetPriority,
+  onShortlist,
   onMoveToInterview,
   onReject,
+  onApplicationOpened,
   onScoringChanged,
 }: {
   jobId: string;
@@ -41,8 +44,10 @@ export function CandidateScoreDrawer({
   candidate: RankedApplicationRow;
   onClose: () => void;
   onSetPriority: () => void;
+  onShortlist: () => void | Promise<void>;
   onMoveToInterview: () => void;
   onReject: () => void;
+  onApplicationOpened: () => void | Promise<void>;
   onScoringChanged: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<Tab>("automatic");
@@ -51,11 +56,19 @@ export function CandidateScoreDrawer({
   const [retryConfirm, setRetryConfirm] = useState(false);
   const [scoreConfirm, setScoreConfirm] = useState(false);
   const [scoringActionLoading, setScoringActionLoading] = useState(false);
-  const [documentCacheVersion, setDocumentCacheVersion] = useState(0);
+  const [shortlisting, setShortlisting] = useState(false);
+  const [shortlistError, setShortlistError] = useState<string | null>(null);
   const [openDocument, setOpenDocument] = useState<
     "cv" | "cover-letter" | null
   >(null);
   const [openDocumentRequest, setOpenDocumentRequest] = useState(0);
+  const acknowledgedApplicationId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (acknowledgedApplicationId.current === candidate.applicationId) return;
+    acknowledgedApplicationId.current = candidate.applicationId;
+    void Promise.resolve(onApplicationOpened()).catch(() => undefined);
+  }, [candidate.applicationId, onApplicationOpened]);
 
   const loadDetail = useCallback(
     async (signal?: AbortSignal) => {
@@ -179,6 +192,24 @@ export function CandidateScoreDrawer({
     detail?.scoring.kind === "SCORED";
   const scoreActionLabel =
     detail?.scoring.kind === "SCORED" ? "Rescore candidate" : "Score candidate";
+  const canShortlist = candidate.stage === "VIEWED";
+
+  const shortlist = async () => {
+    if (!canShortlist || shortlisting) return;
+    setShortlisting(true);
+    setShortlistError(null);
+    try {
+      await onShortlist();
+    } catch (cause) {
+      setShortlistError(
+        cause instanceof Error
+          ? cause.message
+          : "The candidate could not be shortlisted.",
+      );
+    } finally {
+      setShortlisting(false);
+    }
+  };
 
   const retry = async () => {
     setRetryConfirm(false);
@@ -196,11 +227,14 @@ export function CandidateScoreDrawer({
         },
       );
       const payload = await response.json().catch(() => null);
-      if (response.ok && payload?.scoring)
+      if (response.ok && payload?.scoring) {
         setDetail((current) =>
           current ? { ...current, scoring: payload.scoring } : current,
         );
-      else setError(payload?.message ?? "AI retry could not be started.");
+        // Keep the outer ranking in sync immediately, then the polling effect
+        // refreshes it again when the replacement score is published.
+        onScoringChanged();
+      } else setError(payload?.message ?? "AI retry could not be started.");
     } catch {
       setError(
         "AI retry could not be started. Check your connection and try again.",
@@ -209,7 +243,6 @@ export function CandidateScoreDrawer({
   };
   const scoreCandidate = async () => {
     setScoreConfirm(false);
-    setDocumentCacheVersion((current) => current + 1);
     setScoringActionLoading(true);
     setError(null);
     try {
@@ -321,6 +354,21 @@ export function CandidateScoreDrawer({
             >
               <Mail aria-hidden="true" /> View cover letter
             </button>
+            {canShortlist ? (
+              <button
+                type="button"
+                className="ai-ranking-button ai-ranking-button--secondary"
+                onClick={() => void shortlist()}
+                disabled={shortlisting}
+              >
+                {shortlisting ? (
+                  <LoaderCircle aria-hidden="true" className="is-spinning" />
+                ) : (
+                  <ListChecks aria-hidden="true" />
+                )}{" "}
+                {shortlisting ? "Shortlisting…" : "Shortlist"}
+              </button>
+            ) : null}
             <button
               type="button"
               className="ai-ranking-button ai-ranking-button--primary"
@@ -367,6 +415,11 @@ export function CandidateScoreDrawer({
         </nav>
 
         <div className="ranking-drawer__body">
+          {shortlistError ? (
+            <p className="ai-ranking-error" role="alert">
+              {shortlistError}
+            </p>
+          ) : null}
           {error ? (
             <div className="ranking-error" role="alert">
               <AlertTriangle aria-hidden="true" />
@@ -464,7 +517,6 @@ export function CandidateScoreDrawer({
               automatic={automatic}
               openKind={openDocument}
               openRequest={openDocumentRequest}
-              documentCacheVersion={documentCacheVersion}
             />
           )}
         </div>
@@ -568,6 +620,6 @@ function aiUnavailableMessage(code: string) {
   if (code === "AI_PROVIDER_NOT_CONFIGURED")
     return "The AI provider is not configured. Add the approved provider settings before retrying.";
   if (code === "AI_PROVIDER_MALFORMED")
-    return "The AI provider returned an assessment that could not be validated. Restart the scoring worker and retry once.";
+    return "The AI provider returned an invalid assessment after automatic retries. Retry AI evaluation once; a worker restart is not required.";
   return "Deterministic matching is complete. The rule-based score and CV evidence remain visible while the AI provider is unavailable.";
 }
