@@ -124,6 +124,8 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
           sessionExpired: "Phiên đã hết hạn. Hãy đăng nhập lại để tiếp tục.",
           proofExpired:
             "Xác thực bảo mật không còn hiệu lực. Hãy tải lại trang.",
+          rateLimited:
+            "Có quá nhiều lần thử. Vui lòng chờ rồi thử lại với mã hiện tại.",
           unavailable: "Tạm thời không thể thiết lập 2FA. Vui lòng thử lại.",
           passwordAttempt: (remaining: number) =>
             `Hãy xác nhận mật khẩu hiện tại để tiếp tục. (còn ${remaining} lần thử)`,
@@ -156,6 +158,8 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
             "Your session has expired. Sign in again to continue.",
           proofExpired:
             "Your security proof is no longer valid. Reload the page.",
+          rateLimited:
+            "Too many verification attempts. Please wait and try again with the current code.",
           unavailable:
             "Two-factor setup is temporarily unavailable. Please try again.",
           passwordAttempt: (remaining: number) =>
@@ -316,6 +320,23 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
     codeForm.reset({ code: "" });
     if (!response.ok) {
       setStatusTone("error");
+      if (response.status === 403) {
+        writeAttemptState(proof, 0);
+        setIsLocked(false);
+        setStatus(copy.proofExpired);
+        return;
+      }
+      if (response.status === 429) {
+        setIsLocked(false);
+        setStatus(copy.rateLimited);
+        return;
+      }
+      if (response.status !== 401) {
+        writeAttemptState(proof, 0);
+        setIsLocked(false);
+        setStatus(copy.unavailable);
+        return;
+      }
       const nextAttempts = (state.count ?? 0) + 1;
       const remaining = MAX_TOTP_ATTEMPTS - nextAttempts;
       const lockedUntil =
@@ -422,7 +443,13 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
               autoComplete="one-time-code"
               maxLength={6}
               aria-invalid={Boolean(codeForm.formState.errors.code)}
-              {...codeForm.register("code")}
+              {...codeForm.register("code", {
+                onChange: (event) => {
+                  event.target.value = event.target.value
+                    .replace(/\D/g, "")
+                    .slice(0, 6);
+                },
+              })}
             />
             {codeForm.formState.errors.code ? (
               <p role="alert">{codeForm.formState.errors.code.message}</p>
