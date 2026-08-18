@@ -212,6 +212,13 @@ function start(name, command) {
       "scripts/run-application-intake-worker.mjs",
       "--watch",
     ],
+    "candidate-match:worker": [
+      "--conditions=react-server",
+      "--import",
+      "tsx",
+      "scripts/run-candidate-match-worker.mjs",
+      "--watch",
+    ],
   }[command];
 
   if (!commandArgs)
@@ -378,6 +385,7 @@ async function main() {
   start("web", "dev:web");
   start("email worker", "email:worker");
   start("application intake worker", "application-intake:worker");
+  start("candidate match worker", "candidate-match:worker");
 
   void workerBuild.then(async (result) => {
     if (!result.ok) {

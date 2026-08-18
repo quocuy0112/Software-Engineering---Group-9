@@ -47,6 +47,7 @@ export async function GET(
   try {
     const result = await new OpenApplicationDocumentService().execute({
       userId: current.userId,
+      sessionId: current.sessionId,
       jobId,
       applicationId,
       kind,

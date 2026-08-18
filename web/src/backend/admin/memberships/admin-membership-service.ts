@@ -7,6 +7,7 @@ import {
 import { recordMembershipCommand } from "./admin-membership-command-transaction";
 import { PrismaAdminMembershipRepository } from "@/backend/repositories/admin/prisma-admin-membership-repository";
 import { enforceMessagingMembershipRevocation } from "@/backend/messaging/realtime/messaging-authority-enforcement";
+import { recordCompanyDetailViewed } from "../authorization/admin-access-audit";
 type Command = {
   expectedVersion: number;
   idempotencyKey: string;
@@ -20,6 +21,18 @@ export class AdminMembershipService {
     filter: Record<string, unknown>;
   }) {
     return new PrismaAdminMembershipRepository().companies(input);
+  }
+  async companyDetail(authority: AdminAuthority, companyId: string) {
+    const detail = await new PrismaAdminMembershipRepository().companyDetail(
+      companyId,
+    );
+    if (!detail) throw new Error("TARGET_UNAVAILABLE");
+    await recordCompanyDetailViewed({
+      companyId,
+      actorUserId: authority.userId,
+      actorSessionId: authority.sessionId,
+    });
+    return detail;
   }
   list(input: {
     page: number;

@@ -17,7 +17,7 @@ export async function GET(request: Request, context: { params: Promise<{ applica
   const current = await requireSession(request.headers);
   if (!current) return NextResponse.json({ code: "UNAUTHENTICATED", message: "Authentication required." }, { status: 401, headers: noStore });
   try {
-    return NextResponse.json(await new ScoringDetailService().get(current.userId, (await context.params).applicationId), { headers: noStore });
+    return NextResponse.json(await new ScoringDetailService().get(current.userId, (await context.params).applicationId, current.sessionId), { headers: noStore });
   } catch (error) {
     if (isSchemaMismatch(error)) {
       return NextResponse.json({ code: "DATABASE_SCHEMA_OUT_OF_DATE", message: "The scoring database schema is out of date. Apply the pending Prisma migrations and restart the application." }, { status: 503, headers: noStore });

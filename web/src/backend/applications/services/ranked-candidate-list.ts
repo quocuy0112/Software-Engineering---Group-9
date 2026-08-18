@@ -202,6 +202,7 @@ export class RankedCandidateListService {
       input.jobId,
     );
     if (!authorized.authorized) throw new Error("APPLICATION_UNAVAILABLE");
+    const jobPostingId = authorized.jobPostingId;
     const filters = input.filters;
     const filterHash = normalizedRankingFilterHash({
       ...filters,
@@ -209,7 +210,7 @@ export class RankedCandidateListService {
       page: undefined,
     });
     const cursor = decodeRankingCursor(filters.cursor, {
-      jobId: input.jobId,
+      jobId: jobPostingId,
       filterHash,
       sort: filters.sort,
       pageSize: filters.limit,
@@ -217,7 +218,7 @@ export class RankedCandidateListService {
     if (filters.cursor && !cursor) throw new Error("INVALID_RANKING_CURSOR");
     const rows = await this.db.jobApplication.findMany({
       where: {
-        jobPostingId: input.jobId,
+        jobPostingId,
         documentDeletedAt: null,
         ...(filters.stage === "ACTIVE_PIPELINE"
           ? { stage: { not: "REJECTED" } }
@@ -359,7 +360,7 @@ export class RankedCandidateListService {
               }
             : null,
           allowedActions: {
-            moveToInterview: [
+            moveToInterview: authorized.canMoveStages && [
               "APPLIED",
               "VIEWED",
               "SHORTLISTED",
@@ -373,7 +374,7 @@ export class RankedCandidateListService {
                   reasonLabel:
                     "This stage cannot move directly to Interviewing.",
                 },
-            reject: [
+            reject: authorized.canReject && [
               "APPLIED",
               "VIEWED",
               "SHORTLISTED",
@@ -468,13 +469,13 @@ export class RankedCandidateListService {
     const snapshot = cursor
       ? await this.snapshots.find({
           snapshotId: cursor.snapshotId,
-          jobPostingId: input.jobId,
+          jobPostingId,
           filterHash,
           sort: filters.sort,
           pageSize: filters.limit,
         })
       : await this.snapshots.create({
-          jobPostingId: input.jobId,
+          jobPostingId,
           filterHash,
           filters: { ...filters, cursor: undefined, page: undefined },
           sort: filters.sort,
@@ -516,7 +517,7 @@ export class RankedCandidateListService {
       start + snapshotPage.length < snapshot.rows.length && lastItem
         ? encodeRankingCursor({
             v: 1,
-            jobId: input.jobId,
+            jobId: jobPostingId,
             snapshotId: snapshot.snapshotId,
             filterHash,
             sort: filters.sort,
@@ -554,14 +555,14 @@ export class RankedCandidateListService {
     const [activeRescoreCount, lastSuccessfulRescore] = await Promise.all([
       this.db.scoringOperation.count({
         where: {
-          jobPostingId: input.jobId,
+          jobPostingId,
           kind: "JOB_RESCORE",
           state: { in: ["QUEUED", "RUNNING"] },
         },
       }),
       this.db.scoringOperation.findFirst({
         where: {
-          jobPostingId: input.jobId,
+          jobPostingId,
           kind: "JOB_RESCORE",
           state: "COMPLETED",
           completedAt: { not: null },

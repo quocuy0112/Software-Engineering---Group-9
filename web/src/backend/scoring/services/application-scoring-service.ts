@@ -118,10 +118,19 @@ export class ApplicationScoringService {
       },
       update: {},
     });
-    await this.db.jobApplication.update({
-      where: { id: application.id },
-      data: { scoringStatus: kind === "AI_RETRY" ? "PENDING" : "PROCESSING" },
-    });
+    // A completed result remains the candidate-facing source of truth while
+    // a rescore is running. The legacy database check requires a non-null
+    // aiMatchScore to stay in COMPLETED, so marking an already-scored
+    // application as PROCESSING makes the queue request fail after its work
+    // item has already been created. Operation state carries the in-flight
+    // signal; keep the published status constraint-valid until replacement
+    // results are fenced into place by the worker.
+    if (kind !== "JOB_RESCORE") {
+      await this.db.jobApplication.update({
+        where: { id: application.id },
+        data: { scoringStatus: kind === "AI_RETRY" ? "PENDING" : "PROCESSING" },
+      });
+    }
     await new PrismaAuditRepository(this.db)
       .append({
         occurredAt: now,

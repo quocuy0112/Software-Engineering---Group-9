@@ -71,6 +71,12 @@ export const privateMatchJobSchema = z
   })
   .strict();
 
+export const privateMatchJobsResponseSchema = z
+  .object({
+    items: z.array(privateMatchJobSchema).max(50),
+  })
+  .strict();
+
 export const privateMatchEvidenceSchema = z
   .object({
     type: z.enum([
@@ -260,6 +266,9 @@ export type PrivateMatchErrorCode = z.infer<typeof privateMatchErrorCodeSchema>;
 export type SourceProvenance = z.infer<typeof sourceProvenanceSchema>;
 export type PrivateMatchCv = z.infer<typeof privateMatchCvSchema>;
 export type PrivateMatchJob = z.infer<typeof privateMatchJobSchema>;
+export type PrivateMatchJobsResponse = z.infer<
+  typeof privateMatchJobsResponseSchema
+>;
 export type PrivateMatchEvidence = z.infer<typeof privateMatchEvidenceSchema>;
 export type PrivateRequirementMatch = z.infer<
   typeof privateRequirementMatchSchema

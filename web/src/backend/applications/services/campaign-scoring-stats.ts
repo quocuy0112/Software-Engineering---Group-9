@@ -31,16 +31,14 @@ export class CampaignScoringStatsService {
       input.userId,
       requestedJobIds,
     );
-    const authorizedJobIdSet = new Set(
-      authorizationResults
-        .filter((result) => result.authorized)
-        .map((result) => result.jobId),
+    const authorizedResults = authorizationResults.filter(
+      (result) => result.authorized,
     );
-    const authorizedJobIds = requestedJobIds.filter((jobId) =>
-      authorizedJobIdSet.has(jobId),
-    );
+    const authorizedJobIds = [
+      ...new Set(authorizedResults.map((result) => result.jobPostingId)),
+    ];
     const stats = Object.fromEntries(
-      authorizedJobIds.map((jobId) => [jobId, emptyStats()]),
+      authorizedResults.map((result) => [result.requestedJobId, emptyStats()]),
     ) as Record<string, CampaignScoringStats>;
 
     if (authorizedJobIds.length === 0) {
@@ -95,14 +93,15 @@ export class CampaignScoringStatsService {
     `);
 
     for (const row of rows) {
-      const current = stats[row.jobPostingId];
-      if (!current) continue;
-
-      current.total = Number(row.total);
-      current.strong = Number(row.strong);
-      current.review = Number(row.review);
-      current.low = Number(row.low);
-      current.processing = Number(row.processing);
+      for (const result of authorizedResults) {
+        if (result.jobPostingId !== row.jobPostingId) continue;
+        const current = stats[result.requestedJobId];
+        current.total = Number(row.total);
+        current.strong = Number(row.strong);
+        current.review = Number(row.review);
+        current.low = Number(row.low);
+        current.processing = Number(row.processing);
+      }
     }
 
     return campaignScoringStatsResponseSchema.parse({ stats });

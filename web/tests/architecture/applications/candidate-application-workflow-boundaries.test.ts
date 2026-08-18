@@ -45,8 +45,12 @@ describe("candidate application workflow boundaries", () => {
     const rankingList = await source(
       "src/frontend/features/recruiter-applications/candidate-ranking-list.tsx",
     );
-    expect(rankingList).toContain('targetStage: "VIEWED"');
-    expect(rankingList).toContain("markViewed");
-    expect(rankingList).toContain('method: "PATCH"');
+    const drawer = await source(
+      "src/frontend/features/recruiter-applications/candidate-score-drawer.tsx",
+    );
+    expect(rankingList).toContain("acknowledgeCandidateOpened");
+    expect(rankingList).toContain("/view");
+    expect(rankingList).toContain('method: "POST"');
+    expect(drawer).toContain("onApplicationOpened");
   });
 });
