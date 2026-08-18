@@ -4,24 +4,34 @@
 
 ## Phase 1: Foundation
 
-- [X] T001 Extend `web/src/backend/audit/events.ts` with the company-detail view audit action and company target.
-- [X] T002 Implement bounded company overview aggregation in `web/src/backend/repositories/admin/prisma-admin-membership-repository.ts`.
-- [X] T003 Implement authorized detail orchestration and required audit write in `web/src/backend/admin/memberships/admin-membership-service.ts` and `web/src/backend/admin/authorization/admin-access-audit.ts`.
+- [x] T001 Extend `web/src/backend/audit/events.ts` with the company-detail view audit action and company target.
+- [x] T002 Implement bounded company overview aggregation in `web/src/backend/repositories/admin/prisma-admin-membership-repository.ts`.
+- [x] T003 Implement authorized detail orchestration and required audit write in `web/src/backend/admin/memberships/admin-membership-service.ts` and `web/src/backend/admin/authorization/admin-access-audit.ts`.
 
 ## Phase 2: User Story 1 - Inspect a company safely (P1)
 
-- [X] T004 [P] [US1] Add owner-risk component coverage in `web/tests/frontend/components/admin-management/company-detail-show.test.tsx`.
-- [X] T005 [US1] Add protected detail endpoint at `web/src/app/api/admin/companies/[companyId]/route.ts`.
-- [X] T006 [US1] Add `CompanyDetailShow` with responsive summary, empty states, and owner-risk warnings in `web/src/frontend/features/admin/companies/company-detail-show.tsx`.
-- [X] T007 [US1] Register the Company show view in `web/src/frontend/features/admin/app/admin-app.tsx`.
+- [x] T004 [P] [US1] Add owner-risk component coverage in `web/tests/frontend/components/admin-management/company-detail-show.test.tsx`.
+- [x] T005 [US1] Add protected detail endpoint at `web/src/app/api/admin/companies/[companyId]/route.ts`.
+- [x] T006 [US1] Add `CompanyDetailShow` with responsive summary, empty states, and owner-risk warnings in `web/src/frontend/features/admin/companies/company-detail-show.tsx`.
+- [x] T007 [US1] Register the Company show view in `web/src/frontend/features/admin/app/admin-app.tsx`.
 
 ## Phase 3: User Story 2 - Find companies reliably (P2)
 
-- [X] T008 [US2] Replace the generic company list with `web/src/frontend/features/admin/companies/company-list.tsx` and display only server-returned identity fields.
-- [X] T009 [US2] Return display name with the company list projection in `web/src/backend/repositories/admin/prisma-admin-membership-repository.ts`.
-- [X] T012 [US2] Add Accounts-style always-visible search and verification/created-date filters in `web/src/frontend/features/admin/companies/company-list.tsx` and apply them in `web/src/backend/repositories/admin/prisma-admin-membership-repository.ts`.
+- [x] T008 [US2] Replace the generic company list with `web/src/frontend/features/admin/companies/company-list.tsx` and display only server-returned identity fields.
+- [x] T009 [US2] Return display name with the company list projection in `web/src/backend/repositories/admin/prisma-admin-membership-repository.ts`.
+- [x] T012 [US2] Add Accounts-style always-visible search and verification/created-date filters in `web/src/frontend/features/admin/companies/company-list.tsx` and apply them in `web/src/backend/repositories/admin/prisma-admin-membership-repository.ts`.
+- [x] T013 [US2] Repair job-post-review verification navigation with a hash route and canonical `targetCompanyId` filter across `web/src/backend/jobs/review/job-post-review-service.ts`, verification-list transport, contract, and repository files.
+- [x] T014 [US2] Improve the Company Membership show presentation with responsive React Admin/MUI panels, status cues, history, and a sticky action area in `web/src/frontend/features/admin/memberships/membership-lifecycle-panel.tsx`.
+- [x] T015 [US2] Improve the Account Detail show presentation with responsive React Admin/MUI summary, activity, authority, evidence, moderation, and history panels in `web/src/frontend/features/admin/accounts/account-detail-show.tsx`.
+- [x] T016 [US2] Add an always-visible membership search for membership, company, and account references/names, retaining the existing role/state filters in `web/src/frontend/features/admin/memberships/company-membership-list.tsx` and repository query.
+- [x] T017 [US2] Retain processed verification requests and job-post reviews in their administrator lists by default, with explicit status filters for queue narrowing.
+- [x] T018 [US2] Improve the Moderation Report show presentation with responsive React Admin/MUI status, detail, note, enforcement, action, and history panels in `web/src/frontend/features/admin/moderation/moderation-review-show.tsx`.
+- [x] T019 [US2] Add always-visible reference and case-insensitive name search to Verification Requests and Job Post Reviews.
+- [x] T020 [US2] Persist and backfill normalized Job Post Review titles, use token-based title matching, and cover case/partial-title search in repository support and unit tests.
+- [x] T021 [US2] Add always-visible exact-reference and tokenized-name search to Moderation, Messaging, Support, and Connection Proposal administrator lists.
+- [x] T022 [US2] Make the all-status default explicit for administrator report, support, and proposal lists so resolved or rejected records remain visible.
 
 ## Phase 4: Validation
 
-- [X] T010 Run focused lint, typecheck, and component tests from `web/`; the broad admin suite was attempted but exceeded its 180-second command window before producing test results.
-- [X] T011 Update `AGENTS.md` through the Spec Kit agent-context script or equivalent managed-block update.
+- [x] T010 Run focused lint, typecheck, and component tests from `web/`; the broad admin suite was attempted but exceeded its 180-second command window before producing test results.
+- [x] T011 Update `AGENTS.md` through the Spec Kit agent-context script or equivalent managed-block update.

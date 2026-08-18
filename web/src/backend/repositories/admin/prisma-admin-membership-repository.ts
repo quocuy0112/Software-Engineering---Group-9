@@ -196,12 +196,33 @@ export class PrismaAdminMembershipRepository {
     filter: Record<string, unknown>;
   }) {
     const now = new Date();
-    const where = {
+    const q = typeof input.filter.q === "string" ? input.filter.q.trim() : "";
+    const where: Prisma.CompanyMembershipWhereInput = {
+      ...(q
+        ? {
+            OR: [
+              { id: q },
+              { companyId: q },
+              { userId: q },
+              {
+                company: {
+                  is: {
+                    OR: [
+                      { legalName: { contains: q, mode: "insensitive" } },
+                      { displayName: { contains: q, mode: "insensitive" } },
+                    ],
+                  },
+                },
+              },
+              { user: { is: { name: { contains: q, mode: "insensitive" } } } },
+            ],
+          }
+        : {}),
       ...(typeof input.filter.companyId === "string"
-        ? { companyId: input.filter.companyId }
+        ? { companyId: input.filter.companyId.trim() }
         : {}),
       ...(typeof input.filter.accountId === "string"
-        ? { userId: input.filter.accountId }
+        ? { userId: input.filter.accountId.trim() }
         : {}),
       ...(typeof input.filter.role === "string"
         ? {

@@ -267,7 +267,10 @@ export class PrismaConnectionRepository {
     eventKey: string;
     now: Date;
   }) {
-    const notificationKind: Record<ConnectionNotificationKind, NotificationKind> = {
+    const notificationKind: Record<
+      ConnectionNotificationKind,
+      NotificationKind
+    > = {
       PROPOSAL_CREATED: "CONNECTION_PROPOSAL_CREATED",
       PROPOSAL_UPDATED: "CONNECTION_PROPOSAL_UPDATED",
       PROPOSAL_NO_LONGER_ACTIVE: "CONNECTION_PROPOSAL_INACTIVE",
@@ -281,9 +284,7 @@ export class PrismaConnectionRepository {
         deduplicationKey: `${input.eventKey}:${recipientUserId}`,
         correlationId: input.eventKey,
         occurredAt: input.now,
-        contextType: input.connectionId
-          ? "CONNECTION"
-          : "CONNECTION_PROPOSAL",
+        contextType: input.connectionId ? "CONNECTION" : "CONNECTION_PROPOSAL",
         contextId: input.connectionId ?? input.proposalId,
       });
       await this.db.emailOutbox.create({
@@ -608,8 +609,44 @@ export class PrismaConnectionRepository {
       typeof input.filter.creatorAdminUserId === "string"
         ? input.filter.creatorAdminUserId
         : undefined;
+    const q = typeof input.filter.q === "string" ? input.filter.q.trim() : "";
+    const tokens = q.split(/\s+/u).filter(Boolean).slice(0, 8);
     const where: Prisma.ProfessionalConnectionProposalWhereInput = {
       protectedDeletedAt: null,
+      ...(q
+        ? {
+            OR: [
+              { id: q },
+              { participantLowId: q },
+              { participantHighId: q },
+              { createdByAdminUserId: q },
+              ...(tokens.length
+                ? [
+                    {
+                      AND: tokens.map((token) => ({
+                        participantLow: {
+                          name: {
+                            contains: token,
+                            mode: "insensitive" as const,
+                          },
+                        },
+                      })),
+                    },
+                    {
+                      AND: tokens.map((token) => ({
+                        participantHigh: {
+                          name: {
+                            contains: token,
+                            mode: "insensitive" as const,
+                          },
+                        },
+                      })),
+                    },
+                  ]
+                : []),
+            ],
+          }
+        : {}),
       ...(state &&
       [
         "PENDING_BOTH",
@@ -1366,8 +1403,7 @@ export class PrismaConnectionRepository {
           ...copy,
           proposalId:
             row.contextType === "CONNECTION_PROPOSAL" ? row.contextId : null,
-          connectionId:
-            row.contextType === "CONNECTION" ? row.contextId : null,
+          connectionId: row.contextType === "CONNECTION" ? row.contextId : null,
           createdAt: row.createdAt.toISOString(),
           readAt: row.readAt?.toISOString() ?? null,
         };

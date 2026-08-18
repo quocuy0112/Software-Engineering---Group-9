@@ -286,6 +286,12 @@ export function ProfessionalConnectionProposalList() {
       empty={false}
       pagination={<Pagination rowsPerPageOptions={[25, 50, 100]} />}
       filters={[
+        <TextInput
+          key="q"
+          source="q"
+          label="Proposal reference or participant name"
+          alwaysOn
+        />,
         <SelectInput
           key="state"
           source="state"
@@ -297,6 +303,7 @@ export function ProfessionalConnectionProposalList() {
             "EXPIRED",
             "CANCELLED",
           ].map((id) => ({ id, name: id.replaceAll("_", " ") }))}
+          emptyText="All statuses"
         />,
         <TextInput
           key="participantId"

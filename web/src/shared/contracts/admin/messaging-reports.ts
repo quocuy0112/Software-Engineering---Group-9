@@ -15,6 +15,7 @@ export const adminMessagingReportTargetTypeSchema = z.enum([
 
 export const adminMessagingReportFilterSchema = z
   .object({
+    q: z.string().trim().min(1).max(160).optional(),
     targetType: adminMessagingReportTargetTypeSchema.optional(),
     category: reportCategorySchema.optional(),
     state: moderationStateSchema.optional(),

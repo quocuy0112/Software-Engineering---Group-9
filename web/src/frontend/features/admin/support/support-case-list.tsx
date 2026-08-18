@@ -29,6 +29,12 @@ export function SupportCaseList() {
       perPage={25}
       pagination={<Pagination rowsPerPageOptions={[25, 50, 100]} />}
       filters={[
+        <TextInput
+          key="q"
+          source="q"
+          label="Case reference, requester, or subject"
+          alwaysOn
+        />,
         <SelectInput
           key="state"
           source="state"
@@ -39,6 +45,7 @@ export function SupportCaseList() {
             "RESOLVED",
             "CLOSED",
           ])}
+          emptyText="All statuses"
         />,
         <SelectInput
           key="category"
