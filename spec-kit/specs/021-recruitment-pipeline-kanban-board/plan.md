@@ -26,7 +26,7 @@ All board moves and existing interview/rejection actions converge on an extended
 
 **Performance Goals**: P95 visual move feedback <= 500 ms; P95 successful stage persistence <= 2 seconds; P95 board usable <= 2 seconds for the documented 10,000-application job workload; P95 committed in-app notification visibility <= 5 seconds
 
-**Constraints**: One selected job at a time; nine fixed stages; human-only recruitment decisions; `OWNER` read-only; company isolation; server authority; mandatory explicit `HIRED` confirmation and hiring email; no score-driven movement; no all-at-once 10,000-card render; no duplicate critical side effects; no new notification, scoring, session, job, or application domain
+**Constraints**: One selected job at a time; nine fixed stages; human-only recruitment decisions; `OWNER` may manage the pipeline; company isolation; server authority; mandatory explicit `HIRED` confirmation and hiring email; no score-driven movement; no all-at-once 10,000-card render; no duplicate critical side effects; no new notification, scoring, session, job, or application domain
 
 **Scale/Scope**: Up to 10,000 applications for one selected job, nine columns, bounded pages of at most 100 cards per column, multiple simultaneous Recruiter-side actors, and one logical stage command per card at a time in a client session
 
@@ -36,8 +36,8 @@ _GATE: Passed before Phase 0 research and re-checked after Phase 1 design._
 
 | Gate | Status | Evidence |
 |------|--------|----------|
-| Human-controlled recruitment | PASS | Only `HR_MANAGER`, `RECRUITER`, or `HIRING_MANAGER` can mutate. `HIRED` requires a separate explicit human confirmation; candidate activity and scoring never invoke the mutation service. |
-| Security, privacy, tenant isolation | PASS | Better Auth remains the exclusive browser session. Every read and write resolves the selected job to one active verified company membership and revalidates job/application ownership server-side. `OWNER` is read-only and cross-company failures use neutral responses. |
+| Human-controlled recruitment | PASS | `OWNER`, `HR_MANAGER`, `RECRUITER`, and `HIRING_MANAGER` can mutate within their authorized company. `HIRED` requires a separate explicit human confirmation; candidate activity and scoring never invoke the mutation service. |
+| Security, privacy, tenant isolation | PASS | Better Auth remains the exclusive browser session. Every read and write resolves the selected job to one active verified company membership and revalidates job/application ownership server-side. `OWNER` may manage the pipeline within its company and cross-company failures use neutral responses. |
 | Deterministic core and AI separation | PASS | The existing deterministic stage policy remains authoritative. Optional score projection is nullable and no scoring state, result, or worker can change recruitment stage. |
 | State, audit, and data integrity | PASS | Stage compare-and-set, immutable `ApplicationStageEvent`, audit, in-app notification, and email intent share one serializable transaction; exact retries are request-bound and duplicate-safe. |
 | Scope discipline and complete P0 workflow | PASS | Board read, all permitted moves, consequential decisions, notifications, retry/conflict recovery, accessibility, and 10,000-application discoverability are included; analytics, bulk actions, custom stages, scheduling, and new subsystems remain excluded. |
@@ -125,7 +125,7 @@ Extend `ApplicationStageService.transition` to accept the selected job reference
 
 Within one serializable transaction the service:
 
-1. Resolves/revalidates the selected canonical job, active account, active membership, verified active company, role, job lifecycle, and application ownership. `OWNER` fails mutation neutrally.
+1. Resolves/revalidates the selected canonical job, active account, active membership, verified active company, role, job lifecycle, and application ownership.
 2. Computes a deterministic digest over the normalized actor/application/job/target/version/reason/confirmation binding.
 3. Replays an existing `ApplicationStageEvent` only when both application/idempotency key and stored digest match. Reuse with changed input returns an idempotency conflict.
 4. Validates the current stage/version and `canTransitionApplicationStage` policy.
@@ -150,7 +150,7 @@ Introduce a small `RecruiterCandidateWorkspace` shell at the current selected-jo
 
 The board uses local feature state through `useRecruitmentPipeline`; no new global store is required. State contains board metadata, loaded pages/cursors by stage, pending commands by application, a stable idempotency key for each unresolved logical command, announcements, and the application that should regain focus. Sensitive/session material is never stored there.
 
-`@dnd-kit/core@6.3.1` provides pointer and keyboard sensors, droppable columns, drag cancellation, overlay, and screen-reader announcements. Only server-returned destinations are droppable. A visible button/menu on every mutable card invokes the same stage command without drag. `OWNER` receives no mutation destinations and the server still rejects direct attempts.
+`@dnd-kit/core@6.3.1` provides pointer and keyboard sensors, droppable columns, drag cancellation, overlay, and screen-reader announcements. Only server-returned destinations are droppable. A visible button/menu on every mutable card invokes the same stage command without drag. `OWNER` receives the same permitted mutation destinations as the other active company roles.
 
 Ordinary moves may apply an optimistic source/destination/count update. Rejected, Offer Declined, and Hired open the shared stage-decision dialog before any mutation; Hired can never commit in `onDragEnd`. On success, the client applies the authoritative version and refreshes metadata plus affected column pages. On validation, authorization, network, server, or stale failure it restores/removes the optimistic copy, announces the result, and reloads affected authoritative pages. A 404/unavailable result clears cached board/application data rather than continuing to display it as current. Focus returns to the moved card when it remains loaded, otherwise to the destination column heading or originating control.
 
