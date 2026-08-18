@@ -1,0 +1,46 @@
+import { ApplicationStageService } from "@/backend/services/jobs/application-stage-service";
+import { JobServiceError } from "@/backend/services/jobs/job-types";
+import {
+  AccountRequestError,
+  accountErrorResponse,
+  accountJson,
+  parseBoundedJson,
+  requireAccountRequest,
+} from "@/backend/security/account-request-boundary";
+import {
+  idempotencyKeySchema,
+  stageTransitionCommandSchema,
+  stageTransitionOutcomeSchema,
+} from "@/shared/contracts/applications";
+
+export async function PATCH(request: Request, context: { params: Promise<{ jobId: string; applicationId: string }> }) {
+  let actor: Awaited<ReturnType<typeof requireAccountRequest>> | null = null;
+  let params: { jobId: string; applicationId: string } | null = null;
+  try {
+    actor = await requireAccountRequest(request, { mutation: true });
+    params = await context.params;
+    const idempotency = idempotencyKeySchema.safeParse(request.headers.get("idempotency-key"));
+    if (!idempotency.success) {
+      return accountJson({ code: "IDEMPOTENCY_KEY_REQUIRED", message: "A valid Idempotency-Key is required." }, { status: 400 });
+    }
+    const command = await parseBoundedJson(request, stageTransitionCommandSchema, 8 * 1024);
+    const stageService = new ApplicationStageService();
+    const result = await stageService.transition(actor, params.applicationId, command, new Date(), {
+      requestedJobId: params.jobId,
+      idempotencyKey: idempotency.data,
+      source: "KANBAN",
+    });
+    return accountJson(stageTransitionOutcomeSchema.parse(result));
+  } catch (error) {
+    if (error instanceof AccountRequestError) return accountErrorResponse(error);
+    if (error instanceof JobServiceError) {
+      const conflictCodes = ["APPLICATION_STAGE_CONFLICT", "APPLICATION_STAGE_TRANSITION_INVALID", "IDEMPOTENCY_CONFLICT"];
+      if (error.status === 409 && conflictCodes.includes(error.body.code) && actor && params) {
+        const current = await new ApplicationStageService().currentAuthorizedState(actor.userId, params.jobId, params.applicationId);
+        if (current) return accountJson({ ...error.body, current }, { status: 409 });
+      }
+      return accountJson(error.body, { status: error.status });
+    }
+    return accountJson({ code: "JOB_SERVICE_UNAVAILABLE", message: "The stage change could not be completed." }, { status: 503 });
+  }
+}

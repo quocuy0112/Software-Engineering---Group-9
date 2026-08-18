@@ -5,11 +5,18 @@ import { prisma } from "@/backend/database/prisma";
 import { safeFilename } from "@/backend/services/cv-import/cv-import-projection";
 import {
   applicationPageSchema,
+  pipelineApplicationStages,
+  pipelineScoreSchema,
+  pipelineStagePageSchema,
+  type ApplicationStage,
   type ApplicationPage,
 } from "@/shared/contracts/applications";
 import type {
   ApplicationDocumentRecord,
   ApplicationRepositoryPort,
+  RecruitmentPipelineRepositoryPort,
+  PipelineStageCounts,
+  PipelineStageRepositoryPage,
 } from "./application-repository";
 
 const cursorVersion = 1;
@@ -22,6 +29,8 @@ type Cursor = Readonly<{
   submittedAt: string;
   id: string;
 }>;
+
+type PipelineCursor = Cursor & Readonly<{ stage: ApplicationStage }>;
 
 function encodeCursor(cursor: Cursor): string {
   const body = Buffer.from(JSON.stringify(cursor), "utf8").toString(
@@ -65,6 +74,21 @@ function decodeCursor(value: string | undefined, jobId: string): Cursor | null {
   } catch {
     return null;
   }
+}
+
+function encodePipelineCursor(cursor: PipelineCursor): string {
+  const body = Buffer.from(JSON.stringify(cursor), "utf8").toString("base64url");
+  const signature = createHmac("sha256", cursorSecret()).update(body).digest("base64url");
+  return `${body}.${signature}`;
+}
+
+function decodePipelineCursor(
+  value: string | undefined,
+  jobId: string,
+  stage: ApplicationStage,
+): PipelineCursor | null {
+  const parsed = decodeCursor(value, jobId) as PipelineCursor | null;
+  return parsed?.stage === stage ? parsed : null;
 }
 
 function safeAvatar(value: string | null): string | null {
@@ -165,8 +189,151 @@ function coverLetterProjection(row: {
   return { kind: "NONE" };
 }
 
-export class PrismaApplicationRepository implements ApplicationRepositoryPort {
+export class PrismaApplicationRepository implements ApplicationRepositoryPort, RecruitmentPipelineRepositoryPort {
   constructor(private readonly db: typeof prisma = prisma) {}
+
+  async countPipelineStages(jobId: string): Promise<PipelineStageCounts> {
+    const grouped = await this.db.jobApplication.groupBy({
+      by: ["stage"],
+      where: {
+        jobPostingId: jobId,
+        documentDeletedAt: null,
+        candidate: { user: { emailVerified: true } },
+      },
+      _count: { _all: true },
+    });
+    const counts = Object.fromEntries(
+      pipelineApplicationStages.map((stage) => [stage, 0]),
+    ) as PipelineStageCounts;
+    for (const row of grouped) counts[row.stage] = row._count._all;
+    return counts;
+  }
+
+  async listPipelineStage(input: {
+    jobId: string;
+    stage: ApplicationStage;
+    limit: number;
+    cursor?: string;
+  }): Promise<PipelineStageRepositoryPage> {
+    const limit = Math.min(Math.max(input.limit, 1), 100);
+    const cursor = decodePipelineCursor(input.cursor, input.jobId, input.stage);
+    if (input.cursor && !cursor) throw new Error("INVALID_CURSOR");
+    const rows = await this.db.jobApplication.findMany({
+      where: {
+        jobPostingId: input.jobId,
+        stage: input.stage,
+        documentDeletedAt: null,
+        candidate: { user: { emailVerified: true } },
+        AND: [
+          ...(cursor
+            ? [
+                {
+                  OR: [
+                    { submittedAt: { lt: new Date(cursor.submittedAt) } },
+                    {
+                      submittedAt: new Date(cursor.submittedAt),
+                      id: { lt: cursor.id },
+                    },
+                  ],
+                },
+              ]
+            : []),
+        ],
+      },
+      orderBy: [{ submittedAt: "desc" }, { id: "desc" }],
+      take: limit + 1,
+      select: {
+        id: true,
+        submittedAt: true,
+        stage: true,
+        stageVersion: true,
+        scoringStatus: true,
+        currentScoringResult: { select: { state: true, finalScore: true } },
+        candidate: {
+          select: {
+            user: { select: { name: true, image: true, emailVerified: true } },
+          },
+        },
+        applicationDocuments: {
+          where: { committedAt: { not: null }, deletedAt: null },
+          select: { kind: true },
+        },
+        coverLetterText: { select: { deletedAt: true } },
+        coverLetter: true,
+      },
+    });
+    const hasNext = rows.length > limit;
+    const items = rows.slice(0, limit).map((row) => {
+      const final =
+        row.currentScoringResult?.state === "SCORED" &&
+        row.currentScoringResult.finalScore !== null
+          ? Number(row.currentScoringResult.finalScore)
+          : null;
+      const scoreState =
+        row.currentScoringResult?.state === "SCORED" && final !== null
+          ? "SCORED"
+          : row.scoringStatus === "PENDING"
+            ? "PENDING"
+            : row.scoringStatus === "PROCESSING"
+              ? "PROCESSING"
+              : row.scoringStatus === "FAILED"
+                ? "UNAVAILABLE"
+                : "NOT_CALCULATED";
+      const score =
+        scoreState === "NOT_CALCULATED"
+          ? null
+          : pipelineScoreSchema.parse({
+              state: scoreState,
+              final,
+              band:
+                final === null
+                  ? null
+                  : final >= 80
+                    ? { code: "HIGH_MATCH", label: "Strong match" }
+                    : final >= 60
+                      ? { code: "MEDIUM_MATCH", label: "Review needed" }
+                      : { code: "LOW_MATCH", label: "Low match" },
+            });
+      return {
+        applicationId: row.id,
+        candidate: { displayName: row.candidate.user.name, avatarUrl: safeAvatar(row.candidate.user.image) },
+        submittedAt: row.submittedAt.toISOString(),
+        stage: row.stage,
+        stageVersion: row.stageVersion,
+        documents: {
+          cvAvailable: row.applicationDocuments.some((document) => document.kind === "CV"),
+          coverLetterAvailable:
+            row.applicationDocuments.some((document) => document.kind === "COVER_LETTER") ||
+            Boolean(row.coverLetterText && !row.coverLetterText.deletedAt) ||
+            Boolean(row.coverLetter),
+        },
+        score,
+      };
+    });
+    const last = items.at(-1);
+    const nextCursor =
+      hasNext && last
+        ? encodePipelineCursor({
+            v: cursorVersion,
+            jobId: input.jobId,
+            stage: input.stage,
+            submittedAt: last.submittedAt,
+            id: last.applicationId,
+          })
+        : null;
+    const parsed = pipelineStagePageSchema.omit({ stage: true, observedAt: true }).parse({
+      items: items.map((item) => ({ ...item, allowedDestinations: [] })),
+      nextCursor,
+    });
+    return {
+      items: parsed.items.map((card) => {
+        const { allowedDestinations, ...item } = card;
+        void allowedDestinations;
+        return item;
+      }),
+      nextCursor: parsed.nextCursor,
+    };
+  }
 
   async listSubmittedCandidates(input: {
     jobId: string;

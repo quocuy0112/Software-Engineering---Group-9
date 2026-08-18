@@ -7,6 +7,7 @@ import type {
   RejectionReasonCode,
 } from "@/shared/contracts/scoring";
 import { RankingModalFrame } from "./ranking-modal-frame";
+import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 
 const reasons: Array<[RejectionReasonCode, string]> = [
   [
@@ -29,13 +30,16 @@ function stageLabel(value: string) {
 
 export function RejectCandidateModal({
   candidate,
+  jobId,
   onCancel,
   onCompleted,
 }: {
   candidate: RankedApplicationRow;
+  jobId?: string;
   onCancel: () => void;
   onCompleted: () => void;
 }) {
+  const csrfProof = useCsrfProof();
   const [reasonCode, setReasonCode] = useState<RejectionReasonCode | "">("");
   const [internalNote, setInternalNote] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -46,18 +50,18 @@ export function RejectCandidateModal({
     setError(null);
     try {
       const response = await fetch(
-        "/api/recruiter/applications/" +
-          encodeURIComponent(candidate.applicationId) +
-          "/decisions/reject",
+        jobId ? "/api/recruiter/jobs/" + encodeURIComponent(jobId) + "/applications/" + encodeURIComponent(candidate.applicationId) + "/stage" : "/api/recruiter/applications/" + encodeURIComponent(candidate.applicationId) + "/decisions/reject",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "Idempotency-Key":
               globalThis.crypto?.randomUUID?.() ?? "reject-" + Date.now(),
+            "x-csrf-token": csrfProof,
           },
           body: JSON.stringify({
             confirmed: true,
+            targetStage: "REJECTED",
             expectedStageVersion: candidate.stageVersion,
             reasonCode,
             ...(internalNote.trim()

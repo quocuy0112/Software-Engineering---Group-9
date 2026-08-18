@@ -3,6 +3,7 @@ import { defineConfig, devices } from "@playwright/test";
 const reuseExistingServer = process.env.PLAYWRIGHT_REUSE_SERVER === "1";
 const appOnlyServer = process.env.PLAYWRIGHT_APP_ONLY === "1";
 const productionServer = process.env.PLAYWRIGHT_PRODUCTION === "1";
+const nextOnlyServer = process.env.PLAYWRIGHT_NEXT_ONLY === "1";
 
 export default defineConfig({
   testDir: "./tests/system/e2e",
@@ -10,7 +11,9 @@ export default defineConfig({
   // serialize them to keep browser evidence deterministic.
   workers: 1,
   webServer: {
-    command: appOnlyServer
+    command: nextOnlyServer
+      ? "next start --port 3001"
+      : appOnlyServer
       ? productionServer
         ? "npm run start"
         : "npm run dev"
