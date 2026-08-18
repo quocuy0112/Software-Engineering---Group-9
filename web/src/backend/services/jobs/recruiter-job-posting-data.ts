@@ -180,7 +180,12 @@ function normalizeJob(value: unknown): JobCatalogItem {
       : value;
 
   if (candidate && typeof candidate === "object") {
-    delete (candidate as Record<string, unknown>).company;
+    const candidateRecord = candidate as Record<string, unknown>;
+    // These fields are added to the recruiter-facing projection and are not
+    // part of the catalog record sent through the strict job schema.
+    delete candidateRecord.company;
+    delete candidateRecord.review;
+    delete candidateRecord.correctionRequest;
   }
 
   const source = sourceJobSchema.parse(candidate);
