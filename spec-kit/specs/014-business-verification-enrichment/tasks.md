@@ -33,7 +33,7 @@
 - [X] T004 Add normalizers and strict Candidate preparation/submission schemas in `web/src/shared/contracts/employer-verification/business-verification.ts`
 - [X] T005 [P] Add response/error/admin projection types matching OpenAPI in `web/src/shared/contracts/employer-verification/business-verification-responses.ts`
 - [X] T006 Add Feature 014 enums, preparation, snapshot, challenge, facts, and outbox relations in `web/prisma/schema.prisma`
-- [X] T007 Create the additive migration and reuse the active-request partial unique index in `web/prisma/migrations/029_business_verification_enrichment/migration.sql`
+- [X] T007 Create the additive migration and reuse the active-request partial unique index in `web/prisma/migrations/030_business_verification_enrichment/migration.sql`
 - [X] T008 [P] Add legacy-duplicate and migration-shape verifier in `web/scripts/verify-business-verification-enrichment-migration.mjs`
 - [X] T009 Regenerate Prisma client outputs in `web/src/backend/generated/prisma/`
 - [X] T010 Define preparation repository ports and transactional inputs in `web/src/backend/admin/verification/employer-verification-preparation-repository.ts`

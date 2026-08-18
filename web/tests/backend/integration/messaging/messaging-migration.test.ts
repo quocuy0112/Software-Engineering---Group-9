@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 describe("Feature 008 migration", () => {
   const migration = readFileSync(
-    "prisma/migrations/022_realtime_messaging/migration.sql",
+    "prisma/migrations/023_realtime_messaging/migration.sql",
     "utf8",
   );
   const schema = readFileSync("prisma/schema.prisma", "utf8");

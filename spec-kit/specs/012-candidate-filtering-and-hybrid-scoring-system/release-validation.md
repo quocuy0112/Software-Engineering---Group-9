@@ -12,7 +12,7 @@ The Group 1 submission/document flow remains the canonical application and docum
 | `npm run lint --workspace @smarthire/web` | Pass |
 | `npm run test:applications --workspace @smarthire/web` | Pass: 6 files, 10 tests |
 | `npm run applications:contracts --workspace @smarthire/web` | Pass |
-| `npm run db:migrations:check --workspace @smarthire/web` | Pass: 36 migrations, `001_identity_foundation` through `035_candidate_hybrid_ranking` |
+| `npm run db:migrations:check --workspace @smarthire/web` | Pass: 37 migrations, `001_identity_foundation` through `037_candidate_hybrid_ranking` |
 | `npm run applications:migration:verify --workspace @smarthire/web` | Safe skip: `DATABASE_URL_NOT_CONFIGURED` |
 | `npm run perf:applications --workspace @smarthire/web` | Pass: synthetic 10,000-row harness, 20 samples, no external services, 0% errors |
 | `npm run build --workspace @smarthire/web` | Pass with deterministic local build configuration |

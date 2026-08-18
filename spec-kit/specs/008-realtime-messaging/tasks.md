@@ -49,7 +49,7 @@ block every user story.
 **CRITICAL**: No user story implementation begins until this phase passes.
 
 - [X] T005 Add the minimal Feature 007-owned `ProfessionalConnection` canonical pair plus `ACCEPTED` state, `MessagingConversationContextType`, `MessagingReportTargetType`, `MessagingConversation`, `MessagingConversationParticipant`, `MessagingMessage`, `UserMessagingBlock`, `MessagingReport`, and required existing-model relations/constraints to `web/prisma/schema.prisma`
-- [X] T006 Create safe forward/recovery SQL, uniqueness/check constraints, foreign keys, and indexes for Feature 008 in `web/prisma/migrations/022_realtime_messaging/migration.sql`
+- [X] T006 Create safe forward/recovery SQL, uniqueness/check constraints, foreign keys, and indexes for Feature 008 in `web/prisma/migrations/023_realtime_messaging/migration.sql`
 - [X] T007 Regenerate the Prisma client after T005-T006 and verify migration sequencing in `web/src/backend/generated/prisma/` and `web/tests/backend/integration/messaging/messaging-migration.test.ts`
 - [X] T008 [P] Define strict Zod schemas and safe projections for eligible participants, conversations, messages, cursors, read boundaries, blocks, reports, and errors in `web/src/shared/contracts/messaging/common.ts`, `web/src/shared/contracts/messaging/conversations.ts`, and `web/src/shared/contracts/messaging/messages.ts`
 - [X] T009 [P] Define typed `/chat` client/server event maps and acknowledgement unions matching `contracts/socket-events.md` in `web/src/shared/contracts/messaging/socket-events.ts`

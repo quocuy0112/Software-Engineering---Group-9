@@ -239,7 +239,7 @@
 
 ### Implementation
 
-- [x] T091 [US7] Add administrator notification kinds to `web/src/shared/contracts/notifications/index.ts`, `web/prisma/schema.prisma`, and additive migration `web/prisma/migrations/035_actionable_admin_notifications/migration.sql`, then regenerate Prisma output
+- [x] T091 [US7] Add administrator notification kinds to `web/src/shared/contracts/notifications/index.ts`, `web/prisma/schema.prisma`, and additive migration `web/prisma/migrations/036_actionable_admin_notifications/migration.sql`, then regenerate Prisma output
 - [x] T092 [US7] Add transaction-compatible active/assigned administrator recipient resolution and safe fan-out in `web/src/backend/notifications/notification-recipient-policy.ts` and `web/src/backend/notifications/admin-notification-fanout.ts`
 - [x] T093 [US7] Add support created/requester-replied/reopened administrator notifications in `web/src/backend/repositories/support/prisma-support-repository.ts`
 - [x] T094 [US7] Add new messaging/general moderation report administrator notifications in `web/src/backend/repositories/messaging/prisma-messaging-report-repository.ts` and `web/src/backend/admin/moderation/moderation-submission-service.ts`
