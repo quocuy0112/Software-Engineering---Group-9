@@ -35,6 +35,9 @@ web/.private-admin-evidence/
 mail-output/
 email-preview/
 
+# Local job data (companies, jobs, user state, and applications)
+web/data/jobs/
+
 # Prisma local artifacts
 **/prisma/*.db
 **/prisma/*.db-journal
