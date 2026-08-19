@@ -484,6 +484,7 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
             },
             include: {
               company: { select: { id: true, displayName: true } },
+              reviewAggregate: { select: { jobId: true } },
               skills: {
                 where: { required: true },
                 orderBy: { position: "asc" },
@@ -818,7 +819,13 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
               occurredAt: input.occurredAt,
               contextType: "APPLICATION",
               contextId: created.id,
-              variables: { recipientRole: "RECRUITER", jobId: input.jobId },
+              variables: {
+                recipientRole: "RECRUITER",
+                // Candidate applications use the public JobPosting ID. The
+                // recruiter workspace uses the catalogue/review job ID, so
+                // persist the latter when this posting has a review mapping.
+                jobId: job.reviewAggregate?.jobId ?? input.jobId,
+              },
             });
           }
           if (input.directCv) {
