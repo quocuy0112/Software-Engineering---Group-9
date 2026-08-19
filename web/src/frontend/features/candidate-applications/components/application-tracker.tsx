@@ -24,6 +24,7 @@ import {
   Undo2,
   XCircle,
 } from "lucide-react";
+import { Modal } from "@/frontend/components/ui/modal";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { NOTIFICATION_CHANGED_EVENT } from "@/frontend/features/notifications/client/use-notification-context-read";
 import {
@@ -195,6 +196,9 @@ export function ApplicationTracker({
 }) {
   const [tracker, setTracker] = useState(initialTracker);
   const [pending, setPending] = useState<string | null>(null);
+  const [offerDecision, setOfferDecision] = useState<
+    "ACCEPT" | "DECLINE" | null
+  >(null);
   const [error, setError] = useState<string | null>(null);
   const applicationId = tracker.applicationId;
 
@@ -379,7 +383,9 @@ export function ApplicationTracker({
         );
       }
       await poll();
+      setOfferDecision(null);
     } catch (caught) {
+      setOfferDecision(null);
       setError(
         caught instanceof Error
           ? caught.message
@@ -390,6 +396,11 @@ export function ApplicationTracker({
     }
   }
 
+  function requestOfferResponse(decision: "ACCEPT" | "DECLINE") {
+    if (tracker.canonicalStage !== "OFFERED" || pending) return;
+    setError(null);
+    setOfferDecision(decision);
+  }
   const isBranchOutcome =
     tracker.canonicalStage === "REJECTED" ||
     tracker.canonicalStage === "WAITLISTED";
@@ -569,7 +580,8 @@ export function ApplicationTracker({
               type="button"
               className="application-ui-button application-ui-button--primary"
               disabled={pending !== null}
-              onClick={() => void respondToOffer("ACCEPT")}
+              aria-haspopup="dialog"
+              onClick={() => requestOfferResponse("ACCEPT")}
             >
               <Handshake aria-hidden="true" />
               {pending === "accept-offer" ? "Accepting…" : "Accept offer"}
@@ -578,7 +590,8 @@ export function ApplicationTracker({
               type="button"
               className="application-ui-button application-ui-button--secondary"
               disabled={pending !== null}
-              onClick={() => void respondToOffer("DECLINE")}
+              aria-haspopup="dialog"
+              onClick={() => requestOfferResponse("DECLINE")}
             >
               <CircleSlash aria-hidden="true" />
               {pending === "decline-offer" ? "Declining…" : "Decline offer"}
@@ -587,6 +600,55 @@ export function ApplicationTracker({
         </section>
       ) : null}
 
+      <Modal
+        open={offerDecision !== null}
+        title={
+          offerDecision === "ACCEPT"
+            ? "Accept this offer?"
+            : "Decline this offer?"
+        }
+        description={
+          offerDecision === "ACCEPT"
+            ? "This will mark your application as hired. Please confirm that you want to accept the offer."
+            : "This will close your application as offer declined. Please confirm that you want to decline the offer."
+        }
+        tone={offerDecision === "DECLINE" ? "destructive" : "standard"}
+        icon={
+          offerDecision === "ACCEPT" ? (
+            <Handshake aria-hidden="true" />
+          ) : (
+            <CircleSlash aria-hidden="true" />
+          )
+        }
+        busy={pending !== null}
+        onClose={() => setOfferDecision(null)}
+      >
+        <div className="sh-modal-actions">
+          <button
+            type="button"
+            className="application-ui-button application-ui-button--secondary"
+            data-autofocus
+            disabled={pending !== null}
+            onClick={() => setOfferDecision(null)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="application-ui-button application-ui-button--primary"
+            disabled={pending !== null}
+            onClick={() => {
+              if (offerDecision) void respondToOffer(offerDecision);
+            }}
+          >
+            {pending !== null
+              ? "Confirming…"
+              : offerDecision === "ACCEPT"
+                ? "Confirm acceptance"
+                : "Confirm decline"}
+          </button>
+        </div>
+      </Modal>
       <div className="application-ui__columns">
         <div className="application-ui__main">
           <section

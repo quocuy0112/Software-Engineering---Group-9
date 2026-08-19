@@ -18,6 +18,20 @@ function row(index: number, stage = "APPLIED") {
   };
 }
 
+function scoredRow(index: number, stage = "VIEWED") {
+  return {
+    ...row(index, stage),
+    scoringStatus: "COMPLETED",
+    currentScoringResult: {
+      state: "SCORED",
+      finalScore: 82,
+      aiScore: 78,
+      mediumThreshold: 60,
+      highThreshold: 80,
+    },
+  };
+}
+
 describe("pipeline repository", () => {
   it("returns authoritative counts for all nine stages", async () => {
     const db = {
@@ -41,6 +55,29 @@ describe("pipeline repository", () => {
     await expect(repository.listPipelineStage({ jobId: "job-2", stage: "APPLIED", limit: 2, cursor: first.nextCursor! })).rejects.toThrow("INVALID_CURSOR");
     await expect(repository.listPipelineStage({ jobId: "job-1", stage: "VIEWED", limit: 2, cursor: first.nextCursor! })).rejects.toThrow("INVALID_CURSOR");
     expect(db.jobApplication.findMany).toHaveBeenCalledWith(expect.objectContaining({ orderBy: [{ submittedAt: "desc" }, { id: "desc" }], take: 3 }));
+  });
+
+  it("projects scored cards without leaking score-label fields outside the pipeline contract", async () => {
+    const db = {
+      jobApplication: {
+        findMany: vi.fn().mockResolvedValue([scoredRow(1)]),
+      },
+    };
+    const repository = new PrismaApplicationRepository(db as never);
+
+    const page = await repository.listPipelineStage({
+      jobId: "job-1",
+      stage: "VIEWED",
+      limit: 25,
+    });
+
+    expect(page.items[0]?.score).toMatchObject({
+      state: "SCORED",
+      final: 82,
+      aiScore: 78,
+      aiScoreBand: { code: "MEDIUM_MATCH", label: "Review needed" },
+    });
+    expect(page.items[0]?.score?.aiScoreBand).not.toHaveProperty("iconLabel");
   });
 
   it("keeps pages bounded and supports complete 10,000-card traversal without duplicates", async () => {

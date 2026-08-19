@@ -11,5 +11,14 @@ describe("pipeline recovery", () => {
     expect(hook).toContain("stageTransitionOutcomeSchema");
     expect(hook).toContain("await load()");
     expect(hook).toContain("[401, 403, 404, 409]");
+    expect(hook).toContain("pipelineRefreshIntervalMs");
+    expect(hook).toContain("visibilitychange");
+    expect(hook).toContain("pipelineMetadataChanged");
+    expect(hook).toContain("preserve: true");
+
+    const rankingHook = readFileSync("src/frontend/features/recruiter-applications/use-ranked-candidates.ts", "utf8");
+    expect(rankingHook).toContain("RANKED_REFRESH_INTERVAL_MS");
+    expect(rankingHook).toContain("requestInFlight");
+    expect(rankingHook).toContain("visibilitychange");
   });
 });

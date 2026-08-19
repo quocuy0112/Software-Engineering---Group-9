@@ -6,6 +6,7 @@ import { prisma } from "@/backend/database/prisma";
 import { configuredJsonJobCatalogueRepository } from "@/backend/repositories/jobs/job-catalogue-repository-factory";
 import { adoptActiveJobBaseline } from "@/backend/jobs/review/job-post-active-baseline-service";
 import { closeManagedJobPost } from "@/backend/jobs/review/job-post-review-service";
+import { applyRecruiterCapacityIncrease } from "@/backend/services/jobs/recruiter-capacity-service";
 import {
   companyCatalogSchema,
   recruiterCompanySettingsInputSchema,
@@ -710,6 +711,14 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
       },
     });
     await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
+    if (company.databaseBacked && company.databaseId) {
+      await applyRecruiterCapacityIncrease({
+        jobId: updated.id,
+        companyId: company.databaseId,
+        newCapacity: updated.numberOfHires,
+        actorUserId: userId,
+      });
+    }
     return { ...updated, company } satisfies RecruiterJob;
   });
 }

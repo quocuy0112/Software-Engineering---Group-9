@@ -349,7 +349,7 @@ export const offerResponseOutcomeSchema = z
   .object({
     applicationId: idSchema,
     fromStage: z.literal("OFFERED"),
-    stage: z.enum(["HIRED", "OFFER_DECLINED"]),
+    stage: z.enum(["HIRED", "OFFER_DECLINED", "WAITLISTED"]),
     stageVersion: z.number().int().positive(),
     lastStageChangedAt: isoDateTime,
     eventId: idSchema,

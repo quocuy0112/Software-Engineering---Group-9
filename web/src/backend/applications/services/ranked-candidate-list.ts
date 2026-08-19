@@ -15,6 +15,11 @@ import {
   normalizedRankingFilterHash,
   PrismaRankingSnapshotRepository,
 } from "@/backend/scoring/pagination/ranking-snapshot-repository";
+import {
+  automaticScoreConfigForPublishedResult,
+  getAutomaticScoreStageRuleConfig,
+  type AutomaticScoreStageRuleConfig,
+} from "@/backend/applications/services/automatic-score-stage-config";
 
 type RankingFilters = Readonly<{
   limit: number;
@@ -108,17 +113,23 @@ function snapshotStateFor(
   };
 }
 
-function scoreBand(value: number | null) {
+function scoreBand(
+  value: number | null,
+  config: AutomaticScoreStageRuleConfig = getAutomaticScoreStageRuleConfig(),
+) {
   if (value === null) return null;
-  if (value >= 80)
+  if (value >= config.strongScoreThreshold)
     return { code: "HIGH_MATCH", label: "Strong match", iconLabel: "✓" };
-  if (value >= 60)
+  if (value >= config.lowScoreThreshold)
     return { code: "MEDIUM_MATCH", label: "Review needed", iconLabel: "!" };
   return { code: "LOW_MATCH", label: "Low match", iconLabel: "✕" };
 }
 
-function cleanScoreBand(value: number | null) {
-  const band = scoreBand(value);
+function cleanScoreBand(
+  value: number | null,
+  config: AutomaticScoreStageRuleConfig = getAutomaticScoreStageRuleConfig(),
+) {
+  const band = scoreBand(value, config);
   return band
     ? {
         ...band,
@@ -253,6 +264,8 @@ export class RankedCandidateListService {
             automaticScore: true,
             aiScore: true,
             finalScore: true,
+            mediumThreshold: true,
+            highThreshold: true,
             automaticMatch: {
               select: {
                 detectedExperienceYears: true,
@@ -296,11 +309,20 @@ export class RankedCandidateListService {
       .filter((row) => row.candidate.user.emailVerified)
       .map((row): RankedApplicationRow => {
         const state = stateFor(row);
+        const scoreConfig = automaticScoreConfigForPublishedResult({
+          mediumThreshold: row.currentScoringResult?.mediumThreshold,
+          highThreshold: row.currentScoringResult?.highThreshold,
+        });
         const score =
           row.currentScoringResult?.finalScore === null ||
           !row.currentScoringResult
             ? null
             : Number(row.currentScoringResult.finalScore);
+        const aiScore =
+          row.currentScoringResult?.aiScore === null ||
+          !row.currentScoringResult
+            ? null
+            : Number(row.currentScoringResult.aiScore);
         const priority = row.manualPriorities[0];
         return {
           applicationId: row.id,
@@ -331,13 +353,10 @@ export class RankedCandidateListService {
             automatic: row.currentScoringResult
               ? Number(row.currentScoringResult.automaticScore)
               : null,
-            ai:
-              row.currentScoringResult?.aiScore === null ||
-              !row.currentScoringResult
-                ? null
-                : Number(row.currentScoringResult.aiScore),
+            ai: aiScore,
             final: score,
-            band: cleanScoreBand(score),
+            band: cleanScoreBand(score, scoreConfig),
+            aiBand: cleanScoreBand(aiScore, scoreConfig),
           },
           manuallyPrioritized: Boolean(priority),
           manualPriority: priority
@@ -503,7 +522,10 @@ export class RankedCandidateListService {
           scoreSummary: {
             ...current.scoreSummary,
             final: snapshotRow.finalScore,
-            band: cleanScoreBand(snapshotRow.finalScore),
+            band: cleanScoreBand(
+              snapshotRow.finalScore,
+              getAutomaticScoreStageRuleConfig(),
+            ),
           },
           scoring: snapshotStateFor(
             snapshotRow.scoreState,

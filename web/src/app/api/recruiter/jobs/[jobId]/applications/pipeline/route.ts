@@ -10,7 +10,8 @@ export async function GET(request: Request, context: { params: Promise<{ jobId: 
   try {
     const result = await new RecruitmentPipelineBoardService().metadata({ userId: current.userId, jobId: (await context.params).jobId });
     return NextResponse.json(result, { headers });
-  } catch {
+  } catch (error) {
+    console.error("[recruitment-pipeline] metadata request failed", error);
     return NextResponse.json({ code: "APPLICATION_UNAVAILABLE", message: "The recruitment pipeline is unavailable." }, { status: 404, headers });
   }
 }

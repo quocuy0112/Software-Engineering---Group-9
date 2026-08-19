@@ -8,7 +8,9 @@ import type {
 
 export type PipelineStageCounts = Record<ApplicationStage, number>;
 export type PipelineStageRepositoryPage = Readonly<{
-  items: ReadonlyArray<Omit<PipelineApplicationCard, "allowedDestinations">>;
+  items: ReadonlyArray<
+    Omit<PipelineApplicationCard, "allowedDestinations" | "dragDestinations">
+  >;
   nextCursor: string | null;
 }>;
 
@@ -31,6 +33,7 @@ export type ApplicationDocumentRecord = Readonly<{
 
 export type RecruitmentPipelineRepositoryPort = Readonly<{
   countPipelineStages(jobId: string): Promise<PipelineStageCounts>;
+  latestUpdatedAt?(jobId: string): Promise<Date | null>;
   listPipelineStage(input: {
     jobId: string;
     stage: ApplicationStage;

@@ -25,9 +25,24 @@ export async function PATCH(request: Request, context: { params: Promise<{ jobId
     }
     const command = await parseBoundedJson(request, stageTransitionCommandSchema, 8 * 1024);
     const stageService = new ApplicationStageService();
-    const result = await stageService.transition(actor, params.applicationId, command, new Date(), {
+    const result = await stageService.attemptStageTransition({
+      candidateApplicationId: params.applicationId,
+      targetStage: command.targetStage,
+      actor: {
+        kind: "recruiter_manual",
+        userId: actor.userId,
+        sessionId: actor.sessionId,
+      },
       requestedJobId: params.jobId,
+      expectedStageVersion: command.expectedStageVersion,
+      // Button actions retain the legacy default. Drag-and-drop sends an
+      // explicit drag intent so the stricter drag policy is enforced.
+      intent: command.intent ?? "button",
       idempotencyKey: idempotency.data,
+      confirmed: command.confirmed,
+      reasonCode: command.reasonCode,
+      candidateVisibleReason: command.candidateVisibleReason,
+      internalNote: command.internalNote,
       source: "KANBAN",
     });
     return accountJson(stageTransitionOutcomeSchema.parse(result));

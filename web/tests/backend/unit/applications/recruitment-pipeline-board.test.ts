@@ -10,11 +10,16 @@ function authorization(role: "OWNER" | "RECRUITER") {
 
 describe("RecruitmentPipelineBoardService", () => {
   it("returns nine zero-preserving counts and role capabilities", async () => {
-    const repository = { countPipelineStages: vi.fn().mockResolvedValue(Object.fromEntries(stages.map((stage) => [stage, stage === "APPLIED" ? 2 : 0]))) };
+    const revisionAt = new Date("2026-01-01T00:01:00Z");
+    const repository = {
+      countPipelineStages: vi.fn().mockResolvedValue(Object.fromEntries(stages.map((stage) => [stage, stage === "APPLIED" ? 2 : 0]))),
+      latestUpdatedAt: vi.fn().mockResolvedValue(revisionAt),
+    };
     const service = new RecruitmentPipelineBoardService(repository as never, { authorizeJob: vi.fn().mockResolvedValue(authorization("OWNER")) } as never);
     const result = await service.metadata({ userId: "user-1", jobId: "catalogue-1", now: new Date("2026-01-01T00:00:00Z") });
     expect(result.stages).toHaveLength(9);
     expect(result.permissions).toMatchObject({ role: "OWNER", canMoveStages: true });
+    expect(result.revisionAt).toBe(revisionAt.toISOString());
     expect(repository.countPipelineStages).toHaveBeenCalledWith("job-1");
   });
 
@@ -25,5 +30,15 @@ describe("RecruitmentPipelineBoardService", () => {
     expect(result.items[0].score).toBeNull();
     expect(result.items[0].allowedDestinations).toContain("VIEWED");
     expect(result.items[0].allowedDestinations).not.toContain("HIRED");
+  });
+
+  it("does not expose controls for a hired application even if stale data includes destinations", async () => {
+    const repository = { listPipelineStage: vi.fn().mockResolvedValue({ items: [{ applicationId: "app-hired", candidate: { displayName: "Ada", avatarUrl: null }, submittedAt: "2026-01-01T00:00:00.000Z", stage: "HIRED", stageVersion: 2, documents: { cvAvailable: true, coverLetterAvailable: false }, score: null, allowedDestinations: ["REJECTED", "WAITLISTED"], dragDestinations: ["REJECTED", "WAITLISTED"] }], nextCursor: null }) };
+    const service = new RecruitmentPipelineBoardService(repository as never, { authorizeJob: vi.fn().mockResolvedValue(authorization("RECRUITER")) } as never);
+
+    const result = await service.stagePage({ userId: "user-1", jobId: "catalogue-1", stage: "HIRED", limit: 25, now: new Date("2026-01-01T00:00:00Z") });
+
+    expect(result.items[0].allowedDestinations).toEqual([]);
+    expect(result.items[0].dragDestinations).toEqual([]);
   });
 });

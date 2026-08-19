@@ -1,0 +1,112 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { BriefcaseBusiness, ChevronDown, Inbox } from "lucide-react";
+import type { RecruiterJob } from "@/shared/contracts/recruiter-job-posting";
+import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
+import { RecruitmentPipelineBoard } from "./recruitment-pipeline-board";
+
+function mostRecentlyActiveJob(jobs: readonly RecruiterJob[]) {
+  return (
+    jobs
+      .filter((job) => job.status === "active")
+      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))[0]
+      ?.id ?? null
+  );
+}
+
+export function RecruiterPipelinePage({
+  jobs,
+  initialJobId,
+}: {
+  jobs: RecruiterJob[];
+  initialJobId?: string;
+}) {
+  const managedJobs = useMemo(
+    () => jobs.filter((job) => job.status === "active" || job.status === "closed"),
+    [jobs],
+  );
+  const requestedJob = initialJobId
+    ? managedJobs.find((job) => job.id === initialJobId)?.id
+    : undefined;
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(
+    requestedJob ?? mostRecentlyActiveJob(managedJobs),
+  );
+  const selectedJob = managedJobs.find((job) => job.id === selectedJobId) ?? null;
+
+  const selectJob = (jobId: string) => {
+    const next = managedJobs.find((job) => job.id === jobId);
+    if (!next) {
+      setSelectedJobId(null);
+      return;
+    }
+    setSelectedJobId(next.id);
+    window.history.replaceState(
+      null,
+      "",
+      recruiterRoutes.pipelineForJob(next.id),
+    );
+  };
+
+  return (
+    <section className="recruiter-management recruiter-pipeline-page" aria-labelledby="recruiter-pipeline-title">
+      <header className="pipeline-page-heading">
+        <div>
+          <p className="recruiter-eyebrow">Recruiter workspace</p>
+          <h1 id="recruiter-pipeline-title">Pipeline</h1>
+          <p>Track every candidate from application through outcome.</p>
+        </div>
+        <Link href={recruiterRoutes.jobPostings} className="pipeline-page-back-link">
+          <BriefcaseBusiness aria-hidden="true" /> Job postings
+        </Link>
+      </header>
+
+      <div className="pipeline-job-selector recruiter-surface-card">
+        <label htmlFor="pipeline-job-select">
+          <span>Job posting</span>
+          <small>Select one managed job to view its candidate pipeline.</small>
+        </label>
+        <div className="pipeline-job-selector__control">
+          <select
+            id="pipeline-job-select"
+            value={selectedJobId ?? ""}
+            onChange={(event) => selectJob(event.target.value)}
+            aria-describedby="pipeline-job-select-help"
+          >
+            <option value="">Choose a job posting</option>
+            {managedJobs.map((job) => (
+              <option value={job.id} key={job.id}>
+                {job.title || "Untitled job posting"} · {job.status === "active" ? "Active" : "Closed"}
+              </option>
+            ))}
+          </select>
+          <ChevronDown aria-hidden="true" />
+        </div>
+        <span id="pipeline-job-select-help" className="sr-only">
+          {selectedJob ? `Showing the pipeline for ${selectedJob.title}.` : "Select a job to load its pipeline."}
+        </span>
+      </div>
+
+      {!managedJobs.length ? (
+        <div className="pipeline-page-empty recruiter-surface-card" role="status">
+          <Inbox aria-hidden="true" />
+          <div>
+            <h2>No job postings available</h2>
+            <p>Create or publish a job posting before opening its pipeline.</p>
+          </div>
+        </div>
+      ) : !selectedJob ? (
+        <div className="pipeline-page-empty recruiter-surface-card" role="status">
+          <Inbox aria-hidden="true" />
+          <div>
+            <h2>Select a job posting</h2>
+            <p>Choose a job above to see its candidates grouped by stage.</p>
+          </div>
+        </div>
+      ) : (
+        <RecruitmentPipelineBoard key={selectedJob.id} jobId={selectedJob.id} />
+      )}
+    </section>
+  );
+}

@@ -4,6 +4,7 @@ import { prisma } from "@/backend/database/prisma";
 import { RecruiterApplicationAuthorization } from "@/backend/applications/authorization/recruiter-application-authorization";
 import { ApplicationStageService } from "@/backend/services/jobs/application-stage-service";
 import { JobServiceError } from "@/backend/services/jobs/job-types";
+import { applyAutomaticScoreStageRuleForApplication } from "./automatic-viewed-stage-rules";
 import {
   applicationStageSchema,
   applicationViewedOutcomeSchema,
@@ -73,15 +74,51 @@ export class MarkApplicationViewedService {
     }
 
     try {
-      const transitioned = await this.stageService.transition(
-        { userId: input.userId, sessionId: input.sessionId },
-        current.id,
-        {
-          targetStage: "VIEWED",
-          expectedVersion: current.stageVersion,
-        },
-        input.now,
-      );
+      const authority = this.stageService as unknown as {
+        attemptStageTransition?: ApplicationStageService["attemptStageTransition"];
+        transition: ApplicationStageService["transition"];
+      };
+      if (typeof authority.attemptStageTransition === "function") {
+        const automatic = await applyAutomaticScoreStageRuleForApplication({
+          candidateApplicationId: current.id,
+          db: this.db,
+          stageService: this.stageService,
+          now: input.now,
+        });
+        if (automatic?.stage === "REJECTED") {
+          return applicationViewedOutcomeSchema.parse({
+            applicationId: automatic.applicationId,
+            stage: automatic.stage,
+            stageVersion: automatic.stageVersion,
+            lastStageChangedAt: automatic.lastStageChangedAt,
+            changed: false,
+          });
+        }
+      }
+      const transitioned =
+        typeof authority.attemptStageTransition === "function"
+          ? await authority.attemptStageTransition({
+              candidateApplicationId: current.id,
+              targetStage: "VIEWED",
+              actor: {
+                kind: "recruiter_manual",
+                userId: input.userId,
+                sessionId: input.sessionId,
+              },
+              requestedJobId: current.jobPostingId,
+              expectedStageVersion: current.stageVersion,
+              source: "STAGE_ROUTE",
+              now: input.now,
+            })
+          : await authority.transition(
+              { userId: input.userId, sessionId: input.sessionId },
+              current.id,
+              {
+                targetStage: "VIEWED",
+                expectedVersion: current.stageVersion,
+              },
+              input.now,
+            );
       return applicationViewedOutcomeSchema.parse({
         applicationId: transitioned.applicationId,
         stage: transitioned.stage,

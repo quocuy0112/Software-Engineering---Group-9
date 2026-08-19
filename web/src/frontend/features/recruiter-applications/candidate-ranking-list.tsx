@@ -381,12 +381,14 @@ export function CandidateRankingList({
   onBack,
   backHref,
   csrfProof,
+  pipelineHref,
 }: {
   jobId: string;
   jobTitle: string;
   onBack?: () => void;
   backHref?: string;
   csrfProof?: string;
+  pipelineHref?: string;
 }) {
   const contextCsrfProof = useCsrfProof();
   const effectiveCsrfProof = csrfProof ?? contextCsrfProof;
@@ -555,6 +557,14 @@ export function CandidateRankingList({
           </p>
         </div>
         <div className="ranking-header-actions">
+          {pipelineHref ? (
+            <Link
+              href={pipelineHref}
+              className="ai-ranking-button ai-ranking-button--secondary"
+            >
+              View pipeline
+            </Link>
+          ) : null}
           <button
             type="button"
             className="ai-ranking-button ai-ranking-button--secondary"

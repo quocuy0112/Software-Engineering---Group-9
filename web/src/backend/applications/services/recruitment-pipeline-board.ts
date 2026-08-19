@@ -11,7 +11,12 @@ import {
   type PipelineBoardMetadata,
   type PipelineStagePage,
 } from "@/shared/contracts/applications";
-import { ordinaryApplicationTransitions } from "@/backend/services/jobs/application-stage-policy";
+import {
+  isTerminalApplicationStage,
+  recruiterPipelineButtonTransitions,
+  recruiterPipelineDragTransitions,
+} from "@/backend/services/jobs/application-stage-policy";
+import { applyAutomaticViewedStageRules } from "./automatic-viewed-stage-rules";
 import { RecruiterApplicationAuthorization } from "../authorization/recruiter-application-authorization";
 
 export class RecruitmentPipelineBoardService {
@@ -30,7 +35,16 @@ export class RecruitmentPipelineBoardService {
 
   async metadata(input: { userId: string; jobId: string; now?: Date }): Promise<PipelineBoardMetadata> {
     const context = await this.context(input.userId, input.jobId);
+    if (this.repository instanceof PrismaApplicationRepository) {
+      await applyAutomaticViewedStageRules({
+        jobPostingId: context.jobPostingId,
+        now: input.now,
+      });
+    }
     const counts = await this.repository.countPipelineStages(context.jobPostingId);
+    const revisionAt = this.repository.latestUpdatedAt
+      ? await this.repository.latestUpdatedAt(context.jobPostingId)
+      : null;
     return pipelineBoardMetadataSchema.parse({
       job: { jobId: context.requestedJobId, title: context.jobTitle, status: context.jobStatus },
       permissions: {
@@ -42,18 +56,30 @@ export class RecruitmentPipelineBoardService {
         canConfirmHired: context.canConfirmHired,
       },
       stages: pipelineApplicationStages.map((stage) => ({ stage, label: pipelineStageLabels[stage], count: counts[stage] })),
+      revisionAt: revisionAt?.toISOString() ?? null,
       observedAt: (input.now ?? new Date()).toISOString(),
     });
   }
 
   async stagePage(input: { userId: string; jobId: string; stage: ApplicationStage; limit: number; cursor?: string; now?: Date }): Promise<PipelineStagePage> {
     const context = await this.context(input.userId, input.jobId);
+    if (this.repository instanceof PrismaApplicationRepository) {
+      await applyAutomaticViewedStageRules({
+        jobPostingId: context.jobPostingId,
+        now: input.now,
+      });
+    }
     const page = await this.repository.listPipelineStage({ jobId: context.jobPostingId, stage: input.stage, limit: input.limit, cursor: input.cursor });
     return pipelineStagePageSchema.parse({
       stage: input.stage,
       items: page.items.map((item) => ({
         ...item,
-        allowedDestinations: context.canMoveStages ? ordinaryApplicationTransitions[item.stage] : [],
+        allowedDestinations: context.canMoveStages && !isTerminalApplicationStage(item.stage)
+          ? [...recruiterPipelineButtonTransitions[item.stage]]
+          : [],
+        dragDestinations: context.canMoveStages && !isTerminalApplicationStage(item.stage)
+          ? [...recruiterPipelineDragTransitions[item.stage]]
+          : [],
       })),
       nextCursor: page.nextCursor,
       observedAt: (input.now ?? new Date()).toISOString(),

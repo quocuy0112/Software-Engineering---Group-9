@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import {
+  isTerminalPipelineStage,
   pipelineApplicationStages,
   pipelineBoardMetadataSchema,
   pipelineStagePageSchema,
@@ -16,7 +17,29 @@ import {
 
 type ColumnState = Readonly<{ page: PipelineStagePage | null; loading: boolean; loadingMore: boolean; error: string | null }>;
 type StageMoveOperation = Readonly<{ card: PipelineApplicationCard; targetStage: ApplicationStage; extras: Omit<StageTransitionCommand, "targetStage" | "expectedStageVersion">; idempotencyKey: string }>;
+type LoadStageOptions = Readonly<{ background?: boolean }>;
+type PipelineLoadOptions = Readonly<{ preserve?: boolean }>;
 const emptyColumn = (): ColumnState => ({ page: null, loading: false, loadingMore: false, error: null });
+const pipelineRefreshIntervalMs = 2_000;
+
+function pipelineMetadataChanged(current: PipelineBoardMetadata, next: PipelineBoardMetadata) {
+  if (
+    current.job.jobId !== next.job.jobId ||
+    current.job.title !== next.job.title ||
+    current.job.status !== next.job.status ||
+    current.permissions.role !== next.permissions.role ||
+    current.permissions.canMoveStages !== next.permissions.canMoveStages ||
+    current.permissions.canReject !== next.permissions.canReject ||
+    current.permissions.canRecordOfferDeclined !== next.permissions.canRecordOfferDeclined ||
+    current.permissions.canConfirmHired !== next.permissions.canConfirmHired ||
+    current.revisionAt !== next.revisionAt
+  ) {
+    return true;
+  }
+
+  const currentCounts = new Map(current.stages.map((stage) => [stage.stage, stage.count]));
+  return next.stages.some((stage) => currentCounts.get(stage.stage) !== stage.count);
+}
 
 class StageMoveRequestError extends Error {
   constructor(
@@ -38,10 +61,14 @@ export function useRecruitmentPipeline(jobId: string) {
   const [canRetryStageMove, setCanRetryStageMove] = useState(false);
   const generation = useRef(0);
   const retryOperation = useRef<StageMoveOperation | null>(null);
+  const metadataRef = useRef<PipelineBoardMetadata | null>(null);
+  const loadingRef = useRef(true);
+  const pipelineRefreshInFlight = useRef(false);
 
-  const loadStage = useCallback(async (stage: ApplicationStage, cursor?: string) => {
+  const loadStage = useCallback(async (stage: ApplicationStage, cursor?: string, options: LoadStageOptions = {}) => {
     const currentGeneration = generation.current;
-    setColumns((current) => ({ ...current, [stage]: { ...(current[stage] ?? emptyColumn()), loading: !cursor, loadingMore: Boolean(cursor), error: null } }));
+    const background = options.background === true;
+    setColumns((current) => ({ ...current, [stage]: { ...(current[stage] ?? emptyColumn()), loading: background ? (current[stage]?.loading ?? false) : !cursor, loadingMore: background ? (current[stage]?.loadingMore ?? false) : Boolean(cursor), error: null } }));
     try {
       const params = new URLSearchParams({ limit: "25" });
       if (cursor) params.set("cursor", cursor);
@@ -62,11 +89,16 @@ export function useRecruitmentPipeline(jobId: string) {
     }
   }, [jobId]);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (options: PipelineLoadOptions = {}) => {
+    const preserve = options.preserve === true;
     const currentGeneration = ++generation.current;
-    setMetadata(null);
-    setColumns({});
-    setLoading(true);
+    loadingRef.current = true;
+    if (!preserve) {
+      metadataRef.current = null;
+      setMetadata(null);
+      setColumns({});
+      setLoading(true);
+    }
     setError(null);
     setCanRetryStageMove(false);
     try {
@@ -75,19 +107,65 @@ export function useRecruitmentPipeline(jobId: string) {
       if (!response.ok) throw new Error(json?.message ?? "The recruitment pipeline is unavailable.");
       const next = pipelineBoardMetadataSchema.parse(json);
       if (generation.current !== currentGeneration) return;
+      metadataRef.current = next;
       setMetadata(next);
-      await Promise.all(pipelineApplicationStages.map((stage) => loadStage(stage)));
+      await Promise.all(pipelineApplicationStages.map((stage) => loadStage(stage, undefined, { background: preserve })));
     } catch (cause) {
       if (generation.current !== currentGeneration) return;
-      setMetadata(null);
-      setColumns({});
-      setError(cause instanceof Error ? cause.message : "The recruitment pipeline is unavailable.");
+      if (!preserve) {
+        metadataRef.current = null;
+        setMetadata(null);
+        setColumns({});
+        setError(cause instanceof Error ? cause.message : "The recruitment pipeline is unavailable.");
+      }
     } finally {
-      if (generation.current === currentGeneration) setLoading(false);
+      if (generation.current === currentGeneration) {
+        loadingRef.current = false;
+        if (!preserve) setLoading(false);
+      }
     }
   }, [jobId, loadStage]);
 
   useEffect(() => { void load(); return () => { generation.current += 1; }; }, [load]);
+
+  const pollMetadata = useCallback(async () => {
+    if (
+      pipelineRefreshInFlight.current ||
+      loadingRef.current ||
+      !metadataRef.current ||
+      (typeof document !== "undefined" && document.visibilityState !== "visible")
+    ) {
+      return;
+    }
+
+    pipelineRefreshInFlight.current = true;
+    try {
+      const response = await fetch(`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/pipeline`, { cache: "no-store" });
+      const json = await response.json().catch(() => null);
+      if (!response.ok) {
+        if ([401, 403, 404].includes(response.status)) await load();
+        return;
+      }
+      const next = pipelineBoardMetadataSchema.parse(json);
+      const current = metadataRef.current;
+      if (current && pipelineMetadataChanged(current, next)) await load({ preserve: true });
+    } catch {
+      // Keep the last usable board during transient polling failures.
+    } finally {
+      pipelineRefreshInFlight.current = false;
+    }
+  }, [jobId, load]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    const refreshWhenVisible = () => { if (document.visibilityState === "visible") void pollMetadata(); };
+    const interval = window.setInterval(refreshWhenVisible, pipelineRefreshIntervalMs);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, [pollMetadata]);
 
   const submitStageMove = useCallback(async (operation: StageMoveOperation, optimistic: boolean) => {
     const { card, targetStage, extras, idempotencyKey } = operation;
@@ -131,10 +209,14 @@ export function useRecruitmentPipeline(jobId: string) {
   }, [csrfProof, jobId, load, loadStage, pendingApplicationId]);
 
   const move = useCallback(async (card: PipelineApplicationCard, targetStage: ApplicationStage, extras: Omit<StageTransitionCommand, "targetStage" | "expectedStageVersion"> = {}) => {
-    if (!card.allowedDestinations.includes(targetStage) || pendingApplicationId) return false;
+    if (isTerminalPipelineStage(card.stage) || !card.allowedDestinations.includes(targetStage) || pendingApplicationId) return false;
     setCanRetryStageMove(false);
     return submitStageMove({ card, targetStage, extras, idempotencyKey: crypto.randomUUID() }, true);
   }, [pendingApplicationId, submitStageMove]);
+
+  const moveDrag = useCallback(async (card: PipelineApplicationCard, targetStage: ApplicationStage, extras: Omit<StageTransitionCommand, "targetStage" | "expectedStageVersion"> = {}) => {
+    return move(card, targetStage, { ...extras, intent: "drag" });
+  }, [move]);
 
   const retryStageMove = useCallback(() => {
     const operation = retryOperation.current;
@@ -153,6 +235,7 @@ export function useRecruitmentPipeline(jobId: string) {
     },
     retry: load,
     move,
+    moveDrag,
     announcement,
     pendingApplicationId,
     canRetryStageMove,

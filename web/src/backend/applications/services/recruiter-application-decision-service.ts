@@ -20,13 +20,16 @@ type DecisionInput = Readonly<{
   now?: Date;
 }>;
 
-type StageServiceDependency = Pick<ApplicationStageService, "transition">;
+type StageServiceDependency = Pick<ApplicationStageService, "transition"> &
+  Partial<Pick<ApplicationStageService, "attemptStageTransition">>;
 type AuthorizationDependency = Pick<
   RecruiterApplicationAuthorization,
   "authorizeApplication"
 >;
 
 type StageServiceOutcome = Awaited<
+  ReturnType<ApplicationStageService["attemptStageTransition"]>
+> | Awaited<
   ReturnType<ApplicationStageService["transition"]>
 >;
 
@@ -116,22 +119,40 @@ export class RecruiterApplicationDecisionService {
   async moveToInterview(input: DecisionInput): Promise<DecisionOutcome> {
     const command = interviewDecisionRequestSchema.parse(input.raw);
     const jobId = await this.canonicalJobId(input.applicationId);
-    const outcome = await this.stageService.transition(
-      { userId: input.userId, sessionId: input.sessionId },
-      input.applicationId,
-      {
-        targetStage: "INTERVIEWING",
-        expectedStageVersion: command.expectedStageVersion,
-        confirmed: command.confirmed,
-        reasonCode: "RECRUITER_CONFIRMED_INTERVIEW",
-      },
-      input.now ?? new Date(),
-      {
-        requestedJobId: jobId,
-        idempotencyKey: input.idempotencyKey,
-        source: "INTERVIEW_ADAPTER",
-      },
-    );
+    const outcome =
+      typeof this.stageService.attemptStageTransition === "function"
+        ? await this.stageService.attemptStageTransition({
+            candidateApplicationId: input.applicationId,
+            targetStage: "INTERVIEWING",
+            actor: {
+              kind: "recruiter_manual",
+              userId: input.userId,
+              sessionId: input.sessionId,
+            },
+            requestedJobId: jobId,
+            expectedStageVersion: command.expectedStageVersion,
+            idempotencyKey: input.idempotencyKey,
+            confirmed: command.confirmed,
+            reasonCode: "RECRUITER_CONFIRMED_INTERVIEW",
+            source: "INTERVIEW_ADAPTER",
+            now: input.now,
+          })
+        : await this.stageService.transition(
+            { userId: input.userId, sessionId: input.sessionId },
+            input.applicationId,
+            {
+              targetStage: "INTERVIEWING",
+              expectedStageVersion: command.expectedStageVersion,
+              confirmed: command.confirmed,
+              reasonCode: "RECRUITER_CONFIRMED_INTERVIEW",
+            },
+            input.now ?? new Date(),
+            {
+              requestedJobId: jobId,
+              idempotencyKey: input.idempotencyKey,
+              source: "INTERVIEW_ADAPTER",
+            },
+          );
     return this.toDecisionOutcome(
       input,
       "INTERVIEWING",
@@ -143,23 +164,42 @@ export class RecruiterApplicationDecisionService {
   async reject(input: DecisionInput): Promise<DecisionOutcome> {
     const command = rejectDecisionRequestSchema.parse(input.raw);
     const jobId = await this.canonicalJobId(input.applicationId);
-    const outcome = await this.stageService.transition(
-      { userId: input.userId, sessionId: input.sessionId },
-      input.applicationId,
-      {
-        targetStage: "REJECTED",
-        expectedStageVersion: command.expectedStageVersion,
-        confirmed: command.confirmed,
-        reasonCode: command.reasonCode,
-        internalNote: command.internalNote,
-      },
-      input.now ?? new Date(),
-      {
-        requestedJobId: jobId,
-        idempotencyKey: input.idempotencyKey,
-        source: "REJECTION_ADAPTER",
-      },
-    );
+    const outcome =
+      typeof this.stageService.attemptStageTransition === "function"
+        ? await this.stageService.attemptStageTransition({
+            candidateApplicationId: input.applicationId,
+            targetStage: "REJECTED",
+            actor: {
+              kind: "recruiter_manual",
+              userId: input.userId,
+              sessionId: input.sessionId,
+            },
+            requestedJobId: jobId,
+            expectedStageVersion: command.expectedStageVersion,
+            idempotencyKey: input.idempotencyKey,
+            confirmed: command.confirmed,
+            reasonCode: command.reasonCode,
+            internalNote: command.internalNote,
+            source: "REJECTION_ADAPTER",
+            now: input.now,
+          })
+        : await this.stageService.transition(
+            { userId: input.userId, sessionId: input.sessionId },
+            input.applicationId,
+            {
+              targetStage: "REJECTED",
+              expectedStageVersion: command.expectedStageVersion,
+              confirmed: command.confirmed,
+              reasonCode: command.reasonCode,
+              internalNote: command.internalNote,
+            },
+            input.now ?? new Date(),
+            {
+              requestedJobId: jobId,
+              idempotencyKey: input.idempotencyKey,
+              source: "REJECTION_ADAPTER",
+            },
+          );
     return this.toDecisionOutcome(
       input,
       "REJECTED",
