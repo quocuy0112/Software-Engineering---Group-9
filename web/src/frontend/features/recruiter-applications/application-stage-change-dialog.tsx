@@ -43,34 +43,37 @@ export function ApplicationStageChangeDialog({
     >,
   ) => void;
 }) {
-  const allowedDestinations = card.allowedDestinations.filter(
-    (stage) => stage !== "HIRED" && stage !== "OFFER_DECLINED",
-  );
+  // The destination list is intentionally taken verbatim from the server
+  // projection. The client does not recreate or narrow transition policy.
+  const allowedDestinations = card.allowedDestinations;
   const [target, setTarget] = useState<ApplicationStage | "">(
-    initialTarget ?? "",
+    initialTarget && allowedDestinations.includes(initialTarget)
+      ? initialTarget
+      : "",
   );
   const [reasonCode, setReasonCode] = useState("");
   const [internalNote, setInternalNote] = useState("");
   const consequential = target ? stageTransitionNeedsDialog(target) : false;
-  const reasonRequired = target === "REJECTED" || target === "OFFER_DECLINED";
+  const rejection = target === "REJECTED";
+  const reasonRequired = rejection || target === "OFFER_DECLINED";
   const valid =
     Boolean(target) && (!reasonRequired || Boolean(reasonCode.trim()));
-  const actionLabel =
-    target === "HIRED"
+  const actionLabel = rejection
+    ? "Confirm rejection"
+    : target === "HIRED"
       ? "Confirm hiring"
-      : target === "REJECTED"
-        ? "Confirm rejection"
-        : target === "OFFER_DECLINED"
-          ? "Confirm offer declined"
-          : target
-            ? "Confirm stage change"
-            : "Change Stage";
+      : target === "OFFER_DECLINED"
+        ? "Confirm offer declined"
+        : target
+          ? "Confirm stage change"
+          : "Change Stage";
+
   return (
     <Modal
       open
       title={`Change Stage for ${card.candidate.displayName}`}
-      description="Choose an authorized destination for this application."
-      tone={target === "REJECTED" ? "destructive" : "standard"}
+      description="Choose one destination returned for this application."
+      tone={rejection ? "destructive" : "standard"}
       onClose={onCancel}
     >
       <div className="pipeline-stage-form">
@@ -82,6 +85,7 @@ export function ApplicationStageChangeDialog({
             onChange={(event) => {
               setTarget(event.target.value as ApplicationStage);
               setReasonCode("");
+              setInternalNote("");
             }}
           >
             <option value="">Choose a stage</option>
@@ -92,7 +96,7 @@ export function ApplicationStageChangeDialog({
             ))}
           </select>
         </label>
-        {target === "REJECTED" ? (
+        {rejection ? (
           <>
             <label>
               Rejection reason

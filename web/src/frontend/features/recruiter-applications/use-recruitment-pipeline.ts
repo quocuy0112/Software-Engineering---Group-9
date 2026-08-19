@@ -215,6 +215,8 @@ export function useRecruitmentPipeline(jobId: string) {
   }, [pendingApplicationId, submitStageMove]);
 
   const moveDrag = useCallback(async (card: PipelineApplicationCard, targetStage: ApplicationStage, extras: Omit<StageTransitionCommand, "targetStage" | "expectedStageVersion"> = {}) => {
+    const dragDestinations = card.dragDestinations ?? [];
+    if (isTerminalPipelineStage(card.stage) || !dragDestinations.includes(targetStage)) return false;
     return move(card, targetStage, { ...extras, intent: "drag" });
   }, [move]);
 
