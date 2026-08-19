@@ -18,6 +18,7 @@ import type {
   ScoringDetail,
   ScoringState,
 } from "@/shared/contracts/scoring";
+import type { PipelineApplicationCard } from "@/shared/contracts/applications";
 import { scoringDetailSchema } from "@/shared/contracts/scoring";
 import { AutomaticMatchTab } from "./automatic-match-tab";
 import { AiAssessmentTab } from "./ai-assessment-tab";
@@ -26,11 +27,13 @@ import { RankingModalFrame } from "./ranking-modal-frame";
 import { ScoreBadgeFromLabel, formatScore } from "./candidate-ranking-ui";
 
 type Tab = "automatic" | "ai" | "documents";
+type CandidateScoreDrawerCandidate = RankedApplicationRow | PipelineApplicationCard;
 
 export function CandidateScoreDrawer({
   jobId,
   jobTitle,
   candidate,
+  readOnly = false,
   onClose,
   onSetPriority,
   onShortlist,
@@ -41,7 +44,8 @@ export function CandidateScoreDrawer({
 }: {
   jobId: string;
   jobTitle: string;
-  candidate: RankedApplicationRow;
+  candidate: CandidateScoreDrawerCandidate;
+  readOnly?: boolean;
   onClose: () => void;
   onSetPriority: () => void;
   onShortlist: () => void | Promise<void>;
@@ -145,6 +149,7 @@ export function CandidateScoreDrawer({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [onClose, retryConfirm, scoreConfirm]);
 
+  const scoreSummary = scoreSummaryForCandidate(candidate);
   const scoring = detail?.scoring ?? rowToScoring(candidate);
   const finalScore = scoring.kind === "SCORED" ? scoring.finalScore : null;
   const automatic =
@@ -160,7 +165,7 @@ export function CandidateScoreDrawer({
           scoring.kind === "PENDING" ||
           scoring.kind === "PROCESSING"
         ? null
-        : candidate.scoreSummary.final;
+        : scoreSummary.final;
   const badge =
     scoring.kind === "SCORED"
       ? (finalScore?.band ?? null)
@@ -168,7 +173,7 @@ export function CandidateScoreDrawer({
           scoring.kind === "PENDING" ||
           scoring.kind === "PROCESSING"
         ? null
-        : candidate.scoreSummary.band;
+        : scoreSummary.band;
   const headerScore =
     scoring.kind === "PENDING"
       ? "Pending"
@@ -187,12 +192,26 @@ export function CandidateScoreDrawer({
   const headerCode =
     badge?.code ??
     (scoring.kind === "UNAVAILABLE" ? "RULE_BASED" : scoring.kind);
+  const aiBand =
+    scoring.kind === "SCORED"
+      ? (scoring.aiAssessment.aiScoreBand ?? null)
+      : (scoreSummary.aiBand ?? null);
   const canScoreCandidate =
     detail?.scoring.kind === "NOT_CALCULATED" ||
     detail?.scoring.kind === "SCORED";
   const scoreActionLabel =
     detail?.scoring.kind === "SCORED" ? "Rescore candidate" : "Score candidate";
-  const canShortlist = candidate.stage === "VIEWED";
+  const canShortlist = !readOnly && candidate.stage === "VIEWED";
+  const canMoveToInterview =
+    !readOnly &&
+    "allowedActions" in candidate &&
+    candidate.allowedActions.moveToInterview.allowed;
+  const canReject =
+    !readOnly &&
+    "allowedActions" in candidate &&
+    candidate.allowedActions.reject.allowed;
+  const manuallyPrioritized =
+    "manuallyPrioritized" in candidate && candidate.manuallyPrioritized;
 
   const shortlist = async () => {
     if (!canShortlist || shortlisting) return;
@@ -338,6 +357,13 @@ export function CandidateScoreDrawer({
               </span>
             </div>
             <ScoreBadgeFromLabel code={headerCode} label={headerLabel} />
+            {aiBand ? (
+              <ScoreBadgeFromLabel
+                code={aiBand.code}
+                label={`AI: ${aiBand.label}`}
+                compact
+              />
+            ) : null}
           </div>
           <div className="ranking-drawer__scoreline-actions">
             <button
@@ -369,14 +395,16 @@ export function CandidateScoreDrawer({
                 {shortlisting ? "Shortlisting…" : "Shortlist"}
               </button>
             ) : null}
-            <button
-              type="button"
-              className="ai-ranking-button ai-ranking-button--primary"
-              onClick={onMoveToInterview}
-              disabled={!candidate.allowedActions.moveToInterview.allowed}
-            >
-              <ArrowRight aria-hidden="true" /> Move to interview
-            </button>
+            {!readOnly ? (
+              <button
+                type="button"
+                className="ai-ranking-button ai-ranking-button--primary"
+                onClick={onMoveToInterview}
+                disabled={!canMoveToInterview}
+              >
+                <ArrowRight aria-hidden="true" /> Move to interview
+              </button>
+            ) : null}
           </div>
         </div>
 
@@ -456,9 +484,11 @@ export function CandidateScoreDrawer({
                   {aiUnavailableMessage(scoring.aiAssessment.safeFailureCode)}
                 </span>
               </div>
-              <button type="button" onClick={() => setRetryConfirm(true)}>
-                <RefreshCw aria-hidden="true" /> Retry AI evaluation
-              </button>
+              {!readOnly ? (
+                <button type="button" onClick={() => setRetryConfirm(true)}>
+                  <RefreshCw aria-hidden="true" /> Retry AI evaluation
+                </button>
+              ) : null}
             </div>
           ) : scoring.kind === "PENDING" ? (
             <div
@@ -507,6 +537,7 @@ export function CandidateScoreDrawer({
           ) : activeTab === "ai" ? (
             <AiAssessmentTab
               state={scoring}
+              canScore={!readOnly}
               onScore={() => setScoreConfirm(true)}
             />
           ) : (
@@ -530,37 +561,45 @@ export function CandidateScoreDrawer({
             </span>
           </div>
           <div className="ranking-drawer__actions">
-            {canScoreCandidate ? (
-              <button
-                type="button"
-                className="ai-ranking-button ai-ranking-button--secondary"
-                onClick={() => setScoreConfirm(true)}
-                disabled={scoringActionLoading}
-              >
-                {scoringActionLoading ? (
-                  <LoaderCircle aria-hidden="true" className="is-spinning" />
-                ) : (
-                  <RefreshCw aria-hidden="true" />
-                )}{" "}
-                {scoreActionLabel}
-              </button>
-            ) : null}
-            <button
-              type="button"
-              className="ai-ranking-button ai-ranking-button--secondary"
-              onClick={onSetPriority}
-            >
-              <ShieldCheck aria-hidden="true" />{" "}
-              {candidate.manuallyPrioritized ? "Edit priority" : "Set priority"}
-            </button>
-            <button
-              type="button"
-              className="ai-ranking-button ai-ranking-button--danger-outline"
-              onClick={onReject}
-              disabled={!candidate.allowedActions.reject.allowed}
-            >
-              <UserRoundCheck aria-hidden="true" /> Reject
-            </button>
+            {!readOnly ? (
+              <>
+                {canScoreCandidate ? (
+                  <button
+                    type="button"
+                    className="ai-ranking-button ai-ranking-button--secondary"
+                    onClick={() => setScoreConfirm(true)}
+                    disabled={scoringActionLoading}
+                  >
+                    {scoringActionLoading ? (
+                      <LoaderCircle aria-hidden="true" className="is-spinning" />
+                    ) : (
+                      <RefreshCw aria-hidden="true" />
+                    )}{" "}
+                    {scoreActionLabel}
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  className="ai-ranking-button ai-ranking-button--secondary"
+                  onClick={onSetPriority}
+                >
+                  <ShieldCheck aria-hidden="true" />{" "}
+                  {manuallyPrioritized ? "Edit priority" : "Set priority"}
+                </button>
+                <button
+                  type="button"
+                  className="ai-ranking-button ai-ranking-button--danger-outline"
+                  onClick={onReject}
+                  disabled={!canReject}
+                >
+                  <UserRoundCheck aria-hidden="true" /> Reject
+                </button>
+              </>
+            ) : (
+              <span className="ranking-drawer__read-only-note">
+                Assessment view
+              </span>
+            )}
           </div>
         </footer>
       </aside>
@@ -591,7 +630,38 @@ export function CandidateScoreDrawer({
   );
 }
 
-function rowToScoring(candidate: RankedApplicationRow): ScoringState {
+function scoreSummaryForCandidate(candidate: CandidateScoreDrawerCandidate) {
+  if ("scoreSummary" in candidate) {
+    return {
+      final: candidate.scoreSummary.final,
+      band: candidate.scoreSummary.band,
+      aiBand: candidate.scoreSummary.aiBand ?? null,
+    };
+  }
+  return {
+    final: candidate.score?.final ?? null,
+    band: candidate.score?.band ?? null,
+    aiBand: candidate.score?.aiScoreBand ?? null,
+  };
+}
+
+function rowToScoring(candidate: CandidateScoreDrawerCandidate): ScoringState {
+  if ("score" in candidate) {
+    if (candidate.score?.state === "PROCESSING")
+      return {
+        kind: "PROCESSING",
+        label: "Processing",
+        operationId: `pipeline-${candidate.applicationId}`,
+      };
+    if (candidate.score?.state === "PENDING")
+      return {
+        kind: "PENDING",
+        label: "Pending",
+        operationId: `pipeline-${candidate.applicationId}`,
+        automaticMatch: null,
+      };
+    return { kind: "NOT_CALCULATED", label: "Not calculated" };
+  }
   if (candidate.scoring.kind === "PROCESSING")
     return {
       kind: "PROCESSING",

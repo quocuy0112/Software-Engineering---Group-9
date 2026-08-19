@@ -46,14 +46,18 @@ vi.mock("@dnd-kit/core", () => ({
       <button
         type="button"
         data-testid="start-ordinary-drag"
-        onClick={() => onDragStart({ active: { id: ordinaryCard.applicationId } })}
+        onClick={() =>
+          onDragStart({ active: { id: ordinaryCard.applicationId } })
+        }
       >
         Start ordinary drag
       </button>
       <button
         type="button"
         data-testid="start-guarded-drag"
-        onClick={() => onDragStart({ active: { id: guardedCard.applicationId } })}
+        onClick={() =>
+          onDragStart({ active: { id: guardedCard.applicationId } })
+        }
       >
         Start guarded drag
       </button>
@@ -93,72 +97,101 @@ vi.mock("@dnd-kit/core", () => ({
   useSensors: vi.fn(() => []),
 }));
 
-vi.mock("@/frontend/features/recruiter-applications/use-recruitment-pipeline", () => ({
-  useRecruitmentPipeline: () => ({
-    metadata: {
-      job: { jobId: "job-1", title: "Engineer", status: "ACTIVE" },
-      permissions: {
-        role: "RECRUITER",
-        canView: true,
-        canMoveStages: true,
-        canReject: true,
-        canRecordOfferDeclined: true,
-        canConfirmHired: true,
-      },
-      stages: pipelineApplicationStages.map((stage) => ({
-        stage,
-        label: pipelineStageLabels[stage],
-        count: stage === "APPLIED" || stage === "SHORTLISTED" ? 1 : 0,
-      })),
-      observedAt: "2026-08-18T00:00:00.000Z",
-    },
-    columns: {
-      APPLIED: {
-        page: {
-          stage: "APPLIED",
-          items: [ordinaryCard],
-          nextCursor: null,
-          observedAt: "2026-08-18T00:00:00.000Z",
+vi.mock(
+  "@/frontend/features/recruiter-applications/use-recruitment-pipeline",
+  () => ({
+    useRecruitmentPipeline: () => ({
+      metadata: {
+        job: { jobId: "job-1", title: "Engineer", status: "ACTIVE" },
+        permissions: {
+          role: "RECRUITER",
+          canView: true,
+          canMoveStages: true,
+          canReject: true,
+          canRecordOfferDeclined: true,
+          canConfirmHired: true,
         },
-        loading: false,
-        loadingMore: false,
-        error: null,
+        stages: pipelineApplicationStages.map((stage) => ({
+          stage,
+          label: pipelineStageLabels[stage],
+          count: stage === "APPLIED" || stage === "SHORTLISTED" ? 1 : 0,
+        })),
+        observedAt: "2026-08-18T00:00:00.000Z",
       },
-      SHORTLISTED: {
-        page: {
-          stage: "SHORTLISTED",
-          items: [guardedCard],
-          nextCursor: null,
-          observedAt: "2026-08-18T00:00:00.000Z",
+      columns: {
+        APPLIED: {
+          page: {
+            stage: "APPLIED",
+            items: [ordinaryCard],
+            nextCursor: null,
+            observedAt: "2026-08-18T00:00:00.000Z",
+          },
+          loading: false,
+          loadingMore: false,
+          error: null,
         },
-        loading: false,
-        loadingMore: false,
-        error: null,
+        SHORTLISTED: {
+          page: {
+            stage: "SHORTLISTED",
+            items: [guardedCard],
+            nextCursor: null,
+            observedAt: "2026-08-18T00:00:00.000Z",
+          },
+          loading: false,
+          loadingMore: false,
+          error: null,
+        },
       },
-    },
-    loading: false,
-    error: null,
-    announcement: "",
-    canRetryStageMove: false,
-    loadStage: vi.fn(),
-    loadMore: vi.fn(),
-    retry: vi.fn(),
-    retryStageMove: vi.fn(),
-    move,
+      loading: false,
+      error: null,
+      announcement: "",
+      canRetryStageMove: false,
+      loadStage: vi.fn(),
+      loadMore: vi.fn(),
+      retry: vi.fn(),
+      retryStageMove: vi.fn(),
+      move,
+    }),
   }),
-}));
+);
 
 describe("RecruitmentPipelineBoard drag transitions", () => {
   beforeEach(() => move.mockClear());
 
-  it("persists an ordinary valid drop without opening a confirmation dialog", async () => {
+  it("requires confirmation before persisting an ordinary valid drop", async () => {
     render(<RecruitmentPipelineBoard jobId="job-1" />);
 
     fireEvent.click(screen.getByTestId("start-ordinary-drag"));
     fireEvent.click(screen.getByTestId("drop-viewed"));
 
-    await waitFor(() => expect(move).toHaveBeenCalledWith(ordinaryCard, "VIEWED", {}));
+    const dialog = screen.getByRole("dialog", {
+      name: "Change Stage for Ordinary Candidate",
+    });
+    expect(dialog).toBeVisible();
+    expect(screen.getByLabelText("Destination stage")).toHaveValue("VIEWED");
+    const confirm = screen.getByRole("button", {
+      name: "Confirm stage change",
+    });
+    expect(confirm).toBeVisible();
+    expect(move).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(move).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByTestId("start-ordinary-drag"));
+    fireEvent.click(screen.getByTestId("drop-viewed"));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Confirm stage change" }),
+    );
+
+    await waitFor(() =>
+      expect(move).toHaveBeenCalledWith(ordinaryCard, "VIEWED", {
+        confirmed: undefined,
+        reasonCode: undefined,
+        internalNote: undefined,
+      }),
+    );
   });
 
   it("routes a guarded drop through the shared required-input dialog", async () => {

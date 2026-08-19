@@ -18,6 +18,10 @@ import type {
   PipelineStageCounts,
   PipelineStageRepositoryPage,
 } from "./application-repository";
+import {
+  automaticScoreBand,
+  automaticScoreConfigForPublishedResult,
+} from "@/backend/applications/services/automatic-score-stage-config";
 
 const cursorVersion = 1;
 const cursorSecret = () =>
@@ -213,6 +217,19 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort, R
     return counts;
   }
 
+  async latestUpdatedAt(jobId: string): Promise<Date | null> {
+    const row = await this.db.jobApplication.findFirst({
+      where: {
+        jobPostingId: jobId,
+        documentDeletedAt: null,
+        candidate: { user: { emailVerified: true } },
+      },
+      orderBy: { updatedAt: "desc" },
+      select: { updatedAt: true },
+    });
+    return row?.updatedAt ?? null;
+  }
+
   async listPipelineStage(input: {
     jobId: string;
     stage: ApplicationStage;
@@ -252,7 +269,15 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort, R
         stage: true,
         stageVersion: true,
         scoringStatus: true,
-        currentScoringResult: { select: { state: true, finalScore: true } },
+        currentScoringResult: {
+          select: {
+            state: true,
+            finalScore: true,
+            aiScore: true,
+            mediumThreshold: true,
+            highThreshold: true,
+          },
+        },
         candidate: {
           select: {
             user: { select: { name: true, image: true, emailVerified: true } },
@@ -273,8 +298,18 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort, R
         row.currentScoringResult.finalScore !== null
           ? Number(row.currentScoringResult.finalScore)
           : null;
+      const aiScore =
+        row.currentScoringResult?.state === "SCORED" &&
+        row.currentScoringResult.aiScore !== null
+          ? Number(row.currentScoringResult.aiScore)
+          : null;
+      const scoreConfig = automaticScoreConfigForPublishedResult({
+        mediumThreshold: row.currentScoringResult?.mediumThreshold,
+        highThreshold: row.currentScoringResult?.highThreshold,
+      });
       const scoreState =
-        row.currentScoringResult?.state === "SCORED" && final !== null
+        row.currentScoringResult?.state === "SCORED" &&
+        (final !== null || aiScore !== null)
           ? "SCORED"
           : row.scoringStatus === "PENDING"
             ? "PENDING"
@@ -289,14 +324,21 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort, R
           : pipelineScoreSchema.parse({
               state: scoreState,
               final,
+              aiScore,
               band:
                 final === null
                   ? null
-                  : final >= 80
-                    ? { code: "HIGH_MATCH", label: "Strong match" }
-                    : final >= 60
-                      ? { code: "MEDIUM_MATCH", label: "Review needed" }
-                      : { code: "LOW_MATCH", label: "Low match" },
+                  : (() => {
+                      const band = automaticScoreBand(final, scoreConfig);
+                      return { code: band.code, label: band.label };
+                    })(),
+              aiScoreBand:
+                aiScore === null
+                  ? null
+                  : (() => {
+                      const band = automaticScoreBand(aiScore, scoreConfig);
+                      return { code: band.code, label: band.label };
+                    })(),
             });
       return {
         applicationId: row.id,

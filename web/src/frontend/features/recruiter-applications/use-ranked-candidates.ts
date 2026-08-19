@@ -37,6 +37,7 @@ type RankedPageCacheEntry = Readonly<{
 
 const RANKED_PAGE_CACHE_MAX_AGE_MS = 10 * 60_000;
 const RANKED_PAGE_CACHE_MAX_ENTRIES = 100;
+const RANKED_REFRESH_INTERVAL_MS = 2_000;
 const rankedPageCache = new Map<string, RankedPageCacheEntry>();
 const rankedPageRequests = new Map<string, Promise<RankedApplicationPage>>();
 const rankedPageRequestVersions = new Map<string, number>();
@@ -132,10 +133,12 @@ export function useRankedCandidates(
   const [error, setError] = useState<string | null>(null);
   const [pageIndex, setPageIndex] = useState(0);
   const requestId = useRef(0);
+  const requestInFlight = useRef(false);
 
   const fetchPage = useCallback(
     async (index: number, options: { force?: boolean } = {}) => {
       const id = ++requestId.current;
+      requestInFlight.current = true;
       const key = rankedPageCacheKey(jobId, queryKey, pageSize, index);
       const force = options.force === true;
       if (force) rankedPageCache.delete(key);
@@ -203,6 +206,7 @@ export function useRankedCandidates(
         if (id === requestId.current) {
           setLoading(false);
           setRefreshing(false);
+          requestInFlight.current = false;
         }
       }
     },
@@ -224,6 +228,22 @@ export function useRankedCandidates(
     // older in-flight request that may still contain the previous score.
     void fetchPage(0, { force: true });
   }, [fetchPage]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    const refreshWhenVisible = () => {
+      if (document.visibilityState !== "visible" || requestInFlight.current) return;
+      refresh();
+    };
+    const interval = window.setInterval(refreshWhenVisible, RANKED_REFRESH_INTERVAL_MS);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    window.addEventListener("focus", refreshWhenVisible);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+      window.removeEventListener("focus", refreshWhenVisible);
+    };
+  }, [refresh]);
 
   return {
     page,

@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   applyAutomaticScoreStageRuleForApplication,
   applyAutomaticViewedStageRules,
+  applyAutomaticViewedStageRulesForAllApplications,
 } from "@/backend/applications/services/automatic-viewed-stage-rules";
 
 const now = new Date("2026-08-18T12:00:00.000Z");
@@ -9,11 +10,39 @@ const now = new Date("2026-08-18T12:00:00.000Z");
 function candidate(input: {
   id: string;
   stage: "APPLIED" | "VIEWED";
-  score: number;
   finalScore?: number | null;
+  aiScore?: number | null;
   changedAt?: Date;
   mediumThreshold?: number;
   highThreshold?: number;
+}) {
+  const resolvedFinalScore =
+    input.finalScore === undefined
+      ? (input.aiScore ?? null)
+      : input.finalScore;
+  const resolvedAiScore =
+    input.aiScore === undefined ? resolvedFinalScore : input.aiScore;
+  return {
+    id: input.id,
+    stage: input.stage,
+    stageVersion: input.stage === "APPLIED" ? 1 : 2,
+    lastStageChangedAt: input.changedAt ?? new Date("2026-08-16T12:00:00.000Z"),
+    withdrawalOutcome: null,
+    currentScoringResult: {
+      state: "SCORED" as const,
+      aiScore: resolvedAiScore,
+      finalScore: resolvedFinalScore,
+      mediumThreshold: input.mediumThreshold ?? 60,
+      highThreshold: input.highThreshold ?? 80,
+    },
+  };
+}
+
+function unscoredCandidate(input: {
+  id: string;
+  stage: "APPLIED" | "VIEWED";
+  state?: "DETERMINISTIC_ONLY" | "SCORED";
+  changedAt?: Date;
 }) {
   return {
     id: input.id,
@@ -22,10 +51,11 @@ function candidate(input: {
     lastStageChangedAt: input.changedAt ?? new Date("2026-08-16T12:00:00.000Z"),
     withdrawalOutcome: null,
     currentScoringResult: {
-      aiScore: input.score,
-      finalScore: input.finalScore ?? null,
-      mediumThreshold: input.mediumThreshold ?? 60,
-      highThreshold: input.highThreshold ?? 80,
+      state: input.state ?? ("DETERMINISTIC_ONLY" as const),
+      aiScore: null,
+      finalScore: null,
+      mediumThreshold: 60,
+      highThreshold: 80,
     },
   };
 }
@@ -61,7 +91,7 @@ afterEach(() => {
 describe("automatic score stage rules", () => {
   it("rejects a sub-60 Applied application immediately with the low-score reason", async () => {
     const db = database([
-      candidate({ id: "low", stage: "APPLIED", score: 59.9 }),
+      candidate({ id: "low", stage: "APPLIED", finalScore: 59.9 }),
     ]);
     const service = stageService();
 
@@ -82,9 +112,14 @@ describe("automatic score stage rules", () => {
     );
   });
 
-  it("does not reject a strong final match because the AI-only sub-score is low", async () => {
+  it("does not reject a low AI score when the final score is high", async () => {
     const db = database([
-      candidate({ id: "strong-final", stage: "APPLIED", score: 50, finalScore: 80 }),
+      candidate({
+        id: "strong-final",
+        stage: "APPLIED",
+        aiScore: 50,
+        finalScore: 80,
+      }),
     ]);
     const service = stageService();
 
@@ -98,13 +133,89 @@ describe("automatic score stage rules", () => {
     expect(service.attemptStageTransition).not.toHaveBeenCalled();
   });
 
+  it("rejects a low final score even when the AI score is high", async () => {
+    const db = database([
+      candidate({
+        id: "low-final",
+        stage: "APPLIED",
+        aiScore: 95,
+        finalScore: 59.9,
+      }),
+    ]);
+    const service = stageService();
+
+    await applyAutomaticScoreStageRuleForApplication({
+      candidateApplicationId: "low-final",
+      db: db as never,
+      stageService: service as never,
+      now,
+    });
+
+    expect(service.attemptStageTransition).toHaveBeenCalledWith(
+      expect.objectContaining({
+        candidateApplicationId: "low-final",
+        targetStage: "REJECTED",
+        reasonCode: "score_below_60_auto_reject",
+      }),
+    );
+  });
+
+  it("rejects a low score immediately if scoring completes after the application was viewed", async () => {
+    const db = database([
+      candidate({
+        id: "low-viewed",
+        stage: "VIEWED",
+        finalScore: 59.9,
+        changedAt: new Date("2026-08-18T11:59:00.000Z"),
+      }),
+    ]);
+    const service = stageService();
+
+    await applyAutomaticScoreStageRuleForApplication({
+      candidateApplicationId: "low-viewed",
+      db: db as never,
+      stageService: service as never,
+      now,
+    });
+
+    expect(service.attemptStageTransition).toHaveBeenCalledWith(
+      expect.objectContaining({
+        candidateApplicationId: "low-viewed",
+        targetStage: "REJECTED",
+        reasonCode: "score_below_60_auto_reject",
+      }),
+    );
+  });
+
+  it.each([
+    ["not-scored-applied", "APPLIED"],
+    ["not-scored-viewed", "VIEWED"],
+  ] as const)(
+    "does not auto-transition %s when no final score has been published",
+    async (id, stage) => {
+      const db = database([unscoredCandidate({ id, stage })]);
+      const service = stageService();
+
+      await applyAutomaticScoreStageRuleForApplication({
+        candidateApplicationId: id,
+        db: db as never,
+        stageService: service as never,
+        now,
+      });
+
+      expect(service.attemptStageTransition).not.toHaveBeenCalled();
+    },
+  );
+
   it.each([
     ["review-needed", 79.9, "REJECTED", "review_needed_timeout_auto_reject"],
     ["strong", 80, "SHORTLISTED", "strong_match_timeout_auto_shortlist"],
   ] as const)(
     "uses the timeout decision for %s candidates",
-    async (id, score, targetStage, reasonCode) => {
-      const db = database([candidate({ id, stage: "VIEWED", score })]);
+    async (id, finalScore, targetStage, reasonCode) => {
+      const db = database([
+        candidate({ id, stage: "VIEWED", finalScore }),
+      ]);
       const service = stageService();
 
       await applyAutomaticViewedStageRules({
@@ -125,6 +236,40 @@ describe("automatic score stage rules", () => {
     },
   );
 
+  it("uses a 12-hour default Viewed timeout", async () => {
+    const db = database([
+      candidate({
+        id: "timeout-not-reached",
+        stage: "VIEWED",
+        finalScore: 72,
+        changedAt: new Date(now.getTime() - 12 * 60 * 60_000 + 1),
+      }),
+      candidate({
+        id: "timeout-reached",
+        stage: "VIEWED",
+        finalScore: 72,
+        changedAt: new Date(now.getTime() - 12 * 60 * 60_000),
+      }),
+    ]);
+    const service = stageService();
+
+    await applyAutomaticViewedStageRules({
+      jobPostingId: "job-1",
+      db: db as never,
+      stageService: service as never,
+      now,
+    });
+
+    expect(service.attemptStageTransition).toHaveBeenCalledTimes(1);
+    expect(service.attemptStageTransition).toHaveBeenCalledWith(
+      expect.objectContaining({
+        candidateApplicationId: "timeout-reached",
+        targetStage: "REJECTED",
+        reasonCode: "review_needed_timeout_auto_reject",
+      }),
+    );
+  });
+
   it("uses configured thresholds and leaves a manual-action candidate alone", async () => {
     vi.stubEnv("RECRUITMENT_AUTO_SCORE_LOW_THRESHOLD", "50");
     vi.stubEnv("RECRUITMENT_AUTO_SCORE_STRONG_THRESHOLD", "90");
@@ -133,14 +278,14 @@ describe("automatic score stage rules", () => {
       candidate({
         id: "configured-low",
         stage: "APPLIED",
-        score: 54,
+        finalScore: 54,
         mediumThreshold: 50,
         highThreshold: 90,
       }),
       candidate({
         id: "manual-action",
         stage: "VIEWED",
-        score: 72,
+        finalScore: 72,
         changedAt: new Date("2026-08-18T11:45:00.000Z"),
       }),
     ]);
@@ -158,6 +303,32 @@ describe("automatic score stage rules", () => {
     );
     expect(service.attemptStageTransition).not.toHaveBeenCalledWith(
       expect.objectContaining({ candidateApplicationId: "manual-action" }),
+    );
+  });
+
+  it("sweeps timed-out Viewed candidates without a job-page request", async () => {
+    const db = database([
+      candidate({
+        id: "background-review-needed",
+        stage: "VIEWED",
+        finalScore: 79.9,
+      }),
+    ]);
+    const service = stageService();
+
+    await applyAutomaticViewedStageRulesForAllApplications({
+      db: db as never,
+      stageService: service as never,
+      now,
+    });
+
+    expect(service.attemptStageTransition).toHaveBeenCalledWith(
+      expect.objectContaining({
+        candidateApplicationId: "background-review-needed",
+        targetStage: "REJECTED",
+        reasonCode: "review_needed_timeout_auto_reject",
+        actor: { kind: "system_auto_score" },
+      }),
     );
   });
 });

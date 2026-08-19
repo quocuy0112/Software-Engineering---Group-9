@@ -9,7 +9,7 @@ import type { RecruiterJob } from "@/shared/contracts/recruiter-job-posting";
 
 export type { CampaignScoringStats };
 
-const CAMPAIGN_REFRESH_INTERVAL_MS = 90_000;
+const CAMPAIGN_REFRESH_INTERVAL_MS = 10_000;
 const CAMPAIGN_REQUEST_TIMEOUT_MS = 15_000;
 const CAMPAIGN_STATS_BATCH_SIZE = 100;
 const CAMPAIGN_STATS_CACHE_MAX_AGE_MS = 10 * 60_000;

@@ -2673,6 +2673,7 @@
 :root[data-theme="dark"] .ai-score-reasoning__score { color: #d8b4fe; background: #35204d; }
 .ai-score-reasoning__score strong { font-size: 40px; line-height: 1; }
 .ai-score-reasoning__score span { margin-top: 5px; font-size: 10px; }
+.ai-score-reasoning__tier { display: grid; min-width: 126px; gap: 7px; align-content: center; color: var(--sh-color-text-secondary); font-size: 10px; }
 .ai-score-reasoning h3 { margin: 0 0 8px; font-size: 14px; }
 .ai-score-reasoning ul { display: grid; gap: 5px; margin: 0; padding-left: 17px; color: var(--sh-color-text-secondary); font-size: 11px; }
 .ai-confidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -3596,6 +3597,7 @@
 .pipeline-card__score {
   display: flex;
   align-items: center;
+  gap: var(--sh-space-2);
   min-height: 48px;
   margin-top: var(--sh-space-1);
 }

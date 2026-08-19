@@ -3,6 +3,8 @@ import {
   canTransitionApplicationStage,
   isTerminalApplicationStage,
   ordinaryApplicationTransitions,
+  recruiterPipelineButtonTransitions,
+  recruiterPipelineDragTransitions,
 } from "@/backend/services/jobs/application-stage-policy";
 import type { ApplicationStage } from "@/shared/contracts/jobs/applications";
 
@@ -44,6 +46,13 @@ describe("application stage transition policy", () => {
       expect(isTerminalApplicationStage(stage)).toBe(true);
       expect(canTransitionApplicationStage(stage, "SHORTLISTED")).toBe(false);
     }
+  });
+
+  it("keeps terminal pipeline cards without recruiter controls", () => {
+    expect(recruiterPipelineButtonTransitions.HIRED).toEqual([]);
+    expect(recruiterPipelineDragTransitions.HIRED).toEqual([]);
+    expect(recruiterPipelineButtonTransitions.OFFER_DECLINED).toEqual([]);
+    expect(recruiterPipelineDragTransitions.REJECTED).toEqual([]);
   });
 
   it("does not create duplicate same-stage transitions", () => {
