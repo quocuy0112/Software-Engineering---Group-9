@@ -772,6 +772,16 @@ export const CompanyMembershipStatus = {
 export type CompanyMembershipStatus = (typeof CompanyMembershipStatus)[keyof typeof CompanyMembershipStatus]
 
 
+export const CompanyInvitationState = {
+  PENDING: 'PENDING',
+  REVOKED: 'REVOKED',
+  ACCEPTED: 'ACCEPTED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type CompanyInvitationState = (typeof CompanyInvitationState)[keyof typeof CompanyInvitationState]
+
+
 export const ProfessionalConnectionStatus = {
   ACCEPTED: 'ACCEPTED',
   REVOKED: 'REVOKED'

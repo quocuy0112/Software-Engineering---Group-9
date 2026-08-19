@@ -288,6 +288,7 @@ export type CompanyWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Company"> | Date | string
   jobPostings?: Prisma.JobPostingListRelationFilter
   memberships?: Prisma.CompanyMembershipListRelationFilter
+  invitations?: Prisma.CompanyInvitationListRelationFilter
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestListRelationFilter
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteListRelationFilter
   messagingConversations?: Prisma.MessagingConversationListRelationFilter
@@ -315,6 +316,7 @@ export type CompanyOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   jobPostings?: Prisma.JobPostingOrderByRelationAggregateInput
   memberships?: Prisma.CompanyMembershipOrderByRelationAggregateInput
+  invitations?: Prisma.CompanyInvitationOrderByRelationAggregateInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestOrderByRelationAggregateInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteOrderByRelationAggregateInput
   messagingConversations?: Prisma.MessagingConversationOrderByRelationAggregateInput
@@ -345,6 +347,7 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Company"> | Date | string
   jobPostings?: Prisma.JobPostingListRelationFilter
   memberships?: Prisma.CompanyMembershipListRelationFilter
+  invitations?: Prisma.CompanyInvitationListRelationFilter
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestListRelationFilter
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteListRelationFilter
   messagingConversations?: Prisma.MessagingConversationListRelationFilter
@@ -420,6 +423,7 @@ export type CompanyCreateInput = {
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
   memberships?: Prisma.CompanyMembershipCreateNestedManyWithoutCompanyInput
+  invitations?: Prisma.CompanyInvitationCreateNestedManyWithoutCompanyInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutTargetCompanyInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteCreateNestedManyWithoutCompanyInput
   messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutCompanyInput
@@ -447,6 +451,7 @@ export type CompanyUncheckedCreateInput = {
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
   memberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutCompanyInput
+  invitations?: Prisma.CompanyInvitationUncheckedCreateNestedManyWithoutCompanyInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutTargetCompanyInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUncheckedCreateNestedManyWithoutCompanyInput
   messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutCompanyInput
@@ -474,6 +479,7 @@ export type CompanyUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
   memberships?: Prisma.CompanyMembershipUpdateManyWithoutCompanyNestedInput
+  invitations?: Prisma.CompanyInvitationUpdateManyWithoutCompanyNestedInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutTargetCompanyNestedInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUpdateManyWithoutCompanyNestedInput
   messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutCompanyNestedInput
@@ -501,6 +507,7 @@ export type CompanyUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
   memberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutCompanyNestedInput
+  invitations?: Prisma.CompanyInvitationUncheckedUpdateManyWithoutCompanyNestedInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutTargetCompanyNestedInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUncheckedUpdateManyWithoutCompanyNestedInput
   messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutCompanyNestedInput
@@ -647,6 +654,20 @@ export type EnumCompanyVerificationStateFieldUpdateOperationsInput = {
   set?: $Enums.CompanyVerificationState
 }
 
+export type CompanyCreateNestedOneWithoutInvitationsInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutInvitationsInput, Prisma.CompanyUncheckedCreateWithoutInvitationsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutInvitationsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyUpdateOneRequiredWithoutInvitationsNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutInvitationsInput, Prisma.CompanyUncheckedCreateWithoutInvitationsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutInvitationsInput
+  upsert?: Prisma.CompanyUpsertWithoutInvitationsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutInvitationsInput, Prisma.CompanyUpdateWithoutInvitationsInput>, Prisma.CompanyUncheckedUpdateWithoutInvitationsInput>
+}
+
 export type CompanyCreateNestedOneWithoutMembershipsInput = {
   create?: Prisma.XOR<Prisma.CompanyCreateWithoutMembershipsInput, Prisma.CompanyUncheckedCreateWithoutMembershipsInput>
   connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutMembershipsInput
@@ -735,6 +756,130 @@ export type CompanyUpdateOneWithoutMessagingConversationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutMessagingConversationsInput, Prisma.CompanyUpdateWithoutMessagingConversationsInput>, Prisma.CompanyUncheckedUpdateWithoutMessagingConversationsInput>
 }
 
+export type CompanyCreateWithoutInvitationsInput = {
+  id?: string
+  slug: string
+  legalName: string
+  displayName: string
+  entityType?: string | null
+  logoUrl?: string | null
+  websiteUrl?: string | null
+  publicDescription?: string | null
+  publicLocation?: string | null
+  size?: string | null
+  industry?: string | null
+  address?: string | null
+  verifiedAt?: Date | string | null
+  normalizedTaxIdentifier?: string | null
+  verificationState?: $Enums.CompanyVerificationState
+  verificationInactiveAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
+  memberships?: Prisma.CompanyMembershipCreateNestedManyWithoutCompanyInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutTargetCompanyInput
+  accessPrerequisites?: Prisma.CompanyAccessPrerequisiteCreateNestedManyWithoutCompanyInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutCompanyInput
+  jobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutCompanyInput
+}
+
+export type CompanyUncheckedCreateWithoutInvitationsInput = {
+  id?: string
+  slug: string
+  legalName: string
+  displayName: string
+  entityType?: string | null
+  logoUrl?: string | null
+  websiteUrl?: string | null
+  publicDescription?: string | null
+  publicLocation?: string | null
+  size?: string | null
+  industry?: string | null
+  address?: string | null
+  verifiedAt?: Date | string | null
+  normalizedTaxIdentifier?: string | null
+  verificationState?: $Enums.CompanyVerificationState
+  verificationInactiveAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
+  memberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutCompanyInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutTargetCompanyInput
+  accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUncheckedCreateNestedManyWithoutCompanyInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutCompanyInput
+  jobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutCompanyInput
+}
+
+export type CompanyCreateOrConnectWithoutInvitationsInput = {
+  where: Prisma.CompanyWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutInvitationsInput, Prisma.CompanyUncheckedCreateWithoutInvitationsInput>
+}
+
+export type CompanyUpsertWithoutInvitationsInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutInvitationsInput, Prisma.CompanyUncheckedUpdateWithoutInvitationsInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutInvitationsInput, Prisma.CompanyUncheckedCreateWithoutInvitationsInput>
+  where?: Prisma.CompanyWhereInput
+}
+
+export type CompanyUpdateToOneWithWhereWithoutInvitationsInput = {
+  where?: Prisma.CompanyWhereInput
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutInvitationsInput, Prisma.CompanyUncheckedUpdateWithoutInvitationsInput>
+}
+
+export type CompanyUpdateWithoutInvitationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  legalName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
+  verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
+  memberships?: Prisma.CompanyMembershipUpdateManyWithoutCompanyNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutTargetCompanyNestedInput
+  accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUpdateManyWithoutCompanyNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutCompanyNestedInput
+  jobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutCompanyNestedInput
+}
+
+export type CompanyUncheckedUpdateWithoutInvitationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  legalName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
+  verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
+  memberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutCompanyNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutTargetCompanyNestedInput
+  accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUncheckedUpdateManyWithoutCompanyNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutCompanyNestedInput
+  jobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutCompanyNestedInput
+}
+
 export type CompanyCreateWithoutMembershipsInput = {
   id?: string
   slug: string
@@ -755,6 +900,7 @@ export type CompanyCreateWithoutMembershipsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
+  invitations?: Prisma.CompanyInvitationCreateNestedManyWithoutCompanyInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutTargetCompanyInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteCreateNestedManyWithoutCompanyInput
   messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutCompanyInput
@@ -781,6 +927,7 @@ export type CompanyUncheckedCreateWithoutMembershipsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
+  invitations?: Prisma.CompanyInvitationUncheckedCreateNestedManyWithoutCompanyInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutTargetCompanyInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUncheckedCreateNestedManyWithoutCompanyInput
   messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutCompanyInput
@@ -823,6 +970,7 @@ export type CompanyUpdateWithoutMembershipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
+  invitations?: Prisma.CompanyInvitationUpdateManyWithoutCompanyNestedInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutTargetCompanyNestedInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUpdateManyWithoutCompanyNestedInput
   messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutCompanyNestedInput
@@ -849,6 +997,7 @@ export type CompanyUncheckedUpdateWithoutMembershipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
+  invitations?: Prisma.CompanyInvitationUncheckedUpdateManyWithoutCompanyNestedInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutTargetCompanyNestedInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUncheckedUpdateManyWithoutCompanyNestedInput
   messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutCompanyNestedInput
@@ -876,6 +1025,7 @@ export type CompanyCreateWithoutAccessPrerequisitesInput = {
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
   memberships?: Prisma.CompanyMembershipCreateNestedManyWithoutCompanyInput
+  invitations?: Prisma.CompanyInvitationCreateNestedManyWithoutCompanyInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutTargetCompanyInput
   messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutCompanyInput
   jobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutCompanyInput
@@ -902,6 +1052,7 @@ export type CompanyUncheckedCreateWithoutAccessPrerequisitesInput = {
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
   memberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutCompanyInput
+  invitations?: Prisma.CompanyInvitationUncheckedCreateNestedManyWithoutCompanyInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutTargetCompanyInput
   messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutCompanyInput
   jobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutCompanyInput
@@ -944,6 +1095,7 @@ export type CompanyUpdateWithoutAccessPrerequisitesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
   memberships?: Prisma.CompanyMembershipUpdateManyWithoutCompanyNestedInput
+  invitations?: Prisma.CompanyInvitationUpdateManyWithoutCompanyNestedInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutTargetCompanyNestedInput
   messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutCompanyNestedInput
   jobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutCompanyNestedInput
@@ -970,6 +1122,7 @@ export type CompanyUncheckedUpdateWithoutAccessPrerequisitesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
   memberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutCompanyNestedInput
+  invitations?: Prisma.CompanyInvitationUncheckedUpdateManyWithoutCompanyNestedInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutTargetCompanyNestedInput
   messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutCompanyNestedInput
   jobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutCompanyNestedInput
@@ -996,6 +1149,7 @@ export type CompanyCreateWithoutRecruiterVerificationRequestsInput = {
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
   memberships?: Prisma.CompanyMembershipCreateNestedManyWithoutCompanyInput
+  invitations?: Prisma.CompanyInvitationCreateNestedManyWithoutCompanyInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteCreateNestedManyWithoutCompanyInput
   messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutCompanyInput
   jobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutCompanyInput
@@ -1022,6 +1176,7 @@ export type CompanyUncheckedCreateWithoutRecruiterVerificationRequestsInput = {
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
   memberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutCompanyInput
+  invitations?: Prisma.CompanyInvitationUncheckedCreateNestedManyWithoutCompanyInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUncheckedCreateNestedManyWithoutCompanyInput
   messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutCompanyInput
   jobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutCompanyInput
@@ -1064,6 +1219,7 @@ export type CompanyUpdateWithoutRecruiterVerificationRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
   memberships?: Prisma.CompanyMembershipUpdateManyWithoutCompanyNestedInput
+  invitations?: Prisma.CompanyInvitationUpdateManyWithoutCompanyNestedInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUpdateManyWithoutCompanyNestedInput
   messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutCompanyNestedInput
   jobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutCompanyNestedInput
@@ -1090,6 +1246,7 @@ export type CompanyUncheckedUpdateWithoutRecruiterVerificationRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
   memberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutCompanyNestedInput
+  invitations?: Prisma.CompanyInvitationUncheckedUpdateManyWithoutCompanyNestedInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUncheckedUpdateManyWithoutCompanyNestedInput
   messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutCompanyNestedInput
   jobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutCompanyNestedInput
@@ -1115,6 +1272,7 @@ export type CompanyCreateWithoutJobPostingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.CompanyMembershipCreateNestedManyWithoutCompanyInput
+  invitations?: Prisma.CompanyInvitationCreateNestedManyWithoutCompanyInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutTargetCompanyInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteCreateNestedManyWithoutCompanyInput
   messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutCompanyInput
@@ -1141,6 +1299,7 @@ export type CompanyUncheckedCreateWithoutJobPostingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutCompanyInput
+  invitations?: Prisma.CompanyInvitationUncheckedCreateNestedManyWithoutCompanyInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutTargetCompanyInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUncheckedCreateNestedManyWithoutCompanyInput
   messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutCompanyInput
@@ -1183,6 +1342,7 @@ export type CompanyUpdateWithoutJobPostingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.CompanyMembershipUpdateManyWithoutCompanyNestedInput
+  invitations?: Prisma.CompanyInvitationUpdateManyWithoutCompanyNestedInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutTargetCompanyNestedInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUpdateManyWithoutCompanyNestedInput
   messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutCompanyNestedInput
@@ -1209,6 +1369,7 @@ export type CompanyUncheckedUpdateWithoutJobPostingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutCompanyNestedInput
+  invitations?: Prisma.CompanyInvitationUncheckedUpdateManyWithoutCompanyNestedInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutTargetCompanyNestedInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUncheckedUpdateManyWithoutCompanyNestedInput
   messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutCompanyNestedInput
@@ -1236,6 +1397,7 @@ export type CompanyCreateWithoutJobPostReviewAggregatesInput = {
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
   memberships?: Prisma.CompanyMembershipCreateNestedManyWithoutCompanyInput
+  invitations?: Prisma.CompanyInvitationCreateNestedManyWithoutCompanyInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutTargetCompanyInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteCreateNestedManyWithoutCompanyInput
   messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutCompanyInput
@@ -1262,6 +1424,7 @@ export type CompanyUncheckedCreateWithoutJobPostReviewAggregatesInput = {
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
   memberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutCompanyInput
+  invitations?: Prisma.CompanyInvitationUncheckedCreateNestedManyWithoutCompanyInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutTargetCompanyInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUncheckedCreateNestedManyWithoutCompanyInput
   messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutCompanyInput
@@ -1304,6 +1467,7 @@ export type CompanyUpdateWithoutJobPostReviewAggregatesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
   memberships?: Prisma.CompanyMembershipUpdateManyWithoutCompanyNestedInput
+  invitations?: Prisma.CompanyInvitationUpdateManyWithoutCompanyNestedInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutTargetCompanyNestedInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUpdateManyWithoutCompanyNestedInput
   messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutCompanyNestedInput
@@ -1330,6 +1494,7 @@ export type CompanyUncheckedUpdateWithoutJobPostReviewAggregatesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
   memberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutCompanyNestedInput
+  invitations?: Prisma.CompanyInvitationUncheckedUpdateManyWithoutCompanyNestedInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutTargetCompanyNestedInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUncheckedUpdateManyWithoutCompanyNestedInput
   messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutCompanyNestedInput
@@ -1356,6 +1521,7 @@ export type CompanyCreateWithoutMessagingConversationsInput = {
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
   memberships?: Prisma.CompanyMembershipCreateNestedManyWithoutCompanyInput
+  invitations?: Prisma.CompanyInvitationCreateNestedManyWithoutCompanyInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutTargetCompanyInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteCreateNestedManyWithoutCompanyInput
   jobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutCompanyInput
@@ -1382,6 +1548,7 @@ export type CompanyUncheckedCreateWithoutMessagingConversationsInput = {
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
   memberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutCompanyInput
+  invitations?: Prisma.CompanyInvitationUncheckedCreateNestedManyWithoutCompanyInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutTargetCompanyInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUncheckedCreateNestedManyWithoutCompanyInput
   jobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutCompanyInput
@@ -1424,6 +1591,7 @@ export type CompanyUpdateWithoutMessagingConversationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
   memberships?: Prisma.CompanyMembershipUpdateManyWithoutCompanyNestedInput
+  invitations?: Prisma.CompanyInvitationUpdateManyWithoutCompanyNestedInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutTargetCompanyNestedInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUpdateManyWithoutCompanyNestedInput
   jobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutCompanyNestedInput
@@ -1450,6 +1618,7 @@ export type CompanyUncheckedUpdateWithoutMessagingConversationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
   memberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutCompanyNestedInput
+  invitations?: Prisma.CompanyInvitationUncheckedUpdateManyWithoutCompanyNestedInput
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutTargetCompanyNestedInput
   accessPrerequisites?: Prisma.CompanyAccessPrerequisiteUncheckedUpdateManyWithoutCompanyNestedInput
   jobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutCompanyNestedInput
@@ -1463,6 +1632,7 @@ export type CompanyUncheckedUpdateWithoutMessagingConversationsInput = {
 export type CompanyCountOutputType = {
   jobPostings: number
   memberships: number
+  invitations: number
   recruiterVerificationRequests: number
   accessPrerequisites: number
   messagingConversations: number
@@ -1472,6 +1642,7 @@ export type CompanyCountOutputType = {
 export type CompanyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jobPostings?: boolean | CompanyCountOutputTypeCountJobPostingsArgs
   memberships?: boolean | CompanyCountOutputTypeCountMembershipsArgs
+  invitations?: boolean | CompanyCountOutputTypeCountInvitationsArgs
   recruiterVerificationRequests?: boolean | CompanyCountOutputTypeCountRecruiterVerificationRequestsArgs
   accessPrerequisites?: boolean | CompanyCountOutputTypeCountAccessPrerequisitesArgs
   messagingConversations?: boolean | CompanyCountOutputTypeCountMessagingConversationsArgs
@@ -1500,6 +1671,13 @@ export type CompanyCountOutputTypeCountJobPostingsArgs<ExtArgs extends runtime.T
  */
 export type CompanyCountOutputTypeCountMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.CompanyMembershipWhereInput
+}
+
+/**
+ * CompanyCountOutputType without action
+ */
+export type CompanyCountOutputTypeCountInvitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CompanyInvitationWhereInput
 }
 
 /**
@@ -1552,6 +1730,7 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   updatedAt?: boolean
   jobPostings?: boolean | Prisma.Company$jobPostingsArgs<ExtArgs>
   memberships?: boolean | Prisma.Company$membershipsArgs<ExtArgs>
+  invitations?: boolean | Prisma.Company$invitationsArgs<ExtArgs>
   recruiterVerificationRequests?: boolean | Prisma.Company$recruiterVerificationRequestsArgs<ExtArgs>
   accessPrerequisites?: boolean | Prisma.Company$accessPrerequisitesArgs<ExtArgs>
   messagingConversations?: boolean | Prisma.Company$messagingConversationsArgs<ExtArgs>
@@ -1626,6 +1805,7 @@ export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type CompanyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jobPostings?: boolean | Prisma.Company$jobPostingsArgs<ExtArgs>
   memberships?: boolean | Prisma.Company$membershipsArgs<ExtArgs>
+  invitations?: boolean | Prisma.Company$invitationsArgs<ExtArgs>
   recruiterVerificationRequests?: boolean | Prisma.Company$recruiterVerificationRequestsArgs<ExtArgs>
   accessPrerequisites?: boolean | Prisma.Company$accessPrerequisitesArgs<ExtArgs>
   messagingConversations?: boolean | Prisma.Company$messagingConversationsArgs<ExtArgs>
@@ -1640,6 +1820,7 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     jobPostings: Prisma.$JobPostingPayload<ExtArgs>[]
     memberships: Prisma.$CompanyMembershipPayload<ExtArgs>[]
+    invitations: Prisma.$CompanyInvitationPayload<ExtArgs>[]
     recruiterVerificationRequests: Prisma.$RecruiterVerificationRequestPayload<ExtArgs>[]
     accessPrerequisites: Prisma.$CompanyAccessPrerequisitePayload<ExtArgs>[]
     messagingConversations: Prisma.$MessagingConversationPayload<ExtArgs>[]
@@ -2060,6 +2241,7 @@ export interface Prisma__CompanyClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   jobPostings<T extends Prisma.Company$jobPostingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$jobPostingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   memberships<T extends Prisma.Company$membershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CompanyMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  invitations<T extends Prisma.Company$invitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CompanyInvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   recruiterVerificationRequests<T extends Prisma.Company$recruiterVerificationRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$recruiterVerificationRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecruiterVerificationRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   accessPrerequisites<T extends Prisma.Company$accessPrerequisitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$accessPrerequisitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CompanyAccessPrerequisitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messagingConversations<T extends Prisma.Company$messagingConversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$messagingConversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2549,6 +2731,30 @@ export type Company$membershipsArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.CompanyMembershipScalarFieldEnum | Prisma.CompanyMembershipScalarFieldEnum[]
+}
+
+/**
+ * Company.invitations
+ */
+export type Company$invitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CompanyInvitation
+   */
+  select?: Prisma.CompanyInvitationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CompanyInvitation
+   */
+  omit?: Prisma.CompanyInvitationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CompanyInvitationInclude<ExtArgs> | null
+  where?: Prisma.CompanyInvitationWhereInput
+  orderBy?: Prisma.CompanyInvitationOrderByWithRelationInput | Prisma.CompanyInvitationOrderByWithRelationInput[]
+  cursor?: Prisma.CompanyInvitationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CompanyInvitationScalarFieldEnum | Prisma.CompanyInvitationScalarFieldEnum[]
 }
 
 /**

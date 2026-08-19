@@ -685,6 +685,33 @@ export type EnumCompanyMembershipRoleFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumCompanyMembershipRoleFilter<$PrismaModel> | $Enums.CompanyMembershipRole
 }
 
+export type EnumCompanyInvitationStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyInvitationState | Prisma.EnumCompanyInvitationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.CompanyInvitationState[] | Prisma.ListEnumCompanyInvitationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CompanyInvitationState[] | Prisma.ListEnumCompanyInvitationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCompanyInvitationStateFilter<$PrismaModel> | $Enums.CompanyInvitationState
+}
+
+export type EnumCompanyMembershipRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyMembershipRole | Prisma.EnumCompanyMembershipRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.CompanyMembershipRole[] | Prisma.ListEnumCompanyMembershipRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CompanyMembershipRole[] | Prisma.ListEnumCompanyMembershipRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCompanyMembershipRoleWithAggregatesFilter<$PrismaModel> | $Enums.CompanyMembershipRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCompanyMembershipRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCompanyMembershipRoleFilter<$PrismaModel>
+}
+
+export type EnumCompanyInvitationStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyInvitationState | Prisma.EnumCompanyInvitationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.CompanyInvitationState[] | Prisma.ListEnumCompanyInvitationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CompanyInvitationState[] | Prisma.ListEnumCompanyInvitationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCompanyInvitationStateWithAggregatesFilter<$PrismaModel> | $Enums.CompanyInvitationState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCompanyInvitationStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCompanyInvitationStateFilter<$PrismaModel>
+}
+
 export type EnumCompanyMembershipStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.CompanyMembershipStatus | Prisma.EnumCompanyMembershipStatusFieldRefInput<$PrismaModel>
   in?: $Enums.CompanyMembershipStatus[] | Prisma.ListEnumCompanyMembershipStatusFieldRefInput<$PrismaModel>
@@ -697,16 +724,6 @@ export type EnumCompanyMembershipRoleNullableFilter<$PrismaModel = never> = {
   in?: $Enums.CompanyMembershipRole[] | Prisma.ListEnumCompanyMembershipRoleFieldRefInput<$PrismaModel> | null
   notIn?: $Enums.CompanyMembershipRole[] | Prisma.ListEnumCompanyMembershipRoleFieldRefInput<$PrismaModel> | null
   not?: Prisma.NestedEnumCompanyMembershipRoleNullableFilter<$PrismaModel> | $Enums.CompanyMembershipRole | null
-}
-
-export type EnumCompanyMembershipRoleWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.CompanyMembershipRole | Prisma.EnumCompanyMembershipRoleFieldRefInput<$PrismaModel>
-  in?: $Enums.CompanyMembershipRole[] | Prisma.ListEnumCompanyMembershipRoleFieldRefInput<$PrismaModel>
-  notIn?: $Enums.CompanyMembershipRole[] | Prisma.ListEnumCompanyMembershipRoleFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCompanyMembershipRoleWithAggregatesFilter<$PrismaModel> | $Enums.CompanyMembershipRole
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumCompanyMembershipRoleFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumCompanyMembershipRoleFilter<$PrismaModel>
 }
 
 export type EnumCompanyMembershipStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -3351,6 +3368,33 @@ export type NestedEnumCompanyMembershipRoleFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumCompanyMembershipRoleFilter<$PrismaModel> | $Enums.CompanyMembershipRole
 }
 
+export type NestedEnumCompanyInvitationStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyInvitationState | Prisma.EnumCompanyInvitationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.CompanyInvitationState[] | Prisma.ListEnumCompanyInvitationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CompanyInvitationState[] | Prisma.ListEnumCompanyInvitationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCompanyInvitationStateFilter<$PrismaModel> | $Enums.CompanyInvitationState
+}
+
+export type NestedEnumCompanyMembershipRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyMembershipRole | Prisma.EnumCompanyMembershipRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.CompanyMembershipRole[] | Prisma.ListEnumCompanyMembershipRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CompanyMembershipRole[] | Prisma.ListEnumCompanyMembershipRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCompanyMembershipRoleWithAggregatesFilter<$PrismaModel> | $Enums.CompanyMembershipRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCompanyMembershipRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCompanyMembershipRoleFilter<$PrismaModel>
+}
+
+export type NestedEnumCompanyInvitationStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyInvitationState | Prisma.EnumCompanyInvitationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.CompanyInvitationState[] | Prisma.ListEnumCompanyInvitationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CompanyInvitationState[] | Prisma.ListEnumCompanyInvitationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCompanyInvitationStateWithAggregatesFilter<$PrismaModel> | $Enums.CompanyInvitationState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCompanyInvitationStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCompanyInvitationStateFilter<$PrismaModel>
+}
+
 export type NestedEnumCompanyMembershipStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.CompanyMembershipStatus | Prisma.EnumCompanyMembershipStatusFieldRefInput<$PrismaModel>
   in?: $Enums.CompanyMembershipStatus[] | Prisma.ListEnumCompanyMembershipStatusFieldRefInput<$PrismaModel>
@@ -3363,16 +3407,6 @@ export type NestedEnumCompanyMembershipRoleNullableFilter<$PrismaModel = never> 
   in?: $Enums.CompanyMembershipRole[] | Prisma.ListEnumCompanyMembershipRoleFieldRefInput<$PrismaModel> | null
   notIn?: $Enums.CompanyMembershipRole[] | Prisma.ListEnumCompanyMembershipRoleFieldRefInput<$PrismaModel> | null
   not?: Prisma.NestedEnumCompanyMembershipRoleNullableFilter<$PrismaModel> | $Enums.CompanyMembershipRole | null
-}
-
-export type NestedEnumCompanyMembershipRoleWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.CompanyMembershipRole | Prisma.EnumCompanyMembershipRoleFieldRefInput<$PrismaModel>
-  in?: $Enums.CompanyMembershipRole[] | Prisma.ListEnumCompanyMembershipRoleFieldRefInput<$PrismaModel>
-  notIn?: $Enums.CompanyMembershipRole[] | Prisma.ListEnumCompanyMembershipRoleFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCompanyMembershipRoleWithAggregatesFilter<$PrismaModel> | $Enums.CompanyMembershipRole
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumCompanyMembershipRoleFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumCompanyMembershipRoleFilter<$PrismaModel>
 }
 
 export type NestedEnumCompanyMembershipStatusWithAggregatesFilter<$PrismaModel = never> = {
