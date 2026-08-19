@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -11,6 +11,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
+import { Search, SlidersHorizontal } from "lucide-react";
 import type {
   ApplicationStage,
   PipelineApplicationCard,
@@ -25,6 +26,12 @@ import {
   stageTransitionNeedsDialog,
 } from "./application-stage-change-dialog";
 import { useRecruitmentPipeline } from "./use-recruitment-pipeline";
+import {
+  filterPipelineCards,
+  sortPipelineCards,
+  type PipelineSortDirection,
+  type PipelineTierFilter,
+} from "./recruitment-pipeline-ui";
 
 const activePipelineStages: ApplicationStage[] = [
   "APPLIED",
@@ -40,6 +47,37 @@ const outcomeStages: ApplicationStage[] = [
   "REJECTED",
   "WAITLISTED",
 ];
+
+const tierOptions: Array<{ value: PipelineTierFilter; label: string }> = [
+  { value: "all", label: "All candidates" },
+  { value: "strong", label: "Strong match" },
+  { value: "review", label: "Review needed" },
+  { value: "low", label: "Low match" },
+  { value: "pending", label: "Not yet scored" },
+];
+
+const defaultSortDirections: Record<ApplicationStage, PipelineSortDirection> = {
+  APPLIED: "none",
+  VIEWED: "none",
+  SHORTLISTED: "none",
+  INTERVIEWING: "none",
+  OFFERED: "none",
+  HIRED: "none",
+  OFFER_DECLINED: "none",
+  REJECTED: "none",
+  WAITLISTED: "none",
+};
+
+function dateFilterLabel(filter: PipelineTierFilter, query: string) {
+  const tier = tierOptions.find((option) => option.value === filter)?.label;
+  if (filter === "all" && !query) return "Showing all loaded candidates.";
+  return (
+    "Showing loaded candidates filtered by " +
+    (tier?.toLocaleLowerCase() ?? "tier") +
+    (query ? " and " + query : "") +
+    "."
+  );
+}
 
 export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
   const state = useRecruitmentPipeline(jobId);
@@ -57,6 +95,12 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
     target?: ApplicationStage;
     intent?: "button" | "drag";
   } | null>(null);
+  const [tierFilter, setTierFilter] = useState<PipelineTierFilter>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortDirections, setSortDirections] = useState(defaultSortDirections);
+  const [openSortMenu, setOpenSortMenu] = useState<ApplicationStage | null>(
+    null,
+  );
   const returnFocus = useRef<HTMLElement | null>(null);
   const assessmentReturnFocus = useRef<HTMLElement | null>(null);
   const cards = useMemo(
@@ -66,6 +110,29 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
       ),
     [state.columns],
   );
+  const filterActive = tierFilter !== "all" || Boolean(searchQuery.trim());
+
+  useEffect(() => {
+    if (openSortMenu === null) return;
+    const closeMenu = () => setOpenSortMenu(null);
+    document.addEventListener("click", closeMenu);
+    return () => document.removeEventListener("click", closeMenu);
+  }, [openSortMenu]);
+
+  const visiblePage = (stage: ApplicationStage) => {
+    const column = state.columns[stage];
+    if (!column?.page) return null;
+    const filtered = filterPipelineCards(
+      column.page.items,
+      tierFilter,
+      searchQuery,
+    );
+    return {
+      ...column.page,
+      items: sortPipelineCards(filtered, sortDirections[stage]),
+    };
+  };
+
   const restoreFocus = (applicationId: string) =>
     window.setTimeout(
       () =>
@@ -76,6 +143,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
           ?.focus(),
       0,
     );
+
   const onDragStart = (event: DragStartEvent) => {
     const card =
       cards.find((item) => item.applicationId === String(event.active.id)) ??
@@ -83,28 +151,31 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
     setActiveCard(card && !isTerminalPipelineStage(card.stage) ? card : null);
     returnFocus.current = document.activeElement as HTMLElement | null;
   };
+
   const onDragCancel = () => {
     setActiveCard(null);
     setTimeout(() => returnFocus.current?.focus(), 0);
   };
+
   const moveCard = (
     card: PipelineApplicationCard,
     target: ApplicationStage,
     extras: Parameters<typeof state.move>[2],
     intent: "button" | "drag",
   ) => {
-    if (intent === "drag" && state.moveDrag)
+    if (intent === "drag" && state.moveDrag) {
       return state.moveDrag(card, target, extras);
+    }
     return state.move(card, target, extras);
   };
+
   const onDragEnd = (event: DragEndEvent) => {
     const card = activeCard;
     setActiveCard(null);
     const target = event.over?.data.current?.stage as
       | ApplicationStage
       | undefined;
-    const dragDestinations =
-      card?.dragDestinations ?? card?.allowedDestinations ?? [];
+    const dragDestinations = card?.dragDestinations ?? [];
     if (
       !card ||
       isTerminalPipelineStage(card.stage) ||
@@ -115,8 +186,17 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
       setTimeout(() => returnFocus.current?.focus(), 0);
       return;
     }
-    setDialog({ card, target, intent: "drag" });
+
+    returnFocus.current = document.activeElement as HTMLElement | null;
+    if (stageTransitionNeedsDialog(target)) {
+      setDialog({ card, target, intent: "drag" });
+      return;
+    }
+    void moveCard(card, target, {}, "drag").finally(() =>
+      restoreFocus(card.applicationId),
+    );
   };
+
   const requestStageChange = (
     card: PipelineApplicationCard,
     target?: ApplicationStage,
@@ -131,24 +211,29 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
     }
     setDialog({ card, target, intent: "button" });
   };
+
   const openAssessment = (card: PipelineApplicationCard) => {
-    assessmentReturnFocus.current = document.activeElement as HTMLElement | null;
+    assessmentReturnFocus.current =
+      document.activeElement as HTMLElement | null;
     setAssessmentCard(card);
   };
+
   const closeAssessment = () => {
     const target = assessmentReturnFocus.current;
     assessmentReturnFocus.current = null;
     setAssessmentCard(null);
     window.setTimeout(() => target?.focus(), 0);
   };
+
   const renderColumn = (summary: PipelineStageCount) => {
     const column = state.columns[summary.stage];
+    const page = visiblePage(summary.stage);
     return (
       <RecruitmentPipelineColumn
         key={summary.stage}
         jobId={jobId}
         summary={summary}
-        page={column?.page ?? null}
+        page={page}
         loading={column?.loading ?? true}
         loadingMore={column?.loadingMore ?? false}
         error={column?.error ?? null}
@@ -156,16 +241,29 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
         onRetry={(stage) => void state.loadStage(stage)}
         onChangeStage={requestStageChange}
         onViewAssessment={openAssessment}
+        sortDirection={sortDirections[summary.stage]}
+        sortMenuOpen={openSortMenu === summary.stage}
+        onToggleSortMenu={(stage) =>
+          setOpenSortMenu((current) => (current === stage ? null : stage))
+        }
+        onSortDirectionChange={(stage, direction) => {
+          setSortDirections((current) => ({ ...current, [stage]: direction }));
+          setOpenSortMenu(null);
+        }}
+        filterActive={filterActive}
+        loadedItemCount={column?.page?.items.length ?? 0}
       />
     );
   };
-  if (state.loading && !state.metadata)
+
+  if (state.loading && !state.metadata) {
     return (
       <div className="pipeline-state" role="status">
-        Loading recruitment pipeline…
+        Loading recruitment pipeline...
       </div>
     );
-  if (state.error || !state.metadata)
+  }
+  if (state.error || !state.metadata) {
     return (
       <div className="pipeline-state" role="alert">
         <p>{state.error ?? "The recruitment pipeline is unavailable."}</p>
@@ -174,6 +272,8 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
         </button>
       </div>
     );
+  }
+
   const boardMetadata = state.metadata;
   const total = boardMetadata.stages.reduce((sum, item) => sum + item.count, 0);
   return (
@@ -213,6 +313,57 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
           Retry stage change
         </button>
       ) : null}
+
+      {/* Additions outside the original flow: local filter/search over loaded cards. */}
+      <div
+        className="pipeline-filter-bar"
+        data-addition="outside-original-flow"
+      >
+        <label
+          className="pipeline-search-field"
+          htmlFor="pipeline-candidate-search"
+        >
+          <Search aria-hidden="true" />
+          <span className="sr-only">Search candidates by name</span>
+          <input
+            id="pipeline-candidate-search"
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search candidate names..."
+          />
+        </label>
+        <div
+          className="pipeline-tier-filters"
+          role="group"
+          aria-label="Filter candidates by final-score tier"
+        >
+          {tierOptions.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              className={
+                tierFilter === option.value
+                  ? "pipeline-tier-filter is-active"
+                  : "pipeline-tier-filter"
+              }
+              aria-pressed={tierFilter === option.value}
+              onClick={() => setTierFilter(option.value)}
+            >
+              {option.value !== "all" ? (
+                <span aria-hidden="true" />
+              ) : (
+                <SlidersHorizontal aria-hidden="true" />
+              )}
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <p className="pipeline-filter-status" role="status">
+        {dateFilterLabel(tierFilter, searchQuery)}
+      </p>
+
       <DndContext
         sensors={sensors}
         onDragStart={onDragStart}

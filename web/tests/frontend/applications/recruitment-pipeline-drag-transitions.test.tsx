@@ -20,6 +20,7 @@ const ordinaryCard: PipelineApplicationCard = {
   documents: { cvAvailable: false, coverLetterAvailable: false },
   score: null,
   allowedDestinations: ["VIEWED"],
+  dragDestinations: ["VIEWED"],
 };
 
 const guardedCard: PipelineApplicationCard = {
@@ -28,6 +29,7 @@ const guardedCard: PipelineApplicationCard = {
   candidate: { displayName: "Guarded Candidate", avatarUrl: null },
   stage: "SHORTLISTED",
   allowedDestinations: ["REJECTED"],
+  dragDestinations: ["REJECTED"],
 };
 
 vi.mock("@dnd-kit/core", () => ({
@@ -158,40 +160,16 @@ vi.mock(
 describe("RecruitmentPipelineBoard drag transitions", () => {
   beforeEach(() => move.mockClear());
 
-  it("requires confirmation before persisting an ordinary valid drop", async () => {
+  it("persists an ordinary valid drop without confirmation", async () => {
     render(<RecruitmentPipelineBoard jobId="job-1" />);
 
     fireEvent.click(screen.getByTestId("start-ordinary-drag"));
     fireEvent.click(screen.getByTestId("drop-viewed"));
 
-    const dialog = screen.getByRole("dialog", {
-      name: "Change Stage for Ordinary Candidate",
-    });
-    expect(dialog).toBeVisible();
-    expect(screen.getByLabelText("Destination stage")).toHaveValue("VIEWED");
-    const confirm = screen.getByRole("button", {
-      name: "Confirm stage change",
-    });
-    expect(confirm).toBeVisible();
-    expect(move).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(move).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByTestId("start-ordinary-drag"));
-    fireEvent.click(screen.getByTestId("drop-viewed"));
-    fireEvent.click(
-      screen.getByRole("button", { name: "Confirm stage change" }),
-    );
-
     await waitFor(() =>
-      expect(move).toHaveBeenCalledWith(ordinaryCard, "VIEWED", {
-        confirmed: undefined,
-        reasonCode: undefined,
-        internalNote: undefined,
-      }),
+      expect(move).toHaveBeenCalledWith(ordinaryCard, "VIEWED", {}),
     );
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("routes a guarded drop through the shared required-input dialog", async () => {

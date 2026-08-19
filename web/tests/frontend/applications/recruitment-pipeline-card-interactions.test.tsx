@@ -30,6 +30,7 @@ const card: PipelineApplicationCard = {
   documents: { cvAvailable: true, coverLetterAvailable: false },
   score: null,
   allowedDestinations: ["VIEWED", "REJECTED"],
+  dragDestinations: ["VIEWED", "REJECTED"],
 };
 
 const hiredCard: PipelineApplicationCard = {
@@ -59,10 +60,14 @@ describe("RecruitmentPipelineCard interactions", () => {
     keyDown.mockClear();
   });
 
-  it("starts pointer dragging from the non-interactive card body", () => {
+  it("starts pointer dragging from the dedicated drag handle", () => {
     render(<RecruitmentPipelineCard card={card} jobId="job-1" />);
 
-    fireEvent.pointerDown(screen.getByText("Ada Candidate"));
+    fireEvent.pointerDown(
+      screen.getByRole("button", {
+        name: "Drag Ada Candidate to another stage",
+      }),
+    );
 
     expect(pointerDown).toHaveBeenCalledOnce();
   });
@@ -76,6 +81,7 @@ describe("RecruitmentPipelineCard interactions", () => {
         onChangeStage={onChangeStage}
       />,
     );
+    fireEvent.click(screen.getByText("Ada Candidate"));
     const changeStage = screen.getByRole("button", { name: "Change Stage" });
 
     fireEvent.pointerDown(changeStage);
@@ -109,9 +115,13 @@ describe("RecruitmentPipelineCard interactions", () => {
     );
 
     expect(
-      screen.queryByRole("button", { name: "Drag Ada Candidate to another stage" }),
+      screen.queryByRole("button", {
+        name: "Drag Ada Candidate to another stage",
+      }),
     ).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Change Stage" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Change Stage" }),
+    ).not.toBeInTheDocument();
 
     fireEvent.pointerDown(screen.getByText("Ada Candidate"));
 
@@ -147,9 +157,9 @@ describe("RecruitmentPipelineCard interactions", () => {
       />,
     );
 
-    fireEvent.click(
-      screen.getByRole("button", { name: "View AI assessment" }),
-    );
+    fireEvent.click(screen.getByText("Ada Candidate"));
+
+    fireEvent.click(screen.getByRole("button", { name: "View AI assessment" }));
 
     expect(onViewAssessment).toHaveBeenCalledOnce();
     expect(onViewAssessment).toHaveBeenCalledWith(scoredCard);
