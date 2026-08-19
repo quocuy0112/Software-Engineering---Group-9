@@ -1,10 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import { CandidateRankingList } from "./candidate-ranking-list";
-import { RecruitmentPipelineBoard } from "./recruitment-pipeline-board";
 
 export function RecruiterCandidateWorkspace({ jobId, jobTitle, backHref, csrfProof }: { jobId: string; jobTitle: string; backHref: string; csrfProof?: string }) {
-  const [view, setView] = useState<"list" | "kanban">("list");
-  return <section className="recruiter-candidate-workspace"><div className="candidate-workspace-view-switch" aria-label="Candidate workspace view"><button type="button" aria-pressed={view === "list"} onClick={() => setView("list")}>List</button><button type="button" aria-pressed={view === "kanban"} onClick={() => setView("kanban")}>Kanban</button></div>{view === "list" ? <CandidateRankingList jobId={jobId} jobTitle={jobTitle} backHref={backHref} csrfProof={csrfProof} /> : <RecruitmentPipelineBoard jobId={jobId} />}</section>;
+  return (
+    <section className="recruiter-candidate-workspace" aria-label="Candidate list view">
+      <CandidateRankingList
+        jobId={jobId}
+        jobTitle={jobTitle}
+        backHref={backHref}
+        csrfProof={csrfProof}
+        pipelineHref={`/recruiter/pipeline?jobId=${encodeURIComponent(jobId)}`}
+      />
+    </section>
+  );
 }

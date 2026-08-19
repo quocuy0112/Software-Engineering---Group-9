@@ -227,6 +227,14 @@ const CampaignCard = memo(function CampaignCard({
           Review candidates
           <ArrowRight aria-hidden="true" />
         </a>
+        <a
+          href={recruiterRoutes.pipelineForJob(job.id)}
+          className="campaign-card__action"
+          aria-label={`View pipeline for ${job.title || "Untitled job posting"}`}
+        >
+          View pipeline
+          <ArrowRight aria-hidden="true" />
+        </a>
       </div>
     </article>
   );

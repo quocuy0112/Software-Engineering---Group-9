@@ -6,6 +6,7 @@ import { prisma } from "@/backend/database/prisma";
 import { configuredJsonJobCatalogueRepository } from "@/backend/repositories/jobs/job-catalogue-repository-factory";
 import { adoptActiveJobBaseline } from "@/backend/jobs/review/job-post-active-baseline-service";
 import { closeManagedJobPost } from "@/backend/jobs/review/job-post-review-service";
+import { applyRecruiterCapacityIncrease } from "@/backend/services/jobs/recruiter-capacity-service";
 import {
   companyCatalogSchema,
   recruiterCompanySettingsInputSchema,
@@ -462,6 +463,32 @@ async function readApplications(): Promise<JobApplicationRecord[]> {
   }
 }
 
+/**
+ * Recruiter pages are keyed by the catalogue job ID, while application
+ * notifications are created from the public JobPosting ID. Resolve the
+ * latter only against the already-authorized recruiter projection so an old
+ * notification cannot be used to discover another company's job.
+ */
+export async function resolveRecruiterJobIdForNavigation(
+  requestedJobId: string,
+  availableJobs: ReadonlyArray<Pick<RecruiterJob, "id">>,
+) {
+  const normalizedJobId = requestedJobId.trim();
+  if (!normalizedJobId) return null;
+
+  const directMatch = availableJobs.find((job) => job.id === normalizedJobId);
+  if (directMatch) return directMatch.id;
+
+  const publicPosting = await prisma.jobPosting.findUnique({
+    where: { id: normalizedJobId },
+    select: { reviewAggregate: { select: { jobId: true } } },
+  });
+  const mappedJobId = publicPosting?.reviewAggregate?.jobId;
+  return mappedJobId && availableJobs.some((job) => job.id === mappedJobId)
+    ? mappedJobId
+    : null;
+}
+
 export async function readMockAppliedJobIds(userId: string) {
   const applications = await readApplications();
   return applications
@@ -710,6 +737,14 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
       },
     });
     await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
+    if (company.databaseBacked && company.databaseId) {
+      await applyRecruiterCapacityIncrease({
+        jobId: updated.id,
+        companyId: company.databaseId,
+        newCapacity: updated.numberOfHires,
+        actorUserId: userId,
+      });
+    }
     return { ...updated, company } satisfies RecruiterJob;
   });
 }

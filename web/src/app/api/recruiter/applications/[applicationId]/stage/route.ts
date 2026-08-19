@@ -9,8 +9,20 @@ export async function PATCH(request: Request, context: { params: Promise<{ appli
     const applicationId = (await context.params).applicationId;
     const idempotencyKey = idempotencyKeySchema.parse(request.headers.get("idempotency-key"));
     const command = await parseBoundedJson(request, applicationStageTransitionSchema, 8 * 1024);
-    const result = await new ApplicationStageService().transitionLegacy(actor, applicationId, { targetStage: command.targetStage, expectedStageVersion: command.expectedVersion, reasonCode: command.reasonCode ?? undefined }, idempotencyKey);
-    return accountJson(applicationStageTransitionOutcomeSchema.parse({ applicationId: result.applicationId, fromStage: result.fromStage, stage: result.stage, stageVersion: result.stageVersion, lastStageChangedAt: result.lastStageChangedAt, eventId: "stageEventId" in result ? result.stageEventId : result.eventId }));
+    const result = await new ApplicationStageService().attemptStageTransition({
+      candidateApplicationId: applicationId,
+      targetStage: command.targetStage,
+      actor: {
+        kind: "recruiter_manual",
+        userId: actor.userId,
+        sessionId: actor.sessionId,
+      },
+      expectedStageVersion: command.expectedVersion,
+      reasonCode: command.reasonCode ?? undefined,
+      idempotencyKey,
+      source: "STAGE_ROUTE",
+    });
+    return accountJson(applicationStageTransitionOutcomeSchema.parse({ applicationId: result.applicationId, fromStage: result.fromStage, stage: result.stage, stageVersion: result.stageVersion, lastStageChangedAt: result.lastStageChangedAt, eventId: result.stageEventId }));
   } catch (error) {
     if (error instanceof AccountRequestError) return accountErrorResponse(error);
     if (error instanceof JobServiceError) return accountJson(error.body, { status: error.status });

@@ -196,6 +196,8 @@ export const aiAssessmentSchema = z
   .object({
     assessmentId: z.string().min(1),
     score: z.number().min(0).max(100),
+    /** AI-only score tier for the assessment; stage rules use the final score. */
+    aiScoreBand: explicitLabelSchema.optional(),
     confidencePercent: z.number().int().min(0).max(100),
     confidenceLevel: z.enum(["LOW", "MEDIUM", "HIGH", "STANDARD"]),
     confidenceLabel: z.string().min(1),
@@ -458,6 +460,8 @@ export const rankedApplicationRowSchema = z
         ai: z.number().min(0).max(100).nullable(),
         final: z.number().min(0).max(100).nullable(),
         band: explicitLabelSchema.nullable(),
+        /** AI Smart Match tier shown separately from the final-score tier. */
+        aiBand: explicitLabelSchema.nullable().optional(),
       })
       .strict(),
     manuallyPrioritized: z.boolean(),

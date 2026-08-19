@@ -4,6 +4,7 @@ import {
   createRecruiterJob,
   readRecruiterCompanySettings,
   readRecruiterJobManagementData,
+  resolveRecruiterJobIdForNavigation,
   updateRecruiterJob,
   updateRecruiterCompanySettings,
 } from "@/backend/services/jobs/recruiter-job-posting-data";
@@ -22,6 +23,9 @@ const prismaMocks = vi.hoisted(() => ({
   },
   jobPostReviewAggregate: {
     findMany: vi.fn(),
+    findUnique: vi.fn(),
+  },
+  jobPosting: {
     findUnique: vi.fn(),
   },
 }));
@@ -109,6 +113,36 @@ describe("recruiter JSON job persistence", () => {
     prismaMocks.jobPostReviewAggregate.findMany.mockResolvedValue([]);
     prismaMocks.jobPostReviewAggregate.findUnique.mockReset();
     prismaMocks.jobPostReviewAggregate.findUnique.mockResolvedValue(null);
+    prismaMocks.jobPosting.findUnique.mockReset();
+    prismaMocks.jobPosting.findUnique.mockResolvedValue(null);
+  });
+
+  it("maps an old public posting notification to an authorized catalogue job", async () => {
+    prismaMocks.jobPosting.findUnique.mockResolvedValue({
+      reviewAggregate: { jobId: "catalog-job-1" },
+    });
+
+    await expect(
+      resolveRecruiterJobIdForNavigation("public-job-1", [
+        { id: "catalog-job-1" },
+      ]),
+    ).resolves.toBe("catalog-job-1");
+    expect(prismaMocks.jobPosting.findUnique).toHaveBeenCalledWith({
+      where: { id: "public-job-1" },
+      select: { reviewAggregate: { select: { jobId: true } } },
+    });
+  });
+
+  it("does not resolve a public posting outside the authorized job projection", async () => {
+    prismaMocks.jobPosting.findUnique.mockResolvedValue({
+      reviewAggregate: { jobId: "other-company-job" },
+    });
+
+    await expect(
+      resolveRecruiterJobIdForNavigation("public-job-1", [
+        { id: "catalog-job-1" },
+      ]),
+    ).resolves.toBeNull();
   });
 
   it("exposes an admin-approved database company to recruiter settings", async () => {

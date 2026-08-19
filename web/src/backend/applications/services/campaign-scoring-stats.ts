@@ -60,16 +60,16 @@ export class CampaignScoringStatsService {
         COUNT(*)::int AS "total",
         COUNT(*) FILTER (
           WHERE result."state"::text = 'SCORED'
-            AND result."finalScore" >= 80
+            AND result."aiScore" >= result."highThreshold"
         )::int AS "strong",
         COUNT(*) FILTER (
           WHERE result."state"::text = 'SCORED'
-            AND result."finalScore" >= 60
-            AND result."finalScore" < 80
+            AND result."aiScore" >= result."mediumThreshold"
+            AND result."aiScore" < result."highThreshold"
         )::int AS "review",
         COUNT(*) FILTER (
           WHERE result."state"::text = 'SCORED'
-            AND result."finalScore" < 60
+            AND result."aiScore" < result."mediumThreshold"
         )::int AS "low",
         COUNT(*) FILTER (
           WHERE application."scoringStatus"::text = 'PENDING'

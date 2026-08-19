@@ -1,31 +1,15 @@
 import "server-only";
 
-import { randomUUID } from "node:crypto";
-import { prisma } from "@/backend/database/prisma";
-import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
-import { createInAppNotification } from "@/backend/notifications/notification-service";
+import { ApplicationStageService } from "@/backend/services/jobs/application-stage-service";
+import { JobServiceError } from "@/backend/services/jobs/job-types";
 import {
   offerResponseCommandSchema,
   offerResponseOutcomeSchema,
-  publicOutcomeForCanonicalStage,
-  publicStageForCanonicalStage,
-  publicUpdateKindForCanonicalStage,
-  publicUpdateTitleForCanonicalStage,
   type OfferResponseCommand,
   type OfferResponseOutcome,
 } from "@/shared/contracts/candidate-applications";
-import { applicationStageSchema } from "@/shared/contracts/jobs/applications";
 import type { CandidateActor } from "@/backend/services/jobs/job-types";
 import { CandidateApplicationError } from "./candidate-application-errors";
-
-function isSerializationConflict(error: unknown) {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    (error as { code?: unknown }).code === "P2034"
-  );
-}
 
 function targetStage(command: OfferResponseCommand) {
   return command.decision === "ACCEPT" ? "HIRED" : "OFFER_DECLINED";
@@ -45,15 +29,16 @@ function responseReasonLabel(command: OfferResponseCommand) {
 
 function outcome(row: {
   applicationId: string;
-  eventId: string;
-  fromStage: string | null;
-  toStage: string;
-  applicationVersion: number;
-  occurredAt: Date;
+  stageEventId: string;
+  fromStage: string;
+  stage: string;
+  stageVersion: number;
+  lastStageChangedAt: string;
 }) {
-  const fromStage = applicationStageSchema.parse(row.fromStage);
-  const stage = applicationStageSchema.parse(row.toStage);
-  if (fromStage !== "OFFERED" || !["HIRED", "OFFER_DECLINED"].includes(stage)) {
+  if (
+    row.fromStage !== "OFFERED" ||
+    !["HIRED", "OFFER_DECLINED", "WAITLISTED"].includes(row.stage)
+  ) {
     throw new CandidateApplicationError(
       409,
       "APPLICATION_OFFER_RESPONSE_UNAVAILABLE",
@@ -62,15 +47,48 @@ function outcome(row: {
   }
   return offerResponseOutcomeSchema.parse({
     applicationId: row.applicationId,
-    fromStage,
-    stage,
-    stageVersion: row.applicationVersion,
-    lastStageChangedAt: row.occurredAt.toISOString(),
-    eventId: row.eventId,
+    fromStage: "OFFERED",
+    stage: row.stage,
+    stageVersion: row.stageVersion,
+    lastStageChangedAt: row.lastStageChangedAt,
+    eventId: row.stageEventId,
   });
 }
 
+function mapStageError(error: JobServiceError): CandidateApplicationError {
+  switch (error.body.code) {
+    case "APPLICATION_STAGE_CONFLICT":
+      return new CandidateApplicationError(
+        409,
+        "APPLICATION_STAGE_CONFLICT",
+        "This application changed. Refresh it and try again.",
+      );
+    case "APPLICATION_WITHDRAWAL_BLOCKED":
+      return new CandidateApplicationError(
+        409,
+        "APPLICATION_OFFER_RESPONSE_BLOCKED",
+        "This application has been withdrawn.",
+      );
+    case "APPLICATION_UNAVAILABLE":
+      return new CandidateApplicationError(
+        404,
+        "APPLICATION_UNAVAILABLE",
+        "This application is unavailable.",
+      );
+    default:
+      return new CandidateApplicationError(
+        error.status === 409 ? 409 : 400,
+        error.body.code,
+        error.body.message,
+      );
+  }
+}
+
 export class CandidateOfferResponseService {
+  constructor(
+    private readonly stageService = new ApplicationStageService(),
+  ) {}
+
   async respond(
     actor: CandidateActor,
     applicationId: string,
@@ -92,207 +110,32 @@ export class CandidateOfferResponseService {
     }
 
     try {
-      return await prisma.$transaction(
-        async (tx) => {
-          const replay = await tx.applicationStageEvent.findFirst({
-            where: {
-              applicationId,
-              idempotencyKey,
-              application: { candidateUserId: actor.userId },
-            },
-            select: {
-              id: true,
-              fromStage: true,
-              toStage: true,
-              applicationVersion: true,
-              occurredAt: true,
-            },
-          });
-          if (replay) {
-            return outcome({
-              ...replay,
-              applicationId,
-              eventId: replay.id,
-            });
-          }
-
-          const application = await tx.jobApplication.findFirst({
-            where: { id: applicationId, candidateUserId: actor.userId },
-            select: {
-              id: true,
-              stage: true,
-              stageVersion: true,
-              withdrawalOutcome: true,
-              candidateUserId: true,
-              jobPosting: {
-                select: {
-                  companyId: true,
-                  title: true,
-                  company: { select: { displayName: true } },
-                },
-              },
-              notificationPreference: {
-                select: { inAppEnabled: true },
-              },
-            },
-          });
-          if (!application) {
-            throw new CandidateApplicationError(
-              404,
-              "APPLICATION_UNAVAILABLE",
-              "This application is unavailable.",
-            );
-          }
-          if (application.withdrawalOutcome) {
-            throw new CandidateApplicationError(
-              409,
-              "APPLICATION_OFFER_RESPONSE_BLOCKED",
-              "This application has been withdrawn.",
-            );
-          }
-          if (application.stage !== "OFFERED") {
-            throw new CandidateApplicationError(
-              409,
-              "APPLICATION_OFFER_RESPONSE_UNAVAILABLE",
-              "This offer response is no longer available.",
-            );
-          }
-          if (application.stageVersion !== command.expectedVersion) {
-            throw new CandidateApplicationError(
-              409,
-              "APPLICATION_STAGE_CONFLICT",
-              "This application changed. Refresh it and try again.",
-            );
-          }
-
-          const nextStage = targetStage(command);
-          const nextVersion = application.stageVersion + 1;
-          const updated = await tx.jobApplication.updateMany({
-            where: {
-              id: application.id,
-              candidateUserId: actor.userId,
-              stage: "OFFERED",
-              stageVersion: command.expectedVersion,
-              withdrawalOutcome: null,
-            },
-            data: {
-              stage: nextStage,
-              stageVersion: { increment: 1 },
-              lastStageChangedAt: now,
-            },
-          });
-          if (updated.count !== 1) {
-            throw new CandidateApplicationError(
-              409,
-              "APPLICATION_STAGE_CONFLICT",
-              "This application changed. Refresh it and try again.",
-            );
-          }
-
-          const event = await tx.applicationStageEvent.create({
-            data: {
-              applicationId: application.id,
-              fromStage: "OFFERED",
-              toStage: nextStage,
-              actorUserId: actor.userId,
-              actorType: "CANDIDATE",
-              reasonCode: responseReason(command),
-              reasonLabelSnapshot: responseReasonLabel(command),
-              candidateVisibleReason: responseReasonLabel(command),
-              candidateVisible: true,
-              occurredAt: now,
-              applicationVersion: nextVersion,
-              idempotencyKey,
-              metadata: {
-                v: 1,
-                source: "candidate-offer-response",
-                decision: command.decision,
-              },
-            },
-          });
-
-          await tx.applicationPublicUpdate.create({
-            data: {
-              applicationId: application.id,
-              kind: publicUpdateKindForCanonicalStage(nextStage),
-              publicStage: publicStageForCanonicalStage(nextStage),
-              publicOutcome: publicOutcomeForCanonicalStage(nextStage),
-              title: publicUpdateTitleForCanonicalStage(nextStage),
-              effectiveAt: now,
-              deduplicationKey: `application:${application.id}:public:stage:${nextVersion}`,
-              sourceEventReference: event.id,
-            },
-          });
-
-          await tx.recruitmentNotificationWork.create({
-            data: {
-              applicationId: application.id,
-              audience: "COMPANY",
-              kind: "APPLICATION_STAGE_CHANGED",
-              targetReference: application.jobPosting.companyId,
-              payloadRef: {
-                v: 1,
-                event: "CANDIDATE_OFFER_RESPONSE",
-                decision: command.decision,
-                applicationId: application.id,
-                stage: nextStage,
-                jobTitle: application.jobPosting.title,
-                companyName: application.jobPosting.company.displayName,
-              },
-              idempotencyKey: `application:${application.id}:offer-response:${nextVersion}:company`,
-            },
-          });
-
-          if (application.notificationPreference?.inAppEnabled ?? true) {
-            await createInAppNotification(tx, {
-              recipientUserId: application.candidateUserId,
-              kind: "APPLICATION_STAGE_CHANGED",
-              deduplicationKey: `application:${application.id}:stage:${nextVersion}:candidate`,
-              correlationId: event.id,
-              occurredAt: now,
-              contextType: "APPLICATION",
-              contextId: application.id,
-              variables: { stage: nextStage },
-            });
-          }
-
-          await new PrismaAuditRepository(tx).append({
-            occurredAt: now,
-            actorType: "user",
-            actorUserId: actor.userId,
-            actorSessionId: actor.sessionId,
-            action: "job.application.stage_changed",
-            targetType: "job_application",
-            targetId: application.id,
-            result: "SUCCESS",
-            correlationId: randomUUID(),
-            context: {
-              fromStage: "OFFERED",
-              toStage: nextStage,
-              reason: responseReason(command),
-              applicationVersion: nextVersion,
-            },
-          });
-
-          return offerResponseOutcomeSchema.parse({
-            applicationId: application.id,
-            fromStage: "OFFERED",
-            stage: nextStage,
-            stageVersion: nextVersion,
-            lastStageChangedAt: now.toISOString(),
-            eventId: event.id,
-          });
+      const result = await this.stageService.attemptStageTransition({
+        candidateApplicationId: applicationId,
+        targetStage: targetStage(command),
+        actor: {
+          kind: "candidate_response",
+          userId: actor.userId,
+          sessionId: actor.sessionId,
         },
-        { isolationLevel: "Serializable" },
-      );
+        expectedStageVersion: command.expectedVersion,
+        idempotencyKey,
+        reasonCode: responseReason(command),
+        candidateVisibleReason: responseReasonLabel(command),
+        now,
+      });
+
+      return outcome({
+        applicationId: result.applicationId,
+        stageEventId: result.stageEventId,
+        fromStage: result.fromStage,
+        stage: result.stage,
+        stageVersion: result.stageVersion,
+        lastStageChangedAt: result.lastStageChangedAt,
+      });
     } catch (error) {
-      if (isSerializationConflict(error)) {
-        throw new CandidateApplicationError(
-          409,
-          "APPLICATION_STAGE_CONFLICT",
-          "This application changed. Refresh it and try again.",
-        );
-      }
+      if (error instanceof CandidateApplicationError) throw error;
+      if (error instanceof JobServiceError) throw mapStageError(error);
       throw error;
     }
   }

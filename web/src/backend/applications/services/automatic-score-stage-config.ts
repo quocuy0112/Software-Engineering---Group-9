@@ -4,7 +4,7 @@ import type { ExplicitLabel } from "@/shared/contracts/scoring";
 
 const DEFAULT_LOW_SCORE_THRESHOLD = 60;
 const DEFAULT_STRONG_SCORE_THRESHOLD = 80;
-const DEFAULT_VIEWED_TIMEOUT_MINUTES = 24 * 60;
+const DEFAULT_VIEWED_TIMEOUT_MINUTES = 12 * 60;
 
 export const automaticScoreStageReasonCodes = Object.freeze({
   lowScoreAutoReject: "score_below_60_auto_reject",

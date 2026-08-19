@@ -12,6 +12,16 @@ const isoDateTimeSchema = z.string().datetime();
 
 export const pipelineApplicationStages = applicationStageSchema.options;
 
+export const terminalPipelineStages = [
+  "HIRED",
+  "OFFER_DECLINED",
+  "REJECTED",
+] as const satisfies readonly ApplicationStage[];
+
+export function isTerminalPipelineStage(stage: ApplicationStage) {
+  return terminalPipelineStages.includes(stage as (typeof terminalPipelineStages)[number]);
+}
+
 export const pipelineStageLabels: Record<ApplicationStage, string> = {
   APPLIED: "Applied",
   VIEWED: "Viewed",
@@ -71,6 +81,8 @@ export const pipelineBoardMetadataSchema = z
       .strict(),
     permissions: pipelinePermissionsSchema,
     stages: z.array(pipelineStageCountSchema).length(9),
+    /** Changes whenever a visible application stage or score is persisted. */
+    revisionAt: isoDateTimeSchema.nullable().optional(),
     observedAt: isoDateTimeSchema,
   })
   .strict();
@@ -92,7 +104,12 @@ export const pipelineScoreSchema = z
       "UNAVAILABLE",
     ]),
     final: z.number().min(0).max(100).nullable(),
+    /** The AI-only Smart Match score, shown separately from the final score. */
+    aiScore: z.number().min(0).max(100).nullable().optional(),
+    /** The final-score tier used by automatic recruitment-stage rules. */
     band: pipelineScoreBandSchema.nullable(),
+    /** The AI-only Smart Match tier, shown separately from the final tier. */
+    aiScoreBand: pipelineScoreBandSchema.nullable().optional(),
   })
   .strict();
 
@@ -116,6 +133,8 @@ export const pipelineApplicationCardSchema = z
       .strict(),
     score: pipelineScoreSchema.nullable(),
     allowedDestinations: z.array(applicationStageSchema).max(8),
+    /** Droppable targets are narrower than button destinations. */
+    dragDestinations: z.array(applicationStageSchema).max(8).optional(),
   })
   .strict();
 
@@ -141,8 +160,10 @@ export const stageTransitionCommandSchema = z
   .object({
     targetStage: applicationStageSchema,
     expectedStageVersion: z.number().int().min(1),
+    intent: z.enum(["button", "drag"]).optional(),
     confirmed: z.boolean().optional(),
     reasonCode: z.string().min(1).max(80).optional(),
+    candidateVisibleReason: z.string().min(1).max(500).optional(),
     internalNote: z.string().min(1).max(2_000).optional(),
   })
   .strict();

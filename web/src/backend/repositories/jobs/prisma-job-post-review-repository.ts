@@ -7,6 +7,7 @@ import type { JobReviewSnapshot } from "@/shared/contracts/recruiter-job-posting
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
 import { createInAppNotification } from "@/backend/notifications/notification-service";
 import { projectJobReviewSnapshot } from "@/backend/jobs/review/job-post-publication-projector";
+import { promoteWaitlistedApplicationsInTransaction } from "@/backend/services/jobs/application-stage-service";
 import { reviewSearchTokens } from "@/backend/jobs/review/job-post-review-search";
 
 type ReviewDb = typeof prisma | Prisma.TransactionClient;
@@ -258,10 +259,18 @@ export class PrismaJobPostReviewRepository {
       input.command.command === "APPROVE" ? "APPROVED" : "REJECTED";
     let publicJobPostingId = input.existingPublicJobPostingId;
     let publishedAt: Date | null = null;
+    let previousCapacity: number | null;
 
     if (input.command.command === "APPROVE") {
       const projected = projectJobReviewSnapshot(input.snapshot);
       const { skills, ...jobData } = projected;
+      const previousPublicJob = publicJobPostingId
+        ? await this.db.jobPosting.findUnique({
+            where: { id: publicJobPostingId },
+            select: { numberOfHires: true },
+          })
+        : null;
+      previousCapacity = previousPublicJob?.numberOfHires ?? null;
       const slugOwner = await this.db.jobPosting.findUnique({
         where: { slug: projected.slug },
         select: {
@@ -302,6 +311,16 @@ export class PrismaJobPostReviewRepository {
       });
       publicJobPostingId = publicJob.id;
       publishedAt = input.now;
+      if (input.closedAt === null) {
+        await promoteWaitlistedApplicationsInTransaction({
+          db: this.db,
+          jobPostingId: publicJob.id,
+          previousCapacity,
+          newCapacity: projected.numberOfHires,
+          correlationId: input.correlationId,
+          now: input.now,
+        });
+      }
       await this.db.jobPostingSkill.deleteMany({
         where: { jobPostingId: publicJob.id },
       });

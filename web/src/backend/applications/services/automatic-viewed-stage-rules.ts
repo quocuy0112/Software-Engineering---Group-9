@@ -22,7 +22,7 @@ type ScoredApplication = Readonly<{
   lastStageChangedAt: Date;
   withdrawalOutcome: string | null;
   currentScoringResult: {
-    aiScore: unknown;
+    state: "DETERMINISTIC_ONLY" | "SCORED";
     finalScore: unknown;
     mediumThreshold: unknown;
     highThreshold: unknown;
@@ -30,6 +30,7 @@ type ScoredApplication = Readonly<{
 }>;
 
 const actor: StageTransitionActor = { kind: "system_auto_score" };
+const automaticStageRuleBatchSize = 500;
 
 function decimalNumber(value: unknown) {
   if (value === null || value === undefined || value === "") {
@@ -72,23 +73,26 @@ function timedOut(
 
 function automaticDecision(input: {
   candidate: ScoredApplication;
-  matchScore: number;
+  finalScore: number;
   config: AutomaticScoreStageRuleConfig;
   timeout: boolean;
 }) {
-  const { matchScore, config, timeout, candidate } = input;
-  if (candidate.stage === "APPLIED") {
-    if (matchScore >= config.lowScoreThreshold) return null;
+  const { finalScore, config, timeout, candidate } = input;
+  if (finalScore < config.lowScoreThreshold) {
     return {
       targetStage: "REJECTED" as const,
       reasonCode: lowScoreAutomaticRejectReasonCode(config),
       candidateVisibleReason:
-        "Your application was not selected because its Smart Match score was below the configured threshold.",
+        "Your application was not selected because its final score was below the configured threshold.",
     };
   }
 
+  if (candidate.stage === "APPLIED") {
+    return null;
+  }
+
   if (!timeout) return null;
-  if (matchScore >= config.strongScoreThreshold) {
+  if (finalScore >= config.strongScoreThreshold) {
     return {
       targetStage: "SHORTLISTED" as const,
       reasonCode:
@@ -100,12 +104,12 @@ function automaticDecision(input: {
   return {
     targetStage: "REJECTED" as const,
     reasonCode:
-      matchScore < config.lowScoreThreshold
+      finalScore < config.lowScoreThreshold
         ? lowScoreAutomaticRejectReasonCode(config)
         : automaticScoreStageReasonCodes.reviewNeededTimeoutAutoReject,
     candidateVisibleReason:
-      matchScore < config.lowScoreThreshold
-        ? "Your application was not selected because its Smart Match score was below the configured threshold."
+      finalScore < config.lowScoreThreshold
+        ? "Your application was not selected because its final score was below the configured threshold."
         : "Your application was not selected because no manual decision was recorded during the review window.",
   };
 }
@@ -117,17 +121,23 @@ async function applyDecision(input: {
   config: AutomaticScoreStageRuleConfig;
   timeout: boolean;
 }) {
-  // Stage automation must use the published score recruiters see. Falling
-  // back to the AI-only value keeps deterministic-only/legacy rows compatible
-  // without allowing a low AI sub-score to reject a strong final match.
-  const matchScore = decimalNumber(
-    input.candidate.currentScoringResult?.finalScore ??
-      input.candidate.currentScoringResult?.aiScore,
+  // A deterministic result (or an incomplete/legacy result) is not an AI
+  // score. It must never drive a recruitment-stage decision. In particular,
+  // a missing score must not be coerced into zero and auto-rejected.
+  if (input.candidate.currentScoringResult?.state !== "SCORED") {
+    return null;
+  }
+
+  // Stage automation is driven by the published hybrid final score
+  // (`finalScore`), not the AI-only Smart Match score. The final score is the
+  // same score shown on the pipeline card and in the scoring detail panel.
+  const finalScore = decimalNumber(
+    input.candidate.currentScoringResult.finalScore,
   );
-  if (!Number.isFinite(matchScore)) return null;
+  if (!Number.isFinite(finalScore)) return null;
   const decision = automaticDecision({
     candidate: input.candidate,
-    matchScore,
+    finalScore,
     config: input.config,
     timeout: input.timeout,
   });
@@ -160,7 +170,7 @@ function applicationSelection() {
     withdrawalOutcome: true,
     currentScoringResult: {
       select: {
-        aiScore: true,
+        state: true,
         finalScore: true,
         mediumThreshold: true,
         highThreshold: true,
@@ -192,21 +202,75 @@ export async function applyAutomaticViewedStageRules(input: {
     },
     select: applicationSelection(),
     orderBy: [{ lastStageChangedAt: "asc" }, { id: "asc" }],
-    take: 500,
+    take: automaticStageRuleBatchSize,
   })) as unknown as ScoredApplication[];
 
+  return applyAutomaticStageRulesForCandidates({
+    candidates,
+    now,
+    stageService,
+    fallbackConfig: config,
+  });
+}
+
+/**
+ * Runs the same centralized rules without requiring a recruiter to request a
+ * specific job's pipeline. This is used by the server scoring runtime so a
+ * Viewed timeout is enforced after the recruiter has left the page.
+ */
+export async function applyAutomaticViewedStageRulesForAllApplications(input: {
+  now?: Date;
+  stageService?: ApplicationStageService;
+  db?: typeof prisma;
+  limit?: number;
+}) {
+  const now = input.now ?? new Date();
+  const db = input.db ?? prisma;
+  const stageService = input.stageService ?? new ApplicationStageService(db);
+  const config = getAutomaticScoreStageRuleConfig();
+  const candidates = (await db.jobApplication.findMany({
+    where: {
+      withdrawalOutcome: null,
+      stage: { in: ["APPLIED", "VIEWED"] },
+      currentScoringResultId: { not: null },
+    },
+    select: applicationSelection(),
+    orderBy: [{ lastStageChangedAt: "asc" }, { id: "asc" }],
+    take: Math.max(
+      1,
+      Math.min(input.limit ?? automaticStageRuleBatchSize, 5_000),
+    ),
+  })) as unknown as ScoredApplication[];
+
+  return applyAutomaticStageRulesForCandidates({
+    candidates,
+    now,
+    stageService,
+    fallbackConfig: config,
+  });
+}
+
+async function applyAutomaticStageRulesForCandidates(input: {
+  candidates: ScoredApplication[];
+  now: Date;
+  stageService: ApplicationStageService;
+  fallbackConfig: AutomaticScoreStageRuleConfig;
+}) {
   const results: StageTransitionOutcome[] = [];
-  for (const candidate of candidates) {
+  for (const candidate of input.candidates) {
     if (candidate.withdrawalOutcome) continue;
-    const candidateConfig = configForCandidate(candidate, config);
+    const candidateConfig = configForCandidate(
+      candidate,
+      input.fallbackConfig,
+    );
     const result = await applyDecision({
       candidate,
-      now,
-      stageService,
+      now: input.now,
+      stageService: input.stageService,
       config: candidateConfig,
       timeout:
         candidate.stage === "VIEWED" &&
-        timedOut(candidate, now, candidateConfig),
+        timedOut(candidate, input.now, candidateConfig),
     });
     if (result) results.push(result);
   }
@@ -214,7 +278,7 @@ export async function applyAutomaticViewedStageRules(input: {
 }
 
 /**
- * Called immediately after a published AI result. This is deliberately
+ * Called immediately after a published scoring result. This is deliberately
  * application-scoped so a low score cannot wait for a board read or a CV open.
  */
 export async function applyAutomaticScoreStageRuleForApplication(input: {

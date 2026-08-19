@@ -82,17 +82,38 @@ export class ShortlistApplicationService {
     }
 
     try {
-      const transitioned = await this.stageService.transition(
-        { userId: input.userId, sessionId: input.sessionId },
-        current.id,
-        {
-          targetStage: "SHORTLISTED",
-          expectedVersion: current.stageVersion,
-          reasonCode: "RECRUITER_SHORTLISTED_CANDIDATE",
-          candidateVisibleReason: "Your application has been shortlisted.",
-        },
-        input.now,
-      );
+      const authority = this.stageService as unknown as {
+        attemptStageTransition?: ApplicationStageService["attemptStageTransition"];
+        transition: ApplicationStageService["transition"];
+      };
+      const transitioned =
+        typeof authority.attemptStageTransition === "function"
+          ? await authority.attemptStageTransition({
+              candidateApplicationId: current.id,
+              targetStage: "SHORTLISTED",
+              actor: {
+                kind: "recruiter_manual",
+                userId: input.userId,
+                sessionId: input.sessionId,
+              },
+              requestedJobId: current.jobPostingId,
+              expectedStageVersion: current.stageVersion,
+              reasonCode: "RECRUITER_SHORTLISTED_CANDIDATE",
+              candidateVisibleReason: "Your application has been shortlisted.",
+              source: "STAGE_ROUTE",
+              now: input.now,
+            })
+          : await authority.transition(
+              { userId: input.userId, sessionId: input.sessionId },
+              current.id,
+              {
+                targetStage: "SHORTLISTED",
+                expectedVersion: current.stageVersion,
+                reasonCode: "RECRUITER_SHORTLISTED_CANDIDATE",
+                candidateVisibleReason: "Your application has been shortlisted.",
+              },
+              input.now,
+            );
       return applicationShortlistOutcomeSchema.parse({
         applicationId: transitioned.applicationId,
         stage: transitioned.stage,

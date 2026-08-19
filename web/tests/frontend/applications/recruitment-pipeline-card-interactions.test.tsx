@@ -30,6 +30,28 @@ const card: PipelineApplicationCard = {
   documents: { cvAvailable: true, coverLetterAvailable: false },
   score: null,
   allowedDestinations: ["VIEWED", "REJECTED"],
+  dragDestinations: ["VIEWED", "REJECTED"],
+};
+
+const hiredCard: PipelineApplicationCard = {
+  ...card,
+  applicationId: "application-hired",
+  stage: "HIRED",
+  stageVersion: 2,
+  allowedDestinations: ["REJECTED", "WAITLISTED"],
+  dragDestinations: ["REJECTED", "WAITLISTED"],
+};
+
+const scoredCard: PipelineApplicationCard = {
+  ...card,
+  applicationId: "application-scored",
+  score: {
+    state: "SCORED",
+    final: 72,
+    aiScore: 91,
+    band: { code: "MEDIUM_MATCH", label: "Review needed" },
+    aiScoreBand: { code: "HIGH_MATCH", label: "Strong match" },
+  },
 };
 
 describe("RecruitmentPipelineCard interactions", () => {
@@ -38,10 +60,14 @@ describe("RecruitmentPipelineCard interactions", () => {
     keyDown.mockClear();
   });
 
-  it("starts pointer dragging from the non-interactive card body", () => {
+  it("starts pointer dragging from the dedicated drag handle", () => {
     render(<RecruitmentPipelineCard card={card} jobId="job-1" />);
 
-    fireEvent.pointerDown(screen.getByText("Ada Candidate"));
+    fireEvent.pointerDown(
+      screen.getByRole("button", {
+        name: "Drag Ada Candidate to another stage",
+      }),
+    );
 
     expect(pointerDown).toHaveBeenCalledOnce();
   });
@@ -55,6 +81,7 @@ describe("RecruitmentPipelineCard interactions", () => {
         onChangeStage={onChangeStage}
       />,
     );
+    fireEvent.click(screen.getByText("Ada Candidate"));
     const changeStage = screen.getByRole("button", { name: "Change Stage" });
 
     fireEvent.pointerDown(changeStage);
@@ -75,5 +102,66 @@ describe("RecruitmentPipelineCard interactions", () => {
     fireEvent.keyDown(handle, { key: "Enter" });
 
     expect(keyDown).toHaveBeenCalledOnce();
+  });
+
+  it("keeps hired cards read-only even when stale destinations are present", () => {
+    const onChangeStage = vi.fn();
+    render(
+      <RecruitmentPipelineCard
+        card={hiredCard}
+        jobId="job-1"
+        onChangeStage={onChangeStage}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", {
+        name: "Drag Ada Candidate to another stage",
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Change Stage" }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.pointerDown(screen.getByText("Ada Candidate"));
+
+    expect(pointerDown).not.toHaveBeenCalled();
+    expect(onChangeStage).not.toHaveBeenCalled();
+  });
+
+  it("displays the final score and final-score tier badge", () => {
+    render(<RecruitmentPipelineCard card={scoredCard} jobId="job-1" />);
+
+    expect(
+      screen.getByRole("progressbar", {
+        name: "Final score 72 percent for Ada Candidate",
+      }),
+    ).toHaveAttribute("aria-valuenow", "72");
+    expect(screen.getByText("72%")).toBeVisible();
+    expect(screen.getByText("Review needed")).toBeVisible();
+    expect(screen.queryByText("Strong match")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("progressbar", {
+        name: "AI Smart Match score 91 percent for Ada Candidate",
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("opens the AI assessment from the Kanban card", () => {
+    const onViewAssessment = vi.fn();
+    render(
+      <RecruitmentPipelineCard
+        card={scoredCard}
+        jobId="job-1"
+        onViewAssessment={onViewAssessment}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Ada Candidate"));
+
+    fireEvent.click(screen.getByRole("button", { name: "View AI assessment" }));
+
+    expect(onViewAssessment).toHaveBeenCalledOnce();
+    expect(onViewAssessment).toHaveBeenCalledWith(scoredCard);
   });
 });
