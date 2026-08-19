@@ -6,6 +6,11 @@
 
 ## Summary
 
+**Feature 024 synchronization (2026-08-19):** Pipeline authorization continues
+to derive access from the current `CompanyMembership` row. Team invitations do
+not grant pipeline access until accepted, and suspended/removed members lose it
+on the next server authorization check.
+
 Add a job-scoped Kanban view to the existing Recruiter candidate workspace. The existing catalogue job selector remains the entry point, but a strengthened `RecruiterApplicationAuthorization` resolves that external job reference to exactly one authorized PostgreSQL `JobPosting.id` before applicant reads, scoring enrichment, document access, or mutation. A bounded board projection returns authoritative stage counts and independently cursor-paged columns, so up to 10,000 applications remain discoverable without rendering or transferring every card.
 
 All board moves and existing interview/rejection actions converge on an extended `ApplicationStageService`. That single service validates the canonical transition policy, active verified-company authority, mutation roles, reasons and confirmations; performs stage-version compare-and-set, history, audit, in-app notification, and email-outbox writes in one serializable transaction; and replays exact idempotent retries without duplicating side effects. The frontend adds an accessible list/Kanban switch, pointer drag-and-drop through `@dnd-kit/core`, a first-class non-drag stage control, explicit consequential-decision dialogs, optimistic feedback, and authoritative rollback/reconciliation.

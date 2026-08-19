@@ -609,10 +609,6 @@ export type CompanyMembershipUncheckedUpdateManyWithoutCompanyNestedInput = {
   deleteMany?: Prisma.CompanyMembershipScalarWhereInput | Prisma.CompanyMembershipScalarWhereInput[]
 }
 
-export type EnumCompanyMembershipRoleFieldUpdateOperationsInput = {
-  set?: $Enums.CompanyMembershipRole
-}
-
 export type EnumCompanyMembershipStatusFieldUpdateOperationsInput = {
   set?: $Enums.CompanyMembershipStatus
 }

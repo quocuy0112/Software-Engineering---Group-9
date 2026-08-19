@@ -17,7 +17,7 @@ import {
 } from "@/shared/contracts/jobs/catalog";
 import styles from "./company-settings-screen.module.css";
 
-type Props = { initialCompany: RecruiterCompanySettings | null };
+type Props = { initialCompany: RecruiterCompanySettings | null; canManageTeam?: boolean };
 type FormState = RecruiterCompanySettingsInput;
 type FieldName = "name" | "industry" | "size" | "address" | "logo";
 type FieldErrors = Partial<Record<FieldName | "website", string>>;
@@ -211,7 +211,7 @@ function fieldClass(hasError: boolean) {
   return hasError ? `${styles.field} ${styles.error}` : styles.field;
 }
 
-export function CompanySettingsScreen({ initialCompany }: Props) {
+export function CompanySettingsScreen({ initialCompany, canManageTeam = false }: Props) {
   const csrfProof = useCsrfProof();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -754,10 +754,7 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
             <div className={styles.srl}>Members</div>
             <div className={styles.srv}>{company.memberUserIds.length}</div>
           </div>
-          <p className={styles.sideNote}>
-            Team invitations and member removal will be added after the approval
-            workflow UI is exposed to admins.
-          </p>
+          {canManageTeam ? <Link className={styles.btnOutline} href="/recruiter/company-settings/team">Manage team</Link> : <p className={styles.sideNote}>Only the active company owner can manage team members.</p>}
         </aside>
       </div>
     </section>

@@ -568,6 +568,13 @@ enum CompanyMembershipStatus {
   REMOVED
 }
 
+enum CompanyInvitationState {
+  PENDING
+  REVOKED
+  ACCEPTED
+  EXPIRED
+}
+
 enum ProfessionalConnectionStatus {
   ACCEPTED
   REVOKED
@@ -1061,6 +1068,8 @@ model UserAccount {
   imageSearchQueries              SearchImageQuery[]
   imageSearchConsents             SearchProcessingConsent[]
   companyMemberships              CompanyMembership[]
+  companyInvitationsSent           CompanyInvitation[]                     @relation("CompanyInvitationInviter")
+  companyInvitationsAccepted       CompanyInvitation[]                     @relation("CompanyInvitationAcceptor")
   platformAdministratorGrants     PlatformAdministratorGrant[]
   recruiterVerificationRequests   RecruiterVerificationRequest[]
   employerVerificationPreparation EmployerVerificationPreparation?
@@ -1638,12 +1647,37 @@ model Company {
   updatedAt                     DateTime                       @updatedAt
   jobPostings                   JobPosting[]
   memberships                   CompanyMembership[]
+  invitations                   CompanyInvitation[]
   recruiterVerificationRequests RecruiterVerificationRequest[]
   accessPrerequisites           CompanyAccessPrerequisite[]
   messagingConversations        MessagingConversation[]
   jobPostReviewAggregates       JobPostReviewAggregate[]
 
   @@index([verifiedAt, id])
+}
+
+model CompanyInvitation {
+  id                 String                 @id @default(cuid())
+  companyId          String
+  normalizedEmail    String
+  role               CompanyMembershipRole
+  state              CompanyInvitationState @default(PENDING)
+  tokenDigest        String                 @unique
+  invitedByUserId    String
+  acceptedByUserId   String?
+  acceptedAt         DateTime?
+  revokedAt          DateTime?
+  expiresAt          DateTime
+  version            Int                    @default(1)
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  company            Company                @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  invitedBy          UserAccount            @relation("CompanyInvitationInviter", fields: [invitedByUserId], references: [id], onDelete: Restrict)
+  acceptedBy         UserAccount?           @relation("CompanyInvitationAcceptor", fields: [acceptedByUserId], references: [id], onDelete: SetNull)
+
+  // PostgreSQL migration enforces uniqueness only while the invitation is PENDING.
+  @@index([companyId, normalizedEmail, state])
+  @@index([normalizedEmail, state, expiresAt])
 }
 
 model CompanyMembership {

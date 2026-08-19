@@ -77,6 +77,7 @@ export const ModelName = {
   InAppNotification: 'InAppNotification',
   AuditEvent: 'AuditEvent',
   Company: 'Company',
+  CompanyInvitation: 'CompanyInvitation',
   CompanyMembership: 'CompanyMembership',
   PlatformAdministratorGrant: 'PlatformAdministratorGrant',
   PlatformAdministratorGrantScopeAssignment: 'PlatformAdministratorGrantScopeAssignment',
@@ -686,6 +687,26 @@ export const CompanyScalarFieldEnum = {
 } as const
 
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
+
+
+export const CompanyInvitationScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  normalizedEmail: 'normalizedEmail',
+  role: 'role',
+  state: 'state',
+  tokenDigest: 'tokenDigest',
+  invitedByUserId: 'invitedByUserId',
+  acceptedByUserId: 'acceptedByUserId',
+  acceptedAt: 'acceptedAt',
+  revokedAt: 'revokedAt',
+  expiresAt: 'expiresAt',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CompanyInvitationScalarFieldEnum = (typeof CompanyInvitationScalarFieldEnum)[keyof typeof CompanyInvitationScalarFieldEnum]
 
 
 export const CompanyMembershipScalarFieldEnum = {
