@@ -234,6 +234,8 @@
 
 .auth-navigation a {
   display: inline-flex;
+  min-width: 0;
+  flex: 1 1 0;
   min-height: 44px;
   align-items: center;
   justify-content: center;
@@ -243,7 +245,9 @@
   color: var(--sh-color-text-secondary);
   font-size: var(--sh-font-size-body-sm);
   font-weight: var(--sh-font-weight-medium);
+  line-height: 1;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .auth-navigation a:hover {
@@ -253,7 +257,8 @@
 
 .auth-card:has(#page-title) .auth-navigation a[href="/login"],
 .auth-card:has(#full-name) .auth-navigation a[href="/register"],
-.auth-card:has(#forgot-email) .auth-navigation a[href="/forgot-password"] {
+.auth-card:has(#forgot-email) .auth-navigation a[href="/forgot-password"],
+.auth-card:has(.check-email-view) .auth-navigation a[href="/register"] {
   color: var(--sh-color-brand-primary);
   background: var(--sh-color-surface-card);
   border-color: var(--sh-color-border-subtle);
@@ -385,11 +390,144 @@
 }
 
 .auth-panel-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   margin: var(--sh-space-4) 0 0;
   color: var(--sh-color-text-muted);
   font-size: var(--sh-font-size-caption);
   line-height: var(--sh-line-height-caption);
   text-align: center;
+}
+
+.check-email-view {
+  display: grid;
+  gap: 20px;
+}
+
+.check-email-icon {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border: 1px solid #dbe6fe;
+  border-radius: 16px;
+  color: #1a56db;
+  background: #eef4ff;
+}
+
+.check-email-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.check-email-copy h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 26px;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+}
+
+.check-email-copy p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.check-email-address {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 8px;
+  overflow-wrap: anywhere;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  color: #1e293b;
+  background: #f8fafc;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.check-email-address svg {
+  color: #1a56db;
+  flex: 0 0 auto;
+}
+
+.check-email-inbox-button {
+  display: inline-flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 0;
+  border-radius: 12px;
+  color: #fff;
+  background: #1a56db;
+  box-shadow: 0 6px 20px -3px rgb(26 86 219 / 35%);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.check-email-inbox-button:hover {
+  background: #1e40af;
+}
+.check-email-inbox-button:active {
+  transform: scale(0.98);
+}
+
+.check-email-resend {
+  min-height: 36px;
+  justify-self: center;
+  padding: 0;
+  border: 0;
+  color: #64748b;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.check-email-resend span {
+  color: #1a56db;
+  font-weight: 700;
+  text-decoration: underline;
+}
+.check-email-resend:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.check-email-sign-in {
+  min-height: 52px;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.check-email-sign-in a {
+  color: #1a56db;
+  font-weight: 700;
+  text-decoration: none;
+}
+.check-email-sign-in a:hover {
+  color: #1e40af;
+  text-decoration: underline;
+}
+
+.auth-card:has(.check-email-view) .auth-footer {
+  display: none;
 }
 
 .factor-mode-switcher {
@@ -589,37 +727,50 @@
 }
 
 .auth-navigation {
+  position: relative;
   flex-wrap: nowrap;
-  gap: 4px;
-  padding: 4px;
+  gap: 5px;
+  padding: 5px;
   margin-bottom: 26px;
-  border: 0;
-  border-radius: 999px;
-  background: #ecf2ff;
+  border: 1px solid #dfe8fb;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f4f7ff 0%, #eaf1ff 100%);
+  box-shadow: inset 0 1px 1px rgb(86 117 184 / 8%);
 }
 
 .auth-navigation a {
   min-width: 0;
-  min-height: 44px;
+  min-height: 46px;
   flex: 1;
-  padding: 0 12px;
+  padding: 0 8px;
   border: 0;
-  border-radius: 999px;
-  color: #5c6a8c;
-  font-size: 13.5px;
-  font-weight: 600;
-  line-height: 1.25;
+  border-radius: 13px;
+  color: #4f5f82;
+  font-size: clamp(10px, 2.7vw, 13.5px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1;
   text-align: center;
+  white-space: nowrap;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
 }
 
 .auth-navigation a:hover,
 .auth-card:has(#page-title) .auth-navigation a[href="/login"],
 .auth-card:has(#full-name) .auth-navigation a[href="/register"],
-.auth-card:has(#forgot-email) .auth-navigation a[href="/forgot-password"] {
-  border: 0;
-  color: #2954e5;
-  background: #fff;
-  box-shadow: 0 1px 2px rgb(16 27 57 / 8%);
+.auth-card:has(#forgot-email) .auth-navigation a[href="/forgot-password"],
+.auth-card:has(.check-email-view) .auth-navigation a[href="/register"] {
+  border: 1px solid rgb(255 255 255 / 90%);
+  color: #1a56db;
+  background: linear-gradient(135deg, #fff 0%, #f9fbff 100%);
+  box-shadow:
+    0 5px 12px rgb(49 84 162 / 12%),
+    0 1px 2px rgb(49 84 162 / 8%);
+  transform: translateY(-1px);
 }
 
 .auth-form,
