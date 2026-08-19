@@ -1,6 +1,7 @@
 import { AuthMotion } from "./auth-motion";
 import AuthFooter from "./AuthFooter";
 import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
 import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
 
 type AuthShellProps = {
@@ -80,6 +81,7 @@ export function AuthShell({ children, locale = "en" }: AuthShellProps) {
           </section>
 
           <p className="auth-panel-note">
+            <ShieldCheck size={15} aria-hidden="true" />
             SmartHire keeps account access simple, transparent, and secure.
           </p>
         </div>
