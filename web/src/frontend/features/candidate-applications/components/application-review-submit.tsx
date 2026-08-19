@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   BriefcaseBusiness,
@@ -62,7 +62,11 @@ export function ApplicationReviewSubmit({
   const [message, setMessage] = useState(initialReview.draft.message ?? "");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const errorRef = useRef<HTMLParagraphElement>(null);
   const submitKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
   const draft = review.draft;
   const hasMessage = Boolean(message.trim());
   const applicationHref = `/jobs/${encodeURIComponent(slug)}/apply?draftId=${encodeURIComponent(draft.draftId)}`;
@@ -117,7 +121,15 @@ export function ApplicationReviewSubmit({
   }
 
   async function submit() {
-    if (!confirmed || !draft.cv || pending) return;
+    if (pending) return;
+    if (!confirmed) {
+      setError(copy.confirmationRequired);
+      return;
+    }
+    if (!draft.cv) {
+      setError(copy.cvRequired);
+      return;
+    }
     setPending(true);
     setError(null);
     try {
@@ -141,7 +153,20 @@ export function ApplicationReviewSubmit({
         csrfProof,
       );
       const body: unknown = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(messageFrom(body, copy.submitError));
+      if (!response.ok) {
+        const code =
+          body &&
+          typeof body === "object" &&
+          !Array.isArray(body) &&
+          typeof (body as { code?: unknown }).code === "string"
+            ? (body as { code: string }).code
+            : null;
+        if (code === "APPLICATION_COVER_LETTER_INELIGIBLE") {
+          router.push(`${filesHref}&recover=cover-letter`);
+          return;
+        }
+        throw new Error(messageFrom(body, copy.submitError));
+      }
       const receipt = applicationReceiptSchema.parse(body);
       router.push(
         `/jobs/applied/${encodeURIComponent(receipt.applicationId)}/processing`,
@@ -205,7 +230,12 @@ export function ApplicationReviewSubmit({
       <ApplicationStepper currentStep={3} />
 
       {error ? (
-        <p className="candidate-application-error" role="alert">
+        <p
+          ref={errorRef}
+          className="candidate-application-error"
+          role="alert"
+          tabIndex={-1}
+        >
           {error}
         </p>
       ) : null}
@@ -415,7 +445,7 @@ export function ApplicationReviewSubmit({
         <button
           type="button"
           className="application-review-submit__button application-review-submit__button--primary"
-          disabled={!confirmed || !draft.cv || pending}
+          disabled={pending}
           onClick={() => void submit()}
         >
           <Send aria-hidden="true" />

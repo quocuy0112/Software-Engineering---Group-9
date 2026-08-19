@@ -17,7 +17,10 @@ export default async function CandidateApplicationReviewRoute({
 }) {
   const context = await getWorkspaceContext();
   const { slug } = await params;
-  if (!context) redirect(`/login?returnTo=${encodeURIComponent(`/jobs/${slug}/apply/review`)}`);
+  if (!context)
+    redirect(
+      `/login?returnTo=${encodeURIComponent(`/jobs/${slug}/apply/review`)}`,
+    );
   const rawQuery = await searchParams;
   const rawDraftId = rawQuery.draftId;
   const draftId = Array.isArray(rawDraftId) ? rawDraftId[0] : rawDraftId;
@@ -29,13 +32,27 @@ export default async function CandidateApplicationReviewRoute({
       draftId,
     );
   } catch (error) {
-    if (error instanceof CandidateApplicationError && error.status === 404) redirect(`/jobs/${encodeURIComponent(slug)}/apply`);
+    if (error instanceof CandidateApplicationError) {
+      if (error.status === 404)
+        redirect(`/jobs/${encodeURIComponent(slug)}/apply`);
+      if (error.code === "APPLICATION_COVER_LETTER_INELIGIBLE")
+        redirect(
+          `/jobs/${encodeURIComponent(slug)}/apply?step=2&recover=cover-letter`,
+        );
+    }
     throw error;
   }
-  if (review.job.slug !== slug) redirect(`/jobs/${encodeURIComponent(review.job.slug)}/apply/review?draftId=${encodeURIComponent(draftId)}`);
+  if (review.job.slug !== slug)
+    redirect(
+      `/jobs/${encodeURIComponent(review.job.slug)}/apply/review?draftId=${encodeURIComponent(draftId)}`,
+    );
   return (
     <JobsWorkspace>
-      <ApplicationReviewSubmit slug={slug} review={review} csrfProof={context.csrfProof} />
+      <ApplicationReviewSubmit
+        slug={slug}
+        review={review}
+        csrfProof={context.csrfProof}
+      />
     </JobsWorkspace>
   );
 }

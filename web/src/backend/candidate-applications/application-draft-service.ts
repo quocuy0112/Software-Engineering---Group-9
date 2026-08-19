@@ -1109,6 +1109,7 @@ export class ApplicationDraftService {
         checksumSha256: hash.digest("hex"),
       },
     };
+    let persisted = false;
     try {
       const changed = await this.db.candidateApplicationDraft.updateMany({
         where: {
@@ -1139,12 +1140,17 @@ export class ApplicationDraftService {
           "The application draft could not be saved.",
         );
       }
+      // The database now points at the new object. Keep the object if a later
+      // projection/response step fails; deleting it here would leave a
+      // dangling coverLetterDraft that can never pass review validation.
+      persisted = true;
       const previous = storedCoverLetter(draft.coverLetterDraft);
       if (previous)
         await storage.delete(previous.file.storageKey).catch(() => undefined);
       return draftProjection(updated);
     } catch (error) {
-      await storage.delete(stored.locator).catch(() => undefined);
+      if (!persisted)
+        await storage.delete(stored.locator).catch(() => undefined);
       throw error;
     }
   }

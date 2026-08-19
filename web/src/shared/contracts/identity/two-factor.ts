@@ -9,8 +9,16 @@ export const passwordProofSchema = z
 export type PasswordProof = z.infer<typeof passwordProofSchema>;
 
 /** Six-digit TOTP verification code. Never logged or placed in a URL. */
+const normalizedTotpCodeSchema = z
+  .string()
+  // Authenticator apps commonly display or copy the six digits as `123 456`.
+  // Separators are presentation-only and must not change the code that is
+  // verified by the provider.
+  .transform((value) => value.replace(/[\s-]/g, ""))
+  .pipe(z.string().regex(/^[0-9]{6}$/, "Enter the 6-digit code."));
+
 export const totpCodeSchema = z
-  .object({ code: z.string().regex(/^[0-9]{6}$/, "Enter the 6-digit code.") })
+  .object({ code: normalizedTotpCodeSchema })
   .strict();
 export type TotpCode = z.infer<typeof totpCodeSchema>;
 
@@ -23,7 +31,7 @@ export const completeTwoFactorSchema = z.discriminatedUnion("factor", [
   z
     .object({
       factor: z.literal("totp"),
-      code: z.string().regex(/^\d{6}$/, "Enter the 6-digit code."),
+      code: normalizedTotpCodeSchema,
     })
     .strict(),
   z

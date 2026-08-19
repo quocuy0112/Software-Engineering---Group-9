@@ -1,4 +1,5 @@
 import {
+  act,
   fireEvent,
   render,
   screen,
@@ -96,6 +97,7 @@ const initialData: RecruiterJobManagementData = {
 
 describe("recruiter job posting management", () => {
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllGlobals();
   });
 
@@ -110,9 +112,7 @@ describe("recruiter job posting management", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /48 Applicants/ }));
 
-    expect(onNavigate).toHaveBeenCalledWith(
-      "/recruiter/candidates/job-1",
-    );
+    expect(onNavigate).toHaveBeenCalledWith("/recruiter/candidates/job-1");
   });
 
   it("shows live overview metrics and opens the structured editor", () => {
@@ -126,7 +126,7 @@ describe("recruiter job posting management", () => {
     );
     expect(screen.getByRole("button", { name: /48 Applicants/ })).toBeVisible();
 
-    fireEvent.click(screen.getByRole("button", { name: "Edit posting" }));
+    fireEvent.click(screen.getByRole("button", { name: /Edit job posting/ }));
 
     expect(
       screen.getByRole("heading", {
@@ -139,6 +139,46 @@ describe("recruiter job posting management", () => {
     expect(screen.getByText("Preferred skills")).toBeVisible();
     expect(screen.getByRole("button", { name: "Save changes" })).toBeVisible();
     expect(screen.queryByRole("button", { name: "Save draft" })).toBeNull();
+  });
+
+  it("automatically reflects an administrator approval without a page refresh", async () => {
+    vi.useFakeTimers();
+    const pendingData: RecruiterJobManagementData = {
+      ...initialData,
+      jobs: [{ ...initialData.jobs[0], status: "pending_approval" }],
+    };
+    const approvedData: RecruiterJobManagementData = {
+      ...pendingData,
+      jobs: [{ ...pendingData.jobs[0], status: "active" }],
+    };
+    const fetchMock = vi.fn().mockImplementation(
+      async () =>
+        new Response(JSON.stringify(approvedData), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<RecruiterJobPostingManagement initialData={pendingData} />);
+    expect(
+      screen.queryByRole("heading", {
+        name: "Senior Product Designer",
+        level: 2,
+      }),
+    ).toBeNull();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5_000);
+    });
+
+    const card = screen.getByRole("article", {
+      name: "Senior Product Designer",
+    });
+    expect(within(card).getByText("Active")).toBeVisible();
+    expect(fetchMock).toHaveBeenCalledWith("/api/recruiter/job-postings", {
+      cache: "no-store",
+    });
   });
 
   it("blocks submission and identifies missing required fields", () => {
@@ -166,12 +206,29 @@ describe("recruiter job posting management", () => {
       subIndustry: "Software development",
       status: "pending_approval" as const,
     };
-    const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify(createdJob), {
-        status: 201,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+    const review = {
+      reviewId: "review-created",
+      jobId: "job-created",
+      sequence: 1,
+      state: "PENDING_REVIEW" as const,
+      readOnly: true,
+      submittedAt: "2026-08-18T00:00:00.000Z",
+      version: 1,
+    };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(createdJob), {
+          status: 201,
+          headers: { "Content-Type": "application/json" },
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(review), {
+          status: 201,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
     vi.stubGlobal("fetch", fetchMock);
     render(<RecruiterJobPostingManagement initialData={initialData} />);
 
@@ -196,18 +253,68 @@ describe("recruiter job posting management", () => {
     fireEvent.click(
       screen.getByRole("button", { name: "Submit for approval" }),
     );
+    fireEvent.click(
+      within(
+        screen.getByRole("dialog", { name: "Submit job for approval?" }),
+      ).getByRole("button", { name: "Submit for approval" }),
+    );
 
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     const request = fetchMock.mock.calls[0]?.[1] as RequestInit;
     const payload = JSON.parse(String(request.body)) as {
       status: string;
       job: { subIndustry: string };
     };
-    expect(payload.status).toBe("pending_approval");
+    expect(payload.status).toBe("draft");
     expect(payload.job.subIndustry).toBe("Software development");
     expect(
       await screen.findByText("Job posting saved to the mock database."),
     ).toBeVisible();
+  });
+
+  it("preserves spaces and commas while editing skills", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(initialData.jobs[0]), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    render(<RecruiterJobPostingManagement initialData={initialData} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Edit job posting/ }));
+    const skills = screen.getByPlaceholderText(
+      "React, TypeScript, Product design",
+    );
+
+    fireEvent.change(skills, { target: { value: "React Native " } });
+    expect(skills).toHaveValue("React Native ");
+    fireEvent.change(skills, {
+      target: { value: "React Native, TypeScript, Product design" },
+    });
+    expect(skills).toHaveValue("React Native, TypeScript, Product design");
+
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    const request = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    const payload = JSON.parse(String(request.body)) as {
+      skillTags: string[];
+    };
+    expect(payload.skillTags).toEqual([
+      "React Native",
+      "TypeScript",
+      "Product design",
+    ]);
+  });
+
+  it("does not crash when the deadline input emits a malformed date", () => {
+    render(<RecruiterJobPostingManagement initialData={initialData} />);
+    fireEvent.click(screen.getByRole("button", { name: /Edit job posting/ }));
+
+    const deadline = screen.getByLabelText(/Application deadline/);
+    expect(() =>
+      fireEvent.change(deadline, { target: { value: "25/08/2026" } }),
+    ).not.toThrow();
   });
 
   it("disables creation when no recruiter-owned company is linked", () => {

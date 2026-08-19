@@ -147,12 +147,14 @@ const englishApplicationCopy = {
     coverFileSizeError: "Cover letters must be between 1 byte and 5 MB.",
     coverFileTypeError: "Choose a PDF, DOC, or DOCX cover letter.",
     coverUploadError: "The cover letter could not be uploaded.",
+    coverLetterNeedsReupload:
+      "This cover letter is no longer available. Upload it again before continuing.",
     draftSaveError: "The draft could not be saved.",
     backToJob: "Back to job",
   },
   reviewAndSubmit: {
     eyebrow: "Step 3 of 3",
-    title: (jobTitle: string) => `Apply â€“ ${jobTitle}`,
+    title: (jobTitle: string) => `Apply – ${jobTitle}`,
     subtitle:
       "Review your information and files before sending them to the recruiter.",
     personalInformation: "Personal information",
@@ -210,6 +212,8 @@ const englishApplicationCopy = {
     backToFiles: "Back to Application files",
     submit: "Submit application",
     submitting: "Submitting…",
+    confirmationRequired: "Confirm the application details before submitting.",
+    cvRequired: "Select a CV before submitting.",
     draftSaveError: "The draft could not be saved.",
     submitError: "The application could not be submitted.",
   },

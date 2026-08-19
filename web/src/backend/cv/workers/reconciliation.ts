@@ -12,6 +12,26 @@ import { createCvWorkerStorage } from "./cv-worker-resources";
 
 export const CV_RECONCILIATION_ORPHAN_GRACE_MS = 60 * 60_000;
 
+const storageLocatorPattern = /^[A-Za-z0-9_-]{16,128}$/u;
+
+function draftCoverLetterStorageKey(value: unknown): string | null {
+  if (
+    !value ||
+    typeof value !== "object" ||
+    Array.isArray(value) ||
+    (value as { kind?: unknown }).kind !== "FILE"
+  ) {
+    return null;
+  }
+  const file = (value as { file?: unknown }).file;
+  if (!file || typeof file !== "object" || Array.isArray(file)) return null;
+  const storageKey = (file as { storageKey?: unknown }).storageKey;
+  return typeof storageKey === "string" &&
+    storageLocatorPattern.test(storageKey)
+    ? storageKey
+    : null;
+}
+
 export type CvReconciliationResult = Readonly<{
   referencesChecked: number;
   missingScheduled: number;
@@ -145,15 +165,16 @@ export class CvStorageReconciliation {
     });
     const locators = inventory.items.map((item) => String(item.locator));
     // The local CV storage adapter is also used by CandidateCv materialized
-    // copies and the application-document promotion path. Reconciliation
-    // must treat all four namespaces as owned objects; otherwise a valid
-    // candidate CV is classified as an untracked artifact and deleted after
-    // the orphan grace period, leaving CandidateCv.storageKey dangling.
+    // copies, application-document promotion, and active application drafts.
+    // Reconciliation must treat all five namespaces as owned objects;
+    // otherwise a valid draft cover letter is classified as an untracked
+    // artifact and deleted after the orphan grace period.
     const [
       trackedCvArtifacts,
       trackedCandidateCvs,
       trackedApplicationDocuments,
       trackedPromotions,
+      trackedDrafts,
     ] = locators.length
       ? await Promise.all([
           prisma.cvStoredArtifact.findMany({
@@ -172,13 +193,21 @@ export class CvStorageReconciliation {
             where: { storageKeyEncrypted: { in: locators }, deletedAt: null },
             select: { storageKeyEncrypted: true },
           }),
+          prisma.candidateApplicationDraft.findMany({
+            where: { expiresAt: { gt: now } },
+            select: { coverLetterDraft: true },
+          }),
         ])
-      : [[], [], [], []];
+      : [[], [], [], [], []];
     const trackedLocators = new Set([
       ...trackedCvArtifacts.map((item) => item.storageLocator),
       ...trackedCandidateCvs.map((item) => item.storageKey),
       ...trackedApplicationDocuments.map((item) => item.storageKeyEncrypted),
       ...trackedPromotions.map((item) => item.storageKeyEncrypted),
+      ...trackedDrafts.flatMap(({ coverLetterDraft }) => {
+        const storageKey = draftCoverLetterStorageKey(coverLetterDraft);
+        return storageKey ? [storageKey] : [];
+      }),
     ]);
     let orphansDeleted = 0;
     for (const item of inventory.items) {

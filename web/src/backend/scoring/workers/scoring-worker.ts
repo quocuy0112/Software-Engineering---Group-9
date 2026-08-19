@@ -2,6 +2,7 @@ import "server-only";
 
 import { randomUUID } from "node:crypto";
 import { prisma } from "@/backend/database/prisma";
+import { applyAutomaticScoreStageRuleForApplication } from "@/backend/applications/services/automatic-viewed-stage-rules";
 
 const leaseMilliseconds = 60_000;
 const databaseTimestamp = (value: Date) =>
@@ -20,16 +21,31 @@ export type ScoringWorkProcessor = (
   input: ScoringWorkInput,
 ) => Promise<ScoringWorkOutcome>;
 
+export type AutomaticScoreStageRuleRunner = (input: {
+  candidateApplicationId: string;
+  now: Date;
+  db: typeof prisma;
+}) => Promise<unknown>;
+
 /**
  * Coordinates leased scoring work. Calculation and provider calls stay behind
  * the injected processor; this class owns leases, counters, retries, and the
  * terminal operation state so late workers cannot publish stale work silently.
  */
 export class ScoringWorker {
+  private readonly automaticScoreStageRuleRunner:
+    | AutomaticScoreStageRuleRunner
+    | null;
+
   constructor(
     private readonly db: typeof prisma = prisma,
     private readonly processor?: ScoringWorkProcessor,
-  ) {}
+    automaticScoreStageRuleRunner?: AutomaticScoreStageRuleRunner,
+  ) {
+    this.automaticScoreStageRuleRunner =
+      automaticScoreStageRuleRunner ??
+      (this.db === prisma ? applyAutomaticScoreStageRuleForApplication : null);
+  }
 
   async claim(workerId = `scoring-worker-${randomUUID()}`, now = new Date()) {
     const databaseNow = databaseTimestamp(now);
@@ -98,7 +114,24 @@ export class ScoringWorker {
     }
     try {
       const outcome = await this.processor(claimed);
-      await this.complete(claimed, outcome, new Date());
+      const completedAt = new Date();
+      await this.complete(claimed, outcome, completedAt);
+      if (this.automaticScoreStageRuleRunner) {
+        try {
+          await this.automaticScoreStageRuleRunner({
+            candidateApplicationId: claimed.applicationId,
+            now: completedAt,
+            db: this.db,
+          });
+        } catch (error) {
+          // Scoring publication is durable even if a follow-up automatic
+          // decision must be retried by the next board/worker pass.
+          console.warn(
+            `[scoring] automatic stage rule failed for ${claimed.applicationId}`,
+            error,
+          );
+        }
+      }
       return { state: outcome, workItemId: claimed.workItemId } as const;
     } catch (error) {
       const code =

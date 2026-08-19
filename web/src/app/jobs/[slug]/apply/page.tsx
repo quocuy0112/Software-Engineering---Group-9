@@ -52,6 +52,7 @@ export default async function CandidateApplicationRoute({
   }
   const cvs = await listCandidateCvLibrary(context.userId);
   const step = query("step") === "2" ? (2 as const) : (1 as const);
+  const coverLetterNeedsReupload = query("recover") === "cover-letter";
   return (
     <JobsWorkspace>
       <ApplicationWizard
@@ -70,6 +71,7 @@ export default async function CandidateApplicationRoute({
         initialCvs={cvs.items}
         csrfProof={context.csrfProof}
         initialStep={step}
+        coverLetterNeedsReupload={coverLetterNeedsReupload}
       />
     </JobsWorkspace>
   );

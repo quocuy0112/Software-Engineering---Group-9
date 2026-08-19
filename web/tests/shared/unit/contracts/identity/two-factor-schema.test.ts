@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   completeTwoFactorSchema,
   backupCodeSchema,
+  totpCodeSchema,
   TWO_FACTOR_GENERIC_ERROR,
 } from "@/shared/contracts/identity/two-factor";
 describe("two-factor completion schemas", () => {
@@ -14,6 +15,15 @@ describe("two-factor completion schemas", () => {
       expect(
         completeTwoFactorSchema.safeParse({ factor: "totp", code }).success,
       ).toBe(false);
+  });
+  it("normalizes presentation separators from authenticator apps", () => {
+    expect(totpCodeSchema.safeParse({ code: "123 456" })).toMatchObject({
+      success: true,
+      data: { code: "123456" },
+    });
+    expect(
+      completeTwoFactorSchema.safeParse({ factor: "totp", code: "123-456" }),
+    ).toMatchObject({ success: true, data: { code: "123456" } });
   });
   it("bounds later backup-code input", () => {
     expect(backupCodeSchema.safeParse({ code: "abcd-1234" }).success).toBe(
