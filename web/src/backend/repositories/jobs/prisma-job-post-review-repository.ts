@@ -9,6 +9,7 @@ import { createInAppNotification } from "@/backend/notifications/notification-se
 import { projectJobReviewSnapshot } from "@/backend/jobs/review/job-post-publication-projector";
 import { promoteWaitlistedApplicationsInTransaction } from "@/backend/services/jobs/application-stage-service";
 import { reviewSearchTokens } from "@/backend/jobs/review/job-post-review-search";
+import { appendJobPostingLifecycleFact } from "@/backend/repositories/analytics/prisma-analytics-repository";
 
 type ReviewDb = typeof prisma | Prisma.TransactionClient;
 
@@ -267,7 +268,7 @@ export class PrismaJobPostReviewRepository {
       const previousPublicJob = publicJobPostingId
         ? await this.db.jobPosting.findUnique({
             where: { id: publicJobPostingId },
-            select: { numberOfHires: true },
+            select: { numberOfHires: true, status: true, version: true },
           })
         : null;
       previousCapacity = previousPublicJob?.numberOfHires ?? null;
@@ -311,6 +312,30 @@ export class PrismaJobPostReviewRepository {
       });
       publicJobPostingId = publicJob.id;
       publishedAt = input.now;
+      await appendJobPostingLifecycleFact(this.db, {
+        jobPostingId: publicJob.id,
+        companyId: publicJob.companyId,
+        fromStatus: previousPublicJob?.status ?? null,
+        toStatus: publicJob.status,
+        effectiveAt: input.now,
+        postingVersion: publicJob.version,
+        actorUserId: input.actorUserId,
+        correlationId: input.correlationId,
+      });
+      if (!previousPublicJob) {
+        await new PrismaAuditRepository(this.db).append({
+          occurredAt: input.now,
+          actorType: "user",
+          actorUserId: input.actorUserId,
+          actorSessionId: input.actorSessionId,
+          action: "job_posting.created",
+          targetType: "job_posting",
+          targetId: publicJob.id,
+          result: "SUCCESS",
+          correlationId: input.correlationId,
+          context: { status: publicJob.status },
+        });
+      }
       if (input.closedAt === null) {
         await promoteWaitlistedApplicationsInTransaction({
           db: this.db,

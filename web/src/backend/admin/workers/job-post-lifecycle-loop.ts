@@ -2,6 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
 import { prisma } from "@/backend/database/prisma";
+import { appendJobPostingLifecycleFact } from "@/backend/repositories/analytics/prisma-analytics-repository";
 
 /** Archives expired managed jobs in small idempotent batches. */
 export async function runJobPostLifecycleCycle(now: Date) {
@@ -34,8 +35,12 @@ export async function runJobPostLifecycleCycle(now: Date) {
         },
       });
       if (changed.count !== 1) return false;
-      if (row.publicJobPostingId)
-        await tx.jobPosting.update({
+      if (row.publicJobPostingId) {
+        const currentPublicJob = await tx.jobPosting.findUniqueOrThrow({
+          where: { id: row.publicJobPostingId },
+          select: { status: true },
+        });
+        const removedPublicJob = await tx.jobPosting.update({
           where: { id: row.publicJobPostingId },
           data: {
             status: "REMOVED",
@@ -44,6 +49,17 @@ export async function runJobPostLifecycleCycle(now: Date) {
             version: { increment: 1 },
           },
         });
+        await appendJobPostingLifecycleFact(tx, {
+          jobPostingId: removedPublicJob.id,
+          companyId: removedPublicJob.companyId,
+          fromStatus: currentPublicJob.status,
+          toStatus: removedPublicJob.status,
+          effectiveAt: now,
+          postingVersion: removedPublicJob.version,
+          actorUserId: null,
+          correlationId,
+        });
+      }
       await tx.jobPostOperationalHistory.create({
         data: {
           aggregateId: row.id,
@@ -75,6 +91,21 @@ export async function runJobPostLifecycleCycle(now: Date) {
           targetVersion: row.version + 1,
           visibility: "ARCHIVED",
           applicationState: "CLOSED",
+        },
+      });
+      await new PrismaAuditRepository(tx).append({
+        occurredAt: now,
+        actorType: "system",
+        actorUserId: null,
+        actorSessionId: null,
+        action: "job_posting.deleted",
+        targetType: "job_posting",
+        targetId: row.publicJobPostingId,
+        result: "SUCCESS",
+        correlationId,
+        context: {
+          reason: "APPLICATION_DEADLINE_EXPIRED",
+          status: "REMOVED",
         },
       });
       return true;

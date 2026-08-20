@@ -77,6 +77,28 @@ enum AuditResult {
   DENIED
 }
 
+enum AnalyticsViewQualification {
+  QUALIFIED
+  OWNER_PREVIEW
+  AUTOMATED
+  INVALID
+}
+
+enum ExportFormat {
+  CSV
+  XLSX
+}
+
+enum ExportRequestStatus {
+  QUEUED
+  LEASED
+  SUCCEEDED
+  FAILED
+  EXPIRED
+  DELETING
+  DELETED
+}
+
 enum EmailKind {
   VERIFY_EMAIL
   EMAIL_CHANGE_VERIFY
@@ -1062,6 +1084,9 @@ model UserAccount {
   imageSearchConsents             SearchProcessingConsent[]
   companyMemberships              CompanyMembership[]
   platformAdministratorGrants     PlatformAdministratorGrant[]
+  jobPostingLifecycleFactsActed   JobPostingLifecycleFact[]        @relation("JobPostingLifecycleActor")
+  analyticsExportsRequested       ExportRequest[]                  @relation("ExportRequester")
+  activityLegalHoldsAuthorized    ActivityLegalHold[]              @relation("ActivityLegalHoldAuthorizer")
   recruiterVerificationRequests   RecruiterVerificationRequest[]
   employerVerificationPreparation EmployerVerificationPreparation?
   businessRegistrySnapshots      BusinessRegistryLookupSnapshot[]
@@ -1615,6 +1640,7 @@ model AuditEvent {
   @@index([targetType, targetId, occurredAt])
   @@index([action, occurredAt])
   @@index([correlationId])
+  @@index([occurredAt, id], map: "AuditEvent_analytics_retention_idx")
 }
 
 model Company {
@@ -1637,6 +1663,9 @@ model Company {
   createdAt                     DateTime                       @default(now())
   updatedAt                     DateTime                       @updatedAt
   jobPostings                   JobPosting[]
+  jobPostingViewFacts           JobPostingViewFact[]
+  jobPostingLifecycleFacts      JobPostingLifecycleFact[]
+  analyticsExports              ExportRequest[]
   memberships                   CompanyMembership[]
   recruiterVerificationRequests RecruiterVerificationRequest[]
   accessPrerequisites           CompanyAccessPrerequisite[]
@@ -2188,6 +2217,9 @@ model JobPosting {
   applicationArtifactPromotions ApplicationArtifactPromotion[]
   scoringOperations        ScoringOperation[]
   rankingSnapshots         RankingSnapshot[]
+  analyticsViewFacts       JobPostingViewFact[]
+  analyticsLifecycleFacts  JobPostingLifecycleFact[]
+  analyticsExports         ExportRequest[]
 
   @@index([status, publishedAt(sort: Desc), id])
   @@index([status, applicationDeadline, id])
@@ -4235,4 +4267,102 @@ model RankingSnapshotRow {
   @@unique([rankingSnapshotId, applicationId])
   @@unique([rankingSnapshotId, rankPosition])
   @@index([applicationId, rankingSnapshotId])
+}
+
+model JobPostingViewFact {
+  id                         String                    @id @default(cuid())
+  jobPostingId               String
+  companyId                  String
+  occurredAt                 DateTime
+  platformDay                DateTime                  @db.Date
+  visitorDayDigest           String
+  digestVersion              Int
+  qualification              AnalyticsViewQualification
+  qualificationPolicyVersion String
+  createdAt                  DateTime                  @default(now())
+  jobPosting                 JobPosting                @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+  company                    Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([jobPostingId, platformDay, visitorDayDigest, digestVersion], map: "JobPostingViewFact_qualified_visitor_day_key")
+  @@index([jobPostingId, occurredAt], map: "JobPostingViewFact_jobPostingId_occurredAt_idx")
+  @@index([companyId, occurredAt], map: "JobPostingViewFact_companyId_occurredAt_idx")
+  @@index([qualification, occurredAt], map: "JobPostingViewFact_qualification_occurredAt_idx")
+}
+
+model JobPostingLifecycleFact {
+  id             String           @id @default(cuid())
+  jobPostingId   String
+  companyId      String
+  fromStatus     JobPostingStatus?
+  toStatus       JobPostingStatus
+  effectiveAt    DateTime
+  postingVersion Int
+  actorUserId    String?
+  correlationId  String
+  createdAt      DateTime         @default(now())
+  jobPosting     JobPosting       @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+  company        Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  actorUser      UserAccount?     @relation("JobPostingLifecycleActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@unique([jobPostingId, postingVersion], map: "JobPostingLifecycleFact_jobPostingId_postingVersion_key")
+  @@index([jobPostingId, effectiveAt], map: "JobPostingLifecycleFact_jobPostingId_effectiveAt_idx")
+  @@index([companyId, effectiveAt], map: "JobPostingLifecycleFact_companyId_effectiveAt_idx")
+}
+
+model ExportRequest {
+  id                  String              @id @default(cuid())
+  requesterUserId     String
+  companyId           String
+  jobPostingId        String
+  format              ExportFormat
+  filters             Json
+  rangeStart          DateTime?
+  rangeEnd            DateTime?
+  timeZone            String
+  dataCutoff          DateTime
+  definitionVersion   String
+  status              ExportRequestStatus @default(QUEUED)
+  idempotencyKey      String
+  leaseOwner          String?
+  leaseExpiresAt      DateTime?
+  attemptCount        Int                 @default(0)
+  storageLocator      String?
+  fileName            String?
+  mediaType           String?
+  byteCount           Int?
+  checksum             String?
+  rowCount            Int?
+  failureCode         String?
+  requestedAt         DateTime            @default(now())
+  startedAt           DateTime?
+  completedAt         DateTime?
+  expiresAt           DateTime?
+  inaccessibleAt      DateTime?
+  deletedAt           DateTime?
+  version             Int                 @default(1)
+  requester           UserAccount         @relation("ExportRequester", fields: [requesterUserId], references: [id], onDelete: Restrict)
+  company             Company             @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  jobPosting          JobPosting          @relation(fields: [jobPostingId], references: [id], onDelete: Restrict)
+
+  @@unique([requesterUserId, idempotencyKey], map: "ExportRequest_requesterUserId_idempotencyKey_key")
+  @@index([status, leaseExpiresAt, requestedAt], map: "ExportRequest_claim_idx")
+  @@index([status, expiresAt], map: "ExportRequest_cleanup_idx")
+  @@index([requesterUserId, jobPostingId, requestedAt(sort: Desc)])
+}
+
+model ActivityLegalHold {
+  id                      String      @id @default(cuid())
+  scopeType               String
+  scopeReference          String
+  reasonCategory          String
+  authorizedByAdminUserId String
+  startsAt                DateTime
+  endsAt                  DateTime
+  releasedAt              DateTime?
+  correlationId           String
+  createdAt               DateTime    @default(now())
+  authorizedBy            UserAccount @relation("ActivityLegalHoldAuthorizer", fields: [authorizedByAdminUserId], references: [id], onDelete: Restrict)
+
+  @@index([scopeType, scopeReference, startsAt, endsAt], map: "ActivityLegalHold_scope_idx")
+  @@index([endsAt, releasedAt], map: "ActivityLegalHold_expiry_idx")
 }
