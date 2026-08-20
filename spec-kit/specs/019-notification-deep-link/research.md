@@ -12,9 +12,9 @@
 
 **Alternatives considered:** infer global role on every click (rejected: ambiguous for multi-role accounts); trust browser role (rejected: security boundary violation).
 
-## Decision: Null is a supported outcome
+## Decision: Use the notification inbox as the universal safe fallback
 
-**Rationale:** It is safer to permit read-only interaction than invent a broad fallback that leaks information or navigates incorrectly.
+**Rationale:** Every notification remains actionable without inventing a resource URL. The fallback identifies only the recipient's own notification, and authorization remains enforced at every context-specific destination.
 
 ## Decision: Separate stale availability from authorization loss after authorization
 
