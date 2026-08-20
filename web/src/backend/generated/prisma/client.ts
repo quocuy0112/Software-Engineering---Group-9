@@ -172,6 +172,16 @@ export type AuditEvent = Prisma.AuditEventModel
  */
 export type Company = Prisma.CompanyModel
 /**
+ * Model CompanyInvitation
+ * 
+ */
+export type CompanyInvitation = Prisma.CompanyInvitationModel
+/**
+ * Model CompanyTeamActivity
+ * 
+ */
+export type CompanyTeamActivity = Prisma.CompanyTeamActivityModel
+/**
  * Model CompanyMembership
  * 
  */

@@ -1,0 +1,14 @@
+openapi: 3.1.0
+info: { title: Company Team API, version: 1.0.0 }
+paths:
+  /api/recruiter/company/team:
+    get: { summary: List owner-managed members, responses: { '200': { description: OK }, '401': { description: Authentication required }, '403': { description: Owner required } } }
+  /api/recruiter/company/team/invitations:
+    post: { summary: Invite an existing account as HR Manager or Recruiter, responses: { '201': { description: Invitation created } } }
+  /api/recruiter/company/team/invitations/accept:
+    get: { summary: Preview the invitation bound to the signed-in recipient, responses: { '200': { description: Invitation preview }, '409': { description: Invitation unavailable } } }
+    post: { summary: Accept the recipient-bound invitation, responses: { '200': { description: Membership activated }, '409': { description: Invitation unavailable } }
+  /api/recruiter/company/team/invitations/decline:
+    post: { summary: Decline the recipient-bound invitation, responses: { '200': { description: Invitation declined }, '409': { description: Invitation unavailable } }
+  /api/recruiter/company/team/memberships/{membershipId}:
+    patch: { summary: Change a managed member role or lifecycle, responses: { '200': { description: Updated } } }

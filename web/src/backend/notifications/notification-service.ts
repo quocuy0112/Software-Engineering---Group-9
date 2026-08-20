@@ -50,6 +50,7 @@ const toItem = (
     title: localized?.title ?? row.title,
     summary: localized?.summary ?? row.summary,
     href: resolveNotificationHref({
+      notificationId: row.id,
       kind: row.kind,
       contextType: row.contextType,
       contextId: row.contextId,
@@ -57,7 +58,10 @@ const toItem = (
       occurrenceCount: row.occurrenceCount,
       lastOccurredAt: row.lastOccurredAt,
       jobId:
-        typeof row.variables === "object" && row.variables !== null && "jobId" in row.variables && typeof row.variables.jobId === "string"
+        typeof row.variables === "object" &&
+        row.variables !== null &&
+        "jobId" in row.variables &&
+        typeof row.variables.jobId === "string"
           ? row.variables.jobId
           : null,
     }),

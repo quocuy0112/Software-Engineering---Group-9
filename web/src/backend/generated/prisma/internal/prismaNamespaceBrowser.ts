@@ -77,6 +77,8 @@ export const ModelName = {
   InAppNotification: 'InAppNotification',
   AuditEvent: 'AuditEvent',
   Company: 'Company',
+  CompanyInvitation: 'CompanyInvitation',
+  CompanyTeamActivity: 'CompanyTeamActivity',
   CompanyMembership: 'CompanyMembership',
   PlatformAdministratorGrant: 'PlatformAdministratorGrant',
   PlatformAdministratorGrantScopeAssignment: 'PlatformAdministratorGrantScopeAssignment',
@@ -690,6 +692,41 @@ export const CompanyScalarFieldEnum = {
 } as const
 
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
+
+
+export const CompanyInvitationScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  normalizedEmail: 'normalizedEmail',
+  role: 'role',
+  state: 'state',
+  tokenDigest: 'tokenDigest',
+  invitedByUserId: 'invitedByUserId',
+  acceptedByUserId: 'acceptedByUserId',
+  acceptedAt: 'acceptedAt',
+  declinedByUserId: 'declinedByUserId',
+  declinedAt: 'declinedAt',
+  revokedAt: 'revokedAt',
+  expiresAt: 'expiresAt',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CompanyInvitationScalarFieldEnum = (typeof CompanyInvitationScalarFieldEnum)[keyof typeof CompanyInvitationScalarFieldEnum]
+
+
+export const CompanyTeamActivityScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  kind: 'kind',
+  actorUserId: 'actorUserId',
+  targetEmail: 'targetEmail',
+  role: 'role',
+  occurredAt: 'occurredAt'
+} as const
+
+export type CompanyTeamActivityScalarFieldEnum = (typeof CompanyTeamActivityScalarFieldEnum)[keyof typeof CompanyTeamActivityScalarFieldEnum]
 
 
 export const CompanyMembershipScalarFieldEnum = {

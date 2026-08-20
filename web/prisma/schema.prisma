@@ -116,6 +116,8 @@ enum EmailKind {
   SUPPORT_CASE_UPDATED
   PROFESSIONAL_CONNECTION_UPDATED
   COMPANY_EMAIL_VERIFY
+  COMPANY_INVITATION
+  COMPANY_INVITATION_RESPONSE
 }
 
 enum InAppNotificationSeverity {
@@ -149,6 +151,7 @@ enum InAppNotificationContextType {
   MESSAGING_REPORT
   MODERATION_REPORT
   JOB_POST_REVIEW
+  COMPANY_INVITATION
 }
 
 enum InAppNotificationAudience {
@@ -176,6 +179,9 @@ enum InAppNotificationKind {
   MEMBERSHIP_SUSPENDED
   MEMBERSHIP_RESTORED
   MEMBERSHIP_REMOVED
+  COMPANY_INVITATION_RECEIVED
+  COMPANY_INVITATION_ACCEPTED
+  COMPANY_INVITATION_DECLINED
   APPLICATION_SUBMITTED
   APPLICATION_RECEIVED
   APPLICATION_STAGE_CHANGED
@@ -587,6 +593,25 @@ enum CompanyMembershipRole {
 enum CompanyMembershipStatus {
   ACTIVE
   SUSPENDED
+  REMOVED
+}
+
+enum CompanyInvitationState {
+  PENDING
+  REVOKED
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+enum CompanyTeamActivityKind {
+  INVITED
+  ACCEPTED
+  DECLINED
+  REVOKED
+  ROLE_CHANGED
+  SUSPENDED
+  RESTORED
   REMOVED
 }
 
@@ -1083,6 +1108,9 @@ model UserAccount {
   imageSearchQueries              SearchImageQuery[]
   imageSearchConsents             SearchProcessingConsent[]
   companyMemberships              CompanyMembership[]
+  companyInvitationsSent           CompanyInvitation[]                     @relation("CompanyInvitationInviter")
+  companyInvitationsAccepted       CompanyInvitation[]                     @relation("CompanyInvitationAcceptor")
+  companyInvitationsDeclined       CompanyInvitation[]                     @relation("CompanyInvitationDecliner")
   platformAdministratorGrants     PlatformAdministratorGrant[]
   jobPostingLifecycleFactsActed   JobPostingLifecycleFact[]        @relation("JobPostingLifecycleActor")
   analyticsExportsRequested       ExportRequest[]                  @relation("ExportRequester")
@@ -1667,12 +1695,54 @@ model Company {
   jobPostingLifecycleFacts      JobPostingLifecycleFact[]
   analyticsExports              ExportRequest[]
   memberships                   CompanyMembership[]
+  invitations                   CompanyInvitation[]
+  teamActivities                CompanyTeamActivity[]
   recruiterVerificationRequests RecruiterVerificationRequest[]
   accessPrerequisites           CompanyAccessPrerequisite[]
   messagingConversations        MessagingConversation[]
   jobPostReviewAggregates       JobPostReviewAggregate[]
 
   @@index([verifiedAt, id])
+}
+
+model CompanyInvitation {
+  id                 String                 @id @default(cuid())
+  companyId          String
+  normalizedEmail    String
+  role               CompanyMembershipRole
+  state              CompanyInvitationState @default(PENDING)
+  tokenDigest        String                 @unique
+  invitedByUserId    String
+  acceptedByUserId   String?
+  acceptedAt         DateTime?
+  declinedByUserId   String?
+  declinedAt         DateTime?
+  revokedAt          DateTime?
+  expiresAt          DateTime
+  version            Int                    @default(1)
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  company            Company                @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  invitedBy          UserAccount            @relation("CompanyInvitationInviter", fields: [invitedByUserId], references: [id], onDelete: Restrict)
+  acceptedBy         UserAccount?           @relation("CompanyInvitationAcceptor", fields: [acceptedByUserId], references: [id], onDelete: SetNull)
+  declinedBy         UserAccount?           @relation("CompanyInvitationDecliner", fields: [declinedByUserId], references: [id], onDelete: SetNull)
+
+  // PostgreSQL migration enforces uniqueness only while the invitation is PENDING.
+  @@index([companyId, normalizedEmail, state])
+  @@index([normalizedEmail, state, expiresAt])
+}
+
+model CompanyTeamActivity {
+  id          String                  @id @default(cuid())
+  companyId   String
+  kind        CompanyTeamActivityKind
+  actorUserId String?
+  targetEmail String
+  role        CompanyMembershipRole?
+  occurredAt  DateTime                @default(now())
+  company     Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, occurredAt(sort: Desc), id(sort: Desc)])
 }
 
 model CompanyMembership {

@@ -153,7 +153,9 @@ export const EmailKind = {
   VERIFICATION_EXPIRED: 'VERIFICATION_EXPIRED',
   SUPPORT_CASE_UPDATED: 'SUPPORT_CASE_UPDATED',
   PROFESSIONAL_CONNECTION_UPDATED: 'PROFESSIONAL_CONNECTION_UPDATED',
-  COMPANY_EMAIL_VERIFY: 'COMPANY_EMAIL_VERIFY'
+  COMPANY_EMAIL_VERIFY: 'COMPANY_EMAIL_VERIFY',
+  COMPANY_INVITATION: 'COMPANY_INVITATION',
+  COMPANY_INVITATION_RESPONSE: 'COMPANY_INVITATION_RESPONSE'
 } as const
 
 export type EmailKind = (typeof EmailKind)[keyof typeof EmailKind]
@@ -195,7 +197,8 @@ export const InAppNotificationContextType = {
   CONVERSATION: 'CONVERSATION',
   MESSAGING_REPORT: 'MESSAGING_REPORT',
   MODERATION_REPORT: 'MODERATION_REPORT',
-  JOB_POST_REVIEW: 'JOB_POST_REVIEW'
+  JOB_POST_REVIEW: 'JOB_POST_REVIEW',
+  COMPANY_INVITATION: 'COMPANY_INVITATION'
 } as const
 
 export type InAppNotificationContextType = (typeof InAppNotificationContextType)[keyof typeof InAppNotificationContextType]
@@ -230,6 +233,9 @@ export const InAppNotificationKind = {
   MEMBERSHIP_SUSPENDED: 'MEMBERSHIP_SUSPENDED',
   MEMBERSHIP_RESTORED: 'MEMBERSHIP_RESTORED',
   MEMBERSHIP_REMOVED: 'MEMBERSHIP_REMOVED',
+  COMPANY_INVITATION_RECEIVED: 'COMPANY_INVITATION_RECEIVED',
+  COMPANY_INVITATION_ACCEPTED: 'COMPANY_INVITATION_ACCEPTED',
+  COMPANY_INVITATION_DECLINED: 'COMPANY_INVITATION_DECLINED',
   APPLICATION_SUBMITTED: 'APPLICATION_SUBMITTED',
   APPLICATION_RECEIVED: 'APPLICATION_RECEIVED',
   APPLICATION_STAGE_CHANGED: 'APPLICATION_STAGE_CHANGED',
@@ -801,6 +807,31 @@ export const CompanyMembershipStatus = {
 } as const
 
 export type CompanyMembershipStatus = (typeof CompanyMembershipStatus)[keyof typeof CompanyMembershipStatus]
+
+
+export const CompanyInvitationState = {
+  PENDING: 'PENDING',
+  REVOKED: 'REVOKED',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type CompanyInvitationState = (typeof CompanyInvitationState)[keyof typeof CompanyInvitationState]
+
+
+export const CompanyTeamActivityKind = {
+  INVITED: 'INVITED',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED',
+  REVOKED: 'REVOKED',
+  ROLE_CHANGED: 'ROLE_CHANGED',
+  SUSPENDED: 'SUSPENDED',
+  RESTORED: 'RESTORED',
+  REMOVED: 'REMOVED'
+} as const
+
+export type CompanyTeamActivityKind = (typeof CompanyTeamActivityKind)[keyof typeof CompanyTeamActivityKind]
 
 
 export const ProfessionalConnectionStatus = {

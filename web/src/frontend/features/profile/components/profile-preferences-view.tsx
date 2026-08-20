@@ -156,7 +156,7 @@ export function ProfilePreferencesView({
                 type="button"
                 onClick={() => setIsEditing(true)}
               >
-                {editLabel}
+                <u>{editLabel} &#8594;</u>
               </button>
             </div>
           </div>

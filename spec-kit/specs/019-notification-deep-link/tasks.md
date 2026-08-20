@@ -9,14 +9,14 @@
 ## Phase 2: Foundational
 
 - [X] T002 Add immutable recipient audience, nullable href rollout migration, and shared notification contract updates in `web/prisma/schema.prisma`, `web/prisma/migrations/`, and `web/src/shared/contracts/notifications/index.ts`
-- [ ] T003 Implement audience-aware, current-state `NotificationDestinationResolver` and stop storing generated hrefs in `web/src/backend/notifications/event-policy.ts` and `web/src/backend/notifications/notification-destination-resolver.ts`
+- [X] T003 Implement audience-aware, current-state `NotificationDestinationResolver`, universal notification-inbox fallback, and stop storing generated hrefs in `web/src/backend/notifications/event-policy.ts` and `web/src/backend/notifications/notification-destination-resolver.ts`
 - [X] T004 Resolve transient hrefs at notification list serving time and cover kind/audience/group/staleness contracts in `web/src/backend/notifications/notification-service.ts` and `web/tests/backend/unit/notifications/notification-destination-resolver.test.ts`
 
 ## Phase 3: User Story 1 - Safe current destinations (P1)
 
 **Independent Test**: Candidate and recruiter receive different application hrefs; messages, job reviews, reports, and security notifications select only permitted destination shapes.
 
-- [ ] T005 [US1] Add scoped destination and stale-versus-forbidden reader responses with authorization tests in `web/src/app/`, `web/tests/security/notification-deep-link-authorization.test.ts`
+- [ ] T005 [US1] Add scoped destination and stale-versus-forbidden reader responses with authorization tests in `web/src/app/`, `web/tests/security/notification-deep-link-authorization.test.ts`; retain the notification-inbox fallback where a context-specific target cannot be safely served.
 
 ## Phase 4: User Story 2 - Resilient click flow (P1)
 
@@ -32,6 +32,7 @@
 
 ## Phase 6: Polish
 
+- [X] T009 Add a workspace-level custom unsaved-change dialog for internal navigation, route notification activation through it, retain `beforeunload`, and cover accessibility in `web/src/frontend/features/profile/client/unsaved-changes.tsx`, `web/src/frontend/features/dashboard/components/workspace-shell.tsx`, `web/src/frontend/features/notifications/components/notification-center.tsx`, and `web/tests/frontend/accessibility/professional-profile.accessibility.test.tsx`
 - [ ] T008 Run the relevant notification backend/frontend suites, typecheck, and quickstart scenarios; record results in `spec-kit/specs/019-notification-deep-link/quickstart.md`
 
 ## Dependencies

@@ -503,6 +503,68 @@
     color-mix(in srgb, var(--sh-profile-amber) 14%, transparent);
 }
 
+.profile-unsaved-navigation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.profile-unsaved-navigation-actions .stay-button,
+.profile-unsaved-navigation-actions .leave-button {
+  min-height: 2.75rem;
+  padding: 0.625rem 1rem;
+  border-radius: var(--sh-radius-sm);
+  font: inherit;
+  font-weight: var(--sh-font-weight-semibold);
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.profile-unsaved-navigation-actions .stay-button {
+  border: 1px solid var(--sh-color-border-strong);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+}
+
+.profile-unsaved-navigation-actions .stay-button:hover {
+  background: var(--sh-color-surface-muted);
+}
+
+.profile-unsaved-navigation-actions .leave-button {
+  border: 1px solid var(--sh-color-error);
+  color: #fff;
+  background: var(--sh-color-error);
+}
+
+.profile-unsaved-navigation-actions .leave-button:hover {
+  filter: brightness(0.92);
+}
+
+.profile-unsaved-navigation-actions button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--sh-color-info) 42%, transparent);
+  outline-offset: 2px;
+}
+
+.profile-unsaved-navigation-actions button:active {
+  transform: translateY(1px);
+}
+
+@media (max-width: 420px) {
+  .profile-unsaved-navigation-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .profile-unsaved-navigation-actions button {
+    width: 100%;
+  }
+}
+
 .professional-profile-fields {
   display: grid;
   grid-template-columns: minmax(7rem, 0.3fr) minmax(0, 1fr);
