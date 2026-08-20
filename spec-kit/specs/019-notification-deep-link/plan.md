@@ -35,6 +35,7 @@ GET /api/notifications
 
 Destination route
   -> normal authentication + role/membership/scope policy
+  -> administrator sensitive-route step-up check (when required)
   -> authorized live-state check
   -> detail/list OR safe unavailable content OR neutral 404/403
 ```
@@ -65,6 +66,8 @@ The resolver observes current resource state each list read. It returns null whe
 ## Frontend interaction
 
 Notification rows use a semantic button for item activation and a nested/separate Mark as read button without propagation. A View details control exists only with href. Enter/Space use native button behavior; CSS provides `:focus-visible`. Activation applies optimistic read state, starts the ID-based mark-read request, then calls navigation immediately unless the current pathname/query already represents the href. Failed reads leave a reconciliation flag; subsequent polling/fetch replaces local unread count with the response's server count. If an unsaved-change guard is active, internal links and notification activation are deferred to one accessible SmartHire dialog mounted in the workspace shell; refresh, tab closing, and browser-controlled exits retain `beforeunload` because browsers do not permit a reliable custom replacement.
+
+Administrative deep links may target sensitive detail screens. A `403 STEP_UP_REQUIRED` from such a screen is an authentication-strength challenge, not a lost session: the auth provider preserves the admin context, the detail screen opens the existing TOTP step-up dialog, and a successful proof refreshes the target query.
 
 ## Project Structure
 

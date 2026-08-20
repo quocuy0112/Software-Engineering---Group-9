@@ -293,7 +293,9 @@ Candidate, Recruiter, and unrestricted Administrator views.
   NOT reveal a conversation bound to another company.
 - **FR-006 [Discovery]**: Eligible-person discovery MUST return only safe account
   fields and supported shared context, use bounded pagination, and return a
-  neutral result for ineligible or unknown targets.
+  neutral result for ineligible or unknown targets. Search input MUST filter
+  only this server-authorized eligible set; it MUST NOT broaden account
+  discovery or conversation authority.
 - **FR-007 [Conversation Uniqueness]**: Repeated or concurrent equivalent opens
   MUST return one authoritative direct conversation for the same participant
   pair and immutable context.

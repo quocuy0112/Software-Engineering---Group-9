@@ -5,7 +5,7 @@ import { StartConversation } from "@/frontend/features/messaging/components/star
 afterEach(() => vi.restoreAllMocks());
 
 describe("StartConversation", () => {
-  it("opens an eligible context without exposing a free-form account search", async () => {
+  it("searches only server-authorized contacts and opens an eligible context", async () => {
     const onOpened = vi.fn();
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(
@@ -56,7 +56,9 @@ describe("StartConversation", () => {
     expect(
       screen.getByRole("heading", { name: "Người có thể nhắn" }),
     ).toBeVisible();
-    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("searchbox", { name: "Tìm người có thể nhắn" }),
+    ).toBeVisible();
     fireEvent.click(
       screen.getByRole("button", { name: "Nhắn tin cho Recruiter B" }),
     );
@@ -65,8 +67,8 @@ describe("StartConversation", () => {
     );
   });
 
-  it("does not render a redundant panel when no eligible contact is available", () => {
-    const { container } = render(
+  it("keeps the eligible-only search available when no initial contact is available", () => {
+    render(
       <StartConversation
         csrfProof="csrf"
         initialItems={[]}
@@ -74,6 +76,63 @@ describe("StartConversation", () => {
       />,
     );
 
-    expect(container).toBeEmptyDOMElement();
+    expect(
+      screen.getByRole("searchbox", { name: /search eligible people/i }),
+    ).toBeVisible();
+    expect(screen.getByRole("status")).toHaveTextContent(
+      /no eligible contacts yet/i,
+    );
+  });
+
+  it("replaces the list with the server-filtered eligible search result", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          items: [
+            {
+              participant: {
+                id: "user-match",
+                name: "Matching Recruiter",
+                image: null,
+              },
+              contexts: [
+                {
+                  type: "PROFESSIONAL_CONNECTION",
+                  reference: "connection-1",
+                  label: "Professional connection",
+                  companyName: null,
+                  jobTitle: null,
+                },
+              ],
+            },
+          ],
+          nextCursor: null,
+        }),
+        { headers: { "content-type": "application/json" } },
+      ),
+    );
+
+    render(
+      <StartConversation
+        csrfProof="csrf"
+        initialItems={[]}
+        onOpened={() => undefined}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByRole("searchbox", { name: /search eligible people/i }),
+      { target: { value: "Matching" } },
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText("Matching Recruiter")).toBeVisible(),
+    );
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining(
+        "/api/messaging/eligible-participants?q=Matching",
+      ),
+      expect.objectContaining({ credentials: "same-origin" }),
+    );
   });
 });

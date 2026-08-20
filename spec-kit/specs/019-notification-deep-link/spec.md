@@ -21,6 +21,7 @@ As a signed-in recipient, I can open a notification using a destination calculat
 3. **Given** a job-post decision notification, **When** the recruiter opens it, **Then** approval opens the posting and rejection/request-for-changes opens the editable review context.
 4. **Given** an administrator receives a moderation report notification, **When** it is served, **Then** it opens the protected report detail; a non-administrator never receives that administrative destination.
 5. **Given** a recipient receives a support, connection, membership, invitation, or report notification, **When** it is served, **Then** it receives a safe destination to the relevant workspace, activity, or protected review screen.
+6. **Given** an administrator opens a notification destination requiring fresh two-factor proof, **When** the proof has expired, **Then** the console keeps the authenticated session, prompts for step-up verification, and reloads the protected destination after success.
 
 ---
 
@@ -70,6 +71,7 @@ As an authorized recipient, I receive a useful unavailable-content state when a 
 - **FR-002**: The system MUST resolve each served href from live resource state, context, occurrence count, and recipient audience; the resolver MUST accept the recipient role/audience explicitly.
 - **FR-003**: The system MUST provide a server-resolved safe href for every notification kind, including job-post approval/rejection/request-changes, application received/stage change, moderation report, message, account/security, support, connection, membership, and company-invitation events. If no context-specific destination is safe, it MUST link to the recipient's notification inbox using the notification identifier.
 - **FR-004**: A href MUST NOT grant access. Every destination MUST independently re-check authentication, role, membership, scope, and resource visibility.
+- **FR-004a**: A protected administrator destination returning `STEP_UP_REQUIRED` MUST preserve the authenticated administrator session, request fresh two-factor proof, and retry or reload the destination after successful verification; it MUST NOT treat that response as logout.
 - **FR-005**: Destinations MUST distinguish authorized-but-no-longer-available content from authorization loss: the former may show the safe unavailable-content state; the latter MUST use a neutral 404/403 response.
 - **FR-006**: A grouped notification with occurrence count greater than one MUST resolve to a filtered list using its context and last-notified time, not to an individual resource.
 - **FR-007**: Activating an item MUST mark it read by notification ID idempotently, optimistically refresh unread state, and continue navigation despite a transient read failure; the next fetch MUST reconcile failed optimistic state.

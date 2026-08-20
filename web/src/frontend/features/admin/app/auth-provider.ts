@@ -13,9 +13,23 @@ function statusOf(error: unknown) {
   return (error as { status?: number } | null)?.status;
 }
 
+function errorCodeOf(error: unknown) {
+  const value = error as {
+    code?: unknown;
+    body?: { code?: unknown; error?: { code?: unknown } };
+  } | null;
+  if (typeof value?.code === "string") return value.code;
+  if (typeof value?.body?.code === "string") return value.body.code;
+  return typeof value?.body?.error?.code === "string"
+    ? value.body.error.code
+    : undefined;
+}
+
 function isSignedOutError(error: unknown) {
   const status = statusOf(error);
-  return status === 401 || status === 403;
+  return (
+    status === 401 || (status === 403 && errorCodeOf(error) === "UNAUTHORIZED")
+  );
 }
 
 function clearAuthState() {
@@ -23,10 +37,9 @@ function clearAuthState() {
   contextRequest = null;
 }
 
-async function request<T extends Record<string, unknown> = Record<string, unknown>>(
-  path: string,
-  init: RequestInit = {},
-): Promise<T> {
+async function request<
+  T extends Record<string, unknown> = Record<string, unknown>,
+>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   if (init.body) headers.set("content-type", "application/json");
   if (csrfToken && init.method && init.method !== "GET") {

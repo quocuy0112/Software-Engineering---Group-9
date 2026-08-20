@@ -13,6 +13,8 @@ describe("Administrator job-post decision accessibility", () => {
       "aria-label",
       "Reject exact version",
       "Decision result",
+      "job-post-review-decision-confirmation-title",
+      "job-post-review-decision-confirmation-description",
     ])
       expect(source).toContain(marker);
   });

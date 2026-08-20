@@ -58,4 +58,25 @@ describe("admin auth provider signed-out behavior", () => {
     expect(currentAdminCsrfToken()).toBeNull();
     expect(fetch).toHaveBeenCalledTimes(2);
   });
+
+  it("keeps an authenticated admin session for a step-up challenge", async () => {
+    const fetch = vi.fn(async () =>
+      response(200, {
+        accountId: "admin-1",
+        displayName: "Administrator",
+        csrfToken: "csrf-proof",
+      }),
+    );
+    vi.stubGlobal("fetch", fetch);
+
+    await expect(adminAuthProvider.checkAuth?.({})).resolves.toBeUndefined();
+    await expect(
+      adminAuthProvider.checkError?.({
+        status: 403,
+        code: "STEP_UP_REQUIRED",
+        body: { code: "STEP_UP_REQUIRED" },
+      }),
+    ).resolves.toBeUndefined();
+    expect(currentAdminCsrfToken()).toBe("csrf-proof");
+  });
 });
