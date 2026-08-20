@@ -177,6 +177,11 @@ export type Company = Prisma.CompanyModel
  */
 export type CompanyInvitation = Prisma.CompanyInvitationModel
 /**
+ * Model CompanyTeamActivity
+ * 
+ */
+export type CompanyTeamActivity = Prisma.CompanyTeamActivityModel
+/**
  * Model CompanyMembership
  * 
  */

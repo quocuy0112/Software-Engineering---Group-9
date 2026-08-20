@@ -11,5 +11,7 @@ describe("CompanyTeamScreen accessibility", () => {
     expect(screen.getByLabelText("Work email")).toBeTruthy();
     expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
     expect(screen.getByRole("heading", { name: "Pending invitations" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Team activity" })).toBeTruthy();
+    expect(screen.queryByText("Secure invitation link")).toBeNull();
   });
 });

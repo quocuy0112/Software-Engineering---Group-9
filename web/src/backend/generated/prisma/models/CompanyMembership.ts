@@ -613,10 +613,6 @@ export type EnumCompanyMembershipStatusFieldUpdateOperationsInput = {
   set?: $Enums.CompanyMembershipStatus
 }
 
-export type NullableEnumCompanyMembershipRoleFieldUpdateOperationsInput = {
-  set?: $Enums.CompanyMembershipRole | null
-}
-
 export type CompanyMembershipCreateNestedOneWithoutHistoryInput = {
   create?: Prisma.XOR<Prisma.CompanyMembershipCreateWithoutHistoryInput, Prisma.CompanyMembershipUncheckedCreateWithoutHistoryInput>
   connectOrCreate?: Prisma.CompanyMembershipCreateOrConnectWithoutHistoryInput

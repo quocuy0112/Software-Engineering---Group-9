@@ -24,4 +24,14 @@
 ## Phase 4: Verification and synchronization
 
 - [X] T013 Update Feature 006, 009, and 021 references that conflict with Owner-facing invitation lifecycle in `spec-kit/specs/`.
-- [ ] T014 Run focused tests, typecheck, lint, Prisma validation, and update this checklist in `web/` and `spec-kit/specs/024-company-member-management/tasks.md`.
+- [X] T015 [US2] Deliver each invitation through the email outbox and a token-free in-app notification; remove Owner-browser token delivery and add migration/template coverage.
+- [X] T014 Run focused tests, typecheck, lint, Prisma validation, and update this checklist in `web/` and `spec-kit/specs/024-company-member-management/tasks.md`.
+
+## Phase 5: Recipient decision and activity timeline
+
+- [X] T016 [US2] Add declined invitation state, immutable company team activity storage, migrations, and Prisma updates.
+- [X] T017 [P] [US2] Add recipient preview/decline contracts and Owner response notification templates, policies, and tests.
+- [X] T018 [US2] Implement transactional invitation accept/decline responses, Owner notification delivery, and activity recording.
+- [X] T019 [P] [US2] Add protected preview/decline routes and update the invitation decision UI with accessible terminal states.
+- [X] T020 [US1] Render the Owner-visible Team activity timeline on the Team page.
+- [X] T021 Run focused tests, typecheck, lint, Prisma validation/migration deploy, and synchronize this checklist.

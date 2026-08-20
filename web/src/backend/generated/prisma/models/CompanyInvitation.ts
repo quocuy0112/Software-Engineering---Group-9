@@ -44,6 +44,8 @@ export type CompanyInvitationMinAggregateOutputType = {
   invitedByUserId: string | null
   acceptedByUserId: string | null
   acceptedAt: Date | null
+  declinedByUserId: string | null
+  declinedAt: Date | null
   revokedAt: Date | null
   expiresAt: Date | null
   version: number | null
@@ -61,6 +63,8 @@ export type CompanyInvitationMaxAggregateOutputType = {
   invitedByUserId: string | null
   acceptedByUserId: string | null
   acceptedAt: Date | null
+  declinedByUserId: string | null
+  declinedAt: Date | null
   revokedAt: Date | null
   expiresAt: Date | null
   version: number | null
@@ -78,6 +82,8 @@ export type CompanyInvitationCountAggregateOutputType = {
   invitedByUserId: number
   acceptedByUserId: number
   acceptedAt: number
+  declinedByUserId: number
+  declinedAt: number
   revokedAt: number
   expiresAt: number
   version: number
@@ -105,6 +111,8 @@ export type CompanyInvitationMinAggregateInputType = {
   invitedByUserId?: true
   acceptedByUserId?: true
   acceptedAt?: true
+  declinedByUserId?: true
+  declinedAt?: true
   revokedAt?: true
   expiresAt?: true
   version?: true
@@ -122,6 +130,8 @@ export type CompanyInvitationMaxAggregateInputType = {
   invitedByUserId?: true
   acceptedByUserId?: true
   acceptedAt?: true
+  declinedByUserId?: true
+  declinedAt?: true
   revokedAt?: true
   expiresAt?: true
   version?: true
@@ -139,6 +149,8 @@ export type CompanyInvitationCountAggregateInputType = {
   invitedByUserId?: true
   acceptedByUserId?: true
   acceptedAt?: true
+  declinedByUserId?: true
+  declinedAt?: true
   revokedAt?: true
   expiresAt?: true
   version?: true
@@ -243,6 +255,8 @@ export type CompanyInvitationGroupByOutputType = {
   invitedByUserId: string
   acceptedByUserId: string | null
   acceptedAt: Date | null
+  declinedByUserId: string | null
+  declinedAt: Date | null
   revokedAt: Date | null
   expiresAt: Date
   version: number
@@ -283,6 +297,8 @@ export type CompanyInvitationWhereInput = {
   invitedByUserId?: Prisma.StringFilter<"CompanyInvitation"> | string
   acceptedByUserId?: Prisma.StringNullableFilter<"CompanyInvitation"> | string | null
   acceptedAt?: Prisma.DateTimeNullableFilter<"CompanyInvitation"> | Date | string | null
+  declinedByUserId?: Prisma.StringNullableFilter<"CompanyInvitation"> | string | null
+  declinedAt?: Prisma.DateTimeNullableFilter<"CompanyInvitation"> | Date | string | null
   revokedAt?: Prisma.DateTimeNullableFilter<"CompanyInvitation"> | Date | string | null
   expiresAt?: Prisma.DateTimeFilter<"CompanyInvitation"> | Date | string
   version?: Prisma.IntFilter<"CompanyInvitation"> | number
@@ -291,6 +307,7 @@ export type CompanyInvitationWhereInput = {
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   invitedBy?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   acceptedBy?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
+  declinedBy?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
 }
 
 export type CompanyInvitationOrderByWithRelationInput = {
@@ -303,6 +320,8 @@ export type CompanyInvitationOrderByWithRelationInput = {
   invitedByUserId?: Prisma.SortOrder
   acceptedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   acceptedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  declinedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  declinedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   revokedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -311,6 +330,7 @@ export type CompanyInvitationOrderByWithRelationInput = {
   company?: Prisma.CompanyOrderByWithRelationInput
   invitedBy?: Prisma.UserAccountOrderByWithRelationInput
   acceptedBy?: Prisma.UserAccountOrderByWithRelationInput
+  declinedBy?: Prisma.UserAccountOrderByWithRelationInput
 }
 
 export type CompanyInvitationWhereUniqueInput = Prisma.AtLeast<{
@@ -326,6 +346,8 @@ export type CompanyInvitationWhereUniqueInput = Prisma.AtLeast<{
   invitedByUserId?: Prisma.StringFilter<"CompanyInvitation"> | string
   acceptedByUserId?: Prisma.StringNullableFilter<"CompanyInvitation"> | string | null
   acceptedAt?: Prisma.DateTimeNullableFilter<"CompanyInvitation"> | Date | string | null
+  declinedByUserId?: Prisma.StringNullableFilter<"CompanyInvitation"> | string | null
+  declinedAt?: Prisma.DateTimeNullableFilter<"CompanyInvitation"> | Date | string | null
   revokedAt?: Prisma.DateTimeNullableFilter<"CompanyInvitation"> | Date | string | null
   expiresAt?: Prisma.DateTimeFilter<"CompanyInvitation"> | Date | string
   version?: Prisma.IntFilter<"CompanyInvitation"> | number
@@ -334,6 +356,7 @@ export type CompanyInvitationWhereUniqueInput = Prisma.AtLeast<{
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   invitedBy?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   acceptedBy?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
+  declinedBy?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
 }, "id" | "tokenDigest">
 
 export type CompanyInvitationOrderByWithAggregationInput = {
@@ -346,6 +369,8 @@ export type CompanyInvitationOrderByWithAggregationInput = {
   invitedByUserId?: Prisma.SortOrder
   acceptedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   acceptedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  declinedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  declinedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   revokedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -371,6 +396,8 @@ export type CompanyInvitationScalarWhereWithAggregatesInput = {
   invitedByUserId?: Prisma.StringWithAggregatesFilter<"CompanyInvitation"> | string
   acceptedByUserId?: Prisma.StringNullableWithAggregatesFilter<"CompanyInvitation"> | string | null
   acceptedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"CompanyInvitation"> | Date | string | null
+  declinedByUserId?: Prisma.StringNullableWithAggregatesFilter<"CompanyInvitation"> | string | null
+  declinedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"CompanyInvitation"> | Date | string | null
   revokedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"CompanyInvitation"> | Date | string | null
   expiresAt?: Prisma.DateTimeWithAggregatesFilter<"CompanyInvitation"> | Date | string
   version?: Prisma.IntWithAggregatesFilter<"CompanyInvitation"> | number
@@ -385,6 +412,7 @@ export type CompanyInvitationCreateInput = {
   state?: $Enums.CompanyInvitationState
   tokenDigest: string
   acceptedAt?: Date | string | null
+  declinedAt?: Date | string | null
   revokedAt?: Date | string | null
   expiresAt: Date | string
   version?: number
@@ -393,6 +421,7 @@ export type CompanyInvitationCreateInput = {
   company: Prisma.CompanyCreateNestedOneWithoutInvitationsInput
   invitedBy: Prisma.UserAccountCreateNestedOneWithoutCompanyInvitationsSentInput
   acceptedBy?: Prisma.UserAccountCreateNestedOneWithoutCompanyInvitationsAcceptedInput
+  declinedBy?: Prisma.UserAccountCreateNestedOneWithoutCompanyInvitationsDeclinedInput
 }
 
 export type CompanyInvitationUncheckedCreateInput = {
@@ -405,6 +434,8 @@ export type CompanyInvitationUncheckedCreateInput = {
   invitedByUserId: string
   acceptedByUserId?: string | null
   acceptedAt?: Date | string | null
+  declinedByUserId?: string | null
+  declinedAt?: Date | string | null
   revokedAt?: Date | string | null
   expiresAt: Date | string
   version?: number
@@ -419,6 +450,7 @@ export type CompanyInvitationUpdateInput = {
   state?: Prisma.EnumCompanyInvitationStateFieldUpdateOperationsInput | $Enums.CompanyInvitationState
   tokenDigest?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -427,6 +459,7 @@ export type CompanyInvitationUpdateInput = {
   company?: Prisma.CompanyUpdateOneRequiredWithoutInvitationsNestedInput
   invitedBy?: Prisma.UserAccountUpdateOneRequiredWithoutCompanyInvitationsSentNestedInput
   acceptedBy?: Prisma.UserAccountUpdateOneWithoutCompanyInvitationsAcceptedNestedInput
+  declinedBy?: Prisma.UserAccountUpdateOneWithoutCompanyInvitationsDeclinedNestedInput
 }
 
 export type CompanyInvitationUncheckedUpdateInput = {
@@ -439,6 +472,8 @@ export type CompanyInvitationUncheckedUpdateInput = {
   invitedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -456,6 +491,8 @@ export type CompanyInvitationCreateManyInput = {
   invitedByUserId: string
   acceptedByUserId?: string | null
   acceptedAt?: Date | string | null
+  declinedByUserId?: string | null
+  declinedAt?: Date | string | null
   revokedAt?: Date | string | null
   expiresAt: Date | string
   version?: number
@@ -470,6 +507,7 @@ export type CompanyInvitationUpdateManyMutationInput = {
   state?: Prisma.EnumCompanyInvitationStateFieldUpdateOperationsInput | $Enums.CompanyInvitationState
   tokenDigest?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -487,6 +525,8 @@ export type CompanyInvitationUncheckedUpdateManyInput = {
   invitedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -514,6 +554,8 @@ export type CompanyInvitationCountOrderByAggregateInput = {
   invitedByUserId?: Prisma.SortOrder
   acceptedByUserId?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  declinedByUserId?: Prisma.SortOrder
+  declinedAt?: Prisma.SortOrder
   revokedAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -535,6 +577,8 @@ export type CompanyInvitationMaxOrderByAggregateInput = {
   invitedByUserId?: Prisma.SortOrder
   acceptedByUserId?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  declinedByUserId?: Prisma.SortOrder
+  declinedAt?: Prisma.SortOrder
   revokedAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -552,6 +596,8 @@ export type CompanyInvitationMinOrderByAggregateInput = {
   invitedByUserId?: Prisma.SortOrder
   acceptedByUserId?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  declinedByUserId?: Prisma.SortOrder
+  declinedAt?: Prisma.SortOrder
   revokedAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -577,6 +623,13 @@ export type CompanyInvitationCreateNestedManyWithoutAcceptedByInput = {
   connect?: Prisma.CompanyInvitationWhereUniqueInput | Prisma.CompanyInvitationWhereUniqueInput[]
 }
 
+export type CompanyInvitationCreateNestedManyWithoutDeclinedByInput = {
+  create?: Prisma.XOR<Prisma.CompanyInvitationCreateWithoutDeclinedByInput, Prisma.CompanyInvitationUncheckedCreateWithoutDeclinedByInput> | Prisma.CompanyInvitationCreateWithoutDeclinedByInput[] | Prisma.CompanyInvitationUncheckedCreateWithoutDeclinedByInput[]
+  connectOrCreate?: Prisma.CompanyInvitationCreateOrConnectWithoutDeclinedByInput | Prisma.CompanyInvitationCreateOrConnectWithoutDeclinedByInput[]
+  createMany?: Prisma.CompanyInvitationCreateManyDeclinedByInputEnvelope
+  connect?: Prisma.CompanyInvitationWhereUniqueInput | Prisma.CompanyInvitationWhereUniqueInput[]
+}
+
 export type CompanyInvitationUncheckedCreateNestedManyWithoutInvitedByInput = {
   create?: Prisma.XOR<Prisma.CompanyInvitationCreateWithoutInvitedByInput, Prisma.CompanyInvitationUncheckedCreateWithoutInvitedByInput> | Prisma.CompanyInvitationCreateWithoutInvitedByInput[] | Prisma.CompanyInvitationUncheckedCreateWithoutInvitedByInput[]
   connectOrCreate?: Prisma.CompanyInvitationCreateOrConnectWithoutInvitedByInput | Prisma.CompanyInvitationCreateOrConnectWithoutInvitedByInput[]
@@ -588,6 +641,13 @@ export type CompanyInvitationUncheckedCreateNestedManyWithoutAcceptedByInput = {
   create?: Prisma.XOR<Prisma.CompanyInvitationCreateWithoutAcceptedByInput, Prisma.CompanyInvitationUncheckedCreateWithoutAcceptedByInput> | Prisma.CompanyInvitationCreateWithoutAcceptedByInput[] | Prisma.CompanyInvitationUncheckedCreateWithoutAcceptedByInput[]
   connectOrCreate?: Prisma.CompanyInvitationCreateOrConnectWithoutAcceptedByInput | Prisma.CompanyInvitationCreateOrConnectWithoutAcceptedByInput[]
   createMany?: Prisma.CompanyInvitationCreateManyAcceptedByInputEnvelope
+  connect?: Prisma.CompanyInvitationWhereUniqueInput | Prisma.CompanyInvitationWhereUniqueInput[]
+}
+
+export type CompanyInvitationUncheckedCreateNestedManyWithoutDeclinedByInput = {
+  create?: Prisma.XOR<Prisma.CompanyInvitationCreateWithoutDeclinedByInput, Prisma.CompanyInvitationUncheckedCreateWithoutDeclinedByInput> | Prisma.CompanyInvitationCreateWithoutDeclinedByInput[] | Prisma.CompanyInvitationUncheckedCreateWithoutDeclinedByInput[]
+  connectOrCreate?: Prisma.CompanyInvitationCreateOrConnectWithoutDeclinedByInput | Prisma.CompanyInvitationCreateOrConnectWithoutDeclinedByInput[]
+  createMany?: Prisma.CompanyInvitationCreateManyDeclinedByInputEnvelope
   connect?: Prisma.CompanyInvitationWhereUniqueInput | Prisma.CompanyInvitationWhereUniqueInput[]
 }
 
@@ -619,6 +679,20 @@ export type CompanyInvitationUpdateManyWithoutAcceptedByNestedInput = {
   deleteMany?: Prisma.CompanyInvitationScalarWhereInput | Prisma.CompanyInvitationScalarWhereInput[]
 }
 
+export type CompanyInvitationUpdateManyWithoutDeclinedByNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyInvitationCreateWithoutDeclinedByInput, Prisma.CompanyInvitationUncheckedCreateWithoutDeclinedByInput> | Prisma.CompanyInvitationCreateWithoutDeclinedByInput[] | Prisma.CompanyInvitationUncheckedCreateWithoutDeclinedByInput[]
+  connectOrCreate?: Prisma.CompanyInvitationCreateOrConnectWithoutDeclinedByInput | Prisma.CompanyInvitationCreateOrConnectWithoutDeclinedByInput[]
+  upsert?: Prisma.CompanyInvitationUpsertWithWhereUniqueWithoutDeclinedByInput | Prisma.CompanyInvitationUpsertWithWhereUniqueWithoutDeclinedByInput[]
+  createMany?: Prisma.CompanyInvitationCreateManyDeclinedByInputEnvelope
+  set?: Prisma.CompanyInvitationWhereUniqueInput | Prisma.CompanyInvitationWhereUniqueInput[]
+  disconnect?: Prisma.CompanyInvitationWhereUniqueInput | Prisma.CompanyInvitationWhereUniqueInput[]
+  delete?: Prisma.CompanyInvitationWhereUniqueInput | Prisma.CompanyInvitationWhereUniqueInput[]
+  connect?: Prisma.CompanyInvitationWhereUniqueInput | Prisma.CompanyInvitationWhereUniqueInput[]
+  update?: Prisma.CompanyInvitationUpdateWithWhereUniqueWithoutDeclinedByInput | Prisma.CompanyInvitationUpdateWithWhereUniqueWithoutDeclinedByInput[]
+  updateMany?: Prisma.CompanyInvitationUpdateManyWithWhereWithoutDeclinedByInput | Prisma.CompanyInvitationUpdateManyWithWhereWithoutDeclinedByInput[]
+  deleteMany?: Prisma.CompanyInvitationScalarWhereInput | Prisma.CompanyInvitationScalarWhereInput[]
+}
+
 export type CompanyInvitationUncheckedUpdateManyWithoutInvitedByNestedInput = {
   create?: Prisma.XOR<Prisma.CompanyInvitationCreateWithoutInvitedByInput, Prisma.CompanyInvitationUncheckedCreateWithoutInvitedByInput> | Prisma.CompanyInvitationCreateWithoutInvitedByInput[] | Prisma.CompanyInvitationUncheckedCreateWithoutInvitedByInput[]
   connectOrCreate?: Prisma.CompanyInvitationCreateOrConnectWithoutInvitedByInput | Prisma.CompanyInvitationCreateOrConnectWithoutInvitedByInput[]
@@ -644,6 +718,20 @@ export type CompanyInvitationUncheckedUpdateManyWithoutAcceptedByNestedInput = {
   connect?: Prisma.CompanyInvitationWhereUniqueInput | Prisma.CompanyInvitationWhereUniqueInput[]
   update?: Prisma.CompanyInvitationUpdateWithWhereUniqueWithoutAcceptedByInput | Prisma.CompanyInvitationUpdateWithWhereUniqueWithoutAcceptedByInput[]
   updateMany?: Prisma.CompanyInvitationUpdateManyWithWhereWithoutAcceptedByInput | Prisma.CompanyInvitationUpdateManyWithWhereWithoutAcceptedByInput[]
+  deleteMany?: Prisma.CompanyInvitationScalarWhereInput | Prisma.CompanyInvitationScalarWhereInput[]
+}
+
+export type CompanyInvitationUncheckedUpdateManyWithoutDeclinedByNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyInvitationCreateWithoutDeclinedByInput, Prisma.CompanyInvitationUncheckedCreateWithoutDeclinedByInput> | Prisma.CompanyInvitationCreateWithoutDeclinedByInput[] | Prisma.CompanyInvitationUncheckedCreateWithoutDeclinedByInput[]
+  connectOrCreate?: Prisma.CompanyInvitationCreateOrConnectWithoutDeclinedByInput | Prisma.CompanyInvitationCreateOrConnectWithoutDeclinedByInput[]
+  upsert?: Prisma.CompanyInvitationUpsertWithWhereUniqueWithoutDeclinedByInput | Prisma.CompanyInvitationUpsertWithWhereUniqueWithoutDeclinedByInput[]
+  createMany?: Prisma.CompanyInvitationCreateManyDeclinedByInputEnvelope
+  set?: Prisma.CompanyInvitationWhereUniqueInput | Prisma.CompanyInvitationWhereUniqueInput[]
+  disconnect?: Prisma.CompanyInvitationWhereUniqueInput | Prisma.CompanyInvitationWhereUniqueInput[]
+  delete?: Prisma.CompanyInvitationWhereUniqueInput | Prisma.CompanyInvitationWhereUniqueInput[]
+  connect?: Prisma.CompanyInvitationWhereUniqueInput | Prisma.CompanyInvitationWhereUniqueInput[]
+  update?: Prisma.CompanyInvitationUpdateWithWhereUniqueWithoutDeclinedByInput | Prisma.CompanyInvitationUpdateWithWhereUniqueWithoutDeclinedByInput[]
+  updateMany?: Prisma.CompanyInvitationUpdateManyWithWhereWithoutDeclinedByInput | Prisma.CompanyInvitationUpdateManyWithWhereWithoutDeclinedByInput[]
   deleteMany?: Prisma.CompanyInvitationScalarWhereInput | Prisma.CompanyInvitationScalarWhereInput[]
 }
 
@@ -704,6 +792,7 @@ export type CompanyInvitationCreateWithoutInvitedByInput = {
   state?: $Enums.CompanyInvitationState
   tokenDigest: string
   acceptedAt?: Date | string | null
+  declinedAt?: Date | string | null
   revokedAt?: Date | string | null
   expiresAt: Date | string
   version?: number
@@ -711,6 +800,7 @@ export type CompanyInvitationCreateWithoutInvitedByInput = {
   updatedAt?: Date | string
   company: Prisma.CompanyCreateNestedOneWithoutInvitationsInput
   acceptedBy?: Prisma.UserAccountCreateNestedOneWithoutCompanyInvitationsAcceptedInput
+  declinedBy?: Prisma.UserAccountCreateNestedOneWithoutCompanyInvitationsDeclinedInput
 }
 
 export type CompanyInvitationUncheckedCreateWithoutInvitedByInput = {
@@ -722,6 +812,8 @@ export type CompanyInvitationUncheckedCreateWithoutInvitedByInput = {
   tokenDigest: string
   acceptedByUserId?: string | null
   acceptedAt?: Date | string | null
+  declinedByUserId?: string | null
+  declinedAt?: Date | string | null
   revokedAt?: Date | string | null
   expiresAt: Date | string
   version?: number
@@ -746,6 +838,7 @@ export type CompanyInvitationCreateWithoutAcceptedByInput = {
   state?: $Enums.CompanyInvitationState
   tokenDigest: string
   acceptedAt?: Date | string | null
+  declinedAt?: Date | string | null
   revokedAt?: Date | string | null
   expiresAt: Date | string
   version?: number
@@ -753,6 +846,7 @@ export type CompanyInvitationCreateWithoutAcceptedByInput = {
   updatedAt?: Date | string
   company: Prisma.CompanyCreateNestedOneWithoutInvitationsInput
   invitedBy: Prisma.UserAccountCreateNestedOneWithoutCompanyInvitationsSentInput
+  declinedBy?: Prisma.UserAccountCreateNestedOneWithoutCompanyInvitationsDeclinedInput
 }
 
 export type CompanyInvitationUncheckedCreateWithoutAcceptedByInput = {
@@ -764,6 +858,8 @@ export type CompanyInvitationUncheckedCreateWithoutAcceptedByInput = {
   tokenDigest: string
   invitedByUserId: string
   acceptedAt?: Date | string | null
+  declinedByUserId?: string | null
+  declinedAt?: Date | string | null
   revokedAt?: Date | string | null
   expiresAt: Date | string
   version?: number
@@ -778,6 +874,52 @@ export type CompanyInvitationCreateOrConnectWithoutAcceptedByInput = {
 
 export type CompanyInvitationCreateManyAcceptedByInputEnvelope = {
   data: Prisma.CompanyInvitationCreateManyAcceptedByInput | Prisma.CompanyInvitationCreateManyAcceptedByInput[]
+  skipDuplicates?: boolean
+}
+
+export type CompanyInvitationCreateWithoutDeclinedByInput = {
+  id?: string
+  normalizedEmail: string
+  role: $Enums.CompanyMembershipRole
+  state?: $Enums.CompanyInvitationState
+  tokenDigest: string
+  acceptedAt?: Date | string | null
+  declinedAt?: Date | string | null
+  revokedAt?: Date | string | null
+  expiresAt: Date | string
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  company: Prisma.CompanyCreateNestedOneWithoutInvitationsInput
+  invitedBy: Prisma.UserAccountCreateNestedOneWithoutCompanyInvitationsSentInput
+  acceptedBy?: Prisma.UserAccountCreateNestedOneWithoutCompanyInvitationsAcceptedInput
+}
+
+export type CompanyInvitationUncheckedCreateWithoutDeclinedByInput = {
+  id?: string
+  companyId: string
+  normalizedEmail: string
+  role: $Enums.CompanyMembershipRole
+  state?: $Enums.CompanyInvitationState
+  tokenDigest: string
+  invitedByUserId: string
+  acceptedByUserId?: string | null
+  acceptedAt?: Date | string | null
+  declinedAt?: Date | string | null
+  revokedAt?: Date | string | null
+  expiresAt: Date | string
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type CompanyInvitationCreateOrConnectWithoutDeclinedByInput = {
+  where: Prisma.CompanyInvitationWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyInvitationCreateWithoutDeclinedByInput, Prisma.CompanyInvitationUncheckedCreateWithoutDeclinedByInput>
+}
+
+export type CompanyInvitationCreateManyDeclinedByInputEnvelope = {
+  data: Prisma.CompanyInvitationCreateManyDeclinedByInput | Prisma.CompanyInvitationCreateManyDeclinedByInput[]
   skipDuplicates?: boolean
 }
 
@@ -810,6 +952,8 @@ export type CompanyInvitationScalarWhereInput = {
   invitedByUserId?: Prisma.StringFilter<"CompanyInvitation"> | string
   acceptedByUserId?: Prisma.StringNullableFilter<"CompanyInvitation"> | string | null
   acceptedAt?: Prisma.DateTimeNullableFilter<"CompanyInvitation"> | Date | string | null
+  declinedByUserId?: Prisma.StringNullableFilter<"CompanyInvitation"> | string | null
+  declinedAt?: Prisma.DateTimeNullableFilter<"CompanyInvitation"> | Date | string | null
   revokedAt?: Prisma.DateTimeNullableFilter<"CompanyInvitation"> | Date | string | null
   expiresAt?: Prisma.DateTimeFilter<"CompanyInvitation"> | Date | string
   version?: Prisma.IntFilter<"CompanyInvitation"> | number
@@ -833,6 +977,22 @@ export type CompanyInvitationUpdateManyWithWhereWithoutAcceptedByInput = {
   data: Prisma.XOR<Prisma.CompanyInvitationUpdateManyMutationInput, Prisma.CompanyInvitationUncheckedUpdateManyWithoutAcceptedByInput>
 }
 
+export type CompanyInvitationUpsertWithWhereUniqueWithoutDeclinedByInput = {
+  where: Prisma.CompanyInvitationWhereUniqueInput
+  update: Prisma.XOR<Prisma.CompanyInvitationUpdateWithoutDeclinedByInput, Prisma.CompanyInvitationUncheckedUpdateWithoutDeclinedByInput>
+  create: Prisma.XOR<Prisma.CompanyInvitationCreateWithoutDeclinedByInput, Prisma.CompanyInvitationUncheckedCreateWithoutDeclinedByInput>
+}
+
+export type CompanyInvitationUpdateWithWhereUniqueWithoutDeclinedByInput = {
+  where: Prisma.CompanyInvitationWhereUniqueInput
+  data: Prisma.XOR<Prisma.CompanyInvitationUpdateWithoutDeclinedByInput, Prisma.CompanyInvitationUncheckedUpdateWithoutDeclinedByInput>
+}
+
+export type CompanyInvitationUpdateManyWithWhereWithoutDeclinedByInput = {
+  where: Prisma.CompanyInvitationScalarWhereInput
+  data: Prisma.XOR<Prisma.CompanyInvitationUpdateManyMutationInput, Prisma.CompanyInvitationUncheckedUpdateManyWithoutDeclinedByInput>
+}
+
 export type CompanyInvitationCreateWithoutCompanyInput = {
   id?: string
   normalizedEmail: string
@@ -840,6 +1000,7 @@ export type CompanyInvitationCreateWithoutCompanyInput = {
   state?: $Enums.CompanyInvitationState
   tokenDigest: string
   acceptedAt?: Date | string | null
+  declinedAt?: Date | string | null
   revokedAt?: Date | string | null
   expiresAt: Date | string
   version?: number
@@ -847,6 +1008,7 @@ export type CompanyInvitationCreateWithoutCompanyInput = {
   updatedAt?: Date | string
   invitedBy: Prisma.UserAccountCreateNestedOneWithoutCompanyInvitationsSentInput
   acceptedBy?: Prisma.UserAccountCreateNestedOneWithoutCompanyInvitationsAcceptedInput
+  declinedBy?: Prisma.UserAccountCreateNestedOneWithoutCompanyInvitationsDeclinedInput
 }
 
 export type CompanyInvitationUncheckedCreateWithoutCompanyInput = {
@@ -858,6 +1020,8 @@ export type CompanyInvitationUncheckedCreateWithoutCompanyInput = {
   invitedByUserId: string
   acceptedByUserId?: string | null
   acceptedAt?: Date | string | null
+  declinedByUserId?: string | null
+  declinedAt?: Date | string | null
   revokedAt?: Date | string | null
   expiresAt: Date | string
   version?: number
@@ -900,6 +1064,8 @@ export type CompanyInvitationCreateManyInvitedByInput = {
   tokenDigest: string
   acceptedByUserId?: string | null
   acceptedAt?: Date | string | null
+  declinedByUserId?: string | null
+  declinedAt?: Date | string | null
   revokedAt?: Date | string | null
   expiresAt: Date | string
   version?: number
@@ -916,6 +1082,26 @@ export type CompanyInvitationCreateManyAcceptedByInput = {
   tokenDigest: string
   invitedByUserId: string
   acceptedAt?: Date | string | null
+  declinedByUserId?: string | null
+  declinedAt?: Date | string | null
+  revokedAt?: Date | string | null
+  expiresAt: Date | string
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type CompanyInvitationCreateManyDeclinedByInput = {
+  id?: string
+  companyId: string
+  normalizedEmail: string
+  role: $Enums.CompanyMembershipRole
+  state?: $Enums.CompanyInvitationState
+  tokenDigest: string
+  invitedByUserId: string
+  acceptedByUserId?: string | null
+  acceptedAt?: Date | string | null
+  declinedAt?: Date | string | null
   revokedAt?: Date | string | null
   expiresAt: Date | string
   version?: number
@@ -930,6 +1116,7 @@ export type CompanyInvitationUpdateWithoutInvitedByInput = {
   state?: Prisma.EnumCompanyInvitationStateFieldUpdateOperationsInput | $Enums.CompanyInvitationState
   tokenDigest?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -937,6 +1124,7 @@ export type CompanyInvitationUpdateWithoutInvitedByInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutInvitationsNestedInput
   acceptedBy?: Prisma.UserAccountUpdateOneWithoutCompanyInvitationsAcceptedNestedInput
+  declinedBy?: Prisma.UserAccountUpdateOneWithoutCompanyInvitationsDeclinedNestedInput
 }
 
 export type CompanyInvitationUncheckedUpdateWithoutInvitedByInput = {
@@ -948,6 +1136,8 @@ export type CompanyInvitationUncheckedUpdateWithoutInvitedByInput = {
   tokenDigest?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -964,6 +1154,8 @@ export type CompanyInvitationUncheckedUpdateManyWithoutInvitedByInput = {
   tokenDigest?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -978,6 +1170,7 @@ export type CompanyInvitationUpdateWithoutAcceptedByInput = {
   state?: Prisma.EnumCompanyInvitationStateFieldUpdateOperationsInput | $Enums.CompanyInvitationState
   tokenDigest?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -985,6 +1178,7 @@ export type CompanyInvitationUpdateWithoutAcceptedByInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutInvitationsNestedInput
   invitedBy?: Prisma.UserAccountUpdateOneRequiredWithoutCompanyInvitationsSentNestedInput
+  declinedBy?: Prisma.UserAccountUpdateOneWithoutCompanyInvitationsDeclinedNestedInput
 }
 
 export type CompanyInvitationUncheckedUpdateWithoutAcceptedByInput = {
@@ -996,6 +1190,8 @@ export type CompanyInvitationUncheckedUpdateWithoutAcceptedByInput = {
   tokenDigest?: Prisma.StringFieldUpdateOperationsInput | string
   invitedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1012,6 +1208,62 @@ export type CompanyInvitationUncheckedUpdateManyWithoutAcceptedByInput = {
   tokenDigest?: Prisma.StringFieldUpdateOperationsInput | string
   invitedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type CompanyInvitationUpdateWithoutDeclinedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
+  state?: Prisma.EnumCompanyInvitationStateFieldUpdateOperationsInput | $Enums.CompanyInvitationState
+  tokenDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  company?: Prisma.CompanyUpdateOneRequiredWithoutInvitationsNestedInput
+  invitedBy?: Prisma.UserAccountUpdateOneRequiredWithoutCompanyInvitationsSentNestedInput
+  acceptedBy?: Prisma.UserAccountUpdateOneWithoutCompanyInvitationsAcceptedNestedInput
+}
+
+export type CompanyInvitationUncheckedUpdateWithoutDeclinedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
+  state?: Prisma.EnumCompanyInvitationStateFieldUpdateOperationsInput | $Enums.CompanyInvitationState
+  tokenDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  invitedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type CompanyInvitationUncheckedUpdateManyWithoutDeclinedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
+  state?: Prisma.EnumCompanyInvitationStateFieldUpdateOperationsInput | $Enums.CompanyInvitationState
+  tokenDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  invitedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  acceptedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1028,6 +1280,8 @@ export type CompanyInvitationCreateManyCompanyInput = {
   invitedByUserId: string
   acceptedByUserId?: string | null
   acceptedAt?: Date | string | null
+  declinedByUserId?: string | null
+  declinedAt?: Date | string | null
   revokedAt?: Date | string | null
   expiresAt: Date | string
   version?: number
@@ -1042,6 +1296,7 @@ export type CompanyInvitationUpdateWithoutCompanyInput = {
   state?: Prisma.EnumCompanyInvitationStateFieldUpdateOperationsInput | $Enums.CompanyInvitationState
   tokenDigest?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1049,6 +1304,7 @@ export type CompanyInvitationUpdateWithoutCompanyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invitedBy?: Prisma.UserAccountUpdateOneRequiredWithoutCompanyInvitationsSentNestedInput
   acceptedBy?: Prisma.UserAccountUpdateOneWithoutCompanyInvitationsAcceptedNestedInput
+  declinedBy?: Prisma.UserAccountUpdateOneWithoutCompanyInvitationsDeclinedNestedInput
 }
 
 export type CompanyInvitationUncheckedUpdateWithoutCompanyInput = {
@@ -1060,6 +1316,8 @@ export type CompanyInvitationUncheckedUpdateWithoutCompanyInput = {
   invitedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1076,6 +1334,8 @@ export type CompanyInvitationUncheckedUpdateManyWithoutCompanyInput = {
   invitedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   acceptedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  declinedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  declinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1095,6 +1355,8 @@ export type CompanyInvitationSelect<ExtArgs extends runtime.Types.Extensions.Int
   invitedByUserId?: boolean
   acceptedByUserId?: boolean
   acceptedAt?: boolean
+  declinedByUserId?: boolean
+  declinedAt?: boolean
   revokedAt?: boolean
   expiresAt?: boolean
   version?: boolean
@@ -1103,6 +1365,7 @@ export type CompanyInvitationSelect<ExtArgs extends runtime.Types.Extensions.Int
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   invitedBy?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   acceptedBy?: boolean | Prisma.CompanyInvitation$acceptedByArgs<ExtArgs>
+  declinedBy?: boolean | Prisma.CompanyInvitation$declinedByArgs<ExtArgs>
 }, ExtArgs["result"]["companyInvitation"]>
 
 export type CompanyInvitationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1115,6 +1378,8 @@ export type CompanyInvitationSelectCreateManyAndReturn<ExtArgs extends runtime.T
   invitedByUserId?: boolean
   acceptedByUserId?: boolean
   acceptedAt?: boolean
+  declinedByUserId?: boolean
+  declinedAt?: boolean
   revokedAt?: boolean
   expiresAt?: boolean
   version?: boolean
@@ -1123,6 +1388,7 @@ export type CompanyInvitationSelectCreateManyAndReturn<ExtArgs extends runtime.T
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   invitedBy?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   acceptedBy?: boolean | Prisma.CompanyInvitation$acceptedByArgs<ExtArgs>
+  declinedBy?: boolean | Prisma.CompanyInvitation$declinedByArgs<ExtArgs>
 }, ExtArgs["result"]["companyInvitation"]>
 
 export type CompanyInvitationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1135,6 +1401,8 @@ export type CompanyInvitationSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   invitedByUserId?: boolean
   acceptedByUserId?: boolean
   acceptedAt?: boolean
+  declinedByUserId?: boolean
+  declinedAt?: boolean
   revokedAt?: boolean
   expiresAt?: boolean
   version?: boolean
@@ -1143,6 +1411,7 @@ export type CompanyInvitationSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   invitedBy?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   acceptedBy?: boolean | Prisma.CompanyInvitation$acceptedByArgs<ExtArgs>
+  declinedBy?: boolean | Prisma.CompanyInvitation$declinedByArgs<ExtArgs>
 }, ExtArgs["result"]["companyInvitation"]>
 
 export type CompanyInvitationSelectScalar = {
@@ -1155,6 +1424,8 @@ export type CompanyInvitationSelectScalar = {
   invitedByUserId?: boolean
   acceptedByUserId?: boolean
   acceptedAt?: boolean
+  declinedByUserId?: boolean
+  declinedAt?: boolean
   revokedAt?: boolean
   expiresAt?: boolean
   version?: boolean
@@ -1162,21 +1433,24 @@ export type CompanyInvitationSelectScalar = {
   updatedAt?: boolean
 }
 
-export type CompanyInvitationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "normalizedEmail" | "role" | "state" | "tokenDigest" | "invitedByUserId" | "acceptedByUserId" | "acceptedAt" | "revokedAt" | "expiresAt" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["companyInvitation"]>
+export type CompanyInvitationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "normalizedEmail" | "role" | "state" | "tokenDigest" | "invitedByUserId" | "acceptedByUserId" | "acceptedAt" | "declinedByUserId" | "declinedAt" | "revokedAt" | "expiresAt" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["companyInvitation"]>
 export type CompanyInvitationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   invitedBy?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   acceptedBy?: boolean | Prisma.CompanyInvitation$acceptedByArgs<ExtArgs>
+  declinedBy?: boolean | Prisma.CompanyInvitation$declinedByArgs<ExtArgs>
 }
 export type CompanyInvitationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   invitedBy?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   acceptedBy?: boolean | Prisma.CompanyInvitation$acceptedByArgs<ExtArgs>
+  declinedBy?: boolean | Prisma.CompanyInvitation$declinedByArgs<ExtArgs>
 }
 export type CompanyInvitationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   invitedBy?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   acceptedBy?: boolean | Prisma.CompanyInvitation$acceptedByArgs<ExtArgs>
+  declinedBy?: boolean | Prisma.CompanyInvitation$declinedByArgs<ExtArgs>
 }
 
 export type $CompanyInvitationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1185,6 +1459,7 @@ export type $CompanyInvitationPayload<ExtArgs extends runtime.Types.Extensions.I
     company: Prisma.$CompanyPayload<ExtArgs>
     invitedBy: Prisma.$UserAccountPayload<ExtArgs>
     acceptedBy: Prisma.$UserAccountPayload<ExtArgs> | null
+    declinedBy: Prisma.$UserAccountPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1196,6 +1471,8 @@ export type $CompanyInvitationPayload<ExtArgs extends runtime.Types.Extensions.I
     invitedByUserId: string
     acceptedByUserId: string | null
     acceptedAt: Date | null
+    declinedByUserId: string | null
+    declinedAt: Date | null
     revokedAt: Date | null
     expiresAt: Date
     version: number
@@ -1598,6 +1875,7 @@ export interface Prisma__CompanyInvitationClient<T, Null = never, ExtArgs extend
   company<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   invitedBy<T extends Prisma.UserAccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccountDefaultArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   acceptedBy<T extends Prisma.CompanyInvitation$acceptedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyInvitation$acceptedByArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  declinedBy<T extends Prisma.CompanyInvitation$declinedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyInvitation$declinedByArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1636,6 +1914,8 @@ export interface CompanyInvitationFieldRefs {
   readonly invitedByUserId: Prisma.FieldRef<"CompanyInvitation", 'String'>
   readonly acceptedByUserId: Prisma.FieldRef<"CompanyInvitation", 'String'>
   readonly acceptedAt: Prisma.FieldRef<"CompanyInvitation", 'DateTime'>
+  readonly declinedByUserId: Prisma.FieldRef<"CompanyInvitation", 'String'>
+  readonly declinedAt: Prisma.FieldRef<"CompanyInvitation", 'DateTime'>
   readonly revokedAt: Prisma.FieldRef<"CompanyInvitation", 'DateTime'>
   readonly expiresAt: Prisma.FieldRef<"CompanyInvitation", 'DateTime'>
   readonly version: Prisma.FieldRef<"CompanyInvitation", 'Int'>
@@ -2045,6 +2325,25 @@ export type CompanyInvitationDeleteManyArgs<ExtArgs extends runtime.Types.Extens
  * CompanyInvitation.acceptedBy
  */
 export type CompanyInvitation$acceptedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserAccount
+   */
+  select?: Prisma.UserAccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserAccount
+   */
+  omit?: Prisma.UserAccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAccountInclude<ExtArgs> | null
+  where?: Prisma.UserAccountWhereInput
+}
+
+/**
+ * CompanyInvitation.declinedBy
+ */
+export type CompanyInvitation$declinedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the UserAccount
    */

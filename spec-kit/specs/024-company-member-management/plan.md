@@ -24,10 +24,10 @@ Add an Owner-only Team page where the sole company owner can invite existing acc
 
 ## Design
 
-1. Add an invitation table and migration. An invitation is `PENDING`, `REVOKED`, `ACCEPTED`, or `EXPIRED`, holds company/email/allowed role, expiry, invitor, token digest, and version.
+1. Add invitation and team-activity storage. An invitation is `PENDING`, `REVOKED`, `ACCEPTED`, `DECLINED`, or `EXPIRED`, holds company/email/allowed role, expiry, invitor, token digest, and version; activity rows provide immutable Owner-visible evidence for invitation and membership commands.
 2. `CompanyTeamService` centralizes owner authorization and all invitation/membership commands in transactions. It refuses target Owners, duplicate eligible invitations/memberships, and cross-company access.
-3. Owner routes list team, create/revoke invitations, and update membership lifecycle/role. The recipient acceptance route consumes the token only for the matching signed-in account.
-4. Reuse existing immutable membership history/audit and notification boundaries; add invitation audit actions and an acceptance notification/link.
+3. Owner routes list team and activity, create/revoke invitations, and update membership lifecycle/role. Recipient preview, acceptance, and decline routes consume the token only for the matching signed-in account.
+4. Reuse existing immutable membership history/audit and notification boundaries. Queue a recipient-bound email containing the encrypted one-time acceptance token and create a token-free in-app invitation notification in the same transaction; acceptance or decline creates Owner email/in-app delivery in that same transaction; never return the token to the Owner browser.
 5. Add `/recruiter/company-settings/team` and a Team section in company settings. It is rendered management-capable only when server projection says the user is Owner.
 
 ## Project Structure
