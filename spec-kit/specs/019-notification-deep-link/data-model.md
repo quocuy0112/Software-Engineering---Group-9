@@ -11,4 +11,4 @@
 
 ## ResolvedDestination (transient)
 
-`href: string | null`, `availability: AVAILABLE | NO_SAFE_DESTINATION`; never persisted and never used as proof of authorization.
+`href: string`, `availability: AVAILABLE | INBOX_FALLBACK`; never persisted and never used as proof of authorization.
