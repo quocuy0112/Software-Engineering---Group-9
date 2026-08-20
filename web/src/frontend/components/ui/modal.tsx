@@ -9,6 +9,8 @@ export function Modal({
   tone = "standard",
   busy = false,
   icon,
+  id,
+  className,
   onClose,
   children,
 }: {
@@ -18,6 +20,8 @@ export function Modal({
   tone?: "standard" | "destructive";
   busy?: boolean;
   icon?: ReactNode;
+  id?: string;
+  className?: string;
   onClose: () => void;
   children: ReactNode;
 }) {
@@ -95,7 +99,8 @@ export function Modal({
     >
       <section
         ref={dialogRef}
-        className="sh-modal"
+        id={id}
+        className={className ? "sh-modal " + className : "sh-modal"}
         data-tone={tone}
         role="dialog"
         aria-modal="true"

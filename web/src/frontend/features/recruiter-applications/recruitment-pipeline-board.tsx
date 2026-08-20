@@ -35,7 +35,7 @@ import {
 } from "./recruitment-pipeline-ui";
 import {
   RecruitmentPipelineViewAllModal,
-  type ActivePipelineStage,
+  type ViewAllPipelineStage,
 } from "./recruitment-pipeline-view-all-modal";
 
 const activePipelineStages: ApplicationStage[] = [
@@ -54,24 +54,22 @@ const outcomeStages: ApplicationStage[] = [
 ];
 
 const viewAllStages = new Set<ApplicationStage>([
-  "APPLIED",
-  "VIEWED",
-  "SHORTLISTED",
-  "INTERVIEWING",
+  ...activePipelineStages,
+  ...outcomeStages,
 ]);
 
-function isActivePipelineBulkStage(
+function isViewAllPipelineStage(
   stage: ApplicationStage,
-): stage is ActivePipelineStage {
+): stage is ViewAllPipelineStage {
   return viewAllStages.has(stage);
 }
 
 const tierOptions: Array<{ value: PipelineTierFilter; label: string }> = [
-  { value: "all", label: "T\u1ea5t c\u1ea3" },
+  { value: "all", label: "All" },
   { value: "strong", label: "Strong match" },
   { value: "review", label: "Review needed" },
   { value: "low", label: "Low match" },
-  { value: "pending", label: "Ch\u01b0a c\u00f3 \u0111i\u1ec3m" },
+  { value: "pending", label: "Not yet scored" },
 ];
 
 const defaultSortDirections: Record<ApplicationStage, PipelineSortDirection> = {
@@ -119,7 +117,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
   const [openSortMenu, setOpenSortMenu] = useState<ApplicationStage | null>(
     null,
   );
-  const [viewAllStage, setViewAllStage] = useState<ActivePipelineStage | null>(
+  const [viewAllStage, setViewAllStage] = useState<ViewAllPipelineStage | null>(
     null,
   );
   const [bulkRejectCards, setBulkRejectCards] = useState<
@@ -278,9 +276,9 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
         onLoadMore={state.loadMore}
         onRetry={(stage) => void state.loadStage(stage)}
         onViewAll={(stage) => {
-          if (isActivePipelineBulkStage(stage)) setViewAllStage(stage);
+          if (isViewAllPipelineStage(stage)) setViewAllStage(stage);
         }}
-        showViewAll={isActivePipelineBulkStage(summary.stage)}
+        showViewAll={isViewAllPipelineStage(summary.stage)}
         onChangeStage={requestStageChange}
         onViewAssessment={openAssessment}
         sortDirection={sortDirections[summary.stage]}
@@ -377,7 +375,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
             type="search"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder={"T\u00ecm theo t\u00ean candidate..."}
+            placeholder={"Search by candidate name..."}
           />
         </label>
         <div

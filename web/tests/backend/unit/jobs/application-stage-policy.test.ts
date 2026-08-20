@@ -9,14 +9,21 @@ import {
 import type { ApplicationStage } from "@/shared/contracts/jobs/applications";
 
 const expected: Record<ApplicationStage, ApplicationStage[]> = {
-  APPLIED: ["VIEWED", "SHORTLISTED", "INTERVIEWING", "OFFERED", "REJECTED", "WAITLISTED"],
+  APPLIED: [
+    "VIEWED",
+    "SHORTLISTED",
+    "INTERVIEWING",
+    "OFFERED",
+    "REJECTED",
+    "WAITLISTED",
+  ],
   VIEWED: ["SHORTLISTED", "INTERVIEWING", "OFFERED", "REJECTED", "WAITLISTED"],
   SHORTLISTED: ["INTERVIEWING", "OFFERED", "REJECTED", "WAITLISTED"],
   INTERVIEWING: ["OFFERED", "REJECTED", "WAITLISTED"],
   OFFERED: ["HIRED", "OFFER_DECLINED", "REJECTED", "WAITLISTED"],
   HIRED: [],
   OFFER_DECLINED: [],
-  REJECTED: [],
+  REJECTED: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING"],
   WAITLISTED: ["VIEWED", "SHORTLISTED", "INTERVIEWING", "OFFERED", "REJECTED"],
 };
 
@@ -41,18 +48,24 @@ describe("application stage transition policy", () => {
     );
   });
 
-  it("keeps terminal stages closed to ordinary transitions", () => {
-    for (const stage of ["HIRED", "OFFER_DECLINED", "REJECTED"] as const) {
+  it("keeps final outcome stages closed to ordinary transitions", () => {
+    for (const stage of ["HIRED", "OFFER_DECLINED"] as const) {
       expect(isTerminalApplicationStage(stage)).toBe(true);
       expect(canTransitionApplicationStage(stage, "SHORTLISTED")).toBe(false);
     }
+    expect(isTerminalApplicationStage("REJECTED")).toBe(false);
   });
 
   it("keeps terminal pipeline cards without recruiter controls", () => {
     expect(recruiterPipelineButtonTransitions.HIRED).toEqual([]);
     expect(recruiterPipelineDragTransitions.HIRED).toEqual([]);
     expect(recruiterPipelineButtonTransitions.OFFER_DECLINED).toEqual([]);
-    expect(recruiterPipelineDragTransitions.REJECTED).toEqual([]);
+    expect(recruiterPipelineDragTransitions.REJECTED).toEqual([
+      "APPLIED",
+      "VIEWED",
+      "SHORTLISTED",
+      "INTERVIEWING",
+    ]);
   });
 
   it("does not create duplicate same-stage transitions", () => {
@@ -64,9 +77,10 @@ describe("application stage transition policy", () => {
     expect(ordinaryApplicationTransitions).toEqual(expected);
     for (const from of stages) {
       for (const to of stages) {
-        expect(canTransitionApplicationStage(from, to), `${from} -> ${to}`).toBe(
-          expected[from].includes(to),
-        );
+        expect(
+          canTransitionApplicationStage(from, to),
+          `${from} -> ${to}`,
+        ).toBe(expected[from].includes(to));
       }
     }
   });

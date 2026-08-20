@@ -72,7 +72,7 @@ describe("recruitment pipeline provisional UI utilities", () => {
     ).toEqual(["strong-ada"]);
   });
 
-  it("exposes score sorting for every canonical pipeline stage", () => {
+  it("exposes score sorting for every pipeline stage", () => {
     const stages: ApplicationStage[] = [
       "APPLIED",
       "VIEWED",

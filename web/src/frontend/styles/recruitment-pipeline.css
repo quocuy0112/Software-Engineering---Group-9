@@ -926,7 +926,7 @@
 }
 
 .recruiter-pipeline-page {
-  width: min(100%, 1440px);
+  width: min(100%, 1620px);
   margin: 0 auto;
   padding: 24px 28px 64px;
   gap: 0;
@@ -1120,6 +1120,7 @@
 
 .pill {
   display: flex;
+  min-height: 0;
   align-items: center;
   gap: 6px;
   padding: 7px 13px;
@@ -1129,6 +1130,8 @@
   background: var(--surface);
   font-size: 12px;
   font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
   white-space: nowrap;
 }
 
@@ -1215,15 +1218,28 @@
 .board,
 .recruitment-pipeline__columns {
   display: grid;
-  grid-template-columns: repeat(5, minmax(260px, 1fr));
+  grid-template-columns: repeat(5, minmax(300px, 1fr));
   align-items: start;
   gap: 16px;
 }
 
+.board:not(.outcomes),
+.recruitment-pipeline__columns:not(.outcomes) {
+  width: 1564px;
+  min-width: 1564px;
+  max-width: none;
+  margin-inline: auto;
+}
+
 .board.outcomes,
 .recruitment-pipeline__columns.board.outcomes {
-  grid-template-columns: repeat(4, minmax(260px, 1fr));
+  grid-template-columns: repeat(4, minmax(280px, 1fr));
+  width: 1168px;
+  min-width: 1168px;
+  max-width: none;
+  margin-inline: auto;
 }
+
 
 .column,
 .pipeline-column {
@@ -1273,9 +1289,19 @@
   gap: 8px;
 }
 
+.pipeline-column__heading {
+  flex: 0 0 auto;
+  min-width: max-content;
+}
+
+.pipeline-column__header-tools {
+  flex: 0 0 auto;
+}
+
 .column-title,
 .pipeline-column__heading h2 {
   min-width: max-content;
+  flex: 0 0 auto;
   margin: 0;
   color: var(--ink);
   font-size: 13.5px;
@@ -1294,15 +1320,31 @@
   background: var(--bg);
   font-size: 11px;
   font-weight: 700;
+  flex: 0 0 auto;
   text-align: center;
+  white-space: nowrap;
 }
 
 .lock-icon,
 .pipeline-card__locked-icon {
-  width: 14px;
-  height: 14px;
   flex-shrink: 0;
   color: var(--muted-2);
+}
+
+.lock-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  opacity: 0.95;
+}
+
+.pipeline-card__locked-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.pipeline-column__lock-icon {
+  margin-inline: 1px;
 }
 
 .column-sort,
@@ -1454,22 +1496,24 @@
   padding-right: 4px;
   margin-right: -4px;
   scrollbar-width: thin;
+  scrollbar-color: rgba(229,232,242,0.72) transparent;
 }
 
 .card-stack::-webkit-scrollbar,
 .pipeline-column__cards::-webkit-scrollbar {
   width: 6px;
+  background: transparent;
 }
 
 .card-stack::-webkit-scrollbar-thumb,
 .pipeline-column__cards::-webkit-scrollbar-thumb {
   border-radius: 3px;
-  background: var(--border);
+  background: rgba(229,232,242,0.72);
 }
 
 .card-stack::-webkit-scrollbar-thumb:hover,
 .pipeline-column__cards::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-2);
+  background: rgba(154,160,180,0.55);
 }
 
 .column-footer {
@@ -1562,6 +1606,7 @@
 
 .card-top,
 .pipeline-card__topline {
+  min-width: 0;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -1577,6 +1622,7 @@
   justify-content: initial;
   gap: initial;
   color: var(--text);
+  overflow-wrap: anywhere;
   font-size: 14px;
   font-weight: 700;
   line-height: 1.3;
@@ -1608,6 +1654,7 @@
 
 .score-row,
 .pipeline-card__score {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1656,6 +1703,7 @@
 .score-meta,
 .pipeline-card__score-meta {
   display: flex;
+  flex: 1 1 auto;
   min-width: 0;
   flex-direction: column;
   gap: 4px;
@@ -1678,7 +1726,9 @@
   gap: 5px;
   font-size: 11.5px;
   font-weight: 700;
-  white-space: nowrap;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .tier-badge .dot {
@@ -1753,6 +1803,7 @@
 .card-actions button,
 .card-actions a,
 .pipeline-card__document-actions > a {
+  overflow-wrap: anywhere;
   display: inline-flex;
   min-width: 0;
   min-height: 0;
@@ -1781,6 +1832,7 @@
 
 .assessment-btn,
 .pipeline-card__assessment-action {
+  white-space: normal;
   display: flex;
   width: 100%;
   min-height: 0;
@@ -1895,6 +1947,19 @@
 
 .pipeline-card.is-draggable .card-top {
   padding-right: 28px;
+}
+
+.pipeline-card.is-draggable {
+  cursor: grab;
+}
+
+.pipeline-card.is-draggable:active {
+  cursor: grabbing;
+}
+
+.pipeline-card__drag-handle {
+  cursor: grab;
+  touch-action: none;
 }
 
 .pipeline-card.is-dragging {
@@ -2188,19 +2253,6 @@
   outline-offset: 2px;
 }
 
-@media (max-width: 1419px) {
-  .board:not(.outcomes),
-  .recruitment-pipeline__columns:not(.outcomes) {
-    grid-template-columns: repeat(2, minmax(230px, 1fr));
-  }
-}
-
-@media (max-width: 1180px) {
-  .board.outcomes,
-  .recruitment-pipeline__columns.outcomes {
-    grid-template-columns: repeat(2, minmax(230px, 1fr));
-  }
-}
 
 @media (max-width: 620px) {
   .recruiter-pipeline-page { padding: 16px; }
@@ -2209,6 +2261,10 @@
   .recruitment-pipeline__columns,
   .recruitment-pipeline__columns.board.outcomes {
     grid-template-columns: 1fr;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    margin-inline: 0;
   }
 
   .job-bar { align-items: flex-start; flex-direction: column; }

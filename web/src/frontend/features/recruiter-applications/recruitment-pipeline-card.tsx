@@ -34,7 +34,6 @@ const lockedStages = new Set<ApplicationStage>([
   "WAITLISTED",
   "HIRED",
   "OFFER_DECLINED",
-  "REJECTED",
 ]);
 
 const tierLabels = {
@@ -118,6 +117,7 @@ export function RecruitmentPipelineCard({
   dragOverlay?: boolean;
 }) {
   const terminal = isTerminalPipelineStage(card.stage);
+  const outcomeStatus = card.stage === "HIRED" || card.stage === "REJECTED";
   const locked = lockedStages.has(card.stage);
   // The server projection is authoritative. A missing dragDestinations value
   // is treated as no drag permission instead of widening the policy on the FE.
@@ -135,6 +135,7 @@ export function RecruitmentPipelineCard({
     draggable;
   const score = pipelineScoreForCard(card);
   const tier = pipelineTierForCard(card);
+  const isExpanded = !collapsible || expanded;
   const quickActions = locked
     ? []
     : allowedDestinations
@@ -160,11 +161,35 @@ export function RecruitmentPipelineCard({
       toggleExpanded();
     }
   };
+  const handleCardPointerDown = (event: React.PointerEvent<HTMLElement>) => {
+    if (!canDrag || stopInteractiveEvent(event)) return;
+    listeners?.onPointerDown?.(event);
+  };
+
+  const dragHandle = canDrag ? (
+    <button
+      type="button"
+      className="pipeline-card__drag-handle"
+      {...attributes}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+        listeners?.onPointerDown?.(event);
+      }}
+      onKeyDown={(event) => {
+        event.stopPropagation();
+        listeners?.onKeyDown?.(event);
+      }}
+      aria-label={`Drag ${card.candidate.displayName} to another stage`}
+      title="Drag card"
+    >
+      <GripVertical aria-hidden="true" />
+    </button>
+  ) : null;
 
   const actionPanel = (
     <div
       className="card-actions-panel pipeline-card__actions-panel"
-      data-state={expanded ? "open" : "closed"}
+      data-state={isExpanded ? "open" : "closed"}
     >
       <div className="card-actions pipeline-card__document-actions">
         {card.documents.cvAvailable ? (
@@ -236,6 +261,7 @@ export function RecruitmentPipelineCard({
   return (
     <article
       ref={setNodeRef}
+      onPointerDown={handleCardPointerDown}
       className={[
         "candidate-card",
         "pipeline-card",
@@ -243,7 +269,7 @@ export function RecruitmentPipelineCard({
         isDragging ? "is-dragging" : "",
         dragOverlay ? "pipeline-card--overlay" : "",
         collapsible ? "collapsible is-collapsible" : "",
-        expanded ? "expanded is-expanded" : "",
+        isExpanded ? "expanded is-expanded" : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -268,30 +294,17 @@ export function RecruitmentPipelineCard({
         <div className="candidate-name pipeline-card__identity">
           {card.candidate.displayName}
         </div>
-        {terminal ? (
-          <span
-            className={`status-pill ${card.stage === "HIRED" ? "status-hired" : "status-rejected"} pipeline-card__status-pill`}
-          >
-            {pipelineStageLabels[card.stage].toUpperCase()}
-          </span>
+        {outcomeStatus ? (
+          <>
+            <span
+              className={`status-pill ${card.stage === "HIRED" ? "status-hired" : "status-rejected"} pipeline-card__status-pill`}
+            >
+              {pipelineStageLabels[card.stage].toUpperCase()}
+            </span>
+            {dragHandle}
+          </>
         ) : canDrag ? (
-          <button
-            type="button"
-            className="pipeline-card__drag-handle"
-            {...attributes}
-            onPointerDown={(event) => {
-              event.stopPropagation();
-              listeners?.onPointerDown?.(event);
-            }}
-            onKeyDown={(event) => {
-              event.stopPropagation();
-              listeners?.onKeyDown?.(event);
-            }}
-            aria-label={`Drag ${card.candidate.displayName} to another stage`}
-            title="Drag card"
-          >
-            <GripVertical aria-hidden="true" />
-          </button>
+          dragHandle
         ) : locked ? (
           <LockKeyhole
             className="pipeline-card__locked-icon"
@@ -327,12 +340,8 @@ export function RecruitmentPipelineCard({
       </div>
       {collapsible ? (
         <div className="card-hint pipeline-card__hint" aria-hidden="true">
-          <span className="hint-collapsed">
-            {"Nh\u1ea5n \u0111\u1ec3 xem h\u00e0nh \u0111\u1ed9ng"}
-          </span>
-          <span className="hint-expanded">
-            {"Nh\u1ea5n \u0111\u1ec3 thu g\u1ecdn"}
-          </span>
+          <span className="hint-collapsed">{"Click to view actions"}</span>
+          <span className="hint-expanded">{"Click to collapse"}</span>
           <ChevronDown aria-hidden="true" />
         </div>
       ) : null}

@@ -52,7 +52,7 @@ export function RecruiterPipelinePage({
 
   return (
     <section
-      className="recruiter-management recruiter-pipeline-page"
+      className="page recruiter-management recruiter-pipeline-page"
       aria-label="Recruiter pipeline"
     >
       <div className="job-bar pipeline-job-selector recruiter-surface-card">

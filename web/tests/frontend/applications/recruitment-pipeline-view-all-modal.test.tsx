@@ -40,7 +40,11 @@ function card(
   };
 }
 
-function page(stage: ApplicationStage, items: PipelineApplicationCard[], nextCursor: string | null) {
+function page(
+  stage: ApplicationStage,
+  items: PipelineApplicationCard[],
+  nextCursor: string | null,
+) {
   return {
     stage,
     items,
@@ -56,20 +60,29 @@ describe("RecruitmentPipelineViewAllModal", () => {
       vi.fn((input: RequestInfo | URL) => {
         const url = String(input);
         const secondPage = url.includes("cursor=cursor-2");
+        const requestedStage = (url.match(/\/pipeline\/([^?]+)/)?.[1] ??
+          "APPLIED") as ApplicationStage;
         return Promise.resolve({
           ok: true,
           json: async () =>
             secondPage
               ? page(
-                  "APPLIED",
-                  [card("application-3", "Cara Candidate", "APPLIED", null)],
+                  requestedStage,
+                  [
+                    card(
+                      "application-3",
+                      "Cara Candidate",
+                      requestedStage,
+                      null,
+                    ),
+                  ],
                   null,
                 )
               : page(
-                  "APPLIED",
+                  requestedStage,
                   [
-                    card("application-1", "Ada Candidate", "APPLIED", 88),
-                    card("application-2", "Bea Candidate", "APPLIED", 62),
+                    card("application-1", "Ada Candidate", requestedStage, 88),
+                    card("application-2", "Bea Candidate", requestedStage, 62),
                   ],
                   "cursor-2",
                 ),
@@ -100,9 +113,7 @@ describe("RecruitmentPipelineViewAllModal", () => {
 
     expect(screen.getByRole("dialog")).toHaveAttribute("id", "viewAllModal");
     expect(screen.getByText("Total 3 candidates in this stage.")).toBeVisible();
-    expect(
-      await screen.findByText("Cara Candidate"),
-    ).toBeVisible();
+    expect(await screen.findByText("Cara Candidate")).toBeVisible();
     expect(screen.getByText("88%")).toBeVisible();
     expect(screen.getByText("Strong match")).toBeVisible();
     expect(screen.getByText("Not yet scored")).toBeVisible();
@@ -140,5 +151,28 @@ describe("RecruitmentPipelineViewAllModal", () => {
     await waitFor(() => expect(onBulkReject).toHaveBeenCalledOnce());
     expect(onBulkReject.mock.calls[0][0]).toHaveLength(3);
     expect(confirmSpy).not.toHaveBeenCalled();
+  });
+
+  it("loads locked stages as a read-only full list", async () => {
+    render(
+      <RecruitmentPipelineViewAllModal
+        jobId="job-1"
+        summary={{ stage: "HIRED", label: "Hired", count: 3 }}
+        canMoveStages
+        canReject
+        onClose={vi.fn()}
+        onBulkMove={vi.fn().mockResolvedValue(undefined)}
+        onBulkReject={vi.fn()}
+      />,
+    );
+
+    expect(await screen.findByText("Cara Candidate")).toBeVisible();
+    expect(
+      screen.queryByRole("checkbox", { name: "Select all in this list" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Reject" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("Total 3 candidates in this stage.")).toBeVisible();
   });
 });

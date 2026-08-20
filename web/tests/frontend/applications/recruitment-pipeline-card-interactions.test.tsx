@@ -42,6 +42,14 @@ const hiredCard: PipelineApplicationCard = {
   dragDestinations: ["REJECTED", "WAITLISTED"],
 };
 
+const rejectedCard: PipelineApplicationCard = {
+  ...card,
+  applicationId: "application-rejected",
+  stage: "REJECTED",
+  allowedDestinations: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING"],
+  dragDestinations: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING"],
+};
+
 const scoredCard: PipelineApplicationCard = {
   ...card,
   applicationId: "application-scored",
@@ -68,6 +76,13 @@ describe("RecruitmentPipelineCard interactions", () => {
         name: "Drag Ada Candidate to another stage",
       }),
     );
+
+    expect(pointerDown).toHaveBeenCalledOnce();
+  });
+  it("starts pointer dragging from the card body", () => {
+    render(<RecruitmentPipelineCard card={card} jobId="job-1" />);
+
+    fireEvent.pointerDown(screen.getByText("Ada Candidate"));
 
     expect(pointerDown).toHaveBeenCalledOnce();
   });
@@ -127,6 +142,19 @@ describe("RecruitmentPipelineCard interactions", () => {
 
     expect(pointerDown).not.toHaveBeenCalled();
     expect(onChangeStage).not.toHaveBeenCalled();
+  });
+
+  it("allows Rejected cards to start dragging from the card body", () => {
+    render(<RecruitmentPipelineCard card={rejectedCard} jobId="job-1" />);
+
+    expect(
+      screen.getByRole("button", {
+        name: "Drag Ada Candidate to another stage",
+      }),
+    ).toBeInTheDocument();
+    fireEvent.pointerDown(screen.getByText("Ada Candidate"));
+
+    expect(pointerDown).toHaveBeenCalledOnce();
   });
 
   it("displays the final score and final-score tier badge", () => {

@@ -32,6 +32,15 @@ const guardedCard: PipelineApplicationCard = {
   dragDestinations: ["REJECTED"],
 };
 
+const rejectedCard: PipelineApplicationCard = {
+  ...ordinaryCard,
+  applicationId: "rejected-application",
+  candidate: { displayName: "Rejected Candidate", avatarUrl: null },
+  stage: "REJECTED",
+  allowedDestinations: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING"],
+  dragDestinations: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING"],
+};
+
 vi.mock("@dnd-kit/core", () => ({
   DndContext: ({
     children,
@@ -62,6 +71,15 @@ vi.mock("@dnd-kit/core", () => ({
         }
       >
         Start guarded drag
+      </button>
+      <button
+        type="button"
+        data-testid="start-rejected-drag"
+        onClick={() =>
+          onDragStart({ active: { id: rejectedCard.applicationId } })
+        }
+      >
+        Start rejected drag
       </button>
       <button
         type="button"
@@ -143,6 +161,17 @@ vi.mock(
           loadingMore: false,
           error: null,
         },
+        REJECTED: {
+          page: {
+            stage: "REJECTED",
+            items: [rejectedCard],
+            nextCursor: null,
+            observedAt: "2026-08-18T00:00:00.000Z",
+          },
+          loading: false,
+          loadingMore: false,
+          error: null,
+        },
       },
       loading: false,
       error: null,
@@ -198,6 +227,16 @@ describe("RecruitmentPipelineBoard drag transitions", () => {
         reasonCode: "POSITION_FILLED",
         internalNote: undefined,
       }),
+    );
+  });
+
+  it("persists a valid drop from Rejected back into the active pipeline", async () => {
+    render(<RecruitmentPipelineBoard jobId="job-1" />);
+    fireEvent.click(screen.getByTestId("start-rejected-drag"));
+    fireEvent.click(screen.getByTestId("drop-viewed"));
+
+    await waitFor(() =>
+      expect(move).toHaveBeenCalledWith(rejectedCard, "VIEWED", {}),
     );
   });
 });

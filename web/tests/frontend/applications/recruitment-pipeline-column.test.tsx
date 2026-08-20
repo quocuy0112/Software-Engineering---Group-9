@@ -50,7 +50,6 @@ const lockedStageCases: Array<[ApplicationStage, string]> = [
   ["OFFERED", "Offered"],
   ["HIRED", "Hired"],
   ["OFFER_DECLINED", "Offer Declined"],
-  ["REJECTED", "Rejected"],
   ["WAITLISTED", "Waitlisted"],
 ];
 
@@ -133,9 +132,39 @@ describe("RecruitmentPipelineColumn footer", () => {
   });
 });
 
+describe("RecruitmentPipelineColumn rejected stage", () => {
+  it("keeps Rejected available as a drop target and without a lock", () => {
+    const { container } = render(
+      <RecruitmentPipelineColumn
+        jobId="job-1"
+        summary={{ stage: "REJECTED", label: "Rejected", count: 1 }}
+        page={{
+          stage: "REJECTED",
+          items: [],
+          nextCursor: null,
+          observedAt: "2026-08-18T00:00:00.000Z",
+        }}
+        loading={false}
+        loadingMore={false}
+        error={null}
+        onLoadMore={vi.fn()}
+        onRetry={vi.fn()}
+      />,
+    );
+
+    expect(container.querySelector(".column")).not.toHaveClass("is-locked");
+    expect(
+      container.querySelector(".pipeline-column__header-tools .lock-icon"),
+    ).not.toBeInTheDocument();
+    expect(container.querySelector(".column")).not.toHaveAttribute(
+      "aria-disabled",
+    );
+  });
+});
+
 describe("RecruitmentPipelineColumn sort controls", () => {
   it.each(lockedStageCases)(
-    "renders sort and the lock for %s",
+    "renders the lock beside the title and sort control for %s",
     (stage, label) => {
       const stageKey = stage as ApplicationStage;
       const stageLabel = label as PipelineStageCount["label"];
@@ -164,21 +193,20 @@ describe("RecruitmentPipelineColumn sort controls", () => {
       );
 
       const sortButton = screen.getByRole("button", {
-        name: `Sort ${label} candidates`,
+        name: "Sort " + label + " candidates",
       });
       expect(sortButton).toHaveClass("column-sort-btn");
-      expect(container.querySelector(".lock-icon")).toBeInTheDocument();
-
+      expect(
+        container.querySelector(".pipeline-column__header-tools .lock-icon"),
+      ).toBeInTheDocument();
       const menu = screen.getByRole("menu", {
-        name: `${label} sort options`,
+        name: label + " sort options",
       });
       expect(menu.querySelectorAll("[data-sort]")).toHaveLength(3);
-
       fireEvent.click(sortButton);
-      expect(onToggleSortMenu).toHaveBeenCalledWith(stage);
-
+      expect(onToggleSortMenu).toHaveBeenCalledWith(stageKey);
       fireEvent.click(menu.querySelector('[data-sort="desc"]') as HTMLElement);
-      expect(onSortDirectionChange).toHaveBeenCalledWith(stage, "desc");
+      expect(onSortDirectionChange).toHaveBeenCalledWith(stageKey, "desc");
     },
   );
 });

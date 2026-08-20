@@ -13,11 +13,9 @@ import {
   pipelineTierForCard,
 } from "./recruitment-pipeline-ui";
 
-export type ActivePipelineStage =
-  | "APPLIED"
-  | "VIEWED"
-  | "SHORTLISTED"
-  | "INTERVIEWING";
+export type ViewAllPipelineStage = ApplicationStage;
+
+export type ActivePipelineStage = ViewAllPipelineStage;
 
 type BulkAction =
   | {
@@ -30,7 +28,7 @@ type BulkAction =
       label: string;
     };
 
-const bulkActions: Record<ActivePipelineStage, readonly BulkAction[]> = {
+const bulkActions: Record<ViewAllPipelineStage, readonly BulkAction[]> = {
   APPLIED: [
     { kind: "waitlist", label: "Waitlist", target: "WAITLISTED" },
     { kind: "reject", label: "Reject" },
@@ -50,6 +48,11 @@ const bulkActions: Record<ActivePipelineStage, readonly BulkAction[]> = {
     { kind: "waitlist", label: "Waitlist", target: "WAITLISTED" },
     { kind: "reject", label: "Reject" },
   ],
+  OFFERED: [],
+  HIRED: [],
+  OFFER_DECLINED: [],
+  REJECTED: [],
+  WAITLISTED: [],
 };
 
 const tierLabels = {
@@ -73,7 +76,7 @@ export function RecruitmentPipelineViewAllModal({
   onBulkReject,
 }: {
   jobId: string;
-  summary: PipelineStageCount & { stage: ActivePipelineStage };
+  summary: PipelineStageCount & { stage: ViewAllPipelineStage };
   canMoveStages: boolean;
   canReject: boolean;
   onClose: () => void;
@@ -95,6 +98,8 @@ export function RecruitmentPipelineViewAllModal({
   const subtitleId = useId();
   const onCloseRef = useRef(onClose);
   const busyRef = useRef(busy);
+  const stageActions = bulkActions[summary.stage];
+  const readOnlyList = stageActions.length === 0;
 
   useEffect(() => {
     onCloseRef.current = onClose;
@@ -318,7 +323,7 @@ export function RecruitmentPipelineViewAllModal({
           <div>
             <div className="modal-eyebrow">
               <span className="dot" aria-hidden="true" />
-              {"TO\u00c0N B\u1ed8 DANH S\u00c1CH"}
+              {"FULL CANDIDATE LIST"}
             </div>
             <div className="modal-title" id={titleId}>
               {summary.label}
@@ -338,52 +343,56 @@ export function RecruitmentPipelineViewAllModal({
           </button>
         </div>
 
-        <div
-          className={`bulk-toolbar view-all-modal__bulk-toolbar${selectedCount > 0 ? "active" : ""}`}
-          role="toolbar"
-        >
-          <div className="bulk-count" aria-live="polite">
-            {selectedCount > 0
-              ? selectedCount + " candidates selected"
-              : "No candidates selected"}
+        {stageActions.length ? (
+          <div
+            className={`bulk-toolbar view-all-modal__bulk-toolbar${selectedCount > 0 ? "active" : ""}`}
+            role="toolbar"
+          >
+            <div className="bulk-count" aria-live="polite">
+              {selectedCount > 0
+                ? selectedCount + " candidates selected"
+                : "No candidates selected"}
+            </div>
+            <div className="bulk-actions view-all-modal__bulk-actions">
+              {stageActions.map((action) =>
+                action.kind === "reject" ? (
+                  <button
+                    key={action.label}
+                    type="button"
+                    className="bulk-actions-button bulk-danger view-all-modal__bulk-action view-all-modal__bulk-action--reject"
+                    disabled={!selectedCount || busy || !canReject}
+                    onClick={requestReject}
+                  >
+                    {action.label}
+                  </button>
+                ) : (
+                  <button
+                    key={action.label}
+                    type="button"
+                    className={`bulk-actions-button ${action.kind === "move" ? "bulk-move" : "bulk-warn"} view-all-modal__bulk-action`}
+                    disabled={!selectedCount || busy || !canMoveStages}
+                    onClick={() => void submitMove(action)}
+                  >
+                    {action.label}
+                  </button>
+                ),
+              )}
+            </div>
           </div>
-          <div className="bulk-actions view-all-modal__bulk-actions">
-            {bulkActions[summary.stage].map((action) =>
-              action.kind === "reject" ? (
-                <button
-                  key={action.label}
-                  type="button"
-                  className="bulk-actions-button bulk-danger view-all-modal__bulk-action view-all-modal__bulk-action--reject"
-                  disabled={!selectedCount || busy || !canReject}
-                  onClick={requestReject}
-                >
-                  {action.label}
-                </button>
-              ) : (
-                <button
-                  key={action.label}
-                  type="button"
-                  className={`bulk-actions-button ${action.kind === "move" ? "bulk-move" : "bulk-warn"} view-all-modal__bulk-action`}
-                  disabled={!selectedCount || busy || !canMoveStages}
-                  onClick={() => void submitMove(action)}
-                >
-                  {action.label}
-                </button>
-              ),
-            )}
-          </div>
-        </div>
+        ) : null}
 
-        <label className="modal-select-all view-all-modal__select-all">
-          <input
-            ref={selectAllRef}
-            type="checkbox"
-            checked={allSelected}
-            disabled={loading || !candidates.length || busy}
-            onChange={toggleAll}
-          />
-          <span>Select all in this list</span>
-        </label>
+        {readOnlyList ? null : (
+          <label className="modal-select-all view-all-modal__select-all">
+            <input
+              ref={selectAllRef}
+              type="checkbox"
+              checked={allSelected}
+              disabled={loading || !candidates.length || busy}
+              onChange={toggleAll}
+            />
+            <span>Select all in this list</span>
+          </label>
+        )}
 
         {loading ? (
           <p className="modal-list-state view-all-modal__state" role="status">
@@ -414,14 +423,16 @@ export function RecruitmentPipelineViewAllModal({
                   role="listitem"
                   key={candidate.applicationId}
                 >
-                  <input
-                    className="row-checkbox"
-                    type="checkbox"
-                    checked={selectedIds.has(candidate.applicationId)}
-                    disabled={busy}
-                    aria-label={"Select " + candidate.candidate.displayName}
-                    onChange={() => toggleCandidate(candidate.applicationId)}
-                  />
+                  {readOnlyList ? null : (
+                    <input
+                      className="row-checkbox"
+                      type="checkbox"
+                      checked={selectedIds.has(candidate.applicationId)}
+                      disabled={busy}
+                      aria-label={"Select " + candidate.candidate.displayName}
+                      onChange={() => toggleCandidate(candidate.applicationId)}
+                    />
+                  )}
                   <div>
                     <div className="modal-row-name">
                       {candidate.candidate.displayName}

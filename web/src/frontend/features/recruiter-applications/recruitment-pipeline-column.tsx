@@ -52,19 +52,18 @@ const lockedStages = new Set<ApplicationStage>([
   "WAITLISTED",
   "HIRED",
   "OFFER_DECLINED",
-  "REJECTED",
 ]);
 
 const sortLabels: Record<PipelineSortDirection, string> = {
-  none: "S\u1eafp x\u1ebfp",
-  asc: "Th\u1ea5p \u2192 Cao",
-  desc: "Cao \u2192 Th\u1ea5p",
+  none: "Sort",
+  asc: "Low \u2192 High",
+  desc: "High \u2192 Low",
 };
 
 const sortOptionLabels: Record<PipelineSortDirection, string> = {
-  none: "M\u1eb7c \u0111\u1ecbnh",
-  asc: "\u0110i\u1ec3m: Th\u1ea5p \u2192 Cao",
-  desc: "\u0110i\u1ec3m: Cao \u2192 Th\u1ea5p",
+  none: "Default",
+  asc: "Score: Low \u2192 High",
+  desc: "Score: High \u2192 Low",
 };
 
 export function RecruitmentPipelineColumn({
@@ -139,6 +138,12 @@ export function RecruitmentPipelineColumn({
           </span>
         </div>
         <div className="column-head-tools pipeline-column__header-tools">
+          {locked ? (
+            <LockKeyhole
+              className="lock-icon pipeline-column__lock-icon"
+              aria-label="Stage is locked"
+            />
+          ) : null}
           {canSort && onToggleSortMenu && onSortDirectionChange ? (
             <div className="column-sort pipeline-column__sort">
               <button
@@ -199,9 +204,6 @@ export function RecruitmentPipelineColumn({
                 </div>
               ) : null}
             </div>
-          ) : null}
-          {locked ? (
-            <LockKeyhole className="lock-icon" aria-label="Stage is locked" />
           ) : null}
         </div>
       </header>
