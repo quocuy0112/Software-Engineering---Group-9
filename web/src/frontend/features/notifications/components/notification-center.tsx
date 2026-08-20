@@ -13,6 +13,7 @@ import {
 } from "../client/use-notifications";
 import { notificationCopy, notificationTime } from "../notification-copy";
 import type { NotificationItem } from "@/shared/contracts/notifications";
+import { requestUnsavedChangesNavigation } from "@/frontend/features/profile/client/unsaved-changes";
 
 export function NotificationCenter(
   props: NotificationMutationAuth & {
@@ -63,7 +64,7 @@ function NotificationCenterContent({
     const current = `${window.location.pathname}${window.location.search}`;
     if (current === item.href) return;
     setOpen(false);
-    router.push(item.href);
+    requestUnsavedChangesNavigation(() => router.push(item.href));
   }
 
   function markItemRead(item: NotificationItem) {
@@ -148,7 +149,10 @@ function NotificationCenterContent({
                     }}
                   >
                     {!item.readAt ? (
-                      <span className="notification-item__accent" aria-hidden="true" />
+                      <span
+                        className="notification-item__accent"
+                        aria-hidden="true"
+                      />
                     ) : null}
                     <div className="notification-item__meta">
                       <span className="notification-item__severity">
@@ -158,8 +162,12 @@ function NotificationCenterContent({
                         {item.readAt ? copy.read : copy.unread}
                       </span>
                     </div>
-                    <strong className="notification-item__title">{item.title}</strong>
-                    <span className="notification-item__summary">{item.summary}</span>
+                    <strong className="notification-item__title">
+                      {item.title}
+                    </strong>
+                    <span className="notification-item__summary">
+                      {item.summary}
+                    </span>
                     <div className="notification-item__footer">
                       <time dateTime={item.lastOccurredAt}>
                         {notificationTime(item.lastOccurredAt, locale)}

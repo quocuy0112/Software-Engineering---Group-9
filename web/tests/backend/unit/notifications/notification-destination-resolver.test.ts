@@ -121,6 +121,16 @@ describe("notification destination resolver", () => {
     expect(
       resolveNotificationHref({
         ...base,
+        kind: "SUPPORT_CASE_RECEIVED",
+        contextType: "SUPPORT_CASE",
+        contextId: "case 1",
+        recipientRole: "ADMIN",
+        adminOrigin: "https://admin.example.test",
+      }),
+    ).toBe("https://admin.example.test/#/support-cases/case%201/show");
+    expect(
+      resolveNotificationHref({
+        ...base,
         kind: "COMPANY_INVITATION_RECEIVED",
         contextType: "COMPANY_INVITATION",
         contextId: "invite 1",

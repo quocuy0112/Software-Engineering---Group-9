@@ -37,6 +37,7 @@ As a recipient, I can activate an unread notification without waiting for the re
 1. **Given** an unread notification with a destination, **When** its item is activated, **Then** the system issues an idempotent mark-read request and navigates without waiting for its result.
 2. **Given** mark-read has a temporary failure, **When** the user activates the item, **Then** navigation still occurs and a later fetch reconciles the optimistic unread count.
 3. **Given** a notification has no current destination or the user is already at its context, **When** it is activated, **Then** it is marked read without reloading or navigating.
+4. **Given** a recipient has unsaved in-app form changes, **When** they activate a notification or another internal link, **Then** a SmartHire confirmation dialog lets them stay or discard the changes before navigation begins.
 
 ---
 
@@ -74,6 +75,7 @@ As an authorized recipient, I receive a useful unavailable-content state when a 
 - **FR-007**: Activating an item MUST mark it read by notification ID idempotently, optimistically refresh unread state, and continue navigation despite a transient read failure; the next fetch MUST reconcile failed optimistic state.
 - **FR-008**: An item already at its resolved context MUST only mark read and must not reload or navigate.
 - **FR-009**: The interface MUST distinguish item activation from a separate Mark as read action, show View details for every served notification, and support Enter, Space, accessible names, and a clear focus indicator.
+- **FR-010**: While unsaved in-app form changes are active, internal navigation—including notification activation—MUST use an accessible SmartHire confirmation dialog. Refresh, tab closing, and other browser-controlled unloads MUST retain the browser-native protection.
 
 ### Key Entities
 
@@ -89,6 +91,7 @@ As an authorized recipient, I receive a useful unavailable-content state when a 
 - **SC-002**: In automated current-state tests, 100% of changed-state and revoked-access scenarios expose neither stale content nor protected state details.
 - **SC-003**: In interaction tests, 100% of valid notification activations navigate even when a read request fails temporarily, and the next refresh restores the server unread count.
 - **SC-004**: 100% of clickable notification controls pass keyboard activation, accessible-name, and visible-focus checks.
+- **SC-005**: In interaction tests, internal navigation with unsaved changes opens the custom confirmation dialog, while the browser unload listener remains active for browser-controlled exits.
 
 ## Assumptions
 
