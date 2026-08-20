@@ -11,11 +11,12 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { RefreshCw, Search } from "lucide-react";
 import type {
   ApplicationStage,
   PipelineApplicationCard,
   PipelineStageCount,
+  StageTransitionCommand,
 } from "@/shared/contracts/applications";
 import { isTerminalPipelineStage } from "@/shared/contracts/applications";
 import { RecruitmentPipelineColumn } from "./recruitment-pipeline-column";
@@ -32,6 +33,10 @@ import {
   type PipelineSortDirection,
   type PipelineTierFilter,
 } from "./recruitment-pipeline-ui";
+import {
+  RecruitmentPipelineViewAllModal,
+  type ActivePipelineStage,
+} from "./recruitment-pipeline-view-all-modal";
 
 const activePipelineStages: ApplicationStage[] = [
   "APPLIED",
@@ -48,12 +53,25 @@ const outcomeStages: ApplicationStage[] = [
   "WAITLISTED",
 ];
 
+const viewAllStages = new Set<ApplicationStage>([
+  "APPLIED",
+  "VIEWED",
+  "SHORTLISTED",
+  "INTERVIEWING",
+]);
+
+function isActivePipelineBulkStage(
+  stage: ApplicationStage,
+): stage is ActivePipelineStage {
+  return viewAllStages.has(stage);
+}
+
 const tierOptions: Array<{ value: PipelineTierFilter; label: string }> = [
-  { value: "all", label: "All candidates" },
+  { value: "all", label: "T\u1ea5t c\u1ea3" },
   { value: "strong", label: "Strong match" },
   { value: "review", label: "Review needed" },
   { value: "low", label: "Low match" },
-  { value: "pending", label: "Not yet scored" },
+  { value: "pending", label: "Ch\u01b0a c\u00f3 \u0111i\u1ec3m" },
 ];
 
 const defaultSortDirections: Record<ApplicationStage, PipelineSortDirection> = {
@@ -101,6 +119,13 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
   const [openSortMenu, setOpenSortMenu] = useState<ApplicationStage | null>(
     null,
   );
+  const [viewAllStage, setViewAllStage] = useState<ActivePipelineStage | null>(
+    null,
+  );
+  const [bulkRejectCards, setBulkRejectCards] = useState<
+    readonly PipelineApplicationCard[] | null
+  >(null);
+  const [bulkRejectBusy, setBulkRejectBusy] = useState(false);
   const returnFocus = useRef<HTMLElement | null>(null);
   const assessmentReturnFocus = useRef<HTMLElement | null>(null);
   const cards = useMemo(
@@ -212,6 +237,19 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
     setDialog({ card, target, intent: "button" });
   };
 
+  const runBulkMove = async (
+    selectedCards: readonly PipelineApplicationCard[],
+    targetStage: ApplicationStage,
+    extras: Omit<
+      StageTransitionCommand,
+      "targetStage" | "expectedStageVersion"
+    > = {},
+  ) => {
+    await state.moveMany(selectedCards, targetStage, extras);
+    await state.retry();
+    setViewAllStage(null);
+  };
+
   const openAssessment = (card: PipelineApplicationCard) => {
     assessmentReturnFocus.current =
       document.activeElement as HTMLElement | null;
@@ -239,6 +277,10 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
         error={column?.error ?? null}
         onLoadMore={state.loadMore}
         onRetry={(stage) => void state.loadStage(stage)}
+        onViewAll={(stage) => {
+          if (isActivePipelineBulkStage(stage)) setViewAllStage(stage);
+        }}
+        showViewAll={isActivePipelineBulkStage(summary.stage)}
         onChangeStage={requestStageChange}
         onViewAssessment={openAssessment}
         sortDirection={sortDirections[summary.stage]}
@@ -281,7 +323,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
       className="recruitment-pipeline"
       aria-label={`Recruitment pipeline for ${boardMetadata.job.title}`}
     >
-      <header className="recruitment-pipeline__header">
+      <header className="page-header recruitment-pipeline__header">
         <div>
           <h1>{boardMetadata.job.title} pipeline</h1>
           <p>
@@ -300,7 +342,12 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
           {!boardMetadata.permissions.canMoveStages ? (
             <strong>Read-only access</strong>
           ) : null}
-          <button type="button" onClick={() => void state.retry()}>
+          <button
+            type="button"
+            className="btn-refresh"
+            onClick={() => void state.retry()}
+          >
+            <RefreshCw aria-hidden="true" />
             Refresh
           </button>
         </div>
@@ -316,11 +363,11 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
 
       {/* Additions outside the original flow: local filter/search over loaded cards. */}
       <div
-        className="pipeline-filter-bar"
+        className="filter-bar pipeline-filter-bar"
         data-addition="outside-original-flow"
       >
         <label
-          className="pipeline-search-field"
+          className="search-input pipeline-search-field"
           htmlFor="pipeline-candidate-search"
         >
           <Search aria-hidden="true" />
@@ -330,11 +377,11 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
             type="search"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Search candidate names..."
+            placeholder={"T\u00ecm theo t\u00ean candidate..."}
           />
         </label>
         <div
-          className="pipeline-tier-filters"
+          className="filter-pills pipeline-tier-filters"
           role="group"
           aria-label="Filter candidates by final-score tier"
         >
@@ -344,17 +391,16 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
               type="button"
               className={
                 tierFilter === option.value
-                  ? "pipeline-tier-filter is-active"
-                  : "pipeline-tier-filter"
+                  ? "pill pipeline-tier-filter active is-active"
+                  : "pill pipeline-tier-filter"
               }
+              data-filter={option.value}
               aria-pressed={tierFilter === option.value}
               onClick={() => setTierFilter(option.value)}
             >
               {option.value !== "all" ? (
-                <span aria-hidden="true" />
-              ) : (
-                <SlidersHorizontal aria-hidden="true" />
-              )}
+                <span className="dot" aria-hidden="true" />
+              ) : null}
               {option.label}
             </button>
           ))}
@@ -381,14 +427,12 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
         }}
       >
         <div className="recruitment-pipeline__sections">
-          <div className="pipeline-section pipeline-section--active">
-            <div className="pipeline-section__header">
-              <div>
-                <h2 id="active-pipeline-heading">Active pipeline</h2>
-                <p>Applications moving through the hiring process.</p>
-              </div>
+          <section className="pipeline-section pipeline-section--active">
+            <div className="section-head pipeline-section__header">
+              <h2 id="active-pipeline-heading">Active pipeline</h2>
+              <span>Applications moving through the hiring process.</span>
             </div>
-            <div className="recruitment-pipeline__columns">
+            <div className="board recruitment-pipeline__columns">
               {activePipelineStages.map((stage) => {
                 const summary = boardMetadata.stages.find(
                   (item) => item.stage === stage,
@@ -396,15 +440,14 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
                 return summary ? renderColumn(summary) : null;
               })}
             </div>
-          </div>
-          <div className="pipeline-section pipeline-section--outcomes">
-            <div className="pipeline-section__header">
-              <div>
-                <h2 id="pipeline-outcomes-heading">Outcomes</h2>
-                <p>Closed or paused applications.</p>
-              </div>
+          </section>
+          <hr className="section-divider" />
+          <section className="pipeline-section pipeline-section--outcomes">
+            <div className="section-head pipeline-section__header">
+              <h2 id="pipeline-outcomes-heading">Outcomes</h2>
+              <span>Closed or paused applications.</span>
             </div>
-            <div className="recruitment-pipeline__columns">
+            <div className="board outcomes recruitment-pipeline__columns">
               {outcomeStages.map((stage) => {
                 const summary = boardMetadata.stages.find(
                   (item) => item.stage === stage,
@@ -412,7 +455,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
                 return summary ? renderColumn(summary) : null;
               })}
             </div>
-          </div>
+          </section>
         </div>
         <DragOverlay>
           {activeCard ? (
@@ -440,6 +483,51 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
             void moveCard(card, target, extras, intent).finally(() =>
               restoreFocus(card.applicationId),
             );
+          }}
+        />
+      ) : null}
+      {viewAllStage
+        ? (() => {
+            const summary = boardMetadata.stages.find(
+              (item) => item.stage === viewAllStage,
+            );
+            return summary ? (
+              <RecruitmentPipelineViewAllModal
+                jobId={jobId}
+                summary={{ ...summary, stage: viewAllStage }}
+                canMoveStages={boardMetadata.permissions.canMoveStages}
+                canReject={boardMetadata.permissions.canReject}
+                onClose={() => setViewAllStage(null)}
+                onBulkMove={runBulkMove}
+                onBulkReject={(cards) => {
+                  setBulkRejectBusy(false);
+                  setBulkRejectCards(cards);
+                }}
+              />
+            ) : null;
+          })()
+        : null}
+      {bulkRejectCards ? (
+        <ApplicationStageChangeDialog
+          card={bulkRejectCards[0]}
+          initialTarget="REJECTED"
+          fixedTarget="REJECTED"
+          title={"Reject " + bulkRejectCards.length + " candidates?"}
+          description="Choose one required rejection reason for every selected candidate."
+          busy={bulkRejectBusy}
+          onCancel={() => {
+            if (!bulkRejectBusy) {
+              setBulkRejectBusy(false);
+              setBulkRejectCards(null);
+            }
+          }}
+          onSubmit={(target, extras) => {
+            const cards = bulkRejectCards;
+            setBulkRejectBusy(true);
+            void runBulkMove(cards, target, extras).then(() => {
+              setBulkRejectBusy(false);
+              setBulkRejectCards(null);
+            });
           }}
         />
       ) : null}
