@@ -42,6 +42,7 @@ import {
   RecruiterWorkspaceNavigation,
 } from "@/frontend/features/recruiter-workspace/job-posting-management";
 import { NotificationCenter } from "@/frontend/features/notifications/components/notification-center";
+import { UnsavedChangesNavigationDialog } from "@/frontend/features/profile/client/unsaved-changes";
 const SIDEBAR_MINIMUM_WIDTH = 220;
 const SIDEBAR_WIDTH_STEP = 16;
 const SIDEBAR_MAXIMUM_FALLBACK_WIDTH = 360;
@@ -331,6 +332,7 @@ function WorkspaceShellContent({
 
   return (
     <main className="workspace-page" lang={locale}>
+      <UnsavedChangesNavigationDialog />
       <div
         className="workspace-layout"
         data-sidebar-collapsed={sidebarCollapsed}

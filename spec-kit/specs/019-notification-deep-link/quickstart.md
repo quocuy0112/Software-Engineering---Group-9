@@ -7,3 +7,4 @@
 5. In the notification center test, force read API 500 and verify navigation plus next-fetch unread reconciliation.
 6. Run accessibility tests for focus, names, Enter and Space.
 7. Check the administrator notification list, company invitations, support, connections, reports, and membership notifications; each must return a non-empty href without exposing invitation tokens.
+8. Make a profile form dirty, then click an internal navigation item and a notification: confirm the SmartHire dialog can cancel or continue navigation. Refresh or close the tab and confirm the browser-native warning remains.

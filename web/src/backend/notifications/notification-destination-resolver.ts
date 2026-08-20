@@ -77,7 +77,10 @@ export function resolveNotificationHref(input: NotificationDestinationInput) {
       : recipientRole === "RECRUITER"
         ? "/dashboard/employer-verification"
         : fallback;
-  if (contextType === "SUPPORT_CASE") return `/support?case=${id}`;
+  if (contextType === "SUPPORT_CASE")
+    return recipientRole === "ADMIN"
+      ? adminHref(adminOrigin, `support-cases/${id}/show`)
+      : `/support?case=${id}`;
   if (contextType === "CONNECTION_PROPOSAL")
     return `/connections?proposal=${id}`;
   if (contextType === "CONNECTION") return `/connections?connection=${id}`;

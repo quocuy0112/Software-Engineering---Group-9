@@ -1,8 +1,15 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ProfileOverview } from "@/frontend/features/profile/components/profile-overview";
+import { UnsavedChangesNavigationDialog } from "@/frontend/features/profile/client/unsaved-changes";
 
 vi.mock("sonner", () => ({
   toast: Object.assign(vi.fn(), {
@@ -248,14 +255,16 @@ describe("professional profile accessibility", () => {
     ).toHaveAttribute("href", "https://github.com/example");
   });
 
-  it("marks edited sections and blocks accidental in-app navigation", () => {
-    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+  it("marks edited sections and blocks accidental in-app navigation", async () => {
     render(
-      <ProfileOverview
-        account={account}
-        initialProfile={emptyProfile}
-        csrfProof="csrf-proof"
-      />,
+      <>
+        <UnsavedChangesNavigationDialog />
+        <ProfileOverview
+          account={account}
+          initialProfile={emptyProfile}
+          csrfProof="csrf-proof"
+        />
+      </>,
     );
 
     fireEvent.change(screen.getByLabelText("Headline"), {
@@ -265,9 +274,16 @@ describe("professional profile accessibility", () => {
     expect(fireEvent.click(screen.getByRole("link", { name: "Account" }))).toBe(
       false,
     );
-    expect(confirm).toHaveBeenCalledWith(
-      "You have unsaved changes. Are you sure you want to leave this page?",
+    expect(
+      screen.getByRole("dialog", { name: "You have unsaved changes" }),
+    ).toBeVisible();
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "Stay on page" }),
+      ).toHaveFocus(),
     );
+    fireEvent.click(screen.getByRole("button", { name: "Stay on page" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("ships 320px-safe and reduced-motion styles", () => {
