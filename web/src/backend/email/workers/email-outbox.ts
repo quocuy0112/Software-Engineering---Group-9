@@ -47,6 +47,14 @@ import {
   applicationStageChangedEmailText,
 } from "../templates/application-stage-changed";
 import {
+  CompanyInvitationTemplate,
+  companyInvitationEmailText,
+} from "../templates/company-invitation";
+import {
+  CompanyInvitationResponseTemplate,
+  companyInvitationResponseEmailText,
+} from "../templates/company-invitation-response";
+import {
   applicationStageLabel,
   applicationStageSchema,
 } from "@/shared/contracts/jobs/applications";
@@ -215,6 +223,66 @@ export async function deliverClaimedOutbox(
         }),
       );
       text = companyEmailVerificationText(verificationUrl.toString());
+    } else if (row.templateVersion === "company-invitation.v1") {
+      const invitationPayload = row.payloadRef as {
+        companyName?: string;
+        role?: "HR_MANAGER" | "RECRUITER";
+        protectedToken?: string;
+      };
+      if (
+        !invitationPayload.protectedToken ||
+        !invitationPayload.companyName ||
+        (invitationPayload.role !== "HR_MANAGER" &&
+          invitationPayload.role !== "RECRUITER")
+      ) {
+        throw new Error("COMPANY_INVITATION_EMAIL_PAYLOAD_INVALID");
+      }
+      const invitationUrl = new URL(
+        "/recruiter/company-invitation",
+        serverEnvironment.NEXT_PUBLIC_APP_URL,
+      );
+      invitationUrl.searchParams.set(
+        "token",
+        protector.unseal(invitationPayload.protectedToken),
+      );
+      const templateProps = {
+        companyName: invitationPayload.companyName,
+        role:
+          invitationPayload.role === "HR_MANAGER" ? "HR Manager" : "Recruiter",
+        invitationUrl: invitationUrl.toString(),
+      };
+      subject = `You're invited to join ${templateProps.companyName} on SmartHire`;
+      html = await render(
+        createElement(CompanyInvitationTemplate, templateProps),
+      );
+      text = companyInvitationEmailText(templateProps);
+    } else if (row.templateVersion === "company-invitation-response.v1") {
+      const responsePayload = row.payloadRef as {
+        companyName?: string;
+        recipientEmail?: string;
+        outcome?: "ACCEPTED" | "DECLINED";
+        role?: string;
+      };
+      if (
+        !responsePayload.companyName ||
+        !responsePayload.recipientEmail ||
+        !responsePayload.role ||
+        (responsePayload.outcome !== "ACCEPTED" &&
+          responsePayload.outcome !== "DECLINED")
+      ) {
+        throw new Error("COMPANY_INVITATION_RESPONSE_EMAIL_PAYLOAD_INVALID");
+      }
+      const templateProps = {
+        companyName: responsePayload.companyName,
+        recipientEmail: responsePayload.recipientEmail,
+        outcome: responsePayload.outcome,
+        role: responsePayload.role,
+      };
+      subject = `${templateProps.recipientEmail} ${templateProps.outcome === "ACCEPTED" ? "accepted" : "declined"} your invitation`;
+      html = await render(
+        createElement(CompanyInvitationResponseTemplate, templateProps),
+      );
+      text = companyInvitationResponseEmailText(templateProps);
     } else if (row.templateVersion === "email-change-verification.v1") {
       const emailChangePayload = row.payloadRef as {
         protectedProof?: string;

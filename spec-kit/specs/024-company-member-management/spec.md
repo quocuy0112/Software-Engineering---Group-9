@@ -29,7 +29,8 @@ As an active owner, I can invite an existing account by email as a Recruiter or 
 
 1. **Given** an owner enters an eligible account email and selects Recruiter or HR Manager, **When** they send an invitation, **Then** a single pending invitation is created and the recipient receives a safe notification/link.
 2. **Given** the invited account accepts a valid, unexpired invitation, **When** acceptance succeeds, **Then** one active membership is created with the invitation's role.
-3. **Given** an invitation is expired, revoked, already used, or belongs to another account, **When** it is accepted, **Then** access is not granted.
+3. **Given** the invited account does not want to join, **When** they decline a valid invitation, **Then** it becomes declined, cannot be accepted later, and the inviting Owner is notified.
+4. **Given** an invitation is expired, revoked, declined, already used, or belongs to another account, **When** it is accepted, **Then** access is not granted.
 
 ---
 
@@ -65,13 +66,16 @@ As an active owner, I can change a Recruiter or HR Manager role, suspend/restore
 - **FR-007**: Suspend, restore, removal, invitation, revocation, acceptance, and role change MUST be recorded in immutable audit/history data.
 - **FR-008**: A suspended or removed membership MUST lose server-authorized company access immediately.
 - **FR-009**: The Team UI MUST provide clear pending, active, suspended, removed, loading, error, and confirmation states with keyboard-accessible controls.
-- **FR-010**: Invitation and membership data MUST be tenant-scoped and omit secrets from browser responses and ordinary logs.
+- **FR-010**: Invitation and membership data MUST be tenant-scoped and omit secrets from browser responses and ordinary logs. The acceptance link MUST be delivered only to the invited account by email; the in-app notification MUST not contain the token.
+- **FR-011**: A recipient MAY explicitly decline a valid invitation. Accept and decline are terminal, compare-and-set transitions that notify the inviting Owner without exposing an acceptance token.
+- **FR-012**: The Owner Team page MUST expose a tenant-scoped, immutable activity timeline for invitation and managed-membership actions, including actor, target, action, role where applicable, and timestamp.
 
 ### Key Entities
 
 - **Company Membership**: A user’s role and lifecycle state inside one company.
 - **Company Invitation**: A one-time, expiring owner-issued invitation for a known account email and allowed role.
 - **Membership History**: Immutable evidence of a membership state or role change.
+- **Company Team Activity**: Immutable, tenant-scoped timeline evidence for invitations and managed-membership actions.
 
 ## Success Criteria
 

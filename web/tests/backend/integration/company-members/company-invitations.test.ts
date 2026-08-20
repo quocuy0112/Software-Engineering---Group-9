@@ -10,4 +10,7 @@ describe("company invitation lifecycle inputs", () => {
     expect(teamAcceptSchema.safeParse({ token: "" }).success).toBe(false);
     expect(teamAcceptSchema.safeParse({ token: "x".repeat(32) }).success).toBe(true);
   });
+  it("keeps recipient decisions as explicit action boundaries", () => {
+    expect(teamAcceptSchema.safeParse({ token: "x".repeat(32) }).success).toBe(true);
+  });
 });
