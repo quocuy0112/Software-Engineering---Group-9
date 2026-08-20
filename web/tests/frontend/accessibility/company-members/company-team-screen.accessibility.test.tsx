@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/frontend/features/authentication/client/csrf-proof-context", () => ({ useCsrfProof: () => "csrf" }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
+vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 import { CompanyTeamScreen } from "@/frontend/features/recruiter-workspace/company-team-screen";
 
 describe("CompanyTeamScreen accessibility", () => {

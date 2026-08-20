@@ -35,3 +35,7 @@
 - [X] T019 [P] [US2] Add protected preview/decline routes and update the invitation decision UI with accessible terminal states.
 - [X] T020 [US1] Render the Owner-visible Team activity timeline on the Team page.
 - [X] T021 Run focused tests, typecheck, lint, Prisma validation/migration deploy, and synchronize this checklist.
+
+## Phase 6: Invitation feedback polish
+
+- [X] T022 [US2] Show success/error toast feedback for invitation delivery and map pending-invitation, existing-member, and unavailable-recipient responses to actionable messages.
