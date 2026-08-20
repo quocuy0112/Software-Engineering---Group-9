@@ -18,6 +18,8 @@ describe("Administrator job-post decision UI", () => {
       "<Paper",
       "<TextField",
       "<Alert",
+      "<Dialog",
+      "DialogContentText",
       "approvalBlockers",
       "useGetIdentity",
       "claimedByCurrentAdmin",
@@ -26,5 +28,6 @@ describe("Administrator job-post decision UI", () => {
       expect(source).toContain(marker);
     expect(source).not.toContain("<textarea");
     expect(source).not.toContain("<select");
+    expect(source).not.toContain("window.confirm");
   });
 });

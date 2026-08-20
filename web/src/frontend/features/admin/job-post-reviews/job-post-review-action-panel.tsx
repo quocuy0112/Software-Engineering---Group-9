@@ -7,6 +7,11 @@ import {
   Button,
   Chip,
   Divider,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   MenuItem,
   Paper,
   Stack,
@@ -44,6 +49,9 @@ export function JobPostReviewActionPanel() {
   const [publicExplanation, setPublicExplanation] = useState("");
   const [privateNote, setPrivateNote] = useState("");
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  const [confirmationAction, setConfirmationAction] = useState<
+    "approve" | "reject" | null
+  >(null);
   const [claimedByCurrentAdmin, setClaimedByCurrentAdmin] = useState(false);
 
   if (!record || record.state !== "PENDING_REVIEW") return null;
@@ -106,11 +114,6 @@ export function JobPostReviewActionPanel() {
   };
 
   const decide = async (action: "approve" | "reject") => {
-    const label = action === "approve" ? "approve" : "reject";
-    if (!window.confirm(`Confirm ${label} of this exact submitted version?`)) {
-      return;
-    }
-
     setPendingAction(action);
     try {
       const result = (await dataProvider.command(
@@ -259,7 +262,7 @@ export function JobPostReviewActionPanel() {
               color="success"
               aria-label="Approve exact version"
               disabled={approvalBlocked || pendingAction !== null}
-              onClick={() => void decide("approve")}
+              onClick={() => setConfirmationAction("approve")}
               sx={{ mt: 1.5 }}
             >
               {pendingAction === "approve"
@@ -367,7 +370,7 @@ export function JobPostReviewActionPanel() {
                 publicExplanation.trim().length < 20 ||
                 pendingAction !== null
               }
-              onClick={() => void decide("reject")}
+              onClick={() => setConfirmationAction("reject")}
             >
               {pendingAction === "reject"
                 ? "Rejecting..."
@@ -390,6 +393,42 @@ export function JobPostReviewActionPanel() {
           </Alert>
         ) : null}
       </Stack>
+      <Dialog
+        open={confirmationAction !== null}
+        onClose={() => setConfirmationAction(null)}
+        aria-labelledby="job-post-review-decision-confirmation-title"
+        aria-describedby="job-post-review-decision-confirmation-description"
+      >
+        <DialogTitle id="job-post-review-decision-confirmation-title">
+          {confirmationAction === "approve"
+            ? "Approve this submitted version?"
+            : "Reject this submitted version?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="job-post-review-decision-confirmation-description">
+            {confirmationAction === "approve"
+              ? "The job will become visible to candidates after approval."
+              : "The recruiter will receive the selected reason and public explanation."}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmationAction(null)}>Cancel</Button>
+          <Button
+            variant="contained"
+            color={confirmationAction === "approve" ? "success" : "error"}
+            onClick={() => {
+              if (!confirmationAction) return;
+              const action = confirmationAction;
+              setConfirmationAction(null);
+              void decide(action);
+            }}
+          >
+            {confirmationAction === "approve"
+              ? "Approve version"
+              : "Reject version"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   );
 }

@@ -33,6 +33,7 @@
 ## Phase 6: Polish
 
 - [X] T009 Add a workspace-level custom unsaved-change dialog for internal navigation, route notification activation through it, retain `beforeunload`, and cover accessibility in `web/src/frontend/features/profile/client/unsaved-changes.tsx`, `web/src/frontend/features/dashboard/components/workspace-shell.tsx`, `web/src/frontend/features/notifications/components/notification-center.tsx`, and `web/tests/frontend/accessibility/professional-profile.accessibility.test.tsx`
+- [X] T010 Preserve authenticated admin sessions on `STEP_UP_REQUIRED` and reopen the job-post review detail after TOTP step-up in `web/src/frontend/features/admin/app/auth-provider.ts` and `web/src/frontend/features/admin/job-post-reviews/job-post-review-show.tsx`.
 - [ ] T008 Run the relevant notification backend/frontend suites, typecheck, and quickstart scenarios; record results in `spec-kit/specs/019-notification-deep-link/quickstart.md`
 
 ## Dependencies

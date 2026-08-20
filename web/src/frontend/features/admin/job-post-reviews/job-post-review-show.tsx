@@ -14,8 +14,10 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { Show, useRecordContext } from "react-admin";
+import { Show, useRecordContext, useRefresh } from "react-admin";
 import type { JobReviewSnapshot } from "@/shared/contracts/recruiter-job-posting";
+import { useState } from "react";
+import { StepUpDialog } from "../auth/step-up-dialog";
 import { JobPostReviewActionPanel } from "./job-post-review-action-panel";
 
 type ReviewDetailRecord = {
@@ -614,9 +616,38 @@ function ReviewDetail() {
 }
 
 export function JobPostReviewShow() {
+  const [stepUpRequired, setStepUpRequired] = useState(false);
+  const refresh = useRefresh();
+
   return (
-    <Show>
-      <ReviewDetail />
-    </Show>
+    <>
+      <Show
+        queryOptions={{
+          retry: false,
+          onError: (error) => {
+            const response = error as {
+              code?: string;
+              body?: { code?: string; error?: { code?: string } };
+            };
+            const code =
+              response.code ??
+              response.body?.code ??
+              response.body?.error?.code;
+            if (code === "STEP_UP_REQUIRED") setStepUpRequired(true);
+          },
+        }}
+      >
+        <ReviewDetail />
+      </Show>
+      <StepUpDialog
+        open={stepUpRequired}
+        id="job-post-review-detail"
+        onCancel={() => setStepUpRequired(false)}
+        onVerified={() => {
+          setStepUpRequired(false);
+          refresh();
+        }}
+      />
+    </>
   );
 }

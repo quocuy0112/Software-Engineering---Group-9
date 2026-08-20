@@ -305,6 +305,11 @@ not DOM virtualization in the MVP. The composer is plain text only. Delivery,
 read, approximate presence, blocked, reconnecting, empty, and failure states use
 text and live regions rather than color alone.
 
+Eligible-person discovery includes a debounced search field. It calls only the
+authenticated eligible-participants endpoint, whose application, accepted-
+connection, account-state, and company-membership-role filtering remains the
+authority; the browser never performs a general account search.
+
 ### Verification strategy
 
 - Contract tests keep OpenAPI, Zod, TypeScript socket event maps, and safe error

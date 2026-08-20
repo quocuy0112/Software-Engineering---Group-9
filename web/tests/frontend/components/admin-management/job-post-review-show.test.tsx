@@ -22,4 +22,15 @@ describe("Administrator job-post review detail", () => {
     expect(source).not.toContain("<pre>");
     expect(source).not.toContain("JSON.stringify");
   });
+
+  it("requests a fresh two-factor proof instead of treating a protected detail as a logout", () => {
+    const source = readFileSync(
+      "src/frontend/features/admin/job-post-reviews/job-post-review-show.tsx",
+      "utf8",
+    );
+
+    expect(source).toContain("STEP_UP_REQUIRED");
+    expect(source).toContain("StepUpDialog");
+    expect(source).toContain("refresh();");
+  });
 });
