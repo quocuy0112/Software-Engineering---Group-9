@@ -999,7 +999,7 @@ export function RecruiterJobPostingManagement({
 
 type RecruiterNavIconName = Exclude<
   WorkspaceNavIconName,
-  "messages" | "support" | "profile"
+  "support" | "profile"
 >;
 
 export function RecruiterWorkspaceNavigation({
@@ -1051,6 +1051,14 @@ export function RecruiterWorkspaceNavigation({
       active:
         pathname === recruiterRoutes.pipeline ||
         pathname.startsWith(`${recruiterRoutes.pipeline}/`),
+    },
+    {
+      label: "Recruitment messages",
+      icon: "messages",
+      href: recruiterRoutes.messages,
+      active:
+        pathname === recruiterRoutes.messages ||
+        pathname.startsWith(`${recruiterRoutes.messages}/`),
     },
     {
       label: "Company settings",

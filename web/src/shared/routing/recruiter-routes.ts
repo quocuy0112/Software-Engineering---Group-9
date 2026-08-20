@@ -3,6 +3,7 @@ export const recruiterRoutes = {
   jobPostings: "/recruiter/job-postings",
   candidates: "/recruiter/candidates",
   pipeline: "/recruiter/pipeline",
+  messages: "/recruiter/messages",
   analyticsForJob: (jobId: string) =>
     "/recruiter/analytics/" + encodeURIComponent(jobId),
   jobPostingCreate: "/recruiter/job-postings/create",

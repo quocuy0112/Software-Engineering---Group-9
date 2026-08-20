@@ -523,6 +523,14 @@ export const ApplicationStage = {
 export type ApplicationStage = (typeof ApplicationStage)[keyof typeof ApplicationStage]
 
 
+export const RecruitmentThreadState = {
+  OPEN: 'OPEN',
+  READ_ONLY: 'READ_ONLY'
+} as const
+
+export type RecruitmentThreadState = (typeof RecruitmentThreadState)[keyof typeof RecruitmentThreadState]
+
+
 export const ApplicationWithdrawalOutcome = {
   CANDIDATE_WITHDRAWN: 'CANDIDATE_WITHDRAWN'
 } as const

@@ -64,6 +64,13 @@ const toItem = (
         typeof row.variables.jobId === "string"
           ? row.variables.jobId
           : null,
+      threadId:
+        typeof row.variables === "object" &&
+        row.variables !== null &&
+        "threadId" in row.variables &&
+        typeof row.variables.threadId === "string"
+          ? row.variables.threadId
+          : null,
     }),
     contextType: row.contextType,
     contextId: row.contextId,

@@ -8,6 +8,7 @@ import {
   ListChecks,
   LoaderCircle,
   Mail,
+  MessageSquare,
   RefreshCw,
   ShieldCheck,
   UserRoundCheck,
@@ -27,7 +28,9 @@ import { RankingModalFrame } from "./ranking-modal-frame";
 import { ScoreBadgeFromLabel, formatScore } from "./candidate-ranking-ui";
 
 type Tab = "automatic" | "ai" | "documents";
-type CandidateScoreDrawerCandidate = RankedApplicationRow | PipelineApplicationCard;
+type CandidateScoreDrawerCandidate =
+  | RankedApplicationRow
+  | PipelineApplicationCard;
 
 export function CandidateScoreDrawer({
   jobId,
@@ -40,6 +43,7 @@ export function CandidateScoreDrawer({
   onMoveToInterview,
   onReject,
   onApplicationOpened,
+  onOpenRecruitmentChat,
   onScoringChanged,
 }: {
   jobId: string;
@@ -52,6 +56,7 @@ export function CandidateScoreDrawer({
   onMoveToInterview: () => void;
   onReject: () => void;
   onApplicationOpened: () => void | Promise<void>;
+  onOpenRecruitmentChat: () => Promise<void>;
   onScoringChanged: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<Tab>("automatic");
@@ -62,6 +67,7 @@ export function CandidateScoreDrawer({
   const [scoringActionLoading, setScoringActionLoading] = useState(false);
   const [shortlisting, setShortlisting] = useState(false);
   const [shortlistError, setShortlistError] = useState<string | null>(null);
+  const [openingRecruitmentChat, setOpeningRecruitmentChat] = useState(false);
   const [openDocument, setOpenDocument] = useState<
     "cv" | "cover-letter" | null
   >(null);
@@ -202,6 +208,11 @@ export function CandidateScoreDrawer({
   const scoreActionLabel =
     detail?.scoring.kind === "SCORED" ? "Rescore candidate" : "Score candidate";
   const canShortlist = !readOnly && candidate.stage === "VIEWED";
+  const canOpenRecruitmentChat =
+    !readOnly &&
+    ["VIEWED", "SHORTLISTED", "INTERVIEWING", "OFFERED"].includes(
+      candidate.stage,
+    );
   const canMoveToInterview =
     !readOnly &&
     "allowedActions" in candidate &&
@@ -227,6 +238,21 @@ export function CandidateScoreDrawer({
       );
     } finally {
       setShortlisting(false);
+    }
+  };
+  const openRecruitmentChat = async () => {
+    if (!canOpenRecruitmentChat || openingRecruitmentChat) return;
+    setOpeningRecruitmentChat(true);
+    setError(null);
+    try {
+      await onOpenRecruitmentChat();
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "The recruitment conversation could not be opened.",
+      );
+      setOpeningRecruitmentChat(false);
     }
   };
 
@@ -393,6 +419,21 @@ export function CandidateScoreDrawer({
                   <ListChecks aria-hidden="true" />
                 )}{" "}
                 {shortlisting ? "Shortlisting…" : "Shortlist"}
+              </button>
+            ) : null}
+            {canOpenRecruitmentChat ? (
+              <button
+                type="button"
+                className="ai-ranking-button ai-ranking-button--primary"
+                onClick={() => void openRecruitmentChat()}
+                disabled={openingRecruitmentChat}
+              >
+                {openingRecruitmentChat ? (
+                  <LoaderCircle aria-hidden="true" className="is-spinning" />
+                ) : (
+                  <MessageSquare aria-hidden="true" />
+                )}{" "}
+                {openingRecruitmentChat ? "Opening chat…" : "Message candidate"}
               </button>
             ) : null}
             {!readOnly ? (
@@ -571,7 +612,10 @@ export function CandidateScoreDrawer({
                     disabled={scoringActionLoading}
                   >
                     {scoringActionLoading ? (
-                      <LoaderCircle aria-hidden="true" className="is-spinning" />
+                      <LoaderCircle
+                        aria-hidden="true"
+                        className="is-spinning"
+                      />
                     ) : (
                       <RefreshCw aria-hidden="true" />
                     )}{" "}

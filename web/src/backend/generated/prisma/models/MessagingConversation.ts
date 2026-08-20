@@ -629,6 +629,11 @@ export type MessagingConversationScalarRelationFilter = {
   isNot?: Prisma.MessagingConversationWhereInput
 }
 
+export type MessagingConversationNullableScalarRelationFilter = {
+  is?: Prisma.MessagingConversationWhereInput | null
+  isNot?: Prisma.MessagingConversationWhereInput | null
+}
+
 export type MessagingConversationCreateNestedManyWithoutParticipantLowInput = {
   create?: Prisma.XOR<Prisma.MessagingConversationCreateWithoutParticipantLowInput, Prisma.MessagingConversationUncheckedCreateWithoutParticipantLowInput> | Prisma.MessagingConversationCreateWithoutParticipantLowInput[] | Prisma.MessagingConversationUncheckedCreateWithoutParticipantLowInput[]
   connectOrCreate?: Prisma.MessagingConversationCreateOrConnectWithoutParticipantLowInput | Prisma.MessagingConversationCreateOrConnectWithoutParticipantLowInput[]
@@ -881,10 +886,12 @@ export type MessagingConversationCreateNestedOneWithoutReportsInput = {
   connect?: Prisma.MessagingConversationWhereUniqueInput
 }
 
-export type MessagingConversationUpdateOneRequiredWithoutReportsNestedInput = {
+export type MessagingConversationUpdateOneWithoutReportsNestedInput = {
   create?: Prisma.XOR<Prisma.MessagingConversationCreateWithoutReportsInput, Prisma.MessagingConversationUncheckedCreateWithoutReportsInput>
   connectOrCreate?: Prisma.MessagingConversationCreateOrConnectWithoutReportsInput
   upsert?: Prisma.MessagingConversationUpsertWithoutReportsInput
+  disconnect?: Prisma.MessagingConversationWhereInput | boolean
+  delete?: Prisma.MessagingConversationWhereInput | boolean
   connect?: Prisma.MessagingConversationWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.MessagingConversationUpdateToOneWithWhereWithoutReportsInput, Prisma.MessagingConversationUpdateWithoutReportsInput>, Prisma.MessagingConversationUncheckedUpdateWithoutReportsInput>
 }

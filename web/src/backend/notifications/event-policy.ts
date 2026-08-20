@@ -14,6 +14,7 @@ export const notificationVariablesSchema = z
     companyName: z.string().trim().min(1).max(120).optional(),
     targetEmail: z.string().email().max(320).optional(),
     jobId: z.string().trim().min(1).max(128).optional(),
+    threadId: z.string().trim().min(1).max(128).optional(),
     audience: z.enum(["USER", "ADMIN"]).optional(),
     recipientRole: z.enum(["CANDIDATE", "RECRUITER", "ADMIN"]).optional(),
     safeReason: z

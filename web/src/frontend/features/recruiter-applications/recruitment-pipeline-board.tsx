@@ -543,6 +543,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
           onApplicationOpened={() => {
             void state.retry({ preserve: true });
           }}
+          onOpenRecruitmentChat={async () => undefined}
           onScoringChanged={() => {
             void state.retry({ preserve: true });
           }}

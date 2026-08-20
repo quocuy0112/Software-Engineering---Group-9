@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { Prisma } from "@/backend/generated/prisma/client";
 
 const storage = vi.hoisted(() => ({
   assertReady: vi.fn(),
@@ -9,6 +10,10 @@ const storage = vi.hoisted(() => ({
 
 vi.mock("@/backend/applications/storage/factory", () => ({
   createApplicationDocumentStorage: () => storage,
+}));
+
+vi.mock("@/backend/services/profile/candidate-cv-library", () => ({
+  ensureCandidateCvLibrary: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { ApplicationDraftService } from "@/backend/candidate-applications/application-draft-service";
@@ -80,5 +85,58 @@ describe("ApplicationDraftService cover-letter persistence", () => {
       file: { storageKey: "new-cover-letter-locator" },
     });
     expect(storage.delete).not.toHaveBeenCalled();
+  });
+
+  it("returns the winning draft when concurrent page requests race to create it", async () => {
+    const concurrent = draftRow({
+      personalInfoDraft: {
+        fullName: "Candidate One",
+        email: "candidate@example.test",
+        phone: "0900000000",
+        currentLocation: "Ho Chi Minh City",
+        linkedInPortfolio: null,
+        cvSource: null,
+      },
+    });
+    const duplicate = new Prisma.PrismaClientKnownRequestError("duplicate", {
+      code: "P2002",
+      clientVersion: "test",
+    });
+    const db = {
+      $transaction: vi.fn(async (callback) => callback(db)),
+      jobPosting: {
+        findFirst: vi.fn().mockResolvedValue({ id: "job-1" }),
+      },
+      candidateIdentity: {
+        findFirst: vi.fn().mockResolvedValue({
+          user: { name: "Candidate One", email: "candidate@example.test" },
+          profile: null,
+        }),
+      },
+      jobApplication: {
+        findUnique: vi.fn().mockResolvedValue(null),
+      },
+      candidateCv: {
+        findFirst: vi.fn().mockResolvedValue(null),
+      },
+      candidateApplicationDraft: {
+        findUnique: vi
+          .fn()
+          .mockResolvedValueOnce(null)
+          .mockResolvedValueOnce(concurrent),
+        create: vi.fn().mockRejectedValue(duplicate),
+      },
+    };
+
+    await expect(
+      new ApplicationDraftService(db as never).getOrCreate(
+        { userId: "candidate-1", sessionId: "session-1" },
+        "job-1",
+        now,
+      ),
+    ).resolves.toMatchObject({ draftId: "draft-1", jobId: "job-1" });
+
+    expect(db.candidateApplicationDraft.create).toHaveBeenCalledOnce();
+    expect(db.candidateApplicationDraft.findUnique).toHaveBeenCalledTimes(2);
   });
 });

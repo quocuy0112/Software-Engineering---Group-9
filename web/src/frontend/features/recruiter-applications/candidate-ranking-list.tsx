@@ -470,6 +470,27 @@ export function CandidateRankingList({
       // the scoring/document read fallback can still acknowledge the review.
     }
   };
+  const openRecruitmentChat = async (row: RankedApplicationRow) => {
+    const response = await mutateWithCurrentCsrf(
+      `/api/recruiter/applications/${encodeURIComponent(row.applicationId)}/recruitment-thread`,
+      { method: "POST" },
+      effectiveCsrfProof,
+    );
+    const payload = (await response.json().catch(() => null)) as {
+      id?: string;
+      code?: string;
+    } | null;
+    if (!response.ok || !payload?.id) {
+      throw new Error(
+        payload?.code === "APPLICATION_NOT_READY"
+          ? "Open the candidate details until the application is marked viewed before starting a conversation."
+          : "The recruitment conversation could not be opened.",
+      );
+    }
+    window.location.assign(
+      `${recruiterRoutes.messages}?thread=${encodeURIComponent(payload.id)}`,
+    );
+  };
   const shortlistCandidate = async (row: RankedApplicationRow) => {
     if (row.stage !== "VIEWED") return;
     const response = await mutateWithCurrentCsrf(
@@ -909,6 +930,7 @@ export function CandidateRankingList({
           onMoveToInterview={() => setModal("interview")}
           onReject={() => setModal("reject")}
           onApplicationOpened={() => acknowledgeCandidateOpened(selected)}
+          onOpenRecruitmentChat={() => openRecruitmentChat(selected)}
           onScoringChanged={ranking.refresh}
         />
       ) : null}

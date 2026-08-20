@@ -530,115 +530,140 @@ export class ApplicationDraftService {
     await ensureCandidateCvLibrary(actor.userId, this.db);
     await this.assertOpenJob(jobId, now);
     const candidate = await candidateContact(this.db, actor.userId);
-    const result = await this.db.$transaction(async (tx) => {
-      const existingApplication = await tx.jobApplication.findUnique({
-        where: {
-          candidateUserId_jobPostingId: {
-            candidateUserId: actor.userId,
-            jobPostingId: jobId,
-          },
-        },
-        select: { id: true },
-      });
-      if (existingApplication) {
-        throw new CandidateApplicationError(
-          409,
-          "APPLICATION_EXISTS",
-          "You already applied to this job.",
-        );
-      }
-      const existing = await draftRow(tx as DraftDatabase, actor.userId, jobId);
-      if (existing && existing.expiresAt > now) {
-        if (!existing.selectedCv && prefilledCvId) {
-          const cv = await optionalValidCv(
-            tx as DraftDatabase,
-            actor.userId,
-            prefilledCvId,
-          );
-          if (cv) {
-            const updated = await tx.candidateApplicationDraft.update({
-              where: { id: existing.id },
-              data: {
-                selectedCvId: cv.id,
-                revision: { increment: 1 },
-                updatedAt: now,
-                expiresAt: new Date(now.getTime() + DRAFT_TTL_MS),
-              },
-              include: {
-                selectedCv: {
-                  select: {
-                    id: true,
-                    displayName: true,
-                    fileName: true,
-                    mimeType: true,
-                    byteSize: true,
-                    version: true,
-                    confirmedAt: true,
-                  },
-                },
-              },
-            });
-            return updated;
-          }
-        }
-        return existing;
-      }
-      if (existing) {
-        await tx.candidateApplicationDraft.delete({
-          where: { id: existing.id },
-        });
-      }
-      const requested = await optionalValidCv(
-        tx as DraftDatabase,
-        actor.userId,
-        prefilledCvId,
-      );
-      let selectedCvId = requested?.id ?? null;
-      if (!selectedCvId && !prefilledCvId) {
-        const firstCv = await tx.candidateCv.findFirst({
+    let result: NonNullable<Awaited<ReturnType<typeof draftRow>>>;
+    try {
+      result = await this.db.$transaction(async (tx) => {
+        const existingApplication = await tx.jobApplication.findUnique({
           where: {
-            candidateUserId: actor.userId,
-            confirmedAt: { not: null },
-            archivedAt: null,
-            byteSize: { gte: 1, lte: MAX_FILE_BYTES },
-            mimeType: { in: [...supportedCvMimeTypes] },
-          },
-          orderBy: [{ confirmedAt: "desc" }, { id: "desc" }],
-          select: { id: true },
-        });
-        selectedCvId = firstCv?.id ?? null;
-      }
-      return tx.candidateApplicationDraft.create({
-        data: {
-          candidateUserId: actor.userId,
-          jobPostingId: jobId,
-          revision: 1,
-          personalInfoDraft: storedPersonalInformation(
-            initialPersonalInfo(candidate),
-            selectedCvId ? "PROFILE" : null,
-          ) as Prisma.InputJsonValue,
-          selectedCvId,
-          coverLetterDraft: Prisma.JsonNull,
-          messageDraft: null,
-          confirmationAccepted: false,
-          updatedAt: now,
-          expiresAt: new Date(now.getTime() + DRAFT_TTL_MS),
-        },
-        include: {
-          selectedCv: {
-            select: {
-              id: true,
-              displayName: true,
-              fileName: true,
-              mimeType: true,
-              byteSize: true,
-              version: true,
-              confirmedAt: true,
+            candidateUserId_jobPostingId: {
+              candidateUserId: actor.userId,
+              jobPostingId: jobId,
             },
           },
-        },
+          select: { id: true },
+        });
+        if (existingApplication) {
+          throw new CandidateApplicationError(
+            409,
+            "APPLICATION_EXISTS",
+            "You already applied to this job.",
+          );
+        }
+        const existing = await draftRow(
+          tx as DraftDatabase,
+          actor.userId,
+          jobId,
+        );
+        if (existing && existing.expiresAt > now) {
+          if (!existing.selectedCv && prefilledCvId) {
+            const cv = await optionalValidCv(
+              tx as DraftDatabase,
+              actor.userId,
+              prefilledCvId,
+            );
+            if (cv) {
+              const updated = await tx.candidateApplicationDraft.update({
+                where: { id: existing.id },
+                data: {
+                  selectedCvId: cv.id,
+                  revision: { increment: 1 },
+                  updatedAt: now,
+                  expiresAt: new Date(now.getTime() + DRAFT_TTL_MS),
+                },
+                include: {
+                  selectedCv: {
+                    select: {
+                      id: true,
+                      displayName: true,
+                      fileName: true,
+                      mimeType: true,
+                      byteSize: true,
+                      version: true,
+                      confirmedAt: true,
+                    },
+                  },
+                },
+              });
+              return updated;
+            }
+          }
+          return existing;
+        }
+        if (existing) {
+          await tx.candidateApplicationDraft.delete({
+            where: { id: existing.id },
+          });
+        }
+        const requested = await optionalValidCv(
+          tx as DraftDatabase,
+          actor.userId,
+          prefilledCvId,
+        );
+        let selectedCvId = requested?.id ?? null;
+        if (!selectedCvId && !prefilledCvId) {
+          const firstCv = await tx.candidateCv.findFirst({
+            where: {
+              candidateUserId: actor.userId,
+              confirmedAt: { not: null },
+              archivedAt: null,
+              byteSize: { gte: 1, lte: MAX_FILE_BYTES },
+              mimeType: { in: [...supportedCvMimeTypes] },
+            },
+            orderBy: [{ confirmedAt: "desc" }, { id: "desc" }],
+            select: { id: true },
+          });
+          selectedCvId = firstCv?.id ?? null;
+        }
+        return tx.candidateApplicationDraft.create({
+          data: {
+            candidateUserId: actor.userId,
+            jobPostingId: jobId,
+            revision: 1,
+            personalInfoDraft: storedPersonalInformation(
+              initialPersonalInfo(candidate),
+              selectedCvId ? "PROFILE" : null,
+            ) as Prisma.InputJsonValue,
+            selectedCvId,
+            coverLetterDraft: Prisma.JsonNull,
+            messageDraft: null,
+            confirmationAccepted: false,
+            updatedAt: now,
+            expiresAt: new Date(now.getTime() + DRAFT_TTL_MS),
+          },
+          include: {
+            selectedCv: {
+              select: {
+                id: true,
+                displayName: true,
+                fileName: true,
+                mimeType: true,
+                byteSize: true,
+                version: true,
+                confirmedAt: true,
+              },
+            },
+          },
+        });
       });
-    });
+    } catch (error) {
+      // The page can be rendered concurrently (for example by a refresh and a
+      // navigation). The unique constraint is the final authority; after a
+      // competing request wins creation, return its durable draft instead of
+      // surfacing a false failure to the candidate.
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        const concurrent = await draftRow(this.db, actor.userId, jobId);
+        if (concurrent && concurrent.expiresAt > now) {
+          result = concurrent;
+        } else {
+          throw error;
+        }
+      } else {
+        throw error;
+      }
+    }
     return draftProjection(result);
   }
 

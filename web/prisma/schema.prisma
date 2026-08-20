@@ -397,6 +397,14 @@ enum ApplicationStage {
   WAITLISTED
 }
 
+/// A recruitment conversation can no longer accept messages once the related
+/// /// application reaches a terminal stage. The history remains available to
+/// the candidate, assigned recruiter and company owner.
+enum RecruitmentThreadState {
+  OPEN
+  READ_ONLY
+}
+
 enum ApplicationWithdrawalOutcome {
   CANDIDATE_WITHDRAWN
 }
@@ -1147,6 +1155,8 @@ model UserAccount {
   handledMessagingReports        MessagingReport[]                       @relation("MessagingReportHandler")
   messagingReportReviewEvents    MessagingReportReviewEvent[]            @relation("MessagingReportReviewActor")
   messagingReportPrivateNotes    MessagingReportPrivateNote[]            @relation("MessagingReportNoteAuthor")
+  recruitmentThreadsAsCandidate  RecruitmentThread[]                     @relation("RecruitmentThreadCandidate")
+  recruitmentMessages            RecruitmentMessage[]                    @relation("RecruitmentMessageSender")
   supportConversationsRequested  SupportConversation[]                   @relation("SupportRequester")
   supportConversationsAssigned   SupportConversation[]                   @relation("SupportCurrentAssignee")
   supportMessages                SupportMessage[]
@@ -1700,6 +1710,7 @@ model Company {
   recruiterVerificationRequests RecruiterVerificationRequest[]
   accessPrerequisites           CompanyAccessPrerequisite[]
   messagingConversations        MessagingConversation[]
+  recruitmentThreads            RecruitmentThread[]
   jobPostReviewAggregates       JobPostReviewAggregate[]
 
   @@index([verifiedAt, id])
@@ -1761,6 +1772,7 @@ model CompanyMembership {
   user                    UserAccount                @relation(fields: [userId], references: [id], onDelete: Cascade)
   history                 CompanyMembershipHistory[]
   submittedJobPostReviews JobPostReviewVersion[]
+  assignedRecruitmentThreads RecruitmentThread[] @relation("RecruitmentThreadAssignee")
 
   @@unique([companyId, userId])
   @@index([userId, status])
@@ -2287,6 +2299,7 @@ model JobPosting {
   applicationArtifactPromotions ApplicationArtifactPromotion[]
   scoringOperations        ScoringOperation[]
   rankingSnapshots         RankingSnapshot[]
+  recruitmentThreads       RecruitmentThread[]
   analyticsViewFacts       JobPostingViewFact[]
   analyticsLifecycleFacts  JobPostingLifecycleFact[]
   analyticsExports         ExportRequest[]
@@ -2871,6 +2884,7 @@ model JobApplication {
   notificationWork        RecruitmentNotificationWork[]
   stageEvents             ApplicationStageEvent[]
   messagingConversations  MessagingConversation[]
+  recruitmentThread       RecruitmentThread?
   applicationDocuments    ApplicationDocument[]
   coverLetterText         ApplicationCoverLetterText?
   artifactPromotions      ApplicationArtifactPromotion[]
@@ -3197,6 +3211,60 @@ model SupportConversationHistory {
   @@index([conversationId, occurredAt])
 }
 
+/// Recruitment messaging is deliberately separate from a social messaging
+/// conversation. It has one durable business context (an application), a
+/// single accountable assignee, and company-owner oversight without making the
+/// owner a message participant.
+model RecruitmentThread {
+  id                         String                  @id @default(cuid())
+  applicationId              String                  @unique
+  companyId                  String
+  jobPostingId               String
+  candidateUserId            String
+  assignedMembershipId       String?
+  state                      RecruitmentThreadState  @default(OPEN)
+  nextMessageSequence        Int                     @default(1)
+  lastMessageSequence        Int?
+  lastMessageAt              DateTime?
+  candidateLastReadSequence  Int                     @default(0)
+  staffLastReadSequence      Int                     @default(0)
+  candidateLastReadAt        DateTime?
+  staffLastReadAt            DateTime?
+  createdAt                  DateTime                @default(now())
+  updatedAt                  DateTime                @updatedAt
+  application                JobApplication          @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  company                    Company                 @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  jobPosting                 JobPosting              @relation(fields: [jobPostingId], references: [id], onDelete: Restrict)
+  candidate                  UserAccount             @relation("RecruitmentThreadCandidate", fields: [candidateUserId], references: [id], onDelete: Restrict)
+  assignedMembership         CompanyMembership?      @relation("RecruitmentThreadAssignee", fields: [assignedMembershipId], references: [id], onDelete: SetNull)
+  messages                   RecruitmentMessage[]
+  reports                    MessagingReport[]     @relation("RecruitmentThreadReports")
+
+  @@index([companyId, lastMessageAt(sort: Desc), id])
+  @@index([jobPostingId, lastMessageAt(sort: Desc), id])
+  @@index([assignedMembershipId, lastMessageAt(sort: Desc), id])
+  @@index([candidateUserId, lastMessageAt(sort: Desc), id])
+  @@index([state, lastMessageAt(sort: Desc), id])
+}
+
+model RecruitmentMessage {
+  id                 String              @id @default(cuid())
+  threadId           String
+  sequence           Int
+  senderUserId       String
+  senderMembershipId String?
+  clientOperationId  String
+  content            String              @db.Text
+  createdAt          DateTime            @default(now())
+  thread             RecruitmentThread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender             UserAccount         @relation("RecruitmentMessageSender", fields: [senderUserId], references: [id], onDelete: Restrict)
+  evidenceForReports MessagingReport[]   @relation("RecruitmentReportEvidence")
+
+  @@unique([threadId, sequence])
+  @@unique([senderUserId, clientOperationId])
+  @@index([threadId, sequence(sort: Desc)])
+}
+
 model MessagingConversation {
   id                       String                              @id @default(cuid())
   participantLowId         String
@@ -3277,9 +3345,11 @@ model MessagingReport {
   id                       String                       @id @default(cuid())
   reporterUserId           String
   targetUserId             String
-  conversationId           String
+  conversationId           String?
+  recruitmentThreadId      String?
   targetType               MessagingReportTargetType
   evidenceMessageId        String?
+  recruitmentEvidenceMessageId String?
   category                 ModerationReportCategory
   normalizedDetail         String?
   state                    ModerationReportState        @default(PENDING_REVIEW)
@@ -3296,13 +3366,16 @@ model MessagingReport {
   target                   UserAccount                  @relation("MessagingTarget", fields: [targetUserId], references: [id], onDelete: Restrict)
   assignedAdmin            UserAccount?                 @relation("MessagingReportAssignee", fields: [assignedAdminUserId], references: [id], onDelete: SetNull)
   handledByAdmin           UserAccount?                 @relation("MessagingReportHandler", fields: [handledByAdminUserId], references: [id], onDelete: SetNull)
-  conversation             MessagingConversation        @relation(fields: [conversationId], references: [id], onDelete: Restrict)
+  conversation             MessagingConversation?       @relation(fields: [conversationId], references: [id], onDelete: Restrict)
   evidenceMessage          MessagingMessage?            @relation("MessagingReportEvidence", fields: [evidenceMessageId], references: [id], onDelete: SetNull)
+  recruitmentThread        RecruitmentThread?           @relation("RecruitmentThreadReports", fields: [recruitmentThreadId], references: [id], onDelete: Cascade)
+  recruitmentEvidenceMessage RecruitmentMessage?        @relation("RecruitmentReportEvidence", fields: [recruitmentEvidenceMessageId], references: [id], onDelete: SetNull)
   reviewEvents             MessagingReportReviewEvent[]
   privateNotes             MessagingReportPrivateNote[]
 
   @@index([reporterUserId, createdAt(sort: Desc)])
   @@index([conversationId, state, createdAt])
+  @@index([recruitmentThreadId, state, createdAt])
   @@index([state, createdAt, id])
   @@index([assignedAdminUserId, state, createdAt, id])
   @@index([preserveUntil])

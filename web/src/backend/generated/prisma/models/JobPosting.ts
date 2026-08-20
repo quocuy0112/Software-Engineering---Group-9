@@ -455,6 +455,7 @@ export type JobPostingWhereInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionListRelationFilter
   scoringOperations?: Prisma.ScoringOperationListRelationFilter
   rankingSnapshots?: Prisma.RankingSnapshotListRelationFilter
+  recruitmentThreads?: Prisma.RecruitmentThreadListRelationFilter
   analyticsViewFacts?: Prisma.JobPostingViewFactListRelationFilter
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactListRelationFilter
   analyticsExports?: Prisma.ExportRequestListRelationFilter
@@ -504,6 +505,7 @@ export type JobPostingOrderByWithRelationInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionOrderByRelationAggregateInput
   scoringOperations?: Prisma.ScoringOperationOrderByRelationAggregateInput
   rankingSnapshots?: Prisma.RankingSnapshotOrderByRelationAggregateInput
+  recruitmentThreads?: Prisma.RecruitmentThreadOrderByRelationAggregateInput
   analyticsViewFacts?: Prisma.JobPostingViewFactOrderByRelationAggregateInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactOrderByRelationAggregateInput
   analyticsExports?: Prisma.ExportRequestOrderByRelationAggregateInput
@@ -556,6 +558,7 @@ export type JobPostingWhereUniqueInput = Prisma.AtLeast<{
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionListRelationFilter
   scoringOperations?: Prisma.ScoringOperationListRelationFilter
   rankingSnapshots?: Prisma.RankingSnapshotListRelationFilter
+  recruitmentThreads?: Prisma.RecruitmentThreadListRelationFilter
   analyticsViewFacts?: Prisma.JobPostingViewFactListRelationFilter
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactListRelationFilter
   analyticsExports?: Prisma.ExportRequestListRelationFilter
@@ -682,6 +685,7 @@ export type JobPostingCreateInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
@@ -730,6 +734,7 @@ export type JobPostingUncheckedCreateInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
@@ -778,6 +783,7 @@ export type JobPostingUpdateInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
@@ -826,6 +832,7 @@ export type JobPostingUncheckedUpdateInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUncheckedUpdateManyWithoutJobPostingNestedInput
@@ -1258,6 +1265,20 @@ export type JobPostingUpdateOneRequiredWithoutApplicationArtifactPromotionsNeste
   update?: Prisma.XOR<Prisma.XOR<Prisma.JobPostingUpdateToOneWithWhereWithoutApplicationArtifactPromotionsInput, Prisma.JobPostingUpdateWithoutApplicationArtifactPromotionsInput>, Prisma.JobPostingUncheckedUpdateWithoutApplicationArtifactPromotionsInput>
 }
 
+export type JobPostingCreateNestedOneWithoutRecruitmentThreadsInput = {
+  create?: Prisma.XOR<Prisma.JobPostingCreateWithoutRecruitmentThreadsInput, Prisma.JobPostingUncheckedCreateWithoutRecruitmentThreadsInput>
+  connectOrCreate?: Prisma.JobPostingCreateOrConnectWithoutRecruitmentThreadsInput
+  connect?: Prisma.JobPostingWhereUniqueInput
+}
+
+export type JobPostingUpdateOneRequiredWithoutRecruitmentThreadsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobPostingCreateWithoutRecruitmentThreadsInput, Prisma.JobPostingUncheckedCreateWithoutRecruitmentThreadsInput>
+  connectOrCreate?: Prisma.JobPostingCreateOrConnectWithoutRecruitmentThreadsInput
+  upsert?: Prisma.JobPostingUpsertWithoutRecruitmentThreadsInput
+  connect?: Prisma.JobPostingWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobPostingUpdateToOneWithWhereWithoutRecruitmentThreadsInput, Prisma.JobPostingUpdateWithoutRecruitmentThreadsInput>, Prisma.JobPostingUncheckedUpdateWithoutRecruitmentThreadsInput>
+}
+
 export type JobPostingCreateNestedOneWithoutScoringOperationsInput = {
   create?: Prisma.XOR<Prisma.JobPostingCreateWithoutScoringOperationsInput, Prisma.JobPostingUncheckedCreateWithoutScoringOperationsInput>
   connectOrCreate?: Prisma.JobPostingCreateOrConnectWithoutScoringOperationsInput
@@ -1370,6 +1391,7 @@ export type JobPostingCreateWithoutCompanyInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
@@ -1417,6 +1439,7 @@ export type JobPostingUncheckedCreateWithoutCompanyInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
@@ -1528,6 +1551,7 @@ export type JobPostingCreateWithoutReviewAggregateInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
@@ -1575,6 +1599,7 @@ export type JobPostingUncheckedCreateWithoutReviewAggregateInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
@@ -1638,6 +1663,7 @@ export type JobPostingUpdateWithoutReviewAggregateInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
@@ -1685,6 +1711,7 @@ export type JobPostingUncheckedUpdateWithoutReviewAggregateInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUncheckedUpdateManyWithoutJobPostingNestedInput
@@ -1732,6 +1759,7 @@ export type JobPostingCreateWithoutSkillsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
@@ -1779,6 +1807,7 @@ export type JobPostingUncheckedCreateWithoutSkillsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
@@ -1842,6 +1871,7 @@ export type JobPostingUpdateWithoutSkillsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
@@ -1889,6 +1919,7 @@ export type JobPostingUncheckedUpdateWithoutSkillsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUncheckedUpdateManyWithoutJobPostingNestedInput
@@ -1936,6 +1967,7 @@ export type JobPostingCreateWithoutQuestionsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
@@ -1983,6 +2015,7 @@ export type JobPostingUncheckedCreateWithoutQuestionsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
@@ -2046,6 +2079,7 @@ export type JobPostingUpdateWithoutQuestionsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
@@ -2093,6 +2127,7 @@ export type JobPostingUncheckedUpdateWithoutQuestionsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUncheckedUpdateManyWithoutJobPostingNestedInput
@@ -2140,6 +2175,7 @@ export type JobPostingCreateWithoutSavedByInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
@@ -2187,6 +2223,7 @@ export type JobPostingUncheckedCreateWithoutSavedByInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
@@ -2250,6 +2287,7 @@ export type JobPostingUpdateWithoutSavedByInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
@@ -2297,6 +2335,7 @@ export type JobPostingUncheckedUpdateWithoutSavedByInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUncheckedUpdateManyWithoutJobPostingNestedInput
@@ -2344,6 +2383,7 @@ export type JobPostingCreateWithoutReportsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
@@ -2391,6 +2431,7 @@ export type JobPostingUncheckedCreateWithoutReportsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
@@ -2454,6 +2495,7 @@ export type JobPostingUpdateWithoutReportsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
@@ -2501,6 +2543,7 @@ export type JobPostingUncheckedUpdateWithoutReportsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUncheckedUpdateManyWithoutJobPostingNestedInput
@@ -2548,6 +2591,7 @@ export type JobPostingCreateWithoutCandidateApplicationDraftsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
@@ -2595,6 +2639,7 @@ export type JobPostingUncheckedCreateWithoutCandidateApplicationDraftsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
@@ -2658,6 +2703,7 @@ export type JobPostingUpdateWithoutCandidateApplicationDraftsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
@@ -2705,6 +2751,7 @@ export type JobPostingUncheckedUpdateWithoutCandidateApplicationDraftsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUncheckedUpdateManyWithoutJobPostingNestedInput
@@ -2752,6 +2799,7 @@ export type JobPostingCreateWithoutApplicationsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
@@ -2799,6 +2847,7 @@ export type JobPostingUncheckedCreateWithoutApplicationsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
@@ -2862,6 +2911,7 @@ export type JobPostingUpdateWithoutApplicationsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
@@ -2909,6 +2959,7 @@ export type JobPostingUncheckedUpdateWithoutApplicationsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUncheckedUpdateManyWithoutJobPostingNestedInput
@@ -2956,6 +3007,7 @@ export type JobPostingCreateWithoutApplicationArtifactPromotionsInput = {
   reviewAggregate?: Prisma.JobPostReviewAggregateCreateNestedOneWithoutPublicJobPostingInput
   scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
@@ -3003,6 +3055,7 @@ export type JobPostingUncheckedCreateWithoutApplicationArtifactPromotionsInput =
   reviewAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutPublicJobPostingInput
   scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
@@ -3066,6 +3119,7 @@ export type JobPostingUpdateWithoutApplicationArtifactPromotionsInput = {
   reviewAggregate?: Prisma.JobPostReviewAggregateUpdateOneWithoutPublicJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
@@ -3111,6 +3165,215 @@ export type JobPostingUncheckedUpdateWithoutApplicationArtifactPromotionsInput =
   applications?: Prisma.JobApplicationUncheckedUpdateManyWithoutJobPostingNestedInput
   candidateApplicationDrafts?: Prisma.CandidateApplicationDraftUncheckedUpdateManyWithoutJobPostingNestedInput
   reviewAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutPublicJobPostingNestedInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
+  rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
+  analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
+  analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutJobPostingNestedInput
+  analyticsExports?: Prisma.ExportRequestUncheckedUpdateManyWithoutJobPostingNestedInput
+}
+
+export type JobPostingCreateWithoutRecruitmentThreadsInput = {
+  id?: string
+  slug: string
+  title: string
+  normalizedTitle: string
+  summary: string
+  description: string
+  responsibilities: string
+  requirements: string
+  benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
+  location: string
+  normalizedLocation: string
+  employmentType: $Enums.EmploymentType
+  experienceLevel: $Enums.ExperienceLevel
+  workArrangement: $Enums.WorkArrangement
+  salaryMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  salaryMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  salaryCurrency?: string | null
+  salaryPeriod?: $Enums.SalaryPeriod | null
+  searchDocumentNormalized: string
+  status?: $Enums.JobPostingStatus
+  approvedAt?: Date | string | null
+  publishedAt?: Date | string | null
+  applicationDeadline?: Date | string | null
+  closedAt?: Date | string | null
+  removedAt?: Date | string | null
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  company: Prisma.CompanyCreateNestedOneWithoutJobPostingsInput
+  skills?: Prisma.JobPostingSkillCreateNestedManyWithoutJobPostingInput
+  questions?: Prisma.ApplicationQuestionCreateNestedManyWithoutJobPostingInput
+  savedBy?: Prisma.SavedJobCreateNestedManyWithoutJobPostingInput
+  reports?: Prisma.JobReportCreateNestedManyWithoutJobPostingInput
+  applications?: Prisma.JobApplicationCreateNestedManyWithoutJobPostingInput
+  candidateApplicationDrafts?: Prisma.CandidateApplicationDraftCreateNestedManyWithoutJobPostingInput
+  reviewAggregate?: Prisma.JobPostReviewAggregateCreateNestedOneWithoutPublicJobPostingInput
+  applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
+  scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
+  rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
+  analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
+  analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
+}
+
+export type JobPostingUncheckedCreateWithoutRecruitmentThreadsInput = {
+  id?: string
+  companyId: string
+  slug: string
+  title: string
+  normalizedTitle: string
+  summary: string
+  description: string
+  responsibilities: string
+  requirements: string
+  benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
+  location: string
+  normalizedLocation: string
+  employmentType: $Enums.EmploymentType
+  experienceLevel: $Enums.ExperienceLevel
+  workArrangement: $Enums.WorkArrangement
+  salaryMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  salaryMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  salaryCurrency?: string | null
+  salaryPeriod?: $Enums.SalaryPeriod | null
+  searchDocumentNormalized: string
+  status?: $Enums.JobPostingStatus
+  approvedAt?: Date | string | null
+  publishedAt?: Date | string | null
+  applicationDeadline?: Date | string | null
+  closedAt?: Date | string | null
+  removedAt?: Date | string | null
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  skills?: Prisma.JobPostingSkillUncheckedCreateNestedManyWithoutJobPostingInput
+  questions?: Prisma.ApplicationQuestionUncheckedCreateNestedManyWithoutJobPostingInput
+  savedBy?: Prisma.SavedJobUncheckedCreateNestedManyWithoutJobPostingInput
+  reports?: Prisma.JobReportUncheckedCreateNestedManyWithoutJobPostingInput
+  applications?: Prisma.JobApplicationUncheckedCreateNestedManyWithoutJobPostingInput
+  candidateApplicationDrafts?: Prisma.CandidateApplicationDraftUncheckedCreateNestedManyWithoutJobPostingInput
+  reviewAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutPublicJobPostingInput
+  applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
+  scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
+  rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
+  analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
+  analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
+}
+
+export type JobPostingCreateOrConnectWithoutRecruitmentThreadsInput = {
+  where: Prisma.JobPostingWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobPostingCreateWithoutRecruitmentThreadsInput, Prisma.JobPostingUncheckedCreateWithoutRecruitmentThreadsInput>
+}
+
+export type JobPostingUpsertWithoutRecruitmentThreadsInput = {
+  update: Prisma.XOR<Prisma.JobPostingUpdateWithoutRecruitmentThreadsInput, Prisma.JobPostingUncheckedUpdateWithoutRecruitmentThreadsInput>
+  create: Prisma.XOR<Prisma.JobPostingCreateWithoutRecruitmentThreadsInput, Prisma.JobPostingUncheckedCreateWithoutRecruitmentThreadsInput>
+  where?: Prisma.JobPostingWhereInput
+}
+
+export type JobPostingUpdateToOneWithWhereWithoutRecruitmentThreadsInput = {
+  where?: Prisma.JobPostingWhereInput
+  data: Prisma.XOR<Prisma.JobPostingUpdateWithoutRecruitmentThreadsInput, Prisma.JobPostingUncheckedUpdateWithoutRecruitmentThreadsInput>
+}
+
+export type JobPostingUpdateWithoutRecruitmentThreadsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  summary?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
+  requirements?: Prisma.StringFieldUpdateOperationsInput | string
+  benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  experienceLevel?: Prisma.EnumExperienceLevelFieldUpdateOperationsInput | $Enums.ExperienceLevel
+  workArrangement?: Prisma.EnumWorkArrangementFieldUpdateOperationsInput | $Enums.WorkArrangement
+  salaryMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  salaryMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  salaryCurrency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  salaryPeriod?: Prisma.NullableEnumSalaryPeriodFieldUpdateOperationsInput | $Enums.SalaryPeriod | null
+  searchDocumentNormalized?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumJobPostingStatusFieldUpdateOperationsInput | $Enums.JobPostingStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  company?: Prisma.CompanyUpdateOneRequiredWithoutJobPostingsNestedInput
+  skills?: Prisma.JobPostingSkillUpdateManyWithoutJobPostingNestedInput
+  questions?: Prisma.ApplicationQuestionUpdateManyWithoutJobPostingNestedInput
+  savedBy?: Prisma.SavedJobUpdateManyWithoutJobPostingNestedInput
+  reports?: Prisma.JobReportUpdateManyWithoutJobPostingNestedInput
+  applications?: Prisma.JobApplicationUpdateManyWithoutJobPostingNestedInput
+  candidateApplicationDrafts?: Prisma.CandidateApplicationDraftUpdateManyWithoutJobPostingNestedInput
+  reviewAggregate?: Prisma.JobPostReviewAggregateUpdateOneWithoutPublicJobPostingNestedInput
+  applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
+  scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
+  rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
+  analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
+  analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
+}
+
+export type JobPostingUncheckedUpdateWithoutRecruitmentThreadsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  summary?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
+  requirements?: Prisma.StringFieldUpdateOperationsInput | string
+  benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  experienceLevel?: Prisma.EnumExperienceLevelFieldUpdateOperationsInput | $Enums.ExperienceLevel
+  workArrangement?: Prisma.EnumWorkArrangementFieldUpdateOperationsInput | $Enums.WorkArrangement
+  salaryMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  salaryMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  salaryCurrency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  salaryPeriod?: Prisma.NullableEnumSalaryPeriodFieldUpdateOperationsInput | $Enums.SalaryPeriod | null
+  searchDocumentNormalized?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumJobPostingStatusFieldUpdateOperationsInput | $Enums.JobPostingStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  applicationDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  skills?: Prisma.JobPostingSkillUncheckedUpdateManyWithoutJobPostingNestedInput
+  questions?: Prisma.ApplicationQuestionUncheckedUpdateManyWithoutJobPostingNestedInput
+  savedBy?: Prisma.SavedJobUncheckedUpdateManyWithoutJobPostingNestedInput
+  reports?: Prisma.JobReportUncheckedUpdateManyWithoutJobPostingNestedInput
+  applications?: Prisma.JobApplicationUncheckedUpdateManyWithoutJobPostingNestedInput
+  candidateApplicationDrafts?: Prisma.CandidateApplicationDraftUncheckedUpdateManyWithoutJobPostingNestedInput
+  reviewAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutPublicJobPostingNestedInput
+  applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
@@ -3160,6 +3423,7 @@ export type JobPostingCreateWithoutScoringOperationsInput = {
   reviewAggregate?: Prisma.JobPostReviewAggregateCreateNestedOneWithoutPublicJobPostingInput
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
@@ -3207,6 +3471,7 @@ export type JobPostingUncheckedCreateWithoutScoringOperationsInput = {
   reviewAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutPublicJobPostingInput
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
@@ -3270,6 +3535,7 @@ export type JobPostingUpdateWithoutScoringOperationsInput = {
   reviewAggregate?: Prisma.JobPostReviewAggregateUpdateOneWithoutPublicJobPostingNestedInput
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
@@ -3317,6 +3583,7 @@ export type JobPostingUncheckedUpdateWithoutScoringOperationsInput = {
   reviewAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutPublicJobPostingNestedInput
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUncheckedUpdateManyWithoutJobPostingNestedInput
@@ -3364,6 +3631,7 @@ export type JobPostingCreateWithoutRankingSnapshotsInput = {
   reviewAggregate?: Prisma.JobPostReviewAggregateCreateNestedOneWithoutPublicJobPostingInput
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
@@ -3411,6 +3679,7 @@ export type JobPostingUncheckedCreateWithoutRankingSnapshotsInput = {
   reviewAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutPublicJobPostingInput
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
@@ -3474,6 +3743,7 @@ export type JobPostingUpdateWithoutRankingSnapshotsInput = {
   reviewAggregate?: Prisma.JobPostReviewAggregateUpdateOneWithoutPublicJobPostingNestedInput
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
@@ -3521,6 +3791,7 @@ export type JobPostingUncheckedUpdateWithoutRankingSnapshotsInput = {
   reviewAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutPublicJobPostingNestedInput
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUncheckedUpdateManyWithoutJobPostingNestedInput
@@ -3569,6 +3840,7 @@ export type JobPostingCreateWithoutAnalyticsViewFactsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
 }
@@ -3616,6 +3888,7 @@ export type JobPostingUncheckedCreateWithoutAnalyticsViewFactsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
 }
@@ -3679,6 +3952,7 @@ export type JobPostingUpdateWithoutAnalyticsViewFactsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
 }
@@ -3726,6 +4000,7 @@ export type JobPostingUncheckedUpdateWithoutAnalyticsViewFactsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUncheckedUpdateManyWithoutJobPostingNestedInput
 }
@@ -3773,6 +4048,7 @@ export type JobPostingCreateWithoutAnalyticsLifecycleFactsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestCreateNestedManyWithoutJobPostingInput
 }
@@ -3820,6 +4096,7 @@ export type JobPostingUncheckedCreateWithoutAnalyticsLifecycleFactsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsExports?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutJobPostingInput
 }
@@ -3883,6 +4160,7 @@ export type JobPostingUpdateWithoutAnalyticsLifecycleFactsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
 }
@@ -3930,6 +4208,7 @@ export type JobPostingUncheckedUpdateWithoutAnalyticsLifecycleFactsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUncheckedUpdateManyWithoutJobPostingNestedInput
 }
@@ -3977,6 +4256,7 @@ export type JobPostingCreateWithoutAnalyticsExportsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutJobPostingInput
 }
@@ -4024,6 +4304,7 @@ export type JobPostingUncheckedCreateWithoutAnalyticsExportsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutJobPostingInput
   scoringOperations?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutJobPostingInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedCreateNestedManyWithoutJobPostingInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutJobPostingInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutJobPostingInput
 }
@@ -4087,6 +4368,7 @@ export type JobPostingUpdateWithoutAnalyticsExportsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
 }
@@ -4134,6 +4416,7 @@ export type JobPostingUncheckedUpdateWithoutAnalyticsExportsInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutJobPostingNestedInput
 }
@@ -4214,6 +4497,7 @@ export type JobPostingUpdateWithoutCompanyInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUpdateManyWithoutJobPostingNestedInput
@@ -4261,6 +4545,7 @@ export type JobPostingUncheckedUpdateWithoutCompanyInput = {
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutJobPostingNestedInput
   scoringOperations?: Prisma.ScoringOperationUncheckedUpdateManyWithoutJobPostingNestedInput
   rankingSnapshots?: Prisma.RankingSnapshotUncheckedUpdateManyWithoutJobPostingNestedInput
+  recruitmentThreads?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsLifecycleFacts?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutJobPostingNestedInput
   analyticsExports?: Prisma.ExportRequestUncheckedUpdateManyWithoutJobPostingNestedInput
@@ -4315,6 +4600,7 @@ export type JobPostingCountOutputType = {
   applicationArtifactPromotions: number
   scoringOperations: number
   rankingSnapshots: number
+  recruitmentThreads: number
   analyticsViewFacts: number
   analyticsLifecycleFacts: number
   analyticsExports: number
@@ -4330,6 +4616,7 @@ export type JobPostingCountOutputTypeSelect<ExtArgs extends runtime.Types.Extens
   applicationArtifactPromotions?: boolean | JobPostingCountOutputTypeCountApplicationArtifactPromotionsArgs
   scoringOperations?: boolean | JobPostingCountOutputTypeCountScoringOperationsArgs
   rankingSnapshots?: boolean | JobPostingCountOutputTypeCountRankingSnapshotsArgs
+  recruitmentThreads?: boolean | JobPostingCountOutputTypeCountRecruitmentThreadsArgs
   analyticsViewFacts?: boolean | JobPostingCountOutputTypeCountAnalyticsViewFactsArgs
   analyticsLifecycleFacts?: boolean | JobPostingCountOutputTypeCountAnalyticsLifecycleFactsArgs
   analyticsExports?: boolean | JobPostingCountOutputTypeCountAnalyticsExportsArgs
@@ -4411,6 +4698,13 @@ export type JobPostingCountOutputTypeCountRankingSnapshotsArgs<ExtArgs extends r
 /**
  * JobPostingCountOutputType without action
  */
+export type JobPostingCountOutputTypeCountRecruitmentThreadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RecruitmentThreadWhereInput
+}
+
+/**
+ * JobPostingCountOutputType without action
+ */
 export type JobPostingCountOutputTypeCountAnalyticsViewFactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.JobPostingViewFactWhereInput
 }
@@ -4474,6 +4768,7 @@ export type JobPostingSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   applicationArtifactPromotions?: boolean | Prisma.JobPosting$applicationArtifactPromotionsArgs<ExtArgs>
   scoringOperations?: boolean | Prisma.JobPosting$scoringOperationsArgs<ExtArgs>
   rankingSnapshots?: boolean | Prisma.JobPosting$rankingSnapshotsArgs<ExtArgs>
+  recruitmentThreads?: boolean | Prisma.JobPosting$recruitmentThreadsArgs<ExtArgs>
   analyticsViewFacts?: boolean | Prisma.JobPosting$analyticsViewFactsArgs<ExtArgs>
   analyticsLifecycleFacts?: boolean | Prisma.JobPosting$analyticsLifecycleFactsArgs<ExtArgs>
   analyticsExports?: boolean | Prisma.JobPosting$analyticsExportsArgs<ExtArgs>
@@ -4600,6 +4895,7 @@ export type JobPostingInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   applicationArtifactPromotions?: boolean | Prisma.JobPosting$applicationArtifactPromotionsArgs<ExtArgs>
   scoringOperations?: boolean | Prisma.JobPosting$scoringOperationsArgs<ExtArgs>
   rankingSnapshots?: boolean | Prisma.JobPosting$rankingSnapshotsArgs<ExtArgs>
+  recruitmentThreads?: boolean | Prisma.JobPosting$recruitmentThreadsArgs<ExtArgs>
   analyticsViewFacts?: boolean | Prisma.JobPosting$analyticsViewFactsArgs<ExtArgs>
   analyticsLifecycleFacts?: boolean | Prisma.JobPosting$analyticsLifecycleFactsArgs<ExtArgs>
   analyticsExports?: boolean | Prisma.JobPosting$analyticsExportsArgs<ExtArgs>
@@ -4626,6 +4922,7 @@ export type $JobPostingPayload<ExtArgs extends runtime.Types.Extensions.Internal
     applicationArtifactPromotions: Prisma.$ApplicationArtifactPromotionPayload<ExtArgs>[]
     scoringOperations: Prisma.$ScoringOperationPayload<ExtArgs>[]
     rankingSnapshots: Prisma.$RankingSnapshotPayload<ExtArgs>[]
+    recruitmentThreads: Prisma.$RecruitmentThreadPayload<ExtArgs>[]
     analyticsViewFacts: Prisma.$JobPostingViewFactPayload<ExtArgs>[]
     analyticsLifecycleFacts: Prisma.$JobPostingLifecycleFactPayload<ExtArgs>[]
     analyticsExports: Prisma.$ExportRequestPayload<ExtArgs>[]
@@ -5068,6 +5365,7 @@ export interface Prisma__JobPostingClient<T, Null = never, ExtArgs extends runti
   applicationArtifactPromotions<T extends Prisma.JobPosting$applicationArtifactPromotionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPosting$applicationArtifactPromotionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationArtifactPromotionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   scoringOperations<T extends Prisma.JobPosting$scoringOperationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPosting$scoringOperationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScoringOperationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   rankingSnapshots<T extends Prisma.JobPosting$rankingSnapshotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPosting$rankingSnapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RankingSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  recruitmentThreads<T extends Prisma.JobPosting$recruitmentThreadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPosting$recruitmentThreadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecruitmentThreadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   analyticsViewFacts<T extends Prisma.JobPosting$analyticsViewFactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPosting$analyticsViewFactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostingViewFactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   analyticsLifecycleFacts<T extends Prisma.JobPosting$analyticsLifecycleFactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPosting$analyticsLifecycleFactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostingLifecycleFactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   analyticsExports<T extends Prisma.JobPosting$analyticsExportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPosting$analyticsExportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExportRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5765,6 +6063,30 @@ export type JobPosting$rankingSnapshotsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.RankingSnapshotScalarFieldEnum | Prisma.RankingSnapshotScalarFieldEnum[]
+}
+
+/**
+ * JobPosting.recruitmentThreads
+ */
+export type JobPosting$recruitmentThreadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RecruitmentThread
+   */
+  select?: Prisma.RecruitmentThreadSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RecruitmentThread
+   */
+  omit?: Prisma.RecruitmentThreadOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecruitmentThreadInclude<ExtArgs> | null
+  where?: Prisma.RecruitmentThreadWhereInput
+  orderBy?: Prisma.RecruitmentThreadOrderByWithRelationInput | Prisma.RecruitmentThreadOrderByWithRelationInput[]
+  cursor?: Prisma.RecruitmentThreadWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RecruitmentThreadScalarFieldEnum | Prisma.RecruitmentThreadScalarFieldEnum[]
 }
 
 /**

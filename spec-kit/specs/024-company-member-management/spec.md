@@ -1,5 +1,7 @@
 # Feature Specification: Company Member Management
 
+> Active HR Managers and Recruiters may be selected as recruitment-thread assignees only within their own company. Owners retain company-scoped read-only oversight and are never a recruitment-thread participant.
+
 **Feature Branch**: `024-company-member-management`  
 **Created**: 2026-08-19  
 **Status**: Ready for planning

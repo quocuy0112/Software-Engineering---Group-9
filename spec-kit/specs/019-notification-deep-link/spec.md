@@ -1,5 +1,7 @@
 # Feature Specification: Notification Deep-Link
 
+> A future recruitment-message notification must resolve server-side to `/jobs/applied/{applicationId}/messages` for Candidates or `/recruiter/messages?thread={threadId}` for assigned staff; it must never use a static or cross-company href.
+
 **Feature Branch**: `016-inapp-email-notification`  
 **Created**: 2026-08-16  
 **Status**: In progress
