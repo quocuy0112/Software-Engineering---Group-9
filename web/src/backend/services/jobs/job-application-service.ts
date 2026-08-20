@@ -70,6 +70,10 @@ function applicationFailureMessage(code: string) {
       return "Shorten the application text before applying.";
     case "APPLICATION_COVER_LETTER_INELIGIBLE":
       return "Use a supported cover letter format before applying.";
+    case "APPLICATION_DRAFT_CONFLICT":
+      return "This application draft changed. Refresh it and try again.";
+    case "APPLICATION_CONFIRMATION_REQUIRED":
+      return "Confirm the application details before submitting.";
     default:
       return "Complete the required profile, CV, answers, and consent before applying.";
   }
@@ -142,10 +146,13 @@ export class JobApplicationService {
     now = new Date(),
     directCvSource?: DirectApplicationCvSource,
     directCoverLetterSource?: DirectApplicationCvSource,
+    draftBinding?: { draftId: string; expectedRevision: number },
+    preparedDirectCoverLetter?: PreparedDirectApplicationCv,
   ) {
     const correlationId = randomUUID();
     let directCv: PreparedDirectApplicationCv | undefined;
-    let directCoverLetter: PreparedDirectApplicationCv | undefined;
+    let directCoverLetter: PreparedDirectApplicationCv | undefined =
+      preparedDirectCoverLetter;
     try {
       const command = applicationSubmissionSchema.parse(raw);
       const key = idempotencyKeySchema.parse(idempotencyKey);
@@ -185,7 +192,7 @@ export class JobApplicationService {
         typeof command.coverLetter !== "string" &&
         command.coverLetter.kind === "FILE"
       ) {
-        if (!directCoverLetterSource) {
+        if (!directCoverLetterSource && !directCoverLetter) {
           throw new JobServiceError(400, {
             code: "APPLICATION_COVER_LETTER_INELIGIBLE",
             message: applicationFailureMessage(
@@ -193,17 +200,19 @@ export class JobApplicationService {
             ),
           });
         }
-        try {
-          directCoverLetter = await (
-            await import("./prepare-direct-application-cv")
-          ).prepareDirectApplicationCv(directCoverLetterSource);
-        } catch {
-          throw new JobServiceError(400, {
-            code: "APPLICATION_COVER_LETTER_INELIGIBLE",
-            message: applicationFailureMessage(
-              "APPLICATION_COVER_LETTER_INELIGIBLE",
-            ),
-          });
+        if (directCoverLetterSource) {
+          try {
+            directCoverLetter = await (
+              await import("./prepare-direct-application-cv")
+            ).prepareDirectApplicationCv(directCoverLetterSource);
+          } catch {
+            throw new JobServiceError(400, {
+              code: "APPLICATION_COVER_LETTER_INELIGIBLE",
+              message: applicationFailureMessage(
+                "APPLICATION_COVER_LETTER_INELIGIBLE",
+              ),
+            });
+          }
         }
       }
       const result = await (
@@ -220,6 +229,8 @@ export class JobApplicationService {
         activeConsentVersion: ACTIVE_APPLICATION_CONSENT_VERSION,
         occurredAt: now,
         correlationId,
+        draftId: draftBinding?.draftId,
+        expectedDraftRevision: draftBinding?.expectedRevision,
       });
       if (!result.created) await directCv?.cleanup();
       if (!result.created) await directCoverLetter?.cleanup();
@@ -256,6 +267,7 @@ export class JobApplicationService {
         const conflict = [
           "IDEMPOTENCY_KEY_REUSED",
           "JOB_NO_LONGER_ACCEPTING_APPLICATIONS",
+          "APPLICATION_DRAFT_CONFLICT",
         ].includes(error.code);
         const invalidApplication = [
           "APPLICATION_PROFILE_INCOMPLETE",
@@ -267,6 +279,7 @@ export class JobApplicationService {
           "APPLICATION_CONSENT_STALE",
           "APPLICATION_TEXT_TOO_LONG",
           "APPLICATION_COVER_LETTER_INELIGIBLE",
+          "APPLICATION_CONFIRMATION_REQUIRED",
         ].includes(error.code);
         throw new JobServiceError(
           conflict ? 409 : invalidApplication ? 400 : 403,

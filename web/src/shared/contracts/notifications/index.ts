@@ -12,6 +12,9 @@ export const notificationKinds = [
   "MEMBERSHIP_SUSPENDED",
   "MEMBERSHIP_RESTORED",
   "MEMBERSHIP_REMOVED",
+  "COMPANY_INVITATION_RECEIVED",
+  "COMPANY_INVITATION_ACCEPTED",
+  "COMPANY_INVITATION_DECLINED",
   "APPLICATION_SUBMITTED",
   "APPLICATION_RECEIVED",
   "APPLICATION_STAGE_CHANGED",
@@ -97,6 +100,7 @@ export const notificationContextTypes = [
   "MESSAGING_REPORT",
   "MODERATION_REPORT",
   "JOB_POST_REVIEW",
+  "COMPANY_INVITATION",
 ] as const;
 export const notificationContextTypeSchema = z.enum(notificationContextTypes);
 export type NotificationContextType = z.infer<

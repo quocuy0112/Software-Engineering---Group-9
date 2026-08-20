@@ -10,6 +10,7 @@ import {
 } from "@/backend/applications/services/open-application-document";
 import {
   buildStructuredDocumentContent,
+  DOCUMENT_PDF_PREVIEW_VERSION,
   DOCUMENT_PREVIEW_PARSER_VERSION,
 } from "@/backend/applications/services/document-preview-parser";
 import {
@@ -60,13 +61,14 @@ function cacheKey(input: {
   kind: DocumentKind;
   contentVersion: string | null | undefined;
   scoringVersion: string;
+  previewVersion: string;
 }) {
   return [
     input.applicationId,
     input.kind,
     input.contentVersion ?? "unknown-content",
     input.scoringVersion,
-    DOCUMENT_PREVIEW_PARSER_VERSION,
+    input.previewVersion,
   ].join(":");
 }
 
@@ -97,6 +99,7 @@ function profileFallbackPreview(input: {
   }
   return structuredDocumentPreviewSchema.parse({
     kind: "cv",
+    previewStatus: "LIMITED",
     fileName: input.fileName,
     mediaType: input.mediaType,
     pageCount: null,
@@ -104,6 +107,33 @@ function profileFallbackPreview(input: {
     processingMilliseconds: Math.max(0, Date.now() - input.startedAt),
     cacheHit: false,
     content,
+  });
+}
+
+/**
+ * Parsing is an enhancement, not a prerequisite for opening an application
+ * document. Keep the document usable and direct the recruiter to its original
+ * file when a PDF/DOCX extractor cannot produce readable text.
+ */
+function limitedPreview(input: {
+  kind: DocumentKind;
+  fileName: string | null;
+  mediaType: string | null;
+  applicationProfileSnapshot?: unknown;
+  startedAt: number;
+}) {
+  const profileFallback = profileFallbackPreview(input);
+  if (profileFallback) return profileFallback;
+  return structuredDocumentPreviewSchema.parse({
+    kind: input.kind,
+    previewStatus: "LIMITED",
+    fileName: input.fileName,
+    mediaType: input.mediaType,
+    pageCount: null,
+    parserVersion: DOCUMENT_PREVIEW_PARSER_VERSION,
+    processingMilliseconds: Math.max(0, Date.now() - input.startedAt),
+    cacheHit: false,
+    content: buildStructuredDocumentContent({ kind: input.kind, segments: [] }),
   });
 }
 
@@ -139,16 +169,22 @@ export async function GET(
   try {
     const result = await new OpenApplicationDocumentService().execute({
       userId: current.userId,
+      sessionId: current.sessionId,
       jobId,
       applicationId,
       kind,
       preview: false,
     });
+    const previewVersion =
+      result.document.mediaType === "application/pdf"
+        ? DOCUMENT_PDF_PREVIEW_VERSION
+        : DOCUMENT_PREVIEW_PARSER_VERSION;
     const key = cacheKey({
       applicationId,
       kind,
       contentVersion: result.document.contentVersion,
       scoringVersion: cacheVersion(request),
+      previewVersion,
     });
     const cached = getCachedDocumentPreview(key);
     if (cached) {
@@ -161,6 +197,22 @@ export async function GET(
       );
     }
 
+    if (result.document.mediaType === "application/pdf") {
+      const preview = structuredDocumentPreviewSchema.parse({
+        kind,
+        previewStatus: "ORIGINAL",
+        fileName: result.document.fileName,
+        mediaType: result.document.mediaType,
+        pageCount: null,
+        parserVersion: DOCUMENT_PDF_PREVIEW_VERSION,
+        processingMilliseconds: Math.max(0, Date.now() - startedAt),
+        cacheHit: false,
+        content: buildStructuredDocumentContent({ kind, segments: [] }),
+      });
+      setCachedDocumentPreview(key, preview);
+      return NextResponse.json(preview, { headers: noStore });
+    }
+
     let segments;
     let pageCount: number | null = null;
     try {
@@ -170,13 +222,15 @@ export async function GET(
       } else {
         const parserKind = extractionKind(result.document.mediaType);
         if (!parserKind || !result.stream) {
-          return NextResponse.json(
-            {
-              code: "PREVIEW_UNAVAILABLE",
-              message: "Parsed preview is unavailable for this document.",
-            },
-            { status: 409, headers: noStore },
-          );
+          const preview = limitedPreview({
+            kind,
+            fileName: result.document.fileName,
+            mediaType: result.document.mediaType,
+            applicationProfileSnapshot: result.document.applicationProfileSnapshot,
+            startedAt,
+          });
+          setCachedDocumentPreview(key, preview);
+          return NextResponse.json(preview, { headers: noStore });
         }
         const extracted = await new IsolatedDocumentExtractor().extract({
           kind: parserKind,
@@ -186,39 +240,28 @@ export async function GET(
         segments = extracted.segments;
         pageCount = extracted.pageCount;
       }
-    } catch (error) {
-      const fallback = profileFallbackPreview({
+    } catch {
+      const preview = limitedPreview({
         kind,
         fileName: result.document.fileName,
         mediaType: result.document.mediaType,
         applicationProfileSnapshot: result.document.applicationProfileSnapshot,
         startedAt,
       });
-      if (fallback) {
-        return NextResponse.json(fallback, { headers: noStore });
-      }
-      throw error;
+      setCachedDocumentPreview(key, preview);
+      return NextResponse.json(preview, { headers: noStore });
     }
 
     if (!segments.length) {
-      const fallback = profileFallbackPreview({
+      const preview = limitedPreview({
         kind,
         fileName: result.document.fileName,
         mediaType: result.document.mediaType,
         applicationProfileSnapshot: result.document.applicationProfileSnapshot,
         startedAt,
       });
-      if (fallback) {
-        return NextResponse.json(fallback, { headers: noStore });
-      }
-      return NextResponse.json(
-        {
-          code: "DOCUMENT_PARSE_FAILED",
-          message:
-            "The document was found, but no readable text was extracted.",
-        },
-        { status: 422, headers: noStore },
-      );
+      setCachedDocumentPreview(key, preview);
+      return NextResponse.json(preview, { headers: noStore });
     }
 
     const content = buildStructuredDocumentContent({
@@ -232,6 +275,7 @@ export async function GET(
     });
     const preview = structuredDocumentPreviewSchema.parse({
       kind,
+      previewStatus: "PARSED",
       fileName: result.document.fileName,
       mediaType: result.document.mediaType,
       pageCount,

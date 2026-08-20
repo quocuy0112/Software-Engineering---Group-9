@@ -4,6 +4,8 @@ import {
   createRecruiterJob,
   readRecruiterCompanySettings,
   readRecruiterJobManagementData,
+  resolveRecruiterJobIdForNavigation,
+  updateRecruiterJob,
   updateRecruiterCompanySettings,
 } from "@/backend/services/jobs/recruiter-job-posting-data";
 import { createEmptyJobPosting } from "@/shared/contracts/recruiter-job-posting";
@@ -21,6 +23,9 @@ const prismaMocks = vi.hoisted(() => ({
   },
   jobPostReviewAggregate: {
     findMany: vi.fn(),
+    findUnique: vi.fn(),
+  },
+  jobPosting: {
     findUnique: vi.fn(),
   },
 }));
@@ -108,6 +113,36 @@ describe("recruiter JSON job persistence", () => {
     prismaMocks.jobPostReviewAggregate.findMany.mockResolvedValue([]);
     prismaMocks.jobPostReviewAggregate.findUnique.mockReset();
     prismaMocks.jobPostReviewAggregate.findUnique.mockResolvedValue(null);
+    prismaMocks.jobPosting.findUnique.mockReset();
+    prismaMocks.jobPosting.findUnique.mockResolvedValue(null);
+  });
+
+  it("maps an old public posting notification to an authorized catalogue job", async () => {
+    prismaMocks.jobPosting.findUnique.mockResolvedValue({
+      reviewAggregate: { jobId: "catalog-job-1" },
+    });
+
+    await expect(
+      resolveRecruiterJobIdForNavigation("public-job-1", [
+        { id: "catalog-job-1" },
+      ]),
+    ).resolves.toBe("catalog-job-1");
+    expect(prismaMocks.jobPosting.findUnique).toHaveBeenCalledWith({
+      where: { id: "public-job-1" },
+      select: { reviewAggregate: { select: { jobId: true } } },
+    });
+  });
+
+  it("does not resolve a public posting outside the authorized job projection", async () => {
+    prismaMocks.jobPosting.findUnique.mockResolvedValue({
+      reviewAggregate: { jobId: "other-company-job" },
+    });
+
+    await expect(
+      resolveRecruiterJobIdForNavigation("public-job-1", [
+        { id: "catalog-job-1" },
+      ]),
+    ).resolves.toBeNull();
   });
 
   it("exposes an admin-approved database company to recruiter settings", async () => {
@@ -482,5 +517,54 @@ describe("recruiter JSON job persistence", () => {
       status: "open",
     });
     expect(persisted.at(-1)?.status).toBe("draft");
+  });
+
+  it("updates an approved recruiter projection without persisting review metadata", async () => {
+    const existing = {
+      ...completeJob("approved-job"),
+      status: "active" as const,
+      applyDeadline: "2099-12-31T23:59:59.000Z",
+    };
+    const recruiterProjection = {
+      ...existing,
+      company,
+      review: {
+        reviewId: "review-1",
+        jobId: existing.id,
+        sequence: 1,
+        state: "APPROVED" as const,
+        readOnly: false,
+        reasonCode: null,
+        publicExplanation: null,
+        submittedAt: "2026-08-18T00:00:00.000Z",
+        decidedAt: "2026-08-18T01:00:00.000Z",
+        version: 1,
+      },
+      correctionRequest: {
+        id: "correction-1",
+        publicExplanation: "Keep the approved version live.",
+        hideImmediately: false,
+        createdAt: "2026-08-18T02:00:00.000Z",
+      },
+      title: "Updated Product Designer",
+    };
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return JSON.stringify([existing]);
+      if (path.endsWith("companies.json")) return JSON.stringify([company]);
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const saved = await updateRecruiterJob("recruiter-1", recruiterProjection);
+
+    expect(saved.title).toBe("Updated Product Designer");
+    const jobWrite = fsMocks.writeFile.mock.calls.find(([path]) =>
+      String(path).endsWith("jobs.json"),
+    );
+    const persisted = JSON.parse(String(jobWrite?.[1])) as Array<
+      Record<string, unknown>
+    >;
+    expect(persisted[0]).not.toHaveProperty("review");
+    expect(persisted[0]).not.toHaveProperty("correctionRequest");
+    expect(persisted[0]).not.toHaveProperty("company");
   });
 });

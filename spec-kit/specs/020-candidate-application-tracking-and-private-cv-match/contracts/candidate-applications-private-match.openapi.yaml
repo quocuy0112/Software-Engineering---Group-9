@@ -1,0 +1,763 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Candidate Applications and Private CV Match API
+  version: 1.0.0
+  description: Candidate-owned contracts for Feature 018. Private-match schemas are never employer-facing.
+servers:
+  - url: /
+paths:
+  /api/candidate/application-drafts:
+    get:
+      operationId: getApplicationDraft
+      parameters:
+        - $ref: '#/components/parameters/JobIdQuery'
+      responses:
+        '200':
+          description: Owned active draft or null
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [draft]
+                properties:
+                  draft:
+                    oneOf:
+                      - $ref: '#/components/schemas/ApplicationDraft'
+                      - type: 'null'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    put:
+      operationId: saveApplicationDraft
+      parameters:
+        - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveDraftCommand' }
+      responses:
+        '200':
+          description: Created or updated single candidate-job draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApplicationDraft' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/candidate/applications:
+    get:
+      operationId: listCandidateApplications
+      parameters:
+        - name: cursor
+          in: query
+          required: false
+          schema: { type: string, minLength: 1, maxLength: 128 }
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100, default: 24 }
+      responses:
+        '200':
+          description: Candidate-safe application summaries
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CandidateApplicationListResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: submitApplication
+      parameters:
+        - $ref: '#/components/parameters/CsrfToken'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [draftId, expectedRevision, informationConfirmed]
+              properties:
+                draftId: { type: string, minLength: 1, maxLength: 128 }
+                expectedRevision: { type: integer, minimum: 1 }
+                informationConfirmed: { const: true }
+      responses:
+        '201':
+          description: Newly accepted immutable Application
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApplicationReceipt' }
+        '200':
+          description: Idempotent replay returns the existing Application receipt
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApplicationReceipt' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/candidate/applications/{applicationId}:
+    get:
+      operationId: getCandidateApplicationTracker
+      parameters:
+        - $ref: '#/components/parameters/ApplicationId'
+      responses:
+        '200':
+          description: Candidate-safe owned Application projection
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApplicationTracker' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+  /api/candidate/applications/{applicationId}/withdraw:
+    post:
+      operationId: withdrawCandidateApplication
+      parameters:
+        - $ref: '#/components/parameters/ApplicationId'
+        - $ref: '#/components/parameters/CsrfToken'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [expectedVersion, confirmed]
+              properties:
+                expectedVersion: { type: integer, minimum: 1 }
+                confirmed: { const: true }
+      responses:
+        '200':
+          description: Idempotent withdrawal outcome
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WithdrawalOutcome' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/candidate/applications/{applicationId}/notification-preferences:
+    patch:
+      operationId: updateApplicationNotificationPreferences
+      parameters:
+        - $ref: '#/components/parameters/ApplicationId'
+        - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [emailEnabled, inAppEnabled, expectedVersion]
+              properties:
+                emailEnabled: { type: boolean }
+                inAppEnabled: { type: boolean }
+                expectedVersion: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: Application-local settings
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NotificationPreference' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/candidate/applications/{applicationId}/processing/retry:
+    post:
+      operationId: retryApplicationIntake
+      parameters:
+        - $ref: '#/components/parameters/ApplicationId'
+        - $ref: '#/components/parameters/CsrfToken'
+      responses:
+        '200':
+          description: Persisted candidate-safe intake projection after retry
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApplicationTracker' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/candidate/application-drafts/cover-letter:
+    post:
+      operationId: uploadApplicationDraftCoverLetter
+      parameters:
+        - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [draftId, expectedRevision, file]
+              properties:
+                draftId: { type: string, minLength: 1, maxLength: 128 }
+                expectedRevision: { type: integer, minimum: 1 }
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Draft with the validated cover-letter file variant
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApplicationDraft' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/candidate/private-cv-matches:
+    get:
+      operationId: listPrivateCvMatches
+      responses:
+        '200':
+          description: Owner-only list of retained private checks
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PrivateMatchListResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      operationId: createPrivateCvMatch
+      parameters:
+        - $ref: '#/components/parameters/CsrfToken'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [jobId, cvVersionId]
+              properties:
+                jobId: { type: string, minLength: 1, maxLength: 128 }
+                cvVersionId: { type: string, minLength: 1, maxLength: 128 }
+      responses:
+        '202':
+          description: Private asynchronous check accepted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PrivateMatchStatus' }
+        '200':
+          description: Idempotent replay
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PrivateMatchStatus' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/candidate/private-cv-matches/{checkId}:
+    get:
+      operationId: getPrivateCvMatch
+      parameters:
+        - $ref: '#/components/parameters/CheckId'
+      responses:
+        '200':
+          description: Owner-only private status, limited report, or full report
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PrivateMatchStatus'
+                  - $ref: '#/components/schemas/LimitedPrivateReport'
+                  - $ref: '#/components/schemas/FullPrivateReport'
+                discriminator:
+                  propertyName: view
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+    delete:
+      operationId: deletePrivateCvMatch
+      parameters:
+        - $ref: '#/components/parameters/CheckId'
+        - $ref: '#/components/parameters/CsrfToken'
+      responses:
+        '204': { description: Access revoked immediately; cleanup scheduled }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+  /api/candidate/private-cv-matches/{checkId}/retry-ai:
+    post:
+      operationId: retryPrivateCvMatchAi
+      parameters:
+        - $ref: '#/components/parameters/CheckId'
+        - $ref: '#/components/parameters/CsrfToken'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          description: AI-only retry accepted against fixed inputs
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PrivateMatchStatus' }
+        '200':
+          description: Idempotent replay
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PrivateMatchStatus' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+components:
+  parameters:
+    ApplicationId:
+      name: applicationId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    CheckId:
+      name: checkId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    JobIdQuery:
+      name: jobId
+      in: query
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    CsrfToken:
+      name: x-csrf-token
+      in: header
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 2048 }
+    IdempotencyKey:
+      name: idempotency-key
+      in: header
+      required: true
+      schema: { type: string, minLength: 16, maxLength: 128 }
+  schemas:
+    FileDescriptor:
+      type: object
+      additionalProperties: false
+      required: [versionId, displayName, mimeType, byteSize, parseStatus]
+      properties:
+        versionId: { type: string, minLength: 1, maxLength: 128 }
+        displayName: { type: string, minLength: 1, maxLength: 200 }
+        fileName: { type: string, minLength: 1, maxLength: 255 }
+        mimeType: { type: string, enum: [application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document] }
+        byteSize: { type: integer, minimum: 1, maximum: 5000000 }
+        version: { type: integer, minimum: 1 }
+        parseStatus: { type: string, enum: [READY, PARTIAL, FAILED, NOT_APPLICABLE] }
+        confirmedAt: { type: string, format: date-time }
+    CandidatePersonalInfo:
+      type: object
+      additionalProperties: false
+      required: [fullName, email, phone]
+      properties:
+        fullName: { type: string, minLength: 1, maxLength: 150 }
+        email: { type: string, format: email, maxLength: 254 }
+        phone: { type: string, maxLength: 20 }
+    CoverLetterTextDraft:
+      type: object
+      additionalProperties: false
+      required: [kind, text]
+      properties:
+        kind: { const: TEXT }
+        text: { type: string, minLength: 1, maxLength: 10000 }
+    CoverLetterFileDraft:
+      type: object
+      additionalProperties: false
+      required: [kind, file]
+      properties:
+        kind: { const: FILE }
+        file: { $ref: '#/components/schemas/FileDescriptor' }
+    CoverLetterDraft:
+      oneOf:
+        - $ref: '#/components/schemas/CoverLetterTextDraft'
+        - $ref: '#/components/schemas/CoverLetterFileDraft'
+      discriminator:
+        propertyName: kind
+    ApplicationDraft:
+      type: object
+      additionalProperties: false
+      required: [draftId, jobId, revision, personalInformation, cv, coverLetter, message, confirmationAccepted, updatedAt, expiresAt]
+      properties:
+        draftId: { type: string, minLength: 1, maxLength: 128 }
+        jobId: { type: string, minLength: 1, maxLength: 128 }
+        revision: { type: integer, minimum: 1 }
+        personalInformation: { $ref: '#/components/schemas/CandidatePersonalInfo' }
+        cv: { oneOf: [{ $ref: '#/components/schemas/FileDescriptor' }, { type: 'null' }] }
+        coverLetter: { oneOf: [{ $ref: '#/components/schemas/CoverLetterDraft' }, { type: 'null' }] }
+        message: { type: [string, 'null'], maxLength: 2000 }
+        confirmationAccepted: { type: boolean }
+        updatedAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+    SaveDraftCommand:
+      type: object
+      additionalProperties: false
+      required: [jobId, expectedRevision, personalInformation, cvVersionId, coverLetter, message, confirmationAccepted]
+      properties:
+        jobId: { type: string, minLength: 1, maxLength: 128 }
+        expectedRevision: { type: [integer, 'null'], minimum: 1 }
+        personalInformation: { $ref: '#/components/schemas/CandidatePersonalInfo' }
+        cvVersionId: { type: [string, 'null'], minLength: 1, maxLength: 128 }
+        coverLetter: { oneOf: [{ $ref: '#/components/schemas/CoverLetterDraft' }, { type: 'null' }] }
+        message: { type: [string, 'null'], maxLength: 2000 }
+        confirmationAccepted: { type: boolean }
+    IntakeStep:
+      type: object
+      additionalProperties: false
+      required: [code, status, timestamp]
+      properties:
+        code: { type: string, enum: [APPLICATION_RECEIVED, CHECKING_FILES, SENT_TO_RECRUITER] }
+        status: { type: string, enum: [PENDING, ACTIVE, COMPLETE, ATTENTION_REQUIRED] }
+        timestamp: { type: [string, 'null'], format: date-time }
+    ApplicationIntake:
+      type: object
+      additionalProperties: false
+      required: [state, progressPercent, steps, failureCode, updatedAt]
+      properties:
+        state: { type: string, enum: [RECEIVED, CHECKING_FILES, SENT_TO_RECRUITER, ATTENTION_REQUIRED] }
+        progressPercent: { type: integer, minimum: 0, maximum: 100 }
+        steps: { type: array, minItems: 3, maxItems: 3, items: { $ref: '#/components/schemas/IntakeStep' } }
+        failureCode: { type: [string, 'null'], minLength: 1, maxLength: 80 }
+        updatedAt: { type: string, format: date-time }
+    ApplicationReceipt:
+      type: object
+      additionalProperties: false
+      required: [applicationId, submittedAt, publicStage, intake, files]
+      properties:
+        applicationId: { type: string }
+        submittedAt: { type: string, format: date-time }
+        publicStage: { const: APPLICATION_SUBMITTED }
+        intake: { $ref: '#/components/schemas/ApplicationIntake' }
+        files: { type: array, minItems: 1, items: { $ref: '#/components/schemas/FileDescriptor' } }
+    PublicUpdate:
+      type: object
+      additionalProperties: false
+      required: [id, kind, title, occurredAt]
+      properties:
+        id: { type: string }
+        kind: { type: string, enum: [SUBMITTED, UNDER_REVIEW, INTERVIEW, OUTCOME, WITHDRAWN, TECHNICAL_UPDATE] }
+        publicStage: { type: [string, 'null'], enum: [APPLICATION_SUBMITTED, UNDER_REVIEW, INTERVIEW, OUTCOME, null] }
+        publicOutcome: { type: [string, 'null'], enum: [OFFERED, HIRED, OFFER_DECLINED, REJECTED, WITHDRAWN, null] }
+        title: { type: string, maxLength: 160 }
+        occurredAt: { type: string, format: date-time }
+    NotificationPreference:
+      type: object
+      additionalProperties: false
+      required: [emailEnabled, inAppEnabled, version, updatedAt]
+      properties:
+        emailEnabled: { type: boolean }
+        inAppEnabled: { type: boolean }
+        version: { type: integer, minimum: 1 }
+        updatedAt: { type: string, format: date-time }
+    ApplicationTracker:
+      type: object
+      additionalProperties: false
+      required: [applicationId, job, publicStage, publicOutcome, canonicalStage, stageVersion, submittedAt, lastUpdatedAt, intake, updates, files, notificationPreference, canWithdraw]
+      properties:
+        applicationId: { type: string, minLength: 1, maxLength: 128 }
+        job:
+          type: object
+          additionalProperties: false
+          required: [jobId, slug, title, companyName, companyLogoUrl, location, jobAvailable]
+          properties:
+            jobId: { type: string, minLength: 1, maxLength: 128 }
+            slug: { type: [string, 'null'], maxLength: 220 }
+            title: { type: string, minLength: 1, maxLength: 200 }
+            companyName: { type: string, minLength: 1, maxLength: 160 }
+            companyLogoUrl: { type: [string, 'null'], format: uri }
+            location: { type: string, minLength: 1, maxLength: 300 }
+            jobAvailable: { type: boolean }
+        publicStage: { type: string, enum: [APPLICATION_SUBMITTED, UNDER_REVIEW, INTERVIEW, OUTCOME] }
+        publicOutcome: { type: [string, 'null'], enum: [OFFERED, HIRED, OFFER_DECLINED, REJECTED, WITHDRAWN, null] }
+        canonicalStage: { type: string, enum: [APPLIED, VIEWED, SHORTLISTED, INTERVIEWING, OFFERED, HIRED, OFFER_DECLINED, REJECTED, WAITLISTED] }
+        submittedAt: { type: string, format: date-time }
+        lastUpdatedAt: { type: string, format: date-time }
+        stageVersion: { type: integer, minimum: 1 }
+        intake: { $ref: '#/components/schemas/ApplicationIntake' }
+        updates: { type: array, items: { $ref: '#/components/schemas/PublicUpdate' } }
+        files: { type: array, minItems: 1, items: { $ref: '#/components/schemas/FileDescriptor' } }
+        notificationPreference: { $ref: '#/components/schemas/NotificationPreference' }
+        canWithdraw: { type: boolean }
+    CandidateApplicationSummary:
+      type: object
+      additionalProperties: false
+      required: [applicationId, jobId, jobSlug, jobTitle, companyName, companyLogoUrl, location, publicStage, publicOutcome, canonicalStage, stageVersion, submittedAt, lastUpdatedAt, jobAvailable]
+      properties:
+        applicationId: { type: string, minLength: 1, maxLength: 128 }
+        jobId: { type: string, minLength: 1, maxLength: 128 }
+        jobSlug: { type: [string, 'null'], maxLength: 220 }
+        jobTitle: { type: string, minLength: 1, maxLength: 200 }
+        companyName: { type: string, minLength: 1, maxLength: 160 }
+        companyLogoUrl: { type: [string, 'null'], format: uri }
+        location: { type: string, minLength: 1, maxLength: 300 }
+        publicStage: { type: string, enum: [APPLICATION_SUBMITTED, UNDER_REVIEW, INTERVIEW, OUTCOME] }
+        publicOutcome: { type: [string, 'null'], enum: [OFFERED, HIRED, OFFER_DECLINED, REJECTED, WITHDRAWN, null] }
+        canonicalStage: { type: string, enum: [APPLIED, VIEWED, SHORTLISTED, INTERVIEWING, OFFERED, HIRED, OFFER_DECLINED, REJECTED, WAITLISTED] }
+        stageVersion: { type: integer, minimum: 1 }
+        submittedAt: { type: string, format: date-time }
+        lastUpdatedAt: { type: string, format: date-time }
+        jobAvailable: { type: boolean }
+    CandidateApplicationListResponse:
+      type: object
+      additionalProperties: false
+      required: [applications, nextCursor]
+      properties:
+        applications: { type: array, maxItems: 100, items: { $ref: '#/components/schemas/CandidateApplicationSummary' } }
+        nextCursor: { type: [string, 'null'], maxLength: 128 }
+    WithdrawalOutcome:
+      type: object
+      additionalProperties: false
+      required: [applicationId, outcome, withdrawnAt, preservedStage, version]
+      properties:
+        applicationId: { type: string }
+        outcome: { const: WITHDRAWN }
+        withdrawnAt: { type: string, format: date-time }
+        preservedStage: { type: string, enum: [APPLIED, VIEWED, SHORTLISTED, WAITLISTED] }
+        version: { type: integer, minimum: 1 }
+    SourceProvenance:
+      type: object
+      additionalProperties: false
+      required: [cvVersionId, cvVersion, jdVersion, scoringConfigVersion, aiProvider, aiModel, promptVersion, inputPolicyVersion]
+      properties:
+        cvVersionId: { type: string }
+        cvVersion: { type: integer, minimum: 1 }
+        jdVersion: { type: integer, minimum: 1 }
+        scoringConfigVersion: { type: string }
+        aiProvider: { type: [string, 'null'], maxLength: 100 }
+        aiModel: { type: [string, 'null'], maxLength: 200 }
+        promptVersion: { type: [string, 'null'], maxLength: 100 }
+        inputPolicyVersion: { type: [string, 'null'], maxLength: 100 }
+    PrivateMatchCv:
+      type: object
+      additionalProperties: false
+      required: [versionId, version, displayName, fileName, mimeType, byteSize, pageCount, parseStatus, confirmedAt]
+      properties:
+        versionId: { type: string, minLength: 1, maxLength: 128 }
+        version: { type: integer, minimum: 1 }
+        displayName: { type: string, minLength: 1, maxLength: 200 }
+        fileName: { type: string, minLength: 1, maxLength: 255 }
+        mimeType: { type: string, enum: [application/pdf, application/vnd.openxmlformats-officedocument.wordprocessingml.document] }
+        byteSize: { type: integer, minimum: 1, maximum: 5000000 }
+        pageCount: { type: [integer, 'null'], minimum: 1 }
+        parseStatus: { type: string, enum: [READY, PARTIAL, FAILED] }
+        confirmedAt: { type: string, format: date-time }
+    PrivateMatchJob:
+      type: object
+      additionalProperties: false
+      required: [jobId, slug, title, company, location, employmentType, workArrangement, requiredExperienceYears, requirements, jdVersion, jdUpdatedAt]
+      properties:
+        jobId: { type: string, minLength: 1, maxLength: 128 }
+        slug: { type: string, minLength: 1, maxLength: 200 }
+        title: { type: string, minLength: 1, maxLength: 200 }
+        company: { type: string, minLength: 1, maxLength: 200 }
+        location: { type: string, minLength: 1, maxLength: 200 }
+        employmentType: { type: string, minLength: 1, maxLength: 80 }
+        workArrangement: { type: string, minLength: 1, maxLength: 80 }
+        requiredExperienceYears: { type: [integer, 'null'], minimum: 0 }
+        requirements: { type: array, maxItems: 100, items: { type: string, minLength: 1, maxLength: 200 } }
+        jdVersion: { type: integer, minimum: 1 }
+        jdUpdatedAt: { type: string, format: date-time }
+    PrivateMatchStatus:
+      type: object
+      additionalProperties: false
+      required: [view, checkId, state, createdAt, expiresAt, provenance, job, cv, failureCode, durationSeconds]
+      properties:
+        view: { const: STATUS }
+        checkId: { type: string, minLength: 1, maxLength: 128 }
+        state: { type: string, enum: [QUEUED, ANALYZING, FAILED] }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        provenance: { $ref: '#/components/schemas/SourceProvenance' }
+        job: { $ref: '#/components/schemas/PrivateMatchJob' }
+        cv: { $ref: '#/components/schemas/PrivateMatchCv' }
+        failureCode: { type: [string, 'null'], maxLength: 80 }
+        durationSeconds: { type: [number, 'null'], minimum: 0 }
+    PrivateMatchListResponse:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/PrivateMatchListItem' }
+    PrivateMatchListItem:
+      type: object
+      additionalProperties: false
+      required: [checkId, state, createdAt, expiresAt, job, cv, hybridScore, deterministicScore]
+      properties:
+        checkId: { type: string, minLength: 1, maxLength: 128 }
+        state: { type: string, enum: [QUEUED, ANALYZING, LIMITED, READY, FAILED] }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        job:
+          type: object
+          additionalProperties: false
+          required: [jobId, slug, title, company, location]
+          properties:
+            jobId: { type: string, minLength: 1, maxLength: 128 }
+            slug: { type: string, minLength: 1, maxLength: 200 }
+            title: { type: string, minLength: 1, maxLength: 200 }
+            company: { type: string, minLength: 1, maxLength: 200 }
+            location: { type: string, minLength: 1, maxLength: 200 }
+        cv:
+          type: object
+          additionalProperties: false
+          required: [versionId, displayName, fileName, version]
+          properties:
+            versionId: { type: string, minLength: 1, maxLength: 128 }
+            displayName: { type: string, minLength: 1, maxLength: 200 }
+            fileName: { type: string, minLength: 1, maxLength: 255 }
+            version: { type: integer, minimum: 1 }
+        hybridScore: { type: [number, 'null'], minimum: 0, maximum: 100, multipleOf: 0.1 }
+        deterministicScore: { type: [number, 'null'], minimum: 0, maximum: 100 }
+    EvidenceItem:
+      type: object
+      additionalProperties: false
+      required: [type, quote, criterion, location, confidence]
+      properties:
+        type: { type: string, enum: [SKILL, PROJECT, IMPACT, EXPERIENCE, EDUCATION, OTHER] }
+        quote: { type: string, maxLength: 1000 }
+        criterion: { type: string, maxLength: 300 }
+        location: { type: string, maxLength: 160 }
+        confidence: { type: number, minimum: 0, maximum: 1 }
+    RequirementMatch:
+      type: object
+      additionalProperties: false
+      required: [id, label, kind, matched]
+      properties:
+        id: { type: string, maxLength: 128 }
+        label: { type: string, maxLength: 200 }
+        kind: { type: string, enum: [REQUIRED, PREFERRED] }
+        matched: { type: boolean }
+    RequirementGap:
+      type: object
+      additionalProperties: false
+      required: [code, title, description, kind]
+      properties:
+        code: { type: string, maxLength: 160 }
+        title: { type: string, maxLength: 300 }
+        description: { type: string, maxLength: 500 }
+        kind: { type: string, enum: [REQUIRED, PREFERRED, EXPERIENCE] }
+    AutomaticComponent:
+      type: object
+      additionalProperties: false
+      required: [score, weight, weightedContribution, evidenceCoverage, evidenceConfidence, matchedRequirements, gaps, requiredExperience, detectedExperience, evidence, parserProvenance, mayBeIncomplete]
+      properties:
+        score: { type: number, minimum: 0, maximum: 100 }
+        weight: { const: 0.6 }
+        weightedContribution: { type: number, minimum: 0, maximum: 60 }
+        evidenceCoverage: { type: number, minimum: 0, maximum: 100 }
+        evidenceConfidence: { type: number, minimum: 0, maximum: 100 }
+        matchedRequirements: { type: array, maxItems: 200, items: { $ref: '#/components/schemas/RequirementMatch' } }
+        gaps: { type: array, maxItems: 200, items: { $ref: '#/components/schemas/RequirementGap' } }
+        requiredExperience: { type: [number, 'null'], minimum: 0 }
+        detectedExperience: { type: [number, 'null'], minimum: 0 }
+        evidence: { type: array, items: { $ref: '#/components/schemas/EvidenceItem' } }
+        parserProvenance:
+          type: object
+          additionalProperties: false
+          required: [parserVersion, cvStatus, jdStatus]
+          properties:
+            parserVersion: { type: string, maxLength: 80 }
+            cvStatus: { type: string, maxLength: 80 }
+            jdStatus: { type: string, maxLength: 80 }
+        mayBeIncomplete: { type: boolean }
+    AiEvaluation:
+      type: object
+      additionalProperties: false
+      required: [score, weight, weightedContribution, summary, strengths, mainGap, actions, evidenceConfidence, evidenceLevel, provider, model, promptVersion, policyVersion, durationMs, completedAt]
+      properties:
+        score: { type: number, minimum: 0, maximum: 100 }
+        weight: { const: 0.4 }
+        weightedContribution: { type: number, minimum: 0, maximum: 40 }
+        summary: { type: string, minLength: 1, maxLength: 1000 }
+        strengths:
+          type: array
+          maxItems: 4
+          items:
+            type: object
+            additionalProperties: false
+            required: [title, evidence]
+            properties:
+              title: { type: string, maxLength: 160 }
+              evidence: { type: string, maxLength: 1000 }
+        mainGap: { type: [string, 'null'], maxLength: 1000 }
+        actions: { type: array, maxItems: 4, items: { type: string, maxLength: 500 } }
+        evidenceConfidence: { type: integer, minimum: 0, maximum: 100 }
+        evidenceLevel: { type: string, enum: [LOW, MEDIUM, HIGH] }
+        provider: { type: string, maxLength: 100 }
+        model: { type: string, maxLength: 200 }
+        promptVersion: { type: string, maxLength: 100 }
+        policyVersion: { type: string, maxLength: 100 }
+        durationMs: { type: integer, minimum: 0 }
+        completedAt: { type: string, format: date-time }
+    LimitedPrivateReport:
+      type: object
+      additionalProperties: false
+      required: [view, checkId, state, mode, automatic, aiEvaluation, hybridScore, matchBand, provenance, canRetryAi, canApply, retryInProgress, completedAt, failureCode, job, cv, createdAt, expiresAt]
+      properties:
+        view: { const: LIMITED_REPORT }
+        checkId: { type: string }
+        state: { const: LIMITED }
+        mode: { const: LIMITED }
+        automatic: { $ref: '#/components/schemas/AutomaticComponent' }
+        aiEvaluation: { type: 'null' }
+        hybridScore: { type: 'null' }
+        matchBand: { type: 'null' }
+        provenance: { $ref: '#/components/schemas/SourceProvenance' }
+        canRetryAi: { const: true }
+        canApply: { type: boolean }
+        retryInProgress: { type: boolean }
+        completedAt: { type: string, format: date-time }
+        failureCode: { type: [string, 'null'], maxLength: 80 }
+        job: { $ref: '#/components/schemas/PrivateMatchJob' }
+        cv: { $ref: '#/components/schemas/PrivateMatchCv' }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+    FullPrivateReport:
+      type: object
+      additionalProperties: false
+      required: [view, checkId, state, mode, hybridScore, matchBand, automatic, aiEvaluation, evidenceConfidence, summary, actions, provenance, canApply, completedAt, retryInProgress, job, cv, createdAt, expiresAt]
+      properties:
+        view: { const: FULL_REPORT }
+        checkId: { type: string }
+        state: { const: READY }
+        mode: { const: HYBRID }
+        hybridScore: { type: number, minimum: 0, maximum: 100, multipleOf: 0.1 }
+        matchBand: { type: string, enum: [HIGH_MATCH, MEDIUM_MATCH, LOW_MATCH] }
+        automatic: { $ref: '#/components/schemas/AutomaticComponent' }
+        aiEvaluation: { $ref: '#/components/schemas/AiEvaluation' }
+        evidenceConfidence: { type: number, minimum: 0, maximum: 100 }
+        summary: { type: string, maxLength: 1000 }
+        actions: { type: array, items: { type: string, maxLength: 500 } }
+        provenance: { $ref: '#/components/schemas/SourceProvenance' }
+        canApply: { type: boolean }
+        completedAt: { type: string, format: date-time }
+        retryInProgress: { const: false }
+        job: { $ref: '#/components/schemas/PrivateMatchJob' }
+        cv: { $ref: '#/components/schemas/PrivateMatchCv' }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [code]
+      properties:
+        code:
+          type: string
+          enum: [AUTH_REQUIRED, FORBIDDEN, INVALID_REQUEST, UNAVAILABLE, CONFLICT, JOB_UNAVAILABLE, CV_UNAVAILABLE, CV_NOT_PARSED, INTERNAL_FAILURE]
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    Forbidden:
+      description: CSRF or authority check failed
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    Invalid:
+      description: Request validation failed
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    Unavailable:
+      description: Missing, expired, deleted, or not owned; response is indistinguishable
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    Conflict:
+      description: Stale revision/version or invalid current state
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }

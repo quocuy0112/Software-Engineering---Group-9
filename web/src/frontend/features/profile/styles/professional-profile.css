@@ -1062,6 +1062,12 @@
 
 .professional-profile-page
   .profile-avatar-panel--compact
+  .profile-avatar-preview-wrap {
+  width: 82px;
+}
+
+.professional-profile-page
+  .profile-avatar-panel--compact
   .profile-avatar-controls {
   grid-template-columns: minmax(0, 1fr);
   gap: var(--sh-space-2);
@@ -1106,6 +1112,12 @@
   .professional-profile-page
     .profile-avatar-panel--compact
     .profile-avatar-preview {
+    width: 72px;
+  }
+
+  .professional-profile-page
+    .profile-avatar-panel--compact
+    .profile-avatar-preview-wrap {
     width: 72px;
   }
 }

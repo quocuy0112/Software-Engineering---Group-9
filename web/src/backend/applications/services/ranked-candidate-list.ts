@@ -15,6 +15,11 @@ import {
   normalizedRankingFilterHash,
   PrismaRankingSnapshotRepository,
 } from "@/backend/scoring/pagination/ranking-snapshot-repository";
+import {
+  automaticScoreConfigForPublishedResult,
+  getAutomaticScoreStageRuleConfig,
+  type AutomaticScoreStageRuleConfig,
+} from "@/backend/applications/services/automatic-score-stage-config";
 
 type RankingFilters = Readonly<{
   limit: number;
@@ -108,17 +113,23 @@ function snapshotStateFor(
   };
 }
 
-function scoreBand(value: number | null) {
+function scoreBand(
+  value: number | null,
+  config: AutomaticScoreStageRuleConfig = getAutomaticScoreStageRuleConfig(),
+) {
   if (value === null) return null;
-  if (value >= 80)
+  if (value >= config.strongScoreThreshold)
     return { code: "HIGH_MATCH", label: "Strong match", iconLabel: "✓" };
-  if (value >= 60)
+  if (value >= config.lowScoreThreshold)
     return { code: "MEDIUM_MATCH", label: "Review needed", iconLabel: "!" };
   return { code: "LOW_MATCH", label: "Low match", iconLabel: "✕" };
 }
 
-function cleanScoreBand(value: number | null) {
-  const band = scoreBand(value);
+function cleanScoreBand(
+  value: number | null,
+  config: AutomaticScoreStageRuleConfig = getAutomaticScoreStageRuleConfig(),
+) {
+  const band = scoreBand(value, config);
   return band
     ? {
         ...band,
@@ -202,6 +213,7 @@ export class RankedCandidateListService {
       input.jobId,
     );
     if (!authorized.authorized) throw new Error("APPLICATION_UNAVAILABLE");
+    const jobPostingId = authorized.jobPostingId;
     const filters = input.filters;
     const filterHash = normalizedRankingFilterHash({
       ...filters,
@@ -209,7 +221,7 @@ export class RankedCandidateListService {
       page: undefined,
     });
     const cursor = decodeRankingCursor(filters.cursor, {
-      jobId: input.jobId,
+      jobId: jobPostingId,
       filterHash,
       sort: filters.sort,
       pageSize: filters.limit,
@@ -217,7 +229,7 @@ export class RankedCandidateListService {
     if (filters.cursor && !cursor) throw new Error("INVALID_RANKING_CURSOR");
     const rows = await this.db.jobApplication.findMany({
       where: {
-        jobPostingId: input.jobId,
+        jobPostingId,
         documentDeletedAt: null,
         ...(filters.stage === "ACTIVE_PIPELINE"
           ? { stage: { not: "REJECTED" } }
@@ -252,6 +264,8 @@ export class RankedCandidateListService {
             automaticScore: true,
             aiScore: true,
             finalScore: true,
+            mediumThreshold: true,
+            highThreshold: true,
             automaticMatch: {
               select: {
                 detectedExperienceYears: true,
@@ -295,11 +309,20 @@ export class RankedCandidateListService {
       .filter((row) => row.candidate.user.emailVerified)
       .map((row): RankedApplicationRow => {
         const state = stateFor(row);
+        const scoreConfig = automaticScoreConfigForPublishedResult({
+          mediumThreshold: row.currentScoringResult?.mediumThreshold,
+          highThreshold: row.currentScoringResult?.highThreshold,
+        });
         const score =
           row.currentScoringResult?.finalScore === null ||
           !row.currentScoringResult
             ? null
             : Number(row.currentScoringResult.finalScore);
+        const aiScore =
+          row.currentScoringResult?.aiScore === null ||
+          !row.currentScoringResult
+            ? null
+            : Number(row.currentScoringResult.aiScore);
         const priority = row.manualPriorities[0];
         return {
           applicationId: row.id,
@@ -330,13 +353,10 @@ export class RankedCandidateListService {
             automatic: row.currentScoringResult
               ? Number(row.currentScoringResult.automaticScore)
               : null,
-            ai:
-              row.currentScoringResult?.aiScore === null ||
-              !row.currentScoringResult
-                ? null
-                : Number(row.currentScoringResult.aiScore),
+            ai: aiScore,
             final: score,
-            band: cleanScoreBand(score),
+            band: cleanScoreBand(score, scoreConfig),
+            aiBand: cleanScoreBand(aiScore, scoreConfig),
           },
           manuallyPrioritized: Boolean(priority),
           manualPriority: priority
@@ -359,7 +379,7 @@ export class RankedCandidateListService {
               }
             : null,
           allowedActions: {
-            moveToInterview: [
+            moveToInterview: authorized.canMoveStages && [
               "APPLIED",
               "VIEWED",
               "SHORTLISTED",
@@ -373,7 +393,7 @@ export class RankedCandidateListService {
                   reasonLabel:
                     "This stage cannot move directly to Interviewing.",
                 },
-            reject: [
+            reject: authorized.canReject && [
               "APPLIED",
               "VIEWED",
               "SHORTLISTED",
@@ -468,13 +488,13 @@ export class RankedCandidateListService {
     const snapshot = cursor
       ? await this.snapshots.find({
           snapshotId: cursor.snapshotId,
-          jobPostingId: input.jobId,
+          jobPostingId,
           filterHash,
           sort: filters.sort,
           pageSize: filters.limit,
         })
       : await this.snapshots.create({
-          jobPostingId: input.jobId,
+          jobPostingId,
           filterHash,
           filters: { ...filters, cursor: undefined, page: undefined },
           sort: filters.sort,
@@ -502,7 +522,10 @@ export class RankedCandidateListService {
           scoreSummary: {
             ...current.scoreSummary,
             final: snapshotRow.finalScore,
-            band: cleanScoreBand(snapshotRow.finalScore),
+            band: cleanScoreBand(
+              snapshotRow.finalScore,
+              getAutomaticScoreStageRuleConfig(),
+            ),
           },
           scoring: snapshotStateFor(
             snapshotRow.scoreState,
@@ -516,7 +539,7 @@ export class RankedCandidateListService {
       start + snapshotPage.length < snapshot.rows.length && lastItem
         ? encodeRankingCursor({
             v: 1,
-            jobId: input.jobId,
+            jobId: jobPostingId,
             snapshotId: snapshot.snapshotId,
             filterHash,
             sort: filters.sort,
@@ -554,14 +577,14 @@ export class RankedCandidateListService {
     const [activeRescoreCount, lastSuccessfulRescore] = await Promise.all([
       this.db.scoringOperation.count({
         where: {
-          jobPostingId: input.jobId,
+          jobPostingId,
           kind: "JOB_RESCORE",
           state: { in: ["QUEUED", "RUNNING"] },
         },
       }),
       this.db.scoringOperation.findFirst({
         where: {
-          jobPostingId: input.jobId,
+          jobPostingId,
           kind: "JOB_RESCORE",
           state: "COMPLETED",
           completedAt: { not: null },

@@ -1,6 +1,9 @@
 export type WorkspaceNavIconName =
   | "dashboard"
   | "jobs"
+  | "applications"
+  | "pipeline"
+  | "cv-match"
   | "candidates"
   | "messages"
   | "connections"
@@ -33,6 +36,36 @@ export function WorkspaceNavIcon({ name }: { name: WorkspaceNavIconName }) {
       <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
         <rect x="3" y="6" width="14" height="10" rx="2" />
         <path d="M7 6V4.8C7 3.8 7.8 3 8.8 3h2.4c1 0 1.8.8 1.8 1.8V6M3 10h14M8 10v1h4v-1" />
+      </svg>
+    );
+  }
+
+  if (name === "applications") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
+        <rect x="4" y="3" width="12" height="14" rx="1.5" />
+        <path d="M7 6h6M7 9h6M7 12h3M12.5 13.5l1 1 2-2" />
+      </svg>
+    );
+  }
+
+  if (name === "pipeline") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
+        <rect x="3" y="3" width="4" height="14" rx="1" />
+        <rect x="8" y="6" width="4" height="11" rx="1" />
+        <rect x="13" y="9" width="4" height="8" rx="1" />
+      </svg>
+    );
+  }
+
+  if (name === "cv-match") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
+        <rect x="3" y="2.5" width="10" height="15" rx="1.5" />
+        <path d="M6 6h4M6 9h4M6 12h2" />
+        <circle cx="14.5" cy="13.5" r="3" />
+        <path d="m16.7 15.7 1.3 1.3" />
       </svg>
     );
   }

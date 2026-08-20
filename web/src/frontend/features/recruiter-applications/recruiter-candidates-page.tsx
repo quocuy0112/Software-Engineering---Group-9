@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import type { RecruiterJob } from "@/shared/contracts/recruiter-job-posting";
 import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
-import { CandidateRankingList } from "./candidate-ranking-list";
+import { RecruiterCandidateWorkspace } from "./recruiter-candidate-workspace";
 import { CampaignDistributionBar } from "./campaign-distribution-bar";
 import {
   useCampaignScoringStats,
@@ -227,6 +227,14 @@ const CampaignCard = memo(function CampaignCard({
           Review candidates
           <ArrowRight aria-hidden="true" />
         </a>
+        <a
+          href={recruiterRoutes.pipelineForJob(job.id)}
+          className="campaign-card__action"
+          aria-label={`View pipeline for ${job.title || "Untitled job posting"}`}
+        >
+          View pipeline
+          <ArrowRight aria-hidden="true" />
+        </a>
       </div>
     </article>
   );
@@ -235,9 +243,11 @@ const CampaignCard = memo(function CampaignCard({
 export function RecruiterCandidatesPage({
   jobs,
   selectedJobId,
+  csrfProof,
 }: {
   jobs: RecruiterJob[];
   selectedJobId?: string;
+  csrfProof?: string;
 }) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"ALL" | "active" | "closed">("ALL");
@@ -313,10 +323,11 @@ export function RecruiterCandidatesPage({
 
   if (selectedJob) {
     return (
-      <CandidateRankingList
+      <RecruiterCandidateWorkspace
         jobId={selectedJob.id}
         jobTitle={selectedJob.title}
         backHref={recruiterRoutes.candidates}
+        csrfProof={csrfProof}
       />
     );
   }

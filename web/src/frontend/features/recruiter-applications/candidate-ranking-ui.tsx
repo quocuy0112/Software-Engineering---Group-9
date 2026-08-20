@@ -22,8 +22,8 @@ export type RankingTone =
 
 const pipelineStageLabels: Record<string, string> = {
   APPLIED: "New",
-  VIEWED: "Screened",
-  SHORTLISTED: "Under review",
+  VIEWED: "Viewed",
+  SHORTLISTED: "Shortlisted",
   WAITLISTED: "Needs details",
   INTERVIEWING: "Interviewing",
   OFFERED: "Offer",
@@ -151,6 +151,8 @@ export function ScoreBadgeFromLabel({
       ? { code, label, tone: "red", icon: X }
       : normalized.includes("RULE") || normalized.includes("UNAVAILABLE")
         ? { code, label, tone: "amber", icon: Check }
+        : normalized.includes("MEDIUM") || label === "Review needed"
+          ? { code, label, tone: "amber", icon: AlertCircle }
         : normalized.includes("PROCESS") || normalized.includes("PENDING")
           ? { code, label, tone: "purple", icon: LoaderCircle }
           : { code, label, tone: "slate", icon: CircleDot };

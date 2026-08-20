@@ -104,7 +104,7 @@ Expected:
 - Full-project `npm.cmd run lint -- --no-cache` and focused US3 ESLint: passed.
 - `npm.cmd run test:job-post-reviews`: 30 files passed, 43 tests passed.
 - Canonical job detail/search contract plus job-board/review architecture regression: 4 files passed, 13 tests passed.
-- Migration sequence validation passed with 37 migrations and `036_job_post_review_authority` as the latest numbered migration.
+- Migration sequence validation passed with 38 migrations and `038_job_post_review_authority` as the latest numbered migration.
 - TDD evidence: the nine new US3 files initially failed 10/10 tests before decision policy, transaction, public authority, observability, and UI implementation; the same scope later passed 9 files and 10 tests.
 - PostgreSQL-backed job integration tests, browser end-to-end, and decision concurrency/performance probes remain release gates: the configured database at `localhost:55432` was unavailable (`P1001`) during this run.
 - Commit evidence is the English `feat: add administrator job post decisions` entry in Git history.
@@ -211,7 +211,7 @@ Do not release when any of the following remains:
 - Added migration adoption safety, notification privacy, authorization-matrix, and architecture-boundary coverage. Focused release-gate command: 5 files passed, 18 tests passed.
 - `npm.cmd run typecheck`: passed.
 - Focused ESLint for the added release-gate suites and performance harness: passed.
-- `npm.cmd run db:migrations:check`: passed with 37 migrations; latest is `036_job_post_review_authority`.
+- `npm.cmd run db:migrations:check`: passed with 38 migrations; latest is `038_job_post_review_authority`.
 - Performance self-test: Node `v24.18.0` on `win32`, 120 managed jobs, 36 pending reviews, 3 active Administrators, 3 warm-up runs, 9 measured samples, concurrency 3. Notification visible P95 432 ms, queue visible P95 160 ms, decision visible P95 910 ms; integrity/privacy/audit success rates were 100%.
 - The performance result is deterministic self-test evidence with `managedDb: false`; a database-backed measurement remains required before release.
 - PostgreSQL-backed migration/adoption verification was not run because the configured local database was unavailable in this workspace.
@@ -225,7 +225,7 @@ Do not release when any of the following remains:
 - Regression status: job-board completed 33 passing and 9 skipped tests, with 6 PostgreSQL fixture failures. Administrator management timed out at 150 seconds after multiple PostgreSQL-backed integration failures. These are environment blockers, not assertion failures in the release-gate tests.
 - Live regression rerun after applying migration 036: job-board passed 39 files/136 tests; business-verification passed 25 files/61 tests; notification passed 23 files/58 tests; full job-post review passed 39 files/213 tests; full lint passed.
 - Adoption/verification rerun against PostgreSQL completed twice with identical output: 3 unresolved historical rows, zero adopted rows, zero invalid pointers, zero invalid hashes, zero invalid lifecycle rows, and zero missing terminal notifications. No database rows were written by the dry-runs.
-- Prisma migration deployment applied `036_job_post_review_authority` successfully. `prisma migrate status` still reports pre-existing history drift because the database contains applied migration `20260815023247_smarthire`, which is absent from this checkout; this was not modified or removed.
+- Prisma migration deployment applied `038_job_post_review_authority` successfully. `prisma migrate status` still reports pre-existing history drift because the database contains applied migration `20260815023247_smarthire`, which is absent from this checkout; this was not modified or removed.
 - Serialized Administrator regression passed 72 files/187 tests using one Vitest fork and the live PostgreSQL database.
 - The job-review Playwright server now starts successfully with Docker workers. The four workflow/recovery cases redirect to `/login` because no authenticated Recruiter/Administrator review fixtures are provisioned; they are not counted as passed.
 

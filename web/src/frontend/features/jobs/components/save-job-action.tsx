@@ -6,6 +6,21 @@ import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client
 import { savedJobOutcomeSchema } from "@/shared/contracts/jobs/actions";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 
+export function SaveBookmarkIcon({ filled = false }: { filled?: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-3.8L6 21V4.5Z"
+        fill={filled ? "currentColor" : "none"}
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.2"
+      />
+    </svg>
+  );
+}
+
 export function SaveJobAction({
   jobId,
   initialSaved,
@@ -103,16 +118,7 @@ export function SaveJobAction({
           disabled={pending}
           onClick={() => void toggle()}
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M20.8 8.8c0 5.3-8.8 10.4-8.8 10.4S3.2 14.1 3.2 8.8A4.6 4.6 0 0 1 12 6.3a4.6 4.6 0 0 1 8.8 2.5Z"
-              fill={saved ? "currentColor" : "none"}
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="1.8"
-            />
-          </svg>
+          <SaveBookmarkIcon filled={saved} />
         </button>
         {error ? <span role="alert">{error}</span> : null}
       </span>
@@ -133,7 +139,8 @@ export function SaveJobAction({
           disabled={pending}
           onClick={() => void toggle()}
         >
-          <span aria-hidden="true">{saved ? "♥" : "♡"}</span> {compactLabel}
+          <SaveBookmarkIcon filled={saved} />
+          <span>{compactLabel}</span>
         </button>
         {error ? <span role="alert">{error}</span> : null}
       </span>

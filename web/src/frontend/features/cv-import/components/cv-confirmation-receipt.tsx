@@ -31,10 +31,12 @@ export function CvConfirmationReceipt({ receipt }: { receipt: Receipt }) {
         };
   return (
     <section className={styles.root} aria-labelledby="cv-receipt-heading">
-      <h2 id="cv-receipt-heading">{copy.receipt}</h2>
-      <p role="status">
-        {copy.applied} <strong>{receipt.profileRevisionAfter}</strong>.
-      </p>
+      <header className={styles.summary}>
+        <h2 id="cv-receipt-heading">{copy.receipt}</h2>
+        <p role="status">
+          {copy.applied} <strong>{receipt.profileRevisionAfter}</strong>.
+        </p>
+      </header>
       <dl className={styles.counts} aria-label={copy.appliedCounts}>
         {Object.entries(receipt.appliedCounts).map(([group, count]) => (
           <div key={group}>
@@ -51,12 +53,17 @@ export function CvConfirmationReceipt({ receipt }: { receipt: Receipt }) {
         </time>
       </p>
       <div className={styles.links}>
-        <Link href={`/profile/cv-imports/${receipt.uploadId}`}>
+        <Link
+          className={styles.secondaryAction}
+          href={`/profile/cv-imports/${receipt.uploadId}`}
+        >
           {locale === "vi"
             ? "\u0058em tr\u1EA1ng th\u00E1i nh\u1EADp CV"
             : "View import status"}
         </Link>
-        <Link href="/profile">{copy.openCandidateProfile}</Link>
+        <Link className={styles.primaryAction} href="/profile">
+          {copy.openCandidateProfile}
+        </Link>
       </div>
     </section>
   );

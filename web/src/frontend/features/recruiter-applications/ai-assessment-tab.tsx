@@ -16,13 +16,16 @@ import type {
   FinalScore,
   ScoringState,
 } from "@/shared/contracts/scoring";
+import { ScoreBadgeFromLabel } from "./candidate-ranking-ui";
 
 export function AiAssessmentTab({
   state,
   onScore,
+  canScore = true,
 }: {
   state: ScoringState;
   onScore: () => void;
+  canScore?: boolean;
 }) {
   if (state.kind === "PENDING")
     return <RetryingAssessment automatic={state.automaticMatch} />;
@@ -58,13 +61,19 @@ export function AiAssessmentTab({
           There is no published deterministic result to send for AI assessment
           yet.
         </p>
-        <button
-          type="button"
-          className="ai-ranking-button ai-ranking-button--primary"
-          onClick={onScore}
-        >
-          <BrainCircuit aria-hidden="true" /> Score this candidate
-        </button>
+        {canScore ? (
+          <button
+            type="button"
+            className="ai-ranking-button ai-ranking-button--primary"
+            onClick={onScore}
+          >
+            <BrainCircuit aria-hidden="true" /> Score this candidate
+          </button>
+        ) : (
+          <p className="ranking-muted-text">
+            AI scoring is available from the candidate ranking actions.
+          </p>
+        )}
       </div>
     );
   }
@@ -258,6 +267,16 @@ function ReadyAssessment({
           <strong>{ai.score}</strong>
           <span>/ 100 AI points</span>
         </div>
+        {ai.aiScoreBand ? (
+          <div className="ai-score-reasoning__tier">
+            <span>AI score tier</span>
+            <ScoreBadgeFromLabel
+              code={ai.aiScoreBand.code}
+              label={ai.aiScoreBand.label}
+              compact
+            />
+          </div>
+        ) : null}
         <div>
           <h3>Why did the AI give a score of {ai.score}?</h3>
           <ul>

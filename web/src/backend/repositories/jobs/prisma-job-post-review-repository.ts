@@ -7,6 +7,8 @@ import type { JobReviewSnapshot } from "@/shared/contracts/recruiter-job-posting
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
 import { createInAppNotification } from "@/backend/notifications/notification-service";
 import { projectJobReviewSnapshot } from "@/backend/jobs/review/job-post-publication-projector";
+import { promoteWaitlistedApplicationsInTransaction } from "@/backend/services/jobs/application-stage-service";
+import { reviewSearchTokens } from "@/backend/jobs/review/job-post-review-search";
 
 type ReviewDb = typeof prisma | Prisma.TransactionClient;
 
@@ -101,13 +103,52 @@ export class PrismaJobPostReviewRepository {
     page: number;
     perPage: number;
     state?: "PENDING_REVIEW" | "APPROVED" | "REJECTED";
+    q?: string;
     companyId?: string;
     assignedAdminUserId?: string | null;
     submittedBefore?: Date;
     sequence?: number;
   }) {
+    const tokens = input.q ? reviewSearchTokens(input.q) : [];
+    const companyNameTokens = input.q
+      ? input.q.trim().split(/\s+/u).filter(Boolean).slice(0, 8)
+      : [];
     const where: Prisma.JobPostReviewVersionWhereInput = {
-      state: input.state ?? "PENDING_REVIEW",
+      ...(input.q
+        ? {
+            OR: [
+              { id: input.q },
+              { aggregate: { jobId: input.q } },
+              { aggregate: { companyId: input.q } },
+              ...(companyNameTokens.length
+                ? [
+                    {
+                      AND: companyNameTokens.map((token) => ({
+                        aggregate: {
+                          company: {
+                            displayName: {
+                              contains: token,
+                              mode: "insensitive" as const,
+                            },
+                          },
+                        },
+                      })),
+                    },
+                  ]
+                : []),
+              ...(tokens.length
+                ? [
+                    {
+                      AND: tokens.map((token) => ({
+                        normalizedTitleSearch: { contains: token },
+                      })),
+                    },
+                  ]
+                : []),
+            ],
+          }
+        : {}),
+      ...(input.state ? { state: input.state } : {}),
       ...(input.companyId ? { aggregate: { companyId: input.companyId } } : {}),
       ...(input.assignedAdminUserId !== undefined
         ? { assignedAdminUserId: input.assignedAdminUserId }
@@ -153,6 +194,7 @@ export class PrismaJobPostReviewRepository {
     submittedAt: Date;
     correlationId: string;
     historyAction: "SUBMITTED" | "RESUBMITTED";
+    normalizedTitleSearch: string;
   }) {
     const version = await this.db.jobPostReviewVersion.create({
       data: {
@@ -160,6 +202,7 @@ export class PrismaJobPostReviewRepository {
         reviewAggregateId: input.aggregateId,
         sequence: input.sequence,
         snapshot: input.snapshot,
+        normalizedTitleSearch: input.normalizedTitleSearch,
         snapshotSchemaVersion: input.snapshotSchemaVersion,
         snapshotSha256: input.snapshotSha256,
         submittedByUserId: input.submittedByUserId,
@@ -216,10 +259,18 @@ export class PrismaJobPostReviewRepository {
       input.command.command === "APPROVE" ? "APPROVED" : "REJECTED";
     let publicJobPostingId = input.existingPublicJobPostingId;
     let publishedAt: Date | null = null;
+    let previousCapacity: number | null;
 
     if (input.command.command === "APPROVE") {
       const projected = projectJobReviewSnapshot(input.snapshot);
       const { skills, ...jobData } = projected;
+      const previousPublicJob = publicJobPostingId
+        ? await this.db.jobPosting.findUnique({
+            where: { id: publicJobPostingId },
+            select: { numberOfHires: true },
+          })
+        : null;
+      previousCapacity = previousPublicJob?.numberOfHires ?? null;
       const slugOwner = await this.db.jobPosting.findUnique({
         where: { slug: projected.slug },
         select: {
@@ -260,6 +311,16 @@ export class PrismaJobPostReviewRepository {
       });
       publicJobPostingId = publicJob.id;
       publishedAt = input.now;
+      if (input.closedAt === null) {
+        await promoteWaitlistedApplicationsInTransaction({
+          db: this.db,
+          jobPostingId: publicJob.id,
+          previousCapacity,
+          newCapacity: projected.numberOfHires,
+          correlationId: input.correlationId,
+          now: input.now,
+        });
+      }
       await this.db.jobPostingSkill.deleteMany({
         where: { jobPostingId: publicJob.id },
       });

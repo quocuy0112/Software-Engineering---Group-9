@@ -37,8 +37,10 @@ type RankedPageCacheEntry = Readonly<{
 
 const RANKED_PAGE_CACHE_MAX_AGE_MS = 10 * 60_000;
 const RANKED_PAGE_CACHE_MAX_ENTRIES = 100;
+const RANKED_REFRESH_INTERVAL_MS = 2_000;
 const rankedPageCache = new Map<string, RankedPageCacheEntry>();
 const rankedPageRequests = new Map<string, Promise<RankedApplicationPage>>();
+const rankedPageRequestVersions = new Map<string, number>();
 
 function rankedPageCacheKey(
   jobId: string,
@@ -69,9 +71,12 @@ function writeRankedPageCache(key: string, page: RankedApplicationPage) {
   }
 }
 
-async function requestRankedPage(key: string, url: string) {
+async function requestRankedPage(key: string, url: string, force = false) {
   const existing = rankedPageRequests.get(key);
-  if (existing) return existing;
+  if (existing && !force) return existing;
+
+  const version = (rankedPageRequestVersions.get(key) ?? 0) + 1;
+  rankedPageRequestVersions.set(key, version);
 
   const request = (async () => {
     const controller = new AbortController();
@@ -89,11 +94,18 @@ async function requestRankedPage(key: string, url: string) {
           payload?.message ?? "Unable to load candidate ranking.",
         );
       }
-      writeRankedPageCache(key, payload);
+      // A forced refresh supersedes an older request for the same page. Do not
+      // let the older response repopulate the cache after fresh data arrives.
+      if (rankedPageRequestVersions.get(key) === version) {
+        writeRankedPageCache(key, payload);
+      }
       return payload;
     } finally {
       window.clearTimeout(timeout);
-      rankedPageRequests.delete(key);
+      if (rankedPageRequestVersions.get(key) === version) {
+        rankedPageRequests.delete(key);
+        rankedPageRequestVersions.delete(key);
+      }
     }
   })();
   rankedPageRequests.set(key, request);
@@ -121,11 +133,15 @@ export function useRankedCandidates(
   const [error, setError] = useState<string | null>(null);
   const [pageIndex, setPageIndex] = useState(0);
   const requestId = useRef(0);
+  const requestInFlight = useRef(false);
 
   const fetchPage = useCallback(
-    async (index: number) => {
+    async (index: number, options: { force?: boolean } = {}) => {
       const id = ++requestId.current;
+      requestInFlight.current = true;
       const key = rankedPageCacheKey(jobId, queryKey, pageSize, index);
+      const force = options.force === true;
+      if (force) rankedPageCache.delete(key);
       const cachedPage = readRankedPageCache(key);
       const hasCachedPage = Boolean(cachedPage);
       if (cachedPage) {
@@ -157,6 +173,7 @@ export function useRankedCandidates(
         const payload = await requestRankedPage(
           key,
           `/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/ranked?${params}`,
+          force,
         );
         if (id !== requestId.current) return;
         setPage(payload);
@@ -189,6 +206,7 @@ export function useRankedCandidates(
         if (id === requestId.current) {
           setLoading(false);
           setRefreshing(false);
+          requestInFlight.current = false;
         }
       }
     },
@@ -206,9 +224,26 @@ export function useRankedCandidates(
 
   const refresh = useCallback(() => {
     // A score update can change both the row score and its rank, so restart
-    // from the first page and let the current query create a fresh snapshot.
-    void fetchPage(0);
+    // from the first page and force a fresh snapshot. This also supersedes an
+    // older in-flight request that may still contain the previous score.
+    void fetchPage(0, { force: true });
   }, [fetchPage]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    const refreshWhenVisible = () => {
+      if (document.visibilityState !== "visible" || requestInFlight.current) return;
+      refresh();
+    };
+    const interval = window.setInterval(refreshWhenVisible, RANKED_REFRESH_INTERVAL_MS);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    window.addEventListener("focus", refreshWhenVisible);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+      window.removeEventListener("focus", refreshWhenVisible);
+    };
+  }, [refresh]);
 
   return {
     page,

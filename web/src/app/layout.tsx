@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/500.css";
 import "@fontsource/be-vietnam-pro/600.css";
@@ -24,9 +23,19 @@ export const metadata: Metadata = {
 const themeBootstrapScript = [
   "(function () {",
   "  try {",
+  "    var pathname = window.location.pathname;",
+  "    var publicRoutes = [",
+  '      "/", "/home", "/login", "/register", "/forgot-password",',
+  '      "/reset-password", "/two-factor", "/check-email", "/verify-email",',
+  '      "/verify-company-email", "/verify-email-change", "/account-recovery",',
+  '      "/business", "/legal"',
+  "    ];",
+  "    var forceLight = publicRoutes.some(function (route) {",
+  '      return pathname === route || (route !== "/" && pathname.indexOf(route + "/") === 0);',
+  "    });",
   '    var stored = window.localStorage.getItem("smarthire-theme");',
   "    var theme =",
-  '      stored === "dark" || stored === "light"',
+  '      forceLight ? "light" : stored === "dark" || stored === "light"',
   "        ? stored",
   "        : window.matchMedia &&",
   '            window.matchMedia("(prefers-color-scheme: dark)").matches',
@@ -52,11 +61,12 @@ export default function RootLayout({
     >
       <head>
         <meta charSet="utf-8" />
+        <script
+          id="smarthire-theme-bootstrap"
+          dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
+        />
       </head>
       <body suppressHydrationWarning>
-        <Script id="smarthire-theme-bootstrap" strategy="beforeInteractive">
-          {themeBootstrapScript}
-        </Script>
         <ThemeProvider>
           {children}
           <Toaster

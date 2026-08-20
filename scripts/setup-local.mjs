@@ -200,9 +200,9 @@ const cvDefaults = [
   ["CV_S3_KMS_KEY_ID", ""],
   ["CV_CLAMD_SOCKET_PATH", "/run/clamav/clamd.sock"],
   ["CV_CLAMD_SIGNATURE_MAX_AGE_HOURS", "24"],
-  ["CV_PARSER_ADAPTER", "deterministic"],
-  ["CV_OPENAI_ENABLED", "false"],
-  ["CV_OPENAI_LOCAL_DEV_ENABLED", "false"],
+  ["CV_PARSER_ADAPTER", "openai"],
+  ["CV_OPENAI_ENABLED", "true"],
+  ["CV_OPENAI_LOCAL_DEV_ENABLED", "true"],
   ["OPENAI_API_KEY", ""],
   ["CV_OPENAI_MODEL", "gpt-5.4-mini-2026-03-17"],
   ["CV_OPENAI_DPA_APPROVED", "false"],
@@ -218,6 +218,24 @@ const cvDefaults = [
   ["CV_UNCONFIRMED_RETENTION_DAYS", "30"],
   ["CV_CONFIRMED_RETENTION_DAYS", "7"],
   ["CV_CANDIDATE_DELETE_RETENTION_HOURS", "24"],
+];
+const businessRegistryDefaults = [
+  ["BUSINESS_REGISTRY_PROVIDER", "vietqr"],
+  ["BUSINESS_REGISTRY_TIMEOUT_MS", "4000"],
+  ["BUSINESS_REGISTRY_RESPONSE_LIMIT_BYTES", "65536"],
+];
+const messagingDefaults = [
+  ["MESSAGING_REALTIME_ENABLED", "true"],
+  ["MESSAGING_SOCKET_PATH", "/chat"],
+  ["MESSAGING_ACK_TIMEOUT_MS", "5000"],
+  ["MESSAGING_ACK_RETRIES", "2"],
+  ["MESSAGING_DISCONNECT_GRACE_MS", "2000"],
+];
+const jobCatalogueDefaults = [
+  ["JOB_CATALOGUE_MODE", "writer"],
+  ["JOB_CATALOGUE_PATH", "data/jobs/jobs.json"],
+  ["JOB_CATALOGUE_WRITER_HOST_ID", "local-dev-writer"],
+  ["JOB_CATALOGUE_LEASE_TTL_MS", "30000"],
 ];
 const renderDefaults = (defaults) =>
   defaults.map(([key, value]) => `${key}=${value}`).join("\n");
@@ -254,22 +272,26 @@ const reconcilePinnedFeatureSettings = async (path) => {
 const files = [
   [
     ".env",
-    `POSTGRES_DB=smarthire\nPOSTGRES_USER=smarthire\nPOSTGRES_PASSWORD=${databasePassword}\nPOSTGRES_PORT=55432\nAUDIT_TRUSTED_PROXY_HOPS=0\n${renderDefaults(cvDefaults)}\n${renderDefaults(ocrDefaults)}\n${renderDefaults(imageSearchDefaults)}\n`,
+    `POSTGRES_DB=smarthire\nPOSTGRES_USER=smarthire\nPOSTGRES_PASSWORD=${databasePassword}\nPOSTGRES_PORT=55432\nAUDIT_TRUSTED_PROXY_HOPS=0\n${renderDefaults(cvDefaults)}\n${renderDefaults(ocrDefaults)}\n${renderDefaults(imageSearchDefaults)}\n${renderDefaults(businessRegistryDefaults)}\n`,
   ],
   [
     "web/.env.local",
-    `APP_ENV=local\nNEXT_PUBLIC_APP_URL=http://localhost:3001\nDATABASE_URL=${databaseUrl}\nDIRECT_URL=${databaseUrl}\nBETTER_AUTH_URL=http://localhost:3001\nBETTER_AUTH_SECRET=${authSecret}\nTOKEN_SECRET=${tokenSecret}\nAUDIT_TRUSTED_PROXY_HOPS=0\nAUTH_COOKIE_ENV=local\nEMAIL_ADAPTER=capture\nEMAIL_CAPTURE_DIRECTORY=.local/mail\nEMAIL_CAPTURE_DIR=.local/mail\nRESEND_API_KEY=\nEMAIL_FROM=\nSMTP_HOST=\nSMTP_PORT=\nSMTP_USERNAME=\nSMTP_PASSWORD=\nSMTP_FROM=\nSMTP_SECURE=\nSMTP_USE_TLS=\nSESSION_COOKIE_NAME=smarthire.session\nPRE_AUTH_COOKIE_NAME=smarthire.pre-auth\nCOOKIE_SECURE=false\nCOOKIE_SAME_SITE=lax\n${renderDefaults(cvDefaults)}\n${renderDefaults(ocrDefaults)}\n${renderDefaults(imageSearchDefaults)}\n`,
+    `APP_ENV=local\nNEXT_PUBLIC_APP_URL=http://localhost:3001\nDATABASE_URL=${databaseUrl}\nDIRECT_URL=${databaseUrl}\nBETTER_AUTH_URL=http://localhost:3001\nBETTER_AUTH_SECRET=${authSecret}\nTOKEN_SECRET=${tokenSecret}\nAUDIT_TRUSTED_PROXY_HOPS=0\nAUTH_COOKIE_ENV=local\nEMAIL_ADAPTER=capture\nEMAIL_CAPTURE_DIRECTORY=.local/mail\nEMAIL_CAPTURE_DIR=.local/mail\nRESEND_API_KEY=\nEMAIL_FROM=\nSMTP_HOST=\nSMTP_PORT=\nSMTP_USERNAME=\nSMTP_PASSWORD=\nSMTP_FROM=\nSMTP_SECURE=\nSMTP_USE_TLS=\nSESSION_COOKIE_NAME=smarthire.session\nPRE_AUTH_COOKIE_NAME=smarthire.pre-auth\nCOOKIE_SECURE=false\nCOOKIE_SAME_SITE=lax\n${renderDefaults(cvDefaults)}\n${renderDefaults(ocrDefaults)}\n${renderDefaults(imageSearchDefaults)}\n${renderDefaults(businessRegistryDefaults)}\n${renderDefaults(messagingDefaults)}\n${renderDefaults(jobCatalogueDefaults)}\n`,
   ],
 ];
 for (const [relativePath, contents] of files) {
   const path = resolve(root, relativePath);
   if (await exists(path)) {
-    const addedKeys = await ensureEnvDefaults(path, [
+    const defaults = [
       ["AUDIT_TRUSTED_PROXY_HOPS", "0"],
       ...cvDefaults,
       ...ocrDefaults,
       ...imageSearchDefaults,
-    ]);
+      ...businessRegistryDefaults,
+      ...(relativePath === "web/.env.local" ? messagingDefaults : []),
+      ...(relativePath === "web/.env.local" ? jobCatalogueDefaults : []),
+    ];
+    const addedKeys = await ensureEnvDefaults(path, defaults);
     const reconciledKeys = await reconcilePinnedFeatureSettings(path);
     console.log(
       addedKeys.length > 0 || reconciledKeys.length > 0

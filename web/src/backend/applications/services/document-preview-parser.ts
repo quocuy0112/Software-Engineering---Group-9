@@ -9,7 +9,8 @@ import {
   type StructuredCvPreview,
 } from "@/shared/contracts/applications/document-preview";
 
-export const DOCUMENT_PREVIEW_PARSER_VERSION = "structured-preview-v2";
+export const DOCUMENT_PREVIEW_PARSER_VERSION = "structured-preview-v3";
+export const DOCUMENT_PDF_PREVIEW_VERSION = "native-pdf-preview-v1";
 
 type PreviewSegment = Pick<ExtractedSegment, "id" | "kind" | "text">;
 
@@ -683,7 +684,25 @@ function coverLetterPreview(
     .normalize("NFKC")
     .replace(/\r\n?/gu, "\n")
     .trim();
-  const lines = source
+  const lineBreaksRecovered = source
+    .replace(
+      /^(\w+\s+\d{1,2},\s+\d{4}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{4}[/-]\d{1,2}[/-]\d{1,2})\s+/u,
+      "$1\n",
+    )
+    .replace(/\s+(?=(?:dear|hello|hi)\b)/iu, "\n")
+    .replace(
+      /((?:dear|hello|hi)\b[^.!?\n]{0,120}[,:])\s+/iu,
+      "$1\n",
+    )
+    .replace(
+      /\s+(?=(?:sincerely|best regards|kind regards|regards|respectfully|yours sincerely|thank you)\b)/iu,
+      "\n",
+    );
+  const recoveredLines = lineBreaksRecovered.replace(
+    /((?:sincerely|best regards|kind regards|regards|respectfully|yours sincerely|thank you)\b[,.]?)\s+/iu,
+    "$1\n",
+  );
+  const lines = recoveredLines
     .split(/\n+/u)
     .flatMap((value) => {
       const normalized = value.trim();

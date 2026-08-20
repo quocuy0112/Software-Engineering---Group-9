@@ -60,6 +60,10 @@ export const structuredCoverLetterPreviewSchema = z
 export const structuredDocumentPreviewSchema = z
   .object({
     kind: z.enum(["cv", "cover-letter"]),
+    /** A file can remain available when extracting its text is not possible. */
+    previewStatus: z
+      .enum(["PARSED", "LIMITED", "ORIGINAL"])
+      .default("PARSED"),
     fileName: previewText(255).nullable(),
     mediaType: previewText(120).nullable(),
     pageCount: z.number().int().positive().nullable(),

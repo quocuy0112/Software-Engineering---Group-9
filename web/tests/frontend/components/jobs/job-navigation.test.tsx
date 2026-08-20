@@ -161,7 +161,7 @@ describe("job board navigation", () => {
     expect(styles).toContain("position: sticky;");
   });
 
-  it("uses the Next.js apply query to open the detail-page modal", async () => {
+  it("routes Apply entry points to the page-based application wizard", async () => {
     const detailSource = await readFile(
       resolve(
         process.cwd(),
@@ -176,26 +176,12 @@ describe("job board navigation", () => {
       ),
       "utf8",
     );
-    const formSource = await readFile(
-      resolve(
-        process.cwd(),
-        "src/frontend/features/jobs/components/apply-form-section.tsx",
-      ),
-      "utf8",
-    );
-    const styles = await readFile(
-      resolve(process.cwd(), "src/frontend/features/jobs/styles/job-board.css"),
-      "utf8",
-    );
-
-    expect(cardSource).toContain('"?apply=true"');
-    expect(detailSource).toContain('params.get("apply") === "true"');
+    expect(cardSource).toContain('href={"/jobs/" + job.slug + "/apply"}');
+    expect(detailSource).toContain('const applyPath = "/jobs/" + job.slug + "/apply";');
+    expect(detailSource).toContain("href={applyPath}");
+    expect(cardSource).not.toContain("?apply=true");
+    expect(detailSource).not.toContain('params.get("apply")');
     expect(detailSource).not.toContain("scrollIntoView");
-    expect(formSource).toContain('className="job-apply-modal-backdrop"');
-    expect(formSource).toContain('role="dialog"');
-    expect(styles).toContain(".job-apply-modal-body {");
-    expect(styles).toContain("position: sticky;");
-    expect(styles).toContain("bottom: 0;");
   });
 
   it("shows the Profile workspace bar and marks Jobs as active", () => {

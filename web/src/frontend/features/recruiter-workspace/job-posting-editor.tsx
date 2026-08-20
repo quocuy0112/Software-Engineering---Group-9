@@ -2,6 +2,7 @@
 
 import { useRef, useState, type ReactNode } from "react";
 import { Badge } from "@/frontend/components/ui/badge";
+import { Modal } from "@/frontend/components/ui/modal";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import {
   formatVndInput,
@@ -41,6 +42,59 @@ function formatReasonCode(code: string): string {
     OTHER: "Other reason",
   };
   return reasonLabels[code] || code.replace(/_/g, " ");
+}
+
+function skillInputToTags(value: string) {
+  return value
+    .split(",")
+    .map((skill) => skill.trim())
+    .filter(Boolean);
+}
+
+function dateInputToIso(value: string) {
+  const normalized = value.trim();
+  if (!normalized) return null;
+
+  const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/u.exec(normalized);
+  const localizedMatch = /^(\d{2})\/(\d{2})\/(\d{4})$/u.exec(normalized);
+  const year = isoMatch
+    ? Number(isoMatch[1])
+    : localizedMatch
+      ? Number(localizedMatch[3])
+      : NaN;
+  const month = isoMatch
+    ? Number(isoMatch[2])
+    : localizedMatch
+      ? Number(localizedMatch[2])
+      : NaN;
+  const day = isoMatch
+    ? Number(isoMatch[3])
+    : localizedMatch
+      ? Number(localizedMatch[1])
+      : NaN;
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
+    !Number.isInteger(day)
+  ) {
+    return null;
+  }
+
+  const date = new Date(Date.UTC(year, month - 1, day, 23, 59, 59));
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  ) {
+    return null;
+  }
+  return date.toISOString();
+}
+
+function limitDateInputYear(value: string) {
+  const match = /^(\d{5,})-(\d{2})-(\d{2})$/u.exec(value);
+  return match ? `${match[1].slice(0, 4)}-${match[2]}-${match[3]}` : value;
 }
 
 function FieldError({
@@ -162,6 +216,8 @@ export function JobPostingEditor({
   const [job, setJob] = useState(initialJob);
   const csrfProof = useCsrfProof();
   const [saving, setSaving] = useState(false);
+  const [pendingSubmission, setPendingSubmission] =
+    useState<JobCatalogItem | null>(null);
   const submissionKey = useRef<string | null>(null);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<RecruiterJobFieldErrors>({});
@@ -172,6 +228,7 @@ export function JobPostingEditor({
     min: formatVndInput(initialJob.salary.min),
     max: formatVndInput(initialJob.salary.max),
   });
+  const [skillInput, setSkillInput] = useState(initialJob.skillTags.join(", "));
   const readOnly = job.status === "pending_approval";
   const canSubmitForApproval =
     job.id === "new-job" || job.status === "draft" || job.status === "rejected";
@@ -299,73 +356,13 @@ export function JobPostingEditor({
       },
     }));
 
-  const save = async (targetStatus: JobPostingStatus) => {
-    if (readOnly) return;
-    const prepared = prepareRecruiterJobForSave(job);
-    const nextErrors = validateRecruiterJobForSave(prepared, targetStatus);
-    setJob((current) => ({
-      ...prepared,
-      company: current.company,
-    }));
-    setFieldErrors(nextErrors);
-    if (Object.keys(nextErrors).length) {
-      setOpenSections((current) => {
-        const next = [...current];
-        const paths = Object.keys(nextErrors);
-        if (
-          paths.some((path) =>
-            [
-              "title",
-              "shortPitch",
-              "industry",
-              "subIndustry",
-              "categoryFamily",
-            ].includes(path),
-          )
-        )
-          next[0] = true;
-        if (
-          paths.some(
-            (path) =>
-              path.startsWith("location.") ||
-              path === "workArrangement" ||
-              path === "employmentType",
-          )
-        )
-          next[1] = true;
-        if (
-          paths.some(
-            (path) =>
-              path.startsWith("experience.") ||
-              ["level", "education"].includes(path),
-          )
-        )
-          next[2] = true;
-        if (paths.some((path) => path.startsWith("salary."))) next[3] = true;
-        if (paths.some((path) => path.startsWith("description.")))
-          next[4] = true;
-        if (
-          paths.some((path) =>
-            ["numberOfHires", "applyDeadline"].includes(path),
-          )
-        )
-          next[5] = true;
-        return next;
-      });
-      setError("Review the highlighted fields before saving this posting.");
-      return;
-    }
-
+  const persist = async (
+    prepared: JobCatalogItem,
+    targetStatus: JobPostingStatus,
+  ) => {
     setSaving(true);
     setError("");
     try {
-      if (
-        targetStatus === "pending_approval" &&
-        !window.confirm(
-          "Submit this exact version for Administrator review? You cannot edit it while the review is pending.",
-        )
-      )
-        return;
       const method = prepared.id === "new-job" ? "POST" : "PATCH";
       const response = await fetch("/api/recruiter/job-postings", {
         method,
@@ -439,8 +436,82 @@ export function JobPostingEditor({
     }
   };
 
+  const save = async (targetStatus: JobPostingStatus) => {
+    if (readOnly) return;
+    const prepared = prepareRecruiterJobForSave(job);
+    const nextErrors = validateRecruiterJobForSave(prepared, targetStatus);
+    setJob((current) => ({
+      ...prepared,
+      company: current.company,
+    }));
+    setFieldErrors(nextErrors);
+    if (Object.keys(nextErrors).length) {
+      setOpenSections((current) => {
+        const next = [...current];
+        const paths = Object.keys(nextErrors);
+        if (
+          paths.some((path) =>
+            [
+              "title",
+              "shortPitch",
+              "industry",
+              "subIndustry",
+              "categoryFamily",
+            ].includes(path),
+          )
+        )
+          next[0] = true;
+        if (
+          paths.some(
+            (path) =>
+              path.startsWith("location.") ||
+              path === "workArrangement" ||
+              path === "employmentType",
+          )
+        )
+          next[1] = true;
+        if (
+          paths.some(
+            (path) =>
+              path.startsWith("experience.") ||
+              ["level", "education"].includes(path),
+          )
+        )
+          next[2] = true;
+        if (paths.some((path) => path.startsWith("salary."))) next[3] = true;
+        if (paths.some((path) => path.startsWith("description.")))
+          next[4] = true;
+        if (
+          paths.some((path) =>
+            ["numberOfHires", "applyDeadline"].includes(path),
+          )
+        )
+          next[5] = true;
+        return next;
+      });
+      setError("Review the highlighted fields before saving this posting.");
+      return;
+    }
+
+    if (targetStatus === "pending_approval") {
+      setError("");
+      setPendingSubmission(prepared);
+      return;
+    }
+
+    await persist(prepared, targetStatus);
+  };
+
+  const confirmSubmission = () => {
+    if (!pendingSubmission) return;
+    const prepared = pendingSubmission;
+    setPendingSubmission(null);
+    void persist(prepared, "pending_approval");
+  };
+
   const department = job.description.generalInfo.department ?? "";
   const minDeadline = new Date().toISOString().slice(0, 10);
+  const maxDeadline = "9999-12-31";
   const sectionCompletion = [
     Boolean(
       job.title &&
@@ -971,20 +1042,16 @@ export function JobPostingEditor({
             <label>
               Skills
               <span className="recruiter-field-help">
-                Separate skills with commas.
+                Separate skills with commas; spaces are allowed inside a skill.
               </span>
               <input
                 disabled={readOnly}
-                value={job.skillTags.join(", ")}
-                onChange={(event) =>
-                  update(
-                    "skillTags",
-                    event.target.value
-                      .split(",")
-                      .map((skill) => skill.trim())
-                      .filter(Boolean),
-                  )
-                }
+                value={skillInput}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setSkillInput(value);
+                  update("skillTags", skillInputToTags(value));
+                }}
                 placeholder="React, TypeScript, Product design"
               />
             </label>
@@ -1296,18 +1363,38 @@ export function JobPostingEditor({
                   disabled={readOnly}
                   type="date"
                   min={minDeadline}
-                  value={job.applyDeadline?.slice(0, 10) ?? ""}
+                  max={maxDeadline}
+                  defaultValue={job.applyDeadline?.slice(0, 10) ?? ""}
+                  onInput={(event) => {
+                    const input = event.currentTarget;
+                    input.value = limitDateInputYear(input.value);
+                  }}
                   onChange={(event) => {
+                    const rawValue = limitDateInputYear(
+                      event.currentTarget.value,
+                    );
+                    if (rawValue !== event.currentTarget.value) {
+                      event.currentTarget.value = rawValue;
+                    }
+                    const applyDeadline = dateInputToIso(rawValue);
                     clearFieldErrors("applyDeadline");
                     setJob((current) => ({
                       ...current,
-                      applyDeadline: event.target.value
-                        ? new Date(
-                            `${event.target.value}T23:59:59.000Z`,
-                          ).toISOString()
-                        : null,
+                      applyDeadline,
                       updatedAt: new Date().toISOString(),
                     }));
+                  }}
+                  onBlur={(event) => {
+                    const rawValue = event.target.value;
+                    if (rawValue && !dateInputToIso(rawValue)) {
+                      setFieldErrors((current) => ({
+                        ...current,
+                        applyDeadline: "Enter a valid application deadline.",
+                      }));
+                      setError(
+                        "Review the highlighted fields before saving this posting.",
+                      );
+                    }
                   }}
                   {...fieldA11y("applyDeadline")}
                 />
@@ -1380,6 +1467,45 @@ export function JobPostingEditor({
 
         <JobPostingPreview companyName={companyName} job={job} />
       </div>
+
+      <Modal
+        open={Boolean(pendingSubmission)}
+        title="Submit job for approval?"
+        description="Send this posting to an Administrator for review."
+        icon="✓"
+        onClose={() => setPendingSubmission(null)}
+      >
+        <div className="recruiter-submit-confirmation">
+          <p className="recruiter-submit-confirmation__lead">
+            Once submitted, this version is locked and cannot be edited until
+            the review is complete.
+          </p>
+          <div className="recruiter-submit-confirmation__notice">
+            <strong>Before you submit</strong>
+            <span>
+              Make sure the title, salary, deadline, and required skills are
+              correct.
+            </span>
+          </div>
+          <div className="sh-modal-actions">
+            <button
+              type="button"
+              className="recruiter-outline-button"
+              data-autofocus
+              onClick={() => setPendingSubmission(null)}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="recruiter-primary-button"
+              onClick={confirmSubmission}
+            >
+              Submit for approval
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

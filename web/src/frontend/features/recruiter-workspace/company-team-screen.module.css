@@ -1,0 +1,416 @@
+.page {
+  width: min(100%, 1120px);
+  margin: 0 auto;
+  padding: 38px 28px 72px;
+  color: #17213d;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 28px;
+}
+.eyebrow {
+  margin: 0 0 8px;
+  color: #5668dc;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.header h1 {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 34px);
+  letter-spacing: -0.04em;
+}
+.header p:not(.eyebrow) {
+  margin: 8px 0 0;
+  color: #68718b;
+  font-size: 14px;
+}
+.memberCount {
+  min-width: 116px;
+  padding: 12px 16px;
+  border: 1px solid #e1e5f0;
+  border-radius: 14px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 5px 15px #1a29510a;
+}
+.memberCount strong {
+  display: block;
+  color: #4055d8;
+  font-size: 20px;
+}
+.memberCount span {
+  color: #7a839a;
+  font-size: 12px;
+}
+.notice {
+  min-height: 20px;
+  margin: 0 0 14px;
+  color: #4655ba;
+  font-size: 13px;
+  font-weight: 650;
+}
+.inviteCard,
+.linkCard,
+.section {
+  border: 1px solid #e3e7f1;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 28px #1a29510d;
+}
+.inviteCard {
+  padding: 22px;
+  margin-bottom: 22px;
+}
+.cardTitle {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 11px;
+  background: #e9edff;
+  color: #4357da;
+  font-size: 24px;
+}
+.cardTitle h2,
+.section h2,
+.linkCard h2 {
+  margin: 0;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+.cardTitle p,
+.sectionHeading p,
+.linkCard p {
+  margin: 4px 0 0;
+  color: #778097;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.inviteForm {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.7fr) minmax(150px, 0.8fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+.field {
+  display: grid;
+  gap: 7px;
+  color: #39435d;
+  font-size: 12px;
+  font-weight: 800;
+}
+.field input,
+.field select,
+.linkRow input {
+  width: 100%;
+  border: 1px solid #dbe0ec;
+  border-radius: 10px;
+  padding: 11px 12px;
+  background: #fbfcff;
+  color: #202a43;
+  font: inherit;
+  font-size: 13px;
+}
+.field input:focus-visible,
+.field select:focus-visible,
+.linkRow input:focus-visible {
+  outline: 3px solid #4a5edc38;
+  border-color: #5165df;
+}
+.primaryButton,
+.secondaryButton,
+.textButton,
+.removeButton {
+  border: 0;
+  border-radius: 10px;
+  padding: 11px 14px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  transition: 0.15s;
+}
+.primaryButton {
+  background: #4659db;
+  color: #fff;
+  white-space: nowrap;
+}
+.primaryButton:hover:not(:disabled) {
+  background: #3449c8;
+  transform: translateY(-1px);
+}
+.primaryButton:disabled,
+.textButton:disabled,
+.removeButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.linkCard {
+  display: grid;
+  grid-template-columns: 1fr minmax(300px, 0.9fr);
+  gap: 18px;
+  align-items: center;
+  padding: 18px 20px;
+  margin: -6px 0 22px;
+  background: #f7f8ff;
+  border-color: #d9deff;
+}
+.linkRow {
+  display: flex;
+  gap: 8px;
+}
+.linkRow input {
+  min-width: 0;
+  color: #586176;
+}
+.secondaryButton {
+  border: 1px solid #cbd3fa;
+  background: #fff;
+  color: #4054d2;
+  white-space: nowrap;
+}
+.section {
+  overflow: hidden;
+  margin-top: 22px;
+}
+.sectionHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+  padding: 20px 22px;
+  border-bottom: 1px solid #edf0f6;
+}
+.sectionHeading > span {
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #f0f2f8;
+  color: #65708b;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.memberList,
+.invitationList {
+  display: grid;
+}
+.memberRow,
+.invitationRow {
+  display: grid;
+  grid-template-columns: 42px minmax(190px, 1fr) 120px 92px auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 22px;
+  border-bottom: 1px solid #edf0f6;
+}
+.memberRow:last-child,
+.invitationRow:last-child {
+  border-bottom: 0;
+}
+.avatar,
+.pendingAvatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dce4ff, #eff1ff);
+  color: #4e60d5;
+  font-size: 12px;
+  font-weight: 850;
+}
+.memberIdentity,
+.invitationRow > div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+.memberIdentity strong,
+.invitationRow strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.5px;
+}
+.memberIdentity span,
+.invitationRow span {
+  overflow: hidden;
+  color: #768097;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.roleBadge,
+.statusBadge {
+  justify-self: start;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 11px;
+  font-weight: 800;
+}
+.roleBadge {
+  background: #f0f2fa;
+  color: #4e5872;
+}
+.statusBadge {
+  background: #edf8f3;
+  color: #19815f;
+}
+.suspended {
+  background: #fff6e9;
+  color: #b36e0e;
+}
+.removed {
+  background: #fff0f1;
+  color: #be4853;
+}
+.actions {
+  display: flex;
+  justify-content: end;
+  gap: 6px;
+}
+.textButton {
+  background: #f4f6fb;
+  color: #536078;
+  padding: 8px 9px;
+}
+.textButton:hover:not(:disabled) {
+  background: #e8ecfb;
+  color: #3c50ca;
+}
+.removeButton {
+  background: transparent;
+  color: #bd4b56;
+  padding: 8px 9px;
+}
+.removeButton:hover:not(:disabled) {
+  background: #fff0f1;
+}
+.ownerNote {
+  color: #65708b;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+}
+.invitationRow {
+  grid-template-columns: 42px 1fr auto;
+}
+.pendingAvatar {
+  border-radius: 12px;
+  background: #fff3df;
+  color: #bb790e;
+}
+.emptyState {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 27px 22px;
+  color: #65708b;
+}
+.emptyState > span {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: #f0f2fa;
+  color: #6979d7;
+}
+.emptyState strong {
+  display: block;
+  font-size: 13px;
+}
+.emptyState p {
+  margin: 3px 0 0;
+  font-size: 12px;
+}
+@media (max-width: 900px) {
+  .memberRow {
+    grid-template-columns: 42px minmax(150px, 1fr) 100px auto;
+  }
+  .memberRow .statusBadge {
+    display: none;
+  }
+  .actions {
+    grid-column: 2/-1;
+    justify-content: start;
+  }
+  .ownerNote {
+    grid-column: 2/-1;
+    text-align: left;
+  }
+}
+@media (max-width: 650px) {
+  .page {
+    padding: 25px 16px 48px;
+  }
+  .header,
+  .linkCard {
+    display: grid;
+  }
+  .memberCount {
+    justify-self: start;
+  }
+  .inviteForm {
+    grid-template-columns: 1fr;
+  }
+  .primaryButton {
+    width: 100%;
+  }
+  .linkRow {
+    display: grid;
+  }
+  .memberRow {
+    grid-template-columns: 42px 1fr auto;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+  .memberRow .roleBadge {
+    display: none;
+  }
+  .sectionHeading {
+    padding: 17px 16px;
+  }
+  .invitationRow {
+    grid-template-columns: 38px 1fr;
+    padding: 14px 16px;
+  }
+  .invitationRow .removeButton {
+    grid-column: 2;
+    justify-self: start;
+    padding-left: 0;
+  }
+  .actions {
+    flex-wrap: wrap;
+  }
+  .memberIdentity span,
+  .invitationRow span {
+    white-space: normal;
+  }
+}
+
+.sectionHeading > span.pendingColor {
+  background: #fff3df;
+  color: #bb790e;
+}
+
+.sectionHeading > span.recentColor {
+  background: #f0f2fa;
+  color: #6979d7;
+}
+
+.sectionHeading > span.totalColor {
+  background: #edf8f3;
+  color: #19815f;
+}

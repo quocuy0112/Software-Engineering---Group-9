@@ -6,7 +6,7 @@ const service = readFileSync(
   "utf8",
 );
 const migration = readFileSync(
-  "prisma/migrations/036_job_post_review_authority/migration.sql",
+  "prisma/migrations/038_job_post_review_authority/migration.sql",
   "utf8",
 );
 

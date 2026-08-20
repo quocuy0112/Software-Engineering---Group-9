@@ -201,4 +201,145 @@ describe("candidate ranking list", () => {
     });
     expect(await screen.findByText("Candidate Updated")).toBeInTheDocument();
   });
+
+  it("acknowledges the application when its detail drawer opens", async () => {
+    const viewRequests: Array<{ url: string; method: string }> = [];
+    let rankingRequestCount = 0;
+    const detail = {
+      applicationId: "app-1",
+      humanDecisionNotice:
+        "Scores support decision-making only. The recruiter makes the final decision.",
+      scoring: {
+        kind: "PROCESSING" as const,
+        label: "Processing" as const,
+        operationId: "operation-1",
+      },
+      rescoreInProgress: false,
+      documentAccess: {
+        cvViewerPath: "/cv",
+        coverLetterViewerPath: "/cover-letter",
+      },
+    };
+    const viewedPage = {
+      ...page,
+      items: [{ ...page.items[0], stage: "VIEWED" as const, stageVersion: 2 }],
+    };
+    const fetchMock = vi.fn(async (input: unknown, init?: RequestInit) => {
+      const url = String(input);
+      if (url.includes("/ranked?")) {
+        rankingRequestCount += 1;
+        return new Response(
+          JSON.stringify(rankingRequestCount > 1 ? viewedPage : page),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+      if (url.endsWith("/view")) {
+        viewRequests.push({ url, method: init?.method ?? "GET" });
+        return new Response(
+          JSON.stringify({
+            applicationId: "app-1",
+            stage: "VIEWED",
+            stageVersion: 2,
+            lastStageChangedAt: "2026-08-18T06:22:00.000Z",
+            changed: true,
+          }),
+          { status: 200 },
+        );
+      }
+      if (url.endsWith("/scoring")) {
+        return new Response(JSON.stringify(detail), { status: 200 });
+      }
+      return new Response(JSON.stringify({}), { status: 404 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <CandidateRankingList
+        jobId="job-1"
+        jobTitle="Senior Engineer"
+        csrfProof="csrf-proof"
+      />,
+    );
+    const candidate = await screen.findByText("Candidate One");
+    const row = candidate.closest('[role="row"]');
+    expect(row).not.toBeNull();
+    fireEvent.click(row!);
+
+    await waitFor(() => expect(viewRequests).toHaveLength(1));
+    expect(viewRequests[0]).toMatchObject({ method: "POST" });
+    expect(screen.getByRole("dialog")).toHaveAttribute(
+      "aria-labelledby",
+      "ai-ranking-drawer-title",
+    );
+  });
+
+  it("shortlists a Viewed candidate from the detail drawer", async () => {
+    const viewedPage = {
+      ...page,
+      items: [{ ...page.items[0], stage: "VIEWED" as const, stageVersion: 2 }],
+    };
+    const shortlistRequests: Array<{ url: string; method: string }> = [];
+    const detail = {
+      applicationId: "app-1",
+      humanDecisionNotice:
+        "Scores support decision-making only. The recruiter makes the final decision.",
+      scoring: {
+        kind: "PROCESSING" as const,
+        label: "Processing" as const,
+        operationId: "operation-1",
+      },
+      rescoreInProgress: false,
+      documentAccess: {
+        cvViewerPath: "/cv",
+        coverLetterViewerPath: "/cover-letter",
+      },
+    };
+    const fetchMock = vi.fn(async (input: unknown, init?: RequestInit) => {
+      const url = String(input);
+      if (url.includes("/ranked?")) {
+        return new Response(JSON.stringify(viewedPage), { status: 200 });
+      }
+      if (url.endsWith("/shortlist")) {
+        shortlistRequests.push({ url, method: init?.method ?? "GET" });
+        return new Response(
+          JSON.stringify({
+            applicationId: "app-1",
+            stage: "SHORTLISTED",
+            stageVersion: 3,
+            lastStageChangedAt: "2026-08-18T06:22:00.000Z",
+            changed: true,
+          }),
+          { status: 200 },
+        );
+      }
+      if (url.endsWith("/scoring")) {
+        return new Response(JSON.stringify(detail), { status: 200 });
+      }
+      return new Response(JSON.stringify({}), { status: 404 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <CandidateRankingList
+        jobId="job-1"
+        jobTitle="Senior Engineer"
+        csrfProof="csrf-proof"
+      />,
+    );
+    const candidate = await screen.findByText("Candidate One");
+    fireEvent.click(candidate.closest('[role="row"]')!);
+
+    const shortlist = await screen.findByRole("button", { name: "Shortlist" });
+    fireEvent.click(shortlist);
+    await waitFor(() => expect(shortlistRequests).toHaveLength(1));
+    expect(shortlistRequests[0]).toMatchObject({ method: "POST" });
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("button", { name: "Shortlist" }),
+      ).not.toBeInTheDocument(),
+    );
+  });
 });

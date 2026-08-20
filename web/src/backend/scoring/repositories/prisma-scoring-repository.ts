@@ -15,6 +15,12 @@ import type {
   PublishedScoringRecord,
 } from "./scoring-repository";
 import { SKILL_NORMALIZATION_VERSION } from "../domain/skill-evidence-extractor";
+import {
+  automaticScoreBand,
+  automaticScoreConfigForPublishedResult,
+  getAutomaticScoreStageRuleConfig,
+  type AutomaticScoreStageRuleConfig,
+} from "@/backend/applications/services/automatic-score-stage-config";
 
 /* The generated Prisma include projection is intentionally narrowed at the
  * contract boundary below; the projection contains encrypted text fields. */
@@ -241,8 +247,12 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
     });
     if (!row) return null;
     const automatic = this.projectAutomatic(row.automaticMatch);
+    const scoreConfig = automaticScoreConfigForPublishedResult({
+      mediumThreshold: row.mediumThreshold,
+      highThreshold: row.highThreshold,
+    });
     const ai = row.aiAssessment
-      ? this.projectAi(row.aiAssessment, automatic)
+      ? this.projectAi(row.aiAssessment, automatic, scoreConfig)
       : null;
     const finalScore =
       row.finalScore === null || !ai
@@ -254,9 +264,9 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
             automaticWeight: 0.6 as const,
             aiWeight: 0.4 as const,
             band:
-              Number(row.finalScore) >= 80
+              Number(row.finalScore) >= scoreConfig.strongScoreThreshold
                 ? { code: "HIGH_MATCH", label: "Strong match", iconLabel: "✓" }
-                : Number(row.finalScore) >= 60
+                : Number(row.finalScore) >= scoreConfig.lowScoreThreshold
                   ? {
                       code: "MEDIUM_MATCH",
                       label: "Review needed",
@@ -367,7 +377,12 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
     };
   }
 
-  private projectAi(row: any, automatic?: AutomaticMatch): AiAssessment {
+  private projectAi(
+    row: any,
+    automatic?: AutomaticMatch,
+    scoreConfig: AutomaticScoreStageRuleConfig =
+      getAutomaticScoreStageRuleConfig(),
+  ): AiAssessment {
     const dataQualityNotes = row.findings
       .filter(
         (finding: any) =>
@@ -644,6 +659,7 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
     return {
       assessmentId: row.id,
       score: scoreReasoning.score,
+      aiScoreBand: automaticScoreBand(scoreReasoning.score, scoreConfig),
       confidencePercent,
       confidenceLevel,
       confidenceLabel:
@@ -704,6 +720,7 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
   }
 
   async publish(input: Parameters<ScoringRepositoryPort["publish"]>[0]) {
+    const scoreConfig = getAutomaticScoreStageRuleConfig();
     await this.db.$transaction(async (tx) => {
       const application = await tx.jobApplication.findUnique({
         where: { id: input.applicationId },
@@ -898,8 +915,8 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
           formulaVersion: input.finalScore?.formulaVersion ?? "HS-60/40-v1",
           automaticWeight: 0.6,
           aiWeight: 0.4,
-          highThreshold: 80,
-          mediumThreshold: 60,
+          highThreshold: scoreConfig.strongScoreThreshold,
+          mediumThreshold: scoreConfig.lowScoreThreshold,
           roundingRule: "round-half-up-1-decimal",
           jobDescriptionVersionId: input.automatic.jdVersion,
           cvSnapshotVersionId: input.automatic.cvVersion,

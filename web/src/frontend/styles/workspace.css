@@ -554,7 +554,7 @@
 
 .workspace-page-header__eyebrow {
   color: var(--sh-color-brand-primary);
-  font-family: var(--sh-font-family-label);
+  font-family: var(--sh-font-family);
   font-size: 11px;
   font-weight: var(--sh-font-weight-bold);
   line-height: var(--sh-line-height-caption);
@@ -563,13 +563,7 @@
 }
 
 .workspace-page-header__eyebrow::before {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin: 0 7px 1px 0;
-  border-radius: var(--sh-radius-full);
-  background: currentColor;
-  content: "";
+  display: none;
 }
 
 .workspace-page-header h1 {

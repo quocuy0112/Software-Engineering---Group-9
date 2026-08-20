@@ -12,6 +12,7 @@ import { notificationKindSchema } from "@/shared/contracts/notifications";
 export const notificationVariablesSchema = z
   .object({
     companyName: z.string().trim().min(1).max(120).optional(),
+    targetEmail: z.string().email().max(320).optional(),
     jobId: z.string().trim().min(1).max(128).optional(),
     audience: z.enum(["USER", "ADMIN"]).optional(),
     recipientRole: z.enum(["CANDIDATE", "RECRUITER", "ADMIN"]).optional(),
@@ -170,6 +171,33 @@ const policies = {
       "Bạn đã bị xóa khỏi một công ty trên SmartHire.",
       "You were removed from a company on SmartHire.",
     ),
+  },
+  COMPANY_INVITATION_RECEIVED: {
+    category: "ACCOUNT",
+    severity: "MEDIUM",
+    title: { vi: "Lời mời tham gia công ty", en: "Company team invitation" },
+    summary: (locale, variables) =>
+      locale === "vi"
+        ? `Bạn đã được mời tham gia đội ngũ${variables.companyName ? ` của ${variables.companyName}` : ""}. Kiểm tra email để chấp nhận lời mời.`
+        : `You were invited to join${variables.companyName ? ` ${variables.companyName}` : " a company team"}. Check your email to accept the invitation.`,
+  },
+  COMPANY_INVITATION_ACCEPTED: {
+    category: "ACCOUNT",
+    severity: "LOW",
+    title: { vi: "Lời mời đã được chấp nhận", en: "Invitation accepted" },
+    summary: (locale, variables) =>
+      locale === "vi"
+        ? `${variables.targetEmail ?? "Người được mời"} đã chấp nhận lời mời${variables.companyName ? ` tham gia ${variables.companyName}` : ""}.`
+        : `${variables.targetEmail ?? "The invited account"} accepted the invitation${variables.companyName ? ` to join ${variables.companyName}` : ""}.`,
+  },
+  COMPANY_INVITATION_DECLINED: {
+    category: "ACCOUNT",
+    severity: "LOW",
+    title: { vi: "Lời mời đã bị từ chối", en: "Invitation declined" },
+    summary: (locale, variables) =>
+      locale === "vi"
+        ? `${variables.targetEmail ?? "Người được mời"} đã từ chối lời mời${variables.companyName ? ` tham gia ${variables.companyName}` : ""}.`
+        : `${variables.targetEmail ?? "The invited account"} declined the invitation${variables.companyName ? ` to join ${variables.companyName}` : ""}.`,
   },
   APPLICATION_SUBMITTED: {
     category: "APPLICATION",
@@ -507,38 +535,12 @@ const policies = {
   },
 } satisfies Record<NotificationKind, Policy>;
 
-const hrefForContext = (
-  kind: NotificationKind,
-  contextType?: NotificationContextType,
-  contextId?: string,
-) => {
-  if (!contextType || !contextId) return null;
-  if (contextType === "ACCOUNT") return "/profile/security";
-  if (contextType === "MEMBERSHIP") return recruiterRoutes.jobPostings;
-  if (contextType === "APPLICATION")
-    return kind === "APPLICATION_RECEIVED"
-      ? recruiterRoutes.jobPostings
-      : `/jobs/applied/${encodeURIComponent(contextId)}`;
-  if (contextType === "VERIFICATION_REQUEST")
-    return "/dashboard/employer-verification";
-  if (contextType === "SUPPORT_CASE") return "/support";
-  if (contextType === "CONNECTION_PROPOSAL" || contextType === "CONNECTION")
-    return "/connections";
-  if (contextType === "CONVERSATION")
-    return `/messages?conversation=${encodeURIComponent(contextId)}`;
-  if (contextType === "JOB_POST_REVIEW")
-    return kind === "JOB_POST_REVIEW_REQUESTED_ADMIN"
-      ? `/admin/job-post-reviews/${encodeURIComponent(contextId)}`
-      : `${recruiterRoutes.jobPostings}?review=${encodeURIComponent(contextId)}`;
-  return null;
-};
-
 export type BuiltNotification = {
   kind: NotificationKind;
   category: NotificationCategory;
   severity: NotificationSeverity;
   audience: "USER" | "ADMIN";
-  recipientRole: NotificationRecipientRole;
+  recipientRole?: NotificationRecipientRole;
   title: string;
   summary: string;
   href: string | null;

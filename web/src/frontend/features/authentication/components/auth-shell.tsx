@@ -1,10 +1,34 @@
 import { AuthMotion } from "./auth-motion";
 import AuthFooter from "./AuthFooter";
 import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
 import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
-import { ThemeToggle } from "@/frontend/components/ui/theme-toggle";
 
-export function AuthShell({ children }: { children: React.ReactNode }) {
+type AuthShellProps = {
+  children: React.ReactNode;
+  locale?: "vi" | "en";
+};
+
+export function AuthShell({ children, locale = "en" }: AuthShellProps) {
+  const copy =
+    locale === "vi"
+      ? {
+          protection: "Bảo vệ tài khoản",
+          secure: "An toàn",
+          note: "Ví dụ minh hoạ — không phải trạng thái tài khoản của bạn.",
+          emailVerified: "Xác thực email",
+          twoFactor: "Bảo vệ tài khoản bằng 2FA",
+          profile: "Xây dựng hồ sơ chuyên môn",
+        }
+      : {
+          protection: "Account protection",
+          secure: "Secure",
+          note: "Illustration only — not your account status.",
+          emailVerified: "Verify your email",
+          twoFactor: "Protect your account with 2FA",
+          profile: "Build your professional profile",
+        };
+
   return (
     <main className="auth-page">
       <aside className="auth-visual" aria-label="About SmartHire">
@@ -20,34 +44,30 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
             </p>
           </div>
 
-          <div className="auth-visual-board" aria-hidden="true">
+          <div className="auth-visual-board">
             <div className="visual-board-header">
               <span className="visual-board-dot" />
-              <span>Account protection</span>
-              <span className="visual-board-status">Secure</span>
+              <span>{copy.protection}</span>
+              <span className="visual-board-status">{copy.secure}</span>
             </div>
-            <div className="visual-profile-row">
-              <span className="visual-avatar">AM</span>
-              <span>
-                <strong>Your identity stays yours</strong>
-                <small>Private, transparent, and secure</small>
-              </span>
-            </div>
-            <div className="visual-signal-row">
-              <span className="visual-signal" />
-              <span className="visual-signal" />
-              <span className="visual-signal" />
-              <span className="visual-signal-label">Protected by design</span>
-            </div>
+            <p className="visual-board-note">{copy.note}</p>
+            <ol className="visual-trust-steps">
+              <li className="is-complete">
+                <span aria-hidden="true">✓</span> {copy.emailVerified}
+              </li>
+              <li className="is-complete">
+                <span aria-hidden="true">✓</span> {copy.twoFactor}
+              </li>
+              <li>
+                <span aria-hidden="true">3</span> {copy.profile}
+              </li>
+            </ol>
           </div>
         </div>
       </aside>
 
       <section className="auth-panel">
         <div className="auth-panel-inner">
-          <div className="auth-panel-toolbar">
-            <ThemeToggle compact />
-          </div>
           <section className="auth-card">
             <nav className="auth-navigation" aria-label="Authentication">
               <Link href="/login">Sign in</Link>
@@ -61,6 +81,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
           </section>
 
           <p className="auth-panel-note">
+            <ShieldCheck size={15} aria-hidden="true" />
             SmartHire keeps account access simple, transparent, and secure.
           </p>
         </div>

@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { ChecklistItem } from "@/frontend/components/ui/checklist-item";
+import { ContentTabs } from "@/frontend/components/ui/content-tabs";
+import { StatChip } from "@/frontend/components/ui/stat-chip";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
 import {
   jobCategories,
@@ -11,6 +14,7 @@ import {
   jobResponsibilities,
   jobSkills,
 } from "./job-detail-data";
+import { JobMetaIcon } from "./job-meta-icon";
 
 export type JobDetailSectionId =
   | "description"
@@ -49,12 +53,10 @@ function BulletList({ items }: { items: string[] }) {
   return (
     <ul className="job-detail-bullet-list">
       {items.map((item, index) => (
-        <li key={item + "-" + index}>
-          <span className="job-bullet-marker" aria-hidden="true">
-            ✓
-          </span>
-          <BulletContent item={item} />
-        </li>
+        <ChecklistItem
+          key={item + "-" + index}
+          text={<BulletContent item={item} />}
+        />
       ))}
     </ul>
   );
@@ -118,17 +120,12 @@ function SectionHeading({
 export function JobDetailOverview({ job }: { job: JobDetail }) {
   const facts = [
     {
-      label: "Experience",
-      value:
-        job.experienceMinYears !== undefined
-          ? job.experienceMinYears + "+ years"
-          : "Not listed",
-    },
-    {
+      icon: <JobMetaIcon name="person" />,
       label: "Age",
       value: job.age?.trim() || "Not listed",
     },
     {
+      icon: <JobMetaIcon name="education" />,
       label: "Education level",
       value: job.education?.trim() || "Not listed",
     },
@@ -155,27 +152,27 @@ export function JobDetailOverview({ job }: { job: JobDetail }) {
         aria-label="Job requirements at a glance"
       >
         {facts.map((fact) => (
-          <div className="job-overview-fact" key={fact.label}>
-            <span className="job-overview-fact-label">{fact.label}</span>
-            <span className="job-detail-tag">{fact.value}</span>
-          </div>
+          <StatChip
+            className="job-overview-stat"
+            key={fact.label}
+            icon={fact.icon}
+            label={fact.label}
+            value={fact.value}
+          />
         ))}
       </div>
 
       <div className="job-overview-specialization">
-        <p className="job-detail-inline-chip-label">Specialization</p>
-        {specialization.length ? (
-          <ul
-            className="job-detail-inline-chips"
-            aria-label="Job specialization"
-          >
-            {specialization.slice(0, 10).map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        ) : (
-          <span className="job-detail-tag">Not listed</span>
-        )}
+        <InlineChips
+          items={specialization.slice(0, 10)}
+          label="Specialization"
+          ariaLabel="Job specialization"
+        />
+        <InlineChips
+          items={jobSkills(job).slice(0, 14)}
+          label="Required skills"
+          ariaLabel="Required skills"
+        />
       </div>
     </section>
   );
@@ -307,30 +304,18 @@ export function JobDetailSections({
         <h2 id="job-details-tabs-heading" className="sr-only">
           Job details
         </h2>
-        <div
-          className="job-detail-tab-list"
-          role="tablist"
-          aria-label="Job detail sections"
-        >
-          {detailTabs.map((tab) => {
-            const selected = tab.id === activeTab;
-            return (
-              <button
-                key={tab.id}
-                id={"job-detail-tab-" + tab.id}
-                className={"job-detail-tab" + (selected ? " is-active" : "")}
-                type="button"
-                role="tab"
-                aria-selected={selected}
-                aria-controls="job-detail-tab-panel"
-                tabIndex={selected ? 0 : -1}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+        <ContentTabs
+          tabs={detailTabs.map((tab) => ({
+            id: "job-detail-tab-" + tab.id,
+            label: tab.label,
+          }))}
+          activeIndex={detailTabs.findIndex((tab) => tab.id === activeTab)}
+          onChange={(index) =>
+            setActiveTab(detailTabs[index]?.id ?? "description")
+          }
+          ariaLabel="Job detail sections"
+          panelId="job-detail-tab-panel"
+        />
         <p className="job-detail-tab-description">
           {activeTabConfig.description}
         </p>

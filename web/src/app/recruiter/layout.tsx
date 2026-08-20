@@ -1,19 +1,22 @@
-import '@/frontend/styles/workspace.css';
-import '@/frontend/styles/responsive.css';
-import '@/frontend/styles/recruiter-workspace-full.css';
-import { redirect } from 'next/navigation';
-import { getWorkspaceContext } from '@/backend/auth/get-workspace-context';
-import { WorkspaceShell } from '@/frontend/features/dashboard/components/workspace-shell';
-import { recruiterRoutes } from '@/shared/routing/recruiter-routes';
+import "@/frontend/styles/workspace.css";
+import "@/frontend/styles/responsive.css";
+import "@/frontend/styles/recruiter-workspace-full.css";
+import "@/frontend/styles/recruitment-pipeline.css";
+import { redirect } from "next/navigation";
+import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
+import { WorkspaceShell } from "@/frontend/features/dashboard/components/workspace-shell";
+import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function RecruiterLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const context = await getWorkspaceContext();
   if (!context)
-    redirect(`/login?returnTo=${encodeURIComponent(recruiterRoutes.jobPostings)}`);
+    redirect(
+      `/login?returnTo=${encodeURIComponent(recruiterRoutes.jobPostings)}`,
+    );
 
   return (
     <WorkspaceShell
@@ -21,7 +24,7 @@ export default async function RecruiterLayout({
       profile={context.account}
       initialLocale={context.initialLocale}
       initialRecruiterStatus={context.initialRecruiterStatus}
-      initialWorkspaceMode='recruiter'
+      initialWorkspaceMode="recruiter"
       recruiterContent={children}
     >
       <div />

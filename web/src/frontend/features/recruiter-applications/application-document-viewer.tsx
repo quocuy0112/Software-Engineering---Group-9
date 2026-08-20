@@ -16,7 +16,9 @@ export function ApplicationDocumentViewer({
   fileName?: string | null;
   onClose: () => void;
 }) {
-  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
+  const [state, setState] = useState<
+    "loading" | "ready" | "download-only" | "error"
+  >("loading");
   const [message, setMessage] = useState("");
   const [documentUrl, setDocumentUrl] = useState<string | null>(null);
   const previewUrl = `/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(applicationId)}/documents/${kind}`;
@@ -29,7 +31,8 @@ export function ApplicationDocumentViewer({
       cache: "no-store",
       credentials: "same-origin",
       headers: {
-        Accept: "application/pdf, application/octet-stream, text/plain",
+        Accept:
+          "application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/octet-stream, text/plain",
       },
     })
       .then(async (response) => {
@@ -45,6 +48,13 @@ export function ApplicationDocumentViewer({
         }
         const blob = await response.blob();
         if (!blob.size) throw new Error("The document is empty.");
+        const canPreviewInline =
+          blob.type === "application/pdf" || blob.type.startsWith("text/");
+        if (!canPreviewInline) {
+          if (!active) return;
+          setState("download-only");
+          return;
+        }
         objectUrl = URL.createObjectURL(blob);
         if (!active) {
           URL.revokeObjectURL(objectUrl);
@@ -108,6 +118,19 @@ export function ApplicationDocumentViewer({
               <AlertTriangle aria-hidden="true" />
               <strong>Couldn&apos;t load document</strong>
               <p>{message}</p>
+              <a href={downloadUrl} download={fileName ?? undefined}>
+                Download original file
+              </a>
+            </div>
+          ) : null}
+          {state === "download-only" ? (
+            <div className="application-document-dialog__state" role="status">
+              <Download aria-hidden="true" />
+              <strong>Original file is ready</strong>
+              <p>
+                This file format cannot be rendered inline in the browser.
+                Download it to view the full CV or cover letter.
+              </p>
               <a href={downloadUrl} download={fileName ?? undefined}>
                 Download original file
               </a>

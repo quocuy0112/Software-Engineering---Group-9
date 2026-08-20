@@ -12,6 +12,106 @@ type Limits = Readonly<{
   maximumOutputBytes: number;
 }>;
 
+type PositionedTextItem = Readonly<{
+  text: string;
+  x: number;
+  y: number;
+  fontSize: number;
+  hasEOL: boolean;
+  order: number;
+}>;
+
+function textItem(value: unknown, order: number): PositionedTextItem | null {
+  if (!value || typeof value !== "object" || !("str" in value)) return null;
+  const text = typeof value.str === "string" ? value.str.trim() : "";
+  if (!text) return null;
+  const transform =
+    "transform" in value && Array.isArray(value.transform)
+      ? value.transform
+      : null;
+  const x = Number(transform?.[4]);
+  const y = Number(transform?.[5]);
+  const fontSize = Math.max(
+    Math.abs(Number(transform?.[0])) || 0,
+    Math.abs(Number(transform?.[3])) || 0,
+    1,
+  );
+  return {
+    text,
+    x: Number.isFinite(x) ? x : Number.NaN,
+    y: Number.isFinite(y) ? y : Number.NaN,
+    fontSize,
+    hasEOL: "hasEOL" in value && value.hasEOL === true,
+    order,
+  };
+}
+
+/**
+ * PDF.js exposes text as positioned fragments. Joining every fragment with a
+ * space loses the visual line structure, which is especially noticeable for
+ * cover letters. Rebuild lines from the baseline and retain a safe fallback
+ * for PDFs that do not expose usable transforms.
+ */
+function pageText(items: readonly unknown[]) {
+  const extracted = items.flatMap((item, index) => {
+    const value = textItem(item, index);
+    return value ? [value] : [];
+  });
+  if (!extracted.length) return "";
+
+  if (extracted.some((item) => !Number.isFinite(item.x) || !Number.isFinite(item.y))) {
+    return extracted
+      .map((item) => item.text + (item.hasEOL ? "\n" : " "))
+      .join("")
+      .replace(/[ \t]+/gu, " ")
+      .replace(/ *\n */gu, "\n")
+      .trim();
+  }
+
+  const ordered = extracted
+    .slice()
+    .sort(
+      (left, right) =>
+        right.y - left.y || left.x - right.x || left.order - right.order,
+    );
+  const lines: Array<{
+    y: number;
+    fontSize: number;
+    hasEOL: boolean;
+    items: PositionedTextItem[];
+  }> = [];
+
+  for (const item of ordered) {
+    const previous = lines.at(-1);
+    const tolerance = Math.max(
+      2,
+      Math.min(6, (previous?.fontSize ?? item.fontSize) * 0.35),
+    );
+    if (!previous || previous.hasEOL || Math.abs(previous.y - item.y) > tolerance) {
+      lines.push({
+        y: item.y,
+        fontSize: item.fontSize,
+        hasEOL: item.hasEOL,
+        items: [item],
+      });
+      continue;
+    }
+    previous.items.push(item);
+    previous.hasEOL = item.hasEOL;
+  }
+
+  return lines
+    .map((line) =>
+      line.items
+        .map((item) => item.text)
+        .join(" ")
+        .replace(/\s+/gu, " ")
+        .trim(),
+    )
+    .filter(Boolean)
+    .join("\n");
+}
+
 function rejectStaticActiveContent(source: Uint8Array) {
   const raw = Buffer.from(source).toString("latin1");
   if (/\/Encrypt\b/u.test(raw)) throw new DocumentExtractionError("ENCRYPTED");
@@ -57,11 +157,10 @@ export async function extractPdf(
       const content = await page.getTextContent({
         disableNormalization: false,
       });
-      const text = content.items
-        .map((item) => ("str" in item ? item.str : ""))
-        .join(" ")
+      const text = pageText(content.items)
         .normalize("NFKC")
-        .replace(/\s+/gu, " ")
+        .replace(/[ \t]+/gu, " ")
+        .replace(/ *\n */gu, "\n")
         .trim();
       if (!text) continue;
       outputBytes += Buffer.byteLength(text, "utf8");

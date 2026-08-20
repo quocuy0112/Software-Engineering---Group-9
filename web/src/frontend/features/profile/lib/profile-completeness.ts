@@ -1,5 +1,14 @@
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 
+export const PROFILE_SUMMARY_COMPLETION_MIN_LENGTH = 50;
+export const PROFILE_HEADLINE_COMPLETION_MIN_LENGTH = 10;
+
+export type ProfileBasicsMissingRequirement =
+  | "headline"
+  | "summary"
+  | "headlineAndSummary"
+  | null;
+
 export type ProfileCompletionSection =
   | "avatar"
   | "basics"
@@ -16,6 +25,20 @@ export type ProfileCompletionItem = {
 
 function hasText(value: string | null | undefined) {
   return Boolean(value?.trim());
+}
+
+export function getProfileBasicsMissingRequirement(
+  profile: CandidateProfileContract,
+): ProfileBasicsMissingRequirement {
+  const headlineLength = profile.basics.headline?.trim().length ?? 0;
+  const summaryLength = profile.basics.summary?.trim().length ?? 0;
+  const hasHeadline = headlineLength >= PROFILE_HEADLINE_COMPLETION_MIN_LENGTH;
+  const hasSummary = summaryLength >= PROFILE_SUMMARY_COMPLETION_MIN_LENGTH;
+
+  if (!hasHeadline && !hasSummary) return "headlineAndSummary";
+  if (!hasHeadline) return "headline";
+  if (!hasSummary) return "summary";
+  return null;
 }
 
 function hasProfessionalLink(value: string) {
@@ -42,6 +65,7 @@ export function getProfileCompletion(
 ) {
   const headlineLength = profile.basics.headline?.trim().length ?? 0;
   const summaryLength = profile.basics.summary?.trim().length ?? 0;
+  const basicsMissingRequirement = getProfileBasicsMissingRequirement(profile);
   const detailedExperience = profile.experience.some(
     (entry) => (entry.description?.trim().length ?? 0) >= 80,
   );
@@ -54,7 +78,7 @@ export function getProfileCompletion(
     {
       key: "basics",
       targetId: "profile-basics-section",
-      complete: headlineLength >= 20 && summaryLength >= 120,
+      complete: basicsMissingRequirement === null,
     },
     {
       key: "skills",
@@ -86,8 +110,16 @@ export function getProfileCompletion(
 
   const completed = items.filter((item) => item.complete).length;
   const percentage = Math.round(
-    (headlineLength >= 20 ? 10 : headlineLength > 0 ? 5 : 0) +
-      (summaryLength >= 120 ? 15 : summaryLength > 0 ? 7 : 0) +
+    (headlineLength >= PROFILE_HEADLINE_COMPLETION_MIN_LENGTH
+      ? 10
+      : headlineLength > 0
+        ? 5
+        : 0) +
+      (summaryLength >= PROFILE_SUMMARY_COMPLETION_MIN_LENGTH
+        ? 15
+        : summaryLength > 0
+          ? 7
+          : 0) +
       (avatar ? 15 : 0) +
       Math.min(profile.skills.length / 3, 1) * 20 +
       (items.find((item) => item.key === "experience")?.complete ? 15 : 0) +

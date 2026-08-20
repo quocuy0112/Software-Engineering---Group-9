@@ -87,19 +87,20 @@
   }
 
   .auth-navigation {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--sh-space-1) var(--sh-space-3);
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 2px;
     margin-bottom: var(--sh-space-6);
   }
 
   .auth-navigation a {
+    min-width: 0;
+    flex: 1 1 0;
     min-height: 44px;
-    font-size: var(--sh-font-size-label);
-  }
-
-  .auth-navigation a:last-child {
-    grid-column: 1 / -1;
+    padding-inline: 4px;
+    font-size: 11px;
+    line-height: 1;
+    white-space: nowrap;
   }
 
   .page-heading,
@@ -162,7 +163,8 @@
   }
 
   .auth-navigation a {
-    font-size: var(--sh-font-size-caption);
+    padding-inline: 2px;
+    font-size: 10px;
   }
 
   .backup-codes,

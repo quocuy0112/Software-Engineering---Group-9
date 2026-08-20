@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import type { RankedApplicationRow } from "@/shared/contracts/scoring";
 import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
+import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
+import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import {
   useRankedCandidates,
   type RankedCandidateQuery,
@@ -38,6 +40,10 @@ import {
   StatCard,
   statusLabel,
 } from "./candidate-ranking-ui";
+import {
+  applicationShortlistOutcomeSchema,
+  applicationViewedOutcomeSchema,
+} from "@/shared/contracts/jobs/applications";
 
 const defaultQuery: RankedCandidateQuery = {
   sort: "FINAL_SCORE",
@@ -374,12 +380,18 @@ export function CandidateRankingList({
   jobTitle,
   onBack,
   backHref,
+  csrfProof,
+  pipelineHref,
 }: {
   jobId: string;
   jobTitle: string;
   onBack?: () => void;
   backHref?: string;
+  csrfProof?: string;
+  pipelineHref?: string;
 }) {
+  const contextCsrfProof = useCsrfProof();
+  const effectiveCsrfProof = csrfProof ?? contextCsrfProof;
   const [query, setQuery] = useState<RankedCandidateQuery>(defaultQuery);
   const [pageSize, setPageSize] = useState(10);
   const [searchDraft, setSearchDraft] = useState("");
@@ -425,6 +437,62 @@ export function CandidateRankingList({
     setSelected(null);
     setSelectedRank(null);
     setMessage(nextMessage);
+    ranking.refresh();
+  };
+  const acknowledgeCandidateOpened = async (row: RankedApplicationRow) => {
+    if (row.stage !== "APPLIED") return;
+    try {
+      const response = await mutateWithCurrentCsrf(
+        `/api/recruiter/applications/${encodeURIComponent(row.applicationId)}/view`,
+        {
+          method: "POST",
+        },
+        effectiveCsrfProof,
+      );
+      if (!response.ok) return;
+      const result = applicationViewedOutcomeSchema.parse(
+        await response.json(),
+      );
+      setSelected((current) =>
+        current?.applicationId === row.applicationId
+          ? {
+              ...current,
+              stage: result.stage,
+              stageVersion: result.stageVersion,
+            }
+          : current,
+      );
+      // The stage transition changes the authoritative row and the candidate
+      // table must stop showing the cached Applied/New state immediately.
+      ranking.refresh();
+    } catch {
+      // Opening the candidate remains available if the acknowledgement fails;
+      // the scoring/document read fallback can still acknowledge the review.
+    }
+  };
+  const shortlistCandidate = async (row: RankedApplicationRow) => {
+    if (row.stage !== "VIEWED") return;
+    const response = await mutateWithCurrentCsrf(
+      `/api/recruiter/applications/${encodeURIComponent(row.applicationId)}/shortlist`,
+      { method: "POST" },
+      effectiveCsrfProof,
+    );
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      throw new Error(
+        payload?.message ?? "The candidate could not be shortlisted.",
+      );
+    }
+    const result = applicationShortlistOutcomeSchema.parse(payload);
+    setSelected((current) =>
+      current?.applicationId === row.applicationId
+        ? {
+            ...current,
+            stage: result.stage,
+            stageVersion: result.stageVersion,
+          }
+        : current,
+    );
     ranking.refresh();
   };
   const openRow = (row: RankedApplicationRow, rank: number) => {
@@ -489,6 +557,14 @@ export function CandidateRankingList({
           </p>
         </div>
         <div className="ranking-header-actions">
+          {pipelineHref ? (
+            <Link
+              href={pipelineHref}
+              className="ai-ranking-button ai-ranking-button--secondary"
+            >
+              View pipeline
+            </Link>
+          ) : null}
           <button
             type="button"
             className="ai-ranking-button ai-ranking-button--secondary"
@@ -675,8 +751,8 @@ export function CandidateRankingList({
                   <option value="ACTIVE_PIPELINE">Active pipeline</option>
                   <option value="ALL">All statuses</option>
                   <option value="APPLIED">New</option>
-                  <option value="VIEWED">Screened</option>
-                  <option value="SHORTLISTED">Under review</option>
+                  <option value="VIEWED">Viewed</option>
+                  <option value="SHORTLISTED">Shortlisted</option>
                   <option value="WAITLISTED">Needs details</option>
                   <option value="INTERVIEWING">Interviewing</option>
                   <option value="REJECTED">Rejected</option>
@@ -829,8 +905,10 @@ export function CandidateRankingList({
             setSelectedRank(null);
           }}
           onSetPriority={() => setModal("priority")}
+          onShortlist={() => shortlistCandidate(selected)}
           onMoveToInterview={() => setModal("interview")}
           onReject={() => setModal("reject")}
+          onApplicationOpened={() => acknowledgeCandidateOpened(selected)}
           onScoringChanged={ranking.refresh}
         />
       ) : null}
@@ -862,6 +940,7 @@ export function CandidateRankingList({
       {modal === "interview" && selected ? (
         <StageTransitionConfirmModal
           candidate={selected}
+          jobId={jobId}
           onCancel={() => setModal(null)}
           onCompleted={() =>
             finishAction(
@@ -873,6 +952,7 @@ export function CandidateRankingList({
       {modal === "reject" && selected ? (
         <RejectCandidateModal
           candidate={selected}
+          jobId={jobId}
           onCancel={() => setModal(null)}
           onCompleted={() =>
             finishAction(

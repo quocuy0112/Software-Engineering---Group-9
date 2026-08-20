@@ -4,7 +4,10 @@ import { cvConfiguration, cvParserAvailability } from "@/backend/cv/config";
 import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
 import { listCandidateCvLibrary } from "@/backend/services/profile/candidate-cv-library";
 import { listCvImports } from "@/backend/services/cv-import/cv-import-projection";
-import { StatCard, StepCard } from "@/frontend/components/ui/cv-import-primitives";
+import {
+  StatCard,
+  StepCard,
+} from "@/frontend/components/ui/cv-import-primitives";
 import { Panel } from "@/frontend/components/ui/design-system";
 import { CvImportWorkspace } from "@/frontend/features/cv-import/components/cv-import-workspace";
 import { ProfileNavigation } from "@/frontend/features/profile/components/profile-navigation";
@@ -27,12 +30,17 @@ export default async function CvImportsPage() {
 
   return (
     <main className={styles.page}>
+      <ProfileNavigation active="cv-imports" />
       <Panel
         as="header"
         accentBorder="blue"
         showDivider={false}
         eyebrow={vi ? "Tài khoản SmartHire của bạn" : "Your SmartHire account"}
-        title={vi ? "Biến CV thành cập nhật hồ sơ" : "Turn your CV into profile updates"}
+        title={
+          vi
+            ? "Biến CV thành cập nhật hồ sơ"
+            : "Turn your CV into profile updates"
+        }
         titleAs="h1"
         titleId="workspace-page-title"
         className={styles.hero}
@@ -44,7 +52,9 @@ export default async function CvImportsPage() {
                 ? `trên ${maximumImports} lần nhập được lưu giữ`
                 : `of ${maximumImports} imports retained`
             }
-            sublabel={vi ? "PDF hoặc DOCX · tối đa 5 MB" : "PDF or DOCX · up to 5 MB"}
+            sublabel={
+              vi ? "PDF hoặc DOCX · tối đa 5 MB" : "PDF or DOCX · up to 5 MB"
+            }
           />
         }
       >
@@ -55,13 +65,37 @@ export default async function CvImportsPage() {
         </p>
       </Panel>
 
-      <ol className={styles.workflow} aria-label={vi ? "Quy trình nhập CV" : "CV import workflow"}>
-        <li><StepCard number={1} title={vi ? "Tải lên" : "Upload"} subtitle={vi ? "Chọn CV được hỗ trợ" : "Choose a supported CV"} /></li>
-        <li><StepCard number={2} title={vi ? "Xử lý an toàn" : "Process securely"} subtitle={vi ? "Quét, trích xuất và phân tích" : "Scan, extract, and parse"} /></li>
-        <li><StepCard number={3} title={vi ? "Xem xét và áp dụng" : "Review and apply"} subtitle={vi ? "Bạn phê duyệt mọi thay đổi" : "You approve every change"} /></li>
+      <ol
+        className={styles.workflow}
+        aria-label={vi ? "Quy trình nhập CV" : "CV import workflow"}
+      >
+        <li>
+          <StepCard
+            number={1}
+            title={vi ? "Tải lên" : "Upload"}
+            subtitle={vi ? "Chọn CV được hỗ trợ" : "Choose a supported CV"}
+          />
+        </li>
+        <li>
+          <StepCard
+            number={2}
+            title={vi ? "Xử lý an toàn" : "Process securely"}
+            subtitle={
+              vi ? "Quét, trích xuất và phân tích" : "Scan, extract, and parse"
+            }
+          />
+        </li>
+        <li>
+          <StepCard
+            number={3}
+            title={vi ? "Xem xét và áp dụng" : "Review and apply"}
+            subtitle={
+              vi ? "Bạn phê duyệt mọi thay đổi" : "You approve every change"
+            }
+          />
+        </li>
       </ol>
 
-      <ProfileNavigation active="cv-imports" />
       <CvImportWorkspace
         csrfProof={context.csrfProof}
         initialItems={imports.items}

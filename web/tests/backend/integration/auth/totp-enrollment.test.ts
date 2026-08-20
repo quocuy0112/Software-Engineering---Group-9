@@ -1,9 +1,7 @@
-import { randomUUID } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 import { afterEach, describe, expect, it } from "vitest";
 import { auth } from "@/backend/auth/cookies/config";
-import { symmetricDecrypt } from "better-auth/crypto";
 import { prisma } from "@/backend/database/prisma";
-import { serverEnvironment } from "@/backend/env/runtime";
 import { TokenProtector } from "@/backend/security/security-token/security-tokens";
 import { csrfProof } from "@/backend/security/csrf/csrf-proof";
 import { BetterAuthGateway } from "@/backend/auth/better-auth/better-auth-gateway";
@@ -102,16 +100,39 @@ function verifyRequest(cookie: string, proof: string, body: unknown) {
   );
 }
 
-async function currentTotpCode(userId: string) {
-  const stored = await prisma.twoFactor.findFirstOrThrow({ where: { userId } });
-  const decryptedSecret = await symmetricDecrypt({
-    key: serverEnvironment.BETTER_AUTH_SECRET,
-    data: stored.secret,
-  });
-  const { code } = await auth.api.generateTOTP({
-    body: { secret: decryptedSecret },
-  });
-  return code;
+function base32Decode(input: string) {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  const clean = input.replace(/=+$/, "").toUpperCase().replace(/\s+/g, "");
+  let buffer = 0;
+  let bits = 0;
+  const bytes: number[] = [];
+  for (const character of clean) {
+    const value = alphabet.indexOf(character);
+    if (value < 0) throw new Error("Invalid test Base32 secret");
+    buffer = (buffer << 5) | value;
+    bits += 5;
+    if (bits >= 8) {
+      bits -= 8;
+      bytes.push((buffer >>> bits) & 0xff);
+    }
+  }
+  return Buffer.from(bytes);
+}
+
+function authenticatorCode(manualKey: string, now = Date.now()) {
+  const counter = Math.floor(now / 1000 / 30);
+  const counterBytes = Buffer.alloc(8);
+  counterBytes.writeBigInt64BE(BigInt(counter));
+  const digest = createHmac("sha1", base32Decode(manualKey))
+    .update(counterBytes)
+    .digest();
+  const offset = digest[digest.length - 1] & 0x0f;
+  const binary =
+    ((digest[offset] & 0x7f) << 24) |
+    ((digest[offset + 1] & 0xff) << 16) |
+    ((digest[offset + 2] & 0xff) << 8) |
+    (digest[offset + 3] & 0xff);
+  return String(binary % 1_000_000).padStart(6, "0");
 }
 
 afterEach(async () => {
@@ -160,7 +181,7 @@ describe("TOTP enrollment route handlers (real Better Auth + qrcode)", () => {
         where: { normalizedEmail: email },
       })
     ).id;
-    const code = await currentTotpCode(userId);
+    const code = authenticatorCode(setup.manualKey);
 
     const verified = await verifyEnrollment(
       verifyRequest(cookie, proof, { code }),

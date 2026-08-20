@@ -6,6 +6,7 @@ import { prisma } from "@/backend/database/prisma";
 import { configuredJsonJobCatalogueRepository } from "@/backend/repositories/jobs/job-catalogue-repository-factory";
 import { adoptActiveJobBaseline } from "@/backend/jobs/review/job-post-active-baseline-service";
 import { closeManagedJobPost } from "@/backend/jobs/review/job-post-review-service";
+import { applyRecruiterCapacityIncrease } from "@/backend/services/jobs/recruiter-capacity-service";
 import {
   companyCatalogSchema,
   recruiterCompanySettingsInputSchema,
@@ -29,6 +30,15 @@ const companiesRepository =
 const applicationsRepository =
   configuredJsonJobCatalogueRepository("applications.json");
 const MAX_COMPANY_LOGO_BYTES = 800 * 1024;
+
+function isCatalogueWriterConfigured() {
+  return (
+    process.env.NODE_ENV === "test" ||
+    (process.env.JOB_CATALOGUE_MODE === "writer" &&
+      Boolean(process.env.JOB_CATALOGUE_WRITER_HOST_ID?.trim()))
+  );
+}
+
 type CompanyProfileField =
   RecruiterCompanySettings["missingProfileFields"][number];
 
@@ -171,7 +181,12 @@ function normalizeJob(value: unknown): JobCatalogItem {
       : value;
 
   if (candidate && typeof candidate === "object") {
-    delete (candidate as Record<string, unknown>).company;
+    const candidateRecord = candidate as Record<string, unknown>;
+    // These fields are added to the recruiter-facing projection and are not
+    // part of the catalog record sent through the strict job schema.
+    delete candidateRecord.company;
+    delete candidateRecord.review;
+    delete candidateRecord.correctionRequest;
   }
 
   const source = sourceJobSchema.parse(candidate);
@@ -448,6 +463,32 @@ async function readApplications(): Promise<JobApplicationRecord[]> {
   }
 }
 
+/**
+ * Recruiter pages are keyed by the catalogue job ID, while application
+ * notifications are created from the public JobPosting ID. Resolve the
+ * latter only against the already-authorized recruiter projection so an old
+ * notification cannot be used to discover another company's job.
+ */
+export async function resolveRecruiterJobIdForNavigation(
+  requestedJobId: string,
+  availableJobs: ReadonlyArray<Pick<RecruiterJob, "id">>,
+) {
+  const normalizedJobId = requestedJobId.trim();
+  if (!normalizedJobId) return null;
+
+  const directMatch = availableJobs.find((job) => job.id === normalizedJobId);
+  if (directMatch) return directMatch.id;
+
+  const publicPosting = await prisma.jobPosting.findUnique({
+    where: { id: normalizedJobId },
+    select: { reviewAggregate: { select: { jobId: true } } },
+  });
+  const mappedJobId = publicPosting?.reviewAggregate?.jobId;
+  return mappedJobId && availableJobs.some((job) => job.id === mappedJobId)
+    ? mappedJobId
+    : null;
+}
+
 export async function readMockAppliedJobIds(userId: string) {
   const applications = await readApplications();
   return applications
@@ -696,6 +737,14 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
       },
     });
     await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
+    if (company.databaseBacked && company.databaseId) {
+      await applyRecruiterCapacityIncrease({
+        jobId: updated.id,
+        companyId: company.databaseId,
+        newCapacity: updated.numberOfHires,
+        actorUserId: userId,
+      });
+    }
     return { ...updated, company } satisfies RecruiterJob;
   });
 }
@@ -823,9 +872,6 @@ export async function updateRecruiterCompanySettings(
       website: editable.website,
       description: editable.description,
     });
-    await companiesRepository.mutate(() =>
-      replaceOrAppendRawCompany(rawCompanies, updated),
-    );
     if (company.databaseBacked && company.databaseId) {
       await prisma.company.update({
         where: { id: company.databaseId },
@@ -841,6 +887,11 @@ export async function updateRecruiterCompanySettings(
           publicLocation: updated.address,
         },
       });
+    }
+    if (!company.databaseBacked || isCatalogueWriterConfigured()) {
+      await companiesRepository.mutate(() =>
+        replaceOrAppendRawCompany(rawCompanies, updated),
+      );
     }
     return settingsFromCompany({
       ...updated,

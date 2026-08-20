@@ -55,33 +55,38 @@ function DecisionControls({
   const copy = cvCopy(locale).review;
   return (
     <fieldset className={styles.choices}>
-      <legend>
+      <legend className={styles.srOnly}>
         {copy.decisionFor} {label}
       </legend>
-      {(
-        [
-          "ADD",
-          ...(allowReplace ? (["REPLACE"] as const) : []),
-          "SKIP",
-        ] as const
-      ).map((candidate) => (
-        <label key={candidate}>
-          <input
-            type="radio"
-            name={`decision-${proposalId}`}
-            checked={action === candidate}
-            onChange={() =>
-              onChange(
-                candidate,
-                candidate === "REPLACE"
-                  ? (targetId ?? targets[0]?.id ?? null)
-                  : null,
-              )
-            }
-          />
-          {cvActionLabel(locale, candidate)}
-        </label>
-      ))}
+      <p className={styles.decisionTitle} aria-hidden="true">
+        {copy.decisionFor} {label}
+      </p>
+      <div className={styles.actionOptions}>
+        {(
+          [
+            "ADD",
+            ...(allowReplace ? (["REPLACE"] as const) : []),
+            "SKIP",
+          ] as const
+        ).map((candidate) => (
+          <label key={candidate}>
+            <input
+              type="radio"
+              name={`decision-${proposalId}`}
+              checked={action === candidate}
+              onChange={() =>
+                onChange(
+                  candidate,
+                  candidate === "REPLACE"
+                    ? (targetId ?? targets[0]?.id ?? null)
+                    : null,
+                )
+              }
+            />
+            {cvActionLabel(locale, candidate)}
+          </label>
+        ))}
+      </div>
       {action === "REPLACE" ? (
         <label className={styles.target}>
           {copy.replaceCurrent}

@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import {
+  getProfileBasicsMissingRequirement,
   getProfileCompletion,
   ProfileCompletionHeader,
 } from "@/frontend/features/profile/components/profile-completion-header";
@@ -16,6 +17,66 @@ const emptyProfile = {
 };
 
 describe("profile completion header", () => {
+  it("identifies the exact missing basic-profile requirement", () => {
+    expect(
+      getProfileBasicsMissingRequirement({
+        ...emptyProfile,
+        basics: {
+          headline: "Short",
+          summary: "a".repeat(50),
+          phone: null,
+          location: null,
+        },
+      }),
+    ).toBe("headline");
+
+    expect(
+      getProfileBasicsMissingRequirement({
+        ...emptyProfile,
+        basics: {
+          headline: "Platform reliability engineer",
+          summary: "Short bio",
+          phone: null,
+          location: null,
+        },
+      }),
+    ).toBe("summary");
+  });
+
+  it("accepts a 50-character summary for the basics completion criterion", () => {
+    const completion = getProfileCompletion(
+      {
+        ...emptyProfile,
+        basics: {
+          headline: "Platform reliability engineer",
+          summary: "a".repeat(50),
+          phone: null,
+          location: null,
+        },
+      },
+      null,
+    );
+
+    expect(
+      completion.items.find((item) => item.key === "basics")?.complete,
+    ).toBe(true);
+    expect(completion.percentage).toBe(25);
+  });
+
+  it("accepts a 10-character headline for the basics completion criterion", () => {
+    expect(
+      getProfileBasicsMissingRequirement({
+        ...emptyProfile,
+        basics: {
+          headline: "a".repeat(10),
+          summary: "a".repeat(50),
+          phone: null,
+          location: null,
+        },
+      }),
+    ).toBeNull();
+  });
+
   it("calculates each completion state from meaningful saved profile data", () => {
     const completion = getProfileCompletion(
       {

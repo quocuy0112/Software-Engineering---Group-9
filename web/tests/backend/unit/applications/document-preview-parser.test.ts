@@ -1,7 +1,30 @@
 import { describe, expect, it } from "vitest";
 import { buildStructuredDocumentContent } from "@/backend/applications/services/document-preview-parser";
+import { structuredDocumentPreviewSchema } from "@/shared/contracts/applications/document-preview";
 
 describe("structured application document previews", () => {
+  it("keeps a document available with a limited preview when extraction is empty", () => {
+    const content = buildStructuredDocumentContent({
+      kind: "cover-letter",
+      segments: [],
+    });
+    const preview = structuredDocumentPreviewSchema.parse({
+      kind: "cover-letter",
+      previewStatus: "LIMITED",
+      fileName: "cover-letter.docx",
+      mediaType:
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      pageCount: null,
+      parserVersion: "document-preview-v1",
+      processingMilliseconds: 0,
+      cacheHit: false,
+      content,
+    });
+
+    expect(preview.previewStatus).toBe("LIMITED");
+    expect(preview.content.kind).toBe("cover-letter");
+  });
+
   it("renders the application profile snapshot as structured CV content", () => {
     const content = buildStructuredDocumentContent({
       kind: "cv",
@@ -90,6 +113,29 @@ describe("structured application document previews", () => {
         "cover-letter-signoff-missing",
       ]),
     );
+  });
+
+  it("recovers cover-letter structure when PDF extraction flattens line breaks", () => {
+    const content = buildStructuredDocumentContent({
+      kind: "cover-letter",
+      segments: [
+        {
+          id: "cover-flat-1",
+          kind: "paragraph",
+          text: "June 1, 2026 Dear Hiring Manager, I am excited to apply for this backend role. My experience building dependable services would let me contribute quickly to your team. Sincerely, Candidate One",
+        },
+      ],
+    });
+
+    if (content.kind !== "cover-letter")
+      throw new Error("Expected cover-letter content");
+    expect(content.date).toBe("June 1, 2026");
+    expect(content.greeting).toBe("Dear Hiring Manager,");
+    expect(content.paragraphs).toEqual([
+      "I am excited to apply for this backend role. My experience building dependable services would let me contribute quickly to your team.",
+    ]);
+    expect(content.closing).toBe("Sincerely,");
+    expect(content.signOff).toBe("Candidate One");
   });
 
   it("segments a single-line extracted CV into readable sections", () => {

@@ -5,96 +5,95 @@
 .choices {
   display: grid;
   min-width: 0;
-  gap: var(--sh-space-4);
+  gap: 16px;
 }
-
+.root {
+  color: var(--sh-profile-text, #101b39);
+  font-family: var(--sh-profile-font-body);
+}
+.root :is(input, textarea, select, button) {
+  font: inherit;
+}
 .root > h2 {
-  margin: var(--sh-space-3) 0 0;
-  font-size: var(--sh-font-size-h2);
-  line-height: var(--sh-line-height-h2);
+  margin: 2px 0 0;
+  color: #10142b;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
 }
-
 .group {
-  padding-block-start: var(--sh-space-5);
-  border-block-start: 1px solid var(--sh-color-border-default);
+  padding-block-start: 24px;
+  border-block-start: 1px solid #e5e8f2;
 }
-
 .group > h3 {
   margin: 0;
-  font-size: var(--sh-font-size-h3);
-  line-height: var(--sh-line-height-h3);
+  color: #10142b;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
 }
-
 .groupControls {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sh-space-2);
+  gap: 8px;
 }
-
 .groupControls button {
-  min-height: var(--sh-control-height-sm);
-  padding: 0 var(--sh-space-4);
-  border: 1px solid var(--sh-color-border-default);
-  border-radius: var(--sh-radius-sm);
-  color: var(--sh-color-text-secondary);
-  background: var(--sh-color-surface-card);
-  font-size: var(--sh-font-size-body-sm);
-  font-weight: var(--sh-font-weight-semibold);
-  box-shadow: var(--sh-shadow-control);
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #e5e8f2;
+  border-radius: 9px;
+  color: #6c7288;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 600;
 }
-
 .groupControls button:hover {
-  border-color: var(--sh-color-brand-primary);
-  color: var(--sh-color-brand-primary-hover);
-  background: var(--sh-color-info-bg);
+  border-color: #4453e8;
+  color: #4453e8;
+  background: #edeffc;
 }
-
 .card {
-  padding: var(--sh-space-5);
-  border: 1px solid var(--sh-color-border-subtle);
-  border-radius: var(--sh-radius-md);
-  background: var(--sh-color-surface-card);
-  box-shadow: var(--sh-shadow-control);
+  padding: 22px;
+  border: 1px solid #e5e8f2;
+  border-radius: 16px;
+  background: #fff;
 }
-
 .fields {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
 }
-
 .fields label,
 .card > label,
 .target {
   display: grid;
   min-width: 0;
-  gap: var(--sh-space-2);
-  color: var(--sh-color-text-primary);
-  font-size: var(--sh-font-size-body-sm);
-  font-weight: var(--sh-font-weight-semibold);
-  text-transform: capitalize;
+  gap: 7px;
+  color: #10142b;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: none;
 }
-
 .fields input,
 .fields textarea,
 .card > label input,
 .target select {
   box-sizing: border-box;
   inline-size: 100%;
-  min-block-size: var(--sh-control-height);
-  padding: 11px var(--sh-space-3);
-  border: 1px solid var(--sh-color-border-default);
-  border-radius: var(--sh-radius-sm);
-  color: var(--sh-color-text-primary);
-  background: var(--sh-color-surface-card);
-  font-weight: var(--sh-font-weight-regular);
+  min-block-size: 42px;
+  padding: 10px 12px;
+  border: 1px solid #e5e8f2;
+  border-radius: 10px;
+  color: #10142b;
+  background: #fff;
+  font-weight: 400;
   text-transform: none;
-  box-shadow: var(--sh-shadow-control);
+  box-shadow: none;
 }
-
 .fields textarea {
   min-block-size: 7rem;
   resize: vertical;
 }
-
 .fields :is(input, textarea)[aria-invalid="true"],
 .card > label input[aria-invalid="true"],
 .target select[aria-invalid="true"] {
@@ -102,85 +101,103 @@
   background: var(--color-error-surface, #fef2f2);
   box-shadow: 0 0 0 1px var(--color-error, #b91c1c);
 }
-
 .fieldError {
   color: var(--color-error-text, #7f1d1d);
-  font-size: var(--sh-font-size-caption);
-  font-weight: var(--sh-font-weight-semibold);
-  line-height: var(--sh-line-height-caption);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
   text-transform: none;
 }
-
 .fullWidth,
 .target {
   grid-column: 1 / -1;
 }
-
 .checkbox {
   display: flex !important;
   flex-direction: row;
   align-items: center;
 }
-
 .checkbox input {
-  inline-size: 20px;
-  min-block-size: 20px;
-  accent-color: var(--sh-color-brand-primary);
+  inline-size: 18px;
+  min-block-size: 18px;
+  accent-color: #4453e8;
 }
-
 .choices {
-  grid-template-columns: repeat(3, minmax(0, max-content));
+  grid-template-columns: 1fr;
   margin: 0;
-  padding: var(--sh-space-3) var(--sh-space-4);
-  border: 1px solid var(--sh-color-border-subtle);
-  border-radius: var(--sh-radius-sm);
-  background: var(--sh-color-surface-tinted);
+  padding: 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #edeffc;
 }
-
-.choices legend {
-  padding-inline: var(--sh-space-2);
-  font-size: var(--sh-font-size-body-sm);
-  font-weight: var(--sh-font-weight-semibold);
-}
-
-.choices label:not(.target) {
+.actionOptions {
   display: flex;
-  min-height: 36px;
-  align-items: center;
-  gap: var(--sh-space-2);
-  padding-inline: var(--sh-space-2);
-  font-size: var(--sh-font-size-body-sm);
-  text-transform: capitalize;
+  flex-wrap: wrap;
+  gap: 8px;
 }
-
-.choices label:not(.target) input {
+.actionOptions label {
+  display: flex;
+  flex: 0 1 170px;
+  min-height: 38px;
+  align-items: center;
+  gap: 8px;
+  padding-inline: 10px;
+  border: 1px solid #dfe3f5;
+  border-radius: 8px;
+  color: #37415f;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: none;
+}
+.actionOptions input {
   width: 18px;
   height: 18px;
-  accent-color: var(--sh-color-brand-primary);
+  accent-color: #4453e8;
 }
-
+.decisionTitle {
+  margin: 0;
+  color: #10142b;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 .card :is(button, input, select, textarea):focus-visible,
 .groupControls button:focus-visible {
   outline: 3px solid var(--color-focus, #1d4ed8);
   outline-offset: 2px;
 }
-
+@media (max-width: 44rem) {
+  .fields {
+    grid-template-columns: 1fr;
+  }
+}
 @media (max-width: 32rem) {
   .card {
-    padding: var(--sh-space-4);
+    padding: 18px;
   }
-
   .fields,
   .choices {
     grid-template-columns: 1fr;
   }
-
+  .actionOptions label {
+    flex-basis: 100%;
+  }
   .groupControls {
     align-items: stretch;
     flex-direction: column;
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
   .root * {
     scroll-behavior: auto;

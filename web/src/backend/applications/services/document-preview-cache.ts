@@ -5,10 +5,11 @@ import type { StructuredDocumentPreview } from "@/shared/contracts/applications/
 const MAX_ENTRIES = 128;
 const TTL_MS = 30 * 60_000;
 
-type CachedPreview = Omit<
-  StructuredDocumentPreview,
-  "cacheHit" | "processingMilliseconds"
-> & {
+type CachedPreview = {
+  preview: Omit<
+    StructuredDocumentPreview,
+    "cacheHit" | "processingMilliseconds"
+  >;
   cachedAt: number;
 };
 
@@ -35,7 +36,7 @@ export function getCachedDocumentPreview(
   cache.delete(key);
   cache.set(key, value);
   return {
-    ...value,
+    ...value.preview,
     processingMilliseconds: 0,
     cacheHit: true,
   };
@@ -48,7 +49,7 @@ export function setCachedDocumentPreview(
   const now = Date.now();
   cache.delete(key);
   cache.set(key, {
-    ...value,
+    preview: value,
     cachedAt: now,
   });
   evictExpired(now);
