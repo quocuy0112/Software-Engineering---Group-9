@@ -23,6 +23,7 @@ import {
 } from "./job-post-review-policy";
 import { projectJobReviewSnapshot } from "./job-post-publication-projector";
 import { emitJobPostReviewOperation } from "./job-post-review-operations";
+import { appendJobPostingLifecycleFact } from "@/backend/repositories/analytics/prisma-analytics-repository";
 
 /**
  * Application boundary for the review lifecycle. User-story orchestration is
@@ -549,11 +550,26 @@ export async function closeManagedJobPost(input: {
         version: { increment: 1 },
       },
     });
-    if (aggregate.publicJobPostingId)
-      await transaction.jobPosting.update({
+    if (aggregate.publicJobPostingId) {
+      const currentPublicJob = await transaction.jobPosting.findUniqueOrThrow({
+        where: { id: aggregate.publicJobPostingId },
+        select: { status: true },
+      });
+      const closedPublicJob = await transaction.jobPosting.update({
         where: { id: aggregate.publicJobPostingId },
         data: { status: "CLOSED", closedAt: now, version: { increment: 1 } },
       });
+      await appendJobPostingLifecycleFact(transaction, {
+        jobPostingId: closedPublicJob.id,
+        companyId: aggregate.companyId,
+        fromStatus: currentPublicJob.status,
+        toStatus: closedPublicJob.status,
+        effectiveAt: now,
+        postingVersion: closedPublicJob.version,
+        actorUserId: input.actorUserId,
+        correlationId,
+      });
+    }
     const reviewVersionId =
       aggregate.pendingVersionId ?? aggregate.approvedVersionId;
     if (reviewVersionId) {

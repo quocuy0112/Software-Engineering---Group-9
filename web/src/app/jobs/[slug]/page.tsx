@@ -6,6 +6,7 @@ import { serverEnvironment } from "@/backend/env/runtime";
 import { JobDiscoveryService } from "@/backend/services/jobs/job-discovery-service";
 import { JobServiceError } from "@/backend/services/jobs/job-types";
 import { optionalJobActor } from "@/backend/security/job-request-boundary";
+import { QualifiedViewService } from "@/backend/analytics/qualified-view-service";
 import { JobDetailView } from "@/frontend/features/jobs/components/job-detail";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -14,13 +15,22 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 async function load(slug: string) {
-  const actor = await optionalJobActor(await headers());
-  return new JobDiscoveryService().detail(
+  const requestHeaders = await headers();
+  const actor = await optionalJobActor(requestHeaders);
+  const job = await new JobDiscoveryService().detail(
     slug,
     actor,
     new Date(),
     serverEnvironment.NEXT_PUBLIC_APP_URL,
   );
+  void new QualifiedViewService()
+    .admit({
+      jobPostingId: job.id,
+      headers: new Headers(requestHeaders),
+      actorUserId: actor.kind === "user" ? actor.userId : null,
+    })
+    .catch(() => undefined);
+  return job;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

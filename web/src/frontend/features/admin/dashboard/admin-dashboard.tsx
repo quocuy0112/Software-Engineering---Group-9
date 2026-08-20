@@ -4,6 +4,7 @@ import { Alert, Box, CircularProgress, Typography } from "@mui/material";
 import { useRedirect } from "react-admin";
 import { adminDataProvider } from "../app/data-provider";
 import { MetricCard } from "./metric-card";
+import { AdminGrowthDashboard } from "../analytics/admin-growth-dashboard";
 
 type Snapshot = {
   calculatedAt: string;
@@ -35,53 +36,63 @@ export function AdminDashboard() {
       .then((value) => setSnapshot(value as Snapshot))
       .catch(() => setFailed(true));
   }, []);
-  if (failed)
-    return (
-      <Alert severity="error">
-        Dashboard snapshot is unavailable. Retry after the next calculation
-        cycle.
-      </Alert>
-    );
-  if (!snapshot) return <CircularProgress aria-label="Loading dashboard" />;
   return (
     <Box sx={{ p: 3 }}>
       <Typography component="h1" variant="h4" gutterBottom>
         Platform administration
       </Typography>
-      <Alert severity="info" sx={{ mb: 2 }}>
-        Counts may be up to 60 seconds old.
-      </Alert>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: 2,
-        }}
-      >
-        {Object.entries(snapshot.metrics).map(([key, metric]) => (
-          <MetricCard
-            key={key}
-            label={labels[key] ?? key}
-            {...metric}
-            calculatedAt={snapshot.calculatedAt}
-            onOpen={() => {
-              const path =
-                key === "securityNotificationsManualIntervention"
-                  ? "/accounts?notificationStatus=MANUAL_INTERVENTION_REQUIRED"
-                  : key.includes("Verification")
-                    ? "/verification-requests"
-                    : key.includes("Moderation")
-                      ? "/moderation-reports"
-                      : key.includes("Membership") || key.includes("members")
-                        ? "/company-memberships"
-                        : "/accounts";
-              redirect(
-                `${path}${path.includes("?") ? "&" : "?"}sourceCount=${metric.value}&sourceAt=${encodeURIComponent(snapshot.calculatedAt)}`,
-              );
+      {failed ? (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          Dashboard snapshot is unavailable. Retry after the next calculation
+          cycle.
+        </Alert>
+      ) : snapshot ? (
+        <>
+          <Alert severity="info" sx={{ mb: 2 }}>
+            Counts may be up to 60 seconds old.
+          </Alert>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: 2,
             }}
-          />
-        ))}
-      </Box>
+          >
+            {Object.entries(snapshot.metrics).map(([key, metric]) => (
+              <MetricCard
+                key={key}
+                label={labels[key] ?? key}
+                {...metric}
+                calculatedAt={snapshot.calculatedAt}
+                onOpen={() => {
+                  const path =
+                    key === "securityNotificationsManualIntervention"
+                      ? "/accounts?notificationStatus=MANUAL_INTERVENTION_REQUIRED"
+                      : key.includes("Verification")
+                        ? "/verification-requests"
+                        : key.includes("Moderation")
+                          ? "/moderation-reports"
+                          : key.includes("Membership") ||
+                              key.includes("members")
+                            ? "/company-memberships"
+                            : "/accounts";
+                  redirect(
+                    path +
+                      (path.includes("?") ? "&" : "?") +
+                      "sourceCount=" +
+                      metric.value +
+                      "&sourceAt=" +
+                      encodeURIComponent(snapshot.calculatedAt),
+                  );
+                }}
+              />
+            ))}
+          </Box>
+        </>
+      ) : (
+        <CircularProgress aria-label="Loading dashboard" />
+      )}
+      <AdminGrowthDashboard />
     </Box>
   );
 }

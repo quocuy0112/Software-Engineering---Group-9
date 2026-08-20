@@ -1018,7 +1018,14 @@ export function RecruiterWorkspaceNavigation({
     href?: string;
     active: boolean;
   }> = [
-    { label: "Overview", icon: "dashboard", active: false },
+    {
+      label: "Overview",
+      icon: "dashboard",
+      href: recruiterRoutes.analytics,
+      active:
+        pathname === recruiterRoutes.analytics ||
+        pathname.startsWith(recruiterRoutes.analytics + "/"),
+    },
     {
       label: "Job postings",
       icon: "jobs",

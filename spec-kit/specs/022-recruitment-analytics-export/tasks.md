@@ -6,6 +6,8 @@
 
 **Tests**: Tests are required because the specification defines testable acceptance scenarios and measurable accuracy, security, accessibility, parity, retention, and performance outcomes. Story tests must be written first and observed failing before implementation.
 
+**Implementation passes (2026-08-19 to 2026-08-20)**: The backend P1 contracts, persistence, aggregation services, authorization boundaries, export pipeline/runtime, retention foundation, and Route Handlers are implemented. The recruiter Overview and Admin growth UI are now connected to those endpoints, including inclusive end-date handling, baseline-overlap retry in the clients, export-worker startup/env fixes, and focused frontend/backend regression coverage. Full database-backed integration/contract/e2e/performance validation, operational probes, and the optional P2 activity-report projection remain unchecked and deferred.
+
 **Organization**: Tasks are grouped by user story so each story can be implemented and validated as an independent technical checkpoint. P1 release scope requires User Stories 1–3; User Story 4 UI/aggregates are P2, while its foundational critical-event capture is mandatory.
 
 ## Format: `[ID] [P?] [Story] Description`
@@ -19,10 +21,10 @@
 **Purpose**: Establish dependencies, directories, scripts, and feature-level verification commands.
 
 - [ ] T001 Add the pinned ExcelJS dependency and recruitment analytics test/performance/worker scripts to `web/package.json`
-- [ ] T002 [P] Create analytics shared-contract barrels and definition-version constants in `web/src/shared/contracts/analytics/index.ts`, `web/src/shared/contracts/analytics/admin.ts`, `web/src/shared/contracts/analytics/employer.ts`, and `web/src/shared/contracts/analytics/exports.ts`
-- [ ] T003 [P] Create analytics backend, export, storage, repository, and frontend feature directory barrels in `web/src/backend/analytics/index.ts`, `web/src/backend/exports/index.ts`, `web/src/backend/repositories/analytics/index.ts`, `web/src/frontend/features/admin/analytics/index.ts`, and `web/src/frontend/features/recruitment-analytics/index.ts`
+- [x] T002 [P] Create analytics shared-contract barrels and definition-version constants in `web/src/shared/contracts/analytics/index.ts`, `web/src/shared/contracts/analytics/admin.ts`, `web/src/shared/contracts/analytics/employer.ts`, and `web/src/shared/contracts/analytics/exports.ts`
+- [x] T003 [P] Create analytics backend, export, storage, repository, and frontend feature directory barrels in `web/src/backend/analytics/index.ts`, `web/src/backend/exports/index.ts`, `web/src/backend/repositories/analytics/index.ts`, `web/src/frontend/features/admin/analytics/index.ts`, and `web/src/frontend/features/recruitment-analytics/index.ts`
 - [ ] T004 [P] Add common analytics test fixture builders for time ranges, users, companies, postings, views, applications, stages, and scores in `web/tests/helpers/recruitment-analytics/fixtures.ts`
-- [ ] T005 [P] Add environment contracts for visitor-digest keys, export storage, lease limits, and worker batch bounds in `web/src/backend/analytics/analytics-config.ts` and `web/src/backend/exports/export-config.ts`
+- [x] T005 [P] Add environment contracts for visitor-digest keys, export storage, lease limits, and worker batch bounds in `web/src/backend/analytics/analytics-config.ts` and `web/src/backend/exports/export-config.ts`
 
 ---
 
@@ -42,18 +44,18 @@
 
 ### Foundational Implementation
 
-- [ ] T011 Extend Prisma with `JobPostingViewFact`, `JobPostingLifecycleFact`, `ExportRequest`, and `ActivityLegalHold` entities, enums, relations, uniqueness, and reporting/worker indexes in `web/prisma/schema.prisma`
-- [ ] T012 Create the additive recruitment analytics migration, existing-post lifecycle baseline, and safe disable/rollback notes in `web/prisma/migrations/<timestamp>_recruitment_analytics_export/migration.sql`
-- [ ] T013 Implement `[from,to)` validation, IANA time-zone normalization, `analyticsAvailableFrom` enforcement, DAY/WEEK/MONTH bucket generation, one-cutoff metadata, rounding, and null-rate policy in `web/src/backend/analytics/report-time-policy.ts`
+- [x] T011 Extend Prisma with `JobPostingViewFact`, `JobPostingLifecycleFact`, `ExportRequest`, and `ActivityLegalHold` entities, enums, relations, uniqueness, and reporting/worker indexes in `web/prisma/schema.prisma`
+- [x] T012 Create the additive recruitment analytics migration, existing-post lifecycle baseline, and safe disable/rollback notes in `web/prisma/migrations/<timestamp>_recruitment_analytics_export/migration.sql`
+- [x] T013 Implement `[from,to)` validation, IANA time-zone normalization, `analyticsAvailableFrom` enforcement, DAY/WEEK/MONTH bucket generation, one-cutoff metadata, rounding, and null-rate policy in `web/src/backend/analytics/report-time-policy.ts`
 - [ ] T014 Implement Administrator grant and Employer company/posting scope adapters over existing authorization services in `web/src/backend/analytics/analytics-authorization.ts`
-- [ ] T015 Implement privacy-safe visitor-day HMAC classification and qualification policy in `web/src/backend/analytics/qualified-view-policy.ts`
-- [ ] T016 Implement idempotent qualified-view admission and aggregate reads, then invoke non-blocking admission from the public job-detail request boundary in `web/src/backend/repositories/analytics/prisma-qualified-view-repository.ts`, `web/src/backend/analytics/qualified-view-service.ts`, and `web/src/app/jobs/[slug]/page.tsx`
-- [ ] T017 Integrate lifecycle-fact append operations transactionally with posting create/publish/close/expire/remove transitions in `web/src/backend/services/jobs/recruiter-job-posting-data.ts` and `web/src/backend/jobs/management/job-post-management-service.ts`
-- [ ] T018 Implement lifecycle baseline/read reconstruction and shared analytics queries in `web/src/backend/repositories/analytics/prisma-analytics-repository.ts`
-- [ ] T019 Extend strict audit action, target, and privacy-safe context allow-lists for posting creation/deletion and export lifecycle events in `web/src/backend/audit/events.ts`
-- [ ] T020 Integrate mandatory job-post creation/deletion audit writes with authoritative business transactions in `web/src/backend/services/jobs/recruiter-job-posting-data.ts` and `web/src/backend/jobs/management/job-post-management-service.ts`
-- [ ] T021 Implement the branded `ExportArtifactStoragePort` and private filesystem/S3 adapters with opaque locators, byte integrity, encryption/private access, and separate export prefixes in `web/src/backend/exports/storage/export-artifact-storage.ts`, `web/src/backend/exports/storage/filesystem.ts`, and `web/src/backend/exports/storage/s3.ts`
-- [ ] T022 Implement export-request persistence plus mandatory audit-retention/legal-hold persistence, idempotent admission, `SKIP LOCKED` lease/retry transitions, successful publication metadata, expiry, and cleanup claims in `web/src/backend/repositories/analytics/prisma-export-request-repository.ts` and `web/src/backend/repositories/analytics/prisma-activity-retention-repository.ts`
+- [x] T015 Implement privacy-safe visitor-day HMAC classification and qualification policy in `web/src/backend/analytics/qualified-view-policy.ts`
+- [x] T016 Implement idempotent qualified-view admission and aggregate reads, then invoke non-blocking admission from the public job-detail request boundary in `web/src/backend/repositories/analytics/prisma-qualified-view-repository.ts`, `web/src/backend/analytics/qualified-view-service.ts`, and `web/src/app/jobs/[slug]/page.tsx`
+- [x] T017 Integrate lifecycle-fact append operations transactionally with posting create/publish/close/expire/remove transitions in `web/src/backend/services/jobs/recruiter-job-posting-data.ts` and `web/src/backend/jobs/management/job-post-management-service.ts`
+- [x] T018 Implement lifecycle baseline/read reconstruction and shared analytics queries in `web/src/backend/repositories/analytics/prisma-analytics-repository.ts`
+- [x] T019 Extend strict audit action, target, and privacy-safe context allow-lists for posting creation/deletion and export lifecycle events in `web/src/backend/audit/events.ts`
+- [x] T020 Integrate mandatory job-post creation/deletion audit writes with authoritative business transactions in `web/src/backend/services/jobs/recruiter-job-posting-data.ts` and `web/src/backend/jobs/management/job-post-management-service.ts`
+- [x] T021 Implement the branded `ExportArtifactStoragePort` and private filesystem/S3 adapters with opaque locators, byte integrity, encryption/private access, and separate export prefixes in `web/src/backend/exports/storage/export-artifact-storage.ts`, `web/src/backend/exports/storage/filesystem.ts`, and `web/src/backend/exports/storage/s3.ts`
+- [x] T022 Implement export-request persistence plus mandatory audit-retention/legal-hold persistence, idempotent admission, `SKIP LOCKED` lease/retry transitions, successful publication metadata, expiry, and cleanup claims in `web/src/backend/repositories/analytics/prisma-export-request-repository.ts` and `web/src/backend/repositories/analytics/prisma-activity-retention-repository.ts`
 - [ ] T023 Implement mandatory 24-month audit retention, scoped legal holds, bounded idempotent deletion, retries, and operational evidence in `web/src/backend/analytics/activity-retention-service.ts` and `web/scripts/run-recruitment-analytics-retention-worker.mjs`, run the failing-first T006 coverage, then record foundational outcomes in `specs/022-recruitment-analytics-export/quickstart.md`
 
 **Checkpoint**: Shared persistence, authorization, time definitions, views, lifecycle facts, audit contracts, and export infrastructure are ready; all user stories may now proceed independently.
@@ -75,12 +77,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T028 [US1] Define strict Zod schemas for overview filters, metadata, metric rates, buckets, and report responses in `web/src/shared/contracts/analytics/admin.ts`
-- [ ] T029 [US1] Implement cutoff-consistent Administrator growth calculations and metric definition metadata in `web/src/backend/analytics/admin-analytics-service.ts`
-- [ ] T030 [US1] Implement the Administrator overview Route Handler with grant authorization, validation, neutral denial, no-store behavior, and typed responses in `web/src/app/api/admin/analytics/overview/route.ts`
-- [ ] T031 [P] [US1] Implement accessible trend summaries, semantic table alternatives, metric cards, and empty/error/loading components in `web/src/frontend/features/admin/analytics/admin-growth-dashboard.tsx` and `web/src/frontend/features/admin/analytics/analytics-trend.tsx`
-- [ ] T032 [P] [US1] Implement reusable date-range/grouping controls with visible time zone and cutoff in `web/src/frontend/features/admin/analytics/analytics-filters.tsx`
-- [ ] T033 [US1] Register the growth dashboard in the existing React Admin workspace and data provider in `web/src/frontend/features/admin/app/admin-app.tsx` and `web/src/frontend/features/admin/app/data-provider.ts`
+- [x] T028 [US1] Define strict Zod schemas for overview filters, metadata, metric rates, buckets, and report responses in `web/src/shared/contracts/analytics/admin.ts`
+- [x] T029 [US1] Implement cutoff-consistent Administrator growth calculations and metric definition metadata in `web/src/backend/analytics/admin-analytics-service.ts`
+- [x] T030 [US1] Implement the Administrator overview Route Handler with grant authorization, validation, neutral denial, no-store behavior, and typed responses in `web/src/app/api/admin/analytics/overview/route.ts`
+- [x] T031 [P] [US1] Implement accessible trend summaries, semantic table alternatives, metric cards, and empty/error/loading components in `web/src/frontend/features/admin/analytics/admin-growth-dashboard.tsx` and `web/src/frontend/features/admin/analytics/analytics-trend.tsx`
+- [x] T032 [P] [US1] Implement reusable date-range/grouping controls with visible time zone and cutoff in `web/src/frontend/features/admin/analytics/analytics-filters.tsx`
+- [x] T033 [US1] Register the growth dashboard in the existing React Admin workspace and data provider in `web/src/frontend/features/admin/app/admin-app.tsx` and `web/src/frontend/features/admin/app/data-provider.ts`
 - [ ] T034 [US1] Execute US1 contract, integration, component, accessibility, and authorization tests and record the independent checkpoint result in `specs/022-recruitment-analytics-export/quickstart.md`
 
 **Checkpoint**: Administrator platform-growth reporting is complete and independently demonstrable.
@@ -102,12 +104,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T039 [US2] Define strict Employer performance request/response, conversion, and canonical funnel contracts in `web/src/shared/contracts/analytics/employer.ts`
-- [ ] T040 [US2] Implement tenant-scoped view/application aggregation, null conversion, and current funnel calculation in `web/src/backend/analytics/job-performance-service.ts`
-- [ ] T041 [US2] Implement the job performance Route Handler with fresh membership/posting authorization, validation, neutral denial, and no-store typed responses in `web/src/app/api/recruiter/analytics/jobs/[jobId]/performance/route.ts`
-- [ ] T042 [P] [US2] Add centralized recruiter analytics route builders and job-scoped server-page ownership guard in `web/src/shared/routing/recruiter-routes.ts` and `web/src/app/recruiter/analytics/[jobId]/page.tsx`
-- [ ] T043 [P] [US2] Implement performance cards, definitions, current-snapshot header, and accessible Kanban-style funnel in `web/src/frontend/features/recruitment-analytics/job-performance-report.tsx` and `web/src/frontend/features/recruitment-analytics/hiring-funnel.tsx`
-- [ ] T044 [P] [US2] Implement the Employer analytics landing/posting selector and report filters in `web/src/app/recruiter/analytics/page.tsx` and `web/src/frontend/features/recruitment-analytics/job-performance-filters.tsx`
+- [x] T039 [US2] Define strict Employer performance request/response, conversion, and canonical funnel contracts in `web/src/shared/contracts/analytics/employer.ts`
+- [x] T040 [US2] Implement tenant-scoped view/application aggregation, null conversion, and current funnel calculation in `web/src/backend/analytics/job-performance-service.ts`
+- [x] T041 [US2] Implement the job performance Route Handler with fresh membership/posting authorization, validation, neutral denial, and no-store typed responses in `web/src/app/api/recruiter/analytics/jobs/[jobId]/performance/route.ts`
+- [x] T042 [P] [US2] Add centralized recruiter analytics route builders and job-scoped server-page ownership guard in `web/src/shared/routing/recruiter-routes.ts` and `web/src/app/recruiter/analytics/[jobId]/page.tsx`
+- [x] T043 [P] [US2] Implement performance cards, definitions, current-snapshot header, and accessible Kanban-style funnel in `web/src/frontend/features/recruitment-analytics/job-performance-report.tsx` and `web/src/frontend/features/recruitment-analytics/hiring-funnel.tsx`
+- [x] T044 [P] [US2] Implement the Employer analytics landing/posting selector and report filters in `web/src/app/recruiter/analytics/page.tsx` and `web/src/frontend/features/recruitment-analytics/job-performance-filters.tsx`
 - [ ] T045 [US2] Execute US2 contract, integration, component, accessibility, view-policy, and tenant-security tests and record the independent checkpoint result in `specs/022-recruitment-analytics-export/quickstart.md`
 
 **Checkpoint**: Employer posting performance and funnel reporting are complete and independently demonstrable.
@@ -123,7 +125,7 @@
 ### Tests for User Story 3
 
 - [ ] T046 [P] [US3] Write contract tests for export admission/status/download responses, idempotency, strict metadata, neutral unavailable responses, MIME/cache/disposition headers, and OpenAPI parity in `web/tests/backend/contract/recruitment-analytics/candidate-export.contract.test.ts`
-- [ ] T047 [P] [US3] Write unit/security tests for RFC 4180 quoting, UTF-8, fixed columns, explicit XLSX strings, and leading whitespace/tab/CR/LF plus `= + - @` neutralization in `web/tests/backend/unit/recruitment-analytics/export-cell-policy.test.ts`
+- [x] T047 [P] [US3] Write unit/security tests for RFC 4180 quoting, UTF-8, fixed columns, explicit XLSX strings, and leading whitespace/tab/CR/LF plus `= + - @` neutralization in `web/tests/backend/unit/recruitment-analytics/export-cell-policy.test.ts`
 - [ ] T048 [P] [US3] Write integration tests for leases, bounded retries, stable cutoff/order, immutable application-contact snapshots despite later profile edits, canonical published score selection, missing scores, checksum/row counts, atomic publication, and CSV/XLSX parity in `web/tests/backend/integration/recruitment-analytics/candidate-export-worker.integration.test.ts`
 - [ ] T049 [P] [US3] Write security tests for request/generation/download reauthorization, wrong company, revoked membership, suspended account, opaque locators, no PII in audit/logs, and neutral absence in `web/tests/security/recruitment-analytics/candidate-export-security.test.ts`
 - [ ] T050 [P] [US3] Write retention tests for exact 24-hour denial, early revocation, idempotent deletion, storage failure retries, and audit-metadata survival in `web/tests/backend/integration/recruitment-analytics/export-retention.integration.test.ts`
@@ -131,16 +133,16 @@
 
 ### Implementation for User Story 3
 
-- [ ] T052 [US3] Define strict export admission, status, row/column, availability, and error contracts with fixed header/version metadata in `web/src/shared/contracts/analytics/exports.ts`
-- [ ] T053 [US3] Implement the shared export cell normalization, CSV stream encoder, and canonical candidate-row projection using only immutable application contact snapshots in `web/src/backend/exports/export-cell-policy.ts`, `web/src/backend/exports/csv-export-writer.ts`, and `web/src/backend/exports/candidate-export-projection.ts`
-- [ ] T054 [P] [US3] Implement the ExcelJS streaming writer with `Candidates` and `Metadata` sheets and explicit string cells in `web/src/backend/exports/xlsx-export-writer.ts`
-- [ ] T055 [US3] Implement export admission/status/download orchestration with idempotency, data cutoff, current published score, audit outcomes, expiry, integrity, and fresh authorization in `web/src/backend/exports/candidate-export-service.ts`
-- [ ] T056 [US3] Implement leased export generation with authority recheck, stable batching/order, bounded retries, checksum/bytes/rows, and atomic artifact publication in `web/src/backend/exports/candidate-export-worker.ts`
+- [x] T052 [US3] Define strict export admission, status, row/column, availability, and error contracts with fixed header/version metadata in `web/src/shared/contracts/analytics/exports.ts`
+- [x] T053 [US3] Implement the shared export cell normalization, CSV stream encoder, and canonical candidate-row projection using only immutable application contact snapshots in `web/src/backend/exports/export-cell-policy.ts`, `web/src/backend/exports/csv-export-writer.ts`, and `web/src/backend/exports/candidate-export-projection.ts`
+- [x] T054 [P] [US3] Implement the ExcelJS streaming writer with `Candidates` and `Metadata` sheets and explicit string cells in `web/src/backend/exports/xlsx-export-writer.ts`
+- [x] T055 [US3] Implement export admission/status/download orchestration with idempotency, data cutoff, current published score, audit outcomes, expiry, integrity, and fresh authorization in `web/src/backend/exports/candidate-export-service.ts`
+- [x] T056 [US3] Implement leased export generation with authority recheck, stable batching/order, bounded retries, checksum/bytes/rows, and atomic artifact publication in `web/src/backend/exports/candidate-export-worker.ts`
 - [ ] T057 [P] [US3] Implement the bounded expiry/revocation cleanup worker and operational probes in `web/src/backend/exports/candidate-export-retention.ts` and `web/scripts/run-recruitment-analytics-retention-worker.mjs`
-- [ ] T058 [P] [US3] Add the export worker entrypoint, probe, graceful shutdown, and package-script integration in `web/scripts/run-recruitment-export-worker.mjs`
-- [ ] T059 [US3] Implement export admission and status Route Handlers in `web/src/app/api/recruiter/analytics/jobs/[jobId]/exports/route.ts` and `web/src/app/api/recruiter/analytics/jobs/[jobId]/exports/[exportId]/route.ts`
-- [ ] T060 [US3] Implement the authenticated private download Route Handler with integrity checks, safe filename, private/no-store, nosniff, content type, and neutral denial in `web/src/app/api/recruiter/analytics/jobs/[jobId]/exports/[exportId]/download/route.ts`
-- [ ] T061 [US3] Implement the Employer export controls, polling/status announcements, retry, and download interaction in `web/src/frontend/features/recruitment-analytics/candidate-export-panel.tsx` and integrate it into `web/src/frontend/features/recruitment-analytics/job-performance-report.tsx`
+- [x] T058 [P] [US3] Add the export worker entrypoint, probe, graceful shutdown, and package-script integration in `web/scripts/run-recruitment-export-worker.mjs`
+- [x] T059 [US3] Implement export admission and status Route Handlers in `web/src/app/api/recruiter/analytics/jobs/[jobId]/exports/route.ts` and `web/src/app/api/recruiter/analytics/jobs/[jobId]/exports/[exportId]/route.ts`
+- [x] T060 [US3] Implement the authenticated private download Route Handler with integrity checks, safe filename, private/no-store, nosniff, content type, and neutral denial in `web/src/app/api/recruiter/analytics/jobs/[jobId]/exports/[exportId]/download/route.ts`
+- [x] T061 [US3] Implement the Employer export controls, polling/status announcements, retry, and download interaction in `web/src/frontend/features/recruitment-analytics/candidate-export-panel.tsx` and integrate it into `web/src/frontend/features/recruitment-analytics/job-performance-report.tsx`
 - [ ] T062 [US3] Execute US3 contract, unit, integration, security, retention, component, accessibility, and CSV/XLSX parity tests and record the independent checkpoint result in `specs/022-recruitment-analytics-export/quickstart.md`
 
 **Checkpoint**: The complete P1 feature scope—Administrator growth, Employer performance, and secure candidate export—is functional and independently verified.

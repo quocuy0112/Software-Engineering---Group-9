@@ -29,11 +29,19 @@ export function stageTransitionNeedsDialog(target: ApplicationStage) {
 export function ApplicationStageChangeDialog({
   card,
   initialTarget,
+  fixedTarget,
+  title,
+  description,
+  busy = false,
   onCancel,
   onSubmit,
 }: {
   card: PipelineApplicationCard;
   initialTarget?: ApplicationStage;
+  fixedTarget?: ApplicationStage;
+  title?: string;
+  description?: string;
+  busy?: boolean;
   onCancel: () => void;
   onSubmit: (
     target: ApplicationStage,
@@ -47,9 +55,11 @@ export function ApplicationStageChangeDialog({
   // projection. The client does not recreate or narrow transition policy.
   const allowedDestinations = card.allowedDestinations;
   const [target, setTarget] = useState<ApplicationStage | "">(
-    initialTarget && allowedDestinations.includes(initialTarget)
-      ? initialTarget
-      : "",
+    fixedTarget && allowedDestinations.includes(fixedTarget)
+      ? fixedTarget
+      : initialTarget && allowedDestinations.includes(initialTarget)
+        ? initialTarget
+        : "",
   );
   const [reasonCode, setReasonCode] = useState("");
   const [internalNote, setInternalNote] = useState("");
@@ -71,31 +81,40 @@ export function ApplicationStageChangeDialog({
   return (
     <Modal
       open
-      title={`Change Stage for ${card.candidate.displayName}`}
-      description="Choose one destination returned for this application."
+      title={title ?? `Change Stage for ${card.candidate.displayName}`}
+      description={
+        description ?? "Choose one destination returned for this application."
+      }
       tone={rejection ? "destructive" : "standard"}
+      busy={busy}
       onClose={onCancel}
     >
       <div className="pipeline-stage-form">
-        <label>
-          Destination stage
-          <select
-            data-autofocus
-            value={target}
-            onChange={(event) => {
-              setTarget(event.target.value as ApplicationStage);
-              setReasonCode("");
-              setInternalNote("");
-            }}
-          >
-            <option value="">Choose a stage</option>
-            {allowedDestinations.map((stage) => (
-              <option key={stage} value={stage}>
-                {pipelineStageLabels[stage]}
-              </option>
-            ))}
-          </select>
-        </label>
+        {fixedTarget ? (
+          <p role="note">
+            Destination stage: <strong>{pipelineStageLabels[fixedTarget]}</strong>
+          </p>
+        ) : (
+          <label>
+            Destination stage
+            <select
+              data-autofocus
+              value={target}
+              onChange={(event) => {
+                setTarget(event.target.value as ApplicationStage);
+                setReasonCode("");
+                setInternalNote("");
+              }}
+            >
+              <option value="">Choose a stage</option>
+              {allowedDestinations.map((stage) => (
+                <option key={stage} value={stage}>
+                  {pipelineStageLabels[stage]}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         {rejection ? (
           <>
             <label>
@@ -136,12 +155,12 @@ export function ApplicationStageChangeDialog({
           </label>
         ) : null}
         <div className="sh-modal-actions">
-          <button type="button" onClick={onCancel}>
+          <button type="button" disabled={busy} onClick={onCancel}>
             Cancel
           </button>
           <button
             type="button"
-            disabled={!valid}
+            disabled={!valid || busy}
             onClick={() =>
               target &&
               onSubmit(target, {
@@ -151,7 +170,7 @@ export function ApplicationStageChangeDialog({
               })
             }
           >
-            {actionLabel}
+            {busy ? "Saving..." : actionLabel}
           </button>
         </div>
       </div>

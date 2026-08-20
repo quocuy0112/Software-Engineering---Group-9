@@ -8,6 +8,7 @@ import { FEATURED_PLACEMENT_CAPACITY } from "@/backend/jobs/management/job-post-
 import { maskEmail } from "@/backend/repositories/admin/prisma-account-directory-repository";
 import type { z } from "zod";
 import type { jobManagementListQuerySchema } from "@/shared/contracts/admin/job-post-management";
+import { appendJobPostingLifecycleFact } from "@/backend/repositories/analytics/prisma-analytics-repository";
 
 type Transaction = PrismaTypes.TransactionClient;
 type JobManagementListInput = z.infer<typeof jobManagementListQuerySchema>;
@@ -288,6 +289,8 @@ export async function syncManagedJobPublicProjection(
     visibility: "PUBLISHED" | "HIDDEN" | "ARCHIVED";
     applicationState: "OPEN" | "CLOSED";
     now: Date;
+    actorUserId?: string | null;
+    correlationId?: string;
   },
 ) {
   const status =
@@ -296,7 +299,11 @@ export async function syncManagedJobPublicProjection(
         ? "ACTIVE"
         : "CLOSED"
       : "REMOVED";
-  return tx.jobPosting.update({
+  const current = await tx.jobPosting.findUniqueOrThrow({
+    where: { id: input.publicJobPostingId },
+    select: { status: true },
+  });
+  const updated = await tx.jobPosting.update({
     where: { id: input.publicJobPostingId },
     data: {
       status,
@@ -305,6 +312,17 @@ export async function syncManagedJobPublicProjection(
       version: { increment: 1 },
     },
   });
+  await appendJobPostingLifecycleFact(tx, {
+    jobPostingId: updated.id,
+    companyId: updated.companyId,
+    fromStatus: current.status,
+    toStatus: updated.status,
+    effectiveAt: input.now,
+    postingVersion: updated.version,
+    actorUserId: input.actorUserId,
+    correlationId: input.correlationId ?? "job-post-management:" + updated.id,
+  });
+  return updated;
 }
 
 export async function reserveManagedJobFeaturePlacement(

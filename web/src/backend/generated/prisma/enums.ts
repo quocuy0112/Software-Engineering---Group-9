@@ -106,6 +106,37 @@ export const AuditResult = {
 export type AuditResult = (typeof AuditResult)[keyof typeof AuditResult]
 
 
+export const AnalyticsViewQualification = {
+  QUALIFIED: 'QUALIFIED',
+  OWNER_PREVIEW: 'OWNER_PREVIEW',
+  AUTOMATED: 'AUTOMATED',
+  INVALID: 'INVALID'
+} as const
+
+export type AnalyticsViewQualification = (typeof AnalyticsViewQualification)[keyof typeof AnalyticsViewQualification]
+
+
+export const ExportFormat = {
+  CSV: 'CSV',
+  XLSX: 'XLSX'
+} as const
+
+export type ExportFormat = (typeof ExportFormat)[keyof typeof ExportFormat]
+
+
+export const ExportRequestStatus = {
+  QUEUED: 'QUEUED',
+  LEASED: 'LEASED',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+  EXPIRED: 'EXPIRED',
+  DELETING: 'DELETING',
+  DELETED: 'DELETED'
+} as const
+
+export type ExportRequestStatus = (typeof ExportRequestStatus)[keyof typeof ExportRequestStatus]
+
+
 export const EmailKind = {
   VERIFY_EMAIL: 'VERIFY_EMAIL',
   EMAIL_CHANGE_VERIFY: 'EMAIL_CHANGE_VERIFY',

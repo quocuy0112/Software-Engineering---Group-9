@@ -736,3 +736,23 @@ export type RankingSnapshot = Prisma.RankingSnapshotModel
  * 
  */
 export type RankingSnapshotRow = Prisma.RankingSnapshotRowModel
+/**
+ * Model JobPostingViewFact
+ * 
+ */
+export type JobPostingViewFact = Prisma.JobPostingViewFactModel
+/**
+ * Model JobPostingLifecycleFact
+ * 
+ */
+export type JobPostingLifecycleFact = Prisma.JobPostingLifecycleFactModel
+/**
+ * Model ExportRequest
+ * 
+ */
+export type ExportRequest = Prisma.ExportRequestModel
+/**
+ * Model ActivityLegalHold
+ * 
+ */
+export type ActivityLegalHold = Prisma.ActivityLegalHoldModel

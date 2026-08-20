@@ -60,11 +60,12 @@ function NotificationCenterContent({
       void markRead
         .mutateAsync({ notificationId: item.id })
         .catch(() => toast.error(copy.error));
-    if (!item.href) return;
+    const href = item.href;
+    if (!href) return;
     const current = `${window.location.pathname}${window.location.search}`;
-    if (current === item.href) return;
+    if (current === href) return;
     setOpen(false);
-    requestUnsavedChangesNavigation(() => router.push(item.href));
+    requestUnsavedChangesNavigation(() => router.push(href));
   }
 
   function markItemRead(item: NotificationItem) {

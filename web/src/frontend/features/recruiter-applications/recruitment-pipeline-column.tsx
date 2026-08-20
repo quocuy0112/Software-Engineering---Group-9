@@ -6,6 +6,7 @@ import {
   ArrowUp,
   Check,
   Inbox,
+  List as ListIcon,
   LockKeyhole,
   SlidersHorizontal,
 } from "lucide-react";
@@ -27,6 +28,8 @@ type PipelineColumnProps = {
   error: string | null;
   onLoadMore: (stage: ApplicationStage) => void;
   onRetry: (stage: ApplicationStage) => void;
+  onViewAll?: (stage: ApplicationStage) => void;
+  showViewAll?: boolean;
   onChangeStage?: Parameters<
     typeof RecruitmentPipelineCard
   >[0]["onChangeStage"];
@@ -49,7 +52,6 @@ const lockedStages = new Set<ApplicationStage>([
   "WAITLISTED",
   "HIRED",
   "OFFER_DECLINED",
-  "REJECTED",
 ]);
 
 const sortLabels: Record<PipelineSortDirection, string> = {
@@ -73,6 +75,8 @@ export function RecruitmentPipelineColumn({
   error,
   onLoadMore,
   onRetry,
+  onViewAll,
+  showViewAll = false,
   onChangeStage,
   onViewAssessment,
   sortDirection = "none",
@@ -92,6 +96,9 @@ export function RecruitmentPipelineColumn({
   const headingId = `pipeline-${summary.stage.toLowerCase()}-heading`;
   const canSort = canSortPipelineStage(summary.stage);
   const visibleItems = page?.items ?? [];
+  const hasMore =
+    page?.hasMore ??
+    (page?.nextCursor !== null && page?.nextCursor !== undefined);
   const noFilterMatch =
     !loading &&
     !error &&
@@ -102,34 +109,51 @@ export function RecruitmentPipelineColumn({
   return (
     <section
       ref={setNodeRef}
-      className={`pipeline-column${isOver ? "is-drag-over" : ""}${locked ? "is-locked" : ""}`}
+      className={
+        "column pipeline-column" +
+        (summary.count > 0 ? " has-cards" : "") +
+        (isOver ? " is-drag-over" : "") +
+        (locked ? " is-locked" : "")
+      }
       role="region"
       aria-labelledby={headingId}
       aria-disabled={locked || undefined}
       data-stage={summary.stage}
     >
-      <header className="pipeline-column__header">
-        <div className="pipeline-column__heading">
-          <h2 id={headingId} aria-describedby={`${headingId}-count`}>
+      <header className="column-head pipeline-column__header">
+        <div className="column-head-left pipeline-column__heading">
+          <h2
+            id={headingId}
+            className="column-title"
+            aria-describedby={`${headingId}-count`}
+          >
             {summary.label}
           </h2>
           <span
+            className="column-count"
             id={`${headingId}-count`}
             aria-label={`${summary.count} candidates`}
           >
             {summary.count}
           </span>
         </div>
-        <div className="pipeline-column__header-tools">
+        <div className="column-head-tools pipeline-column__header-tools">
+          {locked ? (
+            <LockKeyhole
+              className="lock-icon pipeline-column__lock-icon"
+              aria-label="Stage is locked"
+            />
+          ) : null}
           {canSort && onToggleSortMenu && onSortDirectionChange ? (
-            <div className="pipeline-column__sort">
+            <div className="column-sort pipeline-column__sort">
               <button
                 type="button"
                 className={
                   sortDirection === "none"
-                    ? "pipeline-sort-button"
-                    : "pipeline-sort-button is-active"
+                    ? "column-sort-btn pipeline-sort-button"
+                    : "column-sort-btn pipeline-sort-button active is-active"
                 }
+                data-dir={sortDirection}
                 aria-haspopup="menu"
                 aria-expanded={sortMenuOpen}
                 aria-label={`Sort ${summary.label} candidates`}
@@ -139,11 +163,11 @@ export function RecruitmentPipelineColumn({
                 }}
               >
                 <SlidersHorizontal aria-hidden="true" />
-                <span>{sortLabels[sortDirection]}</span>
+                <span className="sort-label">{sortLabels[sortDirection]}</span>
               </button>
               {sortMenuOpen ? (
                 <div
-                  className="pipeline-sort-menu"
+                  className="column-sort-menu pipeline-sort-menu open"
                   role="menu"
                   aria-label={`${summary.label} sort options`}
                   onClick={(event) => event.stopPropagation()}
@@ -155,9 +179,10 @@ export function RecruitmentPipelineColumn({
                       aria-checked={sortDirection === direction}
                       className={
                         sortDirection === direction
-                          ? "pipeline-sort-option is-selected"
-                          : "pipeline-sort-option"
+                          ? "column-sort-option pipeline-sort-option selected is-selected"
+                          : "column-sort-option pipeline-sort-option"
                       }
+                      data-sort={direction}
                       key={direction}
                       onClick={() =>
                         onSortDirectionChange(summary.stage, direction)
@@ -180,30 +205,29 @@ export function RecruitmentPipelineColumn({
               ) : null}
             </div>
           ) : null}
-          {locked ? <LockKeyhole aria-label="Stage is locked" /> : null}
         </div>
       </header>
-      {loading ? (
-        <p role="status">Loading applications...</p>
-      ) : error ? (
-        <div role="alert">
-          <p>{error}</p>
-          <button type="button" onClick={() => onRetry(summary.stage)}>
-            Retry
-          </button>
-        </div>
-      ) : !visibleItems.length ? (
-        <div className="pipeline-column__empty">
-          <Inbox aria-hidden="true" />
-          <span aria-label="No applications in this stage.">
-            {noFilterMatch
-              ? "No loaded candidates match the current filter."
-              : "No candidates yet."}
-          </span>
-        </div>
-      ) : (
-        <div className="pipeline-column__cards" data-card-stack>
-          {visibleItems.map((card) => (
+      <div className="card-stack pipeline-column__cards" data-card-stack>
+        {loading ? (
+          <p role="status">Loading applications...</p>
+        ) : error ? (
+          <div role="alert">
+            <p>{error}</p>
+            <button type="button" onClick={() => onRetry(summary.stage)}>
+              Retry
+            </button>
+          </div>
+        ) : !visibleItems.length ? (
+          <div className="column-empty pipeline-column__empty">
+            <Inbox aria-hidden="true" />
+            <span aria-label="No applications in this stage.">
+              {noFilterMatch
+                ? "No loaded candidates match the current filter."
+                : "No candidates yet."}
+            </span>
+          </div>
+        ) : (
+          visibleItems.map((card) => (
             <RecruitmentPipelineCard
               key={card.applicationId}
               card={card}
@@ -211,20 +235,34 @@ export function RecruitmentPipelineColumn({
               onChangeStage={onChangeStage}
               onViewAssessment={onViewAssessment}
             />
-          ))}
-        </div>
-      )}
-      {page?.nextCursor ? (
-        <button
-          type="button"
-          onClick={() => onLoadMore(summary.stage)}
-          disabled={loadingMore}
-          className="pipeline-column__load-more"
-        >
-          {loadingMore
-            ? "Loading more..."
-            : `Load more ${summary.label} applications`}
-        </button>
+          ))
+        )}
+      </div>
+      {hasMore || showViewAll ? (
+        <footer className="column-footer">
+          {hasMore ? (
+            <button
+              type="button"
+              onClick={() => onLoadMore(summary.stage)}
+              disabled={loadingMore}
+              className="load-more-btn pipeline-column__load-more"
+            >
+              {loadingMore
+                ? "Loading..."
+                : "Load more " + summary.label + " applications"}
+            </button>
+          ) : null}
+          {showViewAll && onViewAll ? (
+            <button
+              type="button"
+              onClick={() => onViewAll(summary.stage)}
+              className="view-all-btn pipeline-column__view-all"
+            >
+              <ListIcon aria-hidden="true" />
+              View full list
+            </button>
+          ) : null}
+        </footer>
       ) : null}
     </section>
   );

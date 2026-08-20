@@ -8,11 +8,7 @@ const activeStages = [
   "OFFERED",
 ] as const satisfies readonly ApplicationStage[];
 
-const terminalStages = new Set<ApplicationStage>([
-  "HIRED",
-  "OFFER_DECLINED",
-  "REJECTED",
-]);
+const terminalStages = new Set<ApplicationStage>(["HIRED", "OFFER_DECLINED"]);
 
 export function isTerminalApplicationStage(stage: ApplicationStage) {
   return terminalStages.has(stage);
@@ -40,6 +36,15 @@ export function canTransitionApplicationStage(
       to === "OFFER_DECLINED" ||
       to === "REJECTED" ||
       to === "WAITLISTED"
+    );
+  }
+
+  if (from === "REJECTED") {
+    return (
+      to === "APPLIED" ||
+      to === "VIEWED" ||
+      to === "SHORTLISTED" ||
+      to === "INTERVIEWING"
     );
   }
 
@@ -102,7 +107,7 @@ export const recruiterPipelineButtonTransitions = Object.freeze({
   OFFERED: [],
   HIRED: [],
   OFFER_DECLINED: [],
-  REJECTED: [],
+  REJECTED: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING"],
   WAITLISTED: [],
 } as const satisfies Record<ApplicationStage, readonly ApplicationStage[]>);
 
@@ -114,7 +119,7 @@ export const recruiterPipelineDragTransitions = Object.freeze({
   OFFERED: [],
   HIRED: [],
   OFFER_DECLINED: [],
-  REJECTED: [],
+  REJECTED: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING"],
   WAITLISTED: [],
 } as const satisfies Record<ApplicationStage, readonly ApplicationStage[]>);
 

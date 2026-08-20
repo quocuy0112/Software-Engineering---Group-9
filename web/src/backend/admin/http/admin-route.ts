@@ -118,6 +118,8 @@ export function adminRouteError(error: unknown) {
       ACTION_BLOCKED: 423,
       CORRECTION_REQUEST_OPEN: 409,
       FEATURE_CAPACITY_CONFLICT: 409,
+      INVALID_REPORT_RANGE: 400,
+      ANALYTICS_RANGE_UNAVAILABLE: 404,
     };
     if (known[error.message])
       return adminJson(

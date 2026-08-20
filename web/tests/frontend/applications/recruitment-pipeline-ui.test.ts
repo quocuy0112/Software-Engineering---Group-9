@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
-import type { PipelineApplicationCard } from "@/shared/contracts/applications";
+import type {
+  ApplicationStage,
+  PipelineApplicationCard,
+} from "@/shared/contracts/applications";
 import {
+  canSortPipelineStage,
   filterPipelineCards,
   pipelineTierForCard,
   sortPipelineCards,
@@ -66,6 +70,22 @@ describe("recruitment pipeline provisional UI utilities", () => {
         (item) => item.applicationId,
       ),
     ).toEqual(["strong-ada"]);
+  });
+
+  it("exposes score sorting for every pipeline stage", () => {
+    const stages: ApplicationStage[] = [
+      "APPLIED",
+      "VIEWED",
+      "SHORTLISTED",
+      "INTERVIEWING",
+      "OFFERED",
+      "HIRED",
+      "OFFER_DECLINED",
+      "REJECTED",
+      "WAITLISTED",
+    ];
+
+    expect(stages.every(canSortPipelineStage)).toBe(true);
   });
 
   it("sorts each loaded subset by score while keeping pending cards last", () => {
