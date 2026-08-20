@@ -2,6 +2,6 @@
 
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at spec-kit/specs/024-company-member-management/plan.md
+at spec-kit/specs/025-recruitment-messaging/plan.md
 
 <!-- SPECKIT END -->

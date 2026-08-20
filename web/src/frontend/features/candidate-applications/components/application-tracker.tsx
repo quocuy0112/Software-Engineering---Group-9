@@ -449,10 +449,10 @@ export function ApplicationTracker({
         </div>
         <Link
           className="application-ui-button application-ui-button--secondary"
-          href="/support"
+          href={`/jobs/applied/${encodeURIComponent(tracker.applicationId)}/messages`}
         >
           <MessageCircle aria-hidden="true" />
-          Contact support
+          Contact recruiter
         </Link>
       </header>
 

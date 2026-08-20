@@ -515,6 +515,19 @@ export type SupportInternalNote = Prisma.SupportInternalNoteModel
  */
 export type SupportConversationHistory = Prisma.SupportConversationHistoryModel
 /**
+ * Model RecruitmentThread
+ * Recruitment messaging is deliberately separate from a social messaging
+ * conversation. It has one durable business context (an application), a
+ * single accountable assignee, and company-owner oversight without making the
+ * owner a message participant.
+ */
+export type RecruitmentThread = Prisma.RecruitmentThreadModel
+/**
+ * Model RecruitmentMessage
+ * 
+ */
+export type RecruitmentMessage = Prisma.RecruitmentMessageModel
+/**
  * Model MessagingConversation
  * 
  */

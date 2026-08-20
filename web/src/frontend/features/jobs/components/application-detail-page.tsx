@@ -95,6 +95,12 @@ export function ApplicationDetailPage({
         <aside className="application-detail-panel application-submission-summary">
           <p className="workspace-kicker">Submitted application</p>
           <h2>Application details</h2>
+          <Link
+            className="application-detail-back"
+            href={`/jobs/applied/${encodeURIComponent(application.applicationId)}/messages`}
+          >
+            Recruitment messages
+          </Link>
           <dl>
             <div>
               <dt>Application ID</dt>

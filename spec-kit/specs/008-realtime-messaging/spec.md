@@ -512,3 +512,7 @@ Candidate, Recruiter, and unrestricted Administrator views.
 - A durably accepted message creates or updates one bounded unread-conversation in-app notification for the other participant and never creates email.
 - Opening successfully rendered message history atomically advances the existing participant read boundary and clears only that conversation's unified notifications; failed or forbidden loads do neither.
 - Notification polling reuses safe `message:new` invalidation but does not add a second realtime transport or expose message content in notification payloads.
+
+## Cross-feature boundary: application-scoped recruitment messaging
+
+Recruitment messaging is a separate durable thread per Job Application. It does not reuse a social `MessagingConversation`, and it does not grant a Company Owner participant or socket authority. Its authorization, ordering, and read state stay isolated from the social messaging context.

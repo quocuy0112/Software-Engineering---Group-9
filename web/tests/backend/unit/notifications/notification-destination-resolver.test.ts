@@ -27,6 +27,19 @@ describe("notification destination resolver", () => {
       }),
     ).toBe("/recruiter/candidates/job%201?application=app%201");
   });
+  it("opens application-scoped recruitment messages without reusing social conversation URLs", () => {
+    expect(resolveNotificationHref({
+      ...base,
+      kind: "MESSAGE_RECEIVED",
+      recipientRole: "CANDIDATE",
+    })).toBe("/jobs/applied/app%201/messages");
+    expect(resolveNotificationHref({
+      ...base,
+      kind: "MESSAGE_RECEIVED",
+      recipientRole: "RECRUITER",
+      threadId: "thread 1",
+    })).toBe("/recruiter/messages?thread=thread%201");
+  });
   it("uses the notification inbox as the safe fallback when exact context is unavailable", () => {
     expect(
       resolveNotificationHref({

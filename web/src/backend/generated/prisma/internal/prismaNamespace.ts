@@ -491,6 +491,8 @@ export const ModelName = {
   SupportAssignment: 'SupportAssignment',
   SupportInternalNote: 'SupportInternalNote',
   SupportConversationHistory: 'SupportConversationHistory',
+  RecruitmentThread: 'RecruitmentThread',
+  RecruitmentMessage: 'RecruitmentMessage',
   MessagingConversation: 'MessagingConversation',
   MessagingConversationParticipant: 'MessagingConversationParticipant',
   MessagingMessage: 'MessagingMessage',
@@ -550,7 +552,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "companyInvitation" | "companyTeamActivity" | "companyMembership" | "platformAdministratorGrant" | "platformAdministratorGrantScopeAssignment" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostReviewAggregate" | "jobPostRevisionRequest" | "jobPostFeaturedPlacement" | "jobPostEnforcementAction" | "jobPostEnforcementTarget" | "moderationReportEnforcementLink" | "jobPostOperationalHistory" | "jobPostReviewVersion" | "jobPostReviewHistory" | "jobPostReviewPrivateNote" | "jobCatalogueWriteLease" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "privateCvMatchCheck" | "privateCvMatchAttempt" | "privateAutomaticMatchResult" | "privateAiEvaluationResult" | "privateMatchEvidence" | "privateCvMatchCommandReceipt" | "savedJob" | "jobReport" | "candidateApplicationDraft" | "applicationIntake" | "applicationPublicUpdate" | "applicationNotificationPreference" | "jobApplication" | "applicationDocument" | "applicationCoverLetterText" | "applicationArtifactPromotion" | "applicationDocumentLegalHold" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence" | "automaticMatchResult" | "documentParseResult" | "skillEvidenceExtraction" | "cvEvidenceExcerpt" | "aiAssessment" | "aiAssessmentFinding" | "aiSuggestedInterviewQuestion" | "scoringOperation" | "scoringWorkItem" | "aiAssessmentAttempt" | "applicationScoringResult" | "manualApplicationPriority" | "rankingSnapshot" | "rankingSnapshotRow"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "companyInvitation" | "companyTeamActivity" | "companyMembership" | "platformAdministratorGrant" | "platformAdministratorGrantScopeAssignment" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostReviewAggregate" | "jobPostRevisionRequest" | "jobPostFeaturedPlacement" | "jobPostEnforcementAction" | "jobPostEnforcementTarget" | "moderationReportEnforcementLink" | "jobPostOperationalHistory" | "jobPostReviewVersion" | "jobPostReviewHistory" | "jobPostReviewPrivateNote" | "jobCatalogueWriteLease" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "privateCvMatchCheck" | "privateCvMatchAttempt" | "privateAutomaticMatchResult" | "privateAiEvaluationResult" | "privateMatchEvidence" | "privateCvMatchCommandReceipt" | "savedJob" | "jobReport" | "candidateApplicationDraft" | "applicationIntake" | "applicationPublicUpdate" | "applicationNotificationPreference" | "jobApplication" | "applicationDocument" | "applicationCoverLetterText" | "applicationArtifactPromotion" | "applicationDocumentLegalHold" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "recruitmentThread" | "recruitmentMessage" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence" | "automaticMatchResult" | "documentParseResult" | "skillEvidenceExtraction" | "cvEvidenceExcerpt" | "aiAssessment" | "aiAssessmentFinding" | "aiSuggestedInterviewQuestion" | "scoringOperation" | "scoringWorkItem" | "aiAssessmentAttempt" | "applicationScoringResult" | "manualApplicationPriority" | "rankingSnapshot" | "rankingSnapshotRow"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -7510,6 +7512,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RecruitmentThread: {
+      payload: Prisma.$RecruitmentThreadPayload<ExtArgs>
+      fields: Prisma.RecruitmentThreadFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RecruitmentThreadFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentThreadPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RecruitmentThreadFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentThreadPayload>
+        }
+        findFirst: {
+          args: Prisma.RecruitmentThreadFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentThreadPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RecruitmentThreadFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentThreadPayload>
+        }
+        findMany: {
+          args: Prisma.RecruitmentThreadFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentThreadPayload>[]
+        }
+        create: {
+          args: Prisma.RecruitmentThreadCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentThreadPayload>
+        }
+        createMany: {
+          args: Prisma.RecruitmentThreadCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RecruitmentThreadCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentThreadPayload>[]
+        }
+        delete: {
+          args: Prisma.RecruitmentThreadDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentThreadPayload>
+        }
+        update: {
+          args: Prisma.RecruitmentThreadUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentThreadPayload>
+        }
+        deleteMany: {
+          args: Prisma.RecruitmentThreadDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RecruitmentThreadUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RecruitmentThreadUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentThreadPayload>[]
+        }
+        upsert: {
+          args: Prisma.RecruitmentThreadUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentThreadPayload>
+        }
+        aggregate: {
+          args: Prisma.RecruitmentThreadAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRecruitmentThread>
+        }
+        groupBy: {
+          args: Prisma.RecruitmentThreadGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RecruitmentThreadGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RecruitmentThreadCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RecruitmentThreadCountAggregateOutputType> | number
+        }
+      }
+    }
+    RecruitmentMessage: {
+      payload: Prisma.$RecruitmentMessagePayload<ExtArgs>
+      fields: Prisma.RecruitmentMessageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RecruitmentMessageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentMessagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RecruitmentMessageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentMessagePayload>
+        }
+        findFirst: {
+          args: Prisma.RecruitmentMessageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentMessagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RecruitmentMessageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentMessagePayload>
+        }
+        findMany: {
+          args: Prisma.RecruitmentMessageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentMessagePayload>[]
+        }
+        create: {
+          args: Prisma.RecruitmentMessageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentMessagePayload>
+        }
+        createMany: {
+          args: Prisma.RecruitmentMessageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RecruitmentMessageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentMessagePayload>[]
+        }
+        delete: {
+          args: Prisma.RecruitmentMessageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentMessagePayload>
+        }
+        update: {
+          args: Prisma.RecruitmentMessageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentMessagePayload>
+        }
+        deleteMany: {
+          args: Prisma.RecruitmentMessageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RecruitmentMessageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RecruitmentMessageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentMessagePayload>[]
+        }
+        upsert: {
+          args: Prisma.RecruitmentMessageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecruitmentMessagePayload>
+        }
+        aggregate: {
+          args: Prisma.RecruitmentMessageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRecruitmentMessage>
+        }
+        groupBy: {
+          args: Prisma.RecruitmentMessageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RecruitmentMessageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RecruitmentMessageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RecruitmentMessageCountAggregateOutputType> | number
+        }
+      }
+    }
     MessagingConversation: {
       payload: Prisma.$MessagingConversationPayload<ExtArgs>
       fields: Prisma.MessagingConversationFieldRefs
@@ -12560,6 +12710,42 @@ export const SupportConversationHistoryScalarFieldEnum = {
 export type SupportConversationHistoryScalarFieldEnum = (typeof SupportConversationHistoryScalarFieldEnum)[keyof typeof SupportConversationHistoryScalarFieldEnum]
 
 
+export const RecruitmentThreadScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  companyId: 'companyId',
+  jobPostingId: 'jobPostingId',
+  candidateUserId: 'candidateUserId',
+  assignedMembershipId: 'assignedMembershipId',
+  state: 'state',
+  nextMessageSequence: 'nextMessageSequence',
+  lastMessageSequence: 'lastMessageSequence',
+  lastMessageAt: 'lastMessageAt',
+  candidateLastReadSequence: 'candidateLastReadSequence',
+  staffLastReadSequence: 'staffLastReadSequence',
+  candidateLastReadAt: 'candidateLastReadAt',
+  staffLastReadAt: 'staffLastReadAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RecruitmentThreadScalarFieldEnum = (typeof RecruitmentThreadScalarFieldEnum)[keyof typeof RecruitmentThreadScalarFieldEnum]
+
+
+export const RecruitmentMessageScalarFieldEnum = {
+  id: 'id',
+  threadId: 'threadId',
+  sequence: 'sequence',
+  senderUserId: 'senderUserId',
+  senderMembershipId: 'senderMembershipId',
+  clientOperationId: 'clientOperationId',
+  content: 'content',
+  createdAt: 'createdAt'
+} as const
+
+export type RecruitmentMessageScalarFieldEnum = (typeof RecruitmentMessageScalarFieldEnum)[keyof typeof RecruitmentMessageScalarFieldEnum]
+
+
 export const MessagingConversationScalarFieldEnum = {
   id: 'id',
   participantLowId: 'participantLowId',
@@ -12620,8 +12806,10 @@ export const MessagingReportScalarFieldEnum = {
   reporterUserId: 'reporterUserId',
   targetUserId: 'targetUserId',
   conversationId: 'conversationId',
+  recruitmentThreadId: 'recruitmentThreadId',
   targetType: 'targetType',
   evidenceMessageId: 'evidenceMessageId',
+  recruitmentEvidenceMessageId: 'recruitmentEvidenceMessageId',
   category: 'category',
   normalizedDetail: 'normalizedDetail',
   state: 'state',
@@ -14795,6 +14983,20 @@ export type ListEnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> = Fiel
 
 
 /**
+ * Reference to a field of type 'RecruitmentThreadState'
+ */
+export type EnumRecruitmentThreadStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RecruitmentThreadState'>
+    
+
+
+/**
+ * Reference to a field of type 'RecruitmentThreadState[]'
+ */
+export type ListEnumRecruitmentThreadStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RecruitmentThreadState[]'>
+    
+
+
+/**
  * Reference to a field of type 'MessagingConversationContextType'
  */
 export type EnumMessagingConversationContextTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessagingConversationContextType'>
@@ -15724,6 +15926,8 @@ export type GlobalOmitConfig = {
   supportAssignment?: Prisma.SupportAssignmentOmit
   supportInternalNote?: Prisma.SupportInternalNoteOmit
   supportConversationHistory?: Prisma.SupportConversationHistoryOmit
+  recruitmentThread?: Prisma.RecruitmentThreadOmit
+  recruitmentMessage?: Prisma.RecruitmentMessageOmit
   messagingConversation?: Prisma.MessagingConversationOmit
   messagingConversationParticipant?: Prisma.MessagingConversationParticipantOmit
   messagingMessage?: Prisma.MessagingMessageOmit

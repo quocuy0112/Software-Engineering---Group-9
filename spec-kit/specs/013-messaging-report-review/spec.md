@@ -1,5 +1,7 @@
 # Feature Specification: Protected Messaging Report Review
 
+> Recruitment-thread messages are a separate evidence type. They may enter this workflow only through an explicit adapter that preserves application/company scope and never treats Owner oversight reads as participant evidence.
+
 **Feature Branch**: `013-messaging-report-review`
 
 **Created**: 2026-08-13

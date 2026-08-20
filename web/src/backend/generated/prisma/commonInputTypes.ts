@@ -1894,6 +1894,23 @@ export type EnumSupportConversationStateNullableWithAggregatesFilter<$PrismaMode
   _max?: Prisma.NestedEnumSupportConversationStateNullableFilter<$PrismaModel>
 }
 
+export type EnumRecruitmentThreadStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.RecruitmentThreadState | Prisma.EnumRecruitmentThreadStateFieldRefInput<$PrismaModel>
+  in?: $Enums.RecruitmentThreadState[] | Prisma.ListEnumRecruitmentThreadStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RecruitmentThreadState[] | Prisma.ListEnumRecruitmentThreadStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRecruitmentThreadStateFilter<$PrismaModel> | $Enums.RecruitmentThreadState
+}
+
+export type EnumRecruitmentThreadStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RecruitmentThreadState | Prisma.EnumRecruitmentThreadStateFieldRefInput<$PrismaModel>
+  in?: $Enums.RecruitmentThreadState[] | Prisma.ListEnumRecruitmentThreadStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RecruitmentThreadState[] | Prisma.ListEnumRecruitmentThreadStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRecruitmentThreadStateWithAggregatesFilter<$PrismaModel> | $Enums.RecruitmentThreadState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRecruitmentThreadStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRecruitmentThreadStateFilter<$PrismaModel>
+}
+
 export type EnumMessagingConversationContextTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.MessagingConversationContextType | Prisma.EnumMessagingConversationContextTypeFieldRefInput<$PrismaModel>
   in?: $Enums.MessagingConversationContextType[] | Prisma.ListEnumMessagingConversationContextTypeFieldRefInput<$PrismaModel>
@@ -4581,6 +4598,23 @@ export type NestedEnumSupportConversationStateNullableWithAggregatesFilter<$Pris
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumSupportConversationStateNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumSupportConversationStateNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumRecruitmentThreadStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.RecruitmentThreadState | Prisma.EnumRecruitmentThreadStateFieldRefInput<$PrismaModel>
+  in?: $Enums.RecruitmentThreadState[] | Prisma.ListEnumRecruitmentThreadStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RecruitmentThreadState[] | Prisma.ListEnumRecruitmentThreadStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRecruitmentThreadStateFilter<$PrismaModel> | $Enums.RecruitmentThreadState
+}
+
+export type NestedEnumRecruitmentThreadStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RecruitmentThreadState | Prisma.EnumRecruitmentThreadStateFieldRefInput<$PrismaModel>
+  in?: $Enums.RecruitmentThreadState[] | Prisma.ListEnumRecruitmentThreadStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RecruitmentThreadState[] | Prisma.ListEnumRecruitmentThreadStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRecruitmentThreadStateWithAggregatesFilter<$PrismaModel> | $Enums.RecruitmentThreadState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRecruitmentThreadStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRecruitmentThreadStateFilter<$PrismaModel>
 }
 
 export type NestedEnumMessagingConversationContextTypeFilter<$PrismaModel = never> = {

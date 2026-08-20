@@ -145,6 +145,8 @@ export const ModelName = {
   SupportAssignment: 'SupportAssignment',
   SupportInternalNote: 'SupportInternalNote',
   SupportConversationHistory: 'SupportConversationHistory',
+  RecruitmentThread: 'RecruitmentThread',
+  RecruitmentMessage: 'RecruitmentMessage',
   MessagingConversation: 'MessagingConversation',
   MessagingConversationParticipant: 'MessagingConversationParticipant',
   MessagingMessage: 'MessagingMessage',
@@ -1962,6 +1964,42 @@ export const SupportConversationHistoryScalarFieldEnum = {
 export type SupportConversationHistoryScalarFieldEnum = (typeof SupportConversationHistoryScalarFieldEnum)[keyof typeof SupportConversationHistoryScalarFieldEnum]
 
 
+export const RecruitmentThreadScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  companyId: 'companyId',
+  jobPostingId: 'jobPostingId',
+  candidateUserId: 'candidateUserId',
+  assignedMembershipId: 'assignedMembershipId',
+  state: 'state',
+  nextMessageSequence: 'nextMessageSequence',
+  lastMessageSequence: 'lastMessageSequence',
+  lastMessageAt: 'lastMessageAt',
+  candidateLastReadSequence: 'candidateLastReadSequence',
+  staffLastReadSequence: 'staffLastReadSequence',
+  candidateLastReadAt: 'candidateLastReadAt',
+  staffLastReadAt: 'staffLastReadAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RecruitmentThreadScalarFieldEnum = (typeof RecruitmentThreadScalarFieldEnum)[keyof typeof RecruitmentThreadScalarFieldEnum]
+
+
+export const RecruitmentMessageScalarFieldEnum = {
+  id: 'id',
+  threadId: 'threadId',
+  sequence: 'sequence',
+  senderUserId: 'senderUserId',
+  senderMembershipId: 'senderMembershipId',
+  clientOperationId: 'clientOperationId',
+  content: 'content',
+  createdAt: 'createdAt'
+} as const
+
+export type RecruitmentMessageScalarFieldEnum = (typeof RecruitmentMessageScalarFieldEnum)[keyof typeof RecruitmentMessageScalarFieldEnum]
+
+
 export const MessagingConversationScalarFieldEnum = {
   id: 'id',
   participantLowId: 'participantLowId',
@@ -2022,8 +2060,10 @@ export const MessagingReportScalarFieldEnum = {
   reporterUserId: 'reporterUserId',
   targetUserId: 'targetUserId',
   conversationId: 'conversationId',
+  recruitmentThreadId: 'recruitmentThreadId',
   targetType: 'targetType',
   evidenceMessageId: 'evidenceMessageId',
+  recruitmentEvidenceMessageId: 'recruitmentEvidenceMessageId',
   category: 'category',
   normalizedDetail: 'normalizedDetail',
   state: 'state',

@@ -37,7 +37,6 @@ type RankedPageCacheEntry = Readonly<{
 
 const RANKED_PAGE_CACHE_MAX_AGE_MS = 10 * 60_000;
 const RANKED_PAGE_CACHE_MAX_ENTRIES = 100;
-const RANKED_REFRESH_INTERVAL_MS = 2_000;
 const rankedPageCache = new Map<string, RankedPageCacheEntry>();
 const rankedPageRequests = new Map<string, Promise<RankedApplicationPage>>();
 const rankedPageRequestVersions = new Map<string, number>();
@@ -230,16 +229,16 @@ export function useRankedCandidates(
   }, [fetchPage]);
 
   useEffect(() => {
-    if (typeof window === "undefined" || typeof document === "undefined") return;
+    if (typeof window === "undefined" || typeof document === "undefined")
+      return;
     const refreshWhenVisible = () => {
-      if (document.visibilityState !== "visible" || requestInFlight.current) return;
+      if (document.visibilityState !== "visible" || requestInFlight.current)
+        return;
       refresh();
     };
-    const interval = window.setInterval(refreshWhenVisible, RANKED_REFRESH_INTERVAL_MS);
     document.addEventListener("visibilitychange", refreshWhenVisible);
     window.addEventListener("focus", refreshWhenVisible);
     return () => {
-      window.clearInterval(interval);
       document.removeEventListener("visibilitychange", refreshWhenVisible);
       window.removeEventListener("focus", refreshWhenVisible);
     };

@@ -14,6 +14,7 @@ export type NotificationDestinationInput = {
   occurrenceCount: number;
   lastOccurredAt: Date;
   jobId?: string | null;
+  threadId?: string | null;
   adminOrigin?: string;
 };
 
@@ -50,6 +51,11 @@ export function resolveNotificationHref(input: NotificationDestinationInput) {
       ? `/messages?filter=unread&since=${since}`
       : `/messages?conversation=${id}`;
   if (contextType === "APPLICATION") {
+    if (input.kind === "MESSAGE_RECEIVED") {
+      if (recipientRole === "CANDIDATE") return `/jobs/applied/${id}/messages`;
+      if (recipientRole === "RECRUITER" && input.threadId)
+        return `/recruiter/messages?thread=${encode(input.threadId)}`;
+    }
     if (recipientRole === "CANDIDATE")
       return grouped ? "/jobs/applied" : `/jobs/applied/${id}`;
     if (recipientRole === "RECRUITER" && input.jobId) {
