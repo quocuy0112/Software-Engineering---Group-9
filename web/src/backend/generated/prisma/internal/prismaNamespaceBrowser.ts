@@ -190,7 +190,11 @@ export const ModelName = {
   ApplicationScoringResult: 'ApplicationScoringResult',
   ManualApplicationPriority: 'ManualApplicationPriority',
   RankingSnapshot: 'RankingSnapshot',
-  RankingSnapshotRow: 'RankingSnapshotRow'
+  RankingSnapshotRow: 'RankingSnapshotRow',
+  JobPostingViewFact: 'JobPostingViewFact',
+  JobPostingLifecycleFact: 'JobPostingLifecycleFact',
+  ExportRequest: 'ExportRequest',
+  ActivityLegalHold: 'ActivityLegalHold'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -2941,6 +2945,90 @@ export const RankingSnapshotRowScalarFieldEnum = {
 } as const
 
 export type RankingSnapshotRowScalarFieldEnum = (typeof RankingSnapshotRowScalarFieldEnum)[keyof typeof RankingSnapshotRowScalarFieldEnum]
+
+
+export const JobPostingViewFactScalarFieldEnum = {
+  id: 'id',
+  jobPostingId: 'jobPostingId',
+  companyId: 'companyId',
+  occurredAt: 'occurredAt',
+  platformDay: 'platformDay',
+  visitorDayDigest: 'visitorDayDigest',
+  digestVersion: 'digestVersion',
+  qualification: 'qualification',
+  qualificationPolicyVersion: 'qualificationPolicyVersion',
+  createdAt: 'createdAt'
+} as const
+
+export type JobPostingViewFactScalarFieldEnum = (typeof JobPostingViewFactScalarFieldEnum)[keyof typeof JobPostingViewFactScalarFieldEnum]
+
+
+export const JobPostingLifecycleFactScalarFieldEnum = {
+  id: 'id',
+  jobPostingId: 'jobPostingId',
+  companyId: 'companyId',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  effectiveAt: 'effectiveAt',
+  postingVersion: 'postingVersion',
+  actorUserId: 'actorUserId',
+  correlationId: 'correlationId',
+  createdAt: 'createdAt'
+} as const
+
+export type JobPostingLifecycleFactScalarFieldEnum = (typeof JobPostingLifecycleFactScalarFieldEnum)[keyof typeof JobPostingLifecycleFactScalarFieldEnum]
+
+
+export const ExportRequestScalarFieldEnum = {
+  id: 'id',
+  requesterUserId: 'requesterUserId',
+  companyId: 'companyId',
+  jobPostingId: 'jobPostingId',
+  format: 'format',
+  filters: 'filters',
+  rangeStart: 'rangeStart',
+  rangeEnd: 'rangeEnd',
+  timeZone: 'timeZone',
+  dataCutoff: 'dataCutoff',
+  definitionVersion: 'definitionVersion',
+  status: 'status',
+  idempotencyKey: 'idempotencyKey',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  attemptCount: 'attemptCount',
+  storageLocator: 'storageLocator',
+  fileName: 'fileName',
+  mediaType: 'mediaType',
+  byteCount: 'byteCount',
+  checksum: 'checksum',
+  rowCount: 'rowCount',
+  failureCode: 'failureCode',
+  requestedAt: 'requestedAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  expiresAt: 'expiresAt',
+  inaccessibleAt: 'inaccessibleAt',
+  deletedAt: 'deletedAt',
+  version: 'version'
+} as const
+
+export type ExportRequestScalarFieldEnum = (typeof ExportRequestScalarFieldEnum)[keyof typeof ExportRequestScalarFieldEnum]
+
+
+export const ActivityLegalHoldScalarFieldEnum = {
+  id: 'id',
+  scopeType: 'scopeType',
+  scopeReference: 'scopeReference',
+  reasonCategory: 'reasonCategory',
+  authorizedByAdminUserId: 'authorizedByAdminUserId',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  releasedAt: 'releasedAt',
+  correlationId: 'correlationId',
+  createdAt: 'createdAt'
+} as const
+
+export type ActivityLegalHoldScalarFieldEnum = (typeof ActivityLegalHoldScalarFieldEnum)[keyof typeof ActivityLegalHoldScalarFieldEnum]
 
 
 export const SortOrder = {

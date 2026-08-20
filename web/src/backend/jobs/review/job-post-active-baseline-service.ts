@@ -9,6 +9,7 @@ import {
 } from "./job-post-review-policy";
 import { projectJobReviewSnapshot } from "./job-post-publication-projector";
 import { normalizedReviewTitleSearch } from "./job-post-review-search";
+import { appendJobPostingLifecycleFact } from "@/backend/repositories/analytics/prisma-analytics-repository";
 
 export async function adoptActiveJobBaseline(input: {
   job: JobCatalogItem;
@@ -61,6 +62,16 @@ export async function adoptActiveJobBaseline(input: {
             publishedAt: publicationTime,
           },
         });
+    await appendJobPostingLifecycleFact(transaction, {
+      jobPostingId: publicJob.id,
+      companyId: publicJob.companyId,
+      fromStatus: null,
+      toStatus: publicJob.status,
+      effectiveAt: publicationTime,
+      postingVersion: publicJob.version,
+      actorUserId: input.actorUserId,
+      correlationId,
+    });
     if (!existingProjection) {
       for (const skill of projected.skills) {
         const stored = await transaction.skill.upsert({

@@ -405,6 +405,8 @@ export class JobPostManagementService {
             visibility,
             applicationState,
             now,
+            actorUserId: authority.userId,
+            correlationId,
           });
           const version = expectedVersion + 1;
           await tx.jobPostOperationalHistory.create({
@@ -457,6 +459,27 @@ export class JobPostManagementService {
               applicationState,
             },
           });
+          if (
+            command.command === "SOFT_DELETE" ||
+            (command.command === "ENFORCE" &&
+              command.type === "SOFT_DELETE_JOB")
+          ) {
+            await new PrismaAuditRepository(tx).append({
+              occurredAt: now,
+              actorType: "user",
+              actorUserId: authority.userId,
+              actorSessionId: authority.sessionId,
+              action: "job_posting.deleted",
+              targetType: "job_posting",
+              targetId: row.publicJobPosting.id,
+              result: "SUCCESS",
+              correlationId,
+              context: {
+                reasonCategory: reason ?? undefined,
+                status: "REMOVED",
+              },
+            });
+          }
           if (
             (command.command === "REQUEST_CHANGES" ||
               (command.command === "ENFORCE" &&

@@ -15,11 +15,12 @@ export const pipelineApplicationStages = applicationStageSchema.options;
 export const terminalPipelineStages = [
   "HIRED",
   "OFFER_DECLINED",
-  "REJECTED",
 ] as const satisfies readonly ApplicationStage[];
 
 export function isTerminalPipelineStage(stage: ApplicationStage) {
-  return terminalPipelineStages.includes(stage as (typeof terminalPipelineStages)[number]);
+  return terminalPipelineStages.includes(
+    stage as (typeof terminalPipelineStages)[number],
+  );
 }
 
 export const pipelineStageLabels: Record<ApplicationStage, string> = {
@@ -143,6 +144,8 @@ export const pipelineStagePageSchema = z
     stage: applicationStageSchema,
     items: z.array(pipelineApplicationCardSchema).max(100),
     nextCursor: z.string().min(1).max(512).nullable(),
+    /** Explicit pagination state for consumers that do not need to inspect the cursor. */
+    hasMore: z.boolean().optional(),
     observedAt: isoDateTimeSchema,
   })
   .strict();
@@ -233,14 +236,22 @@ export {
 };
 export type { ApplicationStage, ApplicationStageTransition };
 
-export type PipelineMembershipRole = z.infer<typeof pipelineMembershipRoleSchema>;
+export type PipelineMembershipRole = z.infer<
+  typeof pipelineMembershipRoleSchema
+>;
 export type PipelinePermissions = z.infer<typeof pipelinePermissionsSchema>;
 export type PipelineStageCount = z.infer<typeof pipelineStageCountSchema>;
 export type PipelineBoardMetadata = z.infer<typeof pipelineBoardMetadataSchema>;
 export type PipelineScore = z.infer<typeof pipelineScoreSchema>;
-export type PipelineApplicationCard = z.infer<typeof pipelineApplicationCardSchema>;
+export type PipelineApplicationCard = z.infer<
+  typeof pipelineApplicationCardSchema
+>;
 export type PipelineStagePage = z.infer<typeof pipelineStagePageSchema>;
-export type StageTransitionCommand = z.infer<typeof stageTransitionCommandSchema>;
-export type StageTransitionOutcome = z.infer<typeof stageTransitionOutcomeSchema>;
+export type StageTransitionCommand = z.infer<
+  typeof stageTransitionCommandSchema
+>;
+export type StageTransitionOutcome = z.infer<
+  typeof stageTransitionOutcomeSchema
+>;
 export type PipelineProblem = z.infer<typeof pipelineProblemSchema>;
 export type StageConflict = z.infer<typeof stageConflictSchema>;

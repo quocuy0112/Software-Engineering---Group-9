@@ -16,7 +16,8 @@ import {
 } from "@/shared/contracts/applications";
 
 type ColumnState = Readonly<{ page: PipelineStagePage | null; loading: boolean; loadingMore: boolean; error: string | null }>;
-type StageMoveOperation = Readonly<{ card: PipelineApplicationCard; targetStage: ApplicationStage; extras: Omit<StageTransitionCommand, "targetStage" | "expectedStageVersion">; idempotencyKey: string }>;
+type StageMoveExtras = Omit<StageTransitionCommand, "targetStage" | "expectedStageVersion">;
+type StageMoveOperation = Readonly<{ card: PipelineApplicationCard; targetStage: ApplicationStage; extras: StageMoveExtras; idempotencyKey: string }>;
 type LoadStageOptions = Readonly<{ background?: boolean }>;
 type PipelineLoadOptions = Readonly<{ preserve?: boolean }>;
 const emptyColumn = (): ColumnState => ({ page: null, loading: false, loadingMore: false, error: null });
@@ -61,6 +62,7 @@ export function useRecruitmentPipeline(jobId: string) {
   const [canRetryStageMove, setCanRetryStageMove] = useState(false);
   const generation = useRef(0);
   const retryOperation = useRef<StageMoveOperation | null>(null);
+  const pendingApplicationIdRef = useRef<string | null>(null);
   const metadataRef = useRef<PipelineBoardMetadata | null>(null);
   const loadingRef = useRef(true);
   const pipelineRefreshInFlight = useRef(false);
@@ -169,8 +171,9 @@ export function useRecruitmentPipeline(jobId: string) {
 
   const submitStageMove = useCallback(async (operation: StageMoveOperation, optimistic: boolean) => {
     const { card, targetStage, extras, idempotencyKey } = operation;
-    if (pendingApplicationId) return false;
+    if (pendingApplicationIdRef.current) return false;
     retryOperation.current = operation;
+    pendingApplicationIdRef.current = card.applicationId;
     setPendingApplicationId(card.applicationId);
     setAnnouncement(`Moving ${card.candidate.displayName} to ${targetStage.replaceAll("_", " ")}.`);
     if (optimistic) {
@@ -205,20 +208,48 @@ export function useRecruitmentPipeline(jobId: string) {
       if (commandCannotBeRetried) retryOperation.current = null;
       setCanRetryStageMove(!commandCannotBeRetried);
       return false;
-    } finally { setPendingApplicationId(null); }
-  }, [csrfProof, jobId, load, loadStage, pendingApplicationId]);
+    } finally {
+      pendingApplicationIdRef.current = null;
+      setPendingApplicationId(null);
+    }
+  }, [csrfProof, jobId, load, loadStage]);
 
-  const move = useCallback(async (card: PipelineApplicationCard, targetStage: ApplicationStage, extras: Omit<StageTransitionCommand, "targetStage" | "expectedStageVersion"> = {}) => {
-    if (isTerminalPipelineStage(card.stage) || !card.allowedDestinations.includes(targetStage) || pendingApplicationId) return false;
+  const move = useCallback(async (card: PipelineApplicationCard, targetStage: ApplicationStage, extras: StageMoveExtras = {}) => {
+    if (isTerminalPipelineStage(card.stage) || !card.allowedDestinations.includes(targetStage) || pendingApplicationIdRef.current) return false;
     setCanRetryStageMove(false);
     return submitStageMove({ card, targetStage, extras, idempotencyKey: crypto.randomUUID() }, true);
-  }, [pendingApplicationId, submitStageMove]);
+  }, [submitStageMove]);
 
-  const moveDrag = useCallback(async (card: PipelineApplicationCard, targetStage: ApplicationStage, extras: Omit<StageTransitionCommand, "targetStage" | "expectedStageVersion"> = {}) => {
+  const moveDrag = useCallback(async (card: PipelineApplicationCard, targetStage: ApplicationStage, extras: StageMoveExtras = {}) => {
     const dragDestinations = card.dragDestinations ?? [];
     if (isTerminalPipelineStage(card.stage) || !dragDestinations.includes(targetStage)) return false;
     return move(card, targetStage, { ...extras, intent: "drag" });
   }, [move]);
+
+  const moveMany = useCallback(async (
+    cardsToMove: readonly PipelineApplicationCard[],
+    targetStage: ApplicationStage,
+    extras: StageMoveExtras = {},
+  ) => {
+    let allSucceeded = true;
+    for (const card of cardsToMove) {
+      if (isTerminalPipelineStage(card.stage)) {
+        allSucceeded = false;
+        continue;
+      }
+      const succeeded = await submitStageMove(
+        {
+          card,
+          targetStage,
+          extras,
+          idempotencyKey: crypto.randomUUID(),
+        },
+        true,
+      );
+      if (!succeeded) allSucceeded = false;
+    }
+    return allSucceeded;
+  }, [submitStageMove]);
 
   const retryStageMove = useCallback(() => {
     const operation = retryOperation.current;
@@ -238,6 +269,7 @@ export function useRecruitmentPipeline(jobId: string) {
     retry: load,
     move,
     moveDrag,
+    moveMany,
     announcement,
     pendingApplicationId,
     canRetryStageMove,

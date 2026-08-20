@@ -3,7 +3,6 @@
 import { useDraggable } from "@dnd-kit/core";
 import { ChevronDown, GripVertical, LockKeyhole } from "lucide-react";
 import { useState, type KeyboardEvent } from "react";
-import { ProgressRing } from "@/frontend/components/ui/progress-ring";
 import {
   isTerminalPipelineStage,
   pipelineStageLabels,
@@ -35,7 +34,6 @@ const lockedStages = new Set<ApplicationStage>([
   "WAITLISTED",
   "HIRED",
   "OFFER_DECLINED",
-  "REJECTED",
 ]);
 
 const tierLabels = {
@@ -44,6 +42,53 @@ const tierLabels = {
   low: "Low match",
   pending: "Not yet scored",
 } as const;
+
+function ScoreRing({
+  score,
+  tier,
+  candidateName,
+}: {
+  score: number | null;
+  tier: keyof typeof tierLabels;
+  candidateName: string;
+}) {
+  const dashOffset =
+    score === null
+      ? undefined
+      : 113 - (Math.max(0, Math.min(100, score)) / 100) * 113;
+
+  return (
+    <div
+      className={`score-ring ring-${tier} pipeline-card__score-ring`}
+      role={score === null ? undefined : "progressbar"}
+      aria-label={
+        score === null
+          ? "Final score not yet available"
+          : `Final score ${Math.round(score)} percent for ${candidateName}`
+      }
+      aria-valuemin={score === null ? undefined : 0}
+      aria-valuemax={score === null ? undefined : 100}
+      aria-valuenow={score === null ? undefined : Math.round(score)}
+    >
+      <svg viewBox="0 0 44 44" aria-hidden="true">
+        <circle className="track" cx="22" cy="22" r="18" />
+        {score !== null ? (
+          <circle
+            className="value"
+            cx="22"
+            cy="22"
+            r="18"
+            strokeDasharray="113"
+            strokeDashoffset={dashOffset}
+          />
+        ) : null}
+      </svg>
+      <div className="score-num">
+        {score === null ? "\u2014" : `${Math.round(score)}%`}
+      </div>
+    </div>
+  );
+}
 
 function stopInteractiveEvent(event: {
   target: EventTarget | null;
@@ -72,6 +117,7 @@ export function RecruitmentPipelineCard({
   dragOverlay?: boolean;
 }) {
   const terminal = isTerminalPipelineStage(card.stage);
+  const outcomeStatus = card.stage === "HIRED" || card.stage === "REJECTED";
   const locked = lockedStages.has(card.stage);
   // The server projection is authoritative. A missing dragDestinations value
   // is treated as no drag permission instead of widening the policy on the FE.
@@ -89,6 +135,7 @@ export function RecruitmentPipelineCard({
     draggable;
   const score = pipelineScoreForCard(card);
   const tier = pipelineTierForCard(card);
+  const isExpanded = !collapsible || expanded;
   const quickActions = locked
     ? []
     : allowedDestinations
@@ -114,13 +161,37 @@ export function RecruitmentPipelineCard({
       toggleExpanded();
     }
   };
+  const handleCardPointerDown = (event: React.PointerEvent<HTMLElement>) => {
+    if (!canDrag || stopInteractiveEvent(event)) return;
+    listeners?.onPointerDown?.(event);
+  };
+
+  const dragHandle = canDrag ? (
+    <button
+      type="button"
+      className="pipeline-card__drag-handle"
+      {...attributes}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+        listeners?.onPointerDown?.(event);
+      }}
+      onKeyDown={(event) => {
+        event.stopPropagation();
+        listeners?.onKeyDown?.(event);
+      }}
+      aria-label={`Drag ${card.candidate.displayName} to another stage`}
+      title="Drag card"
+    >
+      <GripVertical aria-hidden="true" />
+    </button>
+  ) : null;
 
   const actionPanel = (
     <div
-      className="pipeline-card__actions-panel"
-      data-state={expanded ? "open" : "closed"}
+      className="card-actions-panel pipeline-card__actions-panel"
+      data-state={isExpanded ? "open" : "closed"}
     >
-      <div className="pipeline-card__document-actions">
+      <div className="card-actions pipeline-card__document-actions">
         {card.documents.cvAvailable ? (
           <a
             href={`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(card.applicationId)}/documents/cv`}
@@ -145,7 +216,7 @@ export function RecruitmentPipelineCard({
       {onViewAssessment ? (
         <button
           type="button"
-          className="pipeline-card__assessment-action"
+          className="assessment-btn pipeline-card__assessment-action"
           onClick={(event) => {
             event.stopPropagation();
             onViewAssessment(card);
@@ -155,12 +226,12 @@ export function RecruitmentPipelineCard({
         </button>
       ) : null}
       {quickActions.length > 0 ? (
-        <div className="pipeline-card__quick-actions">
+        <div className="quick-actions pipeline-card__quick-actions">
           {quickActions.map(({ stage, label }) => (
             <button
               key={stage}
               type="button"
-              className={`pipeline-card__quick-action pipeline-card__quick-action--${stage === "REJECTED" ? "reject" : stage === "WAITLISTED" ? "waitlist" : "move"}`}
+              className={`quick-action pipeline-card__quick-action pipeline-card__quick-action--${stage === "REJECTED" ? "reject" : stage === "WAITLISTED" ? "waitlist" : "move"} ${stage === "REJECTED" ? "danger" : stage === "WAITLISTED" ? "warn" : "move"}`}
               onClick={(event) => {
                 event.stopPropagation();
                 onChangeStage?.(card, stage);
@@ -174,13 +245,14 @@ export function RecruitmentPipelineCard({
       {allowedDestinations.length > 0 && onChangeStage ? (
         <button
           type="button"
-          className="pipeline-card__change-stage"
+          className="change-stage-link pipeline-card__change-stage"
+          aria-label="Change Stage"
           onClick={(event) => {
             event.stopPropagation();
             onChangeStage(card);
           }}
         >
-          Change Stage
+          {"Change Stage\u2026"}
         </button>
       ) : null}
     </div>
@@ -189,11 +261,23 @@ export function RecruitmentPipelineCard({
   return (
     <article
       ref={setNodeRef}
-      className={`pipeline-card${canDrag ? "is-draggable" : ""}${isDragging ? "is-dragging" : ""}${dragOverlay ? "pipeline-card--overlay" : ""}${collapsible ? "is-collapsible" : ""}${expanded ? "is-expanded" : ""}`}
+      onPointerDown={handleCardPointerDown}
+      className={[
+        "candidate-card",
+        "pipeline-card",
+        canDrag ? "is-draggable" : "",
+        isDragging ? "is-dragging" : "",
+        dragOverlay ? "pipeline-card--overlay" : "",
+        collapsible ? "collapsible is-collapsible" : "",
+        isExpanded ? "expanded is-expanded" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       data-application-id={dragOverlay ? undefined : card.applicationId}
       data-stage={card.stage}
       data-tier={tier}
       data-score={score ?? -1}
+      data-name={card.candidate.displayName}
       data-dragging={isDragging ? "true" : undefined}
       style={{
         transform: transform
@@ -206,33 +290,21 @@ export function RecruitmentPipelineCard({
       onClick={collapsible ? handleCardClick : undefined}
       onKeyDown={collapsible ? handleCardKeyDown : undefined}
     >
-      <div className="pipeline-card__topline">
-        <div className="pipeline-card__identity">
-          <strong>{card.candidate.displayName}</strong>
-          {terminal ? (
-            <span className="pipeline-card__status-pill">
+      <div className="card-top pipeline-card__topline">
+        <div className="candidate-name pipeline-card__identity">
+          {card.candidate.displayName}
+        </div>
+        {outcomeStatus ? (
+          <>
+            <span
+              className={`status-pill ${card.stage === "HIRED" ? "status-hired" : "status-rejected"} pipeline-card__status-pill`}
+            >
               {pipelineStageLabels[card.stage].toUpperCase()}
             </span>
-          ) : null}
-        </div>
-        {canDrag ? (
-          <button
-            type="button"
-            className="pipeline-card__drag-handle"
-            {...attributes}
-            onPointerDown={(event) => {
-              event.stopPropagation();
-              listeners?.onPointerDown?.(event);
-            }}
-            onKeyDown={(event) => {
-              event.stopPropagation();
-              listeners?.onKeyDown?.(event);
-            }}
-            aria-label={`Drag ${card.candidate.displayName} to another stage`}
-            title="Drag card"
-          >
-            <GripVertical aria-hidden="true" />
-          </button>
+            {dragHandle}
+          </>
+        ) : canDrag ? (
+          dragHandle
         ) : locked ? (
           <LockKeyhole
             className="pipeline-card__locked-icon"
@@ -240,45 +312,40 @@ export function RecruitmentPipelineCard({
           />
         ) : null}
       </div>
-      <time dateTime={card.submittedAt}>
-        Submitted{" "}
-        {new Date(card.submittedAt).toLocaleDateString("en-US", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        })}
-      </time>
-      <div className={`pipeline-card__score pipeline-card__score--${tier}`}>
-        {score !== null ? (
-          <ProgressRing
-            percent={score}
-            size={48}
-            label={`Final score ${Math.round(score)} percent for ${card.candidate.displayName}`}
-            caption="Final score"
-          />
-        ) : (
-          <div
-            className="pipeline-card__score-pending"
-            aria-label="Final score not yet available"
-          >
-            <strong>&mdash;</strong>
-            <span>Final score</span>
-          </div>
-        )}
-        <div className="pipeline-card__score-meta">
-          <span>Final score</span>
-          <strong>{tierLabels[tier]}</strong>
+      <div className="submitted-date pipeline-card__submitted-date">
+        <time dateTime={card.submittedAt}>
+          Submitted{" "}
+          {new Date(card.submittedAt).toLocaleDateString("en-US", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
+        </time>
+      </div>
+      <div
+        className={`score-row pipeline-card__score pipeline-card__score--${tier}`}
+      >
+        <ScoreRing
+          score={score}
+          tier={tier}
+          candidateName={card.candidate.displayName}
+        />
+        <div className="score-meta pipeline-card__score-meta">
+          <span className="score-meta-label">Final score</span>
+          <span className={`tier-badge tier-${tier}`}>
+            <span className="dot" aria-hidden="true" />
+            {tierLabels[tier]}
+          </span>
         </div>
       </div>
       {collapsible ? (
-        <div className="pipeline-card__hint" aria-hidden="true">
-          <span>
-            {expanded ? "Click to collapse" : "Click to view actions"}
-          </span>
-          <ChevronDown />
+        <div className="card-hint pipeline-card__hint" aria-hidden="true">
+          <span className="hint-collapsed">{"Click to view actions"}</span>
+          <span className="hint-expanded">{"Click to collapse"}</span>
+          <ChevronDown aria-hidden="true" />
         </div>
       ) : null}
-      {collapsible ? (expanded ? actionPanel : null) : actionPanel}
+      {actionPanel}
     </article>
   );
 }

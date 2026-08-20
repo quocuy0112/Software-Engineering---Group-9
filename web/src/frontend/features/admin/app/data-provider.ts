@@ -1,6 +1,11 @@
 "use client";
 import type { DataProvider, Identifier } from "react-admin";
 import { currentAdminCsrfToken } from "./auth-provider";
+import {
+  adminGrowthReportSchema,
+  type AdminOverviewQuery,
+  type AdminGrowthReport,
+} from "@/shared/contracts/analytics/admin";
 
 const endpoints: Record<string, string> = {
   accounts: "/api/admin/accounts",
@@ -22,6 +27,7 @@ export function adminApiErrorDetails(body: unknown) {
     return { code: "INTERNAL_FAILURE", message: "INTERNAL_FAILURE" };
   const envelope = body as {
     code?: unknown;
+    message?: unknown;
     error?: { code?: unknown; message?: unknown };
   };
   const code =
@@ -31,7 +37,11 @@ export function adminApiErrorDetails(body: unknown) {
         ? envelope.error.code
         : "INTERNAL_FAILURE";
   const message =
-    typeof envelope.error?.message === "string" ? envelope.error.message : code;
+    typeof envelope.message === "string"
+      ? envelope.message
+      : typeof envelope.error?.message === "string"
+        ? envelope.error.message
+        : code;
   return { code, message };
 }
 
@@ -102,6 +112,7 @@ export type AdminDataProvider = DataProvider & {
     idempotencyKey: string,
   ): Promise<unknown>;
   dashboard(): Promise<unknown>;
+  analyticsOverview(query: AdminOverviewQuery): Promise<AdminGrowthReport>;
   markAllNotificationsRead(): Promise<unknown>;
 };
 
@@ -240,6 +251,57 @@ const closedProvider = {
     });
   },
   dashboard: () => api("/api/admin/dashboard"),
+  analyticsOverview: async (query: AdminOverviewQuery) => {
+    const request = async (nextQuery: AdminOverviewQuery) => {
+      const params = new URLSearchParams({
+        from: nextQuery.from,
+        to: nextQuery.to,
+        timeZone: nextQuery.timeZone,
+        grouping: nextQuery.grouping,
+      });
+      return adminGrowthReportSchema.parse(
+        await api("/api/admin/analytics/overview?" + params.toString()),
+      );
+    };
+    try {
+      return await request(query);
+    } catch (error) {
+      const body =
+        error && typeof error === "object" && "body" in error
+          ? (error as { body?: unknown }).body
+          : null;
+      const details =
+        body && typeof body === "object" && "details" in body
+          ? (body as { details?: unknown }).details
+          : null;
+      const availableFrom =
+        details &&
+        typeof details === "object" &&
+        "analyticsAvailableFrom" in details &&
+        typeof (details as { analyticsAvailableFrom?: unknown })
+          .analyticsAvailableFrom === "string"
+          ? (details as { analyticsAvailableFrom: string })
+              .analyticsAvailableFrom
+          : null;
+      const availableMs = availableFrom ? Date.parse(availableFrom) : NaN;
+      const errorCode =
+        error && typeof error === "object" && "code" in error
+          ? (error as { code?: unknown }).code
+          : null;
+      if (
+        errorCode === "ANALYTICS_RANGE_UNAVAILABLE" &&
+        Number.isFinite(availableMs) &&
+        Date.parse(query.from) < availableMs &&
+        availableMs < Date.parse(query.to)
+      ) {
+        return request({
+          ...query,
+          from: new Date(availableMs).toISOString(),
+        });
+      }
+      throw error;
+    }
+  },
   markAllNotificationsRead: () =>
     api("/api/admin/notifications/read-all", {
       method: "POST",

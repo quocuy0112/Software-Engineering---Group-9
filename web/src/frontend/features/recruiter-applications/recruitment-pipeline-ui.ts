@@ -12,6 +12,11 @@ const sortablePipelineStages = new Set<ApplicationStage>([
   "VIEWED",
   "SHORTLISTED",
   "INTERVIEWING",
+  "OFFERED",
+  "HIRED",
+  "OFFER_DECLINED",
+  "REJECTED",
+  "WAITLISTED",
 ]);
 
 export function canSortPipelineStage(stage: ApplicationStage) {

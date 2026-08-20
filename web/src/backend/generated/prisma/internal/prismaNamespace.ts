@@ -536,7 +536,11 @@ export const ModelName = {
   ApplicationScoringResult: 'ApplicationScoringResult',
   ManualApplicationPriority: 'ManualApplicationPriority',
   RankingSnapshot: 'RankingSnapshot',
-  RankingSnapshotRow: 'RankingSnapshotRow'
+  RankingSnapshotRow: 'RankingSnapshotRow',
+  JobPostingViewFact: 'JobPostingViewFact',
+  JobPostingLifecycleFact: 'JobPostingLifecycleFact',
+  ExportRequest: 'ExportRequest',
+  ActivityLegalHold: 'ActivityLegalHold'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -552,7 +556,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "companyInvitation" | "companyTeamActivity" | "companyMembership" | "platformAdministratorGrant" | "platformAdministratorGrantScopeAssignment" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostReviewAggregate" | "jobPostRevisionRequest" | "jobPostFeaturedPlacement" | "jobPostEnforcementAction" | "jobPostEnforcementTarget" | "moderationReportEnforcementLink" | "jobPostOperationalHistory" | "jobPostReviewVersion" | "jobPostReviewHistory" | "jobPostReviewPrivateNote" | "jobCatalogueWriteLease" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "privateCvMatchCheck" | "privateCvMatchAttempt" | "privateAutomaticMatchResult" | "privateAiEvaluationResult" | "privateMatchEvidence" | "privateCvMatchCommandReceipt" | "savedJob" | "jobReport" | "candidateApplicationDraft" | "applicationIntake" | "applicationPublicUpdate" | "applicationNotificationPreference" | "jobApplication" | "applicationDocument" | "applicationCoverLetterText" | "applicationArtifactPromotion" | "applicationDocumentLegalHold" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "recruitmentThread" | "recruitmentMessage" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence" | "automaticMatchResult" | "documentParseResult" | "skillEvidenceExtraction" | "cvEvidenceExcerpt" | "aiAssessment" | "aiAssessmentFinding" | "aiSuggestedInterviewQuestion" | "scoringOperation" | "scoringWorkItem" | "aiAssessmentAttempt" | "applicationScoringResult" | "manualApplicationPriority" | "rankingSnapshot" | "rankingSnapshotRow"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "companyInvitation" | "companyTeamActivity" | "companyMembership" | "platformAdministratorGrant" | "platformAdministratorGrantScopeAssignment" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostReviewAggregate" | "jobPostRevisionRequest" | "jobPostFeaturedPlacement" | "jobPostEnforcementAction" | "jobPostEnforcementTarget" | "moderationReportEnforcementLink" | "jobPostOperationalHistory" | "jobPostReviewVersion" | "jobPostReviewHistory" | "jobPostReviewPrivateNote" | "jobCatalogueWriteLease" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "privateCvMatchCheck" | "privateCvMatchAttempt" | "privateAutomaticMatchResult" | "privateAiEvaluationResult" | "privateMatchEvidence" | "privateCvMatchCommandReceipt" | "savedJob" | "jobReport" | "candidateApplicationDraft" | "applicationIntake" | "applicationPublicUpdate" | "applicationNotificationPreference" | "jobApplication" | "applicationDocument" | "applicationCoverLetterText" | "applicationArtifactPromotion" | "applicationDocumentLegalHold" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "recruitmentThread" | "recruitmentMessage" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence" | "automaticMatchResult" | "documentParseResult" | "skillEvidenceExtraction" | "cvEvidenceExcerpt" | "aiAssessment" | "aiAssessmentFinding" | "aiSuggestedInterviewQuestion" | "scoringOperation" | "scoringWorkItem" | "aiAssessmentAttempt" | "applicationScoringResult" | "manualApplicationPriority" | "rankingSnapshot" | "rankingSnapshotRow" | "jobPostingViewFact" | "jobPostingLifecycleFact" | "exportRequest" | "activityLegalHold"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -10916,6 +10920,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    JobPostingViewFact: {
+      payload: Prisma.$JobPostingViewFactPayload<ExtArgs>
+      fields: Prisma.JobPostingViewFactFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JobPostingViewFactFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingViewFactPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JobPostingViewFactFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingViewFactPayload>
+        }
+        findFirst: {
+          args: Prisma.JobPostingViewFactFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingViewFactPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JobPostingViewFactFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingViewFactPayload>
+        }
+        findMany: {
+          args: Prisma.JobPostingViewFactFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingViewFactPayload>[]
+        }
+        create: {
+          args: Prisma.JobPostingViewFactCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingViewFactPayload>
+        }
+        createMany: {
+          args: Prisma.JobPostingViewFactCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JobPostingViewFactCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingViewFactPayload>[]
+        }
+        delete: {
+          args: Prisma.JobPostingViewFactDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingViewFactPayload>
+        }
+        update: {
+          args: Prisma.JobPostingViewFactUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingViewFactPayload>
+        }
+        deleteMany: {
+          args: Prisma.JobPostingViewFactDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JobPostingViewFactUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JobPostingViewFactUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingViewFactPayload>[]
+        }
+        upsert: {
+          args: Prisma.JobPostingViewFactUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingViewFactPayload>
+        }
+        aggregate: {
+          args: Prisma.JobPostingViewFactAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJobPostingViewFact>
+        }
+        groupBy: {
+          args: Prisma.JobPostingViewFactGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobPostingViewFactGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JobPostingViewFactCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobPostingViewFactCountAggregateOutputType> | number
+        }
+      }
+    }
+    JobPostingLifecycleFact: {
+      payload: Prisma.$JobPostingLifecycleFactPayload<ExtArgs>
+      fields: Prisma.JobPostingLifecycleFactFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JobPostingLifecycleFactFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingLifecycleFactPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JobPostingLifecycleFactFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingLifecycleFactPayload>
+        }
+        findFirst: {
+          args: Prisma.JobPostingLifecycleFactFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingLifecycleFactPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JobPostingLifecycleFactFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingLifecycleFactPayload>
+        }
+        findMany: {
+          args: Prisma.JobPostingLifecycleFactFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingLifecycleFactPayload>[]
+        }
+        create: {
+          args: Prisma.JobPostingLifecycleFactCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingLifecycleFactPayload>
+        }
+        createMany: {
+          args: Prisma.JobPostingLifecycleFactCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JobPostingLifecycleFactCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingLifecycleFactPayload>[]
+        }
+        delete: {
+          args: Prisma.JobPostingLifecycleFactDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingLifecycleFactPayload>
+        }
+        update: {
+          args: Prisma.JobPostingLifecycleFactUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingLifecycleFactPayload>
+        }
+        deleteMany: {
+          args: Prisma.JobPostingLifecycleFactDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JobPostingLifecycleFactUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JobPostingLifecycleFactUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingLifecycleFactPayload>[]
+        }
+        upsert: {
+          args: Prisma.JobPostingLifecycleFactUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobPostingLifecycleFactPayload>
+        }
+        aggregate: {
+          args: Prisma.JobPostingLifecycleFactAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJobPostingLifecycleFact>
+        }
+        groupBy: {
+          args: Prisma.JobPostingLifecycleFactGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobPostingLifecycleFactGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JobPostingLifecycleFactCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobPostingLifecycleFactCountAggregateOutputType> | number
+        }
+      }
+    }
+    ExportRequest: {
+      payload: Prisma.$ExportRequestPayload<ExtArgs>
+      fields: Prisma.ExportRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ExportRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ExportRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.ExportRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ExportRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportRequestPayload>
+        }
+        findMany: {
+          args: Prisma.ExportRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportRequestPayload>[]
+        }
+        create: {
+          args: Prisma.ExportRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportRequestPayload>
+        }
+        createMany: {
+          args: Prisma.ExportRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ExportRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.ExportRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportRequestPayload>
+        }
+        update: {
+          args: Prisma.ExportRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.ExportRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ExportRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ExportRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.ExportRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.ExportRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateExportRequest>
+        }
+        groupBy: {
+          args: Prisma.ExportRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExportRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ExportRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExportRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    ActivityLegalHold: {
+      payload: Prisma.$ActivityLegalHoldPayload<ExtArgs>
+      fields: Prisma.ActivityLegalHoldFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ActivityLegalHoldFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityLegalHoldPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ActivityLegalHoldFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityLegalHoldPayload>
+        }
+        findFirst: {
+          args: Prisma.ActivityLegalHoldFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityLegalHoldPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ActivityLegalHoldFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityLegalHoldPayload>
+        }
+        findMany: {
+          args: Prisma.ActivityLegalHoldFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityLegalHoldPayload>[]
+        }
+        create: {
+          args: Prisma.ActivityLegalHoldCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityLegalHoldPayload>
+        }
+        createMany: {
+          args: Prisma.ActivityLegalHoldCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ActivityLegalHoldCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityLegalHoldPayload>[]
+        }
+        delete: {
+          args: Prisma.ActivityLegalHoldDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityLegalHoldPayload>
+        }
+        update: {
+          args: Prisma.ActivityLegalHoldUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityLegalHoldPayload>
+        }
+        deleteMany: {
+          args: Prisma.ActivityLegalHoldDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ActivityLegalHoldUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ActivityLegalHoldUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityLegalHoldPayload>[]
+        }
+        upsert: {
+          args: Prisma.ActivityLegalHoldUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityLegalHoldPayload>
+        }
+        aggregate: {
+          args: Prisma.ActivityLegalHoldAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateActivityLegalHold>
+        }
+        groupBy: {
+          args: Prisma.ActivityLegalHoldGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActivityLegalHoldGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ActivityLegalHoldCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActivityLegalHoldCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -13689,6 +13989,90 @@ export const RankingSnapshotRowScalarFieldEnum = {
 export type RankingSnapshotRowScalarFieldEnum = (typeof RankingSnapshotRowScalarFieldEnum)[keyof typeof RankingSnapshotRowScalarFieldEnum]
 
 
+export const JobPostingViewFactScalarFieldEnum = {
+  id: 'id',
+  jobPostingId: 'jobPostingId',
+  companyId: 'companyId',
+  occurredAt: 'occurredAt',
+  platformDay: 'platformDay',
+  visitorDayDigest: 'visitorDayDigest',
+  digestVersion: 'digestVersion',
+  qualification: 'qualification',
+  qualificationPolicyVersion: 'qualificationPolicyVersion',
+  createdAt: 'createdAt'
+} as const
+
+export type JobPostingViewFactScalarFieldEnum = (typeof JobPostingViewFactScalarFieldEnum)[keyof typeof JobPostingViewFactScalarFieldEnum]
+
+
+export const JobPostingLifecycleFactScalarFieldEnum = {
+  id: 'id',
+  jobPostingId: 'jobPostingId',
+  companyId: 'companyId',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  effectiveAt: 'effectiveAt',
+  postingVersion: 'postingVersion',
+  actorUserId: 'actorUserId',
+  correlationId: 'correlationId',
+  createdAt: 'createdAt'
+} as const
+
+export type JobPostingLifecycleFactScalarFieldEnum = (typeof JobPostingLifecycleFactScalarFieldEnum)[keyof typeof JobPostingLifecycleFactScalarFieldEnum]
+
+
+export const ExportRequestScalarFieldEnum = {
+  id: 'id',
+  requesterUserId: 'requesterUserId',
+  companyId: 'companyId',
+  jobPostingId: 'jobPostingId',
+  format: 'format',
+  filters: 'filters',
+  rangeStart: 'rangeStart',
+  rangeEnd: 'rangeEnd',
+  timeZone: 'timeZone',
+  dataCutoff: 'dataCutoff',
+  definitionVersion: 'definitionVersion',
+  status: 'status',
+  idempotencyKey: 'idempotencyKey',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  attemptCount: 'attemptCount',
+  storageLocator: 'storageLocator',
+  fileName: 'fileName',
+  mediaType: 'mediaType',
+  byteCount: 'byteCount',
+  checksum: 'checksum',
+  rowCount: 'rowCount',
+  failureCode: 'failureCode',
+  requestedAt: 'requestedAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  expiresAt: 'expiresAt',
+  inaccessibleAt: 'inaccessibleAt',
+  deletedAt: 'deletedAt',
+  version: 'version'
+} as const
+
+export type ExportRequestScalarFieldEnum = (typeof ExportRequestScalarFieldEnum)[keyof typeof ExportRequestScalarFieldEnum]
+
+
+export const ActivityLegalHoldScalarFieldEnum = {
+  id: 'id',
+  scopeType: 'scopeType',
+  scopeReference: 'scopeReference',
+  reasonCategory: 'reasonCategory',
+  authorizedByAdminUserId: 'authorizedByAdminUserId',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  releasedAt: 'releasedAt',
+  correlationId: 'correlationId',
+  createdAt: 'createdAt'
+} as const
+
+export type ActivityLegalHoldScalarFieldEnum = (typeof ActivityLegalHoldScalarFieldEnum)[keyof typeof ActivityLegalHoldScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -15669,6 +16053,48 @@ export type ListEnumManualPriorityValueFieldRefInput<$PrismaModel> = FieldRefInp
 
 
 /**
+ * Reference to a field of type 'AnalyticsViewQualification'
+ */
+export type EnumAnalyticsViewQualificationFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AnalyticsViewQualification'>
+    
+
+
+/**
+ * Reference to a field of type 'AnalyticsViewQualification[]'
+ */
+export type ListEnumAnalyticsViewQualificationFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AnalyticsViewQualification[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ExportFormat'
+ */
+export type EnumExportFormatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExportFormat'>
+    
+
+
+/**
+ * Reference to a field of type 'ExportFormat[]'
+ */
+export type ListEnumExportFormatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExportFormat[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ExportRequestStatus'
+ */
+export type EnumExportRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExportRequestStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ExportRequestStatus[]'
+ */
+export type ListEnumExportRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExportRequestStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -15972,6 +16398,10 @@ export type GlobalOmitConfig = {
   manualApplicationPriority?: Prisma.ManualApplicationPriorityOmit
   rankingSnapshot?: Prisma.RankingSnapshotOmit
   rankingSnapshotRow?: Prisma.RankingSnapshotRowOmit
+  jobPostingViewFact?: Prisma.JobPostingViewFactOmit
+  jobPostingLifecycleFact?: Prisma.JobPostingLifecycleFactOmit
+  exportRequest?: Prisma.ExportRequestOmit
+  activityLegalHold?: Prisma.ActivityLegalHoldOmit
 }
 
 /* Types for Logging */
