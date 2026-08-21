@@ -1,15 +1,28 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import {
   Alert,
   Box,
   Button,
   Card,
   CardContent,
+  Chip,
   CircularProgress,
+  FormControl,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
@@ -29,6 +42,15 @@ type Run = {
   byteCount?: number | null;
   checksum?: string | null;
   failureCode?: string | null;
+};
+type StatusFilter = "ALL" | Run["status"];
+type TriggerFilter = "ALL" | Run["trigger"];
+
+const stateLabel: Record<Run["status"], string> = {
+  QUEUED: "Queued — waiting for worker",
+  LEASED: "Backing up and uploading",
+  SUCCEEDED: "Uploaded securely",
+  FAILED: "Failed",
 };
 
 async function backupApi(path: string, init: RequestInit = {}) {
@@ -50,9 +72,19 @@ async function backupApi(path: string, init: RequestInit = {}) {
 
 function backupErrorMessage(error: unknown, fallback: string) {
   const code = error instanceof Error ? error.message : fallback;
-  if (code === "STEP_UP_REQUIRED")
-    return "Your two-factor verification has expired. Sign out, sign in again, and verify your authenticator code to access Backup Settings.";
-  return code;
+  return code === "STEP_UP_REQUIRED"
+    ? "Your two-factor verification has expired. Sign out, sign in again, and verify your authenticator code to access Backup Settings."
+    : code;
+}
+
+function formatBytes(value?: number | null) {
+  if (!value) return "—";
+  const units = ["B", "KB", "MB", "GB"];
+  const index = Math.min(
+    Math.floor(Math.log(value) / Math.log(1024)),
+    units.length - 1,
+  );
+  return `${(value / 1024 ** index).toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
 }
 
 export function BackupSettings() {
@@ -62,6 +94,16 @@ export function BackupSettings() {
   const [message, setMessage] = useState("");
   const [stepUpRequired, setStepUpRequired] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+  const [triggerFilter, setTriggerFilter] = useState<TriggerFilter>("ALL");
+
+  const showError = (error: unknown, fallback: string) => {
+    setStepUpRequired(
+      error instanceof Error && error.message === "STEP_UP_REQUIRED",
+    );
+    setMessage(backupErrorMessage(error, fallback));
+  };
   const load = useCallback(async () => {
     const [nextSettings, nextRuns] = await Promise.all([
       backupApi("/api/admin/backup"),
@@ -72,12 +114,9 @@ export function BackupSettings() {
     setRuns(nextRuns);
   }, []);
   useEffect(() => {
-    void load().catch((error: unknown) => {
-      setStepUpRequired(
-        error instanceof Error && error.message === "STEP_UP_REQUIRED",
-      );
-      setMessage(backupErrorMessage(error, "BACKUP_LOAD_FAILED"));
-    });
+    void load().catch((error: unknown) =>
+      showError(error, "BACKUP_LOAD_FAILED"),
+    );
   }, [load]);
   useEffect(() => {
     if (!runs.some((run) => run.status === "QUEUED" || run.status === "LEASED"))
@@ -88,6 +127,7 @@ export function BackupSettings() {
     );
     return () => window.clearInterval(timer);
   }, [load, runs]);
+
   const save = async () => {
     if (!settings) return;
     setBusy(true);
@@ -103,10 +143,7 @@ export function BackupSettings() {
       setSettings(saved);
       setMessage("Backup settings saved.");
     } catch (error) {
-      setStepUpRequired(
-        error instanceof Error && error.message === "STEP_UP_REQUIRED",
-      );
-      setMessage(backupErrorMessage(error, "BACKUP_SAVE_FAILED"));
+      showError(error, "BACKUP_SAVE_FAILED");
     } finally {
       setBusy(false);
     }
@@ -123,10 +160,7 @@ export function BackupSettings() {
       await load();
       setMessage("Backup queued. Its status is being updated automatically.");
     } catch (error) {
-      setStepUpRequired(
-        error instanceof Error && error.message === "STEP_UP_REQUIRED",
-      );
-      setMessage(backupErrorMessage(error, "BACKUP_QUEUE_FAILED"));
+      showError(error, "BACKUP_QUEUE_FAILED");
     } finally {
       setBusy(false);
     }
@@ -140,6 +174,21 @@ export function BackupSettings() {
     }).catch(() => undefined);
     window.location.assign("/#/login");
   };
+  const filteredRuns = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return runs.filter((run) => {
+      if (statusFilter !== "ALL" && run.status !== statusFilter) return false;
+      if (triggerFilter !== "ALL" && run.trigger !== triggerFilter)
+        return false;
+      return (
+        !term ||
+        [run.id, run.checksum, run.failureCode, run.status, run.trigger]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(term))
+      );
+    });
+  }, [runs, search, statusFilter, triggerFilter]);
+
   if (!settings)
     return (
       <Box sx={{ p: 3, maxWidth: 720 }}>
@@ -163,7 +212,7 @@ export function BackupSettings() {
                 sx={{ alignSelf: "flex-start" }}
                 onClick={() =>
                   void load().catch((error: unknown) =>
-                    setMessage(backupErrorMessage(error, "BACKUP_LOAD_FAILED")),
+                    showError(error, "BACKUP_LOAD_FAILED"),
                   )
                 }
               >
@@ -176,15 +225,13 @@ export function BackupSettings() {
         )}
       </Box>
     );
+
   const latest = runs.find((run) => run.status === "SUCCEEDED");
-  const stateLabel: Record<Run["status"], string> = {
-    QUEUED: "Queued — waiting for worker",
-    LEASED: "Backing up and uploading",
-    SUCCEEDED: "Uploaded securely",
-    FAILED: "Failed",
-  };
+  const filtersActive = Boolean(
+    search || statusFilter !== "ALL" || triggerFilter !== "ALL",
+  );
   return (
-    <Box sx={{ p: 3, maxWidth: 960 }}>
+    <Box sx={{ p: 3, maxWidth: 1200 }}>
       <Typography component="h1" variant="h4" gutterBottom>
         Backup settings
       </Typography>
@@ -257,41 +304,154 @@ export function BackupSettings() {
           <Typography variant="h6">Latest successful backup</Typography>
           <Typography>
             {latest
-              ? `${new Date(latest.completedAt ?? latest.requestedAt).toLocaleString()} · ${latest.byteCount ?? 0} bytes · ${latest.checksum?.slice(0, 12) ?? ""}`
+              ? `${new Date(latest.completedAt ?? latest.requestedAt).toLocaleString()} · ${formatBytes(latest.byteCount)} · ${latest.checksum?.slice(0, 12) ?? ""}`
               : "No successful backup yet."}
           </Typography>
         </CardContent>
       </Card>
       <Card variant="outlined" sx={{ mt: 3 }}>
         <CardContent>
-          <Typography variant="h6" sx={{ mb: 1 }}>
-            Backup history
-          </Typography>
-          <Stack spacing={1}>
-            {runs.length ? (
-              runs.map((run) => (
-                <Box
-                  key={run.id}
-                  sx={{
-                    borderBottom: "1px solid",
-                    borderColor: "divider",
-                    pb: 1,
+          <Stack spacing={2}>
+            <Stack
+              direction={{ xs: "column", md: "row" }}
+              alignItems={{ md: "center" }}
+              justifyContent="space-between"
+              spacing={1}
+            >
+              <Box>
+                <Typography variant="h6">Backup history</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Showing {filteredRuns.length} of {runs.length} recent backup
+                  requests.
+                </Typography>
+              </Box>
+              {filtersActive ? (
+                <Button
+                  size="small"
+                  onClick={() => {
+                    setSearch("");
+                    setStatusFilter("ALL");
+                    setTriggerFilter("ALL");
                   }}
                 >
-                  <Typography fontWeight={600}>
-                    {stateLabel[run.status]} · {run.trigger}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {new Date(run.requestedAt).toLocaleString()}
-                    {run.failureCode ? ` · ${run.failureCode}` : ""}
-                  </Typography>
-                </Box>
-              ))
-            ) : (
-              <Typography color="text.secondary">
-                No backup requests yet.
-              </Typography>
-            )}
+                  Clear filters
+                </Button>
+              ) : null}
+            </Stack>
+            <Stack direction={{ xs: "column", md: "row" }} spacing={1}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Search backup history"
+                placeholder="ID, checksum, error, status"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchOutlinedIcon fontSize="small" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <FormControl size="small" sx={{ minWidth: 160 }}>
+                <InputLabel id="backup-status-filter-label">Status</InputLabel>
+                <Select
+                  labelId="backup-status-filter-label"
+                  label="Status"
+                  value={statusFilter}
+                  onChange={(event) =>
+                    setStatusFilter(event.target.value as StatusFilter)
+                  }
+                >
+                  <MenuItem value="ALL">All statuses</MenuItem>
+                  <MenuItem value="QUEUED">Queued</MenuItem>
+                  <MenuItem value="LEASED">In progress</MenuItem>
+                  <MenuItem value="SUCCEEDED">Succeeded</MenuItem>
+                  <MenuItem value="FAILED">Failed</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl size="small" sx={{ minWidth: 150 }}>
+                <InputLabel id="backup-trigger-filter-label">
+                  Trigger
+                </InputLabel>
+                <Select
+                  labelId="backup-trigger-filter-label"
+                  label="Trigger"
+                  value={triggerFilter}
+                  onChange={(event) =>
+                    setTriggerFilter(event.target.value as TriggerFilter)
+                  }
+                >
+                  <MenuItem value="ALL">All triggers</MenuItem>
+                  <MenuItem value="MANUAL">Manual</MenuItem>
+                  <MenuItem value="SCHEDULED">Scheduled</MenuItem>
+                </Select>
+              </FormControl>
+            </Stack>
+            <TableContainer>
+              <Table size="small" aria-label="Backup history">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Trigger</TableCell>
+                    <TableCell>Requested</TableCell>
+                    <TableCell>Size</TableCell>
+                    <TableCell>Integrity / issue</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredRuns.map((run) => (
+                    <TableRow key={run.id} hover>
+                      <TableCell>
+                        <Chip
+                          size="small"
+                          label={stateLabel[run.status]}
+                          color={
+                            run.status === "SUCCEEDED"
+                              ? "success"
+                              : run.status === "FAILED"
+                                ? "error"
+                                : run.status === "LEASED"
+                                  ? "info"
+                                  : "default"
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {run.trigger === "MANUAL" ? "Manual" : "Scheduled"}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(run.requestedAt).toLocaleString()}
+                      </TableCell>
+                      <TableCell>{formatBytes(run.byteCount)}</TableCell>
+                      <TableCell>
+                        <Typography
+                          variant="body2"
+                          color={
+                            run.failureCode ? "error.main" : "text.secondary"
+                          }
+                        >
+                          {run.failureCode ??
+                            (run.checksum
+                              ? `SHA-256 ${run.checksum.slice(0, 12)}…`
+                              : "—")}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {!filteredRuns.length ? (
+                    <TableRow>
+                      <TableCell colSpan={5}>
+                        <Typography color="text.secondary">
+                          No backup requests match these filters.
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ) : null}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Stack>
         </CardContent>
       </Card>
