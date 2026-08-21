@@ -123,6 +123,9 @@ export const publicJobActionsSchema = z
     canSave: z.boolean(),
     canReport: z.boolean(),
     canApply: z.boolean(),
+    applicationCount: z.number().int().nonnegative().optional(),
+    applicationLimitReached: z.boolean().optional(),
+    applicationLimitMessage: z.string().min(1).max(300).optional(),
   })
   .strict();
 

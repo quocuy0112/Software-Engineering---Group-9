@@ -12,6 +12,16 @@ const isoDateTimeSchema = z.string().datetime();
 
 export const pipelineApplicationStages = applicationStageSchema.options;
 
+export const pipelineWithdrawnStageSchema = z.literal("WITHDRAWN");
+export const pipelineBoardColumnStageSchema = z.union([
+  applicationStageSchema,
+  pipelineWithdrawnStageSchema,
+]);
+export const pipelineBoardColumnStages = [
+  ...pipelineApplicationStages,
+  "WITHDRAWN",
+] as const;
+
 export const terminalPipelineStages = [
   "HIRED",
   "OFFER_DECLINED",
@@ -34,6 +44,8 @@ export const pipelineStageLabels: Record<ApplicationStage, string> = {
   REJECTED: "Rejected",
   WAITLISTED: "Waitlisted",
 };
+
+export const pipelineWithdrawalOutcomeSchema = z.literal("CANDIDATE_WITHDRAWN");
 
 export const pipelineMembershipRoleSchema = z.enum([
   "OWNER",
@@ -82,6 +94,8 @@ export const pipelineBoardMetadataSchema = z
       .strict(),
     permissions: pipelinePermissionsSchema,
     stages: z.array(pipelineStageCountSchema).length(9),
+    /** Count for the separate read-only candidate-withdrawn column. */
+    withdrawnCount: z.number().int().min(0).max(10_000).optional(),
     /** Changes whenever a visible application stage or score is persisted. */
     revisionAt: isoDateTimeSchema.nullable().optional(),
     observedAt: isoDateTimeSchema,
@@ -125,6 +139,7 @@ export const pipelineApplicationCardSchema = z
       .strict(),
     submittedAt: isoDateTimeSchema,
     stage: applicationStageSchema,
+    withdrawalOutcome: pipelineWithdrawalOutcomeSchema.nullable().optional(),
     stageVersion: z.number().int().min(1),
     documents: z
       .object({
@@ -145,6 +160,16 @@ export const pipelineStagePageSchema = z
     items: z.array(pipelineApplicationCardSchema).max(100),
     nextCursor: z.string().min(1).max(512).nullable(),
     /** Explicit pagination state for consumers that do not need to inspect the cursor. */
+    hasMore: z.boolean().optional(),
+    observedAt: isoDateTimeSchema,
+  })
+  .strict();
+
+export const pipelineWithdrawnPageSchema = z
+  .object({
+    stage: pipelineWithdrawnStageSchema,
+    items: z.array(pipelineApplicationCardSchema).max(100),
+    nextCursor: z.string().min(1).max(512).nullable(),
     hasMore: z.boolean().optional(),
     observedAt: isoDateTimeSchema,
   })
@@ -191,6 +216,7 @@ export const pipelineProblemCodeSchema = z.enum([
   "ACCOUNT_UNAVAILABLE",
   "REQUEST_FORBIDDEN",
   "APPLICATION_UNAVAILABLE",
+  "APPLICATION_WITHDRAWAL_BLOCKED",
   "APPLICATION_STAGE_CONFLICT",
   "APPLICATION_STAGE_TRANSITION_INVALID",
   "APPLICATION_STAGE_REASON_REQUIRED",
@@ -239,14 +265,29 @@ export type { ApplicationStage, ApplicationStageTransition };
 export type PipelineMembershipRole = z.infer<
   typeof pipelineMembershipRoleSchema
 >;
+export type PipelineBoardColumnStage = z.infer<
+  typeof pipelineBoardColumnStageSchema
+>;
 export type PipelinePermissions = z.infer<typeof pipelinePermissionsSchema>;
 export type PipelineStageCount = z.infer<typeof pipelineStageCountSchema>;
 export type PipelineBoardMetadata = z.infer<typeof pipelineBoardMetadataSchema>;
 export type PipelineScore = z.infer<typeof pipelineScoreSchema>;
+export type PipelineWithdrawalOutcome = z.infer<
+  typeof pipelineWithdrawalOutcomeSchema
+>;
 export type PipelineApplicationCard = z.infer<
   typeof pipelineApplicationCardSchema
 >;
 export type PipelineStagePage = z.infer<typeof pipelineStagePageSchema>;
+export type PipelineWithdrawnPage = z.infer<typeof pipelineWithdrawnPageSchema>;
+export type PipelineBoardPage = PipelineStagePage | PipelineWithdrawnPage;
+export type PipelineColumnSummary =
+  | PipelineStageCount
+  | Readonly<{
+      stage: "WITHDRAWN";
+      label: "Withdrawn";
+      count: number;
+    }>;
 export type StageTransitionCommand = z.infer<
   typeof stageTransitionCommandSchema
 >;

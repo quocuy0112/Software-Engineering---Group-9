@@ -37,6 +37,7 @@ type JobInteractionContextValue = {
   registerJob: (jobId: string, seed: JobInteractionSeed) => void;
   toggleSaved: (jobId: string) => Promise<boolean>;
   markApplied: (jobId: string) => void;
+  clearApplied: (jobId: string) => void;
   hideJob: (jobId: string) => void;
   undoHide: (jobId: string) => void;
   savedFilterPresets: FilterPreset[];
@@ -121,13 +122,22 @@ export function JobInteractionProvider({
 
   const registerJob = useCallback((jobId: string, seed: JobInteractionSeed) => {
     setRecords((current) => {
-      if (current[jobId]) return current;
+      const existing = current[jobId];
+      const hidden = seed.hidden ?? existing?.hidden ?? false;
+      if (
+        existing &&
+        existing.saved === seed.saved &&
+        existing.applied === seed.applied &&
+        existing.hidden === hidden
+      ) {
+        return current;
+      }
       return {
         ...current,
         [jobId]: {
           saved: seed.saved,
           applied: seed.applied,
-          hidden: seed.hidden ?? false,
+          hidden,
         },
       };
     });
@@ -174,6 +184,20 @@ export function JobInteractionProvider({
         hidden: state[jobId]?.hidden ?? false,
       },
     }));
+  }, []);
+
+  const clearApplied = useCallback((jobId: string) => {
+    setRecords((state) => {
+      const existing = state[jobId];
+      if (!existing || !existing.applied) return state;
+      return {
+        ...state,
+        [jobId]: {
+          ...existing,
+          applied: false,
+        },
+      };
+    });
   }, []);
 
   const undoHide = useCallback(
@@ -241,6 +265,7 @@ export function JobInteractionProvider({
       registerJob,
       toggleSaved,
       markApplied,
+      clearApplied,
       hideJob,
       undoHide,
       savedFilterPresets,
@@ -248,6 +273,7 @@ export function JobInteractionProvider({
     }),
     [
       hideJob,
+      clearApplied,
       markApplied,
       records,
       registerJob,
@@ -271,6 +297,7 @@ export function useJobInteraction(
 ): JobInteractionRecord & {
   toggleSaved: () => Promise<boolean>;
   markApplied: () => void;
+  clearApplied: () => void;
   hide: () => void;
   undoHide: () => void;
 } {
@@ -300,6 +327,7 @@ export function useJobInteraction(
     ...record,
     toggleSaved: () => context.toggleSaved(jobId),
     markApplied: () => context.markApplied(jobId),
+    clearApplied: () => context.clearApplied(jobId),
     hide: () => context.hideJob(jobId),
     undoHide: () => context.undoHide(jobId),
   };

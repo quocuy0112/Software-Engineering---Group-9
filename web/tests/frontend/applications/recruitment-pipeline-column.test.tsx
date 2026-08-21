@@ -162,6 +162,49 @@ describe("RecruitmentPipelineColumn rejected stage", () => {
   });
 });
 
+describe("RecruitmentPipelineColumn withdrawn stage", () => {
+  it("renders a separate locked column without sort controls", () => {
+    const { container } = render(
+      <RecruitmentPipelineColumn
+        jobId="job-1"
+        summary={{ stage: "WITHDRAWN", label: "Withdrawn", count: 1 }}
+        page={{
+          stage: "WITHDRAWN",
+          items: [
+            {
+              ...card,
+              withdrawalOutcome: "CANDIDATE_WITHDRAWN",
+            },
+          ],
+          nextCursor: null,
+          observedAt: "2026-08-18T00:00:00.000Z",
+        }}
+        loading={false}
+        loadingMore={false}
+        error={null}
+        onLoadMore={vi.fn()}
+        onRetry={vi.fn()}
+        showViewAll
+      />,
+    );
+
+    expect(container.querySelector(".column")).toHaveClass(
+      "is-locked",
+      "is-withdrawn",
+    );
+    expect(container.querySelector(".column")).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(
+      screen.getByLabelText("Withdrawn applications cannot be moved"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /sort withdrawn/i }),
+    ).not.toBeInTheDocument();
+  });
+});
+
 describe("RecruitmentPipelineColumn sort controls", () => {
   it.each(lockedStageCases)(
     "renders the lock beside the title and sort control for %s",

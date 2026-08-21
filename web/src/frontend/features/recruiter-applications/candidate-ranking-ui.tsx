@@ -30,9 +30,11 @@ const pipelineStageLabels: Record<string, string> = {
   HIRED: "Hired",
   OFFER_DECLINED: "Offer declined",
   REJECTED: "Rejected",
+  WITHDRAWN: "Withdrawn",
 };
 
-export function statusLabel(value: string) {
+export function statusLabel(value: string, withdrawalOutcome?: string | null) {
+  if (withdrawalOutcome === "CANDIDATE_WITHDRAWN") return "Withdrawn";
   return (
     pipelineStageLabels[value] ??
     value
@@ -153,9 +155,9 @@ export function ScoreBadgeFromLabel({
         ? { code, label, tone: "amber", icon: Check }
         : normalized.includes("MEDIUM") || label === "Review needed"
           ? { code, label, tone: "amber", icon: AlertCircle }
-        : normalized.includes("PROCESS") || normalized.includes("PENDING")
-          ? { code, label, tone: "purple", icon: LoaderCircle }
-          : { code, label, tone: "slate", icon: CircleDot };
+          : normalized.includes("PROCESS") || normalized.includes("PENDING")
+            ? { code, label, tone: "purple", icon: LoaderCircle }
+            : { code, label, tone: "slate", icon: CircleDot };
   return <ScoreBadge meta={meta} compact={compact} />;
 }
 

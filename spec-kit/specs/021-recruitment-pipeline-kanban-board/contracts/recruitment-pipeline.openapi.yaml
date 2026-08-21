@@ -72,6 +72,45 @@ paths:
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
 
+  /api/recruiter/jobs/{jobId}/applications/pipeline/withdrawn:
+    get:
+      operationId: getRecruitmentPipelineWithdrawnApplications
+      summary: Get the read-only Withdrawn pipeline column
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+      responses:
+        "200":
+          description: Withdrawn applications projected into a locked display column
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PipelineWithdrawnPage"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/AccountUnavailable"
+        "404":
+          $ref: "#/components/responses/Unavailable"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+
   /api/recruiter/jobs/{jobId}/applications/{applicationId}/stage:
     patch:
       operationId: transitionRecruitmentPipelineStage
@@ -235,7 +274,7 @@ components:
     PipelineBoardMetadata:
       type: object
       additionalProperties: false
-      required: [job, permissions, stages, observedAt]
+      required: [job, permissions, stages, withdrawnCount, observedAt]
       properties:
         job:
           type: object
@@ -260,6 +299,10 @@ components:
           maxItems: 9
           items:
             $ref: "#/components/schemas/StageCount"
+        withdrawnCount:
+          type: integer
+          minimum: 0
+          maximum: 10000
         observedAt:
           type: string
           format: date-time
@@ -329,6 +372,9 @@ components:
           format: date-time
         stage:
           $ref: "#/components/schemas/ApplicationStage"
+        withdrawalOutcome:
+          type: [string, "null"]
+          enum: [CANDIDATE_WITHDRAWN, null]
         stageVersion:
           type: integer
           minimum: 1
@@ -349,6 +395,12 @@ components:
           maxItems: 8
           items:
             $ref: "#/components/schemas/ApplicationStage"
+        dragDestinations:
+          type: array
+          uniqueItems: true
+          maxItems: 8
+          items:
+            $ref: "#/components/schemas/ApplicationStage"
 
     PipelineStagePage:
       type: object
@@ -357,6 +409,26 @@ components:
       properties:
         stage:
           $ref: "#/components/schemas/ApplicationStage"
+        items:
+          type: array
+          maxItems: 100
+          items:
+            $ref: "#/components/schemas/PipelineApplicationCard"
+        nextCursor:
+          type: [string, "null"]
+          maxLength: 512
+        observedAt:
+          type: string
+          format: date-time
+
+    PipelineWithdrawnPage:
+      type: object
+      additionalProperties: false
+      required: [stage, items, nextCursor, observedAt]
+      properties:
+        stage:
+          type: string
+          const: WITHDRAWN
         items:
           type: array
           maxItems: 100
@@ -455,6 +527,7 @@ components:
             - ACCOUNT_UNAVAILABLE
             - REQUEST_FORBIDDEN
             - APPLICATION_UNAVAILABLE
+            - APPLICATION_WITHDRAWAL_BLOCKED
             - APPLICATION_STAGE_CONFLICT
             - APPLICATION_STAGE_TRANSITION_INVALID
             - APPLICATION_STAGE_REASON_REQUIRED

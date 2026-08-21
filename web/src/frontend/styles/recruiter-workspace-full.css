@@ -4366,6 +4366,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.ranking-status-pill--withdrawn {
+  color: var(--sh-color-warning);
+  background: var(--sh-color-warning-bg);
+}
 .ranking-table__experience {
   color: var(--sh-color-text-secondary);
   font-size: 12px;

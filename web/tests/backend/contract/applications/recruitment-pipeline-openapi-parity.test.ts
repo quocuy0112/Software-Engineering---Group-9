@@ -4,6 +4,7 @@ import {
   pipelineApplicationCardSchema,
   pipelineBoardMetadataSchema,
   pipelineStagePageSchema,
+  pipelineWithdrawnPageSchema,
   stageConflictSchema,
   stageTransitionCommandSchema,
   stageTransitionOutcomeSchema,
@@ -19,6 +20,7 @@ describe("recruitment pipeline OpenAPI and runtime parity", () => {
     for (const operation of [
       "getRecruitmentPipelineBoard",
       "getRecruitmentPipelineStage",
+      "getRecruitmentPipelineWithdrawnApplications",
       "transitionRecruitmentPipelineStage",
     ]) {
       expect(openapi).toContain(`operationId: ${operation}`);
@@ -33,6 +35,7 @@ describe("recruitment pipeline OpenAPI and runtime parity", () => {
     for (const schema of [
       pipelineBoardMetadataSchema,
       pipelineStagePageSchema,
+      pipelineWithdrawnPageSchema,
       pipelineApplicationCardSchema,
       stageTransitionCommandSchema,
       stageTransitionOutcomeSchema,

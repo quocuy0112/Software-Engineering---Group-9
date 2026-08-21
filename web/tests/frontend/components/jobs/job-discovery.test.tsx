@@ -91,6 +91,32 @@ describe("job discovery presentation", () => {
     );
   });
 
+  it("shows the permanent per-job attempt limit after five attempts", () => {
+    render(
+      <ApplyButton
+        job={{
+          ...job,
+          actions: {
+            ...job.actions,
+            authenticated: true,
+            canApply: false,
+            applicationCount: 5,
+            applicationLimitReached: true,
+            applicationLimitMessage:
+              "You have reached the maximum number of applications for this job.",
+          },
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("status", {
+        name: "You have reached the maximum number of applications for this job.",
+      }),
+    ).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Apply" })).toBeNull();
+  });
+
   it("keeps secondary actions visible and preserves action order", () => {
     render(<JobCardView job={job} variant="grid" />);
 

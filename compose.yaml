@@ -97,7 +97,7 @@ services:
       - "101"
       - "102"
     volumes:
-      - ./web/.local/cv-storage:/app/.local/cv-storage
+      - ./web/.local/cv-storage-runtime:/app/.local/cv-storage
       - clamav_runtime:/run/clamav
       - ocr_runtime:/run/smarthire-ocr
     tmpfs:

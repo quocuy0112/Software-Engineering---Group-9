@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import type { JobCard } from "@/shared/contracts/jobs/discovery";
+import { MAX_APPLICATION_ATTEMPTS_MESSAGE } from "@/shared/contracts/jobs/actions";
 import { formatSalary } from "@/shared/utils/jobs/job-display";
 import { JobApplicationAction } from "./job-application-form";
 import { QuickSkillChips } from "./quick-skill-chips";
@@ -216,6 +217,18 @@ export function QuickViewPanel({
           <div className="job-quick-view-cta">
             {applied ? (
               <span className="job-applied-state">✓ Applied</span>
+            ) : job.actions.applicationLimitReached ? (
+              <span
+                role="status"
+                aria-label={
+                  job.actions.applicationLimitMessage ??
+                  MAX_APPLICATION_ATTEMPTS_MESSAGE
+                }
+                className="job-closed-state"
+              >
+                {job.actions.applicationLimitMessage ??
+                  MAX_APPLICATION_ATTEMPTS_MESSAGE}
+              </span>
             ) : job.actions.canApply ? (
               job.actions.authenticated ? (
                 <JobApplicationAction

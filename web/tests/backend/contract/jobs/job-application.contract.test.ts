@@ -83,4 +83,45 @@ describe("application form and submission contracts", () => {
       stage: "APPLIED",
     });
   });
+
+  it("rejects a form when the candidate has exhausted this job's attempts", async () => {
+    const repository = {
+      getCandidateForm: async () => ({
+        job: {
+          id: "job-1",
+          title: "Engineer",
+          location: "TP Hô Chi Minh",
+          company: { displayName: "Company" },
+        },
+        profileReady: true,
+        missingProfileFields: [],
+        profileRevision: 1,
+        profileBasics: {
+          headline: "Engineer",
+          summary: null,
+          phone: null,
+          location: "TP Hô Chi Minh",
+        },
+        cvs: [],
+        questions: [],
+        existingApplication: null,
+        applicationCount: 5,
+      }),
+      submit: async () => {
+        throw new Error("not used");
+      },
+    };
+
+    await expect(
+      new JobApplicationService(repository).form(
+        { userId: "user-1", sessionId: "session-1" },
+        "job-1",
+      ),
+    ).rejects.toMatchObject({
+      status: 409,
+      body: {
+        code: "APPLICATION_MAX_ATTEMPTS",
+      },
+    });
+  });
 });

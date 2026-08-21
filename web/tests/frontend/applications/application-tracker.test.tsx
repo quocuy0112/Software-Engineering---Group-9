@@ -102,7 +102,7 @@ function offeredTracker(): ApplicationTrackerData {
   };
 }
 
-function renderTracker() {
+function renderTracker(initialTracker = offeredTracker()) {
   const fetchMock = vi.fn().mockResolvedValue({
     ok: true,
     json: async () => offeredTracker(),
@@ -112,7 +112,7 @@ function renderTracker() {
     randomUUID: () => "idempotency-key-123456",
   });
   render(
-    <ApplicationTracker initialTracker={offeredTracker()} csrfProof="csrf" />,
+    <ApplicationTracker initialTracker={initialTracker} csrfProof="csrf" />,
   );
   return fetchMock;
 }
@@ -183,6 +183,47 @@ describe("candidate offer response confirmation", () => {
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ decision: "DECLINE", expectedVersion: 4 }),
+      }),
+      "csrf",
+    );
+  });
+});
+
+describe("candidate application withdrawal confirmation", () => {
+  it("requires confirmation before withdrawing an application", async () => {
+    mocks.mutate.mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
+    });
+    renderTracker({ ...offeredTracker(), canWithdraw: true });
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Withdraw application" }),
+    );
+
+    expect(
+      screen.getByRole("dialog", { name: "Withdraw this application?" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Confirm withdrawal" }),
+    ).toBeVisible();
+    expect(mocks.mutate).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(mocks.mutate).not.toHaveBeenCalled();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Withdraw application" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Confirm withdrawal" }));
+
+    await waitFor(() => expect(mocks.mutate).toHaveBeenCalledTimes(1));
+    expect(mocks.mutate).toHaveBeenCalledWith(
+      "/api/candidate/applications/application-1/withdraw",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ expectedVersion: 4, confirmed: true }),
       }),
       "csrf",
     );

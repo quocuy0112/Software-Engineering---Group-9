@@ -1,6 +1,13 @@
 "use client";
 
-import { BarChart3, Eye, FileText, Percent, UsersRound } from "lucide-react";
+import {
+  BarChart3,
+  Eye,
+  FileText,
+  Percent,
+  UserRoundX,
+  UsersRound,
+} from "lucide-react";
 import type { JobPerformanceReport } from "@/shared/contracts/analytics/employer";
 import type { RecruiterJob } from "@/shared/contracts/recruiter-job-posting";
 import { CandidateExportPanel } from "./candidate-export-panel";
@@ -16,9 +23,7 @@ function formatRate(value: JobPerformanceReport["conversionRate"]) {
     : "N/A";
 }
 
-function conversionDescription(
-  value: JobPerformanceReport["conversionRate"],
-) {
+function conversionDescription(value: JobPerformanceReport["conversionRate"]) {
   return value.availability === "NOT_APPLICABLE"
     ? "No qualified views in the selected window"
     : "Applications divided by qualified views";
@@ -120,6 +125,13 @@ export function JobPerformanceReport({
           icon={<UsersRound />}
         />
         <MetricCard
+          label="Withdrawn"
+          value={formatNumber(report.withdrawnApplications)}
+          description="Excluded from the current funnel snapshot"
+          tone="amber"
+          icon={<UserRoundX />}
+        />
+        <MetricCard
           label="View-to-application"
           value={formatRate(report.conversionRate)}
           description={conversionDescription(report.conversionRate)}
@@ -149,8 +161,8 @@ export function JobPerformanceReport({
           </p>
           <p>
             Conversion is shown as N/A until the selected window contains at
-            least one qualified view. To collect one, open the public posting
-            as a candidate or anonymous visitor; recruiter previews, bots, and
+            least one qualified view. To collect one, open the public posting as
+            a candidate or anonymous visitor; recruiter previews, bots, and
             same-day repeat visits are excluded.
           </p>
           <p>

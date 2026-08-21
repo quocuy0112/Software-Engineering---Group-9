@@ -19,6 +19,10 @@ import {
   type ApplicationCvSource,
   type CandidatePersonalInfo,
 } from "@/shared/contracts/candidate-applications";
+import {
+  MAX_APPLICATION_ATTEMPTS,
+  MAX_APPLICATION_ATTEMPTS_MESSAGE,
+} from "@/shared/contracts/jobs/actions";
 import { CandidateApplicationError } from "./candidate-application-errors";
 
 const MAX_MESSAGE_LENGTH = 2_000;
@@ -50,6 +54,61 @@ type ApplicationDraftFileDescriptor = {
 };
 
 type DraftDatabase = typeof prisma;
+
+const activeApplicationWhere = (
+  candidateUserId: string,
+  jobPostingId: string,
+) => ({
+  candidateUserId,
+  jobPostingId,
+  withdrawalOutcome: null,
+  stage: { not: "REJECTED" as const },
+});
+
+async function activeApplication(
+  db: DraftDatabase,
+  candidateUserId: string,
+  jobPostingId: string,
+) {
+  const delegate = db.jobApplication as unknown as {
+    findFirst?: (input: unknown) => Promise<{ id: string } | null>;
+  };
+  if (typeof delegate.findFirst !== "function") return null;
+  return delegate.findFirst({
+    where: activeApplicationWhere(candidateUserId, jobPostingId),
+    orderBy: [{ submittedAt: "desc" }, { id: "desc" }],
+    select: { id: true },
+  });
+}
+
+async function applicationCount(
+  db: DraftDatabase,
+  candidateUserId: string,
+  jobPostingId: string,
+) {
+  const counterDelegate = (
+    db as DraftDatabase & {
+      jobApplicationAttemptCounter?: typeof prisma.jobApplicationAttemptCounter;
+    }
+  ).jobApplicationAttemptCounter;
+  if (!counterDelegate) return 0;
+  const counter = await counterDelegate.findUnique({
+    where: {
+      candidateUserId_jobPostingId: { candidateUserId, jobPostingId },
+    },
+    select: { applicationCount: true },
+  });
+  return counter?.applicationCount ?? 0;
+}
+
+function assertApplicationAttemptsAvailable(count: number) {
+  if (count < MAX_APPLICATION_ATTEMPTS) return;
+  throw new CandidateApplicationError(
+    409,
+    "APPLICATION_MAX_ATTEMPTS",
+    MAX_APPLICATION_ATTEMPTS_MESSAGE,
+  );
+}
 
 type CandidateContactRow = {
   user: { name: string; email: string };
@@ -533,15 +592,11 @@ export class ApplicationDraftService {
     let result: NonNullable<Awaited<ReturnType<typeof draftRow>>>;
     try {
       result = await this.db.$transaction(async (tx) => {
-        const existingApplication = await tx.jobApplication.findUnique({
-          where: {
-            candidateUserId_jobPostingId: {
-              candidateUserId: actor.userId,
-              jobPostingId: jobId,
-            },
-          },
-          select: { id: true },
-        });
+        const existingApplication = await activeApplication(
+          tx as DraftDatabase,
+          actor.userId,
+          jobId,
+        );
         if (existingApplication) {
           throw new CandidateApplicationError(
             409,
@@ -549,6 +604,9 @@ export class ApplicationDraftService {
             "You already applied to this job.",
           );
         }
+        assertApplicationAttemptsAvailable(
+          await applicationCount(tx as DraftDatabase, actor.userId, jobId),
+        );
         const existing = await draftRow(
           tx as DraftDatabase,
           actor.userId,
@@ -689,30 +747,18 @@ export class ApplicationDraftService {
   }
 
   async existingApplication(actor: CandidateActor, jobId: string) {
-    return this.db.jobApplication.findUnique({
-      where: {
-        candidateUserId_jobPostingId: {
-          candidateUserId: actor.userId,
-          jobPostingId: jobId,
-        },
-      },
-      select: { id: true },
-    });
+    return activeApplication(this.db, actor.userId, jobId);
   }
 
   async save(actor: CandidateActor, raw: unknown, now = new Date()) {
     const command = saveApplicationDraftCommandSchema.parse(raw);
     await ensureCandidateCvLibrary(actor.userId, this.db);
     await this.assertOpenJob(command.jobId, now);
-    const existingApplication = await this.db.jobApplication.findUnique({
-      where: {
-        candidateUserId_jobPostingId: {
-          candidateUserId: actor.userId,
-          jobPostingId: command.jobId,
-        },
-      },
-      select: { id: true },
-    });
+    const existingApplication = await activeApplication(
+      this.db,
+      actor.userId,
+      command.jobId,
+    );
     if (existingApplication) {
       throw new CandidateApplicationError(
         409,
@@ -720,6 +766,9 @@ export class ApplicationDraftService {
         "You already applied to this job.",
       );
     }
+    assertApplicationAttemptsAvailable(
+      await applicationCount(this.db, actor.userId, command.jobId),
+    );
     const candidate = await candidateContact(this.db, actor.userId);
     const personalInformation = personalInfoForApplication(
       candidate,
@@ -1061,15 +1110,11 @@ export class ApplicationDraftService {
         "This application draft changed in another tab. Refresh and try again.",
       );
     }
-    const existingApplication = await this.db.jobApplication.findUnique({
-      where: {
-        candidateUserId_jobPostingId: {
-          candidateUserId: actor.userId,
-          jobPostingId: draft.jobPostingId,
-        },
-      },
-      select: { id: true },
-    });
+    const existingApplication = await activeApplication(
+      this.db,
+      actor.userId,
+      draft.jobPostingId,
+    );
     if (existingApplication) {
       throw new CandidateApplicationError(
         409,
@@ -1077,6 +1122,9 @@ export class ApplicationDraftService {
         "You already applied to this job.",
       );
     }
+    assertApplicationAttemptsAvailable(
+      await applicationCount(this.db, actor.userId, draft.jobPostingId),
+    );
     const extension = file.name.toLowerCase().split(".").pop();
     const mimeType = coverLetterMimeTypes.has(file.type)
       ? file.type

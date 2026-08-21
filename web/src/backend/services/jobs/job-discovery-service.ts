@@ -25,6 +25,10 @@ import { GetProfileAggregateService } from "@/backend/services/profile/get-profi
 import { normalizeSalaryAmount } from "@/shared/utils/jobs/job-display";
 import { rankJobsForCandidate } from "./candidate-job-match";
 import { jobReviewSnapshotSchema } from "@/shared/contracts/recruiter-job-posting";
+import {
+  MAX_APPLICATION_ATTEMPTS,
+  MAX_APPLICATION_ATTEMPTS_MESSAGE,
+} from "@/shared/contracts/jobs/actions";
 
 const experienceYears: Record<string, number> = {
   ENTRY: 0,
@@ -174,6 +178,12 @@ function card(
   };
   const snapshot = approvedSnapshot(row);
   const authenticated = actor.kind === "user";
+  const applicationCount = authenticated
+    ? (row.applicationAttemptCounters?.[0]?.applicationCount ??
+      Math.min(row.applications.length, 1))
+    : 0;
+  const applicationLimitReached =
+    authenticated && applicationCount >= MAX_APPLICATION_ATTEMPTS;
   const urgent =
     row.applicationDeadline !== null &&
     row.applicationDeadline.getTime() - now.getTime() <= 14 * 86_400_000 &&
@@ -237,7 +247,12 @@ function card(
       applied: row.applications.length > 0,
       canSave: authenticated,
       canReport: authenticated,
-      canApply: true,
+      canApply: !applicationLimitReached,
+      applicationCount: authenticated ? applicationCount : undefined,
+      applicationLimitReached,
+      applicationLimitMessage: applicationLimitReached
+        ? MAX_APPLICATION_ATTEMPTS_MESSAGE
+        : undefined,
     },
   };
 }
@@ -432,7 +447,10 @@ export class JobDiscoveryService {
       ...summary,
       actions: {
         ...summary.actions,
-        canApply: state === "ACTIVE" && !summary.actions.applied,
+        canApply:
+          state === "ACTIVE" &&
+          !summary.actions.applied &&
+          summary.actions.canApply,
       },
       state,
       description:

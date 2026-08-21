@@ -342,4 +342,53 @@ describe("candidate ranking list", () => {
       ).not.toBeInTheDocument(),
     );
   });
+
+  it("shows withdrawn candidates and supports the Withdrawn status filter", async () => {
+    const withdrawnPage = {
+      ...page,
+      items: [
+        {
+          ...page.items[0],
+          withdrawalOutcome: "CANDIDATE_WITHDRAWN" as const,
+          allowedActions: {
+            moveToInterview: {
+              allowed: false as const,
+              label: "Move to interview",
+            },
+            reject: { allowed: false as const, label: "Reject" },
+          },
+        },
+      ],
+    };
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(JSON.stringify(withdrawnPage), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <CandidateRankingList jobId="job-withdrawn" jobTitle="Senior Engineer" />,
+    );
+
+    expect(
+      await screen.findByRole("cell", { name: "Withdrawn" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "Withdrawn" }),
+    ).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Recruitment status"), {
+      target: { value: "WITHDRAWN" },
+    });
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenLastCalledWith(
+        expect.stringContaining("stage=WITHDRAWN"),
+        expect.anything(),
+      ),
+    );
+  });
 });

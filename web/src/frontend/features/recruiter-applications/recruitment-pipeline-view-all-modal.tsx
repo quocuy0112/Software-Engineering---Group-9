@@ -4,18 +4,20 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { X } from "lucide-react";
 import {
   pipelineStagePageSchema,
+  pipelineWithdrawnPageSchema,
   type ApplicationStage,
+  type PipelineBoardColumnStage,
+  type PipelineColumnSummary,
   type PipelineApplicationCard,
-  type PipelineStageCount,
 } from "@/shared/contracts/applications";
 import {
   pipelineScoreForCard,
   pipelineTierForCard,
 } from "./recruitment-pipeline-ui";
 
-export type ViewAllPipelineStage = ApplicationStage;
+export type ViewAllPipelineStage = PipelineBoardColumnStage;
 
-export type ActivePipelineStage = ViewAllPipelineStage;
+export type ActivePipelineStage = ApplicationStage;
 
 type BulkAction =
   | {
@@ -53,6 +55,7 @@ const bulkActions: Record<ViewAllPipelineStage, readonly BulkAction[]> = {
   OFFER_DECLINED: [],
   REJECTED: [],
   WAITLISTED: [],
+  WITHDRAWN: [],
 };
 
 const tierLabels = {
@@ -76,7 +79,7 @@ export function RecruitmentPipelineViewAllModal({
   onBulkReject,
 }: {
   jobId: string;
-  summary: PipelineStageCount & { stage: ViewAllPipelineStage };
+  summary: PipelineColumnSummary;
   canMoveStages: boolean;
   canReject: boolean;
   onClose: () => void;
@@ -169,11 +172,13 @@ export function RecruitmentPipelineViewAllModal({
         do {
           const params = new URLSearchParams({ limit: "100" });
           if (cursor) params.set("cursor", cursor);
+          const path =
+            summary.stage === "WITHDRAWN" ? "withdrawn" : summary.stage;
           const response = await fetch(
             "/api/recruiter/jobs/" +
               encodeURIComponent(jobId) +
               "/applications/pipeline/" +
-              encodeURIComponent(summary.stage) +
+              encodeURIComponent(path) +
               "?" +
               params.toString(),
             { cache: "no-store" },
@@ -185,7 +190,10 @@ export function RecruitmentPipelineViewAllModal({
             );
           }
 
-          const page = pipelineStagePageSchema.parse(json);
+          const page =
+            summary.stage === "WITHDRAWN"
+              ? pipelineWithdrawnPageSchema.parse(json)
+              : pipelineStagePageSchema.parse(json);
           if (page.stage !== summary.stage) {
             throw new Error("The candidate list returned an unexpected stage.");
           }
@@ -232,14 +240,24 @@ export function RecruitmentPipelineViewAllModal({
 
   const selectedCandidates = useMemo(
     () =>
-      candidates.filter((candidate) =>
-        selectedIds.has(candidate.applicationId),
+      candidates.filter(
+        (candidate) =>
+          selectedIds.has(candidate.applicationId) &&
+          candidate.withdrawalOutcome !== "CANDIDATE_WITHDRAWN",
       ),
     [candidates, selectedIds],
   );
+  const selectableCandidates = useMemo(
+    () =>
+      candidates.filter(
+        (candidate) => candidate.withdrawalOutcome !== "CANDIDATE_WITHDRAWN",
+      ),
+    [candidates],
+  );
   const selectedCount = selectedCandidates.length;
   const allSelected =
-    candidates.length > 0 && selectedCount === candidates.length;
+    selectableCandidates.length > 0 &&
+    selectedCount === selectableCandidates.length;
   const partiallySelected = selectedCount > 0 && !allSelected;
 
   useEffect(() => {
@@ -261,7 +279,9 @@ export function RecruitmentPipelineViewAllModal({
     setSelectedIds(
       allSelected
         ? new Set()
-        : new Set(candidates.map((candidate) => candidate.applicationId)),
+        : new Set(
+            selectableCandidates.map((candidate) => candidate.applicationId),
+          ),
     );
   };
 
@@ -387,7 +407,7 @@ export function RecruitmentPipelineViewAllModal({
               ref={selectAllRef}
               type="checkbox"
               checked={allSelected}
-              disabled={loading || !candidates.length || busy}
+              disabled={loading || !selectableCandidates.length || busy}
               onChange={toggleAll}
             />
             <span>Select all in this list</span>
@@ -417,6 +437,8 @@ export function RecruitmentPipelineViewAllModal({
             {candidates.map((candidate) => {
               const tier = pipelineTierForCard(candidate);
               const score = pipelineScoreForCard(candidate);
+              const withdrawn =
+                candidate.withdrawalOutcome === "CANDIDATE_WITHDRAWN";
               return (
                 <label
                   className="modal-row view-all-modal__row"
@@ -428,7 +450,7 @@ export function RecruitmentPipelineViewAllModal({
                       className="row-checkbox"
                       type="checkbox"
                       checked={selectedIds.has(candidate.applicationId)}
-                      disabled={busy}
+                      disabled={busy || withdrawn}
                       aria-label={"Select " + candidate.candidate.displayName}
                       onChange={() => toggleCandidate(candidate.applicationId)}
                     />
@@ -436,6 +458,11 @@ export function RecruitmentPipelineViewAllModal({
                   <div>
                     <div className="modal-row-name">
                       {candidate.candidate.displayName}
+                      {withdrawn ? (
+                        <span className="modal-row-status status-withdrawn">
+                          Withdrawn
+                        </span>
+                      ) : null}
                     </div>
                     <div className="modal-row-date">
                       {"Submitted " +

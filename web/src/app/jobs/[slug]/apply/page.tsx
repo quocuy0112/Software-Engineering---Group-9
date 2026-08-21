@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
 import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
 import { ApplicationDraftService } from "@/backend/candidate-applications/application-draft-service";
 import { CandidateApplicationError } from "@/backend/candidate-applications/candidate-application-errors";
@@ -37,6 +38,20 @@ export default async function CandidateApplicationRoute({
       query("cvVersionId") ?? null,
     );
   } catch (error) {
+    if (
+      error instanceof CandidateApplicationError &&
+      error.code === "APPLICATION_MAX_ATTEMPTS"
+    ) {
+      return (
+        <JobsWorkspace>
+          <section role="alert" aria-labelledby="application-limit-heading">
+            <h1 id="application-limit-heading">Maximum applications reached</h1>
+            <p>{error.message}</p>
+            <Link href="/jobs">Return to Find Jobs</Link>
+          </section>
+        </JobsWorkspace>
+      );
+    }
     if (
       error instanceof CandidateApplicationError &&
       error.code === "APPLICATION_EXISTS"

@@ -5,6 +5,7 @@ import { Sparkles } from "lucide-react";
 import { useEffect } from "react";
 import { JobHeroCard } from "@/frontend/components/ui/job-hero-card";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
+import { MAX_APPLICATION_ATTEMPTS_MESSAGE } from "@/shared/contracts/jobs/actions";
 import { formatSalary } from "@/shared/utils/jobs/job-display";
 import { CompanyLogo, JobDetailSidebar } from "./job-detail-sidebar";
 import { JobDetailOverview, JobDetailSections } from "./job-detail-sections";
@@ -34,10 +35,22 @@ function DetailActionButtons({
 
   return (
     <div className="job-detail-primary-actions">
-      {job.state === "ACTIVE" && job.actions.canApply ? (
-        applied ? (
-          <span className="job-applied-state">✓ Applied</span>
-        ) : job.actions.authenticated ? (
+      {applied ? (
+        <span className="job-applied-state">✓ Applied</span>
+      ) : job.state === "ACTIVE" && job.actions.applicationLimitReached ? (
+        <span
+          role="status"
+          aria-label={
+            job.actions.applicationLimitMessage ??
+            MAX_APPLICATION_ATTEMPTS_MESSAGE
+          }
+          className="job-closed-state"
+        >
+          {job.actions.applicationLimitMessage ??
+            MAX_APPLICATION_ATTEMPTS_MESSAGE}
+        </span>
+      ) : job.state === "ACTIVE" && job.actions.canApply ? (
+        job.actions.authenticated ? (
           <Link
             className="sh-button job-detail-apply-button job-detail-board-apply-button"
             href={applyPath}

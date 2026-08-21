@@ -9,6 +9,8 @@ import {
   applicationSubmissionSchema,
   DIRECT_APPLICATION_CV_ID,
   idempotencyKeySchema,
+  MAX_APPLICATION_ATTEMPTS,
+  MAX_APPLICATION_ATTEMPTS_MESSAGE,
   type ApplicationSubmission,
 } from "@/shared/contracts/jobs/actions";
 import { JobServiceError, type CandidateActor } from "./job-types";
@@ -74,6 +76,8 @@ function applicationFailureMessage(code: string) {
       return "This application draft changed. Refresh it and try again.";
     case "APPLICATION_CONFIRMATION_REQUIRED":
       return "Confirm the application details before submitting.";
+    case "APPLICATION_MAX_ATTEMPTS":
+      return MAX_APPLICATION_ATTEMPTS_MESSAGE;
     default:
       return "Complete the required profile, CV, answers, and consent before applying.";
   }
@@ -118,6 +122,12 @@ export class JobApplicationService {
         code: "APPLICATION_EXISTS",
         message: "You already applied to this job.",
       });
+    const applicationCount = result.applicationCount ?? 0;
+    if (applicationCount >= MAX_APPLICATION_ATTEMPTS)
+      throw new JobServiceError(409, {
+        code: "APPLICATION_MAX_ATTEMPTS",
+        message: MAX_APPLICATION_ATTEMPTS_MESSAGE,
+      });
     return {
       jobId: result.job.id,
       jobTitle: result.job.title,
@@ -134,6 +144,8 @@ export class JobApplicationService {
       })),
       questions: result.questions,
       consentVersion: ACTIVE_APPLICATION_CONSENT_VERSION,
+      applicationCount,
+      maxApplicationAttempts: MAX_APPLICATION_ATTEMPTS,
       csrfToken: await this.createCsrfToken(actor.sessionId),
     };
   }
@@ -268,6 +280,8 @@ export class JobApplicationService {
           "IDEMPOTENCY_KEY_REUSED",
           "JOB_NO_LONGER_ACCEPTING_APPLICATIONS",
           "APPLICATION_DRAFT_CONFLICT",
+          "APPLICATION_MAX_ATTEMPTS",
+          "APPLICATION_ATTEMPT_COUNTER_CONFLICT",
         ].includes(error.code);
         const invalidApplication = [
           "APPLICATION_PROFILE_INCOMPLETE",
@@ -285,9 +299,12 @@ export class JobApplicationService {
           conflict ? 409 : invalidApplication ? 400 : 403,
           {
             code: error.code,
-            message: conflict
-              ? "The application could not be submitted in its current state."
-              : applicationFailureMessage(error.code),
+            message:
+              error.code === "APPLICATION_MAX_ATTEMPTS"
+                ? MAX_APPLICATION_ATTEMPTS_MESSAGE
+                : conflict
+                  ? "The application could not be submitted in its current state."
+                  : applicationFailureMessage(error.code),
           },
         );
       }

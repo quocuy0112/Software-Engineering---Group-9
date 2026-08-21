@@ -491,8 +491,30 @@ export async function resolveRecruiterJobIdForNavigation(
 
 export async function readMockAppliedJobIds(userId: string) {
   const applications = await readApplications();
+  const candidateJobIds = [
+    ...new Set(
+      applications
+        .filter((application) => application.userId === userId)
+        .map((application) => application.jobId),
+    ),
+  ];
+  if (!candidateJobIds.length) return [];
+  const persistedApplications = await prisma.jobApplication.findMany({
+    where: {
+      candidateUserId: userId,
+      jobPostingId: { in: candidateJobIds },
+    },
+    select: { jobPostingId: true },
+  });
+  const persistedJobIds = new Set(
+    persistedApplications.map((application) => application.jobPostingId),
+  );
   return applications
-    .filter((application) => application.userId === userId)
+    .filter(
+      (application) =>
+        application.userId === userId &&
+        !persistedJobIds.has(application.jobId),
+    )
     .map((application) => application.jobId);
 }
 

@@ -46,6 +46,25 @@ describe("pipeline repository", () => {
     expect(counts.HIRED).toBe(0);
   });
 
+  it("counts withdrawn applications independently from canonical stages", async () => {
+    const db = {
+      jobApplication: {
+        count: vi.fn().mockResolvedValue(3),
+      },
+    };
+    const repository = new PrismaApplicationRepository(db as never);
+
+    await expect(repository.countWithdrawnApplications("job-1")).resolves.toBe(
+      3,
+    );
+    expect(db.jobApplication.count).toHaveBeenCalledWith({
+      where: expect.objectContaining({
+        jobPostingId: "job-1",
+        withdrawalOutcome: "CANDIDATE_WITHDRAWN",
+      }),
+    });
+  });
+
   it("binds signed cursors to the canonical job and stage and orders deterministically", async () => {
     const db = { jobApplication: { findMany: vi.fn().mockResolvedValue([row(1), row(2), row(3)]) } };
     const repository = new PrismaApplicationRepository(db as never);
@@ -55,6 +74,37 @@ describe("pipeline repository", () => {
     await expect(repository.listPipelineStage({ jobId: "job-2", stage: "APPLIED", limit: 2, cursor: first.nextCursor! })).rejects.toThrow("INVALID_CURSOR");
     await expect(repository.listPipelineStage({ jobId: "job-1", stage: "VIEWED", limit: 2, cursor: first.nextCursor! })).rejects.toThrow("INVALID_CURSOR");
     expect(db.jobApplication.findMany).toHaveBeenCalledWith(expect.objectContaining({ orderBy: [{ submittedAt: "desc" }, { id: "desc" }], take: 3 }));
+  });
+
+  it("queries Withdrawn independently while preserving the application stage", async () => {
+    const db = {
+      jobApplication: {
+        findMany: vi.fn().mockResolvedValue([{
+          ...row(1, "INTERVIEWING"),
+          withdrawalOutcome: "CANDIDATE_WITHDRAWN",
+        }]),
+      },
+    };
+    const repository = new PrismaApplicationRepository(db as never);
+
+    const page = await repository.listPipelineStage({
+      jobId: "job-1",
+      stage: "WITHDRAWN",
+      limit: 25,
+    });
+
+    expect(page.items[0]).toMatchObject({
+      stage: "INTERVIEWING",
+      withdrawalOutcome: "CANDIDATE_WITHDRAWN",
+    });
+    expect(db.jobApplication.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          jobPostingId: "job-1",
+          withdrawalOutcome: "CANDIDATE_WITHDRAWN",
+        }),
+      }),
+    );
   });
 
   it("projects scored cards without leaking score-label fields outside the pipeline contract", async () => {

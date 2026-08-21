@@ -442,6 +442,7 @@ export const rankedApplicationRowSchema = z
       "REJECTED",
       "WAITLISTED",
     ]),
+    withdrawalOutcome: z.literal("CANDIDATE_WITHDRAWN").nullable().optional(),
     stageVersion: z.number().int().positive(),
     submittedAt: isoDateTime,
     candidate: z
@@ -549,6 +550,7 @@ export const rankedListQuerySchema = z
         "OFFER_DECLINED",
         "REJECTED",
         "WAITLISTED",
+        "WITHDRAWN",
       ])
       .default("ACTIVE_PIPELINE"),
     scoringStatus: z

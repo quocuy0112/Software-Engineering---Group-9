@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { profileBasicsSchema } from "@/shared/contracts/account/profile";
 
+export const MAX_APPLICATION_ATTEMPTS = 5;
+export const MAX_APPLICATION_ATTEMPTS_MESSAGE =
+  "You have reached the maximum number of applications for this job.";
+
 export const jobProblemSchema = z
   .object({
     code: z.string().min(1).max(80),
@@ -119,6 +123,8 @@ export const applicationFormSchema = z
     questions: z.array(applicationQuestionSchema).max(20),
     consentVersion: z.string().min(1).max(64),
     csrfToken: z.string().min(1).max(256),
+    applicationCount: z.number().int().nonnegative().optional(),
+    maxApplicationAttempts: z.literal(MAX_APPLICATION_ATTEMPTS).optional(),
   })
   .strict();
 
@@ -183,6 +189,7 @@ export const applicationOutcomeSchema = z
     message: z.string().min(1).max(300),
     aiAnalysisConsent: z.boolean().optional(),
     aiMatchScore: z.number().int().min(0).max(100).nullable().optional(),
+    applicationAttemptNumber: z.number().int().positive().optional(),
   })
   .strict();
 

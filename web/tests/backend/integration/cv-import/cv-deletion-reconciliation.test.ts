@@ -56,6 +56,7 @@ async function seed(
 
 class ReconciliationStorage implements PrivateCvStorage {
   readonly deleted: string[] = [];
+  deleteFailures = new Set<string>();
   missing = new Set<string>();
   inventoryItems: Array<{
     locator: ReturnType<typeof sensitiveStorageLocator>;
@@ -76,6 +77,9 @@ class ReconciliationStorage implements PrivateCvStorage {
   }
   async delete(locator: string) {
     this.deleted.push(locator);
+    if (this.deleteFailures.has(locator)) {
+      throw new CvStorageError("CV_STORAGE_OPERATION_FAILED");
+    }
     return { deleted: true } as const;
   }
   async inventory() {
@@ -362,6 +366,38 @@ describe("CV deletion and storage reconciliation", () => {
     expect(audit.rows[0]?.serialized).not.toMatch(
       /orphan_locator|storageLocator/iu,
     );
+  });
+
+  it("continues reconciliation when an orphan delete fails", async () => {
+    await seed("reconciliation-delete-failure");
+    const storage = new ReconciliationStorage();
+    const failedLocator = "orphan_delete_failure_locator";
+    const deletedLocator = "orphan_delete_success_locator";
+    storage.deleteFailures.add(failedLocator);
+    storage.inventoryItems = [
+      {
+        locator: sensitiveStorageLocator(failedLocator),
+        bytes: 7,
+        createdAt: initial,
+      },
+      {
+        locator: sensitiveStorageLocator(deletedLocator),
+        bytes: 8,
+        createdAt: initial,
+      },
+    ];
+
+    const runAt = new Date(initial.getTime() + 2 * 60 * 60_000);
+    const result = await new CvStorageReconciliation(
+      storage,
+      new ControlledClock(runAt),
+    ).runOnce();
+
+    expect(result).toMatchObject({
+      inventoryChecked: 2,
+      orphansDeleted: 1,
+    });
+    expect(storage.deleted).toEqual([failedLocator, deletedLocator]);
   });
 
   it("requires cleanup even for a delete-only runtime when processing is disabled", async () => {

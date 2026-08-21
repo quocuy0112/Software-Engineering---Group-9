@@ -12,8 +12,9 @@ import {
 } from "lucide-react";
 import type {
   ApplicationStage,
-  PipelineStageCount,
-  PipelineStagePage,
+  PipelineBoardColumnStage,
+  PipelineBoardPage,
+  PipelineColumnSummary,
 } from "@/shared/contracts/applications";
 import type { PipelineSortDirection } from "./recruitment-pipeline-ui";
 import { canSortPipelineStage } from "./recruitment-pipeline-ui";
@@ -21,14 +22,14 @@ import { RecruitmentPipelineCard } from "./recruitment-pipeline-card";
 
 type PipelineColumnProps = {
   jobId: string;
-  summary: PipelineStageCount;
-  page: PipelineStagePage | null;
+  summary: PipelineColumnSummary;
+  page: PipelineBoardPage | null;
   loading: boolean;
   loadingMore: boolean;
   error: string | null;
-  onLoadMore: (stage: ApplicationStage) => void;
-  onRetry: (stage: ApplicationStage) => void;
-  onViewAll?: (stage: ApplicationStage) => void;
+  onLoadMore: (stage: PipelineBoardColumnStage) => void;
+  onRetry: (stage: PipelineBoardColumnStage) => void;
+  onViewAll?: (stage: PipelineBoardColumnStage) => void;
   showViewAll?: boolean;
   onChangeStage?: Parameters<
     typeof RecruitmentPipelineCard
@@ -86,7 +87,11 @@ export function RecruitmentPipelineColumn({
   filterActive = false,
   loadedItemCount = page?.items.length ?? 0,
 }: PipelineColumnProps) {
-  const locked = lockedStages.has(summary.stage);
+  const withdrawn = summary.stage === "WITHDRAWN";
+  const canonicalStage = withdrawn ? null : summary.stage;
+  const locked =
+    withdrawn ||
+    (canonicalStage !== null && lockedStages.has(canonicalStage));
   const droppable = useDroppable({
     id: summary.stage,
     data: { stage: summary.stage },
@@ -94,7 +99,8 @@ export function RecruitmentPipelineColumn({
   });
   const { setNodeRef, isOver } = droppable;
   const headingId = `pipeline-${summary.stage.toLowerCase()}-heading`;
-  const canSort = canSortPipelineStage(summary.stage);
+  const canSort =
+    canonicalStage !== null && canSortPipelineStage(canonicalStage);
   const visibleItems = page?.items ?? [];
   const hasMore =
     page?.hasMore ??
@@ -113,7 +119,8 @@ export function RecruitmentPipelineColumn({
         "column pipeline-column" +
         (summary.count > 0 ? " has-cards" : "") +
         (isOver ? " is-drag-over" : "") +
-        (locked ? " is-locked" : "")
+        (locked ? " is-locked" : "") +
+        (withdrawn ? " is-withdrawn" : "")
       }
       role="region"
       aria-labelledby={headingId}
@@ -141,10 +148,14 @@ export function RecruitmentPipelineColumn({
           {locked ? (
             <LockKeyhole
               className="lock-icon pipeline-column__lock-icon"
-              aria-label="Stage is locked"
+              aria-label={
+                withdrawn
+                  ? "Withdrawn applications cannot be moved"
+                  : "Stage is locked"
+              }
             />
           ) : null}
-          {canSort && onToggleSortMenu && onSortDirectionChange ? (
+          {canSort && canonicalStage && onToggleSortMenu && onSortDirectionChange ? (
             <div className="column-sort pipeline-column__sort">
               <button
                 type="button"
@@ -159,7 +170,7 @@ export function RecruitmentPipelineColumn({
                 aria-label={`Sort ${summary.label} candidates`}
                 onClick={(event) => {
                   event.stopPropagation();
-                  onToggleSortMenu(summary.stage);
+                  onToggleSortMenu(canonicalStage);
                 }}
               >
                 <SlidersHorizontal aria-hidden="true" />
@@ -185,7 +196,7 @@ export function RecruitmentPipelineColumn({
                       data-sort={direction}
                       key={direction}
                       onClick={() =>
-                        onSortDirectionChange(summary.stage, direction)
+                        onSortDirectionChange(canonicalStage, direction)
                       }
                     >
                       {direction === "none" ? (

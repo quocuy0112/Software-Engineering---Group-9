@@ -8,8 +8,8 @@ import {
   pipelineApplicationStages,
   pipelineScoreSchema,
   pipelineStagePageSchema,
-  type ApplicationStage,
   type ApplicationPage,
+  type PipelineBoardColumnStage,
 } from "@/shared/contracts/applications";
 import type {
   ApplicationDocumentRecord,
@@ -34,7 +34,7 @@ type Cursor = Readonly<{
   id: string;
 }>;
 
-type PipelineCursor = Cursor & Readonly<{ stage: ApplicationStage }>;
+type PipelineCursor = Cursor & Readonly<{ stage: PipelineBoardColumnStage }>;
 
 function encodeCursor(cursor: Cursor): string {
   const body = Buffer.from(JSON.stringify(cursor), "utf8").toString(
@@ -81,15 +81,19 @@ function decodeCursor(value: string | undefined, jobId: string): Cursor | null {
 }
 
 function encodePipelineCursor(cursor: PipelineCursor): string {
-  const body = Buffer.from(JSON.stringify(cursor), "utf8").toString("base64url");
-  const signature = createHmac("sha256", cursorSecret()).update(body).digest("base64url");
+  const body = Buffer.from(JSON.stringify(cursor), "utf8").toString(
+    "base64url",
+  );
+  const signature = createHmac("sha256", cursorSecret())
+    .update(body)
+    .digest("base64url");
   return `${body}.${signature}`;
 }
 
 function decodePipelineCursor(
   value: string | undefined,
   jobId: string,
-  stage: ApplicationStage,
+  stage: PipelineBoardColumnStage,
 ): PipelineCursor | null {
   const parsed = decodeCursor(value, jobId) as PipelineCursor | null;
   return parsed?.stage === stage ? parsed : null;
@@ -197,7 +201,9 @@ function coverLetterProjection(row: {
   return { kind: "NONE" };
 }
 
-export class PrismaApplicationRepository implements ApplicationRepositoryPort, RecruitmentPipelineRepositoryPort {
+export class PrismaApplicationRepository
+  implements ApplicationRepositoryPort, RecruitmentPipelineRepositoryPort
+{
   constructor(private readonly db: typeof prisma = prisma) {}
 
   async countPipelineStages(jobId: string): Promise<PipelineStageCounts> {
@@ -205,6 +211,7 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort, R
       by: ["stage"],
       where: {
         jobPostingId: jobId,
+        withdrawalOutcome: null,
         documentDeletedAt: null,
         candidate: { user: { emailVerified: true } },
       },
@@ -215,6 +222,17 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort, R
     ) as PipelineStageCounts;
     for (const row of grouped) counts[row.stage] = row._count._all;
     return counts;
+  }
+
+  async countWithdrawnApplications(jobId: string): Promise<number> {
+    return this.db.jobApplication.count({
+      where: {
+        jobPostingId: jobId,
+        withdrawalOutcome: "CANDIDATE_WITHDRAWN",
+        documentDeletedAt: null,
+        candidate: { user: { emailVerified: true } },
+      },
+    });
   }
 
   async latestUpdatedAt(jobId: string): Promise<Date | null> {
@@ -232,17 +250,22 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort, R
 
   async listPipelineStage(input: {
     jobId: string;
-    stage: ApplicationStage;
+    stage: PipelineBoardColumnStage;
     limit: number;
     cursor?: string;
   }): Promise<PipelineStageRepositoryPage> {
     const limit = Math.min(Math.max(input.limit, 1), 100);
     const cursor = decodePipelineCursor(input.cursor, input.jobId, input.stage);
     if (input.cursor && !cursor) throw new Error("INVALID_CURSOR");
+    const withdrawn = input.stage === "WITHDRAWN";
+    const canonicalStage =
+      input.stage === "WITHDRAWN" ? undefined : input.stage;
     const rows = await this.db.jobApplication.findMany({
       where: {
         jobPostingId: input.jobId,
-        stage: input.stage,
+        ...(withdrawn
+          ? { withdrawalOutcome: "CANDIDATE_WITHDRAWN" as const }
+          : { stage: canonicalStage!, withdrawalOutcome: null }),
         documentDeletedAt: null,
         candidate: { user: { emailVerified: true } },
         AND: [
@@ -267,6 +290,7 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort, R
         id: true,
         submittedAt: true,
         stage: true,
+        withdrawalOutcome: true,
         stageVersion: true,
         scoringStatus: true,
         currentScoringResult: {
@@ -342,14 +366,22 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort, R
             });
       return {
         applicationId: row.id,
-        candidate: { displayName: row.candidate.user.name, avatarUrl: safeAvatar(row.candidate.user.image) },
+        candidate: {
+          displayName: row.candidate.user.name,
+          avatarUrl: safeAvatar(row.candidate.user.image),
+        },
         submittedAt: row.submittedAt.toISOString(),
         stage: row.stage,
+        withdrawalOutcome: row.withdrawalOutcome,
         stageVersion: row.stageVersion,
         documents: {
-          cvAvailable: row.applicationDocuments.some((document) => document.kind === "CV"),
+          cvAvailable: row.applicationDocuments.some(
+            (document) => document.kind === "CV",
+          ),
           coverLetterAvailable:
-            row.applicationDocuments.some((document) => document.kind === "COVER_LETTER") ||
+            row.applicationDocuments.some(
+              (document) => document.kind === "COVER_LETTER",
+            ) ||
             Boolean(row.coverLetterText && !row.coverLetterText.deletedAt) ||
             Boolean(row.coverLetter),
         },
@@ -367,10 +399,12 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort, R
             id: last.applicationId,
           })
         : null;
-    const parsed = pipelineStagePageSchema.omit({ stage: true, observedAt: true }).parse({
-      items: items.map((item) => ({ ...item, allowedDestinations: [] })),
-      nextCursor,
-    });
+    const parsed = pipelineStagePageSchema
+      .omit({ stage: true, observedAt: true })
+      .parse({
+        items: items.map((item) => ({ ...item, allowedDestinations: [] })),
+        nextCursor,
+      });
     return {
       items: parsed.items.map((card) => {
         const { allowedDestinations, ...item } = card;

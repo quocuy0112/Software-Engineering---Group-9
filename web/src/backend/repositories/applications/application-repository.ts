@@ -3,6 +3,7 @@ import "server-only";
 import type {
   ApplicationPage,
   ApplicationStage,
+  PipelineBoardColumnStage,
   PipelineApplicationCard,
 } from "@/shared/contracts/applications";
 
@@ -33,10 +34,11 @@ export type ApplicationDocumentRecord = Readonly<{
 
 export type RecruitmentPipelineRepositoryPort = Readonly<{
   countPipelineStages(jobId: string): Promise<PipelineStageCounts>;
+  countWithdrawnApplications?(jobId: string): Promise<number>;
   latestUpdatedAt?(jobId: string): Promise<Date | null>;
   listPipelineStage(input: {
     jobId: string;
-    stage: ApplicationStage;
+    stage: PipelineBoardColumnStage;
     limit: number;
     cursor?: string;
   }): Promise<PipelineStageRepositoryPage>;

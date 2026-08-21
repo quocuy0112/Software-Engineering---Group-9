@@ -33,6 +33,7 @@ function reportWithCounts(
     job: { id: "job-1", title: "Game Development" },
     qualifiedViews: 40,
     submittedApplications: counts.APPLIED ?? 0,
+    withdrawnApplications: 0,
     conversionRate: {
       numerator: counts.APPLIED ?? 0,
       denominator: 40,
@@ -82,6 +83,35 @@ describe("HiringFunnel", () => {
 
     expect(
       screen.getByText("No applications yet for this job posting."),
+    ).toBeVisible();
+  });
+
+  it("separates withdrawn applications from canonical funnel percentages", () => {
+    const report = reportWithCounts({ APPLIED: 2 });
+    render(
+      <HiringFunnel
+        report={{ ...report, withdrawnApplications: 3 }}
+        jobTitle="Game Development"
+      />,
+    );
+
+    expect(screen.getByText("Withdrawn applications: 3")).toBeVisible();
+    expect(
+      screen.getByText("Excluded from current funnel-stage percentages."),
+    ).toBeVisible();
+  });
+
+  it("explains when withdrawn applications are the only applications", () => {
+    const report = reportWithCounts({});
+    render(
+      <HiringFunnel
+        report={{ ...report, withdrawnApplications: 2 }}
+        jobTitle="Game Development"
+      />,
+    );
+
+    expect(
+      screen.getByText("No active applications remain in the funnel."),
     ).toBeVisible();
   });
 });

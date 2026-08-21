@@ -27,6 +27,7 @@ import {
 import { Modal } from "@/frontend/components/ui/modal";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { NOTIFICATION_CHANGED_EVENT } from "@/frontend/features/notifications/client/use-notification-context-read";
+import { useOptionalJobInteraction } from "@/frontend/features/jobs/components/job-interaction-provider";
 import {
   applicationTrackerSchema,
   notificationPreferenceSchema,
@@ -199,8 +200,11 @@ export function ApplicationTracker({
   const [offerDecision, setOfferDecision] = useState<
     "ACCEPT" | "DECLINE" | null
   >(null);
+  const [withdrawConfirmationOpen, setWithdrawConfirmationOpen] =
+    useState(false);
   const [error, setError] = useState<string | null>(null);
   const applicationId = tracker.applicationId;
+  const shared = useOptionalJobInteraction();
 
   const poll = useCallback(async () => {
     try {
@@ -311,11 +315,7 @@ export function ApplicationTracker({
   }
 
   async function withdraw() {
-    if (
-      !tracker.canWithdraw ||
-      pending ||
-      !window.confirm("Withdraw this application? This cannot be undone.")
-    ) {
+    if (!tracker.canWithdraw || pending) {
       return;
     }
     setPending("withdraw");
@@ -341,8 +341,11 @@ export function ApplicationTracker({
           "This application could not be withdrawn. Refresh and try again.",
         );
       }
+      shared?.clearApplied(tracker.job.jobId);
       await poll();
+      setWithdrawConfirmationOpen(false);
     } catch (caught) {
+      setWithdrawConfirmationOpen(false);
       setError(
         caught instanceof Error
           ? caught.message
@@ -649,6 +652,37 @@ export function ApplicationTracker({
           </button>
         </div>
       </Modal>
+      <Modal
+        open={withdrawConfirmationOpen}
+        title="Withdraw this application?"
+        description="This action cannot be undone. You can apply to this job again unless you have reached the maximum of 5 applications."
+        tone="destructive"
+        icon={<Undo2 aria-hidden="true" />}
+        busy={pending === "withdraw"}
+        onClose={() => {
+          if (!pending) setWithdrawConfirmationOpen(false);
+        }}
+      >
+        <div className="sh-modal-actions">
+          <button
+            type="button"
+            className="application-ui-button application-ui-button--secondary"
+            data-autofocus
+            disabled={pending !== null}
+            onClick={() => setWithdrawConfirmationOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="application-ui-button application-ui-button--primary"
+            disabled={pending !== null}
+            onClick={() => void withdraw()}
+          >
+            {pending === "withdraw" ? "Withdrawing…" : "Confirm withdrawal"}
+          </button>
+        </div>
+      </Modal>
       <div className="application-ui__columns">
         <div className="application-ui__main">
           <section
@@ -835,7 +869,8 @@ export function ApplicationTracker({
                 type="button"
                 className="application-ui-button application-ui-button--secondary"
                 disabled={pending !== null}
-                onClick={() => void withdraw()}
+                aria-haspopup="dialog"
+                onClick={() => setWithdrawConfirmationOpen(true)}
               >
                 <Undo2 aria-hidden="true" />
                 {pending === "withdraw"

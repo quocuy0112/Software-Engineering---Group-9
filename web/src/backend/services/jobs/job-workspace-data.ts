@@ -15,6 +15,7 @@ import { readUserJobState } from "./user-job-state-store";
 import { readMockAppliedJobIds } from "./recruiter-job-posting-data";
 import { prisma } from "@/backend/database/prisma";
 import { jobReviewSnapshotSchema } from "@/shared/contracts/recruiter-job-posting";
+import { MAX_APPLICATION_ATTEMPTS_MESSAGE } from "@/shared/contracts/jobs/actions";
 
 const workspaceJobsRepository =
   configuredJsonJobCatalogueRepository("jobs.json");
@@ -256,8 +257,10 @@ export function projectWorkspaceJob(
   now = new Date(),
   matchScore?: number,
   appliedJobIds: ReadonlySet<string> = new Set(),
+  applicationLimitJobIds: ReadonlySet<string> = new Set(),
 ): JobCard {
   const applied = appliedJobIds.has(job.id);
+  const applicationLimitReached = applicationLimitJobIds.has(job.id);
   const card: JobCard = {
     id: job.id,
     slug: job.slug,
@@ -301,7 +304,12 @@ export function projectWorkspaceJob(
       applied,
       canSave: true,
       canReport: true,
-      canApply: isOpenForApplications(job, now) && !applied,
+      canApply:
+        isOpenForApplications(job, now) && !applied && !applicationLimitReached,
+      applicationLimitReached,
+      applicationLimitMessage: applicationLimitReached
+        ? MAX_APPLICATION_ATTEMPTS_MESSAGE
+        : undefined,
     },
   };
   if (matchScore === undefined) return card;
@@ -314,6 +322,7 @@ export type JobWorkspaceSnapshot = {
   companies: Map<string, SourceCompany>;
   savedJobs: JobCard[];
   appliedJobIds: string[];
+  applicationLimitJobIds: string[];
   positionOptions: JobPositionOption[];
   skillOptions: string[];
 };
@@ -346,19 +355,29 @@ export async function readJobWorkspaceSnapshot(
   candidateUserId: string,
   now = new Date(),
 ): Promise<JobWorkspaceSnapshot> {
-  const [catalog, state, prismaAppliedJobIds, mockAppliedJobIds] =
-    await Promise.all([
-      readCatalog(),
-      readUserJobState(candidateUserId),
-      new PrismaApplicationTrackingRepository().listAppliedJobIds(
-        candidateUserId,
-      ),
-      readMockAppliedJobIds(candidateUserId),
-    ]);
+  const [
+    catalog,
+    state,
+    prismaAppliedJobIds,
+    prismaApplicationLimitJobIds,
+    mockAppliedJobIds,
+  ] = await Promise.all([
+    readCatalog(),
+    readUserJobState(candidateUserId),
+    new PrismaApplicationTrackingRepository().listAppliedJobIds(
+      candidateUserId,
+    ),
+    new PrismaApplicationTrackingRepository().listApplicationLimitJobIds(
+      candidateUserId,
+    ),
+    readMockAppliedJobIds(candidateUserId),
+  ]);
   const appliedJobIds = [
     ...new Set([...prismaAppliedJobIds, ...mockAppliedJobIds]),
   ];
   const appliedIds = new Set(appliedJobIds);
+  const applicationLimitJobIds = [...new Set(prismaApplicationLimitJobIds)];
+  const applicationLimitIds = new Set(applicationLimitJobIds);
   const cardById = new Map(
     catalog.jobs.map((job) => [
       job.id,
@@ -369,6 +388,7 @@ export async function readJobWorkspaceSnapshot(
         now,
         undefined,
         appliedIds,
+        applicationLimitIds,
       ),
     ]),
   );
@@ -382,6 +402,7 @@ export async function readJobWorkspaceSnapshot(
       return job ? [job] : [];
     }),
     appliedJobIds,
+    applicationLimitJobIds,
     positionOptions,
     skillOptions,
   };
@@ -452,6 +473,7 @@ export function suggestedJobsForSnapshot(
 
   const hiddenIds = new Set(state.hiddenJobIds);
   const appliedIds = new Set(snapshot.appliedJobIds);
+  const applicationLimitIds = new Set(snapshot.applicationLimitJobIds);
   const positionConfigured = Boolean(
     preferences.professionalPositions.length ||
     preferences.customPositions.length,
@@ -535,6 +557,7 @@ export function suggestedJobsForSnapshot(
           now,
           matchScore,
           appliedIds,
+          applicationLimitIds,
         ),
         matchedCriteria,
       };

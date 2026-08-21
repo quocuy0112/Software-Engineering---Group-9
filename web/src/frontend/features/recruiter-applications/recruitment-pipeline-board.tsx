@@ -14,8 +14,9 @@ import {
 import { RefreshCw, Search } from "lucide-react";
 import type {
   ApplicationStage,
+  PipelineBoardColumnStage,
   PipelineApplicationCard,
-  PipelineStageCount,
+  PipelineColumnSummary,
   StageTransitionCommand,
 } from "@/shared/contracts/applications";
 import { isTerminalPipelineStage } from "@/shared/contracts/applications";
@@ -53,13 +54,14 @@ const outcomeStages: ApplicationStage[] = [
   "WAITLISTED",
 ];
 
-const viewAllStages = new Set<ApplicationStage>([
+const viewAllStages = new Set<PipelineBoardColumnStage>([
   ...activePipelineStages,
   ...outcomeStages,
+  "WITHDRAWN",
 ]);
 
 function isViewAllPipelineStage(
-  stage: ApplicationStage,
+  stage: PipelineBoardColumnStage,
 ): stage is ViewAllPipelineStage {
   return viewAllStages.has(stage);
 }
@@ -142,7 +144,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
     return () => document.removeEventListener("click", closeMenu);
   }, [openSortMenu]);
 
-  const visiblePage = (stage: ApplicationStage) => {
+  const visiblePage = (stage: PipelineBoardColumnStage) => {
     const column = state.columns[stage];
     if (!column?.page) return null;
     const filtered = filterPipelineCards(
@@ -152,7 +154,10 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
     );
     return {
       ...column.page,
-      items: sortPipelineCards(filtered, sortDirections[stage]),
+      items: sortPipelineCards(
+        filtered,
+        stage === "WITHDRAWN" ? "none" : sortDirections[stage],
+      ),
     };
   };
 
@@ -171,7 +176,13 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
     const card =
       cards.find((item) => item.applicationId === String(event.active.id)) ??
       null;
-    setActiveCard(card && !isTerminalPipelineStage(card.stage) ? card : null);
+    setActiveCard(
+      card &&
+        !isTerminalPipelineStage(card.stage) &&
+        card.withdrawalOutcome !== "CANDIDATE_WITHDRAWN"
+        ? card
+        : null,
+    );
     returnFocus.current = document.activeElement as HTMLElement | null;
   };
 
@@ -196,13 +207,15 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
     const card = activeCard;
     setActiveCard(null);
     const target = event.over?.data.current?.stage as
-      | ApplicationStage
+      | PipelineBoardColumnStage
       | undefined;
     const dragDestinations = card?.dragDestinations ?? [];
     if (
       !card ||
       isTerminalPipelineStage(card.stage) ||
+      card.withdrawalOutcome === "CANDIDATE_WITHDRAWN" ||
       !target ||
+      target === "WITHDRAWN" ||
       target === card.stage ||
       !dragDestinations.includes(target)
     ) {
@@ -225,7 +238,11 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
     target?: ApplicationStage,
   ) => {
     returnFocus.current = document.activeElement as HTMLElement;
-    if (isTerminalPipelineStage(card.stage)) return;
+    if (
+      isTerminalPipelineStage(card.stage) ||
+      card.withdrawalOutcome === "CANDIDATE_WITHDRAWN"
+    )
+      return;
     if (target && !stageTransitionNeedsDialog(target)) {
       void moveCard(card, target, {}, "button").finally(() =>
         restoreFocus(card.applicationId),
@@ -261,7 +278,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
     window.setTimeout(() => target?.focus(), 0);
   };
 
-  const renderColumn = (summary: PipelineStageCount) => {
+  const renderColumn = (summary: PipelineColumnSummary) => {
     const column = state.columns[summary.stage];
     const page = visiblePage(summary.stage);
     return (
@@ -281,7 +298,9 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
         showViewAll={isViewAllPipelineStage(summary.stage)}
         onChangeStage={requestStageChange}
         onViewAssessment={openAssessment}
-        sortDirection={sortDirections[summary.stage]}
+        sortDirection={
+          summary.stage === "WITHDRAWN" ? "none" : sortDirections[summary.stage]
+        }
         sortMenuOpen={openSortMenu === summary.stage}
         onToggleSortMenu={(stage) =>
           setOpenSortMenu((current) => (current === stage ? null : stage))
@@ -315,7 +334,18 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
   }
 
   const boardMetadata = state.metadata;
-  const total = boardMetadata.stages.reduce((sum, item) => sum + item.count, 0);
+  const withdrawnSummary: PipelineColumnSummary = {
+    stage: "WITHDRAWN",
+    label: "Withdrawn",
+    count: boardMetadata.withdrawnCount ?? 0,
+  };
+  const summaryForStage = (stage: ViewAllPipelineStage) =>
+    stage === "WITHDRAWN"
+      ? withdrawnSummary
+      : boardMetadata.stages.find((item) => item.stage === stage);
+  const total =
+    boardMetadata.stages.reduce((sum, item) => sum + item.count, 0) +
+    withdrawnSummary.count;
   return (
     <div
       className="recruitment-pipeline"
@@ -452,6 +482,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
                 );
                 return summary ? renderColumn(summary) : null;
               })}
+              {renderColumn(withdrawnSummary)}
             </div>
           </section>
         </div>
@@ -486,13 +517,11 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
       ) : null}
       {viewAllStage
         ? (() => {
-            const summary = boardMetadata.stages.find(
-              (item) => item.stage === viewAllStage,
-            );
+            const summary = summaryForStage(viewAllStage);
             return summary ? (
               <RecruitmentPipelineViewAllModal
                 jobId={jobId}
-                summary={{ ...summary, stage: viewAllStage }}
+                summary={summary}
                 canMoveStages={boardMetadata.permissions.canMoveStages}
                 canReject={boardMetadata.permissions.canReject}
                 onClose={() => setViewAllStage(null)}

@@ -11,8 +11,12 @@ import {
   type CandidateApplicationDetail,
   type CandidateApplicationSummary,
 } from "@/shared/contracts/jobs/applications";
+import { MAX_APPLICATION_ATTEMPTS } from "@/shared/contracts/jobs/actions";
 
-type TrackingClient = Pick<typeof prisma, "jobApplication">;
+type TrackingClient = Pick<
+  typeof prisma,
+  "jobApplication" | "jobApplicationAttemptCounter"
+>;
 
 type ListInput = {
   candidateUserId: string;
@@ -222,7 +226,22 @@ export class PrismaApplicationTrackingRepository {
 
   async listAppliedJobIds(candidateUserId: string) {
     const rows = await this.db.jobApplication.findMany({
-      where: { candidateUserId },
+      where: {
+        candidateUserId,
+        withdrawalOutcome: null,
+        stage: { not: "REJECTED" },
+      },
+      select: { jobPostingId: true },
+    });
+    return rows.map((row) => row.jobPostingId);
+  }
+
+  async listApplicationLimitJobIds(candidateUserId: string) {
+    const rows = await this.db.jobApplicationAttemptCounter.findMany({
+      where: {
+        candidateUserId,
+        applicationCount: { gte: MAX_APPLICATION_ATTEMPTS },
+      },
       select: { jobPostingId: true },
     });
     return rows.map((row) => row.jobPostingId);

@@ -16,7 +16,12 @@ type BucketAggregate = {
   distinctCandidates?: bigint | number;
   hired?: bigint | number;
 };
-type FunnelAggregate = { stage: string; count: bigint | number };
+type FunnelAggregate = {
+  stage: string;
+  count: bigint | number;
+  totalCount: bigint | number;
+  withdrawnCount: bigint | number;
+};
 type LifecycleRow = {
   jobPostingId: string;
   effectiveAt: Date;
@@ -93,6 +98,7 @@ export type AdminGrowthRepositoryResult = Readonly<{
 export type JobPerformanceRepositoryResult = Readonly<{
   qualifiedViews: number;
   submittedApplications: number;
+  withdrawnApplications: number;
   funnelCounts: Partial<Record<CanonicalAnalyticsStage, number>>;
 }>;
 
@@ -165,7 +171,11 @@ export class PrismaAnalyticsRepository {
       ),
       this.db.jobPostingLifecycleFact.findMany({
         where: { effectiveAt: { lte: cutoff } },
-        orderBy: [{ effectiveAt: "asc" }, { postingVersion: "asc" }, { id: "asc" }],
+        orderBy: [
+          { effectiveAt: "asc" },
+          { postingVersion: "asc" },
+          { id: "asc" },
+        ],
         select: {
           jobPostingId: true,
           effectiveAt: true,
@@ -237,7 +247,10 @@ export class PrismaAnalyticsRepository {
         'WITH included_applications AS (SELECT * FROM "JobApplication" WHERE "jobPostingId" = $1 AND "submittedAt" >= $2 AND "submittedAt" < $3 AND "documentDeletedAt" IS NULL), latest_stage AS (' +
           'SELECT DISTINCT ON (e."applicationId") e."applicationId", e."toStage" FROM "ApplicationStageEvent" e JOIN included_applications ia ON ia."id" = e."applicationId" ' +
           'WHERE e."occurredAt" <= $3 ORDER BY e."applicationId", e."occurredAt" DESC, e."id" DESC) ' +
-          'SELECT COALESCE(ls."toStage"::text, a."stage"::text) AS "stage", COUNT(*) AS "count" ' +
+          'SELECT COALESCE(ls."toStage"::text, a."stage"::text) AS "stage", ' +
+          'COUNT(*) FILTER (WHERE a."withdrawnAt" IS NULL OR a."withdrawnAt" > $3) AS "count", ' +
+          'COUNT(*) AS "totalCount", ' +
+          'COUNT(*) FILTER (WHERE a."withdrawnAt" IS NOT NULL AND a."withdrawnAt" <= $3) AS "withdrawnCount" ' +
           'FROM included_applications a LEFT JOIN latest_stage ls ON ls."applicationId" = a."id" GROUP BY 1',
         input.jobPostingId,
         input.from,
@@ -245,16 +258,18 @@ export class PrismaAnalyticsRepository {
       ),
     ]);
     const funnelCounts: Partial<Record<CanonicalAnalyticsStage, number>> = {};
+    let submittedApplications = 0;
+    let withdrawnApplications = 0;
     for (const row of applications) {
+      submittedApplications += numberValue(row.totalCount);
+      withdrawnApplications += numberValue(row.withdrawnCount);
       const stage = safeStage(row.stage);
       if (stage) funnelCounts[stage] = numberValue(row.count);
     }
     return {
       qualifiedViews: views,
-      submittedApplications: Object.values(funnelCounts).reduce(
-        (sum, value) => sum + (value ?? 0),
-        0,
-      ),
+      submittedApplications,
+      withdrawnApplications,
       funnelCounts,
     };
   }
@@ -270,7 +285,7 @@ export class PrismaAnalyticsRepository {
         's."finalScore"::text AS "finalScore", s."state"::text AS "scoringState" ' +
         'FROM "JobApplication" a LEFT JOIN LATERAL (' +
         'SELECT e."toStage" FROM "ApplicationStageEvent" e WHERE e."applicationId" = a."id" AND e."occurredAt" <= $2 ORDER BY e."occurredAt" DESC, e."id" DESC LIMIT 1) stage_at_cutoff ON TRUE ' +
-        'LEFT JOIN LATERAL (' +
+        "LEFT JOIN LATERAL (" +
         'SELECT r."finalScore", r."state" FROM "ApplicationScoringResult" r ' +
         'WHERE r."jobApplicationId" = a."id" AND r."publishedAt" <= $2 ' +
         'AND (r."supersededAt" IS NULL OR r."supersededAt" > $2) ' +

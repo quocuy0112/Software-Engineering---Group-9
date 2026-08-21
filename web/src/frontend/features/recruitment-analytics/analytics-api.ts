@@ -33,6 +33,30 @@ function formatAnalyticsAvailability(value: string) {
   }).format(new Date(value));
 }
 
+function parseJobPerformanceReport(body: unknown) {
+  const parsed = jobPerformanceReportSchema.safeParse(body);
+  if (parsed.success) return parsed.data;
+
+  // Keep the Overview usable while an older application server is being
+  // replaced. The withdrawn metric was added after the original report
+  // contract; an older response is still safe to display because it contains
+  // no withdrawn rows, so its value is zero for this view.
+  if (
+    body &&
+    typeof body === "object" &&
+    !Array.isArray(body) &&
+    !("withdrawnApplications" in body)
+  ) {
+    const compatible = jobPerformanceReportSchema.safeParse({
+      ...body,
+      withdrawnApplications: 0,
+    });
+    if (compatible.success) return compatible.data;
+  }
+
+  throw parsed.error;
+}
+
 export async function fetchJobPerformance(
   jobId: string,
   range: AnalyticsDateRange,
@@ -94,7 +118,7 @@ export async function fetchJobPerformance(
       analyticsAvailableFrom,
     );
   }
-  return jobPerformanceReportSchema.parse(body) as JobPerformanceReport;
+  return parseJobPerformanceReport(body) as JobPerformanceReport;
 }
 
 export async function readAnalyticsError(response: Response) {
