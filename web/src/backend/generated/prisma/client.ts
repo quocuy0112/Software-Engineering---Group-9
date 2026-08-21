@@ -765,6 +765,16 @@ export type JobPostingLifecycleFact = Prisma.JobPostingLifecycleFactModel
  */
 export type ExportRequest = Prisma.ExportRequestModel
 /**
+ * Model BackupConfiguration
+ * 
+ */
+export type BackupConfiguration = Prisma.BackupConfigurationModel
+/**
+ * Model BackupRun
+ * 
+ */
+export type BackupRun = Prisma.BackupRunModel
+/**
  * Model ActivityLegalHold
  * 
  */

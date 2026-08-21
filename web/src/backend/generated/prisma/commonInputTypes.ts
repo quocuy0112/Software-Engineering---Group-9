@@ -668,6 +668,20 @@ export type EnumCompanyVerificationStateFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumCompanyVerificationStateFilter<$PrismaModel> | $Enums.CompanyVerificationState
 }
 
+export type EnumCompanyModerationStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyModerationState | Prisma.EnumCompanyModerationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.CompanyModerationState[] | Prisma.ListEnumCompanyModerationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CompanyModerationState[] | Prisma.ListEnumCompanyModerationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCompanyModerationStateFilter<$PrismaModel> | $Enums.CompanyModerationState
+}
+
+export type EnumCompanyVerificationStateNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyVerificationState | Prisma.EnumCompanyVerificationStateFieldRefInput<$PrismaModel> | null
+  in?: $Enums.CompanyVerificationState[] | Prisma.ListEnumCompanyVerificationStateFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.CompanyVerificationState[] | Prisma.ListEnumCompanyVerificationStateFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumCompanyVerificationStateNullableFilter<$PrismaModel> | $Enums.CompanyVerificationState | null
+}
+
 export type EnumCompanyVerificationStateWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.CompanyVerificationState | Prisma.EnumCompanyVerificationStateFieldRefInput<$PrismaModel>
   in?: $Enums.CompanyVerificationState[] | Prisma.ListEnumCompanyVerificationStateFieldRefInput<$PrismaModel>
@@ -676,6 +690,26 @@ export type EnumCompanyVerificationStateWithAggregatesFilter<$PrismaModel = neve
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumCompanyVerificationStateFilter<$PrismaModel>
   _max?: Prisma.NestedEnumCompanyVerificationStateFilter<$PrismaModel>
+}
+
+export type EnumCompanyModerationStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyModerationState | Prisma.EnumCompanyModerationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.CompanyModerationState[] | Prisma.ListEnumCompanyModerationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CompanyModerationState[] | Prisma.ListEnumCompanyModerationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCompanyModerationStateWithAggregatesFilter<$PrismaModel> | $Enums.CompanyModerationState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCompanyModerationStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCompanyModerationStateFilter<$PrismaModel>
+}
+
+export type EnumCompanyVerificationStateNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyVerificationState | Prisma.EnumCompanyVerificationStateFieldRefInput<$PrismaModel> | null
+  in?: $Enums.CompanyVerificationState[] | Prisma.ListEnumCompanyVerificationStateFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.CompanyVerificationState[] | Prisma.ListEnumCompanyVerificationStateFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumCompanyVerificationStateNullableWithAggregatesFilter<$PrismaModel> | $Enums.CompanyVerificationState | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCompanyVerificationStateNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCompanyVerificationStateNullableFilter<$PrismaModel>
 }
 
 export type EnumCompanyMembershipRoleFilter<$PrismaModel = never> = {
@@ -2829,6 +2863,40 @@ export type EnumExportRequestStatusWithAggregatesFilter<$PrismaModel = never> = 
   _max?: Prisma.NestedEnumExportRequestStatusFilter<$PrismaModel>
 }
 
+export type EnumBackupRunTriggerFilter<$PrismaModel = never> = {
+  equals?: $Enums.BackupRunTrigger | Prisma.EnumBackupRunTriggerFieldRefInput<$PrismaModel>
+  in?: $Enums.BackupRunTrigger[] | Prisma.ListEnumBackupRunTriggerFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BackupRunTrigger[] | Prisma.ListEnumBackupRunTriggerFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBackupRunTriggerFilter<$PrismaModel> | $Enums.BackupRunTrigger
+}
+
+export type EnumBackupRunStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.BackupRunStatus | Prisma.EnumBackupRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.BackupRunStatus[] | Prisma.ListEnumBackupRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BackupRunStatus[] | Prisma.ListEnumBackupRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBackupRunStatusFilter<$PrismaModel> | $Enums.BackupRunStatus
+}
+
+export type EnumBackupRunTriggerWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.BackupRunTrigger | Prisma.EnumBackupRunTriggerFieldRefInput<$PrismaModel>
+  in?: $Enums.BackupRunTrigger[] | Prisma.ListEnumBackupRunTriggerFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BackupRunTrigger[] | Prisma.ListEnumBackupRunTriggerFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBackupRunTriggerWithAggregatesFilter<$PrismaModel> | $Enums.BackupRunTrigger
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumBackupRunTriggerFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumBackupRunTriggerFilter<$PrismaModel>
+}
+
+export type EnumBackupRunStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.BackupRunStatus | Prisma.EnumBackupRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.BackupRunStatus[] | Prisma.ListEnumBackupRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BackupRunStatus[] | Prisma.ListEnumBackupRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBackupRunStatusWithAggregatesFilter<$PrismaModel> | $Enums.BackupRunStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumBackupRunStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumBackupRunStatusFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -3453,6 +3521,20 @@ export type NestedEnumCompanyVerificationStateFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumCompanyVerificationStateFilter<$PrismaModel> | $Enums.CompanyVerificationState
 }
 
+export type NestedEnumCompanyModerationStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyModerationState | Prisma.EnumCompanyModerationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.CompanyModerationState[] | Prisma.ListEnumCompanyModerationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CompanyModerationState[] | Prisma.ListEnumCompanyModerationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCompanyModerationStateFilter<$PrismaModel> | $Enums.CompanyModerationState
+}
+
+export type NestedEnumCompanyVerificationStateNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyVerificationState | Prisma.EnumCompanyVerificationStateFieldRefInput<$PrismaModel> | null
+  in?: $Enums.CompanyVerificationState[] | Prisma.ListEnumCompanyVerificationStateFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.CompanyVerificationState[] | Prisma.ListEnumCompanyVerificationStateFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumCompanyVerificationStateNullableFilter<$PrismaModel> | $Enums.CompanyVerificationState | null
+}
+
 export type NestedEnumCompanyVerificationStateWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.CompanyVerificationState | Prisma.EnumCompanyVerificationStateFieldRefInput<$PrismaModel>
   in?: $Enums.CompanyVerificationState[] | Prisma.ListEnumCompanyVerificationStateFieldRefInput<$PrismaModel>
@@ -3461,6 +3543,26 @@ export type NestedEnumCompanyVerificationStateWithAggregatesFilter<$PrismaModel 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumCompanyVerificationStateFilter<$PrismaModel>
   _max?: Prisma.NestedEnumCompanyVerificationStateFilter<$PrismaModel>
+}
+
+export type NestedEnumCompanyModerationStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyModerationState | Prisma.EnumCompanyModerationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.CompanyModerationState[] | Prisma.ListEnumCompanyModerationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CompanyModerationState[] | Prisma.ListEnumCompanyModerationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCompanyModerationStateWithAggregatesFilter<$PrismaModel> | $Enums.CompanyModerationState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCompanyModerationStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCompanyModerationStateFilter<$PrismaModel>
+}
+
+export type NestedEnumCompanyVerificationStateNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyVerificationState | Prisma.EnumCompanyVerificationStateFieldRefInput<$PrismaModel> | null
+  in?: $Enums.CompanyVerificationState[] | Prisma.ListEnumCompanyVerificationStateFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.CompanyVerificationState[] | Prisma.ListEnumCompanyVerificationStateFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumCompanyVerificationStateNullableWithAggregatesFilter<$PrismaModel> | $Enums.CompanyVerificationState | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCompanyVerificationStateNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCompanyVerificationStateNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumCompanyMembershipRoleFilter<$PrismaModel = never> = {
@@ -5601,6 +5703,40 @@ export type NestedEnumExportRequestStatusWithAggregatesFilter<$PrismaModel = nev
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumExportRequestStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumExportRequestStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumBackupRunTriggerFilter<$PrismaModel = never> = {
+  equals?: $Enums.BackupRunTrigger | Prisma.EnumBackupRunTriggerFieldRefInput<$PrismaModel>
+  in?: $Enums.BackupRunTrigger[] | Prisma.ListEnumBackupRunTriggerFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BackupRunTrigger[] | Prisma.ListEnumBackupRunTriggerFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBackupRunTriggerFilter<$PrismaModel> | $Enums.BackupRunTrigger
+}
+
+export type NestedEnumBackupRunStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.BackupRunStatus | Prisma.EnumBackupRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.BackupRunStatus[] | Prisma.ListEnumBackupRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BackupRunStatus[] | Prisma.ListEnumBackupRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBackupRunStatusFilter<$PrismaModel> | $Enums.BackupRunStatus
+}
+
+export type NestedEnumBackupRunTriggerWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.BackupRunTrigger | Prisma.EnumBackupRunTriggerFieldRefInput<$PrismaModel>
+  in?: $Enums.BackupRunTrigger[] | Prisma.ListEnumBackupRunTriggerFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BackupRunTrigger[] | Prisma.ListEnumBackupRunTriggerFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBackupRunTriggerWithAggregatesFilter<$PrismaModel> | $Enums.BackupRunTrigger
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumBackupRunTriggerFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumBackupRunTriggerFilter<$PrismaModel>
+}
+
+export type NestedEnumBackupRunStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.BackupRunStatus | Prisma.EnumBackupRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.BackupRunStatus[] | Prisma.ListEnumBackupRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BackupRunStatus[] | Prisma.ListEnumBackupRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBackupRunStatusWithAggregatesFilter<$PrismaModel> | $Enums.BackupRunStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumBackupRunStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumBackupRunStatusFilter<$PrismaModel>
 }
 
 

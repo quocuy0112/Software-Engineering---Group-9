@@ -8,6 +8,8 @@ export const adminSecurityEventKinds = [
   "MEMBERSHIP_SUSPENDED",
   "MEMBERSHIP_RESTORED",
   "MEMBERSHIP_REMOVED",
+  "COMPANY_BANNED",
+  "COMPANY_UNBANNED",
 ] as const;
 export type AdminSecurityEventKind = (typeof adminSecurityEventKinds)[number];
 
@@ -29,7 +31,7 @@ export type CompanyMembershipRole =
   | "HIRING_MANAGER";
 
 function versionedKey(
-  aggregate: "account" | "membership" | "verification",
+  aggregate: "account" | "membership" | "verification" | "company",
   aggregateId: string,
   eventKind: string,
   resultingVersion: number,
@@ -63,6 +65,15 @@ export const membershipBusinessEventKey = (
   >,
   resultingVersion: number,
 ) => versionedKey("membership", membershipId, eventKind, resultingVersion);
+
+export const companyBusinessEventKey = (
+  companyId: string,
+  eventKind: Extract<
+    AdminSecurityEventKind,
+    "COMPANY_BANNED" | "COMPANY_UNBANNED"
+  >,
+  resultingVersion: number,
+) => versionedKey("company", companyId, eventKind, resultingVersion);
 
 export const verificationBusinessEventKey = (
   requestId: string,

@@ -20,8 +20,18 @@ export type CompanyModel = runtime.Types.Result.DefaultSelection<Prisma.$Company
 
 export type AggregateCompany = {
   _count: CompanyCountAggregateOutputType | null
+  _avg: CompanyAvgAggregateOutputType | null
+  _sum: CompanySumAggregateOutputType | null
   _min: CompanyMinAggregateOutputType | null
   _max: CompanyMaxAggregateOutputType | null
+}
+
+export type CompanyAvgAggregateOutputType = {
+  moderationVersion: number | null
+}
+
+export type CompanySumAggregateOutputType = {
+  moderationVersion: number | null
 }
 
 export type CompanyMinAggregateOutputType = {
@@ -41,6 +51,11 @@ export type CompanyMinAggregateOutputType = {
   normalizedTaxIdentifier: string | null
   verificationState: $Enums.CompanyVerificationState | null
   verificationInactiveAt: Date | null
+  moderationState: $Enums.CompanyModerationState | null
+  moderationVersion: number | null
+  bannedAt: Date | null
+  verificationStateBeforeBan: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -62,6 +77,11 @@ export type CompanyMaxAggregateOutputType = {
   normalizedTaxIdentifier: string | null
   verificationState: $Enums.CompanyVerificationState | null
   verificationInactiveAt: Date | null
+  moderationState: $Enums.CompanyModerationState | null
+  moderationVersion: number | null
+  bannedAt: Date | null
+  verificationStateBeforeBan: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -83,11 +103,24 @@ export type CompanyCountAggregateOutputType = {
   normalizedTaxIdentifier: number
   verificationState: number
   verificationInactiveAt: number
+  moderationState: number
+  moderationVersion: number
+  bannedAt: number
+  verificationStateBeforeBan: number
+  verifiedAtBeforeBan: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
+
+export type CompanyAvgAggregateInputType = {
+  moderationVersion?: true
+}
+
+export type CompanySumAggregateInputType = {
+  moderationVersion?: true
+}
 
 export type CompanyMinAggregateInputType = {
   id?: true
@@ -106,6 +139,11 @@ export type CompanyMinAggregateInputType = {
   normalizedTaxIdentifier?: true
   verificationState?: true
   verificationInactiveAt?: true
+  moderationState?: true
+  moderationVersion?: true
+  bannedAt?: true
+  verificationStateBeforeBan?: true
+  verifiedAtBeforeBan?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -127,6 +165,11 @@ export type CompanyMaxAggregateInputType = {
   normalizedTaxIdentifier?: true
   verificationState?: true
   verificationInactiveAt?: true
+  moderationState?: true
+  moderationVersion?: true
+  bannedAt?: true
+  verificationStateBeforeBan?: true
+  verifiedAtBeforeBan?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -148,6 +191,11 @@ export type CompanyCountAggregateInputType = {
   normalizedTaxIdentifier?: true
   verificationState?: true
   verificationInactiveAt?: true
+  moderationState?: true
+  moderationVersion?: true
+  bannedAt?: true
+  verificationStateBeforeBan?: true
+  verifiedAtBeforeBan?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -191,6 +239,18 @@ export type CompanyAggregateArgs<ExtArgs extends runtime.Types.Extensions.Intern
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: CompanyAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: CompanySumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: CompanyMinAggregateInputType
@@ -221,6 +281,8 @@ export type CompanyGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   _count?: CompanyCountAggregateInputType | true
+  _avg?: CompanyAvgAggregateInputType
+  _sum?: CompanySumAggregateInputType
   _min?: CompanyMinAggregateInputType
   _max?: CompanyMaxAggregateInputType
 }
@@ -242,9 +304,16 @@ export type CompanyGroupByOutputType = {
   normalizedTaxIdentifier: string | null
   verificationState: $Enums.CompanyVerificationState
   verificationInactiveAt: Date | null
+  moderationState: $Enums.CompanyModerationState
+  moderationVersion: number
+  bannedAt: Date | null
+  verificationStateBeforeBan: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan: Date | null
   createdAt: Date
   updatedAt: Date
   _count: CompanyCountAggregateOutputType | null
+  _avg: CompanyAvgAggregateOutputType | null
+  _sum: CompanySumAggregateOutputType | null
   _min: CompanyMinAggregateOutputType | null
   _max: CompanyMaxAggregateOutputType | null
 }
@@ -284,6 +353,11 @@ export type CompanyWhereInput = {
   normalizedTaxIdentifier?: Prisma.StringNullableFilter<"Company"> | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFilter<"Company"> | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.DateTimeNullableFilter<"Company"> | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFilter<"Company"> | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFilter<"Company"> | number
+  bannedAt?: Prisma.DateTimeNullableFilter<"Company"> | Date | string | null
+  verificationStateBeforeBan?: Prisma.EnumCompanyVerificationStateNullableFilter<"Company"> | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.DateTimeNullableFilter<"Company"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Company"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Company"> | Date | string
   jobPostings?: Prisma.JobPostingListRelationFilter
@@ -317,6 +391,11 @@ export type CompanyOrderByWithRelationInput = {
   normalizedTaxIdentifier?: Prisma.SortOrderInput | Prisma.SortOrder
   verificationState?: Prisma.SortOrder
   verificationInactiveAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  moderationState?: Prisma.SortOrder
+  moderationVersion?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationStateBeforeBan?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedAtBeforeBan?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   jobPostings?: Prisma.JobPostingOrderByRelationAggregateInput
@@ -353,6 +432,11 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   verifiedAt?: Prisma.DateTimeNullableFilter<"Company"> | Date | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFilter<"Company"> | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.DateTimeNullableFilter<"Company"> | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFilter<"Company"> | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFilter<"Company"> | number
+  bannedAt?: Prisma.DateTimeNullableFilter<"Company"> | Date | string | null
+  verificationStateBeforeBan?: Prisma.EnumCompanyVerificationStateNullableFilter<"Company"> | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.DateTimeNullableFilter<"Company"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Company"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Company"> | Date | string
   jobPostings?: Prisma.JobPostingListRelationFilter
@@ -386,11 +470,18 @@ export type CompanyOrderByWithAggregationInput = {
   normalizedTaxIdentifier?: Prisma.SortOrderInput | Prisma.SortOrder
   verificationState?: Prisma.SortOrder
   verificationInactiveAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  moderationState?: Prisma.SortOrder
+  moderationVersion?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationStateBeforeBan?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedAtBeforeBan?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.CompanyCountOrderByAggregateInput
+  _avg?: Prisma.CompanyAvgOrderByAggregateInput
   _max?: Prisma.CompanyMaxOrderByAggregateInput
   _min?: Prisma.CompanyMinOrderByAggregateInput
+  _sum?: Prisma.CompanySumOrderByAggregateInput
 }
 
 export type CompanyScalarWhereWithAggregatesInput = {
@@ -413,6 +504,11 @@ export type CompanyScalarWhereWithAggregatesInput = {
   normalizedTaxIdentifier?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateWithAggregatesFilter<"Company"> | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Company"> | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateWithAggregatesFilter<"Company"> | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntWithAggregatesFilter<"Company"> | number
+  bannedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Company"> | Date | string | null
+  verificationStateBeforeBan?: Prisma.EnumCompanyVerificationStateNullableWithAggregatesFilter<"Company"> | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.DateTimeNullableWithAggregatesFilter<"Company"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Company"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Company"> | Date | string
 }
@@ -434,6 +530,11 @@ export type CompanyCreateInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
@@ -467,6 +568,11 @@ export type CompanyUncheckedCreateInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
@@ -500,6 +606,11 @@ export type CompanyUpdateInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
@@ -533,6 +644,11 @@ export type CompanyUncheckedUpdateInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
@@ -566,6 +682,11 @@ export type CompanyCreateManyInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -587,6 +708,11 @@ export type CompanyUpdateManyMutationInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -608,6 +734,11 @@ export type CompanyUncheckedUpdateManyInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -629,8 +760,17 @@ export type CompanyCountOrderByAggregateInput = {
   normalizedTaxIdentifier?: Prisma.SortOrder
   verificationState?: Prisma.SortOrder
   verificationInactiveAt?: Prisma.SortOrder
+  moderationState?: Prisma.SortOrder
+  moderationVersion?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrder
+  verificationStateBeforeBan?: Prisma.SortOrder
+  verifiedAtBeforeBan?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type CompanyAvgOrderByAggregateInput = {
+  moderationVersion?: Prisma.SortOrder
 }
 
 export type CompanyMaxOrderByAggregateInput = {
@@ -650,6 +790,11 @@ export type CompanyMaxOrderByAggregateInput = {
   normalizedTaxIdentifier?: Prisma.SortOrder
   verificationState?: Prisma.SortOrder
   verificationInactiveAt?: Prisma.SortOrder
+  moderationState?: Prisma.SortOrder
+  moderationVersion?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrder
+  verificationStateBeforeBan?: Prisma.SortOrder
+  verifiedAtBeforeBan?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -671,8 +816,17 @@ export type CompanyMinOrderByAggregateInput = {
   normalizedTaxIdentifier?: Prisma.SortOrder
   verificationState?: Prisma.SortOrder
   verificationInactiveAt?: Prisma.SortOrder
+  moderationState?: Prisma.SortOrder
+  moderationVersion?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrder
+  verificationStateBeforeBan?: Prisma.SortOrder
+  verifiedAtBeforeBan?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type CompanySumOrderByAggregateInput = {
+  moderationVersion?: Prisma.SortOrder
 }
 
 export type CompanyScalarRelationFilter = {
@@ -687,6 +841,14 @@ export type CompanyNullableScalarRelationFilter = {
 
 export type EnumCompanyVerificationStateFieldUpdateOperationsInput = {
   set?: $Enums.CompanyVerificationState
+}
+
+export type EnumCompanyModerationStateFieldUpdateOperationsInput = {
+  set?: $Enums.CompanyModerationState
+}
+
+export type NullableEnumCompanyVerificationStateFieldUpdateOperationsInput = {
+  set?: $Enums.CompanyVerificationState | null
 }
 
 export type CompanyCreateNestedOneWithoutInvitationsInput = {
@@ -878,6 +1040,11 @@ export type CompanyCreateWithoutInvitationsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
@@ -910,6 +1077,11 @@ export type CompanyUncheckedCreateWithoutInvitationsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
@@ -958,6 +1130,11 @@ export type CompanyUpdateWithoutInvitationsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
@@ -990,6 +1167,11 @@ export type CompanyUncheckedUpdateWithoutInvitationsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
@@ -1022,6 +1204,11 @@ export type CompanyCreateWithoutTeamActivitiesInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
@@ -1054,6 +1241,11 @@ export type CompanyUncheckedCreateWithoutTeamActivitiesInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
@@ -1102,6 +1294,11 @@ export type CompanyUpdateWithoutTeamActivitiesInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
@@ -1134,6 +1331,11 @@ export type CompanyUncheckedUpdateWithoutTeamActivitiesInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
@@ -1166,6 +1368,11 @@ export type CompanyCreateWithoutMembershipsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
@@ -1198,6 +1405,11 @@ export type CompanyUncheckedCreateWithoutMembershipsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
@@ -1246,6 +1458,11 @@ export type CompanyUpdateWithoutMembershipsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
@@ -1278,6 +1495,11 @@ export type CompanyUncheckedUpdateWithoutMembershipsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
@@ -1310,6 +1532,11 @@ export type CompanyCreateWithoutAccessPrerequisitesInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
@@ -1342,6 +1569,11 @@ export type CompanyUncheckedCreateWithoutAccessPrerequisitesInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
@@ -1390,6 +1622,11 @@ export type CompanyUpdateWithoutAccessPrerequisitesInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
@@ -1422,6 +1659,11 @@ export type CompanyUncheckedUpdateWithoutAccessPrerequisitesInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
@@ -1454,6 +1696,11 @@ export type CompanyCreateWithoutRecruiterVerificationRequestsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
@@ -1486,6 +1733,11 @@ export type CompanyUncheckedCreateWithoutRecruiterVerificationRequestsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
@@ -1534,6 +1786,11 @@ export type CompanyUpdateWithoutRecruiterVerificationRequestsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
@@ -1566,6 +1823,11 @@ export type CompanyUncheckedUpdateWithoutRecruiterVerificationRequestsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
@@ -1598,6 +1860,11 @@ export type CompanyCreateWithoutJobPostingsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostingViewFacts?: Prisma.JobPostingViewFactCreateNestedManyWithoutCompanyInput
@@ -1630,6 +1897,11 @@ export type CompanyUncheckedCreateWithoutJobPostingsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostingViewFacts?: Prisma.JobPostingViewFactUncheckedCreateNestedManyWithoutCompanyInput
@@ -1678,6 +1950,11 @@ export type CompanyUpdateWithoutJobPostingsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostingViewFacts?: Prisma.JobPostingViewFactUpdateManyWithoutCompanyNestedInput
@@ -1710,6 +1987,11 @@ export type CompanyUncheckedUpdateWithoutJobPostingsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostingViewFacts?: Prisma.JobPostingViewFactUncheckedUpdateManyWithoutCompanyNestedInput
@@ -1742,6 +2024,11 @@ export type CompanyCreateWithoutJobPostReviewAggregatesInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
@@ -1774,6 +2061,11 @@ export type CompanyUncheckedCreateWithoutJobPostReviewAggregatesInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
@@ -1822,6 +2114,11 @@ export type CompanyUpdateWithoutJobPostReviewAggregatesInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
@@ -1854,6 +2151,11 @@ export type CompanyUncheckedUpdateWithoutJobPostReviewAggregatesInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
@@ -1886,6 +2188,11 @@ export type CompanyCreateWithoutRecruitmentThreadsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
@@ -1918,6 +2225,11 @@ export type CompanyUncheckedCreateWithoutRecruitmentThreadsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
@@ -1966,6 +2278,11 @@ export type CompanyUpdateWithoutRecruitmentThreadsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
@@ -1998,6 +2315,11 @@ export type CompanyUncheckedUpdateWithoutRecruitmentThreadsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
@@ -2030,6 +2352,11 @@ export type CompanyCreateWithoutMessagingConversationsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
@@ -2062,6 +2389,11 @@ export type CompanyUncheckedCreateWithoutMessagingConversationsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
@@ -2110,6 +2442,11 @@ export type CompanyUpdateWithoutMessagingConversationsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
@@ -2142,6 +2479,11 @@ export type CompanyUncheckedUpdateWithoutMessagingConversationsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
@@ -2174,6 +2516,11 @@ export type CompanyCreateWithoutJobPostingViewFactsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
@@ -2206,6 +2553,11 @@ export type CompanyUncheckedCreateWithoutJobPostingViewFactsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
@@ -2254,6 +2606,11 @@ export type CompanyUpdateWithoutJobPostingViewFactsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
@@ -2286,6 +2643,11 @@ export type CompanyUncheckedUpdateWithoutJobPostingViewFactsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
@@ -2318,6 +2680,11 @@ export type CompanyCreateWithoutJobPostingLifecycleFactsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
@@ -2350,6 +2717,11 @@ export type CompanyUncheckedCreateWithoutJobPostingLifecycleFactsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
@@ -2398,6 +2770,11 @@ export type CompanyUpdateWithoutJobPostingLifecycleFactsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
@@ -2430,6 +2807,11 @@ export type CompanyUncheckedUpdateWithoutJobPostingLifecycleFactsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
@@ -2462,6 +2844,11 @@ export type CompanyCreateWithoutAnalyticsExportsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingCreateNestedManyWithoutCompanyInput
@@ -2494,6 +2881,11 @@ export type CompanyUncheckedCreateWithoutAnalyticsExportsInput = {
   normalizedTaxIdentifier?: string | null
   verificationState?: $Enums.CompanyVerificationState
   verificationInactiveAt?: Date | string | null
+  moderationState?: $Enums.CompanyModerationState
+  moderationVersion?: number
+  bannedAt?: Date | string | null
+  verificationStateBeforeBan?: $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   jobPostings?: Prisma.JobPostingUncheckedCreateNestedManyWithoutCompanyInput
@@ -2542,6 +2934,11 @@ export type CompanyUpdateWithoutAnalyticsExportsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUpdateManyWithoutCompanyNestedInput
@@ -2574,6 +2971,11 @@ export type CompanyUncheckedUpdateWithoutAnalyticsExportsInput = {
   normalizedTaxIdentifier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationState?: Prisma.EnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState
   verificationInactiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderationState?: Prisma.EnumCompanyModerationStateFieldUpdateOperationsInput | $Enums.CompanyModerationState
+  moderationVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationStateBeforeBan?: Prisma.NullableEnumCompanyVerificationStateFieldUpdateOperationsInput | $Enums.CompanyVerificationState | null
+  verifiedAtBeforeBan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jobPostings?: Prisma.JobPostingUncheckedUpdateManyWithoutCompanyNestedInput
@@ -2736,6 +3138,11 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   normalizedTaxIdentifier?: boolean
   verificationState?: boolean
   verificationInactiveAt?: boolean
+  moderationState?: boolean
+  moderationVersion?: boolean
+  bannedAt?: boolean
+  verificationStateBeforeBan?: boolean
+  verifiedAtBeforeBan?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   jobPostings?: boolean | Prisma.Company$jobPostingsArgs<ExtArgs>
@@ -2770,6 +3177,11 @@ export type CompanySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   normalizedTaxIdentifier?: boolean
   verificationState?: boolean
   verificationInactiveAt?: boolean
+  moderationState?: boolean
+  moderationVersion?: boolean
+  bannedAt?: boolean
+  verificationStateBeforeBan?: boolean
+  verifiedAtBeforeBan?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["company"]>
@@ -2791,6 +3203,11 @@ export type CompanySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   normalizedTaxIdentifier?: boolean
   verificationState?: boolean
   verificationInactiveAt?: boolean
+  moderationState?: boolean
+  moderationVersion?: boolean
+  bannedAt?: boolean
+  verificationStateBeforeBan?: boolean
+  verifiedAtBeforeBan?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["company"]>
@@ -2812,11 +3229,16 @@ export type CompanySelectScalar = {
   normalizedTaxIdentifier?: boolean
   verificationState?: boolean
   verificationInactiveAt?: boolean
+  moderationState?: boolean
+  moderationVersion?: boolean
+  bannedAt?: boolean
+  verificationStateBeforeBan?: boolean
+  verifiedAtBeforeBan?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "legalName" | "displayName" | "entityType" | "logoUrl" | "websiteUrl" | "publicDescription" | "publicLocation" | "size" | "industry" | "address" | "verifiedAt" | "normalizedTaxIdentifier" | "verificationState" | "verificationInactiveAt" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
+export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "legalName" | "displayName" | "entityType" | "logoUrl" | "websiteUrl" | "publicDescription" | "publicLocation" | "size" | "industry" | "address" | "verifiedAt" | "normalizedTaxIdentifier" | "verificationState" | "verificationInactiveAt" | "moderationState" | "moderationVersion" | "bannedAt" | "verificationStateBeforeBan" | "verifiedAtBeforeBan" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
 export type CompanyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jobPostings?: boolean | Prisma.Company$jobPostingsArgs<ExtArgs>
   jobPostingViewFacts?: boolean | Prisma.Company$jobPostingViewFactsArgs<ExtArgs>
@@ -2868,6 +3290,11 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     normalizedTaxIdentifier: string | null
     verificationState: $Enums.CompanyVerificationState
     verificationInactiveAt: Date | null
+    moderationState: $Enums.CompanyModerationState
+    moderationVersion: number
+    bannedAt: Date | null
+    verificationStateBeforeBan: $Enums.CompanyVerificationState | null
+    verifiedAtBeforeBan: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["company"]>
@@ -3321,6 +3748,11 @@ export interface CompanyFieldRefs {
   readonly normalizedTaxIdentifier: Prisma.FieldRef<"Company", 'String'>
   readonly verificationState: Prisma.FieldRef<"Company", 'CompanyVerificationState'>
   readonly verificationInactiveAt: Prisma.FieldRef<"Company", 'DateTime'>
+  readonly moderationState: Prisma.FieldRef<"Company", 'CompanyModerationState'>
+  readonly moderationVersion: Prisma.FieldRef<"Company", 'Int'>
+  readonly bannedAt: Prisma.FieldRef<"Company", 'DateTime'>
+  readonly verificationStateBeforeBan: Prisma.FieldRef<"Company", 'CompanyVerificationState'>
+  readonly verifiedAtBeforeBan: Prisma.FieldRef<"Company", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Company", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Company", 'DateTime'>
 }
