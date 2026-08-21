@@ -3,6 +3,11 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY web/package.json web/package.json
 RUN npm ci --omit=dev --ignore-scripts --workspace @smarthire/web
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl gnupg \
+ && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql.gpg \
+ && echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+ && apt-get update && apt-get install -y --no-install-recommends postgresql-client-16 \
+ && rm -rf /var/lib/apt/lists/*
 COPY web web
 RUN install -d -o node -g node -m 0700 /app/.local/admin-evidence
 USER node

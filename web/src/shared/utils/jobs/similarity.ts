@@ -29,10 +29,11 @@ export type CandidateJobProfile = {
 };
 
 const weights = {
-  category: 0.4,
+  category: 0.35,
   skills: 0.25,
+  title: 0.1,
   location: 0.15,
-  salary: 0.1,
+  salary: 0.05,
   experience: 0.1,
 } as const;
 
@@ -127,7 +128,40 @@ function locationSimilarity(
 ) {
   const currentCity = normalized(current.city);
   const candidateCity = normalized(candidate.city);
-  return currentCity && currentCity === candidateCity ? 1 : 0;
+  if (!currentCity || !candidateCity) return 0;
+  if (currentCity === candidateCity) return 1;
+
+  // A profile often records just a province while a job post includes a
+  // district and city. Compare meaningful place tokens so these two forms do
+  // not look unrelated, while avoiding generic administrative words.
+  const ignoredTokens = new Set([
+    "city",
+    "district",
+    "province",
+    "ward",
+    "commune",
+    "town",
+    "thanh",
+    "pho",
+    "quan",
+    "huyen",
+    "thi",
+    "xa",
+    "tp",
+  ]);
+  const tokens = (value: string) =>
+    new Set(
+      value
+        .split(" ")
+        .filter((token) => token.length > 1 && !ignoredTokens.has(token)),
+    );
+  const currentTokens = tokens(currentCity);
+  const candidateTokens = tokens(candidateCity);
+  if (!currentTokens.size || !candidateTokens.size) return 0;
+  const overlap = [...currentTokens].filter((token) =>
+    candidateTokens.has(token),
+  ).length;
+  return overlap / Math.max(currentTokens.size, candidateTokens.size);
 }
 
 function midpoint(
@@ -166,17 +200,74 @@ function experienceSimilarity(
   return difference <= 2 ? 1 - difference / 2 : 0;
 }
 
+export type MatchScoreBreakdown = Readonly<{
+  roleAndSkills: number;
+  preferences: number;
+  experience: number;
+}>;
+
+export type MatchScoreDetails = Readonly<{
+  score: number;
+  breakdown: MatchScoreBreakdown;
+}>;
+
+function roundedContributionPoints(
+  values: Readonly<Record<keyof MatchScoreBreakdown, number>>,
+  score: number,
+): MatchScoreBreakdown {
+  const keys = Object.keys(values) as (keyof MatchScoreBreakdown)[];
+  const points = keys.map((key) => ({
+    key,
+    raw: values[key] * 100,
+  }));
+  const rounded = new Map(
+    points.map((item) => [item.key, Math.floor(item.raw)]),
+  );
+  let remaining =
+    score - [...rounded.values()].reduce((sum, value) => sum + value, 0);
+  for (const item of [...points].sort(
+    (left, right) =>
+      right.raw - Math.floor(right.raw) - (left.raw - Math.floor(left.raw)),
+  )) {
+    if (remaining <= 0) break;
+    rounded.set(item.key, (rounded.get(item.key) ?? 0) + 1);
+    remaining -= 1;
+  }
+  return {
+    roleAndSkills: rounded.get("roleAndSkills") ?? 0,
+    preferences: rounded.get("preferences") ?? 0,
+    experience: rounded.get("experience") ?? 0,
+  };
+}
+
+export function computeMatchScoreDetails(
+  current: JobSimilarityInput | CandidateJobProfile,
+  candidate: JobSimilarityInput | CandidateJobProfile,
+): MatchScoreDetails {
+  const roleAndSkills =
+    categorySimilarity(current, candidate) * weights.category +
+    skillSimilarity(current, candidate) * weights.skills +
+    titleSimilarity(current, candidate) * weights.title;
+  const preferences =
+    locationSimilarity(current, candidate) * weights.location +
+    salarySimilarity(current, candidate) * weights.salary;
+  const experience =
+    experienceSimilarity(current, candidate) * weights.experience;
+  const score = Math.round((roleAndSkills + preferences + experience) * 100);
+  return {
+    score,
+    breakdown: roundedContributionPoints(
+      { roleAndSkills, preferences, experience },
+      score,
+    ),
+  };
+}
+
 export function computeMatchScore(
   current: JobSimilarityInput | CandidateJobProfile,
   candidate: JobSimilarityInput | CandidateJobProfile,
 ) {
-  const score =
-    categorySimilarity(current, candidate) * weights.category +
-    skillSimilarity(current, candidate) * weights.skills +
-    locationSimilarity(current, candidate) * weights.location +
-    salarySimilarity(current, candidate) * weights.salary +
-    experienceSimilarity(current, candidate) * weights.experience;
-  return Math.round(score * 100);
+  return computeMatchScoreDetails(current, candidate).score;
 }
 
 const discoveryWeights = {

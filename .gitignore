@@ -82,3 +82,11 @@ node_modules
 
 # TypeScript build cache
 web/tsconfig.tsbuildinfo
+
+# backup worker
+**/backup-worker/.next/
+./backup-worker/
+
+# Local Google Drive backup credentials
+/SmartHireBackup/
+/backupwoker/

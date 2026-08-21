@@ -320,6 +320,26 @@ export class JobDiscoveryService {
     };
   }
 
+  /**
+   * Returns every currently candidate-visible posting for a server-side
+   * recommendation calculation. This deliberately has no page-size limit:
+   * callers must rank the collection on the server and project only the
+   * selected results to a page.
+   */
+  async listRecommendationCandidates(actor: JobActor, now = new Date()) {
+    const repository =
+      this.repository ??
+      new (
+        await import("@/backend/repositories/jobs/prisma-public-job-repository")
+      ).PrismaPublicJobRepository();
+    if (!repository.findPublicRecommendationCandidates) return [];
+    const rows = await repository.findPublicRecommendationCandidates(
+      actor.kind === "user" ? actor.userId : null,
+      now,
+    );
+    return rows.map((row) => card(row, actor, now));
+  }
+
   async detail(
     rawSlug: unknown,
     actor: JobActor,

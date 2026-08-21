@@ -12,6 +12,8 @@ import type {
   PrivateMatchResponse,
   PrivateMatchStatus,
 } from "@/shared/contracts/private-cv-match";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { privateMatchCopy } from "../i18n/private-match-copy";
 import {
   privateMatchErrorMessage,
   usePrivateCvMatch,
@@ -29,18 +31,17 @@ import {
 } from "./private-match-shared";
 
 function LoadingScreen({ data }: { data?: PrivateMatchStatus }) {
+  const copy = privateMatchCopy(useWorkspaceLocale());
   const job = data?.job;
   return (
     <main className="private-match-page" aria-busy="true" aria-live="polite">
       <div className="private-match-breadcrumb">
-        CV Match Check <span>/</span> Analysis
+        {copy.common.cvMatchCheck} <span>/</span> {copy.common.analysis}
       </div>
       <div className="private-match-title-row">
         <div>
-          <h1>Analyzing your CV</h1>
-          <p>
-            SmartHire is comparing the selected CV with the job requirements.
-          </p>
+          <h1>{copy.pageStates.analyzingTitle}</h1>
+          <p>{copy.pageStates.analyzingDescription}</p>
         </div>
         <PrivateMatchStatusBadge state="analyzing" />
       </div>
@@ -50,24 +51,20 @@ function LoadingScreen({ data }: { data?: PrivateMatchStatus }) {
           <LoaderCircle className="private-match-spin" />
         </span>
         <div>
-          <span className="private-match-card-label">PROCESSING</span>
-          <h2>SmartHire is checking your CV evidence</h2>
-          <p>
-            This private analysis compares skills, experience and evidence with
-            the selected job. It does not change your profile or application.
-          </p>
-          <strong>
-            You can leave this page — we&apos;ll save the result when it&apos;s
-            ready.
-          </strong>
+          <span className="private-match-card-label">
+            {copy.pageStates.processing}
+          </span>
+          <h2>{copy.pageStates.processingTitle}</h2>
+          <p>{copy.pageStates.processingDescription}</p>
+          <strong>{copy.pageStates.processingNote}</strong>
         </div>
       </section>
       <div className="private-match-columns">
         <div className="private-match-main-column">
           <section className="private-match-card">
-            <h2>Analysis progress</h2>
+            <h2>{copy.pageStates.progressTitle}</h2>
             <p className="private-match-section-intro">
-              Each stage completes safely before the report is published.
+              {copy.pageStates.progressDescription}
             </p>
             <PrivateMatchAnalysisSteps
               activeStep={data?.state === "ANALYZING" ? 2 : 1}
@@ -77,11 +74,8 @@ function LoadingScreen({ data }: { data?: PrivateMatchStatus }) {
         <aside className="private-match-sidebar">
           <PrivateMatchSelectedJobCard job={job} />
           <section className="private-match-card">
-            <h2>What happens next</h2>
-            <p>
-              When the analysis is complete, you can review the preview before
-              choosing whether to apply.
-            </p>
+            <h2>{copy.pageStates.nextTitle}</h2>
+            <p>{copy.pageStates.nextDescription}</p>
           </section>
           <PrivateMatchPrivacyCard />
         </aside>
@@ -91,28 +85,26 @@ function LoadingScreen({ data }: { data?: PrivateMatchStatus }) {
 }
 
 function FailedScreen({ retryHref }: { retryHref: string }) {
+  const copy = privateMatchCopy(useWorkspaceLocale());
   return (
     <main className="private-match-page private-match-state-page">
       <div className="private-match-breadcrumb">
-        CV Match Check <span>/</span> Analysis
+        {copy.common.cvMatchCheck} <span>/</span> {copy.common.analysis}
       </div>
       <section className="private-match-limit-card" role="alert">
         <TriangleAlert aria-hidden="true" />
         <div>
-          <h1>We could not finish this private check</h1>
-          <p>
-            The report was not published because the source evidence could not
-            be analyzed safely.
-          </p>
+          <h1>{copy.pageStates.failedTitle}</h1>
+          <p>{copy.pageStates.failedDescription}</p>
           <div className="private-match-state-actions">
             <Link className="private-match-primary-button" href={retryHref}>
-              <RefreshCw aria-hidden="true" /> Try again
+              <RefreshCw aria-hidden="true" /> {copy.common.tryAgain}
             </Link>
             <Link
               className="private-match-secondary-button"
               href="/cv-match-check"
             >
-              Back to CV Match Check
+              {copy.common.backToCheck}
             </Link>
           </div>
         </div>
@@ -122,28 +114,29 @@ function FailedScreen({ retryHref }: { retryHref: string }) {
 }
 
 function UnavailableScreen() {
+  const copy = privateMatchCopy(useWorkspaceLocale());
   return (
     <main className="private-match-page private-match-state-page">
       <div className="private-match-breadcrumb">
-        CV Match Check <span>/</span> Report
+        {copy.common.cvMatchCheck} <span>/</span> {copy.common.report}
       </div>
       <section className="private-match-limit-card" role="status">
         <TriangleAlert aria-hidden="true" />
         <div>
-          <h1>This match check is no longer available.</h1>
-          <p>This private preview can no longer be opened.</p>
+          <h1>{copy.pageStates.unavailableTitle}</h1>
+          <p>{copy.pageStates.unavailableDescription}</p>
           <div className="private-match-state-actions">
             <Link
               className="private-match-primary-button"
               href="/cv-match-check/new"
             >
-              Start a new check
+              {copy.pageStates.startNew}
             </Link>
             <Link
               className="private-match-secondary-button"
               href="/cv-match-check"
             >
-              Back to CV Match Check
+              {copy.common.backToCheck}
             </Link>
           </div>
         </div>
@@ -153,19 +146,20 @@ function UnavailableScreen() {
 }
 
 function NetworkErrorScreen({ onRetry }: { onRetry: () => void }) {
+  const copy = privateMatchCopy(useWorkspaceLocale());
   return (
     <main className="private-match-page private-match-state-page">
-      <div className="private-match-breadcrumb">CV Match Check</div>
+      <div className="private-match-breadcrumb">{copy.common.cvMatchCheck}</div>
       <section className="private-match-card private-match-empty" role="alert">
         <AlertCircle aria-hidden="true" />
-        <h1>We could not load this report</h1>
-        <p>Please try again. Your private preview has not been changed.</p>
+        <h1>{copy.pageStates.loadErrorTitle}</h1>
+        <p>{copy.pageStates.loadErrorDescription}</p>
         <button
           className="private-match-primary-button"
           type="button"
           onClick={onRetry}
         >
-          <RefreshCw aria-hidden="true" /> Try again
+          <RefreshCw aria-hidden="true" /> {copy.common.tryAgain}
         </button>
       </section>
     </main>
@@ -173,6 +167,8 @@ function NetworkErrorScreen({ onRetry }: { onRetry: () => void }) {
 }
 
 export function PrivateMatchPageClient({ checkId }: { checkId: string }) {
+  const locale = useWorkspaceLocale();
+  const copy = privateMatchCopy(locale);
   const query = usePrivateCvMatch(checkId);
   const retry = useRetryPrivateCvMatch(checkId);
   const [opened, setOpened] = useState(false);
@@ -238,9 +234,9 @@ export function PrivateMatchPageClient({ checkId }: { checkId: string }) {
         retrying={retry.isPending}
         retryError={
           retry.error
-            ? privateMatchErrorMessage(retry.error)
+            ? privateMatchErrorMessage(retry.error, locale)
             : retryRequested && retryWasRunning && !data.retryInProgress
-              ? "AI evaluation is still unavailable. Your deterministic report remains available; try again later."
+              ? copy.pageStates.retryUnavailable
               : undefined
         }
       />
@@ -253,7 +249,7 @@ export function PrivateMatchPageClient({ checkId }: { checkId: string }) {
       onRetry={() => void retryAi()}
       retrying={retry.isPending}
       retryError={
-        retry.error ? privateMatchErrorMessage(retry.error) : undefined
+        retry.error ? privateMatchErrorMessage(retry.error, locale) : undefined
       }
     />
   );

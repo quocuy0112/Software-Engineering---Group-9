@@ -9,35 +9,22 @@ import {
   LockKeyhole,
 } from "lucide-react";
 import type { PrivateMatchJob } from "@/shared/contracts/private-cv-match";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import {
+  privateMatchCopy,
+  type PrivateMatchLocale,
+} from "../i18n/private-match-copy";
 
-const analysisSteps = [
-  ["Read your CV", "Extracted skills, experience and project evidence."],
-  ["Understand the job", "Mapped required and preferred qualifications."],
-  ["Compare evidence", "Checked each requirement against CV evidence."],
-  ["Prepare guidance", "Generated an explainable score and improvement plan."],
-] as const;
-
-const employmentTypeLabels: Record<string, string> = {
-  CONTRACT: "Contract",
-  FULL_TIME: "Full-time",
-  INTERNSHIP: "Internship",
-  PART_TIME: "Part-time",
-  TEMPORARY: "Temporary",
-};
-
-const workArrangementLabels: Record<string, string> = {
-  HYBRID: "Hybrid",
-  ON_SITE: "On-site",
-  ONSITE: "On-site",
-  REMOTE: "Remote",
-};
-
-export function formatEmploymentType(value: string) {
+export function formatEmploymentType(
+  value: string,
+  locale: PrivateMatchLocale = "en",
+) {
   const normalized = value
     .trim()
     .replace(/[\s-]+/gu, "_")
     .toUpperCase();
-  const knownLabel = employmentTypeLabels[normalized];
+  const employment = privateMatchCopy(locale).job.employment;
+  const knownLabel = employment[normalized as keyof typeof employment];
   if (knownLabel) return knownLabel;
   return normalized
     .toLowerCase()
@@ -47,12 +34,16 @@ export function formatEmploymentType(value: string) {
     .join(" ");
 }
 
-export function formatWorkArrangement(value: string) {
+export function formatWorkArrangement(
+  value: string,
+  locale: PrivateMatchLocale = "en",
+) {
   const normalized = value
     .trim()
     .replace(/[\s-]+/gu, "_")
     .toUpperCase();
-  const knownLabel = workArrangementLabels[normalized];
+  const arrangement = privateMatchCopy(locale).job.arrangement;
+  const knownLabel = arrangement[normalized as keyof typeof arrangement];
   if (knownLabel) return knownLabel;
   return normalized
     .toLowerCase()
@@ -62,10 +53,14 @@ export function formatWorkArrangement(value: string) {
     .join(" ");
 }
 
-export function formatExperienceRequirement(value: number | null) {
-  if (value === null) return "Experience flexible";
-  if (value === 0) return "Entry level";
-  return `${value}+ years`;
+export function formatExperienceRequirement(
+  value: number | null,
+  locale: PrivateMatchLocale = "en",
+) {
+  const copy = privateMatchCopy(locale).job;
+  if (value === null) return copy.flexibleExperience;
+  if (value === 0) return copy.entryLevel;
+  return copy.experience(value);
 }
 
 export function PrivateMatchStatusBadge({
@@ -73,6 +68,7 @@ export function PrivateMatchStatusBadge({
 }: {
   state: "analyzing" | "completed";
 }) {
+  const copy = privateMatchCopy(useWorkspaceLocale());
   const analyzing = state === "analyzing";
   const Icon = analyzing ? LoaderCircle : Clock3;
   return (
@@ -84,7 +80,7 @@ export function PrivateMatchStatusBadge({
         aria-hidden="true"
         className={analyzing ? "private-match-spin" : undefined}
       />
-      {analyzing ? "Analysis in progress" : "Completed just now"}
+      {analyzing ? copy.status.analyzing : copy.status.completed}
     </span>
   );
 }
@@ -104,15 +100,16 @@ export function PrivateMatchJobTags({
 }: {
   job: Pick<PrivateMatchJob, "employmentType" | "requiredExperienceYears">;
 }) {
+  const locale = useWorkspaceLocale();
   return (
     <div className="private-match-chip-group private-match-job-tags">
       <span className="private-match-chip private-match-job-tag">
         <Clock3 aria-hidden="true" />
-        {formatEmploymentType(job.employmentType)}
+        {formatEmploymentType(job.employmentType, locale)}
       </span>
       <span className="private-match-chip private-match-job-tag">
         <CalendarDays aria-hidden="true" />
-        {formatExperienceRequirement(job.requiredExperienceYears)}
+        {formatExperienceRequirement(job.requiredExperienceYears, locale)}
       </span>
     </div>
   );
@@ -123,12 +120,13 @@ export function PrivateMatchSelectedJobCard({
 }: {
   job?: PrivateMatchJobSummary | null;
 }) {
+  const copy = privateMatchCopy(useWorkspaceLocale());
   return (
     <section
       className="private-match-card private-match-selected-job-card"
       aria-busy={!job}
     >
-      <div className="private-match-card-label">SELECTED JOB</div>
+      <div className="private-match-card-label">{copy.job.selected}</div>
       {job ? (
         <>
           <h2>{job.title}</h2>
@@ -137,7 +135,7 @@ export function PrivateMatchSelectedJobCard({
           </p>
           <PrivateMatchJobTags job={job} />
           <small className="private-match-sidebar-source">
-            SmartHire job post · Version {job.jdVersion}
+            {copy.job.source(job.jdVersion)}
           </small>
         </>
       ) : (
@@ -152,21 +150,21 @@ export function PrivateMatchSelectedJobCard({
 }
 
 export function PrivateMatchPrivacyCard() {
+  const copy = privateMatchCopy(useWorkspaceLocale());
   return (
     <section className="private-match-card private-match-privacy-assurance-card">
       <h2>
-        <LockKeyhole aria-hidden="true" /> Private and fair by design
+        <LockKeyhole aria-hidden="true" /> {copy.privacy.title}
       </h2>
       <ul className="private-match-check-list">
         <li>
-          <Check aria-hidden="true" /> Only you can see this report.
+          <Check aria-hidden="true" /> {copy.privacy.onlyYou}
         </li>
         <li>
-          <Check aria-hidden="true" /> Sensitive personal attributes are
-          excluded.
+          <Check aria-hidden="true" /> {copy.privacy.sensitiveExcluded}
         </li>
         <li>
-          <Check aria-hidden="true" /> The report is not sent to recruiters.
+          <Check aria-hidden="true" /> {copy.privacy.notSent}
         </li>
       </ul>
     </section>
@@ -174,9 +172,10 @@ export function PrivateMatchPrivacyCard() {
 }
 
 export function PrivateMatchStepper({ activeStep }: { activeStep: 1 | 2 | 3 }) {
-  const labels = ["Choose job and CV", "Analyze evidence", "Review report"];
+  const copy = privateMatchCopy(useWorkspaceLocale());
+  const labels = copy.stepper.labels;
   return (
-    <ol className="private-match-stepper" aria-label="Assessment steps">
+    <ol className="private-match-stepper" aria-label={copy.stepper.aria}>
       {labels.map((label, index) => {
         const step = (index + 1) as 1 | 2 | 3;
         const complete = step < activeStep;
@@ -191,7 +190,7 @@ export function PrivateMatchStepper({ activeStep }: { activeStep: 1 | 2 | 3 }) {
           >
             <span aria-hidden="true">{complete ? <Check /> : step}</span>
             <div>
-              <small>Step {step}</small>
+              <small>{copy.common.step(step)}</small>
               <strong>{label}</strong>
             </div>
           </li>
@@ -206,9 +205,10 @@ export function PrivateMatchAnalysisSteps({
 }: {
   activeStep?: 1 | 2 | 3 | 4;
 }) {
+  const copy = privateMatchCopy(useWorkspaceLocale());
   return (
     <ol className="private-match-analysis-list">
-      {analysisSteps.map(([title, description], index) => {
+      {copy.analysisSteps.map(([title, description], index) => {
         const step = index + 1;
         const allComplete = activeStep === 4;
         const complete = allComplete || step < activeStep;
@@ -246,7 +246,11 @@ export function PrivateMatchAnalysisSteps({
               ) : (
                 <Clock3 aria-hidden="true" />
               )}
-              {complete ? "Complete" : current ? "In progress" : "Next"}
+              {complete
+                ? copy.common.complete
+                : current
+                  ? copy.common.inProgress
+                  : copy.common.next}
             </span>
           </li>
         );

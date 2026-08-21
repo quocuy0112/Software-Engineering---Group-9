@@ -50,7 +50,6 @@ describe("candidate CV Match Check entry points", () => {
       setupRoute,
       setupRouteComponent,
       jobSearchRoute,
-      privateMatchService,
       setup,
       matchLayout,
       workspaceLayout,
@@ -84,13 +83,6 @@ describe("candidate CV Match Check entry points", () => {
       readFile(
         resolve(
           sourceRoot,
-          "backend/private-cv-match/private-cv-match-service.ts",
-        ),
-        "utf8",
-      ),
-      readFile(
-        resolve(
-          sourceRoot,
           "frontend/features/private-cv-match/components/private-match-setup.tsx",
         ),
         "utf8",
@@ -112,24 +104,10 @@ describe("candidate CV Match Check entry points", () => {
     expect(jobSearchRoute).toContain("searchEligiblePrivateMatchJobs");
     expect(jobSearchRoute).toContain("privateMatchJobsResponseSchema");
     expect(setupRoute).not.toContain("readJobWorkspaceSnapshot");
-    expect(privateMatchService).toContain("findEligiblePrivateMatchJob");
-    expect(privateMatchService).toContain("approvedAt: { not: null }");
-    expect(privateMatchService).toContain(
-      'verificationState: { not: "INACTIVE" as const }',
-    );
     expect(setup).toContain("initialJobId");
     expect(setup).toContain("requestedJobIsUnavailable");
     expect(setup).toContain("requestedCvIsUnavailable");
-    expect(setup).toContain("Target job description");
-    expect(setup).toContain("Current job");
-    expect(setup).toContain("Find a job by keyword or company");
     expect(setup).toContain("private-match-job-search");
-    expect(setup).toContain("Key requirements found");
-    expect(setup).toContain("CV to assess");
-    expect(setup).toContain("Current CV");
-    expect(setup).toContain("Choose a CV from your profile");
-    expect(setup).toContain("Import a CV from your device");
-    expect(setup).toContain("Choose local file");
     expect(setup).toContain("/api/account/candidate-cvs");
     expect(setup).toContain("mutateWithCurrentCsrf");
     expect(setup).not.toContain("/profile/cv-imports/${");

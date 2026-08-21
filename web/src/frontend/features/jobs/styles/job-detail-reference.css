@@ -74,7 +74,7 @@
   border-radius: 14px;
   color: #122b8c;
   background: #dee8ff;
-  font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif;
+  font-family: "Be Vietnam Pro", sans-serif;
   font-size: 16px;
 }
 
@@ -89,7 +89,7 @@
 
 .job-detail-board-page .job-detail-eyebrow,
 .job-detail-board-page .panel-kicker {
-  font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif;
+  font-family: "Be Vietnam Pro", sans-serif;
   font-weight: 600;
   letter-spacing: 0.08em;
 }
@@ -144,7 +144,7 @@
 
 .job-detail-board-page .job-detail-salary-line strong {
   color: #2954e5;
-  font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif;
+  font-family: "Be Vietnam Pro", sans-serif;
   font-size: 26px;
   font-weight: 700;
 }
@@ -339,7 +339,7 @@
 .job-detail-sidebar--board .job-similar-jobs-card .panel-kicker {
   margin: 0 0 6px;
   color: #2954e5;
-  font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif;
+  font-family: "Be Vietnam Pro", sans-serif;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -364,7 +364,7 @@
 .job-detail-board-page .job-related-heading .panel-kicker {
   margin: 0 0 6px;
   color: #2954e5;
-  font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif;
+  font-family: "Be Vietnam Pro", sans-serif;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -386,7 +386,7 @@
 .job-advanced-heading .panel-kicker {
   margin: 0 0 6px;
   color: #2954e5;
-  font-family: "Space Grotesk", "Be Vietnam Pro", sans-serif;
+  font-family: "Be Vietnam Pro", sans-serif;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -484,4 +484,79 @@
     max-width: 100%;
     white-space: normal;
   }
+}
+
+/* Candidate job detail keeps its reference layout but uses semantic surfaces
+ * when the workspace is dark. This prevents the detail page from becoming a
+ * light island after navigating from Find Jobs or CV Match Check. */
+:root[data-theme="dark"] .job-detail-board-page {
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-page);
+}
+
+:root[data-theme="dark"] .job-detail-board-page :is(
+  .job-detail-hero--redesign,
+  .job-detail-section-card,
+  .job-related-section,
+  .job-sidebar-card--redesign,
+  .job-detail-primary-actions .job-save-button
+) {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-card);
+}
+
+:root[data-theme="dark"] .job-detail-board-page :is(
+  .job-detail-hero--redesign h1,
+  .job-similar-jobs-card h2,
+  .job-related-heading h2,
+  .job-advanced-heading h2
+) {
+  color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] .job-detail-board-page :is(
+  .job-detail-breadcrumb,
+  .job-detail-summary,
+  .job-detail-tab,
+  .job-detail-tab-description
+) {
+  color: var(--sh-color-text-muted);
+}
+
+:root[data-theme="dark"] .job-detail-board-page :is(
+  .job-detail-quick-info-item,
+  .sh-stat-chip
+) {
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] .job-detail-board-page :is(
+  .job-company-logo.is-large,
+  .job-sidebar-company-logo.is-large,
+  .job-detail-quick-info-icon,
+  .sh-stat-chip__icon,
+  .job-detail-primary-actions .job-save-button[aria-pressed="true"]
+) {
+  color: var(--sh-color-brand-accent);
+  background: var(--sh-color-brand-soft);
+}
+
+:root[data-theme="dark"] .job-detail-board-page :is(
+  .job-company-name,
+  .job-company-accordion-name
+) {
+  color: var(--sh-color-brand-accent);
+}
+
+:root[data-theme="dark"] .job-detail-board-page .job-detail-match-button {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-brand-accent);
+  background: var(--sh-color-info-bg);
+}
+
+:root[data-theme="dark"] .job-detail-board-page .job-detail-match-private-label {
+  color: var(--sh-color-brand-accent);
+  background: var(--sh-color-brand-soft);
 }

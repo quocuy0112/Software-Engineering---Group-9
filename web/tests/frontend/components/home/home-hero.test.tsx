@@ -2,9 +2,9 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { HomePageView } from "@/frontend/features/home/components/home-page-view";
 import {
-  homeModel,
   candidateViewer,
   employerViewer,
+  homeModel,
 } from "../../../helpers/home/home-fixtures";
 
 const navigation = vi.hoisted(() => ({
@@ -20,7 +20,7 @@ describe("Home Hero", () => {
   it("renders the AI CV proposition, concise search, and role CTAs", () => {
     const { container } = render(<HomePageView model={homeModel()} />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "AI understands your CV. You choose what’s next.",
+      /AI understands your CV/u,
     );
     for (const label of ["Keyword", "Location"])
       expect(screen.getByLabelText(label)).toBeInTheDocument();
@@ -36,8 +36,11 @@ describe("Home Hero", () => {
       "/jobs",
     );
     expect(
-      screen.getByRole("link", { name: "For employers →" }),
-    ).toHaveAttribute("href", "/business");
+      screen.getByRole("link", { name: /For employers/u }),
+    ).toHaveAttribute(
+      "href",
+      "/login?returnTo=%2Fdashboard%2Femployer-verification",
+    );
     expect(container.querySelector(".home-cv-scan")).toHaveTextContent(
       "CV analysis in progress",
     );
@@ -76,10 +79,35 @@ describe("Home Hero", () => {
     expect(screen.getAllByText(/Status unavailable/u).length).toBeGreaterThan(
       0,
     );
+    expect(
+      screen.queryByRole("link", { name: /For employers/u }),
+    ).not.toBeInTheDocument();
+
+    rerender(
+      <HomePageView
+        model={homeModel({
+          viewer: {
+            ...candidateViewer,
+            recruiterStatus: {
+              state: "NEVER_APPLIED",
+              destinationKind: "EMPLOYER_VERIFICATION",
+              href: "/dashboard/employer-verification",
+              observedAt: "2026-08-21T00:00:00.000Z",
+            },
+          },
+        })}
+      />,
+    );
+    expect(
+      screen.getByRole("link", { name: /For employers/u }),
+    ).toHaveAttribute("href", "/dashboard/employer-verification");
 
     rerender(<HomePageView model={homeModel({ viewer: employerViewer })} />);
     expect(
+      screen.getByRole("link", { name: /For employers/u }),
+    ).toHaveAttribute("href", "/recruiter/job-postings");
+    expect(
       screen.getAllByRole("link", { name: "Post a Job" })[0],
-    ).toHaveAttribute("href", "https://recruiter.example.test");
+    ).toHaveAttribute("href", "/recruiter/job-postings");
   });
 });

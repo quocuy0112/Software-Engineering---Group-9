@@ -99,6 +99,18 @@ enum ExportRequestStatus {
   DELETED
 }
 
+enum BackupRunTrigger {
+  MANUAL
+  SCHEDULED
+}
+
+enum BackupRunStatus {
+  QUEUED
+  LEASED
+  SUCCEEDED
+  FAILED
+}
+
 enum EmailKind {
   VERIFY_EMAIL
   EMAIL_CHANGE_VERIFY
@@ -179,6 +191,8 @@ enum InAppNotificationKind {
   MEMBERSHIP_SUSPENDED
   MEMBERSHIP_RESTORED
   MEMBERSHIP_REMOVED
+  COMPANY_BANNED
+  COMPANY_UNBANNED
   COMPANY_INVITATION_RECEIVED
   COMPANY_INVITATION_ACCEPTED
   COMPANY_INVITATION_DECLINED
@@ -704,6 +718,13 @@ enum CompanyVerificationState {
   UNVERIFIED
   ACTIVE
   INACTIVE
+}
+
+/// Platform moderation state is separate from the company's verification
+/// lifecycle so a temporary ban can be reversed without deleting the company.
+enum CompanyModerationState {
+  ACTIVE
+  BANNED
 }
 
 enum RecruiterVerificationState {
@@ -1699,6 +1720,11 @@ model Company {
   normalizedTaxIdentifier       String?                        @unique
   verificationState             CompanyVerificationState       @default(UNVERIFIED)
   verificationInactiveAt        DateTime?
+  moderationState               CompanyModerationState         @default(ACTIVE)
+  moderationVersion             Int                            @default(1)
+  bannedAt                      DateTime?
+  verificationStateBeforeBan    CompanyVerificationState?
+  verifiedAtBeforeBan           DateTime?
   createdAt                     DateTime                       @default(now())
   updatedAt                     DateTime                       @updatedAt
   jobPostings                   JobPosting[]
@@ -4508,6 +4534,39 @@ model ExportRequest {
   @@index([status, leaseExpiresAt, requestedAt], map: "ExportRequest_claim_idx")
   @@index([status, expiresAt], map: "ExportRequest_cleanup_idx")
   @@index([requesterUserId, jobPostingId, requestedAt(sort: Desc)])
+}
+
+model BackupConfiguration {
+  id                String   @id
+  enabled           Boolean  @default(false)
+  intervalSeconds   Int      @default(60)
+  version           Int      @default(1)
+  updatedByAdminId  String?
+  updatedAt         DateTime @updatedAt
+  createdAt         DateTime @default(now())
+}
+
+model BackupRun {
+  id              String            @id @default(cuid())
+  trigger         BackupRunTrigger
+  status          BackupRunStatus   @default(QUEUED)
+  activeKey       String?           @unique
+  requestedById   String?
+  idempotencyKey  String?
+  leaseOwner      String?
+  leaseExpiresAt  DateTime?
+  driveFileId     String?
+  driveFolderId   String?
+  fileName        String?
+  checksum        String?
+  byteCount       Int?
+  failureCode     String?
+  requestedAt     DateTime          @default(now())
+  startedAt       DateTime?
+  completedAt     DateTime?
+
+  @@unique([requestedById, idempotencyKey])
+  @@index([status, leaseExpiresAt, requestedAt])
 }
 
 model ActivityLegalHold {

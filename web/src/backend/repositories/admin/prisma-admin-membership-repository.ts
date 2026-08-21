@@ -60,6 +60,7 @@ export class PrismaAdminMembershipRepository {
           legalName: true,
           displayName: true,
           verificationState: true,
+          moderationState: true,
         },
         skip: (input.page - 1) * input.perPage,
         take: input.perPage,
@@ -77,6 +78,9 @@ export class PrismaAdminMembershipRepository {
         legalName: true,
         displayName: true,
         verificationState: true,
+        moderationState: true,
+        moderationVersion: true,
+        bannedAt: true,
         verifiedAt: true,
         createdAt: true,
         updatedAt: true,
@@ -150,6 +154,9 @@ export class PrismaAdminMembershipRepository {
         legalName: company.legalName,
         displayName: company.displayName,
         verificationState: company.verificationState,
+        moderationState: company.moderationState,
+        moderationVersion: company.moderationVersion,
+        bannedAt: company.bannedAt?.toISOString() ?? null,
         verifiedAt: company.verifiedAt?.toISOString() ?? null,
         createdAt: company.createdAt.toISOString(),
         updatedAt: company.updatedAt.toISOString(),
@@ -242,7 +249,12 @@ export class PrismaAdminMembershipRepository {
         where,
         include: {
           company: {
-            select: { id: true, legalName: true, verificationState: true },
+            select: {
+              id: true,
+              legalName: true,
+              verificationState: true,
+              moderationState: true,
+            },
           },
           user: { select: { name: true } },
         },
@@ -261,6 +273,10 @@ export class PrismaAdminMembershipRepository {
         accountDisplayName: row.user.name,
         role: row.role,
         state: row.status,
+        accessState:
+          row.company.moderationState === "BANNED"
+            ? "COMPANY_BANNED"
+            : row.status,
         priorApprovedRole: row.priorApprovedRole ?? row.role,
         version: row.version,
         createdAt: row.createdAt.toISOString(),

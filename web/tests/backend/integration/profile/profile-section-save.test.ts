@@ -122,6 +122,33 @@ describe("section-scoped profile saves", () => {
     expect(links.profile.experience).toEqual(before.experience);
   });
 
+  it("allows candidates to rename and remove existing featured skills", async () => {
+    const before = await new GetProfileAggregateService().execute(owner.userId);
+    const created = await service.execute(owner.userId, {
+      section: "skills",
+      baseRevision: before.revision,
+      skills: [
+        { label: "section-skill-rename-source" },
+        { label: "section-skill-remove" },
+      ],
+    });
+    const source = created.profile.skills[0]!;
+    const updated = await service.execute(owner.userId, {
+      section: "skills",
+      baseRevision: created.profile.revision,
+      skills: [
+        {
+          id: source.id,
+          label: "section-skill-rename-target",
+        },
+      ],
+    });
+
+    expect(updated.profile.skills).toEqual([
+      expect.objectContaining({ label: "section-skill-rename-target" }),
+    ]);
+  });
+
   it("rolls back the full section when any owned child check fails", async () => {
     const foreign = await service.execute(other.userId, {
       section: "education",

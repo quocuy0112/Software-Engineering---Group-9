@@ -109,10 +109,10 @@ export function ProfileBasicsForm({
         content={
           hasBasics ? (
             <>
-              <strong className="profile-compact-primary">
+              <strong className="profile-compact-primary profile-basics-preview-primary">
                 {profile.basics.summary || "Professional profile details"}
               </strong>
-              <span className="profile-compact-secondary">
+              <span className="profile-compact-secondary profile-basics-preview-secondary">
                 {[profile.basics.location, profile.basics.phone]
                   .filter(Boolean)
                   .join(" · ") || "Contact details added"}

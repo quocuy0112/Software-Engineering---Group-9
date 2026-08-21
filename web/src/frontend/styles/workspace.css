@@ -201,13 +201,17 @@
 
 .workspace-navigation-scroll {
   display: flex;
+  width: 100%;
   min-height: 0;
+  min-width: 0;
   flex: 1 1 auto;
   flex-direction: column;
   gap: var(--sh-space-2);
+  box-sizing: border-box;
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding-right: var(--sh-space-1);
+  padding-right: calc(var(--sh-space-1) + 2px);
   scrollbar-color: color-mix(
       in srgb,
       var(--sh-color-sidebar-muted) 36%,
@@ -234,12 +238,15 @@
 .workspace-navigation button {
   display: flex;
   width: 100%;
+  max-width: 100%;
   min-height: var(--sh-control-height);
+  min-width: 0;
   align-items: center;
   gap: var(--sh-space-3);
   padding: 0 var(--sh-space-3);
   border: 1px solid transparent;
   border-radius: var(--sh-radius-sm);
+  box-sizing: border-box;
   color: var(--sh-color-sidebar-text);
   background: transparent;
   font-size: var(--sh-font-size-body-sm);
@@ -264,13 +271,11 @@
 .workspace-navigation a[aria-current="page"] {
   color: var(--sh-color-text-inverse);
   background: var(--sh-color-sidebar-active);
-  border-color: color-mix(
-    in srgb,
-    var(--sh-color-text-inverse) 16%,
-    transparent
-  );
+  border-color: transparent;
   box-shadow:
     0 6px 16px rgb(3 12 28 / 20%),
+    inset 0 0 0 1px
+      color-mix(in srgb, var(--sh-color-text-inverse) 18%, transparent),
     inset 0 1px 0 rgb(255 255 255 / 13%);
   font-weight: var(--sh-font-weight-semibold);
 }
@@ -1292,6 +1297,7 @@
 
 .workspace-navigation-item {
   width: 100%;
+  min-width: 0;
 }
 
 .workspace-navigation-subnav {
@@ -1506,4 +1512,34 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.8;
+}
+
+/* The recruiter header has four compact controls. On narrow screens keep
+ * them inside the viewport and retain the account link through its avatar;
+ * the full account details remain available via its accessible name/title. */
+@media (max-width: 760px) {
+  .workspace-main:has(.workspace-content[data-workspace-mode="recruiter"])
+    .workspace-header-actions {
+    justify-content: flex-end;
+    overflow-x: hidden;
+  }
+
+  .workspace-main:has(.workspace-content[data-workspace-mode="recruiter"])
+    .workspace-account-chip > span:last-child {
+    display: none;
+  }
+
+  .workspace-main:has(.workspace-content[data-workspace-mode="recruiter"])
+    .recruiter-header-action__label {
+    max-width: 112px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (max-width: 380px) {
+  .workspace-main:has(.workspace-content[data-workspace-mode="recruiter"])
+    .recruiter-header-action__label {
+    max-width: 72px;
+  }
 }

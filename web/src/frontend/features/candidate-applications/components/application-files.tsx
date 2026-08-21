@@ -8,7 +8,6 @@ import {
   BriefcaseBusiness,
   FileText,
   Info,
-  Save,
   Upload,
   X,
 } from "lucide-react";
@@ -19,6 +18,11 @@ import {
   ApplicationProgressChecklist,
   ApplicationStepper,
 } from "./application-stepper";
+import {
+  ApplicationFlowHeader,
+  FileSelectionCard,
+  RequirementTag,
+} from "./application-wizard-primitives";
 import type { ApplicationWizardJob } from "./application-personal-information";
 import type { ApplicationDraft } from "@/shared/contracts/candidate-applications";
 import type { CandidateCvSummary } from "@/shared/contracts/cv-import/candidate-cv";
@@ -87,7 +91,6 @@ type CvMode = "PROFILE" | "UPLOAD";
 type CoverMode = "FILE" | "TEXT";
 
 export function ApplicationFiles({
-  slug,
   job,
   draft,
   cvs,
@@ -171,37 +174,16 @@ export function ApplicationFiles({
       className="candidate-application-flow application-files"
       aria-labelledby="application-flow-title"
     >
-      <header className="candidate-application-flow__header application-files__header">
-        <div>
-          <nav
-            className="application-ui__breadcrumb"
-            aria-label={copy.common.breadcrumb}
-          >
-            <Link href="/jobs">{copy.common.jobs}</Link>
-            <span>/</span>
-            <Link href={`/jobs/${encodeURIComponent(slug)}`}>{job.title}</Link>
-            <span>/</span>
-            <span>{copy.common.apply}</span>
-          </nav>
-          <p className="application-files__eyebrow">
-            <span aria-hidden="true" />
-            {copy.applicationFiles.eyebrow}
-          </p>
-          <h1 id="application-flow-title">
-            {copy.applicationFiles.title(job.title)}
-          </h1>
-          <p>{copy.applicationFiles.subtitle}</p>
-        </div>
-        <button
-          type="button"
-          className="application-files__button application-files__button--secondary"
-          onClick={onSaveDraft}
-          disabled={pending !== null}
-        >
-          <Save aria-hidden="true" />
-          {pending === "save" ? copy.common.saving : copy.common.saveDraft}
-        </button>
-      </header>
+      <ApplicationFlowHeader
+        titleId="application-flow-title"
+        eyebrow={copy.applicationFiles.eyebrow}
+        title={copy.applicationFiles.title(job.title)}
+        subtitle={copy.applicationFiles.subtitle}
+        saveLabel={copy.common.saveDraft}
+        savingLabel={copy.common.saving}
+        pending={pending !== null}
+        onSave={onSaveDraft}
+      />
 
       <ApplicationStepper currentStep={2} />
 
@@ -219,9 +201,9 @@ export function ApplicationFiles({
           >
             <div className="application-files__title-row">
               <h2 id="cv-title">{copy.applicationFiles.cvTitle}</h2>
-              <span className="application-files__pill application-files__pill--required">
+              <RequirementTag level="required">
                 {copy.applicationFiles.required}
-              </span>
+              </RequirementTag>
             </div>
             <p className="application-files__description">
               {copy.applicationFiles.cvDescription}
@@ -268,36 +250,28 @@ export function ApplicationFiles({
                   {cvs.map((cv) => {
                     const selected = cv.id === selectedCvId;
                     return (
-                      <button
+                      <FileSelectionCard
                         key={cv.id}
-                        type="button"
-                        role="radio"
-                        aria-checked={selected}
-                        className={selected ? "is-selected" : undefined}
-                        onClick={() => onCvSelectionChange(cv.id)}
+                        fileName={cv.fileName}
+                        selected={selected}
                         disabled={pending !== null}
-                      >
-                        <span
-                          className="application-files__radio"
-                          aria-hidden="true"
-                        />
-                        <span>
-                          <strong>{cv.fileName}</strong>
+                        onSelect={() => onCvSelectionChange(cv.id)}
+                        meta={
+                          <>
                           {/* TODO(application-files): CandidateCvSummary does not
                               expose a page count or parser lifecycle. Confirmed
                               profile CVs are the only currently selectable
                               records, so this copy intentionally reports
                               application readiness rather than inventing a
                               parser result. */}
-                          <small>
                             {copy.applicationFiles.profileCvMeta(
                               formatFileSize(cv.byteSize, locale),
                               formatUpdatedAt(cv.confirmedAt, locale),
                             )}
                             <em>{copy.applicationFiles.cvReady}</em>
-                          </small>
-                        </span>
-                      </button>
+                          </>
+                        }
+                      />
                     );
                   })}
                 </div>
@@ -404,9 +378,9 @@ export function ApplicationFiles({
               <h2 id="cover-letter-title">
                 {copy.applicationFiles.coverLetterTitle}
               </h2>
-              <span className="application-files__pill">
+              <RequirementTag level="optional">
                 {copy.applicationFiles.optional}
-              </span>
+              </RequirementTag>
             </div>
             <p className="application-files__description">
               {copy.applicationFiles.coverLetterDescription}

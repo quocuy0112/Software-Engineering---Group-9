@@ -173,6 +173,24 @@ const policies = {
       "You were removed from a company on SmartHire.",
     ),
   },
+  COMPANY_BANNED: {
+    category: "ACCOUNT",
+    severity: "CRITICAL",
+    title: { vi: "Công ty bị cấm", en: "Company banned" },
+    summary: (locale, variables) =>
+      locale === "vi"
+        ? `Quyền truy cập ${variables.companyName ?? "công ty"} đã bị vô hiệu hóa.`
+        : `Access to ${variables.companyName ?? "your company"} was disabled.`,
+  },
+  COMPANY_UNBANNED: {
+    category: "ACCOUNT",
+    severity: "HIGH",
+    title: { vi: "Công ty được mở cấm", en: "Company unbanned" },
+    summary: (locale, variables) =>
+      locale === "vi"
+        ? `Quyền truy cập ${variables.companyName ?? "công ty"} đã được khôi phục.`
+        : `Access to ${variables.companyName ?? "your company"} was restored.`,
+  },
   COMPANY_INVITATION_RECEIVED: {
     category: "ACCOUNT",
     severity: "MEDIUM",
@@ -601,8 +619,7 @@ export function buildNotification(
       variables.recipientRole ??
       (variables.audience === "ADMIN"
         ? "ADMIN"
-        : kind === "APPLICATION_RECEIVED" ||
-            kind.startsWith("JOB_POST_")
+        : kind === "APPLICATION_RECEIVED" || kind.startsWith("JOB_POST_")
           ? "RECRUITER"
           : "CANDIDATE"),
     title,

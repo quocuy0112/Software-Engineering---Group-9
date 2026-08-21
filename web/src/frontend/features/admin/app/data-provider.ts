@@ -104,6 +104,8 @@ const unsupported = async (): Promise<never> => {
   throw new Error("GENERIC_PRIVILEGED_CRUD_DISABLED");
 };
 
+const ADMIN_LIST_PAGE_SIZE = 100;
+
 export type AdminDataProvider = DataProvider & {
   command(
     path: string,
@@ -129,50 +131,84 @@ type ListParams = {
 const closedProvider = {
   async getList(resource: string, params: ListParams) {
     const page = params.pagination?.page ?? 1;
-    const pageSize = params.pagination?.perPage ?? 25;
+    const requestedPageSize = params.pagination?.perPage ?? 25;
     const filter = params.filter ?? {};
-    const query = new URLSearchParams({
-      page: String(page),
-      pageSize: String(pageSize),
-    });
-    if (resource === "accounts") {
-      for (const key of [
-        "q",
-        "type",
-        "status",
-        "registeredFrom",
-        "registeredTo",
-      ]) {
-        const value = filter[key];
-        if (typeof value === "string" && value.trim())
-          query.set(key, value.trim());
+    const fetchPage = async (nextPage: number, pageSize: number) => {
+      const query = new URLSearchParams({
+        page: String(nextPage),
+        pageSize: String(pageSize),
+      });
+      if (resource === "accounts") {
+        for (const key of [
+          "q",
+          "type",
+          "status",
+          "registeredFrom",
+          "registeredTo",
+        ]) {
+          const value = filter[key];
+          if (typeof value === "string" && value.trim())
+            query.set(key, value.trim());
+        }
+      } else if (resource === "verification-requests") {
+        for (const key of [
+          "q",
+          "state",
+          "applicantEligibility",
+          "company",
+          "targetCompanyId",
+          "taxCode",
+          "submittedFrom",
+          "submittedTo",
+          "applicantId",
+          "assignment",
+        ]) {
+          const value = filter[key];
+          if (typeof value === "string" && value.trim())
+            query.set(key, value.trim());
+        }
+      } else {
+        query.set("perPage", String(pageSize));
+        query.set("sort", params.sort?.field ?? "createdAt");
+        query.set("order", params.sort?.order ?? "DESC");
+        query.set("filter", JSON.stringify(filter));
       }
-    } else if (resource === "verification-requests") {
-      for (const key of [
-        "q",
-        "state",
-        "applicantEligibility",
-        "company",
-        "targetCompanyId",
-        "taxCode",
-        "submittedFrom",
-        "submittedTo",
-        "applicantId",
-        "assignment",
-      ]) {
-        const value = filter[key];
-        if (typeof value === "string" && value.trim())
-          query.set(key, value.trim());
-      }
-    } else {
-      query.set("perPage", String(pageSize));
-      query.set("sort", params.sort?.field ?? "createdAt");
-      query.set("order", params.sort?.order ?? "DESC");
-      query.set("filter", JSON.stringify(filter));
+      return api(`${endpoint(resource)}?${query}`, {
+        signal: params.signal,
+      }) as Promise<{
+        data: unknown[];
+        total: number;
+        meta?: Record<string, unknown>;
+        calculatedAt?: string;
+        stateDefinitionVersion?: string;
+      }>;
+    };
+    const initialBackendPage =
+      Math.floor(((page - 1) * requestedPageSize) / ADMIN_LIST_PAGE_SIZE) + 1;
+    const result = await fetchPage(
+      requestedPageSize > ADMIN_LIST_PAGE_SIZE ? initialBackendPage : page,
+      Math.min(requestedPageSize, ADMIN_LIST_PAGE_SIZE),
+    );
+    if (requestedPageSize > ADMIN_LIST_PAGE_SIZE && result.data.length > 0) {
+      const remainingPageCount = Math.min(
+        Math.ceil(
+          (requestedPageSize - result.data.length) / ADMIN_LIST_PAGE_SIZE,
+        ),
+        Math.max(
+          0,
+          Math.ceil(result.total / ADMIN_LIST_PAGE_SIZE) - initialBackendPage,
+        ),
+      );
+      const additional = await Promise.all(
+        Array.from({ length: remainingPageCount }, (_, index) =>
+          fetchPage(initialBackendPage + index + 1, ADMIN_LIST_PAGE_SIZE),
+        ),
+      );
+      result.data = [
+        ...result.data,
+        ...additional.flatMap((next) => next.data),
+      ];
     }
-    const result = await api(`${endpoint(resource)}?${query}`, {
-      signal: params.signal,
-    });
     return {
       data: result.data,
       total: result.total,
@@ -333,4 +369,11 @@ export function membershipCommandPath(
   action: "suspend" | "restore" | "remove",
 ) {
   return `${endpoint("company-memberships")}/${encodeURIComponent(String(membershipId))}/${action}`;
+}
+
+export function companyModerationCommandPath(
+  companyId: Identifier,
+  action: "ban" | "unban",
+) {
+  return `${endpoint("companies")}/${encodeURIComponent(String(companyId))}/${action}`;
 }

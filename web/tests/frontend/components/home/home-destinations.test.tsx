@@ -85,7 +85,6 @@ describe("Home destination map", () => {
       "#candidate-trust",
       "#companies-hiring",
       "/jobs/frontend-intern",
-      "/business",
       "/register",
       "/login?returnTo=%2Fdashboard%2Femployer-verification",
     ])
@@ -141,6 +140,6 @@ describe("Home destination map", () => {
     rerender(<HomePageView model={homeModel({ viewer: employerViewer })} />);
     expect(
       screen.getAllByRole("link", { name: "Post a Job" })[0],
-    ).toHaveAttribute("href", "https://recruiter.example.test");
+    ).toHaveAttribute("href", "/recruiter/job-postings");
   });
 });

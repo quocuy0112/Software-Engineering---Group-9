@@ -48,6 +48,7 @@ export function CompanyMembershipList() {
         <TextField source="accountId" />
         <TextField source="role" />
         <TextField source="state" />
+        <TextField source="accessState" label="Effective access" />
         <TextField source="priorApprovedRole" />
       </Datagrid>
     </List>

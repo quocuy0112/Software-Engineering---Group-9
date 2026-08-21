@@ -6,11 +6,15 @@ import { prisma } from "@/backend/database/prisma";
 import { csrfProof } from "@/backend/security/csrf/csrf-proof";
 import { JobDiscoveryService } from "@/backend/services/jobs/job-discovery-service";
 import {
+  hasCandidateJobSignals,
   rankJobsForCandidate,
-  type CandidateJobMatch,
 } from "@/backend/services/jobs/candidate-job-match";
 import { careerPathSlugs } from "@/shared/contracts/jobs/career-paths";
 import { GetProfileAggregateService } from "@/backend/services/profile/get-profile-aggregate";
+import {
+  listPrivateMatchHomeScores,
+  type PrivateMatchHomeScore,
+} from "@/backend/private-cv-match/private-cv-match-service";
 import { getRecruiterHeaderStatusService } from "@/backend/recruiter-header/recruiter-header-status-service-factory";
 import {
   PrismaHomePublicCompanyRepository,
@@ -22,6 +26,9 @@ import type {
   HomeCareerPath,
   HomeJob,
   HomeJobMatchBreakdown,
+  HomeCvMatchReference,
+  HomeMatchFallbackReason,
+  HomeMatchSource,
   HomePageModel,
   HomeSectionState,
   SmartMatchInsight,
@@ -37,6 +44,9 @@ type AccountProjection = {
   language: string | null;
 } | null;
 
+const homeTrendingJobLimit = 6;
+const meaningfulMatchMinimumScore = 50;
+
 export type HomeContextDependencies = {
   requestHeaders: () => Promise<Headers>;
   session: (requestHeaders: Headers) => Promise<CurrentSession>;
@@ -45,6 +55,15 @@ export type HomeContextDependencies = {
       | { kind: "visitor" }
       | { kind: "user"; userId: string; sessionId: string },
   ) => Promise<readonly JobCard[]>;
+  recommendationJobs?: (
+    actor:
+      | { kind: "visitor" }
+      | { kind: "user"; userId: string; sessionId: string },
+  ) => Promise<readonly JobCard[]>;
+  privateMatchScores?: (
+    userId: string,
+    now: Date,
+  ) => Promise<readonly PrivateMatchHomeScore[]>;
   careerPaths?: (
     actor:
       | { kind: "visitor" }
@@ -65,10 +84,13 @@ const defaultDependencies = (): HomeContextDependencies => ({
   searchJobs: async (actor) =>
     (
       await new JobDiscoveryService().search(
-        { limit: 6, sort: "NEWEST" },
+        { limit: homeTrendingJobLimit, sort: "NEWEST" },
         actor,
       )
     ).items,
+  recommendationJobs: (actor) =>
+    new JobDiscoveryService().listRecommendationCandidates(actor),
+  privateMatchScores: listPrivateMatchHomeScores,
   careerPaths: async (actor) => {
     const service = new JobDiscoveryService();
     return Promise.all(
@@ -116,7 +138,12 @@ const unavailableCareerPaths = (): readonly HomeCareerPath[] =>
 
 function projectJob(
   job: JobCard,
-  match?: { score: number; breakdown?: HomeJobMatchBreakdown },
+  match?: {
+    score: number;
+    source: HomeMatchSource;
+    breakdown?: HomeJobMatchBreakdown;
+    cvMatch?: HomeCvMatchReference;
+  },
 ): HomeJob {
   return {
     id: job.id,
@@ -131,7 +158,9 @@ function projectJob(
     employmentType: job.employmentType,
     skills: job.skills.slice(0, 5),
     ...(match ? { matchScore: match.score } : {}),
+    ...(match ? { matchSource: match.source } : {}),
     ...(match?.breakdown ? { matchBreakdown: match.breakdown } : {}),
+    ...(match?.cvMatch ? { cvMatch: match.cvMatch } : {}),
     salary: job.salary,
     publishedAt: job.publishedAt,
     saved: job.actions.saved,
@@ -167,8 +196,12 @@ function matchCandidate(job: JobCard) {
     id: job.id,
     status: "open",
     title: job.title,
+    categoryIds: job.categoryIds ? [...job.categoryIds] : undefined,
+    categoryFamily: job.categoryFamily,
     skillTags: [...job.skills],
     city: job.location,
+    salaryMin: job.salary?.minimum,
+    salaryMax: job.salary?.maximum,
     experienceMinYears: experienceMinimum[job.experienceLevel],
     education: job.education,
     postedAt: job.publishedAt,
@@ -176,15 +209,83 @@ function matchCandidate(job: JobCard) {
   };
 }
 
+type HomeRecommendationMatch = Readonly<{
+  candidate: ReturnType<typeof matchCandidate>;
+  score: number;
+  source: HomeMatchSource;
+  breakdown?: HomeJobMatchBreakdown;
+  cvMatch?: HomeCvMatchReference;
+  matchingSkills: readonly string[];
+  improvementAreas: readonly string[];
+}>;
+
 function personalMatch(
   profile: CandidateProfileContract,
   jobs: readonly JobCard[],
   now: Date,
+  privateScores: readonly PrivateMatchHomeScore[],
 ): {
   insight: Extract<SmartMatchInsight, { kind: "personal" }>;
-  ranked: readonly CandidateJobMatch<ReturnType<typeof matchCandidate>>[];
+  ranked: readonly HomeRecommendationMatch[];
 } | null {
-  const ranked = rankJobsForCandidate(profile, jobs.map(matchCandidate), now);
+  const candidates = jobs.map(matchCandidate);
+  const profileMatches = rankJobsForCandidate(profile, candidates, now);
+  const profileByJobId = new Map(
+    profileMatches.map((match) => [match.candidate.id, match]),
+  );
+  const privateScoreByJobId = new Map(
+    privateScores.map((score) => [score.jobId, score]),
+  );
+  const ranked = candidates
+    .flatMap((candidate): HomeRecommendationMatch[] => {
+      const cvScore = privateScoreByJobId.get(candidate.id);
+      if (cvScore !== undefined) {
+        const profileMatch = profileByJobId.get(candidate.id);
+        const cvMatch =
+          cvScore.checkId !== undefined &&
+          cvScore.cvVersion !== undefined &&
+          cvScore.jdVersion !== undefined
+            ? {
+                checkId: cvScore.checkId,
+                cvVersion: cvScore.cvVersion,
+                jdVersion: cvScore.jdVersion,
+              }
+            : undefined;
+        return [
+          {
+            candidate,
+            score: cvScore.score,
+            source: "cv",
+            ...(cvMatch ? { cvMatch } : {}),
+            matchingSkills: profileMatch?.matchingSkills ?? [],
+            improvementAreas: profileMatch?.improvementAreas ?? [],
+          },
+        ];
+      }
+      const profileMatch = profileByJobId.get(candidate.id);
+      return profileMatch
+        ? [
+            {
+              candidate,
+              score: profileMatch.matchScore,
+              source: "profile",
+              ...(profileMatch.matchBreakdown
+                ? { breakdown: profileMatch.matchBreakdown }
+                : {}),
+              matchingSkills: profileMatch.matchingSkills,
+              improvementAreas: profileMatch.improvementAreas,
+            },
+          ]
+        : [];
+    })
+    .sort((left, right) => {
+      if (right.score !== left.score) return right.score - left.score;
+      if (left.source !== right.source) return left.source === "cv" ? -1 : 1;
+      return (right.candidate.postedAt ?? "").localeCompare(
+        left.candidate.postedAt ?? "",
+      );
+    })
+    .slice(0, homeTrendingJobLimit);
   const best = ranked[0];
   if (!best) return null;
   return {
@@ -192,7 +293,14 @@ function personalMatch(
       kind: "personal",
       jobSlug: best.candidate.job.slug,
       jobTitle: best.candidate.job.title,
-      score: best.matchScore,
+      score: best.score,
+      quality:
+        best.score >= meaningfulMatchMinimumScore &&
+        (best.source === "cv" || best.matchingSkills.length > 0)
+          ? "meaningful"
+          : "limited",
+      scoreSource: best.source,
+      ...(best.breakdown ? { matchBreakdown: best.breakdown } : {}),
       matchingSkills: best.matchingSkills,
       improvementAreas: best.improvementAreas,
       limitations: ["profileSignals", "estimate"],
@@ -208,8 +316,17 @@ export async function getHomePageContext(
   const dependencies = {
     ...defaults,
     ...overrides,
+    recommendationJobs:
+      overrides.recommendationJobs ??
+      (overrides.searchJobs
+        ? overrides.searchJobs
+        : defaults.recommendationJobs),
+    privateMatchScores:
+      overrides.privateMatchScores ??
+      (overrides.searchJobs ? async () => [] : defaults.privateMatchScores),
     countCompanies:
-      overrides.countCompanies ?? (overrides.listCompanies ? undefined : defaults.countCompanies),
+      overrides.countCompanies ??
+      (overrides.listCompanies ? undefined : defaults.countCompanies),
   };
   const requestHeaders = await dependencies.requestHeaders();
   const current = await dependencies.session(requestHeaders).catch(() => null);
@@ -224,24 +341,23 @@ export async function getHomePageContext(
 
   const [jobResult, companyResult, companyCountResult, careerPathResult] =
     await Promise.allSettled([
-    dependencies.searchJobs(actor),
-    dependencies.listCompanies(now),
-    dependencies.countCompanies
-      ? dependencies.countCompanies(now)
-      : Promise.resolve(null),
-    dependencies.careerPaths
-      ? dependencies.careerPaths(actor)
-      : Promise.resolve(unavailableCareerPaths()),
+      dependencies.searchJobs(actor),
+      dependencies.listCompanies(now),
+      dependencies.countCompanies
+        ? dependencies.countCompanies(now)
+        : Promise.resolve(null),
+      dependencies.careerPaths
+        ? dependencies.careerPaths(actor)
+        : Promise.resolve(unavailableCareerPaths()),
     ]);
   const rawJobs = jobResult.status === "fulfilled" ? jobResult.value : [];
+  const latestJobs = rawJobs.slice(0, homeTrendingJobLimit);
   const spotlights: HomeSectionState<EmployerSpotlight> =
     companyResult.status === "fulfilled"
       ? section(companyResult.value.map(companyProjection))
       : { status: "error", items: [], recovery: { kind: "reloadHome" } };
   const companyCount =
-    companyCountResult.status === "fulfilled"
-      ? companyCountResult.value
-      : null;
+    companyCountResult.status === "fulfilled" ? companyCountResult.value : null;
   const careerPaths =
     careerPathResult.status === "fulfilled"
       ? careerPathResult.value
@@ -259,7 +375,7 @@ export async function getHomePageContext(
       careerPaths,
       jobs:
         jobResult.status === "fulfilled"
-          ? section(rawJobs.map((job) => projectJob(job)))
+          ? section(latestJobs.map((job) => projectJob(job)))
           : failedJobs,
       spotlights,
       companyCount,
@@ -282,7 +398,7 @@ export async function getHomePageContext(
       careerPaths,
       jobs:
         jobResult.status === "fulfilled"
-          ? section(rawJobs.map((job) => projectJob(job)))
+          ? section(latestJobs.map((job) => projectJob(job)))
           : failedJobs,
       spotlights,
       companyCount,
@@ -293,23 +409,48 @@ export async function getHomePageContext(
   const recruiterStatus =
     recruiterResult.status === "fulfilled" ? recruiterResult.value : null;
   const employer = recruiterStatus?.state === "APPROVED";
+  const profile =
+    profileResult.status === "fulfilled" ? profileResult.value : null;
+  const profileHasSignals = profile ? hasCandidateJobSignals(profile) : false;
+  const [recommendationCandidates, privateScores] =
+    !employer && profile
+      ? await Promise.all([
+          dependencies.recommendationJobs!(actor).catch(() => []),
+          dependencies.privateMatchScores!(current.userId, now).catch(() => []),
+        ])
+      : ([[], []] as const);
   const recommendation =
-    !employer && profileResult.status === "fulfilled" && rawJobs.length
-      ? personalMatch(profileResult.value, rawJobs, now)
+    profile && recommendationCandidates.length
+      ? personalMatch(
+          profile,
+          recommendationCandidates,
+          now,
+          privateScores,
+        )
       : null;
+  const matchFallbackReason: HomeMatchFallbackReason | undefined =
+    !employer && !profile
+      ? "unavailable"
+      : !employer && !profileHasSignals
+        ? "profileSignals"
+        : !employer && recommendationCandidates.length === 0
+          ? "noOpportunities"
+          : !employer && !recommendation
+            ? "unavailable"
+            : undefined;
   const jobs =
     jobResult.status === "fulfilled"
       ? section(
           recommendation
             ? recommendation.ranked.map((match) =>
                 projectJob(match.candidate.job, {
-                  score: match.matchScore,
-                  ...(match.matchBreakdown
-                    ? { breakdown: match.matchBreakdown }
-                    : {}),
+                  score: match.score,
+                  source: match.source,
+                  ...(match.breakdown ? { breakdown: match.breakdown } : {}),
+                  ...(match.cvMatch ? { cvMatch: match.cvMatch } : {}),
                 }),
               )
-            : rawJobs.map((job) => projectJob(job)),
+            : latestJobs.map((job) => projectJob(job)),
         )
       : failedJobs;
   const base = {
@@ -329,6 +470,10 @@ export async function getHomePageContext(
     jobs,
     spotlights,
     companyCount,
-    smartMatch: recommendation?.insight ?? illustrativeSmartMatch(),
+    smartMatch:
+      recommendation?.insight ??
+      (matchFallbackReason
+        ? { kind: "illustrative", score: 82, reason: matchFallbackReason }
+        : illustrativeSmartMatch()),
   };
 }

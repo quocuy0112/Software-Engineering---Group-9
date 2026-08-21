@@ -30,6 +30,7 @@ import { JobPostManagementList } from "../job-post-management/job-post-managemen
 import { JobPostManagementShow } from "../job-post-management/job-post-management-show";
 import { CompanyDetailShow } from "../companies/company-detail-show";
 import { CompanyList } from "../companies/company-list";
+import { BackupSettings } from "../backup/backup-settings";
 
 const theme = createTheme({
   palette: { mode: "light", primary: { main: "#155eef" } },
@@ -137,6 +138,11 @@ export function AdminApp() {
             options={{ label: "Connection Proposals" }}
             list={ProfessionalConnectionProposalList}
             show={ProfessionalConnectionProposalShow}
+          />
+          <Resource
+            name="backup-settings"
+            options={{ label: "Backup settings" }}
+            list={BackupSettings}
           />
         </Admin>
       </main>

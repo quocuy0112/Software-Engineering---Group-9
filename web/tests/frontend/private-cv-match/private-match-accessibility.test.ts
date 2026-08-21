@@ -52,17 +52,24 @@ describe("private CV match accessibility and fallback affordances", () => {
       resolve(featureRoot, "client/use-private-cv-match.ts"),
       "utf8",
     );
+    const copy = await readFile(
+      resolve(featureRoot, "i18n/private-match-copy.ts"),
+      "utf8",
+    );
     expect(page).toContain('aria-busy="true"');
     expect(page).toContain('aria-live="polite"');
-    expect(report).toContain("AI evaluation unavailable");
-    expect(report).toContain("Final score: not calculated");
-    expect(report).toContain("Apply now");
-    expect(setup).toContain("Analyze my CV");
-    expect(setup).toContain("Sensitive personal attributes are excluded");
-    expect(list).toContain("Saved CV match checks");
-    expect(list).toContain("Expires in");
+    expect(copy).toContain("AI evaluation unavailable");
+    expect(copy).toContain("Final score: not calculated");
+    expect(copy).toContain("Apply now");
+    expect(copy).toContain("Analyze my CV");
+    expect(copy).toContain("Sensitive personal attributes are excluded");
+    expect(copy).toContain("Saved CV match checks");
+    expect(copy).toContain("Expires in");
+    expect(report).toContain("useWorkspaceLocale");
+    expect(setup).toContain("useWorkspaceLocale");
+    expect(list).toContain("useWorkspaceLocale");
     expect(deletion).toContain('role="dialog"');
-    expect(deletion).toContain("physically deleted within 30 days");
+    expect(copy).toContain("physically deleted within 30 days");
     expect(client).toContain("document.visibilityState");
     expect(client).toContain("usePrivateCvMatchList");
   });

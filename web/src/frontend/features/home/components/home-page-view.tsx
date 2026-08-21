@@ -34,7 +34,7 @@ function HomeContent({ model }: { model: HomePageModel }) {
           <p>{copy.hero.eyebrow}</p>
           <h1 id="home-title">{copy.hero.title}</h1>
           <p className="home-hero-description">{copy.hero.description}</p>
-          <HomeHeroCtas locale={locale} />
+          <HomeHeroCtas locale={locale} viewer={model.viewer} />
           <HomeHeroSearch />
         </div>
         <HomeCvScan locale={locale} />

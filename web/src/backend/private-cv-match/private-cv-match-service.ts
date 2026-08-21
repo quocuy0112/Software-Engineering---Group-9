@@ -1,8 +1,13 @@
 import "server-only";
 
 import { createHash, randomUUID } from "node:crypto";
+import { z } from "zod";
 import { prisma } from "@/backend/database/prisma";
-import { normalizeSearchText } from "@/backend/services/jobs/search-normalization";
+import { PrismaPublicJobRepository } from "@/backend/repositories/jobs/prisma-public-job-repository";
+import { candidateVisibleJobWhere } from "@/backend/repositories/jobs/candidate-visible-job-policy";
+import { parseJobSearchCriteria } from "@/backend/services/jobs/job-discovery-service";
+import { jobSearchBySchema } from "@/shared/contracts/jobs/discovery";
+import { PRIVATE_MATCH_JOB_PICKER_LIMIT } from "@/shared/contracts/private-cv-match";
 import {
   PrivateCvMatchRepository,
   type PrivateCheckRecord,
@@ -24,6 +29,74 @@ export { PrivateCvMatchError } from "./private-match-errors";
 const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9._:-]{16,128}$/u;
 
 export type PrivateMatchEnqueue = (checkId: string) => Promise<void>;
+
+// The idle picker follows Find Jobs' compact discovery behavior. A typed
+// query uses the larger limit so every matching title/company is selectable.
+export const PRIVATE_MATCH_INITIAL_JOB_LIMIT = 6;
+export const PRIVATE_MATCH_REMOTE_JOB_LIMIT = PRIVATE_MATCH_JOB_PICKER_LIMIT;
+
+export const privateMatchJobsQuerySchema = z
+  .object({
+    q: z.string().trim().max(200).default(""),
+    searchBy: jobSearchBySchema.default("BOTH"),
+    limit: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .max(PRIVATE_MATCH_REMOTE_JOB_LIMIT)
+      .default(PRIVATE_MATCH_REMOTE_JOB_LIMIT),
+  })
+  .strict();
+
+export type PrivateMatchJobsQuery = z.infer<typeof privateMatchJobsQuerySchema>;
+
+export type PrivateMatchHomeScore = Readonly<{
+  jobId: string;
+  score: number;
+  checkId?: string;
+  cvVersion?: number;
+  jdVersion?: number;
+}>;
+
+/**
+ * A completed private check is the only Home score that has read the
+ * candidate's CV. Keep its ownership and expiry boundary inside this feature
+ * and expose only the score plus the minimal report reference needed for that
+ * candidate's own Home page.
+ */
+export async function listPrivateMatchHomeScores(
+  candidateUserId: string,
+  now = new Date(),
+): Promise<readonly PrivateMatchHomeScore[]> {
+  const checks = await new PrivateCvMatchRepository().listOwnedChecks(
+    candidateUserId,
+    now,
+    50,
+  );
+  const scores = new Map<string, PrivateMatchHomeScore>();
+  for (const check of checks) {
+    const score = check.currentAttempt?.hybridScore;
+    if (
+      check.state !== "READY" ||
+      check.currentAttempt?.state !== "READY" ||
+      score === null ||
+      score === undefined
+    )
+      continue;
+    const numericScore = Number(score);
+    if (!Number.isFinite(numericScore)) continue;
+    if (!scores.has(check.jobPostingId)) {
+      scores.set(check.jobPostingId, {
+        jobId: check.jobPostingId,
+        score: Math.round(numericScore),
+        checkId: check.id,
+        cvVersion: check.cvVersion,
+        jdVersion: check.jdVersion,
+      });
+    }
+  }
+  return [...scores.values()];
+}
 
 async function defaultEnqueue(): Promise<void> {
   // The durable queue is the attempt row itself. In a long-lived web process
@@ -95,110 +168,59 @@ const privateMatchJobSelect = {
   },
 } as const;
 
-function privateMatchJobWhere(now: Date, jobId?: string) {
-  return {
-    ...(jobId ? { id: jobId } : {}),
-    status: "ACTIVE" as const,
-    approvedAt: { not: null },
-    publishedAt: { not: null, lte: now },
-    closedAt: null,
-    removedAt: null,
-    AND: [
-      {
-        OR: [
-          { applicationDeadline: null },
-          { applicationDeadline: { gt: now } },
-        ],
-      },
-      {
-        OR: [
-          { reviewAggregate: null },
-          {
-            reviewAggregate: {
-              is: { approvedVersionId: { not: null }, closedAt: null },
-            },
-          },
-        ],
-      },
-    ],
-    company: {
-      // Candidate discovery uses the verifiedAt marker as the public
-      // eligibility boundary. Keep private checks on that same boundary;
-      // older public-job fixtures can legitimately have UNVERIFIED as the
-      // legacy state while retaining a valid verifiedAt timestamp.
-      verifiedAt: { not: null },
-      verificationState: { not: "INACTIVE" as const },
-      verificationInactiveAt: null,
-    },
-  };
-}
-
-function privateMatchJobSearchWhere(now: Date, query: string) {
-  const base = privateMatchJobWhere(now);
-  const tokens = normalizeSearchText(query.slice(0, 200))
-    .split(/\s+/u)
-    .filter(Boolean)
-    .slice(0, 8);
-  if (!tokens.length) return base;
-
-  return {
-    ...base,
-    AND: [
-      ...base.AND,
-      ...tokens.map((token) => ({
-        OR: [
-          { normalizedTitle: { contains: token } },
-          { searchDocumentNormalized: { contains: token } },
-          {
-            company: {
-              OR: [
-                {
-                  displayName: {
-                    contains: token,
-                    mode: "insensitive" as const,
-                  },
-                },
-                {
-                  legalName: { contains: token, mode: "insensitive" as const },
-                },
-              ],
-            },
-          },
-        ],
-      })),
-    ],
-  };
-}
-
 export async function findEligiblePrivateMatchJob(
   jobId: string,
   now = new Date(),
 ) {
   return prisma.jobPosting.findFirst({
-    where: privateMatchJobWhere(now, jobId),
+    where: candidateVisibleJobWhere(now, jobId),
     select: privateMatchJobSelect,
   });
 }
 
 export async function listEligiblePrivateMatchJobs(now = new Date()) {
-  return prisma.jobPosting.findMany({
-    where: privateMatchJobWhere(now),
-    orderBy: [{ publishedAt: "desc" }, { id: "asc" }],
-    take: 200,
-    select: privateMatchJobSelect,
-  });
+  return searchEligiblePrivateMatchJobs(
+    {
+      q: "",
+      searchBy: "BOTH",
+      limit: PRIVATE_MATCH_INITIAL_JOB_LIMIT,
+    },
+    now,
+  );
 }
 
 export async function searchEligiblePrivateMatchJobs(
-  query: string,
+  query: PrivateMatchJobsQuery,
   now = new Date(),
 ) {
-  return prisma.jobPosting.findMany({
-    where: privateMatchJobSearchWhere(now, query.slice(0, 200)),
-    orderBy: [{ publishedAt: "desc" }, { id: "asc" }],
-    take: 50,
+  // Reuse public discovery normalization, token matching, candidate policy,
+  // and relevance ordering without hydrating public Job Cards or actor state.
+  const criteria = {
+    // Public URL requests remain capped at their existing 50-item contract;
+    // the private picker has its own validated, bounded list contract.
+    ...parseJobSearchCriteria({
+      q: query.q,
+      searchBy: query.searchBy,
+      limit: 50,
+    }),
+    limit: query.limit,
+  };
+  const ranked = await new PrismaPublicJobRepository().searchOrderedIds(
+    criteria,
+    now,
+  );
+  if (!ranked.orderedJobIds.length) return [];
+  const entities = await prisma.jobPosting.findMany({
+    where: {
+      ...candidateVisibleJobWhere(now),
+      id: { in: ranked.orderedJobIds },
+    },
     select: privateMatchJobSelect,
   });
+  const byId = new Map(entities.map((entity) => [entity.id, entity]));
+  return ranked.orderedJobIds
+    .map((id) => byId.get(id))
+    .filter((job): job is NonNullable<typeof job> => job !== undefined);
 }
 
 function sha256(value: string): string {

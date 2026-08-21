@@ -2,7 +2,11 @@
   width: min(1080px, 100%);
   margin: 0 auto;
   color: var(--sh-profile-text);
-  font-family: var(--sh-profile-font-body);
+  font-family: var(--sh-font-family);
+}
+
+.candidate-dashboard-page * {
+  font-family: var(--sh-font-family) !important;
 }
 
 .candidate-dashboard-page .sh-page-header {

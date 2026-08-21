@@ -35,7 +35,7 @@ describe("job similarity", () => {
         salaryMax: null,
         experienceMinYears: null,
       }),
-    ).toBe(30);
+    ).toBe(26);
   });
 
   it("uses the same weighted engine for candidate-profile matches", () => {

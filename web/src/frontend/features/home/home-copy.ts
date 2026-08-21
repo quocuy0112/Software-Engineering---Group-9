@@ -42,6 +42,9 @@ export type HomeCopy = {
     dashboard: string;
     applications: string;
     savedJobs: string;
+    notificationLabel: string;
+    notificationPromptTitle: string;
+    notificationPromptDescription: string;
   };
   hero: {
     eyebrow: string;
@@ -97,6 +100,7 @@ export type HomeCopy = {
     personal: string;
     illustrative: string;
     personalScore: string;
+    cvScore: string;
     sampleScore: string;
     matchingSkills: string;
     improvementAreas: string;
@@ -116,13 +120,17 @@ export type HomeCopy = {
     illustrativeJobTitle: string;
     compositionTitle: string;
     skillsContribution: string;
+    roleAndSkillsContribution: string;
+    preferencesContribution: string;
     experienceContribution: string;
     educationContribution: string;
+    unmatchedContribution: string;
     insufficientData: string;
     scoreSuffix: string;
     scoreLabel: string;
     illustrativeCaption: string;
     estimateDetailsLabel: string;
+    cvMatchLimitation: string;
   };
   careerPaths: {
     eyebrow: string;
@@ -157,6 +165,8 @@ export type HomeCopy = {
     title: string;
     matchEstimate: string;
     bestMatch: string;
+    topSuggestion: string;
+    lowMatchNotice: string;
     featured: string;
     postedRecently: string;
     negotiableSalary: string;
@@ -164,6 +174,11 @@ export type HomeCopy = {
     hourlySalaryUnit: string;
     yearlySalaryUnit: string;
     profileMatch: string;
+    profileMatchEstimate: string;
+    cvMatchScore: string;
+    cvMatchPrivate: string;
+    cvMatchContext: string;
+    reviewCvMatch: string;
     matchSignals: string;
     viewJobDetails: string;
     loginForMatch: string;
@@ -173,6 +188,12 @@ export type HomeCopy = {
     completeProfileAction: string;
     completeProfileNote: string;
     lockedMatchLabel: string;
+    noPersonalMatches: string;
+    noPersonalMatchesDescription: string;
+    matchUnavailable: string;
+    matchUnavailableDescription: string;
+    matchUnavailableLabel: string;
+    browseOpportunities: string;
     save: string;
     saved: string;
     saving: string;
@@ -242,6 +263,10 @@ export const homeCopy = {
       dashboard: "My Dashboard",
       applications: "My Applications",
       savedJobs: "Saved Jobs",
+      notificationLabel: "Notifications",
+      notificationPromptTitle: "Stay informed",
+      notificationPromptDescription:
+        "Sign in or create an account to receive system notifications.",
     },
     hero: {
       eyebrow: "SMART HIRE — AI-POWERED HIRING",
@@ -388,6 +413,7 @@ export const homeCopy = {
       personal: "Personal job-fit recommendation",
       illustrative: "Illustrative Smart Match example",
       personalScore: "Personal match estimate",
+      cvScore: "CV Match Check score: {score}%",
       sampleScore: "Illustrative match estimate",
       matchingSkills: "Matching skills",
       improvementAreas: "Improvement areas",
@@ -411,14 +437,19 @@ export const homeCopy = {
       illustrativeJobTitle: "Frontend Developer",
       compositionTitle: "Fit-score composition",
       skillsContribution: "Skills",
+      roleAndSkillsContribution: "Role & skills",
+      preferencesContribution: "Location & pay",
       experienceContribution: "Experience",
       educationContribution: "Education",
+      unmatchedContribution: "Requirements not yet matched",
       insufficientData: "Insufficient data",
       scoreSuffix: "fit",
       scoreLabel: "Fit estimate: {score}%",
       illustrativeCaption:
         "An illustration of how AI can compare a candidate profile with job signals — no real data is used.",
       estimateDetailsLabel: "About this fit estimate",
+      cvMatchLimitation:
+        "This is the latest completed CV Match Check for this role, based on the CV and job description used when you ran the check.",
     },
     careerPaths: {
       eyebrow: "DIRECTIONS",
@@ -484,6 +515,9 @@ export const homeCopy = {
       title: "Trending Opportunities",
       matchEstimate: "match estimate",
       bestMatch: "BEST MATCH FOR YOU",
+      topSuggestion: "TOP SUGGESTION",
+      lowMatchNotice:
+        "This is a low-confidence estimate from your current profile, not a strong match.",
       featured: "FEATURED",
       postedRecently: "Recently posted",
       negotiableSalary: "Negotiable",
@@ -491,6 +525,12 @@ export const homeCopy = {
       hourlySalaryUnit: "m / hour",
       yearlySalaryUnit: "m / year",
       profileMatch: "Fit with your profile",
+      profileMatchEstimate: "Profile fit estimate",
+      cvMatchScore: "CV Match Check score",
+      cvMatchPrivate: "Private result for this exact role",
+      cvMatchContext:
+        "Checked against your latest CV and the current job description.",
+      reviewCvMatch: "Review match report",
       matchSignals: "Profile signals compared",
       viewJobDetails: "View job details",
       loginForMatch: "Log in to view your fit",
@@ -502,6 +542,14 @@ export const homeCopy = {
       completeProfileAction: "Complete your profile now →",
       completeProfileNote: "Usually takes about two minutes",
       lockedMatchLabel: "Profile match is locked",
+      noPersonalMatches: "No personalized matches are available yet",
+      noPersonalMatchesDescription:
+        "Your profile is ready. We will show a match when a suitable opportunity is available.",
+      matchUnavailable: "We can't calculate your fit right now",
+      matchUnavailableDescription:
+        "Your profile may be ready, but matching data is temporarily unavailable. You can still explore all opportunities.",
+      matchUnavailableLabel: "Personalized match unavailable",
+      browseOpportunities: "Browse opportunities",
       save: "Save job",
       saved: "Saved",
       saving: "Saving…",
@@ -601,6 +649,10 @@ export const homeCopy = {
       dashboard: "Trang tổng quan",
       applications: "Đơn ứng tuyển của tôi",
       savedJobs: "Việc làm đã lưu",
+      notificationLabel: "Thông báo",
+      notificationPromptTitle: "Không bỏ lỡ thông tin mới",
+      notificationPromptDescription:
+        "Đăng nhập hoặc tạo tài khoản để nhận thông báo từ hệ thống.",
     },
     hero: {
       eyebrow: "SMART HIRE — TUYỂN DỤNG THÔNG MINH BẰNG AI",
@@ -748,6 +800,7 @@ export const homeCopy = {
       personal: "Gợi ý việc làm phù hợp với bạn",
       illustrative: "Ví dụ Smart Match minh họa",
       personalScore: "Ước tính phù hợp cá nhân",
+      cvScore: "Điểm CV Match Check: {score}%",
       sampleScore: "Ước tính phù hợp minh họa",
       matchingSkills: "Kỹ năng phù hợp",
       improvementAreas: "Điểm có thể cải thiện",
@@ -771,14 +824,19 @@ export const homeCopy = {
       illustrativeJobTitle: "Frontend Developer",
       compositionTitle: "Cấu thành điểm phù hợp",
       skillsContribution: "Kỹ năng",
+      roleAndSkillsContribution: "Vai trò & kỹ năng",
+      preferencesContribution: "Địa điểm & lương",
       experienceContribution: "Kinh nghiệm",
       educationContribution: "Học vấn",
+      unmatchedContribution: "Yêu cầu chưa phù hợp",
       insufficientData: "Chưa đủ dữ liệu",
       scoreSuffix: "phù hợp",
       scoreLabel: "Ước tính phù hợp: {score}%",
       illustrativeCaption:
         "Ví dụ minh hoạ cách AI ghép hồ sơ ứng viên với yêu cầu công việc — không dùng dữ liệu thật.",
       estimateDetailsLabel: "Thông tin về ước tính phù hợp",
+      cvMatchLimitation:
+        "Đây là kết quả CV Match Check hoàn tất gần nhất cho vị trí này, dựa trên CV và mô tả công việc bạn đã dùng khi chấm.",
     },
     careerPaths: {
       eyebrow: "ĐỊNH HƯỚNG",
@@ -844,6 +902,9 @@ export const homeCopy = {
       title: "Cơ hội đang nổi bật",
       matchEstimate: "ước tính phù hợp",
       bestMatch: "PHÙ HỢP NHẤT VỚI BẠN",
+      topSuggestion: "GỢI Ý HÀNG ĐẦU",
+      lowMatchNotice:
+        "Đây là ước tính có độ tin cậy thấp dựa trên hồ sơ hiện tại, chưa phải một vị trí phù hợp cao.",
       featured: "NỔI BẬT",
       postedRecently: "Đăng gần đây",
       negotiableSalary: "Thỏa thuận",
@@ -851,6 +912,12 @@ export const homeCopy = {
       hourlySalaryUnit: "triệu / giờ",
       yearlySalaryUnit: "triệu / năm",
       profileMatch: "Độ phù hợp với hồ sơ",
+      profileMatchEstimate: "Ước tính phù hợp từ hồ sơ",
+      cvMatchScore: "Điểm CV Match Check",
+      cvMatchPrivate: "Kết quả riêng tư cho đúng vị trí này",
+      cvMatchContext:
+        "Đã chấm bằng CV mới nhất của bạn và mô tả công việc hiện tại.",
+      reviewCvMatch: "Xem lại báo cáo đối chiếu",
       matchSignals: "Tín hiệu hồ sơ được đối chiếu",
       viewJobDetails: "Xem chi tiết vị trí",
       loginForMatch: "Đăng nhập để xem điểm phù hợp",
@@ -862,6 +929,14 @@ export const homeCopy = {
       completeProfileAction: "Hoàn thiện hồ sơ ngay →",
       completeProfileNote: "Chỉ mất khoảng 2 phút",
       lockedMatchLabel: "Điểm phù hợp đang bị khóa",
+      noPersonalMatches: "Chưa có gợi ý phù hợp được cá nhân hóa",
+      noPersonalMatchesDescription:
+        "Hồ sơ của bạn đã sẵn sàng. Chúng tôi sẽ hiển thị điểm phù hợp khi có cơ hội phù hợp.",
+      matchUnavailable: "Chưa thể tính độ phù hợp lúc này",
+      matchUnavailableDescription:
+        "Hồ sơ của bạn có thể đã sẵn sàng, nhưng dữ liệu đối chiếu đang tạm thời không khả dụng. Bạn vẫn có thể xem tất cả cơ hội việc làm.",
+      matchUnavailableLabel: "Chưa có điểm phù hợp cá nhân hóa",
+      browseOpportunities: "Xem cơ hội việc làm",
       save: "Lưu việc làm",
       saved: "Đã lưu",
       saving: "Đang lưu…",
