@@ -202,6 +202,8 @@ services:
       IMAGE_SEARCH_STORAGE_LOCAL_ROOT: /app/.local/image-search-storage
       ADMIN_EVIDENCE_STORAGE_ROOT: /app/.local/admin-evidence
       ADMIN_CLAMD_SOCKET_PATH: /run/clamav/clamd.sock
+      GOOGLE_DRIVE_BACKUP_CLIENT_PATH: /app/SmartHireBackup/client_secret_649331580707-cq8m0cp497p5a584bevi311n0ikn9b9h.apps.googleusercontent.com.json
+      GOOGLE_DRIVE_BACKUP_TOKEN_PATH: /app/SmartHireBackup/google-oauth-token.json
       CV_CLAMD_SIGNATURE_MAX_AGE_HOURS: "48"
     depends_on:
       postgres:
@@ -217,6 +219,7 @@ services:
       - no-new-privileges:true
     volumes:
       - ./web/.private-admin-evidence:/app/.local/admin-evidence
+      - ./SmartHireBackup:/app/SmartHireBackup:ro
       - clamav_runtime:/run/clamav
     tmpfs:
       - /tmp:size=128m,mode=1770,uid=1000,gid=1000
