@@ -88,6 +88,7 @@ export class CampaignScoringStatsService {
       WHERE application."jobPostingId" IN (${Prisma.join(authorizedJobIds)})
         AND application."documentDeletedAt" IS NULL
         AND application."stage"::text <> 'REJECTED'
+        AND application."withdrawalOutcome" IS NULL
         AND account."emailVerified" = TRUE
       GROUP BY application."jobPostingId"
     `);
