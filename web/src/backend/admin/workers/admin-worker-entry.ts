@@ -16,6 +16,7 @@ import { runProposalLifecycleCycle } from "@/backend/connections/workers/proposa
 import { runProposalRetentionCycle } from "@/backend/connections/workers/proposal-retention-loop";
 import { runNotificationRetentionCycle } from "./notification-retention-loop";
 import { runJobPostLifecycleCycle } from "./job-post-lifecycle-loop";
+import { runBackupScheduleCycle } from "./backup-schedule-loop";
 
 export async function startAdminWorker(options: { probe?: boolean } = {}) {
   const runtime = new AdminWorkerRuntime([
@@ -69,6 +70,7 @@ export async function startAdminWorker(options: { probe?: boolean } = {}) {
       }),
     },
     { name: "job-post-lifecycle", intervalMs: 60_000, run: runJobPostLifecycleCycle },
+    { name: "backup", intervalMs: 5_000, run: runBackupScheduleCycle },
   ]);
   const readiness = await runtime.probe();
   if (readiness.some((item) => !item.ready))

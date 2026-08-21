@@ -13,7 +13,8 @@ export type AdminWorkerLoop = {
     | "retention"
     | "support"
     | "connections"
-    | "job-post-lifecycle";
+    | "job-post-lifecycle"
+    | "backup";
   intervalMs: number;
   run(now: Date): Promise<unknown>;
 };

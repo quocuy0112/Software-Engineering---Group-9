@@ -137,6 +137,24 @@ export const ExportRequestStatus = {
 export type ExportRequestStatus = (typeof ExportRequestStatus)[keyof typeof ExportRequestStatus]
 
 
+export const BackupRunTrigger = {
+  MANUAL: 'MANUAL',
+  SCHEDULED: 'SCHEDULED'
+} as const
+
+export type BackupRunTrigger = (typeof BackupRunTrigger)[keyof typeof BackupRunTrigger]
+
+
+export const BackupRunStatus = {
+  QUEUED: 'QUEUED',
+  LEASED: 'LEASED',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED'
+} as const
+
+export type BackupRunStatus = (typeof BackupRunStatus)[keyof typeof BackupRunStatus]
+
+
 export const EmailKind = {
   VERIFY_EMAIL: 'VERIFY_EMAIL',
   EMAIL_CHANGE_VERIFY: 'EMAIL_CHANGE_VERIFY',

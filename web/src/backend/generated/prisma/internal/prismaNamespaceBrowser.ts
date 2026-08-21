@@ -194,6 +194,8 @@ export const ModelName = {
   JobPostingViewFact: 'JobPostingViewFact',
   JobPostingLifecycleFact: 'JobPostingLifecycleFact',
   ExportRequest: 'ExportRequest',
+  BackupConfiguration: 'BackupConfiguration',
+  BackupRun: 'BackupRun',
   ActivityLegalHold: 'ActivityLegalHold'
 } as const
 
@@ -3018,6 +3020,42 @@ export const ExportRequestScalarFieldEnum = {
 } as const
 
 export type ExportRequestScalarFieldEnum = (typeof ExportRequestScalarFieldEnum)[keyof typeof ExportRequestScalarFieldEnum]
+
+
+export const BackupConfigurationScalarFieldEnum = {
+  id: 'id',
+  enabled: 'enabled',
+  intervalSeconds: 'intervalSeconds',
+  version: 'version',
+  updatedByAdminId: 'updatedByAdminId',
+  updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type BackupConfigurationScalarFieldEnum = (typeof BackupConfigurationScalarFieldEnum)[keyof typeof BackupConfigurationScalarFieldEnum]
+
+
+export const BackupRunScalarFieldEnum = {
+  id: 'id',
+  trigger: 'trigger',
+  status: 'status',
+  activeKey: 'activeKey',
+  requestedById: 'requestedById',
+  idempotencyKey: 'idempotencyKey',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  driveFileId: 'driveFileId',
+  driveFolderId: 'driveFolderId',
+  fileName: 'fileName',
+  checksum: 'checksum',
+  byteCount: 'byteCount',
+  failureCode: 'failureCode',
+  requestedAt: 'requestedAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt'
+} as const
+
+export type BackupRunScalarFieldEnum = (typeof BackupRunScalarFieldEnum)[keyof typeof BackupRunScalarFieldEnum]
 
 
 export const ActivityLegalHoldScalarFieldEnum = {

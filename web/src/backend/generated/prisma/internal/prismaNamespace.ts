@@ -540,6 +540,8 @@ export const ModelName = {
   JobPostingViewFact: 'JobPostingViewFact',
   JobPostingLifecycleFact: 'JobPostingLifecycleFact',
   ExportRequest: 'ExportRequest',
+  BackupConfiguration: 'BackupConfiguration',
+  BackupRun: 'BackupRun',
   ActivityLegalHold: 'ActivityLegalHold'
 } as const
 
@@ -556,7 +558,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "companyInvitation" | "companyTeamActivity" | "companyMembership" | "platformAdministratorGrant" | "platformAdministratorGrantScopeAssignment" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostReviewAggregate" | "jobPostRevisionRequest" | "jobPostFeaturedPlacement" | "jobPostEnforcementAction" | "jobPostEnforcementTarget" | "moderationReportEnforcementLink" | "jobPostOperationalHistory" | "jobPostReviewVersion" | "jobPostReviewHistory" | "jobPostReviewPrivateNote" | "jobCatalogueWriteLease" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "privateCvMatchCheck" | "privateCvMatchAttempt" | "privateAutomaticMatchResult" | "privateAiEvaluationResult" | "privateMatchEvidence" | "privateCvMatchCommandReceipt" | "savedJob" | "jobReport" | "candidateApplicationDraft" | "applicationIntake" | "applicationPublicUpdate" | "applicationNotificationPreference" | "jobApplication" | "applicationDocument" | "applicationCoverLetterText" | "applicationArtifactPromotion" | "applicationDocumentLegalHold" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "recruitmentThread" | "recruitmentMessage" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence" | "automaticMatchResult" | "documentParseResult" | "skillEvidenceExtraction" | "cvEvidenceExcerpt" | "aiAssessment" | "aiAssessmentFinding" | "aiSuggestedInterviewQuestion" | "scoringOperation" | "scoringWorkItem" | "aiAssessmentAttempt" | "applicationScoringResult" | "manualApplicationPriority" | "rankingSnapshot" | "rankingSnapshotRow" | "jobPostingViewFact" | "jobPostingLifecycleFact" | "exportRequest" | "activityLegalHold"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "companyInvitation" | "companyTeamActivity" | "companyMembership" | "platformAdministratorGrant" | "platformAdministratorGrantScopeAssignment" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostReviewAggregate" | "jobPostRevisionRequest" | "jobPostFeaturedPlacement" | "jobPostEnforcementAction" | "jobPostEnforcementTarget" | "moderationReportEnforcementLink" | "jobPostOperationalHistory" | "jobPostReviewVersion" | "jobPostReviewHistory" | "jobPostReviewPrivateNote" | "jobCatalogueWriteLease" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "privateCvMatchCheck" | "privateCvMatchAttempt" | "privateAutomaticMatchResult" | "privateAiEvaluationResult" | "privateMatchEvidence" | "privateCvMatchCommandReceipt" | "savedJob" | "jobReport" | "candidateApplicationDraft" | "applicationIntake" | "applicationPublicUpdate" | "applicationNotificationPreference" | "jobApplication" | "applicationDocument" | "applicationCoverLetterText" | "applicationArtifactPromotion" | "applicationDocumentLegalHold" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "recruitmentThread" | "recruitmentMessage" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence" | "automaticMatchResult" | "documentParseResult" | "skillEvidenceExtraction" | "cvEvidenceExcerpt" | "aiAssessment" | "aiAssessmentFinding" | "aiSuggestedInterviewQuestion" | "scoringOperation" | "scoringWorkItem" | "aiAssessmentAttempt" | "applicationScoringResult" | "manualApplicationPriority" | "rankingSnapshot" | "rankingSnapshotRow" | "jobPostingViewFact" | "jobPostingLifecycleFact" | "exportRequest" | "backupConfiguration" | "backupRun" | "activityLegalHold"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -11142,6 +11144,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    BackupConfiguration: {
+      payload: Prisma.$BackupConfigurationPayload<ExtArgs>
+      fields: Prisma.BackupConfigurationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BackupConfigurationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupConfigurationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BackupConfigurationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupConfigurationPayload>
+        }
+        findFirst: {
+          args: Prisma.BackupConfigurationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupConfigurationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BackupConfigurationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupConfigurationPayload>
+        }
+        findMany: {
+          args: Prisma.BackupConfigurationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupConfigurationPayload>[]
+        }
+        create: {
+          args: Prisma.BackupConfigurationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupConfigurationPayload>
+        }
+        createMany: {
+          args: Prisma.BackupConfigurationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BackupConfigurationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupConfigurationPayload>[]
+        }
+        delete: {
+          args: Prisma.BackupConfigurationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupConfigurationPayload>
+        }
+        update: {
+          args: Prisma.BackupConfigurationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupConfigurationPayload>
+        }
+        deleteMany: {
+          args: Prisma.BackupConfigurationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BackupConfigurationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BackupConfigurationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupConfigurationPayload>[]
+        }
+        upsert: {
+          args: Prisma.BackupConfigurationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupConfigurationPayload>
+        }
+        aggregate: {
+          args: Prisma.BackupConfigurationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBackupConfiguration>
+        }
+        groupBy: {
+          args: Prisma.BackupConfigurationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BackupConfigurationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BackupConfigurationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BackupConfigurationCountAggregateOutputType> | number
+        }
+      }
+    }
+    BackupRun: {
+      payload: Prisma.$BackupRunPayload<ExtArgs>
+      fields: Prisma.BackupRunFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BackupRunFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupRunPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BackupRunFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupRunPayload>
+        }
+        findFirst: {
+          args: Prisma.BackupRunFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupRunPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BackupRunFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupRunPayload>
+        }
+        findMany: {
+          args: Prisma.BackupRunFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupRunPayload>[]
+        }
+        create: {
+          args: Prisma.BackupRunCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupRunPayload>
+        }
+        createMany: {
+          args: Prisma.BackupRunCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BackupRunCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupRunPayload>[]
+        }
+        delete: {
+          args: Prisma.BackupRunDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupRunPayload>
+        }
+        update: {
+          args: Prisma.BackupRunUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupRunPayload>
+        }
+        deleteMany: {
+          args: Prisma.BackupRunDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BackupRunUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BackupRunUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupRunPayload>[]
+        }
+        upsert: {
+          args: Prisma.BackupRunUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BackupRunPayload>
+        }
+        aggregate: {
+          args: Prisma.BackupRunAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBackupRun>
+        }
+        groupBy: {
+          args: Prisma.BackupRunGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BackupRunGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BackupRunCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BackupRunCountAggregateOutputType> | number
+        }
+      }
+    }
     ActivityLegalHold: {
       payload: Prisma.$ActivityLegalHoldPayload<ExtArgs>
       fields: Prisma.ActivityLegalHoldFieldRefs
@@ -14062,6 +14212,42 @@ export const ExportRequestScalarFieldEnum = {
 export type ExportRequestScalarFieldEnum = (typeof ExportRequestScalarFieldEnum)[keyof typeof ExportRequestScalarFieldEnum]
 
 
+export const BackupConfigurationScalarFieldEnum = {
+  id: 'id',
+  enabled: 'enabled',
+  intervalSeconds: 'intervalSeconds',
+  version: 'version',
+  updatedByAdminId: 'updatedByAdminId',
+  updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type BackupConfigurationScalarFieldEnum = (typeof BackupConfigurationScalarFieldEnum)[keyof typeof BackupConfigurationScalarFieldEnum]
+
+
+export const BackupRunScalarFieldEnum = {
+  id: 'id',
+  trigger: 'trigger',
+  status: 'status',
+  activeKey: 'activeKey',
+  requestedById: 'requestedById',
+  idempotencyKey: 'idempotencyKey',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  driveFileId: 'driveFileId',
+  driveFolderId: 'driveFolderId',
+  fileName: 'fileName',
+  checksum: 'checksum',
+  byteCount: 'byteCount',
+  failureCode: 'failureCode',
+  requestedAt: 'requestedAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt'
+} as const
+
+export type BackupRunScalarFieldEnum = (typeof BackupRunScalarFieldEnum)[keyof typeof BackupRunScalarFieldEnum]
+
+
 export const ActivityLegalHoldScalarFieldEnum = {
   id: 'id',
   scopeType: 'scopeType',
@@ -16114,6 +16300,34 @@ export type ListEnumExportRequestStatusFieldRefInput<$PrismaModel> = FieldRefInp
 
 
 /**
+ * Reference to a field of type 'BackupRunTrigger'
+ */
+export type EnumBackupRunTriggerFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BackupRunTrigger'>
+    
+
+
+/**
+ * Reference to a field of type 'BackupRunTrigger[]'
+ */
+export type ListEnumBackupRunTriggerFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BackupRunTrigger[]'>
+    
+
+
+/**
+ * Reference to a field of type 'BackupRunStatus'
+ */
+export type EnumBackupRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BackupRunStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'BackupRunStatus[]'
+ */
+export type ListEnumBackupRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BackupRunStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -16420,6 +16634,8 @@ export type GlobalOmitConfig = {
   jobPostingViewFact?: Prisma.JobPostingViewFactOmit
   jobPostingLifecycleFact?: Prisma.JobPostingLifecycleFactOmit
   exportRequest?: Prisma.ExportRequestOmit
+  backupConfiguration?: Prisma.BackupConfigurationOmit
+  backupRun?: Prisma.BackupRunOmit
   activityLegalHold?: Prisma.ActivityLegalHoldOmit
 }
 
