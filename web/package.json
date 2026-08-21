@@ -25,6 +25,7 @@
     "backup:authorize-google": "node scripts/authorize-google-drive-backup.mjs",
     "backup:smoke": "node --conditions=react-server --import tsx scripts/run-admin-backup-smoke.mjs",
     "backup:inspect": "node --conditions=react-server --import tsx scripts/inspect-admin-backup.mjs",
+    "backup:decrypt": "node scripts/decrypt-admin-backup.mjs",
     "admin:contracts": "node scripts/validate-admin-user-verification-contracts.mjs --check",
     "test:admin-user-verification": "node scripts/run-admin-user-verification-tests.mjs",
     "test:admin-user-verification:e2e": "node scripts/run-admin-user-verification-e2e.mjs",
