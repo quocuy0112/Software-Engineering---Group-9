@@ -21,7 +21,8 @@ export type RankedCandidateQuery = Readonly<{
     | "HIRED"
     | "OFFER_DECLINED"
     | "REJECTED"
-    | "WAITLISTED";
+    | "WAITLISTED"
+    | "WITHDRAWN";
   scoringStatus:
     | "ALL"
     | "PROCESSING"

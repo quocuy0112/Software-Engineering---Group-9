@@ -299,7 +299,17 @@ function CandidateRow({
         </span>
       </span>
       <span className="ranking-table__cell" role="cell" data-label="Status">
-        <span className="ranking-status-pill">{statusLabel(row.stage)}</span>
+        <span
+          className={[
+            "ranking-status-pill",
+            row.withdrawalOutcome === "CANDIDATE_WITHDRAWN" &&
+              "ranking-status-pill--withdrawn",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          {statusLabel(row.stage, row.withdrawalOutcome)}
+        </span>
       </span>
       <span
         className="ranking-table__cell ranking-table__experience"
@@ -777,6 +787,7 @@ export function CandidateRankingList({
                   <option value="WAITLISTED">Needs details</option>
                   <option value="INTERVIEWING">Interviewing</option>
                   <option value="REJECTED">Rejected</option>
+                  <option value="WITHDRAWN">Withdrawn</option>
                 </select>
               </label>
               <label className="ranking-filter-field">

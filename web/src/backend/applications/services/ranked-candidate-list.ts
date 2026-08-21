@@ -42,7 +42,8 @@ type RankingFilters = Readonly<{
     | "HIRED"
     | "OFFER_DECLINED"
     | "REJECTED"
-    | "WAITLISTED";
+    | "WAITLISTED"
+    | "WITHDRAWN";
   scoringStatus:
     | "ALL"
     | "PROCESSING"
@@ -232,10 +233,12 @@ export class RankedCandidateListService {
         jobPostingId,
         documentDeletedAt: null,
         ...(filters.stage === "ACTIVE_PIPELINE"
-          ? { stage: { not: "REJECTED" } }
-          : filters.stage !== "ALL"
-            ? { stage: filters.stage }
-            : {}),
+          ? { withdrawalOutcome: null, stage: { not: "REJECTED" } }
+          : filters.stage === "WITHDRAWN"
+            ? { withdrawalOutcome: "CANDIDATE_WITHDRAWN" }
+            : filters.stage !== "ALL"
+              ? { withdrawalOutcome: null, stage: filters.stage }
+              : {}),
         ...(filters.search
           ? {
               candidate: {
@@ -254,6 +257,7 @@ export class RankedCandidateListService {
       select: {
         id: true,
         stage: true,
+        withdrawalOutcome: true,
         stageVersion: true,
         submittedAt: true,
         scoringStatus: true,
@@ -327,6 +331,7 @@ export class RankedCandidateListService {
         return {
           applicationId: row.id,
           stage: row.stage,
+          withdrawalOutcome: row.withdrawalOutcome,
           stageVersion: row.stageVersion,
           submittedAt: row.submittedAt.toISOString(),
           candidate: {
@@ -379,35 +384,38 @@ export class RankedCandidateListService {
               }
             : null,
           allowedActions: {
-            moveToInterview: authorized.canMoveStages && [
-              "APPLIED",
-              "VIEWED",
-              "SHORTLISTED",
-              "WAITLISTED",
-            ].includes(row.stage)
-              ? { allowed: true, label: "Move to interview" }
-              : {
-                  allowed: false,
-                  label: "Unavailable",
-                  reasonCode: "INVALID_SOURCE_STAGE",
-                  reasonLabel:
-                    "This stage cannot move directly to Interviewing.",
-                },
-            reject: authorized.canReject && [
-              "APPLIED",
-              "VIEWED",
-              "SHORTLISTED",
-              "INTERVIEWING",
-              "OFFERED",
-              "WAITLISTED",
-            ].includes(row.stage)
-              ? { allowed: true, label: "Reject" }
-              : {
-                  allowed: false,
-                  label: "Unavailable",
-                  reasonCode: "INVALID_SOURCE_STAGE",
-                  reasonLabel: "This application is already closed.",
-                },
+            moveToInterview:
+              !row.withdrawalOutcome &&
+              authorized.canMoveStages &&
+              ["APPLIED", "VIEWED", "SHORTLISTED", "WAITLISTED"].includes(
+                row.stage,
+              )
+                ? { allowed: true, label: "Move to interview" }
+                : {
+                    allowed: false,
+                    label: "Unavailable",
+                    reasonCode: "INVALID_SOURCE_STAGE",
+                    reasonLabel:
+                      "This stage cannot move directly to Interviewing.",
+                  },
+            reject:
+              !row.withdrawalOutcome &&
+              authorized.canReject &&
+              [
+                "APPLIED",
+                "VIEWED",
+                "SHORTLISTED",
+                "INTERVIEWING",
+                "OFFERED",
+                "WAITLISTED",
+              ].includes(row.stage)
+                ? { allowed: true, label: "Reject" }
+                : {
+                    allowed: false,
+                    label: "Unavailable",
+                    reasonCode: "INVALID_SOURCE_STAGE",
+                    reasonLabel: "This application is already closed.",
+                  },
           },
         };
       });
@@ -605,7 +613,7 @@ export class RankedCandidateListService {
         : null,
       defaultRejectedExclusionLabel:
         filters.stage === "ACTIVE_PIPELINE"
-          ? "Rejected candidates are excluded from the active pipeline. Choose All or Rejected to view them."
+          ? "Rejected and withdrawn candidates are excluded from the active pipeline. Choose All, Rejected, or Withdrawn to view them."
           : null,
       rescoreInProgress,
       lastScoredAt: lastSuccessfulRescore?.completedAt?.toISOString() ?? null,
