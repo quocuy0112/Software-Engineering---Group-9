@@ -54,10 +54,10 @@ vi.mock(
 );
 
 describe("RecruitmentPipelineBoard", () => {
-  it("renders all nine named columns and read-only status", () => {
+  it("renders all canonical columns plus the read-only Withdrawn column", () => {
     render(<RecruitmentPipelineBoard jobId="job-1" />);
     const columns = screen.getAllByRole("region");
-    expect(columns).toHaveLength(9);
+    expect(columns).toHaveLength(10);
     expect(
       columns.map((column) => within(column).getByRole("heading").textContent),
     ).toEqual([
@@ -70,6 +70,7 @@ describe("RecruitmentPipelineBoard", () => {
       "Offer Declined",
       "Rejected",
       "Waitlisted",
+      "Withdrawn",
     ]);
     expect(screen.getByText(/read.only/i)).toBeInTheDocument();
     expect(
@@ -77,6 +78,10 @@ describe("RecruitmentPipelineBoard", () => {
     ).toBeInTheDocument();
     expect(
       screen.getAllByRole("button", { name: "View full list" }),
-    ).toHaveLength(9);
+    ).toHaveLength(10);
+    expect(screen.getByRole("region", { name: /withdrawn/i })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
   });
 });

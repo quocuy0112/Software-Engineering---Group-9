@@ -4,18 +4,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import {
   isTerminalPipelineStage,
-  pipelineApplicationStages,
+  pipelineBoardColumnStages,
   pipelineBoardMetadataSchema,
   pipelineStagePageSchema,
+  pipelineWithdrawnPageSchema,
   type ApplicationStage,
+  type PipelineBoardColumnStage,
   type PipelineBoardMetadata,
-  type PipelineStagePage,
+  type PipelineBoardPage,
   type PipelineApplicationCard,
   type StageTransitionCommand,
   stageTransitionOutcomeSchema,
 } from "@/shared/contracts/applications";
 
-type ColumnState = Readonly<{ page: PipelineStagePage | null; loading: boolean; loadingMore: boolean; error: string | null }>;
+type ColumnState = Readonly<{ page: PipelineBoardPage | null; loading: boolean; loadingMore: boolean; error: string | null }>;
 type StageMoveExtras = Omit<StageTransitionCommand, "targetStage" | "expectedStageVersion">;
 type StageMoveOperation = Readonly<{ card: PipelineApplicationCard; targetStage: ApplicationStage; extras: StageMoveExtras; idempotencyKey: string }>;
 type LoadStageOptions = Readonly<{ background?: boolean }>;
@@ -39,7 +41,10 @@ function pipelineMetadataChanged(current: PipelineBoardMetadata, next: PipelineB
   }
 
   const currentCounts = new Map(current.stages.map((stage) => [stage.stage, stage.count]));
-  return next.stages.some((stage) => currentCounts.get(stage.stage) !== stage.count);
+  return (
+    (current.withdrawnCount ?? 0) !== (next.withdrawnCount ?? 0) ||
+    next.stages.some((stage) => currentCounts.get(stage.stage) !== stage.count)
+  );
 }
 
 class StageMoveRequestError extends Error {
@@ -54,7 +59,7 @@ class StageMoveRequestError extends Error {
 export function useRecruitmentPipeline(jobId: string) {
   const csrfProof = useCsrfProof();
   const [metadata, setMetadata] = useState<PipelineBoardMetadata | null>(null);
-  const [columns, setColumns] = useState<Partial<Record<ApplicationStage, ColumnState>>>({});
+  const [columns, setColumns] = useState<Partial<Record<PipelineBoardColumnStage, ColumnState>>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
@@ -67,17 +72,20 @@ export function useRecruitmentPipeline(jobId: string) {
   const loadingRef = useRef(true);
   const pipelineRefreshInFlight = useRef(false);
 
-  const loadStage = useCallback(async (stage: ApplicationStage, cursor?: string, options: LoadStageOptions = {}) => {
+  const loadStage = useCallback(async (stage: PipelineBoardColumnStage, cursor?: string, options: LoadStageOptions = {}) => {
     const currentGeneration = generation.current;
     const background = options.background === true;
     setColumns((current) => ({ ...current, [stage]: { ...(current[stage] ?? emptyColumn()), loading: background ? (current[stage]?.loading ?? false) : !cursor, loadingMore: background ? (current[stage]?.loadingMore ?? false) : Boolean(cursor), error: null } }));
     try {
       const params = new URLSearchParams({ limit: "25" });
       if (cursor) params.set("cursor", cursor);
-      const response = await fetch(`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/pipeline/${stage}?${params}`, { cache: "no-store" });
+      const path = stage === "WITHDRAWN" ? "withdrawn" : stage;
+      const response = await fetch(`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/pipeline/${path}?${params}`, { cache: "no-store" });
       const json = await response.json().catch(() => null);
       if (!response.ok) throw new Error(json?.message ?? "Unable to load this pipeline stage.");
-      const page = pipelineStagePageSchema.parse(json);
+      const page = stage === "WITHDRAWN"
+        ? pipelineWithdrawnPageSchema.parse(json)
+        : pipelineStagePageSchema.parse(json);
       if (generation.current !== currentGeneration) return;
       setColumns((current) => {
         const previous = current[stage]?.page;
@@ -111,7 +119,11 @@ export function useRecruitmentPipeline(jobId: string) {
       if (generation.current !== currentGeneration) return;
       metadataRef.current = next;
       setMetadata(next);
-      await Promise.all(pipelineApplicationStages.map((stage) => loadStage(stage, undefined, { background: preserve })));
+      await Promise.all(
+        pipelineBoardColumnStages.map((stage) =>
+          loadStage(stage, undefined, { background: preserve }),
+        ),
+      );
     } catch (cause) {
       if (generation.current !== currentGeneration) return;
       if (!preserve) {
@@ -215,14 +227,14 @@ export function useRecruitmentPipeline(jobId: string) {
   }, [csrfProof, jobId, load, loadStage]);
 
   const move = useCallback(async (card: PipelineApplicationCard, targetStage: ApplicationStage, extras: StageMoveExtras = {}) => {
-    if (isTerminalPipelineStage(card.stage) || !card.allowedDestinations.includes(targetStage) || pendingApplicationIdRef.current) return false;
+    if (isTerminalPipelineStage(card.stage) || card.withdrawalOutcome === "CANDIDATE_WITHDRAWN" || !card.allowedDestinations.includes(targetStage) || pendingApplicationIdRef.current) return false;
     setCanRetryStageMove(false);
     return submitStageMove({ card, targetStage, extras, idempotencyKey: crypto.randomUUID() }, true);
   }, [submitStageMove]);
 
   const moveDrag = useCallback(async (card: PipelineApplicationCard, targetStage: ApplicationStage, extras: StageMoveExtras = {}) => {
     const dragDestinations = card.dragDestinations ?? [];
-    if (isTerminalPipelineStage(card.stage) || !dragDestinations.includes(targetStage)) return false;
+    if (isTerminalPipelineStage(card.stage) || card.withdrawalOutcome === "CANDIDATE_WITHDRAWN" || !dragDestinations.includes(targetStage)) return false;
     return move(card, targetStage, { ...extras, intent: "drag" });
   }, [move]);
 
@@ -233,7 +245,7 @@ export function useRecruitmentPipeline(jobId: string) {
   ) => {
     let allSucceeded = true;
     for (const card of cardsToMove) {
-      if (isTerminalPipelineStage(card.stage)) {
+      if (isTerminalPipelineStage(card.stage) || card.withdrawalOutcome === "CANDIDATE_WITHDRAWN") {
         allSucceeded = false;
         continue;
       }
@@ -262,7 +274,7 @@ export function useRecruitmentPipeline(jobId: string) {
     loading,
     error,
     loadStage,
-    loadMore: (stage: ApplicationStage) => {
+    loadMore: (stage: PipelineBoardColumnStage) => {
       const cursor = columns[stage]?.page?.nextCursor;
       if (cursor) void loadStage(stage, cursor);
     },

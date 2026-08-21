@@ -1233,9 +1233,10 @@
 
 .board.outcomes,
 .recruitment-pipeline__columns.board.outcomes {
-  grid-template-columns: repeat(4, minmax(280px, 1fr));
-  width: 1168px;
-  min-width: 1168px;
+  /* Keep the outcome row aligned with the five columns above. */
+  grid-template-columns: repeat(5, minmax(300px, 1fr));
+  width: 1564px;
+  min-width: 1564px;
   max-width: none;
   margin-inline: auto;
 }
@@ -1268,6 +1269,12 @@
   border-color: var(--accent);
   background: var(--accent-soft);
   box-shadow: inset 0 0 0 2px rgba(68,83,232,0.14);
+}
+
+.column.is-withdrawn,
+.pipeline-column.is-withdrawn {
+  border-color: var(--warning);
+  background: var(--surface);
 }
 
 .column-head,
@@ -1643,6 +1650,7 @@
 
 .status-hired { color: var(--success); background: var(--success-bg); }
 .status-rejected { color: var(--danger); background: var(--danger-bg); }
+.status-withdrawn { color: var(--warning); background: var(--warning-bg); }
 
 .submitted-date,
 .pipeline-card__submitted-date,
@@ -2179,6 +2187,7 @@
 .modal-row:hover { background: var(--bg); }
 
 .modal-row-name { color: var(--text); font-size: 13px; font-weight: 700; }
+.modal-row-status { display: inline-flex; margin-left: 8px; padding: 3px 7px; border-radius: 999px; font-size: 10px; font-weight: 700; vertical-align: middle; }
 .modal-row-date { margin-top: 1px; color: var(--muted); font-size: 11px; }
 
 .modal-row-score {

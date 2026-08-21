@@ -50,6 +50,12 @@ const rejectedCard: PipelineApplicationCard = {
   dragDestinations: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING"],
 };
 
+const withdrawnCard: PipelineApplicationCard = {
+  ...card,
+  applicationId: "application-withdrawn",
+  withdrawalOutcome: "CANDIDATE_WITHDRAWN",
+};
+
 const scoredCard: PipelineApplicationCard = {
   ...card,
   applicationId: "application-scored",
@@ -129,6 +135,32 @@ describe("RecruitmentPipelineCard interactions", () => {
       />,
     );
 
+    expect(
+      screen.queryByRole("button", {
+        name: "Drag Ada Candidate to another stage",
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Change Stage" }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.pointerDown(screen.getByText("Ada Candidate"));
+
+    expect(pointerDown).not.toHaveBeenCalled();
+    expect(onChangeStage).not.toHaveBeenCalled();
+  });
+
+  it("shows withdrawn cards as read-only with a dedicated status", () => {
+    const onChangeStage = vi.fn();
+    render(
+      <RecruitmentPipelineCard
+        card={withdrawnCard}
+        jobId="job-1"
+        onChangeStage={onChangeStage}
+      />,
+    );
+
+    expect(screen.getByText("WITHDRAWN")).toBeInTheDocument();
     expect(
       screen.queryByRole("button", {
         name: "Drag Ada Candidate to another stage",

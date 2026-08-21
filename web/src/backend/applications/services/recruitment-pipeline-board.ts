@@ -7,9 +7,11 @@ import {
   pipelineBoardMetadataSchema,
   pipelineStageLabels,
   pipelineStagePageSchema,
+  pipelineWithdrawnPageSchema,
   type ApplicationStage,
   type PipelineBoardMetadata,
   type PipelineStagePage,
+  type PipelineWithdrawnPage,
 } from "@/shared/contracts/applications";
 import {
   recruiterPipelineButtonTransitions,
@@ -52,6 +54,9 @@ export class RecruitmentPipelineBoardService {
     const counts = await this.repository.countPipelineStages(
       context.jobPostingId,
     );
+    const withdrawnCount = this.repository.countWithdrawnApplications
+      ? await this.repository.countWithdrawnApplications(context.jobPostingId)
+      : 0;
     const revisionAt = this.repository.latestUpdatedAt
       ? await this.repository.latestUpdatedAt(context.jobPostingId)
       : null;
@@ -74,6 +79,7 @@ export class RecruitmentPipelineBoardService {
         label: pipelineStageLabels[stage],
         count: counts[stage],
       })),
+      withdrawnCount,
       revisionAt: revisionAt?.toISOString() ?? null,
       observedAt: (input.now ?? new Date()).toISOString(),
     });
@@ -104,12 +110,44 @@ export class RecruitmentPipelineBoardService {
       stage: input.stage,
       items: page.items.map((item) => ({
         ...item,
-        allowedDestinations: context.canMoveStages
-          ? [...recruiterPipelineButtonTransitions[item.stage]]
-          : [],
-        dragDestinations: context.canMoveStages
-          ? [...recruiterPipelineDragTransitions[item.stage]]
-          : [],
+        allowedDestinations:
+          context.canMoveStages &&
+          item.withdrawalOutcome !== "CANDIDATE_WITHDRAWN"
+            ? [...recruiterPipelineButtonTransitions[item.stage]]
+            : [],
+        dragDestinations:
+          context.canMoveStages &&
+          item.withdrawalOutcome !== "CANDIDATE_WITHDRAWN"
+            ? [...recruiterPipelineDragTransitions[item.stage]]
+            : [],
+      })),
+      nextCursor: page.nextCursor,
+      hasMore: page.nextCursor !== null,
+      observedAt: (input.now ?? new Date()).toISOString(),
+    });
+  }
+
+  async withdrawnPage(input: {
+    userId: string;
+    jobId: string;
+    limit: number;
+    cursor?: string;
+    now?: Date;
+  }): Promise<PipelineWithdrawnPage> {
+    const context = await this.context(input.userId, input.jobId);
+    const page = await this.repository.listPipelineStage({
+      jobId: context.jobPostingId,
+      stage: "WITHDRAWN",
+      limit: input.limit,
+      cursor: input.cursor,
+    });
+    return pipelineWithdrawnPageSchema.parse({
+      stage: "WITHDRAWN",
+      items: page.items.map((item) => ({
+        ...item,
+        withdrawalOutcome: "CANDIDATE_WITHDRAWN" as const,
+        allowedDestinations: [],
+        dragDestinations: [],
       })),
       nextCursor: page.nextCursor,
       hasMore: page.nextCursor !== null,

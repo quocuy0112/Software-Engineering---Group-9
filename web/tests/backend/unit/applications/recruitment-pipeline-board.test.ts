@@ -43,6 +43,7 @@ describe("RecruitmentPipelineBoardService", () => {
             stages.map((stage) => [stage, stage === "APPLIED" ? 2 : 0]),
           ),
         ),
+      countWithdrawnApplications: vi.fn().mockResolvedValue(1),
       latestUpdatedAt: vi.fn().mockResolvedValue(revisionAt),
     };
     const service = new RecruitmentPipelineBoardService(
@@ -62,27 +63,26 @@ describe("RecruitmentPipelineBoardService", () => {
       canMoveStages: true,
     });
     expect(result.revisionAt).toBe(revisionAt.toISOString());
+    expect(result.withdrawnCount).toBe(1);
     expect(repository.countPipelineStages).toHaveBeenCalledWith("job-1");
   });
 
   it("calculates destinations server-side and keeps scoring optional", async () => {
     const repository = {
-      listPipelineStage: vi
-        .fn()
-        .mockResolvedValue({
-          items: [
-            {
-              applicationId: "app-1",
-              candidate: { displayName: "Ada", avatarUrl: null },
-              submittedAt: "2026-01-01T00:00:00.000Z",
-              stage: "APPLIED",
-              stageVersion: 1,
-              documents: { cvAvailable: true, coverLetterAvailable: false },
-              score: null,
-            },
-          ],
-          nextCursor: null,
-        }),
+      listPipelineStage: vi.fn().mockResolvedValue({
+        items: [
+          {
+            applicationId: "app-1",
+            candidate: { displayName: "Ada", avatarUrl: null },
+            submittedAt: "2026-01-01T00:00:00.000Z",
+            stage: "APPLIED",
+            stageVersion: 1,
+            documents: { cvAvailable: true, coverLetterAvailable: false },
+            score: null,
+          },
+        ],
+        nextCursor: null,
+      }),
     };
     const service = new RecruitmentPipelineBoardService(
       repository as never,
@@ -150,24 +150,22 @@ describe("RecruitmentPipelineBoardService", () => {
 
   it("does not expose controls for a hired application even if stale data includes destinations", async () => {
     const repository = {
-      listPipelineStage: vi
-        .fn()
-        .mockResolvedValue({
-          items: [
-            {
-              applicationId: "app-hired",
-              candidate: { displayName: "Ada", avatarUrl: null },
-              submittedAt: "2026-01-01T00:00:00.000Z",
-              stage: "HIRED",
-              stageVersion: 2,
-              documents: { cvAvailable: true, coverLetterAvailable: false },
-              score: null,
-              allowedDestinations: ["REJECTED", "WAITLISTED"],
-              dragDestinations: ["REJECTED", "WAITLISTED"],
-            },
-          ],
-          nextCursor: null,
-        }),
+      listPipelineStage: vi.fn().mockResolvedValue({
+        items: [
+          {
+            applicationId: "app-hired",
+            candidate: { displayName: "Ada", avatarUrl: null },
+            submittedAt: "2026-01-01T00:00:00.000Z",
+            stage: "HIRED",
+            stageVersion: 2,
+            documents: { cvAvailable: true, coverLetterAvailable: false },
+            score: null,
+            allowedDestinations: ["REJECTED", "WAITLISTED"],
+            dragDestinations: ["REJECTED", "WAITLISTED"],
+          },
+        ],
+        nextCursor: null,
+      }),
     };
     const service = new RecruitmentPipelineBoardService(
       repository as never,
@@ -186,5 +184,94 @@ describe("RecruitmentPipelineBoardService", () => {
 
     expect(result.items[0].allowedDestinations).toEqual([]);
     expect(result.items[0].dragDestinations).toEqual([]);
+  });
+
+  it("does not expose controls for a withdrawn application", async () => {
+    const repository = {
+      listPipelineStage: vi.fn().mockResolvedValue({
+        items: [
+          {
+            applicationId: "app-withdrawn",
+            candidate: { displayName: "Ada", avatarUrl: null },
+            submittedAt: "2026-01-01T00:00:00.000Z",
+            stage: "APPLIED",
+            withdrawalOutcome: "CANDIDATE_WITHDRAWN",
+            stageVersion: 1,
+            documents: { cvAvailable: true, coverLetterAvailable: false },
+            score: null,
+            allowedDestinations: ["VIEWED", "REJECTED"],
+            dragDestinations: ["VIEWED", "REJECTED"],
+          },
+        ],
+        nextCursor: null,
+      }),
+    };
+    const service = new RecruitmentPipelineBoardService(
+      repository as never,
+      {
+        authorizeJob: vi.fn().mockResolvedValue(authorization("RECRUITER")),
+      } as never,
+    );
+
+    const result = await service.stagePage({
+      userId: "user-1",
+      jobId: "catalogue-1",
+      stage: "APPLIED",
+      limit: 25,
+      now: new Date("2026-01-01T00:00:00Z"),
+    });
+
+    expect(result.items[0]).toMatchObject({
+      withdrawalOutcome: "CANDIDATE_WITHDRAWN",
+      allowedDestinations: [],
+      dragDestinations: [],
+    });
+  });
+
+  it("projects withdrawn applications into a locked display page", async () => {
+    const repository = {
+      listPipelineStage: vi.fn().mockResolvedValue({
+        items: [
+          {
+            applicationId: "app-withdrawn-column",
+            candidate: { displayName: "Ada", avatarUrl: null },
+            submittedAt: "2026-01-01T00:00:00.000Z",
+            stage: "VIEWED",
+            withdrawalOutcome: "CANDIDATE_WITHDRAWN",
+            stageVersion: 2,
+            documents: { cvAvailable: true, coverLetterAvailable: false },
+            score: null,
+          },
+        ],
+        nextCursor: null,
+      }),
+    };
+    const service = new RecruitmentPipelineBoardService(
+      repository as never,
+      {
+        authorizeJob: vi.fn().mockResolvedValue(authorization("RECRUITER")),
+      } as never,
+    );
+
+    const result = await service.withdrawnPage({
+      userId: "user-1",
+      jobId: "catalogue-1",
+      limit: 25,
+      now: new Date("2026-01-01T00:00:00Z"),
+    });
+
+    expect(repository.listPipelineStage).toHaveBeenCalledWith({
+      jobId: "job-1",
+      stage: "WITHDRAWN",
+      limit: 25,
+      cursor: undefined,
+    });
+    expect(result.stage).toBe("WITHDRAWN");
+    expect(result.items[0]).toMatchObject({
+      stage: "VIEWED",
+      withdrawalOutcome: "CANDIDATE_WITHDRAWN",
+      allowedDestinations: [],
+      dragDestinations: [],
+    });
   });
 });

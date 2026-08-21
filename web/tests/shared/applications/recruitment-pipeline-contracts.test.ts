@@ -10,6 +10,7 @@ import {
   pipelineStageLabels,
   pipelineStagePageQuerySchema,
   pipelineStagePageSchema,
+  pipelineWithdrawnPageSchema,
   stageConflictSchema,
   stageTransitionCommandSchema,
   stageTransitionOutcomeSchema,
@@ -106,6 +107,7 @@ describe("recruitment pipeline contracts", () => {
         canConfirmHired: true,
       },
       stages: stages.map((stage) => ({ stage, label: pipelineStageLabels[stage], count: 0 })),
+      withdrawnCount: 1,
       observedAt: "2026-08-17T02:00:00.000Z",
     };
     expect(pipelineBoardMetadataSchema.parse(metadata)).toEqual(metadata);
@@ -118,6 +120,21 @@ describe("recruitment pipeline contracts", () => {
         observedAt: "2026-08-17T02:00:00.000Z",
       }),
     ).toBeTruthy();
+    expect(
+      pipelineWithdrawnPageSchema.parse({
+        stage: "WITHDRAWN",
+        items: [
+          {
+            ...card,
+            withdrawalOutcome: "CANDIDATE_WITHDRAWN",
+            allowedDestinations: [],
+            dragDestinations: [],
+          },
+        ],
+        nextCursor: null,
+        observedAt: "2026-08-17T02:00:00.000Z",
+      }).stage,
+    ).toBe("WITHDRAWN");
     expect(pipelineStagePageQuerySchema.parse({}).limit).toBe(25);
     expect(pipelineStagePageQuerySchema.parse({ limit: "100" }).limit).toBe(100);
     expect(() => pipelineStagePageQuerySchema.parse({ limit: 101 })).toThrow();

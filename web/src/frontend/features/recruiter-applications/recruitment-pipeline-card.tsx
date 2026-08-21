@@ -116,15 +116,18 @@ export function RecruitmentPipelineCard({
   onViewAssessment?: (card: PipelineApplicationCard) => void;
   dragOverlay?: boolean;
 }) {
-  const terminal = isTerminalPipelineStage(card.stage);
-  const outcomeStatus = card.stage === "HIRED" || card.stage === "REJECTED";
-  const locked = lockedStages.has(card.stage);
+  const withdrawn = card.withdrawalOutcome === "CANDIDATE_WITHDRAWN";
+  const terminal = isTerminalPipelineStage(card.stage) || withdrawn;
+  const outcomeStatus =
+    withdrawn || card.stage === "HIRED" || card.stage === "REJECTED";
+  const locked = withdrawn || lockedStages.has(card.stage);
   // The server projection is authoritative. A missing dragDestinations value
   // is treated as no drag permission instead of widening the policy on the FE.
   const dragDestinations = terminal ? [] : (card.dragDestinations ?? []);
   const allowedDestinations = terminal ? [] : card.allowedDestinations;
   const canDrag = !dragOverlay && dragDestinations.length > 0 && !locked;
-  const collapsible = !dragOverlay && collapsibleStages.has(card.stage);
+  const collapsible =
+    !dragOverlay && !withdrawn && collapsibleStages.has(card.stage);
   const [expanded, setExpanded] = useState(!collapsible);
   const draggable = useDraggable({
     id: dragOverlay ? `${card.applicationId}-overlay` : card.applicationId,
@@ -297,9 +300,11 @@ export function RecruitmentPipelineCard({
         {outcomeStatus ? (
           <>
             <span
-              className={`status-pill ${card.stage === "HIRED" ? "status-hired" : "status-rejected"} pipeline-card__status-pill`}
+              className={`status-pill ${withdrawn ? "status-withdrawn" : card.stage === "HIRED" ? "status-hired" : "status-rejected"} pipeline-card__status-pill`}
             >
-              {pipelineStageLabels[card.stage].toUpperCase()}
+              {withdrawn
+                ? "WITHDRAWN"
+                : pipelineStageLabels[card.stage].toUpperCase()}
             </span>
             {dragHandle}
           </>
