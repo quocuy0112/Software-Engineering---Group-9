@@ -8,6 +8,7 @@ import {
   open,
   readdir,
   realpath,
+  rename,
   stat,
   unlink,
 } from "node:fs/promises";
@@ -42,16 +43,21 @@ export class FilesystemPrivateCvStorage implements PrivateCvStorage {
     this.root = resolve(input.root);
   }
 
+  private isDockerDesktopBindMount(): boolean {
+    return (
+      process.env.CV_STORAGE_DOCKER_BIND_MOUNT === "true" &&
+      process.env.APP_ENV !== "production" &&
+      this.root === "/app/.local/cv-storage"
+    );
+  }
+
   async assertReady(): Promise<void> {
     try {
       const metadata = await lstat(this.root);
       if (!metadata.isDirectory() || metadata.isSymbolicLink()) {
         throw new CvStorageError("CV_STORAGE_NOT_READY");
       }
-      const dockerDesktopBindMount =
-        process.env.CV_STORAGE_DOCKER_BIND_MOUNT === "true" &&
-        process.env.APP_ENV !== "production" &&
-        this.root === "/app/.local/cv-storage";
+      const dockerDesktopBindMount = this.isDockerDesktopBindMount();
       if (process.platform !== "win32" && (metadata.mode & 0o077) !== 0) {
         if (!dockerDesktopBindMount) {
           await chmod(this.root, 0o700);
@@ -98,7 +104,7 @@ export class FilesystemPrivateCvStorage implements PrivateCvStorage {
       throw new CvStorageError("CV_STORAGE_OPERATION_FAILED");
     });
     let received = 0;
-    let linked = false;
+    let finalized = false;
     try {
       for await (const sourceChunk of input.source) {
         const chunk = Buffer.from(sourceChunk);
@@ -113,19 +119,50 @@ export class FilesystemPrivateCvStorage implements PrivateCvStorage {
       }
       await handle.sync();
       await handle.close();
-      await link(temporaryPath, finalPath).catch((error: unknown) => {
-        if (
-          error &&
-          typeof error === "object" &&
-          "code" in error &&
-          error.code === "EEXIST"
-        ) {
+      if (this.isDockerDesktopBindMount()) {
+        try {
+          await lstat(finalPath);
           throw new CvStorageError("CV_STORAGE_OBJECT_EXISTS");
+        } catch (error) {
+          if (error instanceof CvStorageError) throw error;
+          if (
+            !(
+              error &&
+              typeof error === "object" &&
+              "code" in error &&
+              error.code === "ENOENT"
+            )
+          ) {
+            throw new CvStorageError("CV_STORAGE_OPERATION_FAILED");
+          }
         }
-        throw new CvStorageError("CV_STORAGE_OPERATION_FAILED");
-      });
-      linked = true;
-      await unlink(temporaryPath);
+        await rename(temporaryPath, finalPath).catch((error: unknown) => {
+          if (
+            error &&
+            typeof error === "object" &&
+            "code" in error &&
+            error.code === "EEXIST"
+          ) {
+            throw new CvStorageError("CV_STORAGE_OBJECT_EXISTS");
+          }
+          throw new CvStorageError("CV_STORAGE_OPERATION_FAILED");
+        });
+        finalized = true;
+      } else {
+        await link(temporaryPath, finalPath).catch((error: unknown) => {
+          if (
+            error &&
+            typeof error === "object" &&
+            "code" in error &&
+            error.code === "EEXIST"
+          ) {
+            throw new CvStorageError("CV_STORAGE_OBJECT_EXISTS");
+          }
+          throw new CvStorageError("CV_STORAGE_OPERATION_FAILED");
+        });
+        finalized = true;
+        await unlink(temporaryPath);
+      }
       return Object.freeze({
         locator: sensitiveStorageLocator(locator),
         bytes: received,
@@ -133,7 +170,7 @@ export class FilesystemPrivateCvStorage implements PrivateCvStorage {
     } catch (error) {
       await handle.close().catch(() => undefined);
       await unlink(temporaryPath).catch(() => undefined);
-      if (linked) await unlink(finalPath).catch(() => undefined);
+      if (finalized) await unlink(finalPath).catch(() => undefined);
       if (error instanceof CvStorageError) throw error;
       throw new CvStorageError("CV_STORAGE_OPERATION_FAILED");
     }

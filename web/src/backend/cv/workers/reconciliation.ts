@@ -219,21 +219,30 @@ export class CvStorageReconciliation {
       ) {
         continue;
       }
-      const outcome = await this.storage.delete(String(item.locator));
-      if (!outcome.deleted) continue;
-      orphansDeleted += 1;
-      await prisma.auditEvent.create({
-        data: {
-          occurredAt: now,
-          actorType: "system",
-          action: "cv_import.reconciled",
-          targetType: "cv_import",
-          targetId: null,
-          result: "SUCCESS",
-          correlationId: `cv_reconcile_${randomUUID()}`.slice(0, 128),
-          context: { state: "GRACE_AGED_ORPHAN_DELETED", count: 1 },
-        },
-      });
+      try {
+        const outcome = await this.storage.delete(String(item.locator));
+        if (!outcome.deleted) continue;
+        orphansDeleted += 1;
+        await prisma.auditEvent.create({
+          data: {
+            occurredAt: now,
+            actorType: "system",
+            action: "cv_import.reconciled",
+            targetType: "cv_import",
+            targetId: null,
+            result: "SUCCESS",
+            correlationId: `cv_reconcile_${randomUUID()}`.slice(0, 128),
+            context: { state: "GRACE_AGED_ORPHAN_DELETED", count: 1 },
+          },
+        });
+      } catch (error) {
+        if (!(error instanceof CvStorageError)) throw error;
+        // A stale inventory entry must not stop the worker from processing CVs.
+        // Keep the locator out of logs/audit context because it is sensitive.
+        console.warn(
+          `[cv-worker] orphan cleanup skipped: ${error.code}`,
+        );
+      }
     }
     return Object.freeze({
       referencesChecked: references.length,
