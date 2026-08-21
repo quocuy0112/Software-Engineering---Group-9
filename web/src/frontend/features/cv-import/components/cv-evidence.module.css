@@ -2,10 +2,10 @@
   display: grid;
   gap: 8px;
   padding: 12px 14px;
-  border-inline-start: 3px solid #12946b;
+  border-inline-start: 3px solid var(--sh-color-success);
   border-radius: 0 10px 10px 0;
-  color: #2f6b52;
-  background: #e7f7f1;
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-success-bg);
   font-size: 12px;
   font-family: var(--sh-profile-font-body);
   line-height: 1.5;
@@ -32,10 +32,10 @@
 }
 .technicalDetails {
   padding: 8px 10px;
-  border: 1px solid #bfe4d2;
+  border: 1px solid var(--sh-color-border-subtle);
   border-radius: 9px;
-  background: #fff;
-  color: #2f6b52;
+  background: var(--sh-color-surface-card);
+  color: var(--sh-color-text-secondary);
 }
 .technicalDetails summary {
   font-weight: 600;
@@ -47,10 +47,10 @@
 }
 .root [role="alert"] {
   padding: 9px 10px;
-  border-inline-start: 3px solid #c9820f;
+  border-inline-start: 3px solid var(--sh-color-warning);
   border-radius: 0 8px 8px 0;
-  color: #8a6414;
-  background: #fbf1e1;
+  color: var(--sh-color-warning);
+  background: var(--sh-color-warning-bg);
 }
 .root [role="alert"] p {
   margin: 3px 0 0;

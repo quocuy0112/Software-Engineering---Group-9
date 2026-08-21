@@ -6,15 +6,18 @@ import {
   ArrowLeft,
   BriefcaseBusiness,
   CheckCircle2,
-  FileText,
   LockKeyhole,
-  Save,
   Send,
   ShieldCheck,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { ApplicationStepper } from "@/frontend/features/candidate-applications/components/application-stepper";
+import {
+  ApplicationFlowHeader,
+  ApplicationFileIcon,
+  ReviewSummaryCard,
+} from "@/frontend/features/candidate-applications/components/application-wizard-primitives";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { applicationCopy } from "@/frontend/features/candidate-applications/i18n/application-copy";
 import {
@@ -195,37 +198,16 @@ export function ApplicationReviewSubmit({
       className="candidate-application-flow application-review-submit"
       aria-labelledby="application-review-title"
     >
-      <header className="application-review-submit__header">
-        <div>
-          <nav
-            className="application-ui__breadcrumb"
-            aria-label={commonCopy.breadcrumb}
-          >
-            <Link href="/jobs">{commonCopy.jobs}</Link>
-            <span>/</span>
-            <Link href={`/jobs/${encodeURIComponent(slug)}`}>
-              {review.job.title}
-            </Link>
-            <span>/</span>
-            <span>{commonCopy.apply}</span>
-          </nav>
-          <p className="application-review-submit__eyebrow">
-            <span aria-hidden="true" />
-            {copy.eyebrow}
-          </p>
-          <h1 id="application-review-title">{copy.title(review.job.title)}</h1>
-          <p>{copy.subtitle}</p>
-        </div>
-        <button
-          type="button"
-          className="application-review-submit__button application-review-submit__button--secondary"
-          onClick={() => void saveDraft()}
-          disabled={pending}
-        >
-          <Save aria-hidden="true" />
-          {pending ? commonCopy.saving : commonCopy.saveDraft}
-        </button>
-      </header>
+      <ApplicationFlowHeader
+        titleId="application-review-title"
+        eyebrow={copy.eyebrow}
+        title={copy.title(review.job.title)}
+        subtitle={copy.subtitle}
+        saveLabel={commonCopy.saveDraft}
+        savingLabel={commonCopy.saving}
+        pending={pending}
+        onSave={() => void saveDraft()}
+      />
 
       <ApplicationStepper currentStep={3} />
 
@@ -242,11 +224,10 @@ export function ApplicationReviewSubmit({
 
       <div className="application-review-submit__grid">
         <div className="application-review-submit__main">
-          <section className="application-review-submit__card">
-            <div className="application-review-submit__card-heading">
-              <h2>{copy.personalInformation}</h2>
-              <Link href={applicationHref}>{copy.edit}</Link>
-            </div>
+          <ReviewSummaryCard
+            title={copy.personalInformation}
+            edit={<Link href={applicationHref}>{copy.edit}</Link>}
+          >
             <dl className="application-review-submit__summary-grid">
               <div>
                 <dt>{copy.fullName}</dt>
@@ -278,21 +259,18 @@ export function ApplicationReviewSubmit({
                 </dd>
               </div>
             </dl>
-          </section>
+          </ReviewSummaryCard>
 
-          <section className="application-review-submit__card">
-            <div className="application-review-submit__card-heading">
-              <h2>{copy.applicationFiles}</h2>
-              <Link href={filesHref}>{copy.edit}</Link>
-            </div>
+          <ReviewSummaryCard
+            title={copy.applicationFiles}
+            edit={<Link href={filesHref}>{copy.edit}</Link>}
+          >
 
             <div className="application-review-submit__file-group">
               <h3>{copy.cvResume}</h3>
               {draft.cv ? (
                 <div className="application-review-submit__file-row">
-                  <span className="application-review-submit__file-icon">
-                    <FileText aria-hidden="true" />
-                  </span>
+                  <ApplicationFileIcon />
                   <span className="application-review-submit__file-copy">
                     <strong>{draft.cv.displayName}</strong>
                     <small>{fileMeta(draft.cv)}</small>
@@ -308,9 +286,7 @@ export function ApplicationReviewSubmit({
               <h3>{copy.coverLetter}</h3>
               {draft.coverLetter?.kind === "FILE" ? (
                 <div className="application-review-submit__file-row">
-                  <span className="application-review-submit__file-icon">
-                    <FileText aria-hidden="true" />
-                  </span>
+                  <ApplicationFileIcon />
                   <span className="application-review-submit__file-copy">
                     <strong>{draft.coverLetter.file.displayName}</strong>
                     <small>{fileMeta(draft.coverLetter.file)}</small>
@@ -330,7 +306,7 @@ export function ApplicationReviewSubmit({
                 </p>
               )}
             </div>
-          </section>
+          </ReviewSummaryCard>
 
           <section className="application-review-submit__card">
             <label

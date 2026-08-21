@@ -3,8 +3,11 @@ export type WorkspaceNavIconName =
   | "jobs"
   | "applications"
   | "pipeline"
+  | "kanban"
   | "cv-match"
   | "candidates"
+  | "user-check"
+  | "building-2"
   | "messages"
   | "connections"
   | "support"
@@ -42,9 +45,9 @@ export function WorkspaceNavIcon({ name }: { name: WorkspaceNavIconName }) {
 
   if (name === "applications") {
     return (
-      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
-        <rect x="4" y="3" width="12" height="14" rx="1.5" />
-        <path d="M7 6h6M7 9h6M7 12h3M12.5 13.5l1 1 2-2" />
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="nav-icon">
+        <path d="m22 2-7 20-4-9-9-4Z" />
+        <path d="M22 2 11 13" />
       </svg>
     );
   }
@@ -59,13 +62,22 @@ export function WorkspaceNavIcon({ name }: { name: WorkspaceNavIconName }) {
     );
   }
 
+  if (name === "kanban") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="nav-icon">
+        <path d="M6 5v11M12 5v6M18 5v14" />
+        <rect x="3" y="3" width="6" height="4" rx="1" />
+        <rect x="9" y="11" width="6" height="4" rx="1" />
+        <rect x="15" y="17" width="6" height="4" rx="1" />
+      </svg>
+    );
+  }
+
   if (name === "cv-match") {
     return (
-      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
-        <rect x="3" y="2.5" width="10" height="15" rx="1.5" />
-        <path d="M6 6h4M6 9h4M6 12h2" />
-        <circle cx="14.5" cy="13.5" r="3" />
-        <path d="m16.7 15.7 1.3 1.3" />
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="nav-icon">
+        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z" />
+        <path d="M5 3v4M19 17v4M3 5h4M17 19h4" />
       </svg>
     );
   }
@@ -104,6 +116,26 @@ export function WorkspaceNavIcon({ name }: { name: WorkspaceNavIconName }) {
         <circle cx="7" cy="6.5" r="2.5" />
         <circle cx="14.5" cy="7.5" r="2" />
         <path d="M2.5 16c.4-3.1 1.9-4.7 4.5-4.7s4.1 1.6 4.5 4.7M12 12.3c2.4-.5 4.4.8 5 3.7" />
+      </svg>
+    );
+  }
+
+  if (name === "user-check") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="nav-icon">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="m16 11 2 2 4-4" />
+      </svg>
+    );
+  }
+
+  if (name === "building-2") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="nav-icon">
+        <path d="M6 22V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v18" />
+        <path d="M6 12H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h2M18 9h2a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-2" />
+        <path d="M10 6h4M10 10h4M10 14h4M10 18h4" />
       </svg>
     );
   }

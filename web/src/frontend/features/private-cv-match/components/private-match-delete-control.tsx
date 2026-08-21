@@ -4,13 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, Trash2, TriangleAlert, X } from "lucide-react";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { privateMatchCopy } from "../i18n/private-match-copy";
 import {
   privateMatchErrorMessage,
   useDeletePrivateCvMatch,
 } from "../client/use-private-cv-match";
-
-const deleteDescription =
-  "Access is revoked immediately. Private data is physically deleted within 30 days. Application and employer data are never affected.";
 
 export function PrivateMatchDeleteControl({
   checkId,
@@ -21,6 +20,8 @@ export function PrivateMatchDeleteControl({
   compact?: boolean;
   onDeleted?: () => void;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = privateMatchCopy(locale).delete;
   const router = useRouter();
   const deletion = useDeletePrivateCvMatch(checkId);
   const [open, setOpen] = useState(false);
@@ -85,8 +86,7 @@ export function PrivateMatchDeleteControl({
         disabled={deletion.isPending}
         aria-haspopup="dialog"
       >
-        <Trash2 aria-hidden="true" />{" "}
-        {compact ? "Delete" : "Delete this preview"}
+        <Trash2 aria-hidden="true" /> {compact ? copy.short : copy.trigger}
       </button>
       {open
         ? createPortal(
@@ -116,16 +116,16 @@ export function PrivateMatchDeleteControl({
                   </div>
                   <div>
                     <h2 id={`delete-private-match-title-${checkId}`}>
-                      Delete this private preview?
+                      {copy.title}
                     </h2>
                     <p id={`delete-private-match-description-${checkId}`}>
-                      {deleteDescription}
+                      {copy.description}
                     </p>
                   </div>
                   <button
                     className="private-match-modal-close"
                     type="button"
-                    aria-label="Close delete confirmation"
+                    aria-label={copy.close}
                     onClick={() => setOpen(false)}
                     disabled={deletion.isPending}
                   >
@@ -134,13 +134,11 @@ export function PrivateMatchDeleteControl({
                 </header>
                 <div className="private-match-modal-privacy">
                   <ShieldCheck aria-hidden="true" />
-                  <span>
-                    This action only removes your private CV Match Check report.
-                  </span>
+                  <span>{copy.privacy}</span>
                 </div>
                 {deletion.isError ? (
                   <p className="private-match-inline-error" role="alert">
-                    {privateMatchErrorMessage(deletion.error)}
+                    {privateMatchErrorMessage(deletion.error, locale)}
                   </p>
                 ) : null}
                 <div className="private-match-modal-actions">
@@ -151,7 +149,7 @@ export function PrivateMatchDeleteControl({
                     onClick={() => setOpen(false)}
                     disabled={deletion.isPending}
                   >
-                    Keep preview
+                    {copy.keep}
                   </button>
                   <button
                     className="private-match-danger-button"
@@ -160,7 +158,7 @@ export function PrivateMatchDeleteControl({
                     disabled={deletion.isPending}
                   >
                     <Trash2 aria-hidden="true" />{" "}
-                    {deletion.isPending ? "Deleting…" : "Delete preview"}
+                    {deletion.isPending ? copy.deleting : copy.confirm}
                   </button>
                 </div>
               </section>

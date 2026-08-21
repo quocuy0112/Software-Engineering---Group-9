@@ -23,7 +23,7 @@
   width: min(100%, 1040px);
   gap: 26px;
   margin: 0 auto;
-  font-family: var(--sh-profile-font-body, Manrope, sans-serif);
+  font-family: var(--sh-profile-font-body, "Be Vietnam Pro", sans-serif);
 }
 
 .header {

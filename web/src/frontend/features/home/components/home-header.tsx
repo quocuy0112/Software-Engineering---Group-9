@@ -6,6 +6,7 @@ import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
 import { HomeLanguageSelector } from "./home-language-selector";
 import { HomeGuestActions } from "./home-guest-actions";
 import { HomeAccountMenu } from "./home-account-menu";
+import { HomeHeaderNotification } from "./home-header-notification";
 import { HomePersonalShortcuts } from "./home-personal-shortcuts";
 import { HomeMobileNavigation } from "../client/home-mobile-navigation";
 import { homeCopy } from "../home-copy";
@@ -108,6 +109,17 @@ export function HomeHeader({
         {links}
       </nav>
       <div className="home-header-actions">
+        <HomeHeaderNotification
+          viewer={viewer}
+          locale={locale}
+          labels={{
+            login: copy.account.login,
+            signup: copy.account.signup,
+            notificationLabel: copy.account.notificationLabel,
+            notificationPromptTitle: copy.account.notificationPromptTitle,
+            notificationPromptDescription: copy.account.notificationPromptDescription,
+          }}
+        />
         <HomeLanguageSelector />
         {desktopAccount}
       </div>

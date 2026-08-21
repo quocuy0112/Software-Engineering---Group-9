@@ -3,6 +3,7 @@ import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { PrivateMatchReady } from "@/frontend/features/private-cv-match/components/private-match-ready";
 import { PrivateMatchReport } from "@/frontend/features/private-cv-match/components/private-match-report";
+import { WorkspaceLocaleProvider } from "@/frontend/features/dashboard/client/workspace-locale";
 import type {
   FullPrivateReport,
   LimitedPrivateReport,
@@ -177,6 +178,22 @@ describe("PrivateMatchReport", () => {
     expect(screen.getByText("Private and fair by design")).toBeVisible();
   });
 
+  it("uses the locale selected in the workspace", () => {
+    render(
+      <WorkspaceLocaleProvider initialLocale="vi">
+        <PrivateMatchReport checkId="check-1" report={fullReport} />
+      </WorkspaceLocaleProvider>,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Báo cáo đối chiếu CV riêng tư" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: "Ứng tuyển ngay" }),
+    ).toBeVisible();
+    expect(screen.getByText("Đánh giá AI")).toBeVisible();
+  });
+
   it("uses the caution treatment for a low match band", () => {
     const lowReport: FullPrivateReport = {
       ...fullReport,
@@ -199,37 +216,22 @@ describe("PrivateMatchReport", () => {
     ).toBeVisible();
   });
 
-  it("keeps normal header content in three non-overlapping boxes and stacks evidence", () => {
+  it("keeps normal header content in structured cards and stacks evidence", () => {
     render(<PrivateMatchReport checkId="check-1" report={fullReport} />);
 
     expect(screen.getByText("Independent candidate preview")).toBeVisible();
     expect(
-      document.querySelector(
-        ".private-match-report-score .private-match-badge",
-      ),
+      document.querySelector(".pmr-score .private-match-badge"),
     ).toBeNull();
-    expect(
-      document.querySelectorAll(".private-match-report-header > *"),
-    ).toHaveLength(3);
-    expect(
-      document.querySelectorAll(".private-match-report-summary > p"),
-    ).toHaveLength(1);
-    expect(
-      document.querySelectorAll(".private-match-metric-card"),
-    ).toHaveLength(4);
-    expect(
-      document.querySelectorAll(".private-match-evidence-list > li"),
-    ).toHaveLength(2);
-    const confidenceCard = document.querySelector(
-      ".private-match-confidence-card",
+    expect(document.querySelector(".pmr-score")).toBeInTheDocument();
+    expect(document.querySelector(".pmr-diagnostic")).toBeInTheDocument();
+    expect(document.querySelectorAll(".pmr-metric")).toHaveLength(4);
+    expect(document.querySelectorAll(".pmr-evidence-list > li")).toHaveLength(
+      2,
     );
-    expect(confidenceCard?.children[0]?.tagName).toBe("H3");
-    expect(confidenceCard?.children[1]?.tagName).toBe("STRONG");
-    expect(confidenceCard?.children[2]).toHaveClass("private-match-progress");
-    expect(confidenceCard?.children[3]?.tagName).toBe("P");
     expect(
       Array.from(
-        document.querySelectorAll(".private-match-metric-card p"),
+        document.querySelectorAll(".pmr-metric p"),
         (caption) => caption.textContent,
       ),
     ).toEqual([
@@ -287,17 +289,11 @@ describe("PrivateMatchReport", () => {
     expect(screen.getByText("Reduced-capability preview")).toBeVisible();
     expect(screen.getByText("AI evaluation unavailable")).toBeVisible();
     expect(
-      document.querySelector(
-        ".private-match-report-header.is-limited .private-match-report-score",
-      ),
+      document.querySelector(".pmr-hero.is-limited .pmr-score"),
     ).toBeTruthy();
+    expect(document.querySelector(".pmr-calc-card.is-limited")).toBeTruthy();
     expect(
-      document.querySelector(".private-match-calc-card.is-limited"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector(
-        ".private-match-metric-card.is-unavailable > strong",
-      ),
+      document.querySelector(".pmr-metric.is-unavailable"),
     ).toHaveTextContent("—");
     expect(screen.getByText("Hybrid score unavailable")).toBeVisible();
     expect(screen.getByText("Final score: not calculated")).toBeVisible();
@@ -310,7 +306,7 @@ describe("PrivateMatchReport", () => {
     ).toBeVisible();
     expect(
       Array.from(
-        document.querySelectorAll(".private-match-metric-card p"),
+        document.querySelectorAll(".pmr-metric p"),
         (caption) => caption.textContent,
       ),
     ).toEqual([

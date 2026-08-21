@@ -2,15 +2,13 @@
 
 import { useId } from "react";
 import { homeCopy } from "../home-copy";
+import { illustrativeSmartMatch } from "../home-display-data";
 import type { HomeLocale, HomePageModel } from "../home-page-model";
 import {
   HomeMatchBreakdown,
   HomeMatchRing,
   type HomeMatchBreakdownItem,
 } from "./home-match-visuals";
-
-export const smartMatchExplanationId = (jobSlug: string) =>
-  `smart-match-explanation-${jobSlug}`;
 
 function splitIllustrativeComposition(score: number) {
   const skills = Math.round(score * 0.46);
@@ -59,25 +57,12 @@ export function HomeSmartMatch({
   model: HomePageModel;
   locale: HomeLocale;
 }) {
-  const match = model.smartMatch;
+  // This panel explains the feature. Candidate-specific scores stay beside
+  // their job, where the score source and private report can be reviewed.
+  void model;
+  const match = illustrativeSmartMatch(locale);
   const copy = homeCopy[locale];
   const connectorGradientId = useId().replaceAll(":", "");
-  const matchingSkills =
-    match.kind === "personal"
-      ? match.matchingSkills
-      : copy.smartMatch.illustrativeSkills;
-  const improvementAreas =
-    match.kind === "personal"
-      ? match.improvementAreas
-      : copy.smartMatch.illustrativeAreas;
-  const candidateName =
-    match.kind === "personal" && model.viewer.kind === "candidate"
-      ? model.viewer.displayName
-      : copy.smartMatch.illustrativeCandidateName;
-  const roleTitle =
-    match.kind === "personal"
-      ? match.jobTitle
-      : copy.smartMatch.illustrativeJobTitle;
   const composition = splitIllustrativeComposition(match.score);
   const segments: readonly HomeMatchBreakdownItem[] = [
     {
@@ -100,21 +85,15 @@ export function HomeSmartMatch({
       label: copy.smartMatch.insufficientData,
       value: composition[3],
     },
-  ] as const;
+  ];
   const explanation = [
-    match.kind === "personal"
-      ? copy.smartMatch.profileLimitation
-      : copy.smartMatch.illustrativeLimitation,
+    copy.smartMatch.illustrativeLimitation,
     copy.smartMatch.decisionNotice,
   ].join(" ");
-  const explanationId =
-    match.kind === "personal"
-      ? smartMatchExplanationId(match.jobSlug)
-      : undefined;
 
   return (
     <section
-      className={`home-section home-smart-match home-smart-match-v2 home-smart-match--${match.kind}`}
+      className="home-section home-smart-match home-smart-match-v2 home-smart-match--illustrative"
       id="smart-match"
       aria-labelledby="smart-match-title"
     >
@@ -132,13 +111,13 @@ export function HomeSmartMatch({
             <MatchIdentity
               kind="candidate"
               symbol={copy.smartMatch.candidateToken}
-              name={candidateName}
+              name={copy.smartMatch.illustrativeCandidateName}
               label={copy.smartMatch.candidateLabel}
             />
             <MatchIdentity
               kind="role"
               symbol={copy.smartMatch.roleToken}
-              name={roleTitle}
+              name={copy.smartMatch.illustrativeJobTitle}
               label={copy.smartMatch.roleLabel}
             />
           </div>
@@ -195,23 +174,18 @@ export function HomeSmartMatch({
             <span aria-hidden="true" />
             <div>
               <h3>{copy.smartMatch.matchingSkills}</h3>
-              <p>
-                {matchingSkills.join(" · ") || copy.smartMatch.insufficientData}
-              </p>
+              <p>{copy.smartMatch.illustrativeSkills.join(" · ")}</p>
             </div>
           </div>
           <div className="home-match-insight home-match-insight--improvement">
             <span aria-hidden="true" />
             <div>
               <h3>{copy.smartMatch.improvementAreas}</h3>
-              <p>
-                {improvementAreas.join(" · ") ||
-                  copy.smartMatch.insufficientData}
-              </p>
+              <p>{copy.smartMatch.illustrativeAreas.join(" · ")}</p>
             </div>
           </div>
         </div>
-        <p className="home-match-disclaimer" id={explanationId}>
+        <p className="home-match-disclaimer">
           <span aria-hidden="true" />
           {explanation}
         </p>

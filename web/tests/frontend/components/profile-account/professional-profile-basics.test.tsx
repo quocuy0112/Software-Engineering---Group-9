@@ -169,6 +169,31 @@ describe("professional profile basics", () => {
     expect(toast.success).not.toHaveBeenCalled();
   });
 
+  it("uses the readable preview treatment for long saved basics", () => {
+    const summary =
+      "Digital Marketing Manager with 12+ years of digital marketing experience, including direct management responsibilities.";
+    render(
+      <ProfileOverview
+        account={account}
+        initialProfile={{
+          ...emptyProfile,
+          empty: false,
+          basics: {
+            headline: "Digital Marketing Manager",
+            summary,
+            phone: "+84 90 123 4567",
+            location: "Thuan An, Binh Duong",
+          },
+        }}
+        csrfProof="csrf-proof"
+      />,
+    );
+
+    expect(screen.getByText(summary)).toHaveClass(
+      "profile-basics-preview-primary",
+    );
+  });
+
   it("retains failed values, focuses the invalid field, and blocks duplicates", async () => {
     let resolve!: (response: Response) => void;
     const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(

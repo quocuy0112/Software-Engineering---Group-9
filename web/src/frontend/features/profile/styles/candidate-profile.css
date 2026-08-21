@@ -5,12 +5,16 @@
   margin: 0 auto;
   padding: 28px 24px 70px;
   color: var(--sh-profile-text);
-  font-family: var(--sh-profile-font-body);
+  font-family: var(--sh-font-family);
 }
 
 .candidate-profile-page,
 .candidate-profile-page * {
   box-sizing: border-box;
+}
+
+.candidate-profile-page * {
+  font-family: var(--sh-font-family) !important;
 }
 
 .candidate-profile-page button,
@@ -104,7 +108,7 @@
   background-color: var(--sh-profile-primary-light);
   background-position: center;
   background-size: cover;
-  font-family: var(--sh-profile-font-label);
+  font-family: var(--sh-font-family);
   font-size: 21px;
   font-weight: 600;
 }
@@ -198,7 +202,7 @@
 
 .candidate-identity__progress-copy strong {
   color: var(--sh-profile-primary);
-  font-family: var(--sh-profile-font-label);
+  font-family: var(--sh-font-family);
   font-size: 21px;
   font-weight: 700;
 }
@@ -351,7 +355,7 @@
 .candidate-profile-page__empty-kicker {
   margin: 0 0 6px;
   color: var(--sh-profile-primary);
-  font-family: var(--sh-profile-font-label);
+  font-family: var(--sh-font-family);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -472,6 +476,25 @@
   color: var(--sh-profile-text);
   font-size: 14px;
   line-height: 1.5;
+}
+
+/* Basics are free-form candidate copy, so keep the compact preview readable. */
+.candidate-profile-page .profile-basics-preview-primary,
+.candidate-profile-page .profile-basics-preview-secondary {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.candidate-profile-page .profile-basics-preview-primary {
+  line-height: var(--sh-line-height-body);
+}
+
+.candidate-profile-page .profile-basics-preview-secondary {
+  display: block;
+  margin-top: var(--sh-space-1);
+  line-height: var(--sh-line-height-body-sm);
 }
 
 .candidate-profile-page .profile-compact-secondary,
@@ -624,7 +647,7 @@
 
 .candidate-profile-page .panel-kicker {
   color: var(--sh-profile-primary);
-  font-family: var(--sh-profile-font-label);
+  font-family: var(--sh-font-family);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;

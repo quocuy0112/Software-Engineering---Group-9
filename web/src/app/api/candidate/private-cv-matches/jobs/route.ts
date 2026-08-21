@@ -2,7 +2,9 @@ import {
   AccountRequestError,
   requireAccountRequest,
 } from "@/backend/security/account-request-boundary";
+import { z } from "zod";
 import {
+  privateMatchJobsQuerySchema,
   projectPrivateMatchJob,
   searchEligiblePrivateMatchJobs,
 } from "@/backend/private-cv-match/private-cv-match-service";
@@ -24,6 +26,12 @@ function errorResponse(error: unknown): Response {
       { status: error.status, headers: noStore },
     );
   }
+  if (error instanceof z.ZodError) {
+    return Response.json(
+      { code: "INVALID_REQUEST" },
+      { status: 400, headers: noStore },
+    );
+  }
   return Response.json(
     { code: "INTERNAL_FAILURE" },
     { status: 503, headers: noStore },
@@ -33,7 +41,12 @@ function errorResponse(error: unknown): Response {
 export async function GET(request: Request): Promise<Response> {
   try {
     await requireAccountRequest(request);
-    const query = new URL(request.url).searchParams.get("q") ?? "";
+    const params = new URL(request.url).searchParams;
+    const query = privateMatchJobsQuerySchema.parse({
+      q: params.get("q") ?? "",
+      searchBy: params.get("searchBy") ?? undefined,
+      limit: params.get("limit") ?? undefined,
+    });
     const jobs = await searchEligiblePrivateMatchJobs(query);
     return Response.json(
       privateMatchJobsResponseSchema.parse({

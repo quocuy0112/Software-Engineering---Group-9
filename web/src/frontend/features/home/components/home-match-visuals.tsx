@@ -5,7 +5,14 @@ import { useEffect, useId, useState } from "react";
 const ringCircumference = 534.1;
 
 export type HomeMatchBreakdownItem = Readonly<{
-  key: "skills" | "experience" | "education" | "incomplete";
+  key:
+    | "skills"
+    | "roleAndSkills"
+    | "preferences"
+    | "experience"
+    | "education"
+    | "unmatched"
+    | "incomplete";
   label: string;
   value: number;
 }>;

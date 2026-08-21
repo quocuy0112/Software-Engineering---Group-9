@@ -1437,3 +1437,37 @@
     min-height: 42px;
   }
 }
+
+/* Candidate Security must follow the workspace theme all the way down to
+ * its reference-level refinements. Those refinements intentionally tune the
+ * compact layout, but their original light-only surface values leaked into
+ * dark mode. */
+:root[data-theme="dark"] .profile-page--standalone .security-grid > .security-panel {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-card);
+}
+
+:root[data-theme="dark"] .profile-page--standalone .security-warning-callout {
+  color: var(--sh-color-warning);
+  background: var(--sh-color-warning-bg);
+}
+
+:root[data-theme="dark"] .profile-page--standalone .security-password-protected {
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-success-bg);
+}
+
+:root[data-theme="dark"] .profile-page--standalone .security-panel .field input {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] .profile-page--standalone .security-danger-action {
+  background: color-mix(
+    in srgb,
+    var(--sh-color-error-bg) 72%,
+    var(--sh-color-surface-card)
+  );
+}

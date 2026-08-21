@@ -20,11 +20,16 @@ import {
   privateMatchErrorMessage,
   useCreatePrivateCvMatch,
 } from "../client/use-private-cv-match";
+import { privateMatchCopy } from "../i18n/private-match-copy";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { CV_SOURCE_MAX_BYTES } from "@/shared/contracts/cv-import/common";
 import { candidateCvSummarySchema } from "@/shared/contracts/cv-import/candidate-cv";
-import { privateMatchJobsResponseSchema } from "@/shared/contracts/private-cv-match";
+import {
+  PRIVATE_MATCH_JOB_PICKER_LIMIT,
+  privateMatchJobsResponseSchema,
+} from "@/shared/contracts/private-cv-match";
 import {
   formatEmploymentType,
   formatExperienceRequirement,
@@ -57,6 +62,13 @@ export type PrivateMatchSetupCv = Readonly<{
   pageCount: number | null;
   parseStatus: "READY" | "PARTIAL" | "FAILED";
 }>;
+
+type JobPickerSearchState =
+  | { status: "idle" }
+  | { status: "loading"; query: string }
+  | { status: "success"; query: string }
+  | { status: "empty"; query: string }
+  | { status: "error"; query: string };
 
 function bytes(value: number) {
   if (value < 1024 * 1024) return `${Math.max(1, Math.round(value / 1024))} KB`;
@@ -107,6 +119,9 @@ export function PrivateMatchSetup({
   initialJobId?: string;
   initialCvId?: string;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = privateMatchCopy(locale);
+  const setup = copy.setup;
   const router = useRouter();
   const create = useCreatePrivateCvMatch();
   const csrfProof = useCsrfProof();
@@ -130,7 +145,12 @@ export function PrivateMatchSetup({
   );
   const [selectedRemoteJob, setSelectedRemoteJob] =
     useState<PrivateMatchSetupJob | null>(null);
-  const [jobSearchLoading, setJobSearchLoading] = useState(false);
+  const [jobSearchState, setJobSearchState] = useState<JobPickerSearchState>({
+    status: "idle",
+  });
+  const [jobSearchRetry, setJobSearchRetry] = useState(0);
+  const jobSearchRequest = useRef(0);
+  const jobSearchAbort = useRef<AbortController | null>(null);
   const [localFile, setLocalFile] = useState<File | null>(null);
   const [localUploadState, setLocalUploadState] = useState<
     "IDLE" | "UPLOADING"
@@ -158,40 +178,58 @@ export function PrivateMatchSetup({
   );
   useEffect(() => {
     const query = jobSearch.trim();
-    if (!query) return;
-    let cancelled = false;
+    jobSearchAbort.current?.abort();
+    const request = ++jobSearchRequest.current;
+    if (!query) {
+      setJobSearchState({ status: "idle" });
+      return;
+    }
+    const controller = new AbortController();
+    jobSearchAbort.current = controller;
+    setJobSearchState({ status: "loading", query });
     const timer = window.setTimeout(() => {
-      setJobSearchLoading(true);
       void fetch(
-        `/api/candidate/private-cv-matches/jobs?q=${encodeURIComponent(query)}`,
-        { cache: "no-store", headers: { Accept: "application/json" } },
+        `/api/candidate/private-cv-matches/jobs?q=${encodeURIComponent(query)}&searchBy=BOTH&limit=${PRIVATE_MATCH_JOB_PICKER_LIMIT}`,
+        {
+          cache: "no-store",
+          signal: controller.signal,
+          headers: { Accept: "application/json" },
+        },
       )
         .then(async (response) => {
           if (!response.ok) throw new Error("JOB_SEARCH_FAILED");
           return privateMatchJobsResponseSchema.parse(await response.json());
         })
         .then((result) => {
-          if (cancelled) return;
+          if (request !== jobSearchRequest.current) return;
           setRemoteJobs(result.items);
-          setJobSearchLoading(false);
+          setJobSearchState(
+            result.items.length
+              ? { status: "success", query }
+              : { status: "empty", query },
+          );
         })
-        .catch(() => {
-          if (cancelled) return;
-          setRemoteJobs([]);
-          setJobSearchLoading(false);
+        .catch((error: unknown) => {
+          if (
+            controller.signal.aborted ||
+            request !== jobSearchRequest.current ||
+            (error instanceof DOMException && error.name === "AbortError")
+          )
+            return;
+          setJobSearchState({ status: "error", query });
         });
     }, 250);
     return () => {
-      cancelled = true;
       window.clearTimeout(timer);
+      controller.abort();
     };
-  }, [jobSearch]);
+  }, [jobSearch, jobSearchRetry]);
 
   const matchingJobs = useMemo(
-    () => (jobSearch.trim() ? remoteJobs : jobs.slice(0, 6)),
+    () => (jobSearch.trim() ? remoteJobs : jobs),
     [jobSearch, jobs, remoteJobs],
   );
-  const isJobSearchLoading = Boolean(jobSearch.trim()) && jobSearchLoading;
+  const isJobSearchLoading = jobSearchState.status === "loading";
   const ready = selectedCv?.parseStatus === "READY";
 
   async function importLocalCv() {
@@ -215,7 +253,7 @@ export function PrivateMatchSetup({
           !Array.isArray(body) &&
           typeof (body as { message?: unknown }).message === "string"
             ? (body as { message: string }).message
-            : "The CV could not be imported.";
+            : setup.importFailure;
         throw new Error(message);
       }
       const saved = candidateCvSummarySchema.parse(body);
@@ -225,7 +263,7 @@ export function PrivateMatchSetup({
         mimeType !==
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       ) {
-        throw new Error("Only PDF and DOCX files can be assessed here.");
+        throw new Error(setup.unsupportedFile);
       }
       const nextCv: PrivateMatchSetupCv = {
         ...saved,
@@ -240,9 +278,7 @@ export function PrivateMatchSetup({
       setLocalUploadComplete(true);
     } catch (error) {
       setLocalUploadError(
-        error instanceof Error
-          ? error.message
-          : "The CV could not be imported. Check the file and try again.",
+        error instanceof Error ? error.message : setup.importFailure,
       );
     } finally {
       setLocalUploadState("IDLE");
@@ -271,25 +307,22 @@ export function PrivateMatchSetup({
         aria-live="polite"
       >
         <TriangleAlert aria-hidden="true" />
-        <h1>This job is no longer available for a private check.</h1>
-        <p>
-          Choose another eligible job to start a private CV match check. Your CV
-          has not been changed.
-        </p>
+        <h1>{setup.jobUnavailableTitle}</h1>
+        <p>{setup.jobUnavailableDescription}</p>
         <button
           className="private-match-primary-button"
           type="button"
           onClick={() => router.push("/cv-match-check/new")}
           disabled={!jobs.length}
         >
-          Choose another job
+          {setup.chooseAnotherJob}
         </button>
         <button
           className="private-match-secondary-button"
           type="button"
           onClick={() => router.push("/cv-match-check")}
         >
-          Back to CV Match Check
+          {copy.common.backToCheck}
         </button>
       </main>
     );
@@ -302,24 +335,21 @@ export function PrivateMatchSetup({
         aria-live="polite"
       >
         <TriangleAlert aria-hidden="true" />
-        <h1>This CV version is no longer available for a private check.</h1>
-        <p>
-          Choose another CV from your CV library and return when it is ready.
-          Your CV has not been changed.
-        </p>
+        <h1>{setup.cvUnavailableTitle}</h1>
+        <p>{setup.cvUnavailableDescription}</p>
         <button
           className="private-match-primary-button"
           type="button"
           onClick={() => router.push("/profile/cv-imports")}
         >
-          Choose another CV
+          {setup.chooseAnotherCv}
         </button>
         <button
           className="private-match-secondary-button"
           type="button"
           onClick={() => router.push("/cv-match-check")}
         >
-          Back to CV Match Check
+          {copy.common.backToCheck}
         </button>
       </main>
     );
@@ -332,14 +362,14 @@ export function PrivateMatchSetup({
         aria-live="polite"
       >
         <TriangleAlert aria-hidden="true" />
-        <h1>Check how well your CV fits a job</h1>
-        <p>Add a confirmed CV and return when an eligible job is available.</p>
+        <h1>{setup.emptyTitle}</h1>
+        <p>{setup.emptyDescription}</p>
         <button
           className="private-match-primary-button"
           type="button"
           onClick={() => router.push("/cv-match-check")}
         >
-          Back to CV Match Check
+          {copy.common.backToCheck}
         </button>
       </main>
     );
@@ -348,12 +378,12 @@ export function PrivateMatchSetup({
   return (
     <main className="private-match-page private-match-setup-page">
       <div className="private-match-breadcrumb">
-        CV Match Check <span>/</span> New assessment
+        {copy.common.cvMatchCheck} <span>/</span> {setup.newAssessment}
       </div>
       <div className="private-match-title-row">
         <div>
-          <h1>Check how well your CV fits a job</h1>
-          <p>Get a private, explainable match preview before you apply.</p>
+          <h1>{setup.heading}</h1>
+          <p>{setup.subtitle}</p>
         </div>
       </div>
       <div className="private-match-stepper-card">
@@ -371,33 +401,43 @@ export function PrivateMatchSetup({
                 id="target-job-title"
                 className="private-match-card-topline-heading"
               >
-                Target job description
+                {setup.targetJob}
               </h2>
               <span className="private-match-card-topline-caption">
-                Current job
+                {setup.currentJob}
               </span>
             </div>
             <div className="private-match-picker">
-              <label htmlFor="private-match-job-search">
-                Find a job by keyword or company
-              </label>
+              <label htmlFor="private-match-job-search">{setup.findJob}</label>
               <input
                 id="private-match-job-search"
                 type="search"
                 value={jobSearch}
                 onChange={(event) => setJobSearch(event.currentTarget.value)}
-                placeholder="e.g. React, Product Designer, Acme"
+                placeholder={setup.findJobPlaceholder}
                 autoComplete="off"
               />
               <div
                 className="private-match-picker-results"
                 aria-live="polite"
-                aria-label="Matching jobs"
+                aria-label={setup.matchingJobs}
               >
                 {isJobSearchLoading ? (
                   <p className="private-match-picker-empty">
-                    Searching eligible jobs…
+                    {setup.searchingJobs}
                   </p>
+                ) : jobSearchState.status === "error" ? (
+                  <div className="private-match-picker-empty" role="alert">
+                    <strong>{setup.jobSearchErrorTitle}</strong>
+                    <span>{setup.jobSearchErrorDescription}</span>
+                    <button
+                      className="private-match-secondary-button"
+                      type="button"
+                      onClick={() => setJobSearchRetry((value) => value + 1)}
+                    >
+                      {setup.retryJobSearch}
+                    </button>
+                  </div>
                 ) : matchingJobs.length ? (
                   matchingJobs.map((job) => (
                     <button
@@ -417,7 +457,7 @@ export function PrivateMatchSetup({
                   ))
                 ) : (
                   <p className="private-match-picker-empty">
-                    No eligible jobs match that keyword or company.
+                    {setup.noMatchingJobs}
                   </p>
                 )}
               </div>
@@ -431,25 +471,27 @@ export function PrivateMatchSetup({
                 <span>
                   {selectedJob.company} {"\u00b7"} {selectedJob.location}{" "}
                   {"\u00b7"}{" "}
-                  {formatWorkArrangement(selectedJob.workArrangement)}
+                  {formatWorkArrangement(selectedJob.workArrangement, locale)}
                 </span>
                 <small>
-                  {formatEmploymentType(selectedJob.employmentType)} {"\u00b7"}{" "}
+                  {formatEmploymentType(selectedJob.employmentType, locale)}{" "}
+                  {"\u00b7"}{" "}
                   {formatExperienceRequirement(
                     selectedJob.requiredExperienceYears,
+                    locale,
                   )}{" "}
-                  {"\u00b7"} Source: SmartHire job post
+                  {"\u00b7"} {setup.source}
                 </small>
               </div>
               <span className="private-match-badge private-match-badge--green">
-                <Check aria-hidden="true" /> Selected
+                <Check aria-hidden="true" /> {copy.common.selected}
               </span>
             </div>
             <p
               id="key-requirements-found"
               className="private-match-requirements-label"
             >
-              Key requirements found
+              {setup.keyRequirements}
             </p>
             <div
               className="private-match-chip-group"
@@ -472,10 +514,10 @@ export function PrivateMatchSetup({
                 id="cv-assess-title"
                 className="private-match-card-topline-heading"
               >
-                CV to assess
+                {setup.cvToAssess}
               </h2>
               <span className="private-match-card-topline-caption">
-                Current CV
+                {setup.currentCv}
               </span>
             </div>
             {selectedCv ? (
@@ -487,10 +529,10 @@ export function PrivateMatchSetup({
                   <h3>{selectedCv.fileName}</h3>
                   <span>
                     {selectedCv.pageCount
-                      ? `${selectedCv.pageCount} pages`
-                      : "Page count unavailable"}{" "}
+                      ? setup.pages(selectedCv.pageCount)
+                      : setup.pageCountUnavailable}{" "}
                     {"\u00b7"} {bytes(selectedCv.byteSize)} {"\u00b7"}{" "}
-                    {ready ? "Parsed successfully" : "Parsing in progress"}
+                    {ready ? setup.parsedSuccessfully : setup.parsingInProgress}
                   </span>
                 </div>
                 <span
@@ -501,7 +543,7 @@ export function PrivateMatchSetup({
                   }`}
                 >
                   {ready ? <Check aria-hidden="true" /> : null}
-                  {ready ? "Ready" : "Not ready"}
+                  {ready ? copy.common.ready : setup.notReady}
                 </span>
               </div>
             ) : (
@@ -510,18 +552,16 @@ export function PrivateMatchSetup({
                   <FileText aria-hidden="true" />
                 </span>
                 <div className="private-match-info-body">
-                  <h3>No CV selected yet</h3>
-                  <span>
-                    Choose a profile CV or import one from your device.
-                  </span>
+                  <h3>{setup.noCvTitle}</h3>
+                  <span>{setup.noCvDescription}</span>
                 </div>
                 <span className="private-match-badge private-match-badge--yellow">
-                  Required
+                  {copy.common.required}
                 </span>
               </div>
             )}
             <fieldset className="private-match-picker private-match-cv-picker">
-              <legend>Choose a CV from your profile</legend>
+              <legend>{setup.chooseProfileCv}</legend>
               <div className="private-match-picker-results">
                 {availableCvs.length ? (
                   availableCvs.map((cv) => (
@@ -541,26 +581,24 @@ export function PrivateMatchSetup({
                         <strong>{cv.displayName}</strong>
                         <small>
                           {bytes(cv.byteSize)} ·{" "}
-                          {cv.parseStatus === "READY" ? "Ready" : "Processing"}
+                          {cv.parseStatus === "READY"
+                            ? copy.common.ready
+                            : copy.common.processing}
                         </small>
                       </span>
                     </label>
                   ))
                 ) : (
                   <p className="private-match-picker-empty">
-                    No profile CVs are available yet. You can import a local CV
-                    below without updating your profile.
+                    {setup.noProfileCvs}
                   </p>
                 )}
               </div>
             </fieldset>
             <div className="private-match-local-import">
               <div>
-                <strong>Import a CV from your device</strong>
-                <p>
-                  PDF or DOCX, up to 5 MB. No skills or headline update is
-                  required; the file is kept for this application.
-                </p>
+                <strong>{setup.importTitle}</strong>
+                <p>{setup.importDescription}</p>
               </div>
               <input
                 ref={fileInput}
@@ -573,9 +611,7 @@ export function PrivateMatchSetup({
                   setLocalUploadComplete(false);
                   if (file && !canImportCv(file)) {
                     setLocalFile(null);
-                    setLocalUploadError(
-                      "Choose a PDF or DOCX file up to 5 MB.",
-                    );
+                    setLocalUploadError(setup.invalidFile);
                     return;
                   }
                   setLocalFile(file);
@@ -588,7 +624,7 @@ export function PrivateMatchSetup({
                   onClick={() => fileInput.current?.click()}
                   disabled={localUploadState === "UPLOADING"}
                 >
-                  <Upload aria-hidden="true" /> Choose local file
+                  <Upload aria-hidden="true" /> {setup.chooseLocalFile}
                 </button>
                 {localFile ? <span>{localFile.name}</span> : null}
                 {localFile ? (
@@ -599,45 +635,34 @@ export function PrivateMatchSetup({
                     disabled={localUploadState === "UPLOADING"}
                   >
                     {localUploadState === "UPLOADING"
-                      ? "Uploading…"
-                      : "Import CV"}
+                      ? setup.uploading
+                      : setup.importCv}
                   </button>
                 ) : null}
               </div>
               {localUploadState === "UPLOADING" ? (
                 <p role="status" aria-live="polite">
-                  Uploading your CV securely…
+                  {setup.uploadingSecurely}
                 </p>
               ) : null}
               {localUploadError ? <p role="alert">{localUploadError}</p> : null}
               {localUploadComplete ? (
-                <p role="status">
-                  Your CV is ready and selected for this check. It will be
-                  included for the recruiter when you submit the application.
-                </p>
+                <p role="status">{setup.cvReady}</p>
               ) : null}
             </div>
-            <p className="private-match-caption">
-              The assessment uses this CV version only. Your profile data is not
-              changed.
-            </p>
+            <p className="private-match-caption">{setup.cvVersionOnly}</p>
           </section>
 
           <section
             className="private-match-card"
             aria-labelledby="compare-title"
           >
-            <h2 id="compare-title">What the assessment will compare</h2>
+            <h2 id="compare-title">{setup.compareTitle}</h2>
             <ul
               className="private-match-check-grid"
-              aria-label="Assessment comparison areas"
+              aria-label={setup.comparisonAreas}
             >
-              {[
-                "Required skills and tools",
-                "Evidence quality in the CV",
-                "Years and level of experience",
-                "Preferred skills and context",
-              ].map((label) => (
+              {setup.comparisons.map((label) => (
                 <li key={label}>
                   <span className="private-match-check-mark" aria-hidden="true">
                     <Check />
@@ -656,67 +681,61 @@ export function PrivateMatchSetup({
               <div className="private-match-private-heading">
                 <LockKeyhole aria-hidden="true" />
                 <h2 id="private-self-assessment-title">
-                  Private self-assessment
+                  {copy.privacy.privateSelfAssessment}
                 </h2>
               </div>
-              <p>
-                This private result uses the approved 60/40 method. It is not
-                sent to recruiters and does not affect your application.
-              </p>
+              <p>{setup.privacyDescription}</p>
               <div className="private-match-inset">
                 <ShieldCheck aria-hidden="true" />
-                <span>
-                  Sensitive personal attributes are excluded. Delete saved
-                  previews anytime from CV Match Check.
-                </span>
+                <span>{setup.privacyNote}</span>
               </div>
             </div>
           </section>
 
           {create.isError ? (
             <div className="private-match-inline-error" role="alert">
-              {privateMatchErrorMessage(create.error)}
+              {privateMatchErrorMessage(create.error, locale)}
             </div>
           ) : null}
         </div>
 
         <aside className="private-match-sidebar">
           <section className="private-match-card">
-            <h2>Your report will include</h2>
+            <h2>{setup.reportIncludes}</h2>
             <ul className="private-match-icon-list">
               <IconRow icon={<Clock3 aria-hidden="true" />}>
-                Overall CV-to-job match score
+                {setup.reportItems[0]}
               </IconRow>
               <IconRow icon={<AlignLeft aria-hidden="true" />}>
-                Skill and experience breakdown
+                {setup.reportItems[1]}
               </IconRow>
               <IconRow icon={<Search aria-hidden="true" />}>
-                Evidence linked to CV sections
+                {setup.reportItems[2]}
               </IconRow>
               <IconRow icon={<Star aria-hidden="true" />}>
-                Practical improvement suggestions
+                {setup.reportItems[3]}
               </IconRow>
             </ul>
           </section>
           <section className="private-match-card">
-            <h2>How it works</h2>
+            <h2>{setup.howItWorks}</h2>
             <ol className="private-match-number-list">
               <li>
                 <span>1</span>
                 <div>
-                  <strong>Read the job requirements</strong>
+                  <strong>{setup.steps[0]}</strong>
                 </div>
               </li>
               <li>
                 <span>2</span>
                 <div>
-                  <strong>Find supporting evidence in your CV</strong>
+                  <strong>{setup.steps[1]}</strong>
                 </div>
               </li>
               <li>
                 <span>3</span>
                 <div>
-                  <strong>Calculate an explainable match score</strong>
+                  <strong>{setup.steps[2]}</strong>
                 </div>
               </li>
             </ol>
@@ -724,15 +743,9 @@ export function PrivateMatchSetup({
           <section className="private-match-limit-card">
             <TriangleAlert aria-hidden="true" />
             <div>
-              <h2>Important limitation</h2>
-              <p>
-                The score estimates document fit only. It cannot measure
-                teamwork, motivation, interview performance, or final hiring
-                potential.
-              </p>
-              <p className="private-match-muted">
-                Recruiters may use different criteria and weights.
-              </p>
+              <h2>{setup.limitationTitle}</h2>
+              <p>{setup.limitationDescription}</p>
+              <p className="private-match-muted">{setup.limitationNote}</p>
             </div>
           </section>
           <button
@@ -746,7 +759,7 @@ export function PrivateMatchSetup({
             ) : (
               <Sparkles aria-hidden="true" />
             )}
-            {create.isPending ? "Analyzing…" : "Analyze my CV"}
+            {create.isPending ? setup.analyzing : setup.analyzeCv}
           </button>
         </aside>
       </div>

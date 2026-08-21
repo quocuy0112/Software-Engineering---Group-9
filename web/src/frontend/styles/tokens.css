@@ -166,6 +166,15 @@
   --sh-social-instagram-start: #833ab4;
   --sh-social-instagram-mid: #e1306c;
   --sh-social-instagram-end: #fcb045;
+
+  /* Candidate CV library uses these generic workspace aliases. Defining them
+     here prevents fallback light values from bypassing the active theme. */
+  --workspace-border: var(--sh-color-border-subtle);
+  --workspace-surface: var(--sh-color-surface-card);
+  --workspace-ink: var(--sh-color-text-primary);
+  --workspace-muted: var(--sh-color-text-muted);
+  --workspace-soft: var(--sh-color-surface-subtle);
+  --workspace-primary: var(--sh-color-brand-primary);
 }
 
 :root[data-theme="dark"] {

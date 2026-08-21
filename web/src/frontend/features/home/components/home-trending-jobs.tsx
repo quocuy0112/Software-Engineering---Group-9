@@ -54,14 +54,25 @@ function postedLabel(job: HomeJob, locale: HomeLocale) {
   }).format(-days, "day");
 }
 
+function matchTone(score: number) {
+  if (score >= 70) return "strong";
+  if (score >= 40) return "moderate";
+  return "limited";
+}
+
 function matchBreakdown(job: HomeJob, locale: HomeLocale) {
   const copy = homeCopy[locale];
-  if (!job.matchBreakdown) return [];
+  if (job.matchSource !== "profile" || !job.matchBreakdown) return [];
   return [
     {
-      key: "skills" as const,
-      label: copy.smartMatch.skillsContribution,
-      value: job.matchBreakdown.skills,
+      key: "roleAndSkills" as const,
+      label: copy.smartMatch.roleAndSkillsContribution,
+      value: job.matchBreakdown.roleAndSkills,
+    },
+    {
+      key: "preferences" as const,
+      label: copy.smartMatch.preferencesContribution,
+      value: job.matchBreakdown.preferences,
     },
     {
       key: "experience" as const,
@@ -69,9 +80,9 @@ function matchBreakdown(job: HomeJob, locale: HomeLocale) {
       value: job.matchBreakdown.experience,
     },
     {
-      key: "education" as const,
-      label: copy.smartMatch.educationContribution,
-      value: job.matchBreakdown.education,
+      key: "unmatched" as const,
+      label: copy.smartMatch.unmatchedContribution,
+      value: job.matchBreakdown.unmatched,
     },
   ];
 }
@@ -87,28 +98,54 @@ function MatchPrompt({
 }) {
   const copy = homeCopy[locale];
   const guest = model.viewer.kind === "guest";
-  const href = guest ? `/login?returnTo=/jobs/${job.slug}` : "/profile";
+  const fallbackReason =
+    model.smartMatch.kind === "illustrative" && !guest
+      ? model.smartMatch.reason
+      : undefined;
+  const needsProfileSignals = fallbackReason === "profileSignals";
+  const hasNoOpportunities = fallbackReason === "noOpportunities";
+  const href = guest
+    ? `/login?returnTo=/jobs/${job.slug}`
+    : needsProfileSignals
+      ? "/profile"
+      : "/jobs";
   const heading = guest
     ? copy.jobs.loginForMatch
-    : copy.jobs.completeProfileForMatch;
+    : needsProfileSignals
+      ? copy.jobs.completeProfileForMatch
+      : hasNoOpportunities
+        ? copy.jobs.noPersonalMatches
+        : copy.jobs.matchUnavailable;
   const description = guest
     ? copy.jobs.loginForMatchDescription
-    : copy.jobs.completeProfileDescription;
+    : needsProfileSignals
+      ? copy.jobs.completeProfileDescription
+      : hasNoOpportunities
+        ? copy.jobs.noPersonalMatchesDescription
+        : copy.jobs.matchUnavailableDescription;
   return (
     <div className="home-job-match-prompt">
       <p className="home-job-match-label">{copy.jobs.profileMatch}</p>
       <HomeMatchRing
         size="small"
         state="ghost"
-        label={copy.jobs.lockedMatchLabel}
+        label={
+          needsProfileSignals || guest
+            ? copy.jobs.lockedMatchLabel
+            : copy.jobs.matchUnavailableLabel
+        }
         scoreSuffix={copy.smartMatch.scoreSuffix}
       />
       <h3>{heading}</h3>
       <p className="home-job-match-description">{description}</p>
       <Link className="home-job-match-action" href={href}>
-        {guest ? copy.account.login : copy.jobs.completeProfileAction}
+        {guest
+          ? copy.account.login
+          : needsProfileSignals
+            ? copy.jobs.completeProfileAction
+            : copy.jobs.browseOpportunities}
       </Link>
-      {!guest ? <small>{copy.jobs.completeProfileNote}</small> : null}
+      {needsProfileSignals ? <small>{copy.jobs.completeProfileNote}</small> : null}
     </div>
   );
 }
@@ -123,6 +160,8 @@ export function HomeTrendingJobs({
   const copy = homeCopy[locale];
   const filterLabels: Record<string, string> = copy.filters;
   const hasPersonalMatch = model.smartMatch.kind === "personal";
+  const hasMeaningfulBestMatch =
+    hasPersonalMatch && model.smartMatch.quality === "meaningful";
   const rankedJobs = [...model.jobs.items].slice(0, 6).sort((left, right) => {
     if (hasPersonalMatch)
       return (right.matchScore ?? -1) - (left.matchScore ?? -1);
@@ -161,7 +200,11 @@ export function HomeTrendingJobs({
           <article className="home-job-spotlight">
             <span className="home-job-spotlight-tag">
               <span aria-hidden="true">✦</span>
-              {hasPersonalMatch ? copy.jobs.bestMatch : copy.jobs.featured}
+              {hasMeaningfulBestMatch
+                ? copy.jobs.bestMatch
+                : hasPersonalMatch
+                  ? copy.jobs.topSuggestion
+                  : copy.jobs.featured}
             </span>
             <div className="home-job-spotlight-content">
               <div className="home-job-spotlight-main">
@@ -219,7 +262,11 @@ export function HomeTrendingJobs({
               <div className="home-job-spotlight-match">
                 {hasPersonalMatch && featuredJob.matchScore !== undefined ? (
                   <>
-                    <p>{copy.jobs.profileMatch}</p>
+                    <p>
+                      {featuredJob.matchSource === "cv"
+                        ? copy.jobs.cvMatchScore
+                        : copy.jobs.profileMatchEstimate}
+                    </p>
                     <HomeMatchRing
                       score={featuredJob.matchScore}
                       size="small"
@@ -235,6 +282,29 @@ export function HomeTrendingJobs({
                         size="small"
                         label={copy.jobs.matchSignals}
                       />
+                    ) : null}
+                    {featuredJob.matchSource === "profile" &&
+                    !hasMeaningfulBestMatch ? (
+                      <p className="home-job-low-match-notice">
+                        {copy.jobs.lowMatchNotice}
+                      </p>
+                    ) : null}
+                    {featuredJob.matchSource === "cv" ? (
+                      <div className="home-job-cv-match-context">
+                        <strong>{copy.jobs.cvMatchPrivate}</strong>
+                        <p>
+                          {featuredJob.cvMatch
+                            ? copy.jobs.cvMatchContext
+                            : copy.smartMatch.cvMatchLimitation}
+                        </p>
+                        {featuredJob.cvMatch ? (
+                          <Link
+                            href={`/cv-match-check/${encodeURIComponent(featuredJob.cvMatch.checkId)}`}
+                          >
+                            {copy.jobs.reviewCvMatch}
+                          </Link>
+                        ) : null}
+                      </div>
                     ) : null}
                   </>
                 ) : (
@@ -282,17 +352,35 @@ export function HomeTrendingJobs({
                       {salary.text}
                     </span>
                     {hasPersonalMatch && job.matchScore !== undefined ? (
-                      <span className="home-job-list-match">
-                        {job.matchScore}% {copy.jobs.matchEstimate}
+                      <span
+                        className={`home-job-list-match home-job-list-match--${matchTone(job.matchScore)}`}
+                      >
+                        {job.matchScore}%{" "}
+                        {job.matchSource === "cv"
+                          ? copy.jobs.cvMatchScore
+                          : copy.jobs.matchEstimate}
                       </span>
                     ) : null}
-                    <Link
-                      className="home-job-list-arrow"
-                      href={`/jobs/${job.slug}`}
-                      aria-label={`${copy.jobs.viewJobDetails}: ${job.title}`}
-                    >
-                      <span aria-hidden="true">→</span>
-                    </Link>
+                    <div className="home-job-list-actions">
+                      <HomeSaveJobAction
+                        jobId={job.id}
+                        slug={job.slug}
+                        initialSaved={job.saved}
+                        csrfProof={
+                          model.viewer.kind === "guest"
+                            ? undefined
+                            : model.viewer.csrfProof
+                        }
+                        locale={locale}
+                      />
+                      <Link
+                        className="home-job-list-arrow"
+                        href={`/jobs/${job.slug}`}
+                        aria-label={`${copy.jobs.viewJobDetails}: ${job.title}`}
+                      >
+                        <span aria-hidden="true">→</span>
+                      </Link>
+                    </div>
                   </article>
                 );
               })}

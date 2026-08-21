@@ -20,13 +20,22 @@ import {
 } from "lucide-react";
 import type { PrivateMatchListItem } from "@/shared/contracts/private-cv-match";
 import { PageHeader } from "@/frontend/components/layout/page-header";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import {
   privateMatchErrorMessage,
   usePrivateCvMatchList,
 } from "../client/use-private-cv-match";
+import {
+  privateMatchCopy,
+  type PrivateMatchLocale,
+} from "../i18n/private-match-copy";
 import { PrivateMatchDeleteControl } from "./private-match-delete-control";
 
-const dateFormatter = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" });
+function formatDate(value: string, locale: PrivateMatchLocale) {
+  return new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-GB", {
+    dateStyle: "medium",
+  }).format(new Date(value));
+}
 
 function daysUntil(value: string) {
   return Math.max(
@@ -35,22 +44,33 @@ function daysUntil(value: string) {
   );
 }
 
-function statusCopy(state: PrivateMatchListItem["state"]) {
+function statusCopy(
+  state: PrivateMatchListItem["state"],
+  locale: PrivateMatchLocale,
+) {
+  const states = privateMatchCopy(locale).list.states;
   switch (state) {
     case "READY":
-      return { label: "Ready", className: "private-match-badge--green" };
+      return { label: states.READY, className: "private-match-badge--green" };
     case "LIMITED":
-      return { label: "Limited", className: "private-match-badge--yellow" };
+      return {
+        label: states.LIMITED,
+        className: "private-match-badge--yellow",
+      };
     case "FAILED":
-      return { label: "Failed", className: "private-match-badge--red" };
+      return { label: states.FAILED, className: "private-match-badge--red" };
     case "ANALYZING":
-      return { label: "Analyzing", className: "private-match-badge--blue" };
+      return {
+        label: states.ANALYZING,
+        className: "private-match-badge--blue",
+      };
     default:
-      return { label: "Queued", className: "private-match-badge--blue" };
+      return { label: states.QUEUED, className: "private-match-badge--blue" };
   }
 }
 
 function ListSkeleton() {
+  const copy = privateMatchCopy(useWorkspaceLocale()).list;
   return (
     <div className="private-match-list" aria-busy="true" aria-live="polite">
       {[1, 2, 3].map((item) => (
@@ -66,9 +86,7 @@ function ListSkeleton() {
           <span />
         </div>
       ))}
-      <span className="private-match-visually-hidden">
-        Loading saved CV match checks
-      </span>
+      <span className="private-match-visually-hidden">{copy.loading}</span>
     </div>
   );
 }
@@ -80,7 +98,9 @@ function ListItem({
   item: PrivateMatchListItem;
   onDeleted: () => void;
 }) {
-  const status = statusCopy(item.state);
+  const locale = useWorkspaceLocale();
+  const copy = privateMatchCopy(locale).list;
+  const status = statusCopy(item.state, locale);
   return (
     <article className="private-match-list-row">
       <span className="private-match-list-icon" aria-hidden="true">
@@ -112,11 +132,11 @@ function ListItem({
           </span>
           <span>
             <CalendarDays aria-hidden="true" />
-            Created {dateFormatter.format(new Date(item.createdAt))}
+            {copy.created(formatDate(item.createdAt, locale))}
           </span>
           <span className="private-match-expiry-meta">
             <Clock3 aria-hidden="true" />
-            Expires in {daysUntil(item.expiresAt)} days
+            {copy.expiresIn(daysUntil(item.expiresAt))}
           </span>
         </div>
       </div>
@@ -125,7 +145,7 @@ function ListItem({
           className="private-match-preview-link"
           href={`/cv-match-check/${encodeURIComponent(item.checkId)}`}
         >
-          View preview <ArrowRight aria-hidden="true" />
+          {copy.viewPreview} <ArrowRight aria-hidden="true" />
         </Link>
         <PrivateMatchDeleteControl
           checkId={item.checkId}
@@ -138,6 +158,8 @@ function ListItem({
 }
 
 export function PrivateMatchList() {
+  const locale = useWorkspaceLocale();
+  const copy = privateMatchCopy(locale).list;
   const query = usePrivateCvMatchList();
   const [removedIds, setRemovedIds] = useState<Set<string>>(() => new Set());
   const items =
@@ -146,15 +168,15 @@ export function PrivateMatchList() {
     <main className="private-match-page">
       <PageHeader
         className="private-match-page-header"
-        eyebrow="Candidate workspace"
-        title="CV Match Check"
-        subtitle="Review your private CV-to-job previews before you apply."
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        subtitle={copy.subtitle}
         rightSlot={
           <Link
             className="private-match-primary-button"
             href="/cv-match-check/new"
           >
-            <Plus aria-hidden="true" /> New private check
+            <Plus aria-hidden="true" /> {copy.newCheck}
           </Link>
         }
       />
@@ -165,15 +187,12 @@ export function PrivateMatchList() {
         </span>
         <div>
           <div className="private-match-list-intro-title">
-            <h2>Your private previews</h2>
+            <h2>{copy.privatePreviews}</h2>
             <span className="private-match-list-private-badge">
-              <LockKeyhole aria-hidden="true" /> 100% Private
+              <LockKeyhole aria-hidden="true" /> {copy.privateBadge}
             </span>
           </div>
-          <p>
-            Only you can see these reports. They never change a recruiter&apos;s
-            ranking or your application.
-          </p>
+          <p>{copy.privateDescription}</p>
         </div>
       </section>
 
@@ -183,29 +202,28 @@ export function PrivateMatchList() {
         <section className="private-match-limit-card" role="alert">
           <TriangleAlert aria-hidden="true" />
           <div>
-            <h2>Saved previews could not be loaded</h2>
-            <p>{privateMatchErrorMessage(query.error)}</p>
+            <h2>{copy.loadFailed}</h2>
+            <p>{privateMatchErrorMessage(query.error, locale)}</p>
             <button
               className="private-match-secondary-button"
               type="button"
               onClick={() => void query.refetch()}
             >
-              <RefreshCw aria-hidden="true" /> Try again
+              <RefreshCw aria-hidden="true" />{" "}
+              {privateMatchCopy(locale).common.tryAgain}
             </button>
           </div>
         </section>
       ) : items.length === 0 ? (
         <section className="private-match-card private-match-empty private-match-list-empty">
           <GaugeIcon />
-          <h2>Check your first CV match</h2>
-          <p>
-            Get a private, explainable preview for one job before you apply.
-          </p>
+          <h2>{copy.firstTitle}</h2>
+          <p>{copy.firstDescription}</p>
           <Link
             className="private-match-primary-button"
             href="/cv-match-check/new"
           >
-            <Sparkles aria-hidden="true" /> Start a new check
+            <Sparkles aria-hidden="true" /> {copy.startNew}
             <ArrowRight aria-hidden="true" />
           </Link>
           <div className="private-match-empty-benefits">
@@ -213,31 +231,31 @@ export function PrivateMatchList() {
               <span className="private-match-empty-benefit-icon is-amber">
                 <Zap aria-hidden="true" />
               </span>
-              <p>Instant preview</p>
-              <small>Deep match breakdown in seconds</small>
+              <p>{copy.benefits[0][0]}</p>
+              <small>{copy.benefits[0][1]}</small>
             </div>
             <div>
               <span className="private-match-empty-benefit-icon is-blue">
                 <Target aria-hidden="true" />
               </span>
-              <p>High precision</p>
-              <small>Skill-by-skill evaluation</small>
+              <p>{copy.benefits[1][0]}</p>
+              <small>{copy.benefits[1][1]}</small>
             </div>
             <div>
               <span className="private-match-empty-benefit-icon is-green">
                 <ShieldCheck aria-hidden="true" />
               </span>
-              <p>Completely private</p>
-              <small>No data shared with employers</small>
+              <p>{copy.benefits[2][0]}</p>
+              <small>{copy.benefits[2][1]}</small>
             </div>
           </div>
         </section>
       ) : (
         <section aria-labelledby="saved-checks-heading">
           <div className="private-match-list-heading">
-            <h2 id="saved-checks-heading">Saved CV match checks</h2>
+            <h2 id="saved-checks-heading">{copy.savedTitle}</h2>
             <span className="private-match-storage-meter">
-              <span>Storage</span>
+              <span>{copy.storage}</span>
               <strong>{items.length}</strong>
               <i aria-hidden="true">/</i>
               <b>50</b>

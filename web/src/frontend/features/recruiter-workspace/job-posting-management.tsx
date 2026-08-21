@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { PageHeader } from "@/frontend/components/layout/page-header";
 import { Badge } from "@/frontend/components/ui/badge";
 import {
   WorkspaceNavIcon,
@@ -59,6 +60,7 @@ function Icon({
     | "warning"
     | "calendar"
     | "search"
+    | "chevron-down"
     | "plus"
     | "arrow"
     | "edit"
@@ -68,35 +70,38 @@ function Icon({
   const paths = {
     briefcase: (
       <>
-        <rect x="3" y="7" width="18" height="12" rx="2" />
-        <path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3h3A2.5 2.5 0 0 1 16 5.5V7M3 11h18M9 11v1.5h6V11" />
+        <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+        <rect width="20" height="14" x="2" y="6" rx="2" />
       </>
     ),
     users: (
       <>
-        <circle cx="9" cy="8" r="3" />
-        <circle cx="17" cy="9" r="2" />
-        <path d="M3.5 20c.6-4 2.5-6 5.5-6s4.9 2 5.5 6M14.5 15c2.8-.4 4.8 1.2 5.5 4" />
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
       </>
     ),
     clock: (
       <>
-        <circle cx="12" cy="12" r="8.5" />
-        <path d="M12 7v5l3.5 2" />
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
       </>
     ),
     calendar: (
       <>
-        <rect x="4" y="5" width="16" height="15" rx="2" />
-        <path d="M8 3v4M16 3v4M4 9h16" />
+        <rect width="18" height="18" x="3" y="4" rx="2" />
+        <line x1="16" x2="16" y1="2" y2="6" />
+        <line x1="8" x2="8" y1="2" y2="6" />
+        <line x1="3" x2="21" y1="10" y2="10" />
       </>
     ),
     search: (
       <>
-        <circle cx="10.8" cy="10.8" r="6.3" />
-        <path d="m16 16 4.5 4.5" />
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3" />
       </>
     ),
+    "chevron-down": <path d="m6 9 6 6 6-6" />,
     plus: <path d="M12 5v14M5 12h14" />,
     arrow: <path d="M5 12h14m-5-5 5 5-5 5" />,
     edit: (
@@ -788,21 +793,22 @@ export function RecruiterJobPostingManagement({
   if (!loading && current.companyProfileComplete === false) {
     return (
       <div className="recruiter-management">
-        <header className="recruiter-management__heading">
-          <div>
-            <p className="recruiter-eyebrow">Recruiter workspace</p>
-            <h1>Job postings</h1>
-            <p>Complete the company identity before opening a new role.</p>
-          </div>
-          <button
-            type="button"
-            className="recruiter-primary-button"
-            onClick={openCreate}
-          >
-            <Icon name="plus" />
-            Create job posting
-          </button>
-        </header>
+        <PageHeader
+          className="recruiter-management__page-header"
+          eyebrow="Recruiter workspace"
+          title="Job postings"
+          subtitle="Complete the company identity before opening a new role."
+          rightSlot={
+            <button
+              type="button"
+              className="recruiter-primary-button"
+              onClick={openCreate}
+            >
+              <Icon name="plus" />
+              Create job posting
+            </button>
+          }
+        />
         <CompanyProfileRequiredState
           missingFields={
             current.missingCompanyProfileFields ?? [
@@ -820,43 +826,45 @@ export function RecruiterJobPostingManagement({
   if (!loading && !companyReady) {
     return (
       <div className="recruiter-management">
-        <header className="recruiter-management__heading">
-          <div>
-            <p className="recruiter-eyebrow">Recruiter workspace</p>
-            <h1>Job postings</h1>
-            <p>Manage every opening from first draft to a confident close.</p>
-          </div>
-          <button
-            type="button"
-            className="recruiter-primary-button"
-            disabled
-            title="Link a recruiter-owned company first"
-          >
-            <Icon name="plus" />
-            Create job posting
-          </button>
-        </header>
+        <PageHeader
+          className="recruiter-management__page-header"
+          eyebrow="Recruiter workspace"
+          title="Job postings"
+          subtitle="Manage every opening from first draft to a confident close."
+          rightSlot={
+            <button
+              type="button"
+              className="recruiter-primary-button"
+              disabled
+              title="Link a recruiter-owned company first"
+            >
+              <Icon name="plus" />
+              Create job posting
+            </button>
+          }
+        />
         <CompanyRequiredState />
       </div>
     );
   }
   return (
     <div className="recruiter-management">
-      <header className="recruiter-management__heading">
-        <div>
-          <p className="recruiter-eyebrow">Recruiter workspace</p>
-          <h1>Job postings</h1>
-          <p>Manage every opening from first draft to a confident close.</p>
-        </div>
-        <button
-          type="button"
-          className="recruiter-primary-button"
-          onClick={openCreate}
-        >
-          <Icon name="plus" />
-          Create job posting
-        </button>
-      </header>
+      <PageHeader
+        className="recruiter-management__page-header"
+        eyebrow="Recruiter workspace"
+        title="Job postings"
+        subtitle="Manage every opening from first draft to a confident close."
+        rightSlot={
+          <button
+            type="button"
+            className="recruiter-primary-button"
+            onClick={openCreate}
+          >
+            <Icon name="plus" />
+            Create job posting
+          </button>
+        }
+      />
       <section
         className="recruiter-stat-strip"
         aria-label="Job posting overview"
@@ -907,7 +915,9 @@ export function RecruiterJobPostingManagement({
               key={tab.value}
               type="button"
               role="tab"
+              id={`recruiter-job-tab-${tab.value}`}
               aria-selected={activeTab === tab.value}
+              aria-controls="recruiter-job-postings-panel"
               className={activeTab === tab.value ? "is-active" : ""}
               onClick={() => setActiveTab(tab.value)}
             >
@@ -922,33 +932,46 @@ export function RecruiterJobPostingManagement({
           ))}
         </nav>
         <div className="recruiter-filter-panel recruiter-surface-card">
-          <label>
+          <label htmlFor="recruiter-job-postings-search">
             <span>Search postings</span>
             <div className="recruiter-input-with-icon">
               <Icon name="search" />
               <input
+                id="recruiter-job-postings-search"
+                name="search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search by title or department"
               />
             </div>
           </label>
-          <label>
+          <label htmlFor="recruiter-job-postings-department">
             <span>Department</span>
-            <select
-              value={department}
-              onChange={(event) => setDepartment(event.target.value)}
-            >
-              <option value="all">All departments</option>
-              {departments.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
+            <div className="recruiter-select-with-icon">
+              <select
+                id="recruiter-job-postings-department"
+                name="department"
+                value={department}
+                onChange={(event) => setDepartment(event.target.value)}
+              >
+                <option value="all">All departments</option>
+                {departments.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+              <Icon name="chevron-down" />
+            </div>
           </label>
         </div>
-        <div aria-live="polite" aria-busy={loading}>
+        <div
+          id="recruiter-job-postings-panel"
+          role="tabpanel"
+          aria-labelledby={`recruiter-job-tab-${activeTab}`}
+          aria-live="polite"
+          aria-busy={loading}
+        >
           {loading ? (
             <JobListSkeleton />
           ) : filteredJobs.length ? (
@@ -1031,7 +1054,7 @@ export function RecruiterWorkspaceNavigation({
     },
     {
       label: "Candidates",
-      icon: "candidates",
+      icon: "user-check",
       href: recruiterRoutes.candidates,
       active:
         pathname === recruiterRoutes.candidates ||
@@ -1039,7 +1062,7 @@ export function RecruiterWorkspaceNavigation({
     },
     {
       label: "Pipeline",
-      icon: "pipeline",
+      icon: "kanban",
       href: recruiterRoutes.pipeline,
       active:
         pathname === recruiterRoutes.pipeline ||
@@ -1047,7 +1070,7 @@ export function RecruiterWorkspaceNavigation({
     },
     {
       label: "Company settings",
-      icon: "settings",
+      icon: "building-2",
       href: "/recruiter/company-settings",
       active: pathname === "/recruiter/company-settings",
     },

@@ -1,6 +1,27 @@
 "use client";
 
 import { useRef, useState, type ReactNode } from "react";
+import {
+  Activity,
+  ArrowLeft,
+  Award,
+  BookOpen,
+  Briefcase,
+  CalendarDays,
+  Car,
+  CheckCircle2,
+  ChevronDown,
+  Coffee,
+  DollarSign,
+  Gift,
+  Globe,
+  Heart,
+  Shield,
+  Smile,
+  TrendingUp,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { Badge } from "@/frontend/components/ui/badge";
 import { Modal } from "@/frontend/components/ui/modal";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
@@ -28,6 +49,26 @@ import {
   titleCase,
 } from "./job-posting-editor-options";
 import { JobPostingPreview } from "./job-posting-preview";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruiterJobPostingCopy } from "./recruiter-job-posting-copy";
+
+const benefitIconByName: Record<string, LucideIcon> = {
+  award: Award,
+  gift: Gift,
+  coffee: Coffee,
+  car: Car,
+  "trending-up": TrendingUp,
+  briefcase: Briefcase,
+  calendar: CalendarDays,
+  "dollar-sign": DollarSign,
+  globe: Globe,
+  users: Users,
+  "book-open": BookOpen,
+  activity: Activity,
+  heart: Heart,
+  shield: Shield,
+  smile: Smile,
+};
 
 function formatReasonCode(code: string): string {
   const reasonLabels: Record<string, string> = {
@@ -163,22 +204,32 @@ function EditorSection({
   children,
   complete,
   description,
+  inProgressLabel,
   number,
   onToggle,
   open,
+  readyLabel,
   title,
 }: {
   children: ReactNode;
   complete: boolean;
   description: string;
+  inProgressLabel: string;
   number: number;
   onToggle: (open: boolean) => void;
   open: boolean;
+  readyLabel: string;
   title: string;
 }) {
   return (
     <details
-      className="recruiter-editor-section recruiter-surface-card"
+      className={[
+        "recruiter-editor-section",
+        "recruiter-surface-card",
+        complete ? "is-complete" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       open={open}
       onToggle={(event) => onToggle(event.currentTarget.open)}
     >
@@ -189,13 +240,19 @@ function EditorSection({
           <small>{description}</small>
         </span>
         <span
-          className={`recruiter-editor-section__status${complete ? "is-complete" : ""}`}
+          className={[
+            "recruiter-editor-section__status",
+            complete ? "is-complete" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
         >
-          {complete ? "Ready" : "In progress"}
+          {complete ? readyLabel : inProgressLabel}
         </span>
-        <span className="recruiter-editor-section__chevron" aria-hidden="true">
-          ⌄
-        </span>
+        <ChevronDown
+          className="recruiter-editor-section__chevron"
+          aria-hidden="true"
+        />
       </summary>
       <div className="recruiter-editor-section__body">{children}</div>
     </details>
@@ -229,6 +286,10 @@ export function JobPostingEditor({
     max: formatVndInput(initialJob.salary.max),
   });
   const [skillInput, setSkillInput] = useState(initialJob.skillTags.join(", "));
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [hasSavedDraft, setHasSavedDraft] = useState(false);
+  const locale = useWorkspaceLocale();
+  const copy = recruiterJobPostingCopy(locale);
   const readOnly = job.status === "pending_approval";
   const canSubmitForApproval =
     job.id === "new-job" || job.status === "draft" || job.status === "rejected";
@@ -271,6 +332,7 @@ export function JobPostingEditor({
     updater: (current: JobCatalogItem) => JobCatalogItem,
     ...fields: string[]
   ) => {
+    setHasUnsavedChanges(true);
     clearFieldErrors(...fields);
     setJob((current) => ({
       ...updater(current),
@@ -426,6 +488,8 @@ export function JobPostingEditor({
         onSaved({ ...payload, status: "pending_approval", review });
         return;
       }
+      setHasUnsavedChanges(false);
+      setHasSavedDraft(true);
       onSaved(payload);
     } catch {
       setError(
@@ -549,12 +613,35 @@ export function JobPostingEditor({
           className="recruiter-back-button"
           onClick={onBack}
         >
-          ← All job postings
+          <ArrowLeft aria-hidden="true" />
+          {copy.back}
         </button>
-        <p className="recruiter-eyebrow">
-          {job.id === "new-job" ? "Create job posting" : "Edit posting"}
-        </p>
-        <h1>{job.title || "Untitled job posting"}</h1>
+        <div className="recruiter-editor__heading-row">
+          <div>
+            <h1>
+              {job.id === "new-job" ? copy.create : job.title || copy.edit}
+            </h1>
+          </div>
+          <span
+            className={[
+              "recruiter-editor-save-status",
+              saving ? "is-saving" : "",
+              hasUnsavedChanges ? "is-dirty" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            role="status"
+          >
+            <span aria-hidden="true" />
+            {saving
+              ? copy.saving
+              : hasUnsavedChanges
+                ? copy.unsaved
+                : hasSavedDraft
+                  ? copy.saved
+                  : copy.savedManually}
+          </span>
+        </div>
         <p>
           Build a complete, structured listing and review exactly what
           candidates will see.
@@ -592,13 +679,18 @@ export function JobPostingEditor({
       </div>
 
       <div className="recruiter-editor-progress recruiter-surface-card">
-        <div>
-          <strong>{completedSections} of 6 sections ready</strong>
-          <span>
-            Save a draft after the core required fields are ready; add a
-            deadline before submission.
+        <div className="recruiter-editor-progress__copy">
+          <span className="recruiter-editor-progress__icon" aria-hidden="true">
+            <CheckCircle2 />
           </span>
+          <div>
+            <strong>{copy.completed(completedSections)}</strong>
+            <span>{copy.progressHelp}</span>
+          </div>
         </div>
+        <strong className="recruiter-editor-progress__percentage">
+          {copy.completion(completedSections)}
+        </strong>
         <div
           className="recruiter-editor-progress__track"
           role="progressbar"
@@ -625,6 +717,8 @@ export function JobPostingEditor({
             number={1}
             title="Basic info"
             description="Define how candidates discover and understand the role."
+            readyLabel={copy.ready}
+            inProgressLabel={copy.inProgress}
             complete={sectionCompletion[0]}
             open={openSections[0]}
             onToggle={(open) => setSectionOpen(0, open)}
@@ -757,6 +851,8 @@ export function JobPostingEditor({
             number={2}
             title="Location & work arrangement"
             description="Set where and how the team works."
+            readyLabel={copy.ready}
+            inProgressLabel={copy.inProgress}
             complete={sectionCompletion[1]}
             open={openSections[1]}
             onToggle={(open) => setSectionOpen(1, open)}
@@ -913,6 +1009,8 @@ export function JobPostingEditor({
             number={3}
             title="Candidate requirements"
             description="Describe the experience and qualifications needed to succeed."
+            readyLabel={copy.ready}
+            inProgressLabel={copy.inProgress}
             complete={sectionCompletion[2]}
             open={openSections[2]}
             onToggle={(open) => setSectionOpen(2, open)}
@@ -1084,6 +1182,8 @@ export function JobPostingEditor({
             number={4}
             title="Salary & benefits"
             description="Use readable VND amounts and highlight the complete rewards package."
+            readyLabel={copy.ready}
+            inProgressLabel={copy.inProgress}
             complete={sectionCompletion[3]}
             open={openSections[3]}
             onToggle={(open) => setSectionOpen(3, open)}
@@ -1156,6 +1256,7 @@ export function JobPostingEditor({
                   const selected = job.description.benefits.find(
                     (benefit) => benefit.icon === option.icon,
                   );
+                  const Icon = benefitIconByName[option.icon] ?? Award;
                   return (
                     <div
                       className={[
@@ -1184,7 +1285,7 @@ export function JobPostingEditor({
                           className="recruiter-benefit-icon"
                           aria-hidden="true"
                         >
-                          {option.glyph}
+                          <Icon />
                         </span>
                         <span className="recruiter-benefit-card__label">
                           {option.label}
@@ -1227,6 +1328,8 @@ export function JobPostingEditor({
             number={5}
             title="Job description"
             description="Explain the impact, day-to-day work, and strongest reasons to join."
+            readyLabel={copy.ready}
+            inProgressLabel={copy.inProgress}
             complete={sectionCompletion[4]}
             open={openSections[4]}
             onToggle={(open) => setSectionOpen(4, open)}
@@ -1334,6 +1437,8 @@ export function JobPostingEditor({
             number={6}
             title="Hiring settings"
             description="Set headcount, urgency, and the application window."
+            readyLabel={copy.ready}
+            inProgressLabel={copy.inProgress}
             complete={sectionCompletion[5]}
             open={openSections[5]}
             onToggle={(open) => setSectionOpen(5, open)}
@@ -1377,6 +1482,7 @@ export function JobPostingEditor({
                       event.currentTarget.value = rawValue;
                     }
                     const applyDeadline = dateInputToIso(rawValue);
+                    setHasUnsavedChanges(true);
                     clearFieldErrors("applyDeadline");
                     setJob((current) => ({
                       ...current,
@@ -1420,6 +1526,15 @@ export function JobPostingEditor({
           ) : null}
 
           <div className="recruiter-editor__actions recruiter-surface-card">
+            <span className="recruiter-editor__action-status" role="status">
+              {saving
+                ? copy.saving
+                : hasUnsavedChanges
+                  ? copy.unsaved
+                  : hasSavedDraft
+                    ? copy.saved
+                    : copy.savedManually}
+            </span>
             <button
               type="button"
               className="recruiter-outline-button"

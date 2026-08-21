@@ -6,8 +6,6 @@ import {
   ArrowRight,
   BriefcaseBusiness,
   Info,
-  LockKeyhole,
-  Save,
   ShieldCheck,
 } from "lucide-react";
 import { useState } from "react";
@@ -17,6 +15,10 @@ import {
   ApplicationProgressChecklist,
   ApplicationStepper,
 } from "./application-stepper";
+import {
+  ApplicationFlowHeader,
+  LockedField,
+} from "./application-wizard-primitives";
 import type { ApplicationDraft } from "@/shared/contracts/candidate-applications";
 
 export type ApplicationWizardJob = {
@@ -143,37 +145,16 @@ export function ApplicationPersonalInformation({
       className="candidate-application-flow application-personal-information"
       aria-labelledby="application-flow-title"
     >
-      <header className="candidate-application-flow__header application-personal-information__header">
-        <div>
-          <nav
-            className="application-ui__breadcrumb"
-            aria-label={copy.common.breadcrumb}
-          >
-            <Link href="/jobs">{copy.common.jobs}</Link>
-            <span>/</span>
-            <Link href={`/jobs/${encodeURIComponent(slug)}`}>{job.title}</Link>
-            <span>/</span>
-            <span>{copy.common.apply}</span>
-          </nav>
-          <p className="application-personal-information__eyebrow">
-            <span aria-hidden="true" />
-            {copy.personalInformation.eyebrow}
-          </p>
-          <h1 id="application-flow-title">
-            {copy.personalInformation.title(job.title)}
-          </h1>
-          <p>{copy.personalInformation.subtitle}</p>
-        </div>
-        <button
-          type="button"
-          className="application-personal-information__button application-personal-information__button--secondary"
-          onClick={onSaveDraft}
-          disabled={pending !== null}
-        >
-          <Save aria-hidden="true" />
-          {pending === "save" ? copy.common.saving : copy.common.saveDraft}
-        </button>
-      </header>
+      <ApplicationFlowHeader
+        titleId="application-flow-title"
+        eyebrow={copy.personalInformation.eyebrow}
+        title={copy.personalInformation.title(job.title)}
+        subtitle={copy.personalInformation.subtitle}
+        saveLabel={copy.common.saveDraft}
+        savingLabel={copy.common.saving}
+        pending={pending !== null}
+        onSave={onSaveDraft}
+      />
 
       <ApplicationStepper currentStep={1} />
 
@@ -197,41 +178,23 @@ export function ApplicationPersonalInformation({
                 {copy.personalInformation.cardDescription}
               </p>
 
-              <div className="application-personal-information__field">
-                <div className="application-personal-information__field-label">
-                  <span>{copy.personalInformation.fullName}</span>
-                </div>
-                <div
-                  className="application-personal-information__locked-box"
-                  role="textbox"
-                  aria-readonly="true"
-                  aria-label={`${copy.personalInformation.fullName}: ${draft.personalInformation.fullName}`}
-                >
-                  <span>{draft.personalInformation.fullName}</span>
-                  <LockKeyhole aria-hidden="true" />
-                </div>
-              </div>
+              <LockedField
+                label={copy.personalInformation.fullName}
+                value={draft.personalInformation.fullName}
+              />
 
-              <div className="application-personal-information__field">
-                <div className="application-personal-information__field-label">
-                  <span>{copy.personalInformation.email}</span>
-                </div>
-                <div
-                  className="application-personal-information__locked-box"
-                  role="textbox"
-                  aria-readonly="true"
-                  aria-label={`${copy.personalInformation.email}: ${draft.personalInformation.email}`}
-                >
-                  <span>{draft.personalInformation.email}</span>
-                  <LockKeyhole aria-hidden="true" />
-                </div>
-                <p className="application-personal-information__locked-note">
-                  {copy.personalInformation.lockedEmailNote}{" "}
-                  <Link href="/support">
-                    {copy.personalInformation.contactSupport}
-                  </Link>
-                </p>
-              </div>
+              <LockedField
+                label={copy.personalInformation.email}
+                value={draft.personalInformation.email}
+                helper={
+                  <>
+                    {copy.personalInformation.lockedEmailNote}{" "}
+                    <Link href="/support">
+                      {copy.personalInformation.contactSupport}
+                    </Link>
+                  </>
+                }
+              />
 
               <div className="application-personal-information__two-col">
                 <div className="application-personal-information__field">

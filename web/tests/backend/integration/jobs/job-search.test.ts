@@ -55,6 +55,20 @@ describe.skipIf(!databaseAvailable)("PostgreSQL public job search", () => {
     );
   });
 
+  it("exposes every candidate-visible posting to server-side recommendations", async () => {
+    const rows = await repository.findPublicRecommendationCandidates(
+      fixture.userIds[0]!,
+      fixture.now,
+    );
+    const fixtureRows = rows.filter(
+      (row) => row.companyId === fixture.company.id,
+    );
+
+    expect(fixtureRows.map((row) => row.id).sort()).toEqual(
+      [fixture.jobs.active.id, fixture.jobs.activeSecond.id].sort(),
+    );
+  });
+
   it("matches Vietnamese text without case or diacritics and applies filters", async () => {
     const result = await repository.search(
       {
