@@ -22,7 +22,7 @@
 .account-preferences-panel h2 {
   margin: 6px 0 0;
   color: var(--sh-profile-text);
-  font-family: var(--sh-profile-font-body);
+  font-family: var(--sh-font-family);
   font-size: 18px;
   font-weight: 700;
   line-height: 1.35;
@@ -377,7 +377,7 @@
 .account-preference-summary-item > span,
 .account-preference-notification-summary > div > span {
   color: var(--sh-color-text-muted);
-  font-family: var(--sh-font-family-label);
+  font-family: var(--sh-font-family);
   font-size: 10px;
   font-weight: var(--sh-font-weight-bold);
   letter-spacing: 0.1em;

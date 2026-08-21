@@ -6,18 +6,25 @@ import {
   LiveJobSearchExperience,
   type JobsLiveCopy,
 } from "@/frontend/features/jobs/components/live-job-search-experience";
+import { jobSearchBySchema } from "@/shared/contracts/jobs/discovery";
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-function query(input: Record<string, string | string[] | undefined>) {
+export function jobsPageQuery(
+  input: Record<string, string | string[] | undefined>,
+) {
   const array = (name: string) => {
     const value = input[name];
     return value === undefined ? [] : Array.isArray(value) ? value : [value];
   };
   return {
     q: Array.isArray(input.q) ? input.q[0] : input.q,
+    searchBy:
+      jobSearchBySchema.safeParse(
+        Array.isArray(input.searchBy) ? input.searchBy[0] : input.searchBy,
+      ).data ?? "BOTH",
     location: Array.isArray(input.location)
       ? input.location[0]
       : input.location,
@@ -107,11 +114,12 @@ export default async function JobsPage({ searchParams }: PageProps) {
   const workspace = await getWorkspaceContext();
   const copy = workspace?.initialLocale === "vi" ? vietnameseCopy : englishCopy;
   const actor = await optionalJobActor(await headers());
+  const initialQuery = jobsPageQuery(raw);
   let result = null;
   let error: string | null = null;
 
   try {
-    result = await new JobDiscoveryService().search(query(raw), actor);
+    result = await new JobDiscoveryService().search(initialQuery, actor);
   } catch {
     error = copy.tryAgain;
   }
@@ -119,7 +127,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
   return (
     <div className="jobs-page">
       <LiveJobSearchExperience
-        initialCriteria={raw}
+        initialCriteria={initialQuery}
         initialResult={result}
         initialError={error}
         copy={copy}

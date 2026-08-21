@@ -5,7 +5,7 @@
   gap: 16px;
 }
 .root {
-  color: var(--sh-profile-text, #101b39);
+  color: var(--sh-color-text-primary);
   font-family: var(--sh-profile-font-body);
 }
 .root :is(input, textarea, button) {
@@ -13,7 +13,7 @@
 }
 .root > h2 {
   margin: 2px 0 0;
-  color: #10142b;
+  color: var(--sh-color-text-primary);
   font-size: 18px;
   font-weight: 600;
   line-height: 1.35;
@@ -21,15 +21,15 @@
 }
 .card {
   padding: 22px;
-  border: 1px solid #e5e8f2;
+  border: 1px solid var(--sh-color-border-subtle);
   border-radius: 16px;
-  background: #fff;
+  background: var(--sh-color-surface-card);
 }
 .card > h3 {
   margin: 0;
   padding-bottom: 12px;
-  border-bottom: 1px solid #e5e8f2;
-  color: #10142b;
+  border-bottom: 1px solid var(--sh-color-border-subtle);
+  color: var(--sh-color-text-primary);
   font-size: 15px;
   font-weight: 600;
   line-height: 1.35;
@@ -49,25 +49,25 @@
 .comparison > div:first-child {
   align-content: start;
   padding: 14px 16px;
-  border: 1px solid #e5e8f2;
+  border: 1px solid var(--sh-color-border-subtle);
   border-radius: 10px;
-  background: #f7f8fc;
+  background: var(--sh-color-surface-subtle);
 }
 .comparison strong,
 .decisionTitle {
-  color: #10142b;
+  color: var(--sh-color-text-primary);
   font-size: 13px;
   font-weight: 600;
 }
 .comparison label {
-  color: #10142b;
+  color: var(--sh-color-text-primary);
   font-size: 13px;
   font-weight: 500;
 }
 .comparison p {
   margin: 0;
   overflow-wrap: anywhere;
-  color: #6c7288;
+  color: var(--sh-color-text-muted);
   font-size: 13px;
   white-space: pre-wrap;
 }
@@ -77,10 +77,10 @@
   inline-size: 100%;
   min-block-size: 42px;
   padding: 10px 12px;
-  border: 1px solid #e5e8f2;
+  border: 1px solid var(--sh-color-border-subtle);
   border-radius: 10px;
-  color: #10142b;
-  background: #fff;
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
   font-weight: 400;
   box-shadow: none;
 }
@@ -103,7 +103,7 @@
 }
 .decisionHint {
   margin: 0;
-  color: #6c7288;
+  color: var(--sh-color-text-muted);
   font-size: 12px;
   line-height: 1.45;
 }
@@ -113,7 +113,7 @@
   padding: 16px;
   border: 0;
   border-radius: 10px;
-  background: #edeffc;
+  background: var(--sh-color-info-bg);
 }
 .decisionTitle {
   margin: 0;
@@ -142,10 +142,10 @@
   align-items: center;
   gap: 8px;
   padding: 0 10px;
-  border: 1px solid #dfe3f5;
+  border: 1px solid var(--sh-color-border-subtle);
   border-radius: 8px;
-  color: #37415f;
-  background: #ffffff;
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-card);
   font-size: 13px;
   font-weight: 500;
   text-transform: none;

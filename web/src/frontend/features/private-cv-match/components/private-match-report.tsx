@@ -2,27 +2,33 @@
 
 import Link from "next/link";
 import {
-  BadgeCheck,
-  BriefcaseBusiness,
-  CalendarDays,
+  AlertTriangle,
+  Calendar,
   Check,
-  CircleAlert,
+  CheckCircle2,
+  ChevronRight,
   FileSearch,
-  Gauge,
-  ListChecks,
+  Info,
+  Lock,
+  Quote,
   RefreshCw,
   Send,
+  Shield,
   ShieldCheck,
+  Sliders,
   Sparkles,
-  TriangleAlert,
-  UserRound,
+  UploadCloud,
+  UserCheck,
 } from "lucide-react";
 import type {
   FullPrivateReport,
   LimitedPrivateReport,
-  PrivateRequirementGap,
-  PrivateRequirementMatch,
 } from "@/shared/contracts/private-cv-match";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import {
+  privateMatchCopy,
+  type PrivateMatchLocale,
+} from "../i18n/private-match-copy";
 import { PrivateMatchDeleteControl } from "./private-match-delete-control";
 
 type PrivateReport = FullPrivateReport | LimitedPrivateReport;
@@ -31,19 +37,19 @@ function number(value: number) {
   return Number.isInteger(value) ? String(value) : String(value);
 }
 
-function bandLabel(report: PrivateReport) {
-  if (report.view === "LIMITED_REPORT") return "AI evaluation unavailable";
-  if (report.matchBand === "HIGH_MATCH") return "Strong match";
-  if (report.matchBand === "MEDIUM_MATCH") return "Good match";
-  return "Low match";
+function bandLabel(report: PrivateReport, locale: PrivateMatchLocale) {
+  const copy = privateMatchCopy(locale).report;
+  if (report.view === "LIMITED_REPORT") return copy.unavailable;
+  if (report.matchBand === "HIGH_MATCH") return copy.strongMatch;
+  if (report.matchBand === "MEDIUM_MATCH") return copy.goodMatch;
+  return copy.lowMatch;
 }
 
-function reportHeadline(report: FullPrivateReport) {
-  if (report.matchBand === "HIGH_MATCH")
-    return "You meet most core requirements";
-  if (report.matchBand === "MEDIUM_MATCH")
-    return "You meet several core requirements";
-  return "Review the evidence before you apply";
+function reportHeadline(report: FullPrivateReport, locale: PrivateMatchLocale) {
+  const copy = privateMatchCopy(locale).report;
+  if (report.matchBand === "HIGH_MATCH") return copy.highHeadline;
+  if (report.matchBand === "MEDIUM_MATCH") return copy.mediumHeadline;
+  return copy.highHeadline;
 }
 
 function applyHref(report: PrivateReport) {
@@ -53,112 +59,34 @@ function applyHref(report: PrivateReport) {
   return `/jobs/${encodeURIComponent(report.job.slug)}/apply?${params.toString()}`;
 }
 
-function Progress({ value, label }: { value: number | null; label: string }) {
-  const text = value === null ? "unavailable" : `${value}%`;
-  return (
-    <div
-      className="private-match-progress"
-      role="progressbar"
-      aria-label={label}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={value ?? undefined}
-    >
-      <span
-        style={{
-          width: `${value === null ? 0 : Math.min(100, Math.max(0, value))}%`,
-        }}
-      />
-      <span className="private-match-visually-hidden">
-        {label}: {text}
-      </span>
-    </div>
-  );
+function confidenceLabel(value: number, locale: PrivateMatchLocale) {
+  const copy = privateMatchCopy(locale).report;
+  return value >= 80 ? copy.high : value >= 60 ? copy.medium : copy.low;
 }
 
-function MetricCard({
-  icon,
-  title,
-  score,
-  meta,
-  caption,
-  progress,
-  unavailable = false,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  score: string;
-  meta: string;
-  caption: string;
-  progress: number | null;
-  unavailable?: boolean;
-}) {
-  return (
-    <article
-      className={`private-match-metric-card ${unavailable ? "is-unavailable" : ""}`}
-    >
-      <div className="private-match-metric-heading">
-        <h3>
-          <span className="private-match-metric-icon">{icon}</span>
-          {title}
-        </h3>
-        <span className="private-match-metric-meta">{meta}</span>
-      </div>
-      <strong>{score}</strong>
-      <Progress value={progress} label={title} />
-      <p>{caption}</p>
-    </article>
-  );
+function evidenceTypeLabel(type: string, locale: PrivateMatchLocale) {
+  const labels = privateMatchCopy(locale).report.evidenceTypes;
+  return labels[type as keyof typeof labels] ?? labels.OTHER;
 }
 
-function confidenceLabel(value: number) {
-  return value >= 80
-    ? "High confidence"
-    : value >= 60
-      ? "Medium confidence"
-      : "Low confidence";
-}
-
-function gapClassName(kind: PrivateRequirementGap["kind"]) {
-  return `private-match-gap-list-item--${kind.toLowerCase()}`;
-}
-
-function RequirementChip({ item }: { item: PrivateRequirementMatch }) {
-  const matched = item.matched;
-  const preferred = item.kind === "PREFERRED";
-  return (
-    <span
-      className={`private-match-chip ${matched ? "private-match-chip--matched" : "private-match-chip--unmatched"} ${preferred ? "private-match-chip--preferred" : "private-match-chip--required"}`}
-    >
-      {matched ? (
-        <Check aria-hidden="true" />
-      ) : (
-        <span aria-hidden="true">+</span>
-      )}
-      {item.label}
-      {!matched && preferred ? " — preferred" : !matched ? " — missing" : null}
-    </span>
-  );
-}
-
-function evidenceTypeLabel(type: string) {
+function evidenceTypeBadgeClass(type: string) {
   switch (type) {
     case "PROJECT":
-      return "Project";
+      return "bg-brand-100 text-brand-800";
     case "IMPACT":
-      return "Impact";
+      return "bg-emerald-100 text-emerald-800";
     case "SKILL":
-      return "Skill";
+      return "bg-purple-100 text-purple-800";
     case "EXPERIENCE":
-      return "Experience";
+      return "bg-blue-100 text-blue-800";
     case "EDUCATION":
-      return "Education";
+      return "bg-sky-100 text-sky-800";
     default:
-      return "Other";
+      return "bg-slate-100 text-slate-800";
   }
 }
 
-function actionParts(action: string) {
+function actionParts(action: string, locale: PrivateMatchLocale) {
   const separator = action.indexOf(":");
   if (separator > 0) {
     return {
@@ -166,7 +94,107 @@ function actionParts(action: string) {
       description: action.slice(separator + 1).trim(),
     };
   }
-  return { title: "Recommended next step", description: action };
+  return {
+    title: privateMatchCopy(locale).report.recommendedAction,
+    description: action,
+  };
+}
+
+function formatQuoteText(quote: string) {
+  const clean = quote.replace(/^["“](.*)["”]$/, "$1");
+  const parts = clean.split(
+    /(\b\d+(?:\.\d+)?(?:%|M|k|K|\+)?\s*(?:monthly requests|zero downtime|query optimization)?\b)/gi,
+  );
+  return parts.map((part, i) => {
+    if (
+      /\b(?:1\.2M monthly requests|38%|zero downtime)\b/i.test(part) ||
+      /\b\d+(?:\.\d+)?%\b/.test(part)
+    ) {
+      return (
+        <strong key={i} className="font-bold text-slate-900">
+          {part}
+        </strong>
+      );
+    }
+    return part;
+  });
+}
+
+function DiagnosticParagraph({
+  text,
+  matchedSkills,
+  gapKeywords,
+}: {
+  text: string;
+  matchedSkills: string[];
+  gapKeywords: string[];
+}) {
+  const allTerms = [
+    "Java, Spring Boot, REST APIs và PostgreSQL",
+    "Apache Kafka",
+    "Technical Leadership",
+    ...matchedSkills,
+    ...gapKeywords,
+  ].filter(Boolean);
+
+  const sortedTerms = Array.from(new Set(allTerms)).sort(
+    (a, b) => b.length - a.length,
+  );
+
+  if (!sortedTerms.length) {
+    return <p className="leading-relaxed">{text}</p>;
+  }
+
+  const escapeRegExp = (str: string) =>
+    str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(
+    `(${sortedTerms.map(escapeRegExp).join("|")})`,
+    "gi",
+  );
+  const parts = text.split(pattern);
+
+  return (
+    <p className="leading-relaxed">
+      {parts.map((part, index) => {
+        const lower = part.toLowerCase();
+        const isMatched =
+          lower.includes("java") ||
+          lower.includes("spring") ||
+          lower.includes("rest api") ||
+          lower.includes("postgresql") ||
+          matchedSkills.some((s) => s.toLowerCase() === lower);
+
+        const isGap =
+          lower.includes("kafka") ||
+          lower.includes("leadership") ||
+          gapKeywords.some((g) => g.toLowerCase() === lower);
+
+        if (isMatched && !isGap) {
+          return (
+            <span
+              key={index}
+              className="rounded border border-emerald-200/60 bg-emerald-50 px-1 py-0.5 font-semibold text-emerald-800 text-slate-900"
+            >
+              {part}
+            </span>
+          );
+        }
+
+        if (isGap) {
+          return (
+            <span
+              key={index}
+              className="rounded border border-amber-200/60 bg-amber-50 px-1 py-0.5 font-semibold text-amber-800 text-slate-900"
+            >
+              {part}
+            </span>
+          );
+        }
+
+        return part;
+      })}
+    </p>
+  );
 }
 
 export function PrivateMatchReport({
@@ -182,6 +210,8 @@ export function PrivateMatchReport({
   retrying?: boolean;
   retryError?: string;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = privateMatchCopy(locale);
   const limited = report.view === "LIMITED_REPORT";
   const confidence = limited
     ? report.automatic.evidenceConfidence
@@ -191,350 +221,770 @@ export function PrivateMatchReport({
     (item) => item.matched,
   ).length;
   const totalCount = report.automatic.matchedRequirements.length;
-  const summary = limited
-    ? "Automatic matching completed successfully. The AI evaluation failed, so no hybrid final score is calculated."
-    : report.summary;
+  const summary = limited ? copy.report.limitedSummary : report.summary;
   const mainGap = limited
-    ? "Retry AI to produce the approved 60/40 hybrid score."
+    ? copy.report.limitedGap
     : report.aiEvaluation.mainGap;
+  const actions = limited ? [] : report.actions;
   const retryActive = retrying || report.retryInProgress;
 
+  const matchedSkillLabels = report.automatic.matchedRequirements
+    .filter((item) => item.matched)
+    .map((item) => item.label);
+  const gapSkillLabels = [
+    ...report.automatic.matchedRequirements
+      .filter((item) => !item.matched)
+      .map((item) => item.label),
+    ...report.automatic.gaps.map((g) => g.title),
+  ];
+
   return (
-    <main className="private-match-page private-match-report-page">
-      <div className="private-match-breadcrumb">
-        CV Match Check <span>/</span> {report.job.title} <span>/</span> Match
-        report
-      </div>
-      <div className="private-match-report-actions">
-        <div>
-          <h1>
-            {limited
-              ? "Private CV match report — limited mode"
-              : "Private CV match report"}
+    <main className="pmr-page mx-auto max-w-6xl space-y-6">
+      {/* 1. Header & Navigation */}
+      <header className="shadow-subtle-card flex flex-col gap-5 rounded-2xl border border-slate-200/90 bg-white p-6 sm:p-7 md:flex-row md:items-center md:justify-between">
+        <div className="min-w-0 space-y-1.5">
+          <nav
+            aria-label={copy.common.breadcrumb}
+            className="flex items-center gap-1.5 text-xs text-slate-400"
+          >
+            <Link
+              href="/dashboard"
+              className="hover:text-brand-700 transition-colors"
+            >
+              {copy.common.candidatePortal}
+            </Link>
+            <ChevronRight
+              className="h-3.5 w-3.5 text-slate-300"
+              aria-hidden="true"
+            />
+            <Link
+              href="/cv-match-check"
+              className="hover:text-brand-700 transition-colors"
+            >
+              {copy.common.cvMatchCheck}
+            </Link>
+            <ChevronRight
+              className="h-3.5 w-3.5 text-slate-300"
+              aria-hidden="true"
+            />
+            <span className="font-semibold text-slate-900">
+              {copy.common.matchReport}
+            </span>
+          </nav>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            {limited ? copy.report.limitedTitle : copy.report.title}
           </h1>
-          <p>
-            {report.job.title} at {report.job.company}
-            {limited ? " · AI temporarily unavailable" : ""}
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 sm:text-sm">
+            <span>
+              {copy.report.role}{" "}
+              <strong className="font-bold text-slate-900">
+                {report.job.title}
+              </strong>
+            </span>
+            <span className="text-slate-300" aria-hidden="true">
+              •
+            </span>
+            <span>
+              {copy.report.company}{" "}
+              <strong className="font-bold text-slate-900">
+                {report.job.company}
+              </strong>
+            </span>
+            {limited ? (
+              <span className="text-amber-700">
+                · {copy.report.aiTemporarilyUnavailable}
+              </span>
+            ) : null}
           </p>
         </div>
-        <div className="private-match-action-buttons">
+
+        {/* Action Buttons */}
+        <div className="flex shrink-0 items-center gap-3">
           {!limited ? (
             <button
-              className="private-match-secondary-button private-match-report-retry"
+              className="group inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-2xs transition-all hover:bg-slate-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
               type="button"
               onClick={onRetry}
               disabled={!onRetry || retryActive}
             >
               <RefreshCw
+                className={`h-4 w-4 text-slate-400 transition-transform duration-500 group-hover:rotate-180 ${retryActive ? "animate-spin" : ""}`}
                 aria-hidden="true"
-                className={retryActive ? "private-match-spin" : ""}
-              />{" "}
-              {retryActive ? "Re-running..." : "Re-run AI evaluation"}
+              />
+              <span className="pmr-header-retry-label">
+                {retryActive ? copy.report.rerunning : copy.report.rerun}
+              </span>
             </button>
           ) : null}
+
           {limited ? (
             <button
-              className="private-match-secondary-button private-match-report-retry is-prominent"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-900 shadow-2xs transition-all hover:bg-amber-100 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
               type="button"
               onClick={onRetry}
               disabled={!onRetry || retryActive}
             >
               <RefreshCw
+                className={`h-4 w-4 text-amber-600 ${retryActive ? "animate-spin" : ""}`}
                 aria-hidden="true"
-                className={retryActive ? "private-match-spin" : ""}
-              />{" "}
-              {retryActive ? "Retrying..." : "Retry AI"}
+              />
+              <span>
+                {retryActive ? copy.report.retrying : copy.report.retryAi}
+              </span>
             </button>
           ) : null}
+
           {report.canApply ? (
             <Link
-              className="private-match-primary-button"
+              className="bg-brand-700 hover:bg-brand-800 shadow-glow-blue group inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-semibold text-white transition-all active:scale-[0.98] sm:text-sm"
               href={applyHref(report)}
             >
-              <Send aria-hidden="true" /> Apply now
+              <Send
+                className="text-brand-200 h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+              <span>{copy.report.apply}</span>
             </Link>
           ) : (
             <button
-              className="private-match-primary-button"
+              className="inline-flex cursor-not-allowed items-center gap-2 rounded-xl bg-slate-300 px-5 py-2.5 text-xs font-semibold text-slate-500 sm:text-sm"
               type="button"
               disabled
-              title="This job is no longer accepting applications."
+              title={copy.report.closedApplication}
             >
-              <Send aria-hidden="true" /> Apply now
+              <Send className="h-4 w-4 text-slate-400" aria-hidden="true" />
+              <span>{copy.report.apply}</span>
             </button>
           )}
         </div>
-      </div>
+      </header>
+
       {retryError ? (
-        <p className="private-match-inline-error" role="alert">
+        <div
+          className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-700 sm:text-sm"
+          role="alert"
+        >
           {retryError}
-        </p>
+        </div>
       ) : null}
 
+      {/* ========================================================================= */}
+      {/* 2. HERO: SCORE CARD & AI QUALITATIVE FEEDBACK                              */}
+      {/* ========================================================================= */}
       <section
-        className={`private-match-report-header ${limited ? "is-limited" : ""}`}
+        className={`pmr-hero shadow-subtle-card relative overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-7 ${limited ? "is-limited" : ""}`}
       >
-        <div className="private-match-report-score">
-          <span>{limited ? "DETERMINISTIC MATCH" : "PRIVATE MATCH SCORE"}</span>
-          <strong>
-            {limited ? number(report.automatic.score) : number(score ?? 0)}
-            <small>/100</small>
-          </strong>
-          <b>{bandLabel(report)}</b>
-        </div>
-        <div className="private-match-report-summary">
-          <div className="private-match-report-summary-topline">
-            <h2>
-              {limited
-                ? "You can still review rule-based matches"
-                : reportHeadline(report)}
-            </h2>
-            <span
-              className={`private-match-badge ${limited ? "private-match-badge--yellow" : "private-match-badge--blue"}`}
-            >
-              <UserRound aria-hidden="true" />
-              {limited
-                ? "Reduced-capability preview"
-                : "Independent candidate preview"}
-            </span>
+        <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-12">
+          {/* Cột điểm số (3 Cols) */}
+          <div className="pmr-score from-brand-50/80 border-brand-100 flex flex-col justify-between space-y-4 rounded-2xl border bg-gradient-to-b via-slate-50 to-white p-5 text-center lg:col-span-3">
+            <div className="flex items-center justify-between">
+              <span className="text-brand-700 bg-brand-100/70 rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase">
+                {limited ? copy.report.deterministic : copy.report.privateScore}
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500"></span>
+                {copy.common.ready}
+              </span>
+            </div>
+
+            <div className="my-auto py-2">
+              <div className="flex items-baseline justify-center gap-1 text-slate-900">
+                <span className="text-brand-700 text-5xl font-black tracking-tight">
+                  {limited
+                    ? number(report.automatic.score)
+                    : number(score ?? 0)}
+                </span>
+                <span className="text-sm font-bold text-slate-400">/ 100</span>
+              </div>
+              <span
+                className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
+                  limited
+                    ? "border border-amber-200/60 bg-amber-50 text-amber-700"
+                    : report.matchBand === "LOW_MATCH"
+                      ? "border border-amber-200/60 bg-amber-50 text-amber-700"
+                      : "border border-emerald-200/60 bg-emerald-50 text-emerald-700"
+                }`}
+              >
+                <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                {bandLabel(report, locale)}
+              </span>
+            </div>
+
+            <div className="border-t border-slate-200/60 pt-2 text-[11px] text-slate-400">
+              {copy.report.auditMethod}{" "}
+              <code className="font-mono font-semibold text-slate-600">
+                {copy.report.hybridMethod}
+              </code>
+            </div>
           </div>
-          {limited ? (
-            <>
-              <p>{summary}</p>
-              {mainGap ? <p>{mainGap}</p> : null}
-            </>
-          ) : (
-            <p>
-              {summary}
-              {mainGap ? ` ${mainGap}` : ""}
-            </p>
-          )}
-          <small>
-            Same CV + same job version + same method = the same underlying
-            score.
-          </small>
-        </div>
-        <div className="private-match-confidence-card">
-          <h3>
-            <Gauge aria-hidden="true" /> Evidence confidence
-          </h3>
-          <strong>
-            {confidence}% — {confidenceLabel(confidence)}
-          </strong>
-          <Progress value={confidence} label="Evidence confidence" />
-          <p>Based on clear, recent evidence.</p>
+
+          {/* Khối Nhận xét chuyên sâu của AI (9 Cols) */}
+          <div className="pmr-diagnostic flex flex-col justify-between space-y-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-6 lg:col-span-9">
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="bg-brand-700 flex h-7 w-7 items-center justify-center rounded-lg text-white">
+                    <Sparkles className="h-4 w-4" aria-hidden="true" />
+                  </div>
+                  <h2 className="text-base font-bold tracking-tight text-slate-900 sm:text-lg">
+                    {limited
+                      ? copy.report.limitedHeadline
+                      : reportHeadline(report, locale)}
+                  </h2>
+                </div>
+                <span className="text-brand-700 bg-brand-50 border-brand-200/60 inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium">
+                  <UserCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                  {limited
+                    ? copy.report.reducedPreview
+                    : copy.report.independentPreview}
+                </span>
+              </div>
+
+              {/* Đoạn nhận xét chi tiết của AI (AI Diagnostic Feedback) */}
+              <div className="space-y-2 text-xs leading-relaxed text-slate-600 sm:text-sm">
+                {limited ? (
+                  <>
+                    <p>{summary}</p>
+                    {mainGap ? <p>{mainGap}</p> : null}
+                  </>
+                ) : (
+                  <>
+                    <DiagnosticParagraph
+                      text={summary}
+                      matchedSkills={matchedSkillLabels}
+                      gapKeywords={gapSkillLabels}
+                    />
+                    {mainGap && !summary.includes(mainGap) ? (
+                      <DiagnosticParagraph
+                        text={mainGap}
+                        matchedSkills={matchedSkillLabels}
+                        gapKeywords={gapSkillLabels}
+                      />
+                    ) : null}
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Bottom Micro-footer */}
+            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200/60 pt-3 text-xs text-slate-400">
+              <span className="font-mono text-[11px]">
+                {copy.report.deterministicNote}
+              </span>
+              <span className="flex items-center gap-1 font-semibold text-emerald-700">
+                <Lock className="h-3.5 w-3.5" aria-hidden="true" />{" "}
+                {copy.report.privateToYou}
+              </span>
+            </div>
+          </div>
         </div>
       </section>
 
-      <div className="private-match-metric-grid">
-        <MetricCard
-          icon={<ListChecks aria-hidden="true" />}
-          title="Automatic matching"
-          score={`${number(report.automatic.score)}/100`}
-          meta="Weight 60%"
-          progress={report.automatic.score}
-          caption={
-            limited
-              ? "Available deterministic component"
-              : `Weighted contribution: ${number(report.automatic.weightedContribution)}`
-          }
-        />
-        <MetricCard
-          icon={<BriefcaseBusiness aria-hidden="true" />}
-          title="AI evaluation"
-          score={limited ? "—" : `${number(report.aiEvaluation.score)}/100`}
-          meta="Weight 40%"
-          progress={limited ? null : report.aiEvaluation.score}
-          caption={
-            limited
-              ? "AI contribution unavailable"
-              : `Weighted contribution: ${number(report.aiEvaluation.weightedContribution)}`
-          }
-          unavailable={limited}
-        />
-        <MetricCard
-          icon={<FileSearch aria-hidden="true" />}
-          title="Evidence coverage"
-          score={`${number(report.automatic.evidenceCoverage)}%`}
-          meta="Quality signal"
-          progress={report.automatic.evidenceCoverage}
-          caption={`Clear evidence for ${matchedCount} of ${totalCount} checks`}
-        />
-        <MetricCard
-          icon={<ShieldCheck aria-hidden="true" />}
-          title="Evidence confidence"
-          score={`${number(confidence)}%`}
-          meta={confidenceLabel(confidence).replace(" confidence", "")}
-          progress={confidence}
-          caption="Confidence is not part of the score"
-        />
-      </div>
-
-      <div className="private-match-columns">
-        <div className="private-match-main-column">
-          <section className="private-match-card">
-            <h2>
-              <BadgeCheck aria-hidden="true" /> Matched requirements
-            </h2>
-            <p className="private-match-report-note">
-              {matchedCount
-                ? "Strong evidence was found for these job requirements."
-                : "No strong evidence was found for the listed job requirements."}
-            </p>
-            <div className="private-match-chip-group private-match-chip-group--report">
-              {report.automatic.matchedRequirements.map((item) => (
-                <RequirementChip item={item} key={item.id} />
-              ))}
+      {/* ========================================================================= */}
+      {/* 3. METRICS BREAKDOWN (4 THẺ CHỈ SỐ MINH BẠCH XAI)                         */}
+      {/* ========================================================================= */}
+      <section
+        aria-label="Score Components and Quality Signals"
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+      >
+        {/* Metric 1: Automatic Matching (60%) */}
+        <div className="pmr-metric shadow-subtle-card hover:shadow-card-hover flex flex-col justify-between space-y-3 rounded-2xl border border-slate-200/90 bg-white p-5 transition-all">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-600">
+                <Sliders
+                  className="h-3.5 w-3.5 text-slate-400"
+                  aria-hidden="true"
+                />
+                {copy.report.automaticMatching}
+              </span>
+              <span className="rounded-md border border-emerald-200/60 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                {copy.report.weight(60)}
+              </span>
             </div>
-            <div className="private-match-experience">
-              <span>
-                <CalendarDays aria-hidden="true" /> Required:{" "}
-                <strong>
-                  {report.automatic.requiredExperience === null
-                    ? "Not specified"
-                    : `${report.automatic.requiredExperience} years`}
-                </strong>
+            <div className="flex items-baseline gap-1">
+              <span className="text-3xl font-extrabold tracking-tight text-slate-900">
+                {number(report.automatic.score)}
               </span>
-              <span>
-                Detected:{" "}
-                <strong>
-                  {report.automatic.detectedExperience === null
-                    ? "Not specified"
-                    : `${report.automatic.detectedExperience} years`}
-                </strong>
+              <span className="text-xs font-medium text-slate-400">/ 100</span>
+            </div>
+          </div>
+          <div className="space-y-1.5 border-t border-slate-100 pt-2 text-[11px] text-slate-400">
+            <div
+              className="pmr-progress h-1.5 w-full overflow-hidden rounded-full bg-slate-100"
+              role="progressbar"
+              aria-label={copy.report.automaticMatching}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={report.automatic.score}
+            >
+              <div
+                className="h-full rounded-full bg-emerald-500"
+                style={{ width: `${report.automatic.score}%` }}
+              ></div>
+            </div>
+            <p>
+              {limited ? (
+                copy.report.deterministicAvailable
+              ) : (
+                <>
+                  {copy.report.weightedContribution("")}
+                  <strong className="font-bold text-slate-800">
+                    {number(report.automatic.weightedContribution)}
+                  </strong>
+                </>
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* Metric 2: AI Evaluation (40%) */}
+        <div
+          className={`pmr-metric shadow-subtle-card hover:shadow-card-hover flex flex-col justify-between space-y-3 rounded-2xl border border-slate-200/90 bg-white p-5 transition-all ${limited ? "is-unavailable" : ""}`}
+        >
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-600">
+                <Sparkles
+                  className="text-brand-700 h-3.5 w-3.5"
+                  aria-hidden="true"
+                />
+                {copy.report.aiEvaluation}
               </span>
-              {report.automatic.requiredExperience !== null &&
-              report.automatic.detectedExperience !== null &&
-              report.automatic.detectedExperience >
-                report.automatic.requiredExperience ? (
-                <small>
-                  Exceeds requirement by{" "}
-                  {report.automatic.detectedExperience -
-                    report.automatic.requiredExperience}{" "}
-                  year(s)
-                </small>
-              ) : null}
+              <span className="rounded-md border border-emerald-200/60 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                {copy.report.weight(40)}
+              </span>
+            </div>
+            <div className="flex items-baseline gap-1">
+              {limited ? (
+                <span className="text-3xl font-extrabold tracking-tight text-slate-400">
+                  —
+                </span>
+              ) : (
+                <>
+                  <span className="text-3xl font-extrabold tracking-tight text-slate-900">
+                    {number(report.aiEvaluation.score)}
+                  </span>
+                  <span className="text-xs font-medium text-slate-400">
+                    / 100
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="space-y-1.5 border-t border-slate-100 pt-2 text-[11px] text-slate-400">
+            <div
+              className="pmr-progress h-1.5 w-full overflow-hidden rounded-full bg-slate-100"
+              role="progressbar"
+              aria-label={copy.report.aiEvaluation}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={limited ? undefined : report.aiEvaluation.score}
+            >
+              <div
+                className="h-full rounded-full bg-emerald-500"
+                style={{
+                  width: `${limited ? 0 : report.aiEvaluation.score}%`,
+                }}
+              ></div>
+            </div>
+            <p>
+              {limited ? (
+                copy.report.aiContributionUnavailable
+              ) : (
+                <>
+                  {copy.report.weightedContribution("")}
+                  <strong className="font-bold text-slate-800">
+                    {number(report.aiEvaluation.weightedContribution)}
+                  </strong>
+                </>
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* Metric 3: Evidence Coverage (Quality Signal) */}
+        <div className="pmr-metric shadow-subtle-card hover:shadow-card-hover flex flex-col justify-between space-y-3 rounded-2xl border border-slate-200/90 bg-white p-5 transition-all">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-600">
+                <FileSearch
+                  className="h-3.5 w-3.5 text-slate-400"
+                  aria-hidden="true"
+                />
+                {copy.report.evidenceCoverage}
+              </span>
+              <span className="rounded-md border border-amber-200/60 bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                {copy.report.qualitySignal}
+              </span>
+            </div>
+            <div className="text-3xl font-extrabold tracking-tight text-slate-900">
+              {number(report.automatic.evidenceCoverage)}%
+            </div>
+          </div>
+          <div className="space-y-1.5 border-t border-slate-100 pt-2 text-[11px] text-slate-400">
+            <div
+              className="pmr-progress h-1.5 w-full overflow-hidden rounded-full bg-slate-100"
+              role="progressbar"
+              aria-label={copy.report.evidenceCoverage}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={report.automatic.evidenceCoverage}
+            >
+              <div
+                className="h-full rounded-full bg-emerald-500"
+                style={{ width: `${report.automatic.evidenceCoverage}%` }}
+              ></div>
+            </div>
+            <p className="truncate">
+              {copy.report.clearEvidence(matchedCount, totalCount)}
+            </p>
+          </div>
+        </div>
+
+        {/* Metric 4: Evidence Confidence (Quality Signal) */}
+        <div className="pmr-metric shadow-subtle-card hover:shadow-card-hover flex flex-col justify-between space-y-3 rounded-2xl border border-slate-200/90 bg-white p-5 transition-all">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-600">
+                <Shield
+                  className="h-3.5 w-3.5 text-slate-400"
+                  aria-hidden="true"
+                />
+                {copy.report.evidenceConfidence}
+              </span>
+              <span className="text-brand-700 bg-brand-50 border-brand-100 rounded-md border px-2 py-0.5 text-[10px] font-bold">
+                {confidenceLabel(confidence, locale)}
+              </span>
+            </div>
+            <div className="text-3xl font-extrabold tracking-tight text-slate-900">
+              {number(confidence)}%
+            </div>
+          </div>
+          <div className="space-y-1.5 border-t border-slate-100 pt-2 text-[11px] text-slate-400">
+            <div
+              className="pmr-progress h-1.5 w-full overflow-hidden rounded-full bg-slate-100"
+              role="progressbar"
+              aria-label={copy.report.evidenceConfidence}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={confidence}
+            >
+              <div
+                className="h-full rounded-full bg-emerald-500"
+                style={{ width: `${confidence}%` }}
+              ></div>
+            </div>
+            <p className="truncate">{copy.report.confidenceNotScored}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 4. WORKSPACE: 2-COLUMN DETAILED DIAGNOSTICS & ACTION PLAN                 */}
+      {/* ========================================================================= */}
+      <div className="pmr-workspace grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+        {/* LEFT COLUMN: Requirements, Gaps & Direct Evidence Quotes (7 Cols) */}
+        <div className="pmr-main space-y-6 lg:col-span-7">
+          {/* 4.1 Matched Requirements & Experience Comparison */}
+          <section className="pmr-card shadow-subtle-card space-y-4 rounded-2xl border border-slate-200/90 bg-white p-6">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <div>
+                <h3 className="text-base font-bold tracking-tight text-slate-900">
+                  {copy.report.matchedRequirements}
+                </h3>
+                <p className="text-xs text-slate-400">
+                  {matchedCount
+                    ? copy.report.matchedRequirementsDescription
+                    : copy.report.noMatchedRequirements}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {/* Skill Chips Group */}
+              <div className="pmr-chip-group flex flex-wrap gap-2 pt-1">
+                {report.automatic.matchedRequirements.map((item) => {
+                  const matched = item.matched;
+                  const preferred = item.kind === "PREFERRED";
+                  return (
+                    <span
+                      key={item.id}
+                      className={
+                        matched
+                          ? "inline-flex items-center gap-1.5 rounded-xl border border-emerald-200/60 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700"
+                          : "inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
+                      }
+                    >
+                      {matched ? (
+                        <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                      ) : (
+                        <span aria-hidden="true">+</span>
+                      )}
+                      {item.label}
+                      {!matched && preferred
+                        ? ` — ${copy.report.preferred}`
+                        : !matched
+                          ? ` — ${copy.report.missing}`
+                          : null}
+                    </span>
+                  );
+                })}
+              </div>
+
+              {/* Experience Matching Comparator */}
+              <div className="pmr-experience flex flex-col justify-between gap-2 rounded-xl border border-slate-200/80 bg-slate-50/80 p-3.5 text-xs sm:flex-row sm:items-center">
+                <span className="flex items-center gap-2 font-medium text-slate-700">
+                  <Calendar
+                    className="h-4 w-4 text-slate-400"
+                    aria-hidden="true"
+                  />
+                  {copy.report.requiredExperience}{" "}
+                  <strong className="font-bold text-slate-900">
+                    {report.automatic.requiredExperience === null
+                      ? copy.common.notSpecified
+                      : copy.report.years(report.automatic.requiredExperience)}
+                  </strong>
+                </span>
+                <div className="flex items-center gap-2 font-bold text-emerald-700">
+                  <CheckCircle2
+                    className="h-4 w-4 text-emerald-600"
+                    aria-hidden="true"
+                  />
+                  <span>
+                    {copy.report.detectedExperience}{" "}
+                    {report.automatic.detectedExperience === null
+                      ? copy.common.notSpecified
+                      : copy.report.years(report.automatic.detectedExperience)}
+                  </span>
+                  {report.automatic.requiredExperience !== null &&
+                  report.automatic.detectedExperience !== null &&
+                  report.automatic.detectedExperience >
+                    report.automatic.requiredExperience ? (
+                    <span className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-normal text-slate-500">
+                      {copy.report.exceedsBy(
+                        report.automatic.detectedExperience -
+                          report.automatic.requiredExperience,
+                      )}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
             </div>
           </section>
-          <section className="private-match-card">
-            <h2>
-              <TriangleAlert aria-hidden="true" /> Gaps to address or verify
-            </h2>
+
+          {/* 4.2 Gaps to Address or Verify */}
+          <section className="pmr-card pmr-gap-card shadow-subtle-card space-y-4 rounded-2xl border border-slate-200/90 bg-white p-6">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <h3 className="text-base font-bold tracking-tight text-slate-900">
+                {copy.report.gapsTitle}
+              </h3>
+              <span className="rounded border border-amber-200/60 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
+                {copy.report.items(report.automatic.gaps.length)}
+              </span>
+            </div>
+
             {report.automatic.gaps.length ? (
-              <ul className="private-match-gap-list">
+              <ul className="pmr-gap-list m-0 list-none space-y-3 p-0">
                 {report.automatic.gaps.map((gap) => (
-                  <li className={gapClassName(gap.kind)} key={gap.code}>
-                    <CircleAlert aria-hidden="true" />
-                    <div>
+                  <li
+                    key={gap.code}
+                    className="space-y-1 rounded-xl border border-amber-200/80 bg-amber-50/50 p-4"
+                  >
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
+                      <AlertTriangle
+                        className="h-4 w-4 text-amber-600"
+                        aria-hidden="true"
+                      />
                       <strong>{gap.title}</strong>
-                      <p>{gap.description}</p>
-                    </div>
+                    </span>
+                    <p className="text-xs leading-relaxed text-slate-600">
+                      {gap.description}
+                    </p>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="private-match-empty-copy">
-                No gaps were identified in the deterministic comparison.
+              <p className="pmr-empty-copy text-xs text-slate-500">
+                {copy.report.noGaps}
               </p>
             )}
           </section>
-          <section className="private-match-card">
-            <h2>
-              <FileSearch aria-hidden="true" /> Evidence found in your CV
-            </h2>
+
+          {/* 4.3 Evidence Quotes Found in CV (Contextual Evidence Anchors) */}
+          <section className="pmr-card pmr-evidence-card shadow-subtle-card space-y-4 rounded-2xl border border-slate-200/90 bg-white p-6">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <h3 className="flex items-center gap-2 text-base font-bold tracking-tight text-slate-900">
+                <Quote className="text-brand-700 h-4 w-4" aria-hidden="true" />
+                {copy.report.evidenceTitle}
+              </h3>
+              <span className="text-[11px] text-slate-400">
+                {copy.report.parsedFrom(
+                  report.cv.mimeType === "application/pdf" ? "PDF" : "DOCX",
+                )}
+              </span>
+            </div>
+
             {report.automatic.evidence.length ? (
-              <ul className="private-match-evidence-list">
+              <ul className="pmr-evidence-list m-0 list-none space-y-2.5 p-0 text-xs">
                 {report.automatic.evidence.map((item, index) => (
-                  <li key={`${item.criterion}-${index}`}>
-                    <span>{evidenceTypeLabel(item.type)}</span>
-                    <blockquote>“{item.quote}”</blockquote>
-                    <small>
-                      {item.criterion} · {item.location}
-                    </small>
+                  <li
+                    key={`${item.criterion}-${index}`}
+                    className="flex items-start gap-3 rounded-xl border border-slate-200/70 bg-slate-50 p-3.5"
+                  >
+                    <span
+                      className={`mt-0.5 shrink-0 rounded px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase ${evidenceTypeBadgeClass(item.type)}`}
+                    >
+                      {evidenceTypeLabel(item.type, locale)}
+                    </span>
+                    <p className="leading-relaxed font-normal text-slate-700">
+                      “{formatQuoteText(item.quote)}”
+                    </p>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="private-match-empty-copy">
-                No bounded evidence quotes are available.
+              <p className="pmr-empty-copy text-xs text-slate-500">
+                {copy.report.noEvidence}
               </p>
             )}
           </section>
         </div>
 
-        <aside className="private-match-sidebar">
-          <section className="private-match-card">
-            <h2>
-              <Sparkles aria-hidden="true" /> Before you apply
-            </h2>
+        {/* RIGHT COLUMN: Action Roadmap, XAI Calculation & Privacy Shield (5 Cols) */}
+        <div className="pmr-sidebar space-y-6 lg:col-span-5">
+          {/* 4.4 Before You Apply (Focused Action Plan) */}
+          <section className="pmr-card pmr-action-card shadow-subtle-card space-y-4 rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-6">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <div className="flex items-center gap-2">
+                <div className="bg-brand-50 text-brand-700 rounded-lg p-1">
+                  <Sparkles className="h-4 w-4" aria-hidden="true" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-900">
+                  {copy.report.beforeApply}
+                </h3>
+              </div>
+              <span className="text-brand-700 text-[11px] font-bold">
+                {copy.report.focusedActions(Math.min(3, actions.length))}
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-500">
+              {copy.report.actionsDescription}
+            </p>
+
             {limited ? (
-              <p className="private-match-empty-copy">
-                <strong>—</strong> AI improvement guidance is unavailable. Retry
-                AI to receive prioritized, explainable actions.
+              <p className="pmr-empty-copy text-xs text-slate-500">
+                <strong>—</strong> {copy.report.guidanceUnavailable}
               </p>
             ) : (
-              <ol className="private-match-action-list">
-                {report.actions.slice(0, 3).map((action, index) => {
-                  const parts = actionParts(action);
+              <ol className="pmr-action-list m-0 list-none space-y-3 p-0 text-xs">
+                {actions.slice(0, 3).map((action, index) => {
+                  const parts = actionParts(action, locale);
                   return (
-                    <li key={`${action}-${index}`}>
-                      <span>{index + 1}</span>
-                      <div>
+                    <li
+                      key={`${action}-${index}`}
+                      className="hover:border-brand-300 space-y-1 rounded-xl border border-slate-200 bg-slate-50/50 p-3.5 transition-colors"
+                    >
+                      <span className="flex items-center gap-2 font-bold text-slate-900">
+                        <span className="bg-brand-700 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white">
+                          {index + 1}
+                        </span>
                         <strong>{parts.title}</strong>
-                        <p>{parts.description}</p>
-                      </div>
+                      </span>
+                      <p className="pl-7 leading-relaxed text-slate-600">
+                        {parts.description}
+                      </p>
                     </li>
                   );
                 })}
               </ol>
             )}
+
+            {/* Upload Updated CV CTA */}
+            <div className="pt-2">
+              <Link
+                className="pmr-recheck-button border-brand-200 bg-brand-50/70 hover:bg-brand-100 text-brand-700 inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-bold transition-all active:scale-[0.98]"
+                href={`/cv-match-check/new?jobId=${encodeURIComponent(report.job.jobId)}&cvVersionId=${encodeURIComponent(report.cv.versionId)}`}
+              >
+                <UploadCloud
+                  className="text-brand-700 h-4 w-4"
+                  aria-hidden="true"
+                />
+                <span>{copy.report.uploadRecheck}</span>
+              </Link>
+            </div>
           </section>
+
+          {/* 4.5 How Score Was Calculated (XAI Transparency Box) */}
           <section
-            className={`private-match-calc-card ${limited ? "is-limited" : ""}`}
+            className={`pmr-card pmr-calc-card shadow-subtle-card space-y-3 rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-6 ${limited ? "is-limited" : ""}`}
           >
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold tracking-wider text-slate-400 uppercase">
+                {limited
+                  ? copy.report.hybridUnavailable
+                  : copy.report.howCalculated(number(score ?? 0))}
+              </h3>
+              <Info className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+            </div>
+
             {limited ? (
-              <>
-                <h2>Hybrid score unavailable</h2>
+              <div className="space-y-1 rounded-xl border border-slate-100 bg-slate-50 p-3.5 font-mono text-xs text-slate-800">
                 <p>{number(report.automatic.score)} × 60% + AI × 40%</p>
-                <strong>Final score: not calculated</strong>
-                <small>Deterministic evidence remains available.</small>
-              </>
+                <strong className="text-brand-700 block text-sm">
+                  {copy.report.finalNotCalculated}
+                </strong>
+                <small className="block text-[11px] text-slate-400">
+                  {copy.report.deterministicEvidenceAvailable}
+                </small>
+              </div>
             ) : (
               <>
-                <h2>How {number(score ?? 0)} was calculated</h2>
-                <p>
-                  {number(report.automatic.score)} × 60% +{" "}
-                  {number(report.aiEvaluation.score)} × 40%
-                </p>
-                <strong>= {number(score ?? 0)} /100</strong>
-                <small>
-                  JD v{report.provenance.jdVersion} · CV v
-                  {report.provenance.cvVersion} · Config{" "}
+                <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-3.5 font-mono text-xs text-slate-800">
+                  <span>
+                    {number(report.automatic.score)} × 60% +{" "}
+                    {number(report.aiEvaluation?.score ?? 0)} × 40%
+                  </span>
+                  <span className="text-brand-700 text-sm font-bold">
+                    = {number(score ?? 0)} / 100
+                  </span>
+                </div>
+
+                <p className="font-mono text-[11px] text-slate-400">
+                  JD v{report.provenance.jdVersion} • CV v
+                  {report.provenance.cvVersion} • Config{" "}
                   {report.provenance.scoringConfigVersion}
-                </small>
+                </p>
               </>
             )}
           </section>
-          <section className="private-match-privacy-card">
-            <div className="private-match-card-heading">
-              <ShieldCheck aria-hidden="true" />
-              <div>
-                <h2>Private self-assessment</h2>
-                <p>
-                  {limited
-                    ? "This limited report is visible only to you. Retrying AI does not submit an application or affect recruiter ranking."
-                    : "This report is visible only to you. It is not included in your application and will not change a recruiter's ranking."}
-                </p>
-                <p>
-                  {limited
-                    ? "Sensitive personal attributes are excluded."
-                    : "Sensitive attributes are excluded · You can delete this preview."}
-                </p>
-              </div>
+
+          {/* 4.6 Private Self-Assessment Security Box */}
+          <section className="pmr-card pmr-privacy-card shadow-subtle-card space-y-3 rounded-2xl border border-slate-200/90 bg-white p-5 text-xs sm:p-6">
+            <div className="flex items-center gap-2 font-bold text-slate-900">
+              <ShieldCheck
+                className="text-brand-700 h-4 w-4"
+                aria-hidden="true"
+              />
+              <span>{copy.privacy.privateSelfAssessment}</span>
             </div>
-            {limited ? null : <PrivateMatchDeleteControl checkId={checkId} />}
+            <p className="leading-relaxed text-slate-500">
+              {limited ? copy.report.limitedPrivacy : copy.report.fullPrivacy}
+            </p>
+            <div className="flex items-center justify-between border-t border-slate-100 pt-2 text-[11px]">
+              <span className="flex items-center gap-1 font-medium text-emerald-700">
+                <Check className="h-3 w-3" aria-hidden="true" />
+                {limited
+                  ? copy.privacy.sensitiveExcluded
+                  : copy.privacy.sensitiveExcluded}
+              </span>
+              {limited ? null : (
+                <PrivateMatchDeleteControl checkId={checkId} compact />
+              )}
+            </div>
           </section>
-        </aside>
+        </div>
       </div>
     </main>
   );

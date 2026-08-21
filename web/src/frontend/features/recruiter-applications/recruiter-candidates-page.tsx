@@ -399,6 +399,8 @@ export function RecruiterCandidatesPage({
           <Search aria-hidden="true" />
           <span className="sr-only">Search campaigns</span>
           <input
+            id="candidate-campaign-search"
+            name="campaignSearch"
             value={search}
             onChange={(event) => {
               setSearch(event.target.value);
@@ -410,6 +412,8 @@ export function RecruiterCandidatesPage({
         <label className="campaign-filter-field">
           <span>Status</span>
           <select
+            id="candidate-campaign-status"
+            name="campaignStatus"
             value={status}
             onChange={(event) => {
               setStatus(event.target.value as typeof status);
@@ -424,6 +428,8 @@ export function RecruiterCandidatesPage({
         <label className="campaign-filter-field">
           <span>Department</span>
           <select
+            id="candidate-campaign-department"
+            name="campaignDepartment"
             value={department}
             onChange={(event) => {
               setDepartment(event.target.value);

@@ -7,6 +7,10 @@ import type {
 } from "@/backend/services/jobs/job-types";
 import { encodeJobCursor } from "@/backend/services/jobs/search-normalization";
 import { careerPathSearchTerms } from "@/shared/contracts/jobs/career-paths";
+import {
+  candidateVisibleJobSql,
+  candidateVisibleJobWhere,
+} from "./candidate-visible-job-policy";
 
 const publicInclude = (actorUserId: string | null) =>
   ({
@@ -66,6 +70,12 @@ type RankedRow = {
   salaryMaximum: string | null;
 };
 
+export type RankedJobSearchResult = Readonly<{
+  orderedJobIds: string[];
+  total?: number;
+  nextCursor: string | null;
+}>;
+
 export interface PublicJobRepository {
   search(
     input: NormalizedJobSearch,
@@ -91,6 +101,10 @@ export interface PublicJobRepository {
     actorUserId: string | null,
     now: Date,
   ): Promise<PublicJobRow[]>;
+  findPublicRecommendationCandidates?(
+    actorUserId: string | null,
+    now: Date,
+  ): Promise<PublicJobRow[]>;
   findPublicActionTarget(
     jobId: string,
     now: Date,
@@ -102,23 +116,7 @@ export interface PublicJobRepository {
 }
 
 function publicClauses(input: NormalizedJobSearch, now: Date) {
-  const clauses: Prisma.Sql[] = [
-    Prisma.sql`j."status" = 'ACTIVE'::"JobPostingStatus"`,
-    Prisma.sql`j."approvedAt" IS NOT NULL`,
-    Prisma.sql`j."publishedAt" IS NOT NULL AND j."publishedAt" <= ${now}`,
-    Prisma.sql`(j."applicationDeadline" IS NULL OR j."applicationDeadline" > ${now})`,
-    Prisma.sql`EXISTS (SELECT 1 FROM "Company" c WHERE c."id" = j."companyId" AND c."verifiedAt" IS NOT NULL AND c."verificationState" = 'ACTIVE'::"CompanyVerificationState" AND c."verificationInactiveAt" IS NULL)`,
-    Prisma.sql`(
-      NOT EXISTS (SELECT 1 FROM "JobPostReviewAggregate" r WHERE r."publicJobPostingId" = j."id")
-      OR EXISTS (
-        SELECT 1 FROM "JobPostReviewAggregate" r
-        WHERE r."publicJobPostingId" = j."id"
-          AND r."approvedVersionId" IS NOT NULL
-          AND r."closedAt" IS NULL
-          AND r."visibilityState" = 'PUBLISHED'::"JobPostVisibilityState"
-      )
-    )`,
-  ];
+  const clauses: Prisma.Sql[] = [candidateVisibleJobSql(now)];
   for (const token of input.normalizedQuery.split(" ").filter(Boolean)) {
     if (input.searchBy === "TITLE") {
       clauses.push(Prisma.sql`j."normalizedTitle" LIKE ${`%${token}%`}`);
@@ -130,7 +128,20 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
       )`);
     } else {
       clauses.push(
-        Prisma.sql`j."searchDocumentNormalized" LIKE ${`%${token}%`}`,
+        // Keep BOTH aligned with the Find Jobs selector: a keyword must be
+        // visible in either the job title or company name, not only in a
+        // hidden detail such as a requirement or description.
+        Prisma.sql`(
+          j."normalizedTitle" LIKE ${`%${token}%`}
+          OR EXISTS (
+            SELECT 1 FROM "Company" c
+            WHERE c."id" = j."companyId"
+              AND (
+                lower(c."displayName") LIKE ${`%${token}%`}
+                OR lower(c."legalName") LIKE ${`%${token}%`}
+              )
+          )
+        )`,
       );
     }
   }
@@ -220,11 +231,11 @@ function cursorClause(
 }
 
 export class PrismaPublicJobRepository implements PublicJobRepository {
-  async search(
+  async searchOrderedIds(
     input: NormalizedJobSearch,
-    actorUserId: string | null,
     now: Date,
-  ) {
+    options: Readonly<{ includeTotal?: boolean }> = {},
+  ): Promise<RankedJobSearchResult> {
     const clauses = publicClauses(input, now);
     const query = input.normalizedQuery;
     const score = query
@@ -242,39 +253,27 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
           ? Prisma.sql`j."publishedAt" DESC, j."id" ASC`
           : Prisma.sql`score DESC, j."publishedAt" DESC, j."id" ASC`;
 
-    const [ranked, counts] = await Promise.all([
-      prisma.$queryRaw<RankedRow[]>(Prisma.sql`
-        SELECT j."id", ${score} AS score, j."publishedAt" AS "publishedAt",
-               j."salaryMax"::text AS "salaryMaximum"
-        FROM "JobPosting" j
-        WHERE ${where} ${cursor ? Prisma.sql`AND ${cursor}` : Prisma.empty}
-        ORDER BY ${order}
-        LIMIT ${input.limit + 1}
-        ${offset}
-      `),
-      prisma.$queryRaw<Array<{ count: number }>>(Prisma.sql`
-        SELECT COUNT(*)::int AS count FROM "JobPosting" j WHERE ${where}
-      `),
-    ]);
+    const rankedPromise = prisma.$queryRaw<RankedRow[]>(Prisma.sql`
+      SELECT j."id", ${score} AS score, j."publishedAt" AS "publishedAt",
+             j."salaryMax"::text AS "salaryMaximum"
+      FROM "JobPosting" j
+      WHERE ${where} ${cursor ? Prisma.sql`AND ${cursor}` : Prisma.empty}
+      ORDER BY ${order}
+      LIMIT ${input.limit + 1}
+      ${offset}
+    `);
+    const totalPromise = options.includeTotal
+      ? prisma.$queryRaw<Array<{ count: number }>>(Prisma.sql`
+          SELECT COUNT(*)::int AS count FROM "JobPosting" j WHERE ${where}
+        `)
+      : Promise.resolve(undefined);
+    const [ranked, counts] = await Promise.all([rankedPromise, totalPromise]);
     const hasMore = ranked.length > input.limit;
     const page = ranked.slice(0, input.limit);
-    const entities = await prisma.jobPosting.findMany({
-      where: { id: { in: page.map((row) => row.id) } },
-      include: publicInclude(actorUserId),
-    });
-    const byId = new Map(entities.map((entity) => [entity.id, entity]));
-    const rows = page
-      .map((rank) => {
-        const entity = byId.get(rank.id);
-        return entity
-          ? ({ ...entity, score: Number(rank.score) } as PublicJobRow)
-          : null;
-      })
-      .filter((row): row is PublicJobRow => row !== null);
     const last = hasMore ? page.at(-1) : undefined;
     return {
-      rows,
-      total: counts[0]?.count ?? 0,
+      orderedJobIds: page.map((row) => row.id),
+      total: counts?.[0]?.count ?? undefined,
       nextCursor: last
         ? encodeJobCursor({
             v: 1,
@@ -286,6 +285,32 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
             id: last.id,
           })
         : null,
+    };
+  }
+
+  async search(
+    input: NormalizedJobSearch,
+    actorUserId: string | null,
+    now: Date,
+  ) {
+    const ranked = await this.searchOrderedIds(input, now, {
+      includeTotal: true,
+    });
+    const entities = await prisma.jobPosting.findMany({
+      where: { id: { in: ranked.orderedJobIds } },
+      include: publicInclude(actorUserId),
+    });
+    const byId = new Map(entities.map((entity) => [entity.id, entity]));
+    const rows = ranked.orderedJobIds
+      .map((id) => {
+        const entity = byId.get(id);
+        return entity ? ({ ...entity, score: 0 } as PublicJobRow) : null;
+      })
+      .filter((row): row is PublicJobRow => row !== null);
+    return {
+      rows,
+      total: ranked.total ?? 0,
+      nextCursor: ranked.nextCursor,
     };
   }
 
@@ -331,37 +356,8 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
   ) {
     const rows = await prisma.jobPosting.findMany({
       where: {
+        ...candidateVisibleJobWhere(now),
         id: { not: jobId },
-        status: "ACTIVE",
-        approvedAt: { not: null },
-        publishedAt: { not: null, lte: now },
-        company: {
-          verifiedAt: { not: null },
-          verificationState: "ACTIVE",
-          verificationInactiveAt: null,
-        },
-        AND: [
-          {
-            OR: [
-              { applicationDeadline: null },
-              { applicationDeadline: { gt: now } },
-            ],
-          },
-          {
-            OR: [
-              { reviewAggregate: null },
-              {
-                reviewAggregate: {
-                  is: {
-                    approvedVersionId: { not: null },
-                    closedAt: null,
-                    visibilityState: "PUBLISHED",
-                  },
-                },
-              },
-            ],
-          },
-        ],
       },
       take: 100,
       include: publicInclude(actorUserId),
@@ -375,40 +371,23 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
   ) {
     const rows = await prisma.jobPosting.findMany({
       where: {
+        ...candidateVisibleJobWhere(now),
         id: { not: jobId },
-        status: "ACTIVE",
-        approvedAt: { not: null },
-        publishedAt: { not: null, lte: now },
-        company: {
-          verifiedAt: { not: null },
-          verificationState: "ACTIVE",
-          verificationInactiveAt: null,
-        },
-        AND: [
-          {
-            OR: [
-              { applicationDeadline: null },
-              { applicationDeadline: { gt: now } },
-            ],
-          },
-          {
-            OR: [
-              { reviewAggregate: null },
-              {
-                reviewAggregate: {
-                  is: {
-                    approvedVersionId: { not: null },
-                    closedAt: null,
-                    visibilityState: "PUBLISHED",
-                  },
-                },
-              },
-            ],
-          },
-        ],
       },
       orderBy: [{ publishedAt: "desc" }, { id: "asc" }],
       take: 160,
+      include: publicInclude(actorUserId),
+    });
+    return rows.map((row) => ({ ...row, score: 0 }) as PublicJobRow);
+  }
+
+  async findPublicRecommendationCandidates(
+    actorUserId: string | null,
+    now: Date,
+  ) {
+    const rows = await prisma.jobPosting.findMany({
+      where: candidateVisibleJobWhere(now),
+      orderBy: [{ publishedAt: "desc" }, { id: "asc" }],
       include: publicInclude(actorUserId),
     });
     return rows.map((row) => ({ ...row, score: 0 }) as PublicJobRow);

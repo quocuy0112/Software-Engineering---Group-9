@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowRight,
   BadgeCheck,
   ChartNoAxesColumn,
   BriefcaseBusiness,
@@ -16,6 +17,11 @@ import type {
   FullPrivateReport,
   LimitedPrivateReport,
 } from "@/shared/contracts/private-cv-match";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import {
+  privateMatchCopy,
+  type PrivateMatchLocale,
+} from "../i18n/private-match-copy";
 import {
   PrivateMatchAnalysisSteps,
   PrivateMatchPrivacyCard,
@@ -31,27 +37,32 @@ function duration(report: FullPrivateReport | LimitedPrivateReport) {
   return Math.max(0, Math.round(seconds * 10) / 10);
 }
 
-function date(value: string) {
-  return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(
-    new Date(value),
-  );
+function date(value: string, locale: PrivateMatchLocale) {
+  return new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-GB", {
+    dateStyle: "medium",
+  }).format(new Date(value));
 }
 
-function previewBand(report: FullPrivateReport | LimitedPrivateReport) {
-  if (report.view === "LIMITED_REPORT") return "AI evaluation unavailable";
-  if (report.matchBand === "HIGH_MATCH") return "Strong potential match";
-  if (report.matchBand === "MEDIUM_MATCH") return "Good potential match";
-  return "May need more evidence";
+function previewBand(
+  report: FullPrivateReport | LimitedPrivateReport,
+  locale: PrivateMatchLocale,
+) {
+  const copy = privateMatchCopy(locale).readyView;
+  if (report.view === "LIMITED_REPORT") return copy.aiUnavailable;
+  if (report.matchBand === "HIGH_MATCH") return copy.strongPotential;
+  if (report.matchBand === "MEDIUM_MATCH") return copy.goodPotential;
+  return copy.moreEvidence;
 }
 
-function headline(report: FullPrivateReport | LimitedPrivateReport) {
-  if (report.view === "LIMITED_REPORT")
-    return "Your rule-based match preview is ready";
-  if (report.matchBand === "HIGH_MATCH")
-    return "Your CV shows strong potential for this role";
-  if (report.matchBand === "MEDIUM_MATCH")
-    return "Your CV shows a reasonable fit for this role";
-  return "Your CV may need more evidence for this role";
+function headline(
+  report: FullPrivateReport | LimitedPrivateReport,
+  locale: PrivateMatchLocale,
+) {
+  const copy = privateMatchCopy(locale).readyView;
+  if (report.view === "LIMITED_REPORT") return copy.limitedHeadline;
+  if (report.matchBand === "HIGH_MATCH") return copy.highHeadline;
+  if (report.matchBand === "MEDIUM_MATCH") return copy.mediumHeadline;
+  return copy.lowHeadline;
 }
 
 export function PrivateMatchReady({
@@ -61,20 +72,25 @@ export function PrivateMatchReady({
   report: FullPrivateReport | LimitedPrivateReport;
   onOpen: () => void;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = privateMatchCopy(locale);
   const limited = report.view === "LIMITED_REPORT";
   const score = limited ? report.automatic.score : report.hybridScore;
   const caution = limited || report.matchBand === "LOW_MATCH";
   return (
     <main className="private-match-page private-match-ready-page">
       <div className="private-match-breadcrumb">
-        CV Match Check <span>/</span> Analysis
+        {copy.common.cvMatchCheck} <span>/</span> {copy.common.analysis}
       </div>
       <div className="private-match-title-row">
         <div>
-          <h1>Your match report is ready</h1>
+          <h1>{copy.readyView.heading}</h1>
           <p>
-            The analysis finished in {duration(report)}s. Review the result
-            before you apply.
+            {copy.readyView.finishedPrefix}{" "}
+            <strong className="private-match-analysis-duration">
+              {duration(report)} {copy.readyView.secondsUnit}
+            </strong>
+            . {copy.readyView.reviewBeforeApply}
           </p>
         </div>
         <PrivateMatchStatusBadge state="completed" />
@@ -99,30 +115,35 @@ export function PrivateMatchReady({
               ) : (
                 <CheckCircle2 aria-hidden="true" />
               )}
-              {limited ? "Reduced-capability preview" : "Analysis complete"}
+              {limited
+                ? copy.readyView.limitedStatus
+                : copy.readyView.completedStatus}
             </span>
-            <h2>{headline(report)}</h2>
+            <h2>{headline(report, locale)}</h2>
             <p>
               {limited
-                ? "Automatic matching completed successfully. The AI evaluation failed, so no hybrid final score is calculated."
-                : "SmartHire compared your CV evidence with the job requirements. Open the report to see matched skills, gaps and practical improvements."}
+                ? copy.readyView.limitedDescription
+                : copy.readyView.description}
             </p>
             <span className="private-match-private-line">
-              <LockKeyhole aria-hidden="true" /> Private preview • Not shared
-              with the employer
+              <LockKeyhole aria-hidden="true" /> {copy.readyView.privatePreview}
             </span>
           </div>
         </div>
         <div className="private-match-preview-score">
           <div className="private-match-score-label">
-            {limited ? "DETERMINISTIC MATCH" : "PREVIEW MATCH SCORE"}
+            {limited
+              ? copy.readyView.deterministicMatch
+              : copy.readyView.previewScore}
           </div>
-          <div className="private-match-score-value">{score}</div>
-          <div className="private-match-score-out">out of 100</div>
+          <div className="private-match-score-value">
+            <strong>{score}</strong>
+            <span>/ 100</span>
+          </div>
           <div
             className={`private-match-score-tag ${caution ? "private-match-score-tag--caution" : ""}`}
           >
-            {previewBand(report)}
+            {previewBand(report, locale)}
           </div>
         </div>
       </section>
@@ -130,14 +151,14 @@ export function PrivateMatchReady({
       <div className="private-match-columns">
         <div className="private-match-main-column">
           <section className="private-match-card">
-            <h2>Analysis progress</h2>
+            <h2>{copy.readyView.progressTitle}</h2>
             <p className="private-match-section-intro">
-              Each stage completed successfully.
+              {copy.readyView.progressDescription}
             </p>
             <PrivateMatchAnalysisSteps />
           </section>
-          <section className="private-match-card">
-            <h2>Sources used for this report</h2>
+          <section className="private-match-card private-match-source-card">
+            <h2>{copy.readyView.sourcesTitle}</h2>
             <div className="private-match-source-row">
               <span className="private-match-source-icon">
                 <FileText aria-hidden="true" />
@@ -145,11 +166,13 @@ export function PrivateMatchReady({
               <div>
                 <strong>{report.cv.fileName}</strong>
                 <p>
-                  Parsed successfully • Updated {date(report.cv.confirmedAt)}
+                  {copy.readyView.parsedUpdated(
+                    date(report.cv.confirmedAt, locale),
+                  )}
                 </p>
               </div>
               <span className="private-match-badge private-match-badge--green">
-                <BadgeCheck aria-hidden="true" /> Ready
+                <BadgeCheck aria-hidden="true" /> {copy.common.ready}
               </span>
             </div>
             <div className="private-match-source-row">
@@ -159,13 +182,13 @@ export function PrivateMatchReady({
               <div>
                 <strong>{report.job.title}</strong>
                 <p>
-                  {report.job.company} • Job description version{" "}
-                  {report.job.jdVersion}
+                  {report.job.company} ·{" "}
+                  {copy.readyView.jobDescriptionVersion(report.job.jdVersion)}
                 </p>
               </div>
               <span className="private-match-badge private-match-badge--blue">
                 <CheckCircle2 aria-hidden="true" />
-                Current JD
+                {copy.common.currentJd}
               </span>
             </div>
           </section>
@@ -174,28 +197,24 @@ export function PrivateMatchReady({
               <ShieldCheck aria-hidden="true" />
             </span>
             <div>
-              <strong>This is guidance, not a hiring decision</strong>
-              <p>
-                This private preview uses the approved 60/40 method. A later
-                employer result changes only when the submitted CV or job
-                version changes.
-              </p>
+              <strong>{copy.readyView.guidanceTitle}</strong>
+              <p>{copy.readyView.guidanceDescription}</p>
             </div>
           </section>
         </div>
         <aside className="private-match-sidebar">
           <PrivateMatchSelectedJobCard job={report.job} />
           <PrivateMatchPrivacyCard />
-          <section className="private-match-card">
-            <h2>Inside your report</h2>
+          <section className="private-match-card private-match-report-preview-card">
+            <h2>{copy.readyView.insideTitle}</h2>
             <ul className="private-match-preview-list">
               <li>
                 <span className="private-match-inside-icon">
                   <List aria-hidden="true" />
                 </span>
                 <div>
-                  <strong>Requirement evidence</strong>
-                  <span>See what matched and what is missing.</span>
+                  <strong>{copy.readyView.requirementEvidence}</strong>
+                  <span>{copy.readyView.requirementEvidenceDescription}</span>
                 </div>
               </li>
               <li>
@@ -203,8 +222,8 @@ export function PrivateMatchReady({
                   <ChartNoAxesColumn aria-hidden="true" />
                 </span>
                 <div>
-                  <strong>Explainable score</strong>
-                  <span>Review categories, weights and formula.</span>
+                  <strong>{copy.readyView.explainableScore}</strong>
+                  <span>{copy.readyView.explainableScoreDescription}</span>
                 </div>
               </li>
               <li>
@@ -212,23 +231,24 @@ export function PrivateMatchReady({
                   <Sparkles aria-hidden="true" />
                 </span>
                 <div>
-                  <strong>Improvement plan</strong>
-                  <span>Get focused actions before applying.</span>
+                  <strong>{copy.readyView.improvementPlan}</strong>
+                  <span>{copy.readyView.improvementPlanDescription}</span>
                 </div>
               </li>
             </ul>
+            <button
+              className="private-match-primary-button private-match-primary-button--wide"
+              type="button"
+              onClick={onOpen}
+            >
+              <Sparkles aria-hidden="true" /> {copy.readyView.openReport}
+              <ArrowRight aria-hidden="true" />
+            </button>
           </section>
-          <button
-            className="private-match-primary-button private-match-primary-button--wide"
-            type="button"
-            onClick={onOpen}
-          >
-            <Sparkles aria-hidden="true" /> View full match report
-          </button>
           {limited ? (
             <p className="private-match-inline-note">
-              <TriangleAlert aria-hidden="true" /> The report will open in
-              limited mode.
+              <TriangleAlert aria-hidden="true" />{" "}
+              {copy.readyView.limitedOpenNote}
             </p>
           ) : null}
         </aside>

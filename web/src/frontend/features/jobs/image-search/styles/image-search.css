@@ -835,3 +835,47 @@ body:has(.global-image-search-overlay) {
     padding: 14px;
   }
 }
+
+/* Candidate image-search is opened from Find Jobs, so its modal needs the
+ * same theme contract as the surrounding workspace. */
+:root[data-theme="dark"] :is(
+  .global-image-search-panel,
+  .global-image-search .global-image-search-close,
+  .image-search-demo-poster,
+  .image-search-retention-callout,
+  .image-search-consent,
+  .image-search-file-control[aria-disabled="false"]
+) {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+}
+
+:root[data-theme="dark"] :is(
+  .global-image-search-panel-heading p,
+  .global-image-search .global-image-search-close
+) {
+  color: var(--sh-color-text-muted);
+}
+
+:root[data-theme="dark"] .image-search-demo {
+  background: var(--sh-color-info-bg);
+}
+
+:root[data-theme="dark"] :is(
+  .image-search-demo-chips span,
+  .image-search-privacy
+) {
+  color: var(--sh-color-brand-accent);
+  background: var(--sh-color-brand-soft);
+}
+
+:root[data-theme="dark"] .image-search-privacy p,
+:root[data-theme="dark"] .image-search-privacy strong {
+  color: var(--sh-color-text-secondary);
+}
+
+:root[data-theme="dark"] .image-search-file-control {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-subtle);
+}

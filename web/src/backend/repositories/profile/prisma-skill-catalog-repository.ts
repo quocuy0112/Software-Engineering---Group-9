@@ -16,15 +16,17 @@ export class PrismaSkillCatalogRepository {
     const normalized = normalizeProfileSkillName(input.label);
     if (input.id) {
       const existing = await db.skill.findUnique({ where: { id: input.id } });
-      if (!existing || existing.normalizedName !== normalized.normalizedName) {
-        throw new Error("PROFILE_ITEM_NOT_OWNED");
+      if (existing?.normalizedName === normalized.normalizedName) {
+        return {
+          id: existing.id,
+          displayName: normalized.displayName,
+          normalizedName: existing.normalizedName,
+        };
       }
-      return {
-        id: existing.id,
-        displayName: normalized.displayName,
-        normalizedName: existing.normalizedName,
-      };
     }
+    // A profile skill id is a catalog reference, not a locked field. When a
+    // candidate edits an existing label (or a legacy id is stale), resolve the
+    // new label normally instead of rejecting the whole collection update.
     const rows = await db.$queryRaw<Array<{ id: string }>>`
       INSERT INTO "Skill" (
         "id",

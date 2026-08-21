@@ -13,6 +13,12 @@
   margin: 0 auto;
   padding: 32px clamp(20px, 3vw, 42px) 56px;
   color: var(--app-ink);
+  font-family: var(--sh-font-family);
+}
+
+.application-ui *,
+.candidate-application-flow * {
+  font-family: var(--sh-font-family) !important;
 }
 .application-ui *,
 .candidate-application-flow * {
@@ -1414,7 +1420,7 @@
 .candidate-application-list-page {
   max-width: 760px;
   color: var(--sh-color-text-primary);
-  font-family: var(--sh-font-family-label);
+  font-family: var(--sh-font-family);
 }
 
 .candidate-application-list-page__header {
@@ -1973,7 +1979,7 @@
   margin: 0 auto;
   padding: 26px 32px 60px;
   color: var(--sh-profile-text);
-  font-family: var(--sh-font-family-label);
+  font-family: var(--sh-font-family);
 }
 
 .application-personal-information h1,
@@ -2320,6 +2326,14 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+  align-items: start;
+}
+
+/* Both controls start on the same row. The regular field spacing belongs
+   between form groups, never between columns of a single group. */
+.application-personal-information__two-col
+  > .application-personal-information__field {
+  margin-top: 0;
 }
 
 .application-personal-information
@@ -3049,7 +3063,7 @@
   border-radius: 5px;
   color: var(--app-blue-700);
   background: var(--app-blue-50);
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--sh-font-family);
   font-size: 11.5px;
   overflow-wrap: anywhere;
 }
@@ -3179,7 +3193,7 @@
   margin: 0 auto;
   padding: 26px 32px 60px;
   color: var(--sh-profile-text);
-  font-family: var(--sh-font-family-label);
+  font-family: var(--sh-font-family);
 }
 
 .application-files h1,
@@ -3963,7 +3977,7 @@
   margin: 0 auto;
   padding: 26px 32px 60px;
   color: var(--sh-profile-text);
-  font-family: var(--sh-font-family-label);
+  font-family: var(--sh-font-family);
 }
 
 .application-review-submit h1,
@@ -4545,4 +4559,679 @@
   .application-review-submit__after-submit {
     padding: 18px;
   }
+}
+
+/* Canonical candidate application wizard -------------------------------------------------
+   These rules intentionally sit last: the three persisted steps share one visual system
+   (rather than drifting as separate pages) while retaining the existing draft APIs. */
+.application-personal-information,
+.application-files,
+.application-review-submit {
+  max-width: 1200px;
+  padding: 32px clamp(16px, 2.8vw, 32px) 56px;
+  color: var(--sh-color-text-primary);
+  font-family: var(--sh-font-family);
+}
+
+.application-flow-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.application-flow-header > div {
+  min-width: 0;
+}
+
+.application-flow-header p,
+.application-flow-header h1 {
+  margin: 0;
+}
+
+.application-flow-header__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 5px !important;
+  color: #1a56db;
+  font-family: var(--sh-font-family);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.045em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.application-flow-header__eyebrow > span {
+  width: 4px;
+  height: 4px;
+  flex: 0 0 4px;
+  border-radius: 50%;
+  background: currentcolor;
+}
+
+.application-flow-header h1 {
+  color: #0f172a;
+  font-family: var(--sh-font-family);
+  font-size: clamp(28px, 3vw, 34px);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.18;
+}
+
+.application-flow-header__subtitle {
+  margin-top: 5px !important;
+  color: #64748b;
+  font-family: var(--sh-font-family);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.application-flow-header__save {
+  display: inline-flex;
+  min-height: 42px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  color: #334155;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 3%);
+  font-family: var(--sh-font-family);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.application-flow-header__save:hover:not(:disabled) {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.application-flow-header__save:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.application-flow-header__save svg {
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+}
+
+.application-personal-information__header,
+.application-files__header,
+.application-review-submit__header {
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.application-personal-information__eyebrow,
+.application-files__eyebrow,
+.application-review-submit__eyebrow {
+  gap: 5px;
+  margin-bottom: 5px !important;
+  color: #1a56db;
+  font-family: var(--sh-font-family);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.045em;
+}
+
+.application-personal-information__eyebrow > span,
+.application-files__eyebrow > span,
+.application-review-submit__eyebrow > span {
+  width: 4px;
+  height: 4px;
+  background: #1a56db;
+}
+
+.application-personal-information__header h1,
+.application-files__header h1,
+.application-review-submit__header h1 {
+  color: #0f172a;
+  font-family: var(--sh-font-family);
+  font-size: clamp(28px, 3vw, 34px);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.18;
+}
+
+.application-personal-information__header > div > p:last-child,
+.application-files__header > div > p:last-child,
+.application-review-submit__header > div > p:last-child {
+  margin-top: 5px;
+  color: #64748b;
+  font-family: var(--sh-font-family);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.application-personal-information__button,
+.application-files__button,
+.application-review-submit__button {
+  min-height: 42px;
+  border-radius: 12px;
+  font-family: var(--sh-font-family);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.application-personal-information__button--secondary,
+.application-files__button--secondary,
+.application-review-submit__button--secondary {
+  border-color: #e2e8f0;
+  color: #334155;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 3%);
+}
+
+.application-personal-information__button--primary,
+.application-files__button--primary,
+.application-review-submit__button--primary {
+  border-color: #1a56db;
+  background: #1a56db;
+  box-shadow: 0 8px 24px -4px rgb(26 86 219 / 35%);
+}
+
+.application-personal-information__button--primary:hover:not(:disabled),
+.application-files__button--primary:hover:not(:disabled),
+.application-review-submit__button--primary:hover:not(:disabled) {
+  background: #1e40af;
+}
+
+.application-stepper {
+  margin-bottom: 28px;
+  padding: 22px 26px;
+  border-color: #e2e8f0;
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 5%);
+}
+
+.application-stepper__step {
+  gap: 12px;
+}
+
+.application-stepper__step:not(:last-child)::after {
+  right: 28px;
+  left: 52px;
+  height: 1px;
+  background: #f1f5f9;
+}
+
+.application-stepper__node {
+  width: 38px;
+  height: 38px;
+  flex-basis: 38px;
+  color: #94a3b8;
+  background: #f1f5f9;
+  font-family: var(--sh-font-family);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.application-stepper__step--upcoming .application-stepper__node {
+  border: 0;
+}
+
+.application-stepper__step--current .application-stepper__node {
+  background: #1a56db;
+  box-shadow: 0 6px 16px -6px rgb(26 86 219 / 55%);
+}
+
+.application-stepper__step--complete .application-stepper__node {
+  background: #059669;
+}
+
+.application-stepper__eyebrow {
+  color: #94a3b8;
+  font-family: var(--sh-font-family);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+}
+
+.application-stepper__label strong {
+  color: #64748b;
+  font-family: var(--sh-font-family);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.application-stepper__step--current .application-stepper__label strong,
+.application-stepper__step--complete .application-stepper__label strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.application-personal-information__grid,
+.application-files__grid,
+.application-review-submit__grid {
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  gap: 24px;
+}
+
+.application-personal-information__sidebar,
+.application-files__sidebar,
+.application-review-submit__sidebar {
+  gap: 24px;
+}
+
+.application-personal-information__card,
+.application-files__card,
+.application-review-submit__card {
+  padding: 24px;
+  border-color: #e2e8f0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 5%);
+}
+
+.application-personal-information__card h2,
+.application-files__card h2,
+.application-review-submit__card h2 {
+  color: #0f172a;
+  font-family: var(--sh-font-family);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.application-personal-information__card-description,
+.application-files__description {
+  margin-top: 4px !important;
+  color: #64748b;
+  font-family: var(--sh-font-family);
+  font-size: 13px;
+}
+
+.application-personal-information__field-label {
+  color: #334155;
+  font-family: var(--sh-font-family);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.application-personal-information__locked-box,
+.application-personal-information input:not([type="checkbox"]):not([type="radio"]),
+.application-files__textarea,
+.application-review-submit__textarea {
+  min-height: 48px;
+  border-color: #e2e8f0;
+  border-radius: 12px;
+  color: #0f172a;
+  font-family: var(--sh-font-family);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.application-personal-information__locked-box {
+  background: #f8fafc;
+}
+
+.application-personal-information__locked-note,
+.application-personal-information__field-hint,
+.application-personal-information__field-error {
+  color: #94a3b8;
+  font-family: var(--sh-font-family);
+  font-size: 12px;
+}
+
+.application-personal-information__callout,
+.application-review-submit__callout,
+.application-review-submit__after-submit,
+.application-personal-information__info-card,
+.application-files__info-card {
+  border: 1px solid #dbe6fe;
+  background: #eef4ff;
+}
+
+.application-personal-information__callout {
+  border-radius: 14px;
+}
+
+.application-files__segmented {
+  border-color: #e2e8f0;
+  background: #f1f5f9;
+}
+
+.application-files__segmented button {
+  font-family: var(--sh-font-family);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.application-files__cv-list > button,
+.application-files__file-row {
+  border-color: #e2e8f0;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.application-files__cv-list > button.is-selected {
+  border-color: #3b82f6;
+  background: #eef4ff;
+  box-shadow: inset 0 0 0 1px #3b82f6;
+}
+
+.application-files__dropzone {
+  min-height: 185px;
+  border-color: #e2e8f0;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.application-files__callout {
+  border-radius: 14px;
+  border-left: 4px solid #f59e0b;
+  background: #fffbeb;
+}
+
+.application-personal-information__job-icon,
+.application-files__job-icon,
+.application-review-submit__job-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  border: 1px solid #dbe6fe;
+  border-radius: 14px;
+  background: #eef4ff;
+}
+
+.application-personal-information__tags span,
+.application-files__tags span,
+.application-review-submit__tags span {
+  border: 0;
+  border-radius: 6px;
+  color: #475569;
+  background: #f1f5f9;
+  font-family: var(--sh-font-family);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.application-review-submit__card-heading {
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.application-review-submit__summary-grid dt,
+.application-review-submit__file-group h3,
+.application-review-submit__cover-preview > span {
+  color: #94a3b8;
+  font-family: var(--sh-font-family);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.application-review-submit__summary-grid dd {
+  color: #0f172a;
+  font-family: var(--sh-font-family);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.application-review-submit__confirm {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 14px;
+  font-family: var(--sh-font-family);
+  font-size: 14px;
+}
+
+@media (max-width: 860px) {
+  .application-personal-information,
+  .application-files,
+  .application-review-submit {
+    padding: 24px 16px 44px;
+  }
+
+  .application-personal-information__grid,
+  .application-files__grid,
+  .application-review-submit__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .application-stepper {
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+    padding: 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  .application-flow-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .application-personal-information__header,
+  .application-files__header,
+  .application-review-submit__header {
+    align-items: flex-start;
+  }
+
+  .application-personal-information__card,
+  .application-files__card,
+  .application-review-submit__card {
+    padding: 18px;
+  }
+}
+
+/* Candidate application stages share the workspace palette. The reference
+ * layout below is intentionally explicit, so it also needs explicit theme
+ * values instead of inheriting light-only slate and white utilities. */
+:root[data-theme="dark"] :is(
+  .application-personal-information,
+  .application-files,
+  .application-review-submit
+) {
+  color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] :is(
+  .application-flow-header h1,
+  .application-personal-information__header h1,
+  .application-files__header h1,
+  .application-review-submit__header h1,
+  .application-personal-information__card h2,
+  .application-files__card h2,
+  .application-review-submit__card h2,
+  .application-review-submit__summary-grid dd
+) {
+  color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] :is(
+  .application-flow-header__subtitle,
+  .application-personal-information__header > div > p:last-child,
+  .application-files__header > div > p:last-child,
+  .application-review-submit__header > div > p:last-child,
+  .application-personal-information__card-description,
+  .application-files__description,
+  .application-personal-information__locked-note,
+  .application-personal-information__field-hint,
+  .application-personal-information__field-error,
+  .application-review-submit__summary-grid dt,
+  .application-review-submit__file-group h3,
+  .application-review-submit__cover-preview > span
+) {
+  color: var(--sh-color-text-muted);
+}
+
+:root[data-theme="dark"] :is(
+  .application-flow-header__save,
+  .application-personal-information__button--secondary,
+  .application-files__button--secondary,
+  .application-review-submit__button--secondary,
+  .application-personal-information__card,
+  .application-files__card,
+  .application-review-submit__card
+) {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-card);
+}
+
+:root[data-theme="dark"] :is(
+  .application-flow-header__save:hover:not(:disabled),
+  .application-personal-information__locked-box,
+  .application-files__segmented,
+  .application-files__cv-list > button,
+  .application-files__file-row,
+  .application-files__dropzone
+) {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] :is(
+  .application-personal-information input:not([type="checkbox"]):not([type="radio"]),
+  .application-files__textarea,
+  .application-review-submit__textarea
+) {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] .application-stepper {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-card);
+}
+
+:root[data-theme="dark"] :is(
+  .application-stepper__step:not(:last-child)::after,
+  .application-stepper__node,
+  .application-review-submit__card-heading
+) {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] :is(
+  .application-stepper__eyebrow,
+  .application-stepper__label strong
+) {
+  color: var(--sh-color-text-muted);
+}
+
+:root[data-theme="dark"] :is(
+  .application-stepper__step--current .application-stepper__label strong,
+  .application-stepper__step--complete .application-stepper__label strong,
+  .application-personal-information__field-label
+) {
+  color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] :is(
+  .application-personal-information__callout,
+  .application-review-submit__callout,
+  .application-review-submit__after-submit,
+  .application-personal-information__info-card,
+  .application-files__info-card,
+  .application-files__cv-list > button.is-selected
+) {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-info-bg);
+}
+
+:root[data-theme="dark"] :is(
+  .application-personal-information__tags span,
+  .application-files__tags span
+) {
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-subtle);
+}
+
+/* Legacy candidate-application states share the same screen as the newer
+ * personal-information/files/review stages above. Their local variables are
+ * mapped here so tracker and processing states cannot retain light slate. */
+:root[data-theme="dark"] :is(.application-ui, .candidate-application-flow) {
+  --app-blue: var(--sh-color-brand-primary);
+  --app-blue-50: var(--sh-color-info-bg);
+  --app-ink: var(--sh-color-text-primary);
+  --app-muted: var(--sh-color-text-muted);
+  --app-line: var(--sh-color-border-subtle);
+  --app-green: var(--sh-color-success);
+  --app-green-50: var(--sh-color-success-bg);
+  --app-yellow: var(--sh-color-warning);
+  --app-yellow-50: var(--sh-color-warning-bg);
+}
+
+:root[data-theme="dark"] :is(.application-ui, .candidate-application-flow) :is(
+  .application-ui-button--secondary,
+  .application-ui-card,
+  .candidate-application-panel,
+  .application-ui-textarea textarea,
+  .candidate-application-flow textarea,
+  .candidate-application-flow select,
+  .candidate-application-flow input:not([type="checkbox"]):not([type="radio"]),
+  .application-ui-disclosure__icon,
+  .application-ui-disclosure > svg,
+  .application-ui-disclosure__private,
+  .application-ui-processing-hero__icon,
+  .application-ui-status-hero__icon,
+  .application-ui-status-hero aside,
+  .application-ui-stage-progress li > span
+) {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+}
+
+:root[data-theme="dark"] .application-ui :is(
+  .application-ui-disclosure,
+  .application-ui-after-submit,
+  .application-ui-processing-hero,
+  .application-ui-status-hero
+) {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-info-bg);
+}
+
+:root[data-theme="dark"] .application-ui :is(
+  .application-ui-disclosure,
+  .application-ui-disclosure__private,
+  .application-ui-confirm,
+  .application-ui-check-list li,
+  .application-ui-icon-list li,
+  .application-ui-after-submit p,
+  .application-ui-private-note p,
+  .application-ui-processing-hero p,
+  .application-ui-status-hero p
+) {
+  color: var(--sh-color-text-secondary);
+}
+
+:root[data-theme="dark"] .application-ui :is(
+  .application-ui-file-list li,
+  .application-ui-job-card hr,
+  .application-ui-intake-list li,
+  .application-ui-toggle
+) {
+  border-color: var(--sh-color-border-subtle);
+}
+
+:root[data-theme="dark"] .application-ui .application-ui-timeline li:not(:last-child)::before {
+  background-color: var(--sh-color-border-subtle);
+}
+
+:root[data-theme="dark"] .application-ui :is(
+  .application-ui-file-icon,
+  .application-ui-job-card code,
+  .application-ui-card code,
+  .application-ui-intake-list li > span
+) {
+  color: var(--sh-color-text-muted);
+  background: var(--sh-color-surface-subtle);
 }

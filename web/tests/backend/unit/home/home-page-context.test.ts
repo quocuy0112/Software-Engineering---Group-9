@@ -52,4 +52,23 @@ describe("Home context composition", () => {
     expect(model.spotlights.status).toBe("error");
     expect(JSON.stringify(model)).not.toContain("private provider error");
   });
+
+  it("identifies an empty recommendation pool without claiming the profile is incomplete", async () => {
+    const deps = dependencies();
+    deps.session = async () => ({ userId: "candidate-1", sessionId: "session-1" });
+    deps.recruiterStatus = async () => ({
+      state: "PENDING_REVIEW",
+      destinationKind: "NONE",
+      href: null,
+      observedAt: "2026-08-12T00:00:00.000Z",
+    });
+    deps.recommendationJobs = async () => [];
+
+    const model = await getHomePageContext(deps);
+
+    expect(model.smartMatch).toMatchObject({
+      kind: "illustrative",
+      reason: "noOpportunities",
+    });
+  });
 });

@@ -8,7 +8,7 @@
   gap: 16px;
 }
 .root {
-  color: var(--sh-profile-text, #101b39);
+  color: var(--sh-color-text-primary);
   font-family: var(--sh-profile-font-body);
 }
 .root :is(input, textarea, select, button) {
@@ -16,7 +16,7 @@
 }
 .root > h2 {
   margin: 2px 0 0;
-  color: #10142b;
+  color: var(--sh-color-text-primary);
   font-size: 18px;
   font-weight: 600;
   line-height: 1.35;
@@ -24,11 +24,11 @@
 }
 .group {
   padding-block-start: 24px;
-  border-block-start: 1px solid #e5e8f2;
+  border-block-start: 1px solid var(--sh-color-border-subtle);
 }
 .group > h3 {
   margin: 0;
-  color: #10142b;
+  color: var(--sh-color-text-primary);
   font-size: 15px;
   font-weight: 600;
   line-height: 1.35;
@@ -41,23 +41,23 @@
 .groupControls button {
   min-height: 36px;
   padding: 0 14px;
-  border: 1px solid #e5e8f2;
+  border: 1px solid var(--sh-color-border-subtle);
   border-radius: 9px;
-  color: #6c7288;
-  background: #fff;
+  color: var(--sh-color-text-muted);
+  background: var(--sh-color-surface-card);
   font-size: 12px;
   font-weight: 600;
 }
 .groupControls button:hover {
   border-color: #4453e8;
   color: #4453e8;
-  background: #edeffc;
+  background: var(--sh-color-info-bg);
 }
 .card {
   padding: 22px;
-  border: 1px solid #e5e8f2;
+  border: 1px solid var(--sh-color-border-subtle);
   border-radius: 16px;
-  background: #fff;
+  background: var(--sh-color-surface-card);
 }
 .fields {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -69,7 +69,7 @@
   display: grid;
   min-width: 0;
   gap: 7px;
-  color: #10142b;
+  color: var(--sh-color-text-primary);
   font-size: 13px;
   font-weight: 500;
   text-transform: none;
@@ -82,10 +82,10 @@
   inline-size: 100%;
   min-block-size: 42px;
   padding: 10px 12px;
-  border: 1px solid #e5e8f2;
+  border: 1px solid var(--sh-color-border-subtle);
   border-radius: 10px;
-  color: #10142b;
-  background: #fff;
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
   font-weight: 400;
   text-transform: none;
   box-shadow: none;
@@ -128,7 +128,7 @@
   padding: 16px;
   border: 0;
   border-radius: 10px;
-  background: #edeffc;
+  background: var(--sh-color-info-bg);
 }
 .actionOptions {
   display: flex;
@@ -142,10 +142,10 @@
   align-items: center;
   gap: 8px;
   padding-inline: 10px;
-  border: 1px solid #dfe3f5;
+  border: 1px solid var(--sh-color-border-subtle);
   border-radius: 8px;
-  color: #37415f;
-  background: #ffffff;
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-card);
   font-size: 13px;
   font-weight: 500;
   text-transform: none;
@@ -157,7 +157,7 @@
 }
 .decisionTitle {
   margin: 0;
-  color: #10142b;
+  color: var(--sh-color-text-primary);
   font-size: 13px;
   font-weight: 600;
   line-height: 1.4;

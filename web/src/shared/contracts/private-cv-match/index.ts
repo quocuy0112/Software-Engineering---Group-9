@@ -71,9 +71,14 @@ export const privateMatchJobSchema = z
   })
   .strict();
 
+// The picker presents the complete candidate-visible result set in a bounded
+// scroll region. This comfortably covers the public catalogue while keeping
+// the private endpoint payload explicitly bounded.
+export const PRIVATE_MATCH_JOB_PICKER_LIMIT = 250;
+
 export const privateMatchJobsResponseSchema = z
   .object({
-    items: z.array(privateMatchJobSchema).max(50),
+    items: z.array(privateMatchJobSchema).max(PRIVATE_MATCH_JOB_PICKER_LIMIT),
   })
   .strict();
 

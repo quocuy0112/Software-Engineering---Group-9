@@ -3,6 +3,11 @@
   --sh-font-size-caption: 13px;
   --sh-font-size-label: 14px;
   --sh-line-height-caption: 18px;
+  font-family: var(--sh-font-family);
+}
+
+.job-board-layout * {
+  font-family: var(--sh-font-family) !important;
 }
 
 .job-board-layout {
@@ -1649,7 +1654,7 @@
     .job-search-by label,
     .job-sort-label
   ) {
-  font-family: var(--sh-font-family-label);
+  font-family: var(--sh-font-family);
   font-size: var(--sh-font-size-caption);
   font-weight: 650;
   line-height: 1.45;
@@ -6374,7 +6379,7 @@
 .job-detail-board-page .job-detail-salary-line strong,
 .job-detail-board-page .job-company-logo,
 .job-detail-board-page .job-sidebar-company-logo {
-  font-family: "Space Grotesk", "Be Vietnam Pro", ui-sans-serif, sans-serif;
+  font-family: "Be Vietnam Pro", ui-sans-serif, sans-serif;
 }
 
 .job-detail-sidebar--board .job-company-accordion-identity,
@@ -6621,7 +6626,7 @@
   border-radius: 14px;
   color: var(--sh-profile-primary-dark);
   background: var(--sh-profile-primary-light);
-  font-family: var(--sh-font-family-display);
+  font-family: var(--sh-font-family);
   font-size: 16px;
 }
 
@@ -6696,7 +6701,7 @@
 .job-detail-sidebar--board .job-company-accordion-heading .panel-kicker {
   margin-bottom: 6px;
   color: var(--sh-profile-primary);
-  font-family: var(--sh-font-family-display);
+  font-family: var(--sh-font-family);
   font-size: 11px;
   font-weight: var(--sh-font-weight-semibold);
   letter-spacing: 0.08em;
@@ -6862,7 +6867,7 @@
   border-radius: 14px;
   color: var(--sh-profile-primary-dark);
   background: var(--sh-profile-primary-light);
-  font-family: var(--sh-font-family-display);
+  font-family: var(--sh-font-family);
   font-size: 16px;
 }
 
@@ -10317,7 +10322,7 @@
 .job-filter-heading .panel-kicker {
   margin: 0 0 2px;
   color: var(--sh-color-brand-primary);
-  font-family: var(--sh-font-family-label);
+  font-family: var(--sh-font-family);
   font-size: var(--sh-font-size-caption);
   font-weight: var(--sh-font-weight-bold);
   letter-spacing: 0.02em;
@@ -10353,7 +10358,7 @@
 .job-filter-fields label {
   gap: 6px;
   color: var(--sh-color-text-secondary);
-  font-family: var(--sh-font-family-label);
+  font-family: var(--sh-font-family);
   font-size: var(--sh-font-size-caption);
   font-weight: var(--sh-font-weight-semibold);
 }
@@ -10408,7 +10413,7 @@
   min-height: 40px;
   border-radius: var(--sh-radius-sm);
   color: var(--sh-color-brand-primary);
-  font-family: var(--sh-font-family-label);
+  font-family: var(--sh-font-family);
   font-size: var(--sh-font-size-label);
   font-weight: var(--sh-font-weight-semibold);
   transition:
@@ -10781,7 +10786,7 @@
 /* --------------------------------------------------------------------------
  * Job detail typography and shape refinement
  * Align the rendered page with the approved HTML reference while keeping the
- * shared body font readable for Vietnamese copy and using Space Grotesk only
+ * shared Be Vietnam Pro font for Vietnamese copy throughout the candidate job board
  * for compact display accents.
  * -------------------------------------------------------------------------- */
 .job-detail-board-page .job-detail-header-topline {
@@ -10795,7 +10800,7 @@
 .job-detail-board-page .job-company-logo,
 .job-detail-board-page .job-sidebar-company-logo {
   border-radius: 14px;
-  font-family: var(--sh-font-family-display);
+  font-family: var(--sh-font-family);
 }
 
 .job-detail-board-page .job-company-name {
@@ -10811,7 +10816,7 @@
 .job-detail-board-page .job-detail-section-heading .panel-kicker,
 .job-detail-sidebar--board .job-sidebar-card-heading .panel-kicker,
 .job-detail-board-page .sh-collapsible-card__eyebrow {
-  font-family: var(--sh-font-family-display);
+  font-family: var(--sh-font-family);
   font-weight: var(--sh-font-weight-semibold);
   letter-spacing: 0.08em;
 }
@@ -10886,7 +10891,7 @@
 }
 
 .job-detail-board-page .job-detail-salary-line strong {
-  font-family: var(--sh-font-family-display);
+  font-family: var(--sh-font-family);
   font-size: 26px;
   font-weight: var(--sh-font-weight-bold);
   letter-spacing: -0.01em;

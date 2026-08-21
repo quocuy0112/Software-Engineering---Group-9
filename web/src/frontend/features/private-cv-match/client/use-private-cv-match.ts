@@ -10,6 +10,10 @@ import {
   type CreatePrivateMatchRequest,
   type PrivateMatchResponse,
 } from "@/shared/contracts/private-cv-match";
+import {
+  privateMatchCopy,
+  type PrivateMatchLocale,
+} from "../i18n/private-match-copy";
 
 const queryKey = (checkId: string) => ["private-cv-match", checkId] as const;
 const listQueryKey = ["private-cv-match-list"] as const;
@@ -164,26 +168,30 @@ export function useDeletePrivateCvMatch(checkId: string) {
   });
 }
 
-export function privateMatchErrorMessage(error: unknown): string {
+export function privateMatchErrorMessage(
+  error: unknown,
+  locale: PrivateMatchLocale = "en",
+): string {
   const code = error instanceof Error ? error.message : "INTERNAL_FAILURE";
+  const copy = privateMatchCopy(locale).errors;
   switch (code) {
     case "CV_NOT_PARSED":
-      return "This CV is still being prepared. Return when parsing is complete.";
+      return copy.CV_NOT_PARSED;
     case "JOB_UNAVAILABLE":
-      return "This job is no longer available for a private check.";
+      return copy.JOB_UNAVAILABLE;
     case "CV_UNAVAILABLE":
-      return "This CV version is no longer available.";
+      return copy.CV_UNAVAILABLE;
     case "AUTH_REQUIRED":
-      return "Your session has expired. Refresh the page and sign in again.";
+      return copy.AUTH_REQUIRED;
     case "FORBIDDEN":
-      return "Refresh the page and try again.";
+      return copy.FORBIDDEN;
     case "INVALID_REQUEST":
-      return "Choose an available job and a ready CV before analyzing.";
+      return copy.INVALID_REQUEST;
     case "CONFLICT":
-      return "This private check is already being processed.";
+      return copy.CONFLICT;
     case "UNAVAILABLE":
-      return "This report is no longer available.";
+      return copy.UNAVAILABLE;
     default:
-      return "We could not complete the private CV match check. Please try again.";
+      return copy.default;
   }
 }

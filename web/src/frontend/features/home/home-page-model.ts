@@ -34,9 +34,23 @@ export type HomeViewer =
     };
 
 export type HomeJobMatchBreakdown = Readonly<{
-  skills: number;
+  roleAndSkills: number;
+  preferences: number;
   experience: number;
-  education: number;
+  unmatched: number;
+}>;
+
+export type HomeMatchSource = "cv" | "profile";
+
+export type HomeMatchFallbackReason =
+  | "profileSignals"
+  | "noOpportunities"
+  | "unavailable";
+
+export type HomeCvMatchReference = Readonly<{
+  checkId: string;
+  cvVersion: number;
+  jdVersion: number;
 }>;
 
 export type HomeJobSalary = Readonly<{
@@ -60,7 +74,9 @@ export type HomeJob = Readonly<{
   employmentType: string;
   skills: readonly string[];
   matchScore?: number;
+  matchSource?: HomeMatchSource;
   matchBreakdown?: HomeJobMatchBreakdown;
+  cvMatch?: HomeCvMatchReference;
   salary: HomeJobSalary | null;
   publishedAt: string;
   saved: boolean;
@@ -85,6 +101,9 @@ export type SmartMatchInsight =
       jobSlug: string;
       jobTitle: string;
       score: number;
+      quality: "meaningful" | "limited";
+      scoreSource: HomeMatchSource;
+      matchBreakdown?: HomeJobMatchBreakdown;
       matchingSkills: readonly string[];
       improvementAreas: readonly string[];
       limitations: readonly ("profileSignals" | "estimate")[];
@@ -92,6 +111,7 @@ export type SmartMatchInsight =
   | Readonly<{
       kind: "illustrative";
       score: number;
+      reason?: HomeMatchFallbackReason;
     }>;
 
 export type HomeCareerPath = Readonly<{
@@ -120,7 +140,7 @@ function validScore(score: number) {
 function validBreakdown(breakdown: HomeJobMatchBreakdown) {
   const values = Object.values(breakdown);
   return (
-    values.length === 3 &&
+    values.length === 4 &&
     values.every(validScore) &&
     values.reduce((total, value) => total + value, 0) === 100
   );
@@ -175,12 +195,26 @@ export function validateHomePageModel(model: HomePageModel) {
         (job) =>
           job.matchScore === undefined ||
           !validScore(job.matchScore) ||
-          (job.matchBreakdown !== undefined &&
-            !validBreakdown(job.matchBreakdown)),
+          job.matchSource === undefined ||
+          (job.matchSource === "profile" &&
+            (!job.matchBreakdown ||
+              !validBreakdown(job.matchBreakdown) ||
+              job.cvMatch !== undefined)) ||
+          (job.matchSource === "cv" &&
+            (job.matchBreakdown !== undefined ||
+              (job.cvMatch !== undefined &&
+                (!job.cvMatch.checkId ||
+                  job.cvMatch.cvVersion < 1 ||
+                  job.cvMatch.jdVersion < 1)))),
       ) ||
       !model.jobs.items.some(
         (job) =>
-          job.slug === personal.jobSlug && job.matchScore === personal.score,
+          job.slug === personal.jobSlug &&
+          job.matchScore === personal.score &&
+          job.matchSource === personal.scoreSource &&
+          (personal.scoreSource !== "profile" ||
+            JSON.stringify(job.matchBreakdown) ===
+              JSON.stringify(personal.matchBreakdown)),
       )
     )
       throw new Error("HOME_JOB_SCORE_ASSOCIATION");

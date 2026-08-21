@@ -1,19 +1,10 @@
-import { Badge } from "@/frontend/components/ui/badge";
 import { CompanyAvatar } from "@/frontend/features/jobs/components/company-avatar";
 import { formatRecruiterSalary } from "@/shared/contracts/recruiter-job-posting";
 import type { JobCatalogItem } from "@/shared/contracts/jobs/catalog";
-import { benefitOptions, titleCase } from "./job-posting-editor-options";
-
-function PreviewList({ items }: { items: string[] }) {
-  const visibleItems = items.map((item) => item.trim()).filter(Boolean);
-  return visibleItems.length ? (
-    <ul className="recruiter-preview-list">
-      {visibleItems.map((item, index) => (
-        <li key={`${item}-${index}`}>{item}</li>
-      ))}
-    </ul>
-  ) : null;
-}
+import { Banknote } from "lucide-react";
+import { titleCase } from "./job-posting-editor-options";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruiterJobPostingCopy } from "./recruiter-job-posting-copy";
 
 export function JobPostingPreview({
   companyName,
@@ -22,15 +13,8 @@ export function JobPostingPreview({
   companyName: string;
   job: JobCatalogItem;
 }) {
-  const department = job.description.generalInfo.department ?? "";
-  const topReasons = job.description.topReasonsToJoin
-    .filter(Boolean)
-    .slice(0, 3);
+  const copy = recruiterJobPostingCopy(useWorkspaceLocale());
   const salaryLine = formatRecruiterSalary(job.salary);
-  const previewLocation = job.location.isNationwideRemote
-    ? "Remote across Vietnam"
-    : [job.location.city, job.location.district].filter(Boolean).join(", ") ||
-      "Location not set";
 
   return (
     <aside
@@ -38,37 +22,36 @@ export function JobPostingPreview({
       aria-live="polite"
     >
       <div className="recruiter-preview__heading">
-        <span className="recruiter-feature-icon" aria-hidden="true">
-          JP
-        </span>
-        <div>
-          <p>Live candidate preview</p>
-          <strong>Mirrors all structured job data</strong>
+        <span className="recruiter-preview__live-dot" aria-hidden="true" />
+        <div className="recruiter-preview__heading-copy">
+          <p>{copy.livePreview}</p>
+          <strong>{copy.livePreviewHelp}</strong>
         </div>
+        <span className="recruiter-preview__live-status">
+          {copy.livePreviewStatus}
+        </span>
       </div>
 
       <div className="recruiter-preview__company-row">
         <CompanyAvatar name={companyName} size="md" />
-        <div>
+        <div className="recruiter-preview__company-copy">
           <p className="recruiter-preview__company">{companyName}</p>
           <span>
             {job.industry}
-            {job.subIndustry ? ` · ${job.subIndustry}` : ""}
+            {job.location.city ? ` · ${job.location.city}` : ""}
           </span>
         </div>
-        {job.isUrgent ? <Badge tone="warning">Urgent hiring</Badge> : null}
       </div>
 
-      <h2>{job.title || "Your job title"}</h2>
-      <p className="recruiter-preview__location">
-        {department || job.categoryFamily || "Your department"} ·{" "}
-        {previewLocation}
-      </p>
+      <h2>{job.title || copy.yourJobTitle}</h2>
 
-      {salaryLine ? (
+      {salaryLine || job.salary.isNegotiable ? (
         <div className="recruiter-preview__salary">
-          <strong>{salaryLine}</strong>
-          {job.salary.isNegotiable ? <span>Negotiable</span> : null}
+          <Banknote aria-hidden="true" />
+          <strong>{salaryLine ?? copy.negotiable}</strong>
+          {job.salary.isNegotiable && salaryLine ? (
+            <span>{copy.negotiable}</span>
+          ) : null}
         </div>
       ) : null}
 
@@ -80,154 +63,47 @@ export function JobPostingPreview({
       </div>
 
       <p className="recruiter-preview__pitch">
-        {job.shortPitch || "Your short pitch will appear here."}
+        {job.shortPitch || copy.noPitch}
       </p>
 
-      {job.skillTags.length ? (
-        <div className="recruiter-job-card__chips">
-          {job.skillTags.map((skill) => (
-            <span className="recruiter-skill-chip" key={skill}>
-              {skill}
-            </span>
-          ))}
-        </div>
-      ) : null}
-
-      {topReasons.length ? (
-        <section className="recruiter-preview__highlight">
-          <h3>Top reasons to join</h3>
-          <PreviewList items={topReasons} />
-        </section>
-      ) : null}
-
-      <hr />
-      <section>
-        <h3>About the role</h3>
-        <p>
-          {job.description.overview ||
-            "Your overview will appear here as you complete the form."}
-        </p>
+      <section className="recruiter-preview__summary-section">
+        <h3>{copy.aboutRole}</h3>
+        <p>{job.description.overview || copy.noOverview}</p>
       </section>
 
-      {job.description.responsibilities.length ? (
-        <section>
-          <h3>What you will do</h3>
-          <PreviewList items={job.description.responsibilities} />
-        </section>
-      ) : null}
-
-      {job.description.requirements.length ? (
-        <section>
-          <h3>Requirements</h3>
-          <PreviewList items={job.description.requirements} />
-        </section>
-      ) : null}
-
-      <section>
-        <h3>Required skills</h3>
-        <p>
-          {job.skillTags.length
-            ? job.skillTags.join(", ")
-            : "Add skills to show candidates what success looks like."}
-        </p>
-        <h3>Preferred skills</h3>
-        <p>Structured skills improve deterministic candidate matching.</p>
+      <section className="recruiter-preview__summary-section">
+        <h3>{copy.requiredSkills}</h3>
+        {job.skillTags.length ? (
+          <div className="recruiter-preview__skills">
+            {job.skillTags.map((skill) => (
+              <span key={skill}>{skill}</span>
+            ))}
+          </div>
+        ) : (
+          <p>{copy.noSkills}</p>
+        )}
       </section>
 
-      <section className="recruiter-preview__facts">
-        <h3>Candidate profile</h3>
+      <section className="recruiter-preview__facts recruiter-preview__summary-section">
+        <h3>{copy.hiringSpecs}</h3>
         <dl>
           <div>
-            <dt>Experience</dt>
+            <dt>{copy.experience}</dt>
             <dd>
-              {job.experience.label} (minimum {job.experience.minYears} years)
+              {copy.experienceDetail(
+                job.experience.label,
+                job.experience.minYears,
+              )}
             </dd>
           </div>
           <div>
-            <dt>Level</dt>
-            <dd>{titleCase(job.level)}</dd>
-          </div>
-          <div>
-            <dt>Education</dt>
+            <dt>{copy.education}</dt>
             <dd>{job.education}</dd>
           </div>
-          {job.age ? (
-            <div>
-              <dt>Age range</dt>
-              <dd>{job.age}</dd>
-            </div>
-          ) : null}
-        </dl>
-      </section>
-
-      {job.description.benefits.length ? (
-        <section>
-          <h3>Benefits</h3>
-          <div className="recruiter-preview-benefits">
-            {job.description.benefits.map((benefit) => {
-              const option = benefitOptions.find(
-                (item) => item.icon === benefit.icon,
-              );
-              return (
-                <div key={`${benefit.icon}-${benefit.label}`}>
-                  <span className="recruiter-benefit-icon" aria-hidden="true">
-                    {option?.glyph ?? "+"}
-                  </span>
-                  <span>{benefit.label}</span>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      ) : null}
-
-      <section className="recruiter-preview__facts">
-        <h3>Working & hiring details</h3>
-        <dl>
-          {job.description.generalInfo.reportsTo ? (
-            <div>
-              <dt>Reports to</dt>
-              <dd>{job.description.generalInfo.reportsTo}</dd>
-            </div>
-          ) : null}
-          {job.description.generalInfo.workingHours ? (
-            <div>
-              <dt>Working hours</dt>
-              <dd>{job.description.generalInfo.workingHours}</dd>
-            </div>
-          ) : null}
-          {job.description.generalInfo.workAddress ? (
-            <div>
-              <dt>Work address</dt>
-              <dd>{job.description.generalInfo.workAddress}</dd>
-            </div>
-          ) : null}
           <div>
-            <dt>Saturday work</dt>
-            <dd>{job.workOnSaturday ? "Required" : "Not required"}</dd>
+            <dt>{copy.openSeats}</dt>
+            <dd>{copy.openPositions(job.numberOfHires)}</dd>
           </div>
-          <div>
-            <dt>Remote scope</dt>
-            <dd>
-              {job.location.isNationwideRemote
-                ? "Nationwide"
-                : "Location-based"}
-            </dd>
-          </div>
-          <div>
-            <dt>Open positions</dt>
-            <dd>{job.numberOfHires}</dd>
-          </div>
-          {job.applyDeadline ? (
-            <div>
-              <dt>Apply by</dt>
-              <dd>
-                {new Intl.DateTimeFormat("en-GB", {
-                  dateStyle: "medium",
-                }).format(new Date(job.applyDeadline))}
-              </dd>
-            </div>
-          ) : null}
         </dl>
       </section>
     </aside>

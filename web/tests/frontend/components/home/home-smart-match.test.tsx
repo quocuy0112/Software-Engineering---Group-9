@@ -61,22 +61,22 @@ describe("Home Smart Match", () => {
     );
   });
 
-  it("uses the current candidate, role, score, and explanation binding for a personal estimate", () => {
+  it("keeps the Smart Match panel illustrative when personal scores exist", () => {
     const match = personalMatch({ score: 75 });
-    const { container } = render(
+    render(
       <HomeSmartMatch
         model={homeModel({ viewer: candidateViewer, match })}
         locale="en"
       />,
     );
 
-    expect(screen.getByText(candidateViewer.displayName)).toBeInTheDocument();
-    expect(screen.getByText(match.jobTitle)).toBeInTheDocument();
+    expect(screen.getByText("Minh Anh")).toBeInTheDocument();
+    expect(screen.getByText("Frontend Developer")).toBeInTheDocument();
     expect(
-      screen.getByRole("img", { name: "Fit estimate: 75%" }),
+      screen.getByRole("img", { name: "Fit estimate: 82%" }),
     ).toBeInTheDocument();
-    expect(
-      container.querySelector(`#smart-match-explanation-${match.jobSlug}`),
-    ).toBeInTheDocument();
+    expect(screen.queryByText(candidateViewer.displayName)).not.toBeInTheDocument();
+    expect(screen.queryByText(match.jobTitle)).not.toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: "Fit estimate: 75%" })).toBeNull();
   });
 });
