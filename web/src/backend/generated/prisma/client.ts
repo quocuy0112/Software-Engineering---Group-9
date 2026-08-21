@@ -440,6 +440,11 @@ export type ApplicationNotificationPreference = Prisma.ApplicationNotificationPr
  */
 export type JobApplication = Prisma.JobApplicationModel
 /**
+ * Model JobApplicationAttemptCounter
+ * 
+ */
+export type JobApplicationAttemptCounter = Prisma.JobApplicationAttemptCounterModel
+/**
  * Model ApplicationDocument
  * 
  */

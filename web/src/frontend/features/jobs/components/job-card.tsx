@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { JobCard as JobCardData } from "@/shared/contracts/jobs/discovery";
+import { MAX_APPLICATION_ATTEMPTS_MESSAGE } from "@/shared/contracts/jobs/actions";
 import {
   formatRelativeTime,
   formatSalary,
@@ -245,6 +246,16 @@ export function ApplyButton({ job }: { job: JobCardData }) {
     return (
       <span role="status" className="job-applied-state">
         Applied
+      </span>
+    );
+  }
+
+  if (job.actions.applicationLimitReached) {
+    const message =
+      job.actions.applicationLimitMessage ?? MAX_APPLICATION_ATTEMPTS_MESSAGE;
+    return (
+      <span role="status" aria-label={message} className="job-closed-state">
+        {message}
       </span>
     );
   }

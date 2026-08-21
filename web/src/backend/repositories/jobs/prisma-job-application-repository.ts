@@ -13,6 +13,10 @@ import {
   prepareApplicationSubmission,
 } from "@/backend/services/jobs/application-policy";
 import { DIRECT_APPLICATION_CV_ID } from "@/shared/contracts/jobs/actions";
+import {
+  hasReachedApplicationLimit,
+  isActiveApplication,
+} from "@/backend/services/jobs/application-attempt-policy";
 import { ensureCandidateCvLibrary } from "@/backend/services/profile/candidate-cv-library";
 import type {
   ApplicationForm,
@@ -43,6 +47,7 @@ type CandidateApplicationForm = {
   >;
   questions: ApplicationForm["questions"];
   existingApplication: ApplicationOutcome | null;
+  applicationCount?: number;
 };
 
 export type ApplicationRepositoryPort = {
@@ -77,6 +82,7 @@ const outcome = (
     stageVersion?: number;
     aiAnalysisConsent?: boolean;
     aiMatchScore?: number | null;
+    applicationAttemptNumber?: number;
   },
   created: boolean,
 ): ApplicationOutcome => ({
@@ -91,6 +97,7 @@ const outcome = (
     : "Your application was already submitted.",
   aiAnalysisConsent: row.aiAnalysisConsent,
   aiMatchScore: row.aiMatchScore,
+  applicationAttemptNumber: row.applicationAttemptNumber,
 });
 
 export class PrismaJobApplicationRepository implements ApplicationRepositoryPort {
@@ -105,87 +112,98 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
 
   async getCandidateForm(userId: string, jobId: string, now: Date) {
     await ensureCandidateCvLibrary(userId, this.db);
-    const [candidate, job, existingApplication] = await Promise.all([
-      this.db.candidateIdentity.findFirst({
-        where: { userId, user: { state: "ACTIVE" } },
-        include: {
-          user: { select: { name: true, email: true } },
-          profile: {
-            select: {
-              headline: true,
-              summary: true,
-              location: true,
-              phone: true,
-              revision: true,
-            },
-          },
-          cvs: {
-            where: {
-              confirmedAt: { not: null },
-              archivedAt: null,
-              byteSize: { gte: 1, lte: 5_000_000 },
-              mimeType: {
-                in: [
-                  "application/pdf",
-                  "application/msword",
-                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                ],
+    const [candidate, job, existingApplication, attemptCounter] =
+      await Promise.all([
+        this.db.candidateIdentity.findFirst({
+          where: { userId, user: { state: "ACTIVE" } },
+          include: {
+            user: { select: { name: true, email: true } },
+            profile: {
+              select: {
+                headline: true,
+                summary: true,
+                location: true,
+                phone: true,
+                revision: true,
               },
             },
-            orderBy: { confirmedAt: "desc" },
-            select: {
-              id: true,
-              displayName: true,
-              fileName: true,
-              mimeType: true,
-              byteSize: true,
-              version: true,
-              confirmedAt: true,
+            cvs: {
+              where: {
+                confirmedAt: { not: null },
+                archivedAt: null,
+                byteSize: { gte: 1, lte: 5_000_000 },
+                mimeType: {
+                  in: [
+                    "application/pdf",
+                    "application/msword",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                  ],
+                },
+              },
+              orderBy: { confirmedAt: "desc" },
+              select: {
+                id: true,
+                displayName: true,
+                fileName: true,
+                mimeType: true,
+                byteSize: true,
+                version: true,
+                confirmedAt: true,
+              },
             },
           },
-        },
-      }),
-      this.db.jobPosting.findFirst({
-        where: {
-          id: jobId,
-          status: "ACTIVE",
-          approvedAt: { not: null },
-          publishedAt: { not: null, lte: now },
-          OR: [
-            { applicationDeadline: null },
-            { applicationDeadline: { gt: now } },
-          ],
-          company: { verifiedAt: { not: null } },
-        },
-        select: {
-          id: true,
-          title: true,
-          location: true,
-          company: { select: { displayName: true } },
-          questions: {
-            where: { active: true },
-            orderBy: { position: "asc" },
-            select: {
-              id: true,
-              prompt: true,
-              description: true,
-              kind: true,
-              required: true,
-              options: true,
-              version: true,
+        }),
+        this.db.jobPosting.findFirst({
+          where: {
+            id: jobId,
+            status: "ACTIVE",
+            approvedAt: { not: null },
+            publishedAt: { not: null, lte: now },
+            OR: [
+              { applicationDeadline: null },
+              { applicationDeadline: { gt: now } },
+            ],
+            company: { verifiedAt: { not: null } },
+          },
+          select: {
+            id: true,
+            title: true,
+            location: true,
+            company: { select: { displayName: true } },
+            questions: {
+              where: { active: true },
+              orderBy: { position: "asc" },
+              select: {
+                id: true,
+                prompt: true,
+                description: true,
+                kind: true,
+                required: true,
+                options: true,
+                version: true,
+              },
             },
           },
-        },
-      }),
-      this.db.jobApplication.findUnique({
-        where: {
-          candidateUserId_jobPostingId: {
+        }),
+        this.db.jobApplication.findFirst({
+          where: {
             candidateUserId: userId,
             jobPostingId: jobId,
+            withdrawalOutcome: null,
+            stage: { not: "REJECTED" },
           },
-        },
-      }),
-    ]);
+          orderBy: [{ submittedAt: "desc" }, { id: "desc" }],
+        }),
+        this.db.jobApplicationAttemptCounter.findUnique({
+          where: {
+            candidateUserId_jobPostingId: {
+              candidateUserId: userId,
+              jobPostingId: jobId,
+            },
+          },
+          select: { applicationCount: true },
+        }),
+      ]);
     if (!candidate || !job) return null;
     const missingProfileFields = [
       !candidate.user.name.trim() ? "name" : null,
@@ -237,6 +255,7 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
       existingApplication: existingApplication
         ? outcome(existingApplication, false)
         : null,
+      applicationCount: attemptCounter?.applicationCount ?? 0,
     };
   }
 
@@ -283,15 +302,16 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
         }
         return { application: outcome(existingByKey, false), created: false };
       }
-      const existingDuplicate = await this.db.jobApplication.findUnique({
+      const existingDuplicate = await this.db.jobApplication.findFirst({
         where: {
-          candidateUserId_jobPostingId: {
-            candidateUserId: input.candidateUserId,
-            jobPostingId: input.jobId,
-          },
+          candidateUserId: input.candidateUserId,
+          jobPostingId: input.jobId,
+          withdrawalOutcome: null,
+          stage: { not: "REJECTED" },
         },
+        orderBy: [{ submittedAt: "desc" }, { id: "desc" }],
       });
-      if (existingDuplicate) {
+      if (existingDuplicate && isActiveApplication(existingDuplicate)) {
         return {
           application: outcome(existingDuplicate, false),
           created: false,
@@ -389,16 +409,39 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
               throw new ApplicationRepositoryError("IDEMPOTENCY_KEY_REUSED");
             return { application: outcome(sameKey, false), created: false };
           }
-          const duplicate = await tx.jobApplication.findUnique({
+          await tx.$queryRaw`
+            SELECT "userId"
+            FROM "CandidateIdentity"
+            WHERE "userId" = ${input.candidateUserId}
+            FOR UPDATE
+          `;
+          const duplicate = await tx.jobApplication.findFirst({
             where: {
-              candidateUserId_jobPostingId: {
-                candidateUserId: input.candidateUserId,
-                jobPostingId: input.jobId,
-              },
+              candidateUserId: input.candidateUserId,
+              jobPostingId: input.jobId,
+              withdrawalOutcome: null,
+              stage: { not: "REJECTED" },
             },
+            orderBy: [{ submittedAt: "desc" }, { id: "desc" }],
           });
-          if (duplicate)
+          if (duplicate && isActiveApplication(duplicate))
             return { application: outcome(duplicate, false), created: false };
+
+          const attemptCounter =
+            await tx.jobApplicationAttemptCounter.findUnique({
+              where: {
+                candidateUserId_jobPostingId: {
+                  candidateUserId: input.candidateUserId,
+                  jobPostingId: input.jobId,
+                },
+              },
+              select: { applicationCount: true },
+            });
+          const currentApplicationCount = attemptCounter?.applicationCount ?? 0;
+          if (hasReachedApplicationLimit(currentApplicationCount)) {
+            throw new ApplicationRepositoryError("APPLICATION_MAX_ATTEMPTS");
+          }
+          const nextApplicationAttemptNumber = currentApplicationCount + 1;
 
           if (input.draftId) {
             const draft = await tx.candidateApplicationDraft.findFirst({
@@ -570,10 +613,35 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
             input.command.cvFileRef !== input.command.cvId
               ? input.command.cvFileRef
               : prepared.cvSnapshot.storageKey;
+          if (attemptCounter) {
+            const counterUpdated =
+              await tx.jobApplicationAttemptCounter.updateMany({
+                where: {
+                  candidateUserId: input.candidateUserId,
+                  jobPostingId: input.jobId,
+                  applicationCount: currentApplicationCount,
+                },
+                data: { applicationCount: nextApplicationAttemptNumber },
+              });
+            if (counterUpdated.count !== 1) {
+              throw new ApplicationRepositoryError(
+                "APPLICATION_ATTEMPT_COUNTER_CONFLICT",
+              );
+            }
+          } else {
+            await tx.jobApplicationAttemptCounter.create({
+              data: {
+                candidateUserId: input.candidateUserId,
+                jobPostingId: input.jobId,
+                applicationCount: nextApplicationAttemptNumber,
+              },
+            });
+          }
           const created = await tx.jobApplication.create({
             data: {
               candidateUserId: input.candidateUserId,
               jobPostingId: input.jobId,
+              applicationAttemptNumber: nextApplicationAttemptNumber,
               selectedCvId: input.command.cvId,
               cvFileRef,
               contactSnapshot: input.command.contactSnapshot
@@ -801,7 +869,7 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
           await createInAppNotification(tx, {
             recipientUserId: input.candidateUserId,
             kind: "APPLICATION_SUBMITTED",
-            deduplicationKey: `application:${input.candidateUserId}:${input.jobId}:candidate`,
+            deduplicationKey: `application:${created.id}:candidate`,
             correlationId: input.correlationId,
             occurredAt: input.occurredAt,
             contextType: "APPLICATION",
@@ -814,7 +882,7 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
             await createInAppNotification(tx, {
               recipientUserId,
               kind: "APPLICATION_RECEIVED",
-              deduplicationKey: `application:${input.candidateUserId}:${input.jobId}:company:${recipientUserId}`,
+              deduplicationKey: `application:${created.id}:company:${recipientUserId}`,
               correlationId: input.correlationId,
               occurredAt: input.occurredAt,
               contextType: "APPLICATION",
@@ -890,15 +958,16 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        const existing = await this.db.jobApplication.findUnique({
+        const existing = await this.db.jobApplication.findFirst({
           where: {
-            candidateUserId_jobPostingId: {
-              candidateUserId: input.candidateUserId,
-              jobPostingId: input.jobId,
-            },
+            candidateUserId: input.candidateUserId,
+            jobPostingId: input.jobId,
+            withdrawalOutcome: null,
+            stage: { not: "REJECTED" },
           },
+          orderBy: [{ submittedAt: "desc" }, { id: "desc" }],
         });
-        if (existing)
+        if (existing && isActiveApplication(existing))
           return { application: outcome(existing, false), created: false };
       }
       throw error;

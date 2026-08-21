@@ -32,13 +32,28 @@ const publicInclude = (actorUserId: string | null) =>
       : { where: { userId: "__visitor__" }, select: { userId: true }, take: 0 },
     applications: actorUserId
       ? {
-          where: { candidateUserId: actorUserId },
+          where: {
+            candidateUserId: actorUserId,
+            withdrawalOutcome: null,
+            stage: { not: "REJECTED" as const },
+          },
           select: { id: true, stage: true },
           take: 1,
         }
       : {
           where: { candidateUserId: "__visitor__" },
           select: { id: true, stage: true },
+          take: 0,
+        },
+    applicationAttemptCounters: actorUserId
+      ? {
+          where: { candidateUserId: actorUserId },
+          select: { applicationCount: true },
+          take: 1,
+        }
+      : {
+          where: { candidateUserId: "__visitor__" },
+          select: { applicationCount: true },
           take: 0,
         },
     reviewAggregate: {
@@ -54,8 +69,12 @@ type StoredPublicJobRow = Prisma.JobPostingGetPayload<{
   include: ReturnType<typeof publicInclude>;
 }>;
 
-export type PublicJobRow = Omit<StoredPublicJobRow, "reviewAggregate"> & {
+export type PublicJobRow = Omit<
+  StoredPublicJobRow,
+  "reviewAggregate" | "applicationAttemptCounters"
+> & {
   reviewAggregate?: StoredPublicJobRow["reviewAggregate"];
+  applicationAttemptCounters?: StoredPublicJobRow["applicationAttemptCounters"];
   score: number;
 };
 

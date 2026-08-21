@@ -130,6 +130,7 @@ export const ModelName = {
   ApplicationPublicUpdate: 'ApplicationPublicUpdate',
   ApplicationNotificationPreference: 'ApplicationNotificationPreference',
   JobApplication: 'JobApplication',
+  JobApplicationAttemptCounter: 'JobApplicationAttemptCounter',
   ApplicationDocument: 'ApplicationDocument',
   ApplicationCoverLetterText: 'ApplicationCoverLetterText',
   ApplicationArtifactPromotion: 'ApplicationArtifactPromotion',
@@ -1683,6 +1684,7 @@ export const JobApplicationScalarFieldEnum = {
   id: 'id',
   candidateUserId: 'candidateUserId',
   jobPostingId: 'jobPostingId',
+  applicationAttemptNumber: 'applicationAttemptNumber',
   selectedCvId: 'selectedCvId',
   cvFileRef: 'cvFileRef',
   contactSnapshot: 'contactSnapshot',
@@ -1719,6 +1721,18 @@ export const JobApplicationScalarFieldEnum = {
 } as const
 
 export type JobApplicationScalarFieldEnum = (typeof JobApplicationScalarFieldEnum)[keyof typeof JobApplicationScalarFieldEnum]
+
+
+export const JobApplicationAttemptCounterScalarFieldEnum = {
+  id: 'id',
+  candidateUserId: 'candidateUserId',
+  jobPostingId: 'jobPostingId',
+  applicationCount: 'applicationCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobApplicationAttemptCounterScalarFieldEnum = (typeof JobApplicationAttemptCounterScalarFieldEnum)[keyof typeof JobApplicationAttemptCounterScalarFieldEnum]
 
 
 export const ApplicationDocumentScalarFieldEnum = {

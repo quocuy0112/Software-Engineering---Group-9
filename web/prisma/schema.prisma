@@ -1256,6 +1256,7 @@ model CandidateIdentity {
   profile         CandidateProfile?
   cvs             CandidateCv[]
   jobApplications JobApplication[]
+  applicationAttemptCounters JobApplicationAttemptCounter[]
   applicationDrafts CandidateApplicationDraft[]
 }
 
@@ -2294,6 +2295,7 @@ model JobPosting {
   savedBy                  SavedJob[]
   reports                  JobReport[]
   applications             JobApplication[]
+  applicationAttemptCounters JobApplicationAttemptCounter[]
   candidateApplicationDrafts CandidateApplicationDraft[]
   reviewAggregate          JobPostReviewAggregate?
   applicationArtifactPromotions ApplicationArtifactPromotion[]
@@ -2844,6 +2846,7 @@ model JobApplication {
   id                      String                        @id @default(cuid())
   candidateUserId         String
   jobPostingId            String
+  applicationAttemptNumber Int @default(1)
   selectedCvId            String
   cvFileRef               String?
   contactSnapshot         Json?
@@ -2901,14 +2904,28 @@ model JobApplication {
   publicUpdates           ApplicationPublicUpdate[]
   notificationPreference  ApplicationNotificationPreference?
 
-  @@unique([candidateUserId, jobPostingId])
   @@unique([candidateUserId, idempotencyKey])
+  @@unique([candidateUserId, jobPostingId, applicationAttemptNumber])
   @@index([jobPostingId, stage, submittedAt])
   @@index([candidateUserId, submittedAt(sort: Desc)])
   @@index([candidateUserId, aiAnalysisConsent])
   @@index([jobPostingId, submittedAt(sort: Desc), id(sort: Desc)])
   @@index([documentDeletedAt, documentDeletionDueAt])
   @@index([jobPostingId, currentScoringResultId, submittedAt(sort: Desc), id(sort: Desc)])
+}
+
+model JobApplicationAttemptCounter {
+  id               String            @id @default(cuid())
+  candidateUserId  String
+  jobPostingId     String
+  applicationCount Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  candidate        CandidateIdentity @relation(fields: [candidateUserId], references: [userId], onDelete: Cascade)
+  jobPosting       JobPosting        @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+
+  @@unique([candidateUserId, jobPostingId])
+  @@index([jobPostingId, applicationCount])
 }
 
 model ApplicationDocument {
