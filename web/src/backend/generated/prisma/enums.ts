@@ -233,6 +233,8 @@ export const InAppNotificationKind = {
   MEMBERSHIP_SUSPENDED: 'MEMBERSHIP_SUSPENDED',
   MEMBERSHIP_RESTORED: 'MEMBERSHIP_RESTORED',
   MEMBERSHIP_REMOVED: 'MEMBERSHIP_REMOVED',
+  COMPANY_BANNED: 'COMPANY_BANNED',
+  COMPANY_UNBANNED: 'COMPANY_UNBANNED',
   COMPANY_INVITATION_RECEIVED: 'COMPANY_INVITATION_RECEIVED',
   COMPANY_INVITATION_ACCEPTED: 'COMPANY_INVITATION_ACCEPTED',
   COMPANY_INVITATION_DECLINED: 'COMPANY_INVITATION_DECLINED',
@@ -962,6 +964,14 @@ export const CompanyVerificationState = {
 } as const
 
 export type CompanyVerificationState = (typeof CompanyVerificationState)[keyof typeof CompanyVerificationState]
+
+
+export const CompanyModerationState = {
+  ACTIVE: 'ACTIVE',
+  BANNED: 'BANNED'
+} as const
+
+export type CompanyModerationState = (typeof CompanyModerationState)[keyof typeof CompanyModerationState]
 
 
 export const RecruiterVerificationState = {

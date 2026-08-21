@@ -11731,6 +11731,11 @@ export const CompanyScalarFieldEnum = {
   normalizedTaxIdentifier: 'normalizedTaxIdentifier',
   verificationState: 'verificationState',
   verificationInactiveAt: 'verificationInactiveAt',
+  moderationState: 'moderationState',
+  moderationVersion: 'moderationVersion',
+  bannedAt: 'bannedAt',
+  verificationStateBeforeBan: 'verificationStateBeforeBan',
+  verifiedAtBeforeBan: 'verifiedAtBeforeBan',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -14509,6 +14514,20 @@ export type EnumCompanyVerificationStateFieldRefInput<$PrismaModel> = FieldRefIn
  * Reference to a field of type 'CompanyVerificationState[]'
  */
 export type ListEnumCompanyVerificationStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanyVerificationState[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CompanyModerationState'
+ */
+export type EnumCompanyModerationStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanyModerationState'>
+    
+
+
+/**
+ * Reference to a field of type 'CompanyModerationState[]'
+ */
+export type ListEnumCompanyModerationStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanyModerationState[]'>
     
 
 

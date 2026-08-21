@@ -12,6 +12,8 @@ export const notificationKinds = [
   "MEMBERSHIP_SUSPENDED",
   "MEMBERSHIP_RESTORED",
   "MEMBERSHIP_REMOVED",
+  "COMPANY_BANNED",
+  "COMPANY_UNBANNED",
   "COMPANY_INVITATION_RECEIVED",
   "COMPANY_INVITATION_ACCEPTED",
   "COMPANY_INVITATION_DECLINED",
@@ -83,7 +85,9 @@ export const notificationRecipientRoles = [
   "RECRUITER",
   "ADMIN",
 ] as const;
-export const notificationRecipientRoleSchema = z.enum(notificationRecipientRoles);
+export const notificationRecipientRoleSchema = z.enum(
+  notificationRecipientRoles,
+);
 export type NotificationRecipientRole = z.infer<
   typeof notificationRecipientRoleSchema
 >;

@@ -179,6 +179,8 @@ enum InAppNotificationKind {
   MEMBERSHIP_SUSPENDED
   MEMBERSHIP_RESTORED
   MEMBERSHIP_REMOVED
+  COMPANY_BANNED
+  COMPANY_UNBANNED
   COMPANY_INVITATION_RECEIVED
   COMPANY_INVITATION_ACCEPTED
   COMPANY_INVITATION_DECLINED
@@ -704,6 +706,13 @@ enum CompanyVerificationState {
   UNVERIFIED
   ACTIVE
   INACTIVE
+}
+
+/// Platform moderation state is separate from the company's verification
+/// lifecycle so a temporary ban can be reversed without deleting the company.
+enum CompanyModerationState {
+  ACTIVE
+  BANNED
 }
 
 enum RecruiterVerificationState {
@@ -1698,6 +1707,11 @@ model Company {
   normalizedTaxIdentifier       String?                        @unique
   verificationState             CompanyVerificationState       @default(UNVERIFIED)
   verificationInactiveAt        DateTime?
+  moderationState               CompanyModerationState         @default(ACTIVE)
+  moderationVersion             Int                            @default(1)
+  bannedAt                      DateTime?
+  verificationStateBeforeBan    CompanyVerificationState?
+  verifiedAtBeforeBan           DateTime?
   createdAt                     DateTime                       @default(now())
   updatedAt                     DateTime                       @updatedAt
   jobPostings                   JobPosting[]

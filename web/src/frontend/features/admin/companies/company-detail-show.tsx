@@ -1,7 +1,8 @@
 "use client";
 
 import { Alert, Box, Chip, Paper, Stack, Typography } from "@mui/material";
-import { Show, useRecordContext } from "react-admin";
+import { Show, useRecordContext, useRefresh } from "react-admin";
+import { CompanyModerationPanel } from "./company-moderation-panel";
 
 type CompanyDetail = {
   company: {
@@ -9,6 +10,9 @@ type CompanyDetail = {
     legalName: string;
     displayName: string;
     verificationState: "UNVERIFIED" | "ACTIVE" | "INACTIVE";
+    moderationState: "ACTIVE" | "BANNED";
+    moderationVersion: number;
+    bannedAt: string | null;
     verifiedAt: string | null;
     createdAt: string;
     updatedAt: string;
@@ -83,6 +87,7 @@ function Metric({ label, value }: { label: string; value: number }) {
 
 export function CompanyDetailContent() {
   const record = useRecordContext<CompanyDetail>();
+  const refresh = useRefresh();
   if (!record) return null;
 
   const { company, membershipSummary, verificationSummary, activitySummary } =
@@ -125,6 +130,15 @@ export function CompanyDetailContent() {
                 color={verificationColor}
                 size="small"
               />
+              <Chip
+                label={
+                  company.moderationState === "BANNED" ? "Banned" : "Not banned"
+                }
+                color={
+                  company.moderationState === "BANNED" ? "error" : "success"
+                }
+                size="small"
+              />
             </Stack>
           </Box>
           <Box
@@ -143,6 +157,7 @@ export function CompanyDetailContent() {
             <Detail label="Created" value={dateTime(company.createdAt)} />
             <Detail label="Last updated" value={dateTime(company.updatedAt)} />
             <Detail label="Company reference" value={company.id} />
+            <Detail label="Banned at" value={dateTime(company.bannedAt)} />
           </Box>
         </Paper>
 
@@ -240,6 +255,9 @@ export function CompanyDetailContent() {
           </Stack>
 
           <Stack spacing={2.5}>
+            <Paper variant="outlined" sx={{ p: 2.5 }}>
+              <CompanyModerationPanel company={company} onDone={refresh} />
+            </Paper>
             <Paper variant="outlined" sx={{ p: 2.5 }}>
               <Typography component="h2" variant="h6" fontWeight={700}>
                 Verification

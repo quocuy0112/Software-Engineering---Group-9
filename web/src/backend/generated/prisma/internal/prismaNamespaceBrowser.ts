@@ -689,6 +689,11 @@ export const CompanyScalarFieldEnum = {
   normalizedTaxIdentifier: 'normalizedTaxIdentifier',
   verificationState: 'verificationState',
   verificationInactiveAt: 'verificationInactiveAt',
+  moderationState: 'moderationState',
+  moderationVersion: 'moderationVersion',
+  bannedAt: 'bannedAt',
+  verificationStateBeforeBan: 'verificationStateBeforeBan',
+  verifiedAtBeforeBan: 'verifiedAtBeforeBan',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

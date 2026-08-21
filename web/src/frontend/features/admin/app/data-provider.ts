@@ -334,3 +334,10 @@ export function membershipCommandPath(
 ) {
   return `${endpoint("company-memberships")}/${encodeURIComponent(String(membershipId))}/${action}`;
 }
+
+export function companyModerationCommandPath(
+  companyId: Identifier,
+  action: "ban" | "unban",
+) {
+  return `${endpoint("companies")}/${encodeURIComponent(String(companyId))}/${action}`;
+}
