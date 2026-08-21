@@ -5,11 +5,12 @@ import {
   type JobPerformanceQuery,
   type JobPerformanceReport,
 } from "@/shared/contracts/analytics/employer";
-import {
-  ANALYTICS_DEFINITION_VERSION,
-} from "@/shared/contracts/analytics";
+import { ANALYTICS_DEFINITION_VERSION } from "@/shared/contracts/analytics";
 import { AnalyticsAuthorization } from "./analytics-authorization";
-import { calculateConversionRate, calculateFunnel } from "./analytics-calculations";
+import {
+  calculateConversionRate,
+  calculateFunnel,
+} from "./analytics-calculations";
 import {
   normalizeReportRange,
   ReportTimePolicyError,
@@ -28,8 +29,10 @@ type JobAnalyticsRepository = Pick<
 
 export class JobPerformanceService {
   constructor(
-    private readonly authorization: Pick<AnalyticsAuthorization, "employerJob"> =
-      new AnalyticsAuthorization(),
+    private readonly authorization: Pick<
+      AnalyticsAuthorization,
+      "employerJob"
+    > = new AnalyticsAuthorization(),
     private readonly repository: JobAnalyticsRepository = new PrismaAnalyticsRepository(),
   ) {}
 
@@ -68,6 +71,7 @@ export class JobPerformanceService {
       job: { id: scope.jobPostingId, title: scope.jobTitle },
       qualifiedViews: aggregate.qualifiedViews,
       submittedApplications: aggregate.submittedApplications,
+      withdrawnApplications: aggregate.withdrawnApplications,
       conversionRate: calculateConversionRate(
         aggregate.submittedApplications,
         aggregate.qualifiedViews,

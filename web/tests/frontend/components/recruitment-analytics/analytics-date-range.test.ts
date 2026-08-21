@@ -44,6 +44,7 @@ describe("recruitment analytics date range", () => {
       job: { id: "job-1", title: "Game Development" },
       qualifiedViews: 10,
       submittedApplications: 1,
+      withdrawnApplications: 0,
       conversionRate: {
         numerator: 1,
         denominator: 10,
@@ -91,6 +92,7 @@ describe("recruitment analytics date range", () => {
       job: { id: "job-1", title: "Game Development" },
       qualifiedViews: 0,
       submittedApplications: 4,
+      withdrawnApplications: 0,
       conversionRate: {
         numerator: 4,
         denominator: 0,
@@ -134,5 +136,47 @@ describe("recruitment analytics date range", () => {
     );
     expect(retryUrl.searchParams.get("from")).toBe("2026-08-19T22:41:40.327Z");
     expect(report.submittedApplications).toBe(4);
+  });
+
+  it("keeps an older performance response usable during the report contract rollout", async () => {
+    const responseReport = {
+      metadata: {
+        from: "2026-08-20T00:00:00+07:00",
+        to: "2026-08-21T00:00:00+07:00",
+        timeZone: "Asia/Ho_Chi_Minh",
+        dataCutoff: "2026-08-20T12:00:00+07:00",
+        definitionVersion: "recruitment-analytics-v1",
+        analyticsAvailableFrom: "2026-01-01T00:00:00+07:00",
+      },
+      job: { id: "job-1", title: "Game Development" },
+      qualifiedViews: 0,
+      submittedApplications: 0,
+      conversionRate: {
+        numerator: 0,
+        denominator: 0,
+        value: null,
+        availability: "NOT_APPLICABLE" as const,
+      },
+      funnelAsOf: "2026-08-20T12:00:00+07:00",
+      funnel: canonicalAnalyticsStages.map((stage) => ({
+        stage,
+        count: 0,
+        percentage: 0,
+      })),
+    };
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(responseReport), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const report = await fetchJobPerformance(
+      "job-1",
+      createAnalyticsDateRange("2026-08-20", "2026-08-20"),
+    );
+
+    expect(report.withdrawnApplications).toBe(0);
   });
 });

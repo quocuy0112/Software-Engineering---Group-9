@@ -217,7 +217,7 @@ components:
     JobPerformanceReport:
       type: object
       additionalProperties: false
-      required: [metadata, job, qualifiedViews, submittedApplications, conversionRate, funnelAsOf, funnel]
+      required: [metadata, job, qualifiedViews, submittedApplications, withdrawnApplications, conversionRate, funnelAsOf, funnel]
       properties:
         metadata: { $ref: '#/components/schemas/ReportMetadata' }
         job:
@@ -229,6 +229,7 @@ components:
             title: { type: string }
         qualifiedViews: { type: integer, minimum: 0 }
         submittedApplications: { type: integer, minimum: 0 }
+        withdrawnApplications: { type: integer, minimum: 0 }
         conversionRate: { $ref: '#/components/schemas/MetricRate' }
         funnelAsOf: { type: string, format: date-time }
         funnel: { type: array, minItems: 9, maxItems: 9, items: { $ref: '#/components/schemas/FunnelStage' } }

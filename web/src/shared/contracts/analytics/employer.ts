@@ -29,11 +29,10 @@ export const jobPerformanceReportSchema = z
     job: z.object({ id: z.string().min(1), title: z.string() }).strict(),
     qualifiedViews: z.number().int().nonnegative(),
     submittedApplications: z.number().int().nonnegative(),
+    withdrawnApplications: z.number().int().nonnegative(),
     conversionRate: metricRateSchema,
     funnelAsOf: isoDateTime,
     funnel: z.array(funnelStageSchema).length(9),
   })
   .strict();
-export type JobPerformanceReport = z.infer<
-  typeof jobPerformanceReportSchema
->;
+export type JobPerformanceReport = z.infer<typeof jobPerformanceReportSchema>;

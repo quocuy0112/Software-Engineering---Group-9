@@ -9,6 +9,7 @@ import {
   FileText,
   Percent,
   RefreshCw,
+  UserRoundX,
   UsersRound,
 } from "lucide-react";
 import type { JobPerformanceReport } from "@/shared/contracts/analytics/employer";
@@ -151,9 +152,10 @@ export function RecruiterAnalyticsOverview({
       if (!isBackgroundRefresh) {
         const loadingPerformance: Record<string, PerformanceState> =
           Object.fromEntries(
-            ids.map(
-              (id): [string, PerformanceState] => [id, { status: "loading" }],
-            ),
+            ids.map((id): [string, PerformanceState] => [
+              id,
+              { status: "loading" },
+            ]),
           );
         performanceRef.current = loadingPerformance;
         setPerformance(loadingPerformance);
@@ -257,6 +259,10 @@ export function RecruiterAnalyticsOverview({
     (sum, report) => sum + report.submittedApplications,
     0,
   );
+  const totalWithdrawnApplications = successfulReports.reduce(
+    (sum, report) => sum + report.withdrawnApplications,
+    0,
+  );
   const overallConversion =
     totalViews === 0
       ? null
@@ -290,8 +296,7 @@ export function RecruiterAnalyticsOverview({
     : undefined;
   const selectedReport =
     selectedState?.status === "success" ? selectedState.report : null;
-  const backgroundRefreshActive =
-    isRefreshing && reportableJobs.length > 0;
+  const backgroundRefreshActive = isRefreshing && reportableJobs.length > 0;
 
   function sortBy(nextKey: SortKey) {
     if (nextKey === sortKey) {
@@ -348,7 +353,8 @@ export function RecruiterAnalyticsOverview({
         <span>
           Metrics use qualified views and submitted applications in the selected
           window. The end date includes the full local calendar day in{" "}
-          {range.timeZone}. Funnel stages are a current snapshot.
+          {range.timeZone}. Withdrawn applications are shown separately and
+          excluded from the current funnel snapshot.
         </span>
         {adjustedReports.length > 0 ? (
           <span>
@@ -408,6 +414,14 @@ export function RecruiterAnalyticsOverview({
           loading={loadingReports}
         />
         <MetricCard
+          label="Withdrawn applications"
+          value={formatNumber(totalWithdrawnApplications)}
+          description="Excluded from the current funnel snapshot"
+          tone="amber"
+          icon={<UserRoundX />}
+          loading={loadingReports}
+        />
+        <MetricCard
           label="Overall conversion"
           value={formatRate(overallConversion)}
           description={conversionDescription(overallConversion)}
@@ -425,10 +439,7 @@ export function RecruiterAnalyticsOverview({
             {failedReports.length === 1 ? "" : "s"}. Available rows are still
             shown below. {firstFailureMessage ?? ""}
           </span>
-          <button
-            type="button"
-            onClick={() => requestRefresh()}
-          >
+          <button type="button" onClick={() => requestRefresh()}>
             Retry
           </button>
         </div>
@@ -483,7 +494,8 @@ export function RecruiterAnalyticsOverview({
           <div className="recruiter-analytics-table-wrap">
             <table className="recruiter-analytics-performance-table">
               <caption className="sr-only">
-                Job posting views, applications, conversion, and export actions
+                Job posting views, applications, withdrawn applications,
+                conversion, and export actions
               </caption>
               <thead>
                 <tr>
@@ -508,6 +520,7 @@ export function RecruiterAnalyticsOverview({
                       </button>
                     </th>
                   ))}
+                  <th scope="col">Withdrawn</th>
                   <th scope="col">Export candidates</th>
                 </tr>
               </thead>
@@ -556,6 +569,13 @@ export function RecruiterAnalyticsOverview({
                           : report
                             ? formatRate(report.conversionRate.value)
                             : "—"}
+                      </td>
+                      <td>
+                        {state?.status === "loading"
+                          ? "\u2026"
+                          : report
+                            ? formatNumber(report.withdrawnApplications)
+                            : "\u2014"}
                       </td>
                       <td>
                         <CandidateExportPanel jobId={job.id} jobTitle={title} />

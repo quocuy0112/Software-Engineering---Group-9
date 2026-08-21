@@ -61,4 +61,49 @@ describe("recruitment analytics service aggregation contracts", () => {
       ),
     ).rejects.toBeInstanceOf(AnalyticsResourceUnavailableError);
   });
+
+  it("keeps withdrawn applications visible as a separate report metric", async () => {
+    const service = new JobPerformanceService(
+      {
+        employerJob: async () => ({
+          jobPostingId: "job-1",
+          companyId: "company-1",
+          jobTitle: "Engineer",
+          membershipRole: "OWNER",
+        }),
+      },
+      {
+        analyticsAvailableFrom: async () =>
+          new Date("2026-01-01T00:00:00.000Z"),
+        jobPerformance: async () => ({
+          qualifiedViews: 10,
+          submittedApplications: 4,
+          withdrawnApplications: 2,
+          funnelCounts: { APPLIED: 2 },
+        }),
+      },
+    );
+
+    const report = await service.get(
+      "recruiter-a",
+      "job-1",
+      {
+        from: "2026-01-01T00:00:00.000Z",
+        to: "2026-01-02T00:00:00.000Z",
+        timeZone: "UTC",
+      },
+      new Date("2026-01-03T00:00:00.000Z"),
+    );
+
+    expect(report).toMatchObject({
+      submittedApplications: 4,
+      withdrawnApplications: 2,
+      conversionRate: { numerator: 4, denominator: 10, value: 40 },
+    });
+    expect(report.funnel.find((stage) => stage.stage === "APPLIED")).toEqual({
+      stage: "APPLIED",
+      count: 2,
+      percentage: 100,
+    });
+  });
 });

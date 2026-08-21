@@ -86,9 +86,17 @@ export function HiringFunnel({
           </li>
         ))}
       </ol>
+      <p className="hiring-funnel-withdrawn" role="status">
+        <strong>
+          Withdrawn applications: {formatNumber(report.withdrawnApplications)}
+        </strong>
+        <span>Excluded from current funnel-stage percentages.</span>
+      </p>
       {total === 0 ? (
         <p className="recruiter-analytics-empty-note">
-          No applications yet for this job posting.
+          {report.withdrawnApplications > 0
+            ? "No active applications remain in the funnel."
+            : "No applications yet for this job posting."}
         </p>
       ) : null}
       <details className="hiring-funnel-table">

@@ -266,7 +266,7 @@
 .recruiter-analytics-overview__metrics,
 .recruiter-analytics-metric-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--sh-space-4);
 }
 
@@ -769,6 +769,25 @@
   border-top-color: var(--sh-color-error);
 }
 
+.hiring-funnel-withdrawn {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sh-space-2);
+  margin: var(--sh-space-4) 0 0;
+  padding: var(--sh-space-3);
+  border: 1px solid var(--sh-color-warning);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-warning);
+  background: var(--sh-color-warning-bg);
+  font-size: var(--sh-font-size-body-sm);
+}
+
+.hiring-funnel-withdrawn span {
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-caption);
+}
+
 .hiring-funnel-stage__topline {
   display: flex;
   align-items: baseline;
@@ -893,6 +912,13 @@
 @keyframes recruiter-analytics-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1180px) {
+  .recruiter-analytics-overview__metrics,
+  .recruiter-analytics-metric-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 

@@ -24,6 +24,7 @@ const report: JobPerformanceReport = {
   job: { id: "job-1", title: "Game Development" },
   qualifiedViews: 0,
   submittedApplications: 4,
+  withdrawnApplications: 1,
   conversionRate: {
     numerator: 4,
     denominator: 0,
