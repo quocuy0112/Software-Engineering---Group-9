@@ -2,6 +2,6 @@
 
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at spec-kit/specs/025-recruitment-messaging/plan.md
+at spec-kit/specs/026-admin-data-backup/plan.md
 
 <!-- SPECKIT END -->
