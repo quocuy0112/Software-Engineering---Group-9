@@ -84,7 +84,7 @@ describe("bounded CV content receiver", () => {
         uploadId: "upload_fixture",
         contentType: "application/zip",
         contentLength: 16,
-        body: Readable.from([Buffer.alloc(16)]),
+        body: Readable.from([Buffer.from("%PDF-synthetic!!")]),
         idempotencyKey: "fixture-key_1234567890",
       }),
     ).rejects.toMatchObject({ code: "UNSUPPORTED_MEDIA_TYPE" });
@@ -97,7 +97,7 @@ describe("bounded CV content receiver", () => {
         uploadId: "upload_fixture",
         contentType: "application/pdf",
         contentLength: 16,
-        body: Readable.from([Buffer.alloc(16)]),
+        body: Readable.from([Buffer.from("%PDF-synthetic!!")]),
         idempotencyKey: "fixture-key_1234567890",
       }),
     ).rejects.toMatchObject({ code: "IMPORT_STATE_CONFLICT" });

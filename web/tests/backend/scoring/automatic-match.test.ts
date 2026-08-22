@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { calculateAutomaticMatch } from "@/backend/scoring/domain/automatic-match-calculator";
+import { partitionJobSkillsForMatching } from "@/backend/scoring/domain/job-skill-requirement-policy";
 
 const base = {
   applicationId: "app-1",
@@ -29,6 +30,30 @@ describe("deterministic automatic matching", () => {
     expect(result.missingRequiredSkills.map((skill) => skill.skillCode)).toEqual(["typescript"]);
     expect(result.detectedExperience).toEqual({ kind: "NOT_DETECTED", label: "Not detected" });
     expect(result.score).toBe(37.5);
+  });
+
+  it("reports absent technical skills as missing for a legacy all-preferred job", () => {
+    const matchingSkills = partitionJobSkillsForMatching([
+      { code: "cpp", label: "C++", required: false },
+      { code: "java", label: "Java", required: false },
+      { code: "typescript", label: "TypeScript", required: false },
+    ]);
+    const result = calculateAutomaticMatch({
+      ...base,
+      requiredSkills: matchingSkills.requiredSkills,
+      preferredSkills: matchingSkills.preferredSkills,
+      minimumExperienceYears: 0,
+      cvText: "Built Python automation scripts and maintained SQL reports.",
+    }).result;
+
+    expect(result.foundRequiredSkills).toHaveLength(0);
+    expect(result.missingRequiredSkills.map((skill) => skill.label)).toEqual([
+      "C++",
+      "Java",
+      "TypeScript",
+    ]);
+    expect(result.preferredSkills).toHaveLength(0);
+    expect(result.score).toBe(25);
   });
 
   it("marks parser warnings without removing deterministic evidence", () => {

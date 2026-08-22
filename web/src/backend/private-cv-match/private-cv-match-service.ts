@@ -20,6 +20,7 @@ import type {
   PrivateCvSnapshot,
   PrivateJdSnapshot,
 } from "./private-match-types";
+import { partitionJobSkillsForMatching } from "@/backend/scoring/domain/job-skill-requirement-policy";
 
 export const PRIVATE_SCORING_CONFIG_VERSION = "HS-60/40-v1";
 export const PRIVATE_PARSER_VERSION = "private-cv-match-parser-v1";
@@ -283,15 +284,14 @@ function cvSnapshot(row: CandidateCvSource): PrivateCvSnapshot {
 }
 
 function jobSnapshot(row: JobSource): PrivateJdSnapshot {
-  const requiredSkills = row.skills
-    .filter((skill) => skill.required)
+  const matchingSkills = partitionJobSkillsForMatching(row.skills);
+  const requiredSkills = matchingSkills.requiredSkills
     .map((skill) => ({
       code: safeText(skill.skillId, 128),
       label: safeText(skill.displayName, 200),
     }))
     .filter((skill) => skill.code && skill.label);
-  const preferredSkills = row.skills
-    .filter((skill) => !skill.required)
+  const preferredSkills = matchingSkills.preferredSkills
     .map((skill) => ({
       code: safeText(skill.skillId, 128),
       label: safeText(skill.displayName, 200),
@@ -479,6 +479,7 @@ export class PrivateCvMatchService {
     if (!cv.confirmedAt) throw privateMatchError("CV_NOT_PARSED", 404);
     if (
       cv.mimeType !== "application/pdf" &&
+      cv.mimeType !== "application/msword" &&
       cv.mimeType !==
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     ) {

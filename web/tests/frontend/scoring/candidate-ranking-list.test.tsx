@@ -114,6 +114,40 @@ describe("candidate ranking list", () => {
     );
   });
 
+  it("shows failed scoring as a retryable failure, not as not calculated", async () => {
+    const failedPage = {
+      ...page,
+      items: [
+        {
+          ...page.items[0],
+          scoring: {
+            kind: "FAILED" as const,
+            label: "Scoring failed" as const,
+          },
+        },
+      ],
+      summary: { ...page.summary, processing: 0 },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify(failedPage), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }),
+      ),
+    );
+
+    render(<CandidateRankingList jobId="job-1" jobTitle="Senior Engineer" />);
+
+    expect(await screen.findByText("Candidate One")).toBeInTheDocument();
+    expect(screen.getAllByText("Scoring failed").length).toBeGreaterThan(0);
+    expect(
+      screen.getByRole("option", { name: "Scoring failed" }),
+    ).toBeInTheDocument();
+  });
+
   it("renders numbered pagination and loads a directly selected page", async () => {
     const fetchMock = vi.fn(async (input: string | URL) => {
       const requestUrl = new URL(String(input), "https://test.local");

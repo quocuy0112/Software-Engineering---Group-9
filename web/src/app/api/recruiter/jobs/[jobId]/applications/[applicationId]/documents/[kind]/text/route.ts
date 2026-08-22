@@ -43,6 +43,7 @@ function textSegments(text: string) {
 
 function extractionKind(mediaType: string | null) {
   if (mediaType === "application/pdf") return "PDF" as const;
+  if (mediaType === "application/msword") return "DOC" as const;
   if (
     mediaType ===
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -113,7 +114,7 @@ function profileFallbackPreview(input: {
 /**
  * Parsing is an enhancement, not a prerequisite for opening an application
  * document. Keep the document usable and direct the recruiter to its original
- * file when a PDF/DOCX extractor cannot produce readable text.
+ * file when a PDF/DOC/DOCX extractor cannot produce readable text.
  */
 function limitedPreview(input: {
   kind: DocumentKind;
@@ -174,6 +175,7 @@ export async function GET(
       applicationId,
       kind,
       preview: false,
+      streamPolicy: "SKIP_PDF",
     });
     const previewVersion =
       result.document.mediaType === "application/pdf"
@@ -226,7 +228,8 @@ export async function GET(
             kind,
             fileName: result.document.fileName,
             mediaType: result.document.mediaType,
-            applicationProfileSnapshot: result.document.applicationProfileSnapshot,
+            applicationProfileSnapshot:
+              result.document.applicationProfileSnapshot,
             startedAt,
           });
           setCachedDocumentPreview(key, preview);

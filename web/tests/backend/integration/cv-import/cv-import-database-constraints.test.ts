@@ -19,7 +19,7 @@ const expectedTables = [
 ];
 
 const enumValues = {
-  CvDocumentKind: ["PDF", "DOCX"],
+  CvDocumentKind: ["PDF", "DOC", "DOCX"],
   CvParserClass: ["DETERMINISTIC_INTERNAL", "EXTERNAL_OPENAI"],
   CvArtifactKind: ["SOURCE_DOCUMENT", "EXTRACTED_TEXT"],
   CvArtifactStatus: [

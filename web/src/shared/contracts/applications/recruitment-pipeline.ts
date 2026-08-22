@@ -117,6 +117,7 @@ export const pipelineScoreSchema = z
       "PROCESSING",
       "SCORED",
       "UNAVAILABLE",
+      "FAILED",
     ]),
     final: z.number().min(0).max(100).nullable(),
     /** The AI-only Smart Match score, shown separately from the final score. */

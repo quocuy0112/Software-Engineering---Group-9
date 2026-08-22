@@ -14,7 +14,7 @@ type ReserveInput = Readonly<{
   accountId: string;
   profileId: string;
   uploadId: string;
-  documentKind: "PDF" | "DOCX";
+  documentKind: "PDF" | "DOC" | "DOCX";
   parserClass: "DETERMINISTIC_INTERNAL" | "EXTERNAL_OPENAI";
   declaredMediaType: string;
   declaredBytes: number;
@@ -49,6 +49,8 @@ function validateReservation(input: ReserveInput): number {
     input.expiresAt.getTime() !== input.now.getTime() + 30 * 86_400_000 ||
     (input.documentKind === "PDF" &&
       input.declaredMediaType !== "application/pdf") ||
+    (input.documentKind === "DOC" &&
+      input.declaredMediaType !== "application/msword") ||
     (input.documentKind === "DOCX" &&
       input.declaredMediaType !==
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document")

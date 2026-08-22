@@ -187,7 +187,12 @@ function coverLetterProjection(row: {
   );
   if (file) {
     return {
-      kind: file.mediaType === "application/pdf" ? "PDF" : "DOCX",
+      kind:
+        file.mediaType === "application/pdf"
+          ? "PDF"
+          : file.mediaType === "application/msword"
+            ? "DOC"
+            : "DOCX",
       available: true,
       previewSupported: previewSupported(file.mediaType),
     };
@@ -335,13 +340,15 @@ export class PrismaApplicationRepository
         row.currentScoringResult?.state === "SCORED" &&
         (final !== null || aiScore !== null)
           ? "SCORED"
-          : row.scoringStatus === "PENDING"
-            ? "PENDING"
-            : row.scoringStatus === "PROCESSING"
-              ? "PROCESSING"
-              : row.scoringStatus === "FAILED"
-                ? "UNAVAILABLE"
-                : "NOT_CALCULATED";
+          : row.currentScoringResult?.state === "DETERMINISTIC_ONLY"
+            ? "UNAVAILABLE"
+            : row.scoringStatus === "PENDING"
+              ? "PENDING"
+              : row.scoringStatus === "PROCESSING"
+                ? "PROCESSING"
+                : row.scoringStatus === "FAILED"
+                  ? "FAILED"
+                  : "NOT_CALCULATED";
       const score =
         scoreState === "NOT_CALCULATED"
           ? null

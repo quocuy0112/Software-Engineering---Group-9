@@ -62,6 +62,14 @@ export type ScoreBadgeMeta = {
 };
 
 export function scoreBadgeForRow(row: RankedApplicationRow): ScoreBadgeMeta {
+  if (row.scoring.kind === "FAILED") {
+    return {
+      code: "FAILED",
+      label: "Scoring failed",
+      tone: "red",
+      icon: CircleX,
+    };
+  }
   if (row.scoring.kind === "UNAVAILABLE") {
     return {
       code: "RULE_BASED",
@@ -147,17 +155,19 @@ export function ScoreBadgeFromLabel({
   compact?: boolean;
 }) {
   const normalized = code.toUpperCase();
-  const meta: ScoreBadgeMeta = normalized.includes("HIGH")
-    ? { code, label, tone: "green", icon: Check }
-    : normalized.includes("LOW")
-      ? { code, label, tone: "red", icon: X }
-      : normalized.includes("RULE") || normalized.includes("UNAVAILABLE")
-        ? { code, label, tone: "amber", icon: Check }
-        : normalized.includes("MEDIUM") || label === "Review needed"
-          ? { code, label, tone: "amber", icon: AlertCircle }
-          : normalized.includes("PROCESS") || normalized.includes("PENDING")
-            ? { code, label, tone: "purple", icon: LoaderCircle }
-            : { code, label, tone: "slate", icon: CircleDot };
+  const meta: ScoreBadgeMeta = normalized.includes("FAILED")
+    ? { code, label, tone: "red", icon: CircleX }
+    : normalized.includes("HIGH")
+      ? { code, label, tone: "green", icon: Check }
+      : normalized.includes("LOW")
+        ? { code, label, tone: "red", icon: X }
+        : normalized.includes("RULE") || normalized.includes("UNAVAILABLE")
+          ? { code, label, tone: "amber", icon: Check }
+          : normalized.includes("MEDIUM") || label === "Review needed"
+            ? { code, label, tone: "amber", icon: AlertCircle }
+            : normalized.includes("PROCESS") || normalized.includes("PENDING")
+              ? { code, label, tone: "purple", icon: LoaderCircle }
+              : { code, label, tone: "slate", icon: CircleDot };
   return <ScoreBadge meta={meta} compact={compact} />;
 }
 

@@ -128,7 +128,7 @@ export const cvCopy = (locale: CvLocale) =>
         upload: {
           ready: "Sẵn sàng tải CV lên.",
           file: "Tệp CV",
-          fileGuidance: "PDF hoặc DOCX, tối đa 5 MB (5.000.000 byte).",
+          fileGuidance: "PDF, DOC hoặc DOCX, tối đa 5 MB (5.000.000 byte).",
           chooseParser: "Chọn bộ phân tích cho lần nhập này",
           parserGuidance:
             "Mỗi CV có thể dùng một bộ phân tích khác nhau. Lựa chọn của bạn được lưu cùng lần nhập này.",
@@ -310,7 +310,7 @@ export const cvCopy = (locale: CvLocale) =>
         upload: {
           ready: "Ready to upload a CV.",
           file: "CV file",
-          fileGuidance: "PDF or DOCX, maximum 5 MB (5,000,000 bytes).",
+          fileGuidance: "PDF, DOC, or DOCX, maximum 5 MB (5,000,000 bytes).",
           chooseParser: "Choose a parser for this upload",
           parserGuidance:
             "Each CV can use a different parser. Your choice is saved with this import.",

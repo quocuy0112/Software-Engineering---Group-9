@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { ApplicationFiles } from "@/frontend/features/candidate-applications/components/application-files";
@@ -20,6 +21,10 @@ import {
   candidateCvSummarySchema,
   type CandidateCvSummary,
 } from "@/shared/contracts/cv-import/candidate-cv";
+import {
+  validateCvFile,
+  type CvFileValidationError,
+} from "@/shared/cv-file-validation";
 
 type WizardStep = 1 | 2;
 
@@ -30,16 +35,6 @@ function messageFrom(body: unknown, fallback: string) {
     typeof (body as { message?: unknown }).message === "string"
     ? (body as { message: string }).message
     : fallback;
-}
-
-function fileType(file: File) {
-  const extension = file.name.toLowerCase().split(".").pop();
-  if (extension === "pdf") return "application/pdf";
-  if (extension === "doc") return "application/msword";
-  if (extension === "docx") {
-    return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-  }
-  return file.type;
 }
 
 export function ApplicationWizard({
@@ -102,6 +97,11 @@ export function ApplicationWizard({
     currentLocation,
     linkedInPortfolio: linkedInPortfolio.trim() || null,
   };
+
+  function showFileUploadError(message: string) {
+    setError(message);
+    toast.error(message, { id: "candidate-cv-upload-error" });
+  }
 
   async function saveDraft(nextConfirmation = draft.confirmationAccepted) {
     const coverLetter =
@@ -188,19 +188,16 @@ export function ApplicationWizard({
   }
 
   async function uploadCv(file: File) {
-    if (file.size < 1 || file.size > 5_000_000) {
-      setError(copy.applicationFiles.cvFileSizeError);
-      return;
-    }
-    const mime = fileType(file);
-    if (
-      ![
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      ].includes(mime)
-    ) {
-      setError(copy.applicationFiles.cvFileTypeError);
+    try {
+      await validateCvFile(file);
+    } catch (caught) {
+      const validation = caught as CvFileValidationError;
+      showFileUploadError(
+        validation?.message ??
+          (file.size > 5_000_000
+            ? copy.applicationFiles.cvFileSizeError
+            : copy.applicationFiles.cvFileTypeError),
+      );
       return;
     }
     setPending("cv");
@@ -229,7 +226,7 @@ export function ApplicationWizard({
       setSelectedCvId(saved.id);
       setCvMode("UPLOAD");
     } catch (caught) {
-      setError(
+      showFileUploadError(
         caught instanceof Error
           ? caught.message
           : copy.applicationFiles.cvUploadError,
@@ -240,16 +237,16 @@ export function ApplicationWizard({
   }
 
   async function uploadCoverLetter(file: File) {
-    if (file.size < 1 || file.size > 5_000_000) {
-      setError(copy.applicationFiles.coverFileSizeError);
-      return;
-    }
-    if (
-      !["pdf", "doc", "docx"].includes(
-        file.name.toLowerCase().split(".").pop() ?? "",
-      )
-    ) {
-      setError(copy.applicationFiles.coverFileTypeError);
+    try {
+      await validateCvFile(file);
+    } catch (caught) {
+      const validation = caught as CvFileValidationError;
+      showFileUploadError(
+        validation?.message ??
+          (file.size > 5_000_000
+            ? copy.applicationFiles.coverFileSizeError
+            : copy.applicationFiles.coverFileTypeError),
+      );
       return;
     }
     setPending("cover");
@@ -275,7 +272,7 @@ export function ApplicationWizard({
       setCoverMode("FILE");
       setCoverText("");
     } catch (caught) {
-      setError(
+      showFileUploadError(
         caught instanceof Error
           ? caught.message
           : copy.applicationFiles.coverUploadError,

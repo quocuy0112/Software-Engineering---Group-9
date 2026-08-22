@@ -98,6 +98,7 @@ export class OpenApplicationDocumentService {
     applicationId: string;
     kind: "cv" | "cover-letter";
     preview: boolean;
+    streamPolicy?: "REQUIRED" | "SKIP_PDF";
     now?: Date;
   }) {
     const auth = await this.authorization.authorizeApplication(
@@ -122,6 +123,15 @@ export class OpenApplicationDocumentService {
       now: input.now,
     });
     if (document.text !== null) {
+      return Object.freeze({ document, stream: null });
+    }
+    // The structured-preview endpoint only needs PDF metadata before handing
+    // rendering to the browser. Avoid turning an unrelated storage read (or a
+    // slow first chunk) into a misleading "parse failed" state.
+    if (
+      input.streamPolicy === "SKIP_PDF" &&
+      document.mediaType === "application/pdf"
+    ) {
       return Object.freeze({ document, stream: null });
     }
     if (!document.storageKey) {

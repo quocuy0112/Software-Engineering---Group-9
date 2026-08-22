@@ -28,6 +28,11 @@ export class ScoringDetailService {
         stage: true,
         stageVersion: true,
         scoringStatus: true,
+        scoringWorkItems: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: { lastSafeFailureCode: true },
+        },
         scoringOperations: {
           where: {
             state: { in: ["QUEUED", "RUNNING"] },
@@ -186,6 +191,14 @@ export class ScoringDetailService {
         kind: "PROCESSING",
         label: "Processing",
         operationId: "initial-" + application.id,
+      };
+    } else if (application.scoringStatus === "FAILED") {
+      scoring = {
+        kind: "FAILED",
+        label: "Scoring failed",
+        safeFailureCode:
+          application.scoringWorkItems[0]?.lastSafeFailureCode ?? null,
+        retryAllowed: true,
       };
     } else {
       scoring = { kind: "NOT_CALCULATED", label: "Not calculated" };

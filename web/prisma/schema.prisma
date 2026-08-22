@@ -862,6 +862,7 @@ enum ApplicationStageActorType {
 
 enum CvDocumentKind {
   PDF
+  DOC
   DOCX
 }
 
@@ -2567,7 +2568,11 @@ model JobPostingSkill {
   jobPostingId String
   skillId      String
   displayName  String
-  required     Boolean    @default(false)
+  // The recruiter job form currently exposes one skill list, and every item
+  // in that list is a required skill. Keep the database default aligned with
+  // that product contract so a new writer cannot silently turn skills into
+  // preferred-only criteria.
+  required     Boolean    @default(true)
   position     Int
   createdAt    DateTime   @default(now())
   jobPosting   JobPosting @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)

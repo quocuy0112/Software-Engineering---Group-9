@@ -5,8 +5,13 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ApplyFormSection } from "@/frontend/features/jobs/components/apply-form-section";
+
+const toastError = vi.hoisted(() => vi.fn());
+vi.mock("sonner", () => ({ toast: { error: toastError } }));
+
+beforeEach(() => toastError.mockReset());
 
 const applicationForm = {
   jobId: "job-1",
@@ -159,13 +164,19 @@ describe("application form modal", () => {
       "application-ai-consent",
       "Submit application",
     ]);
-    const file = new File(["cv"], "resume.docx", {
-      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    });
+    const file = new File(
+      ["PK\u0003\u0004 [Content_Types].xml word/document.xml"],
+      "resume.docx",
+      {
+        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      },
+    );
     fireEvent.change(screen.getByLabelText(/drag a cv/i), {
       target: { files: [file] },
     });
-    expect(screen.getByText(/resume\.docx/i)).toBeVisible();
+    await waitFor(() =>
+      expect(screen.getByText(/resume\.docx/i)).toBeVisible(),
+    );
     expect(screen.queryByText(/new cv ready for ai import/i)).toBeNull();
     expect(
       screen.queryByRole("button", { name: /import this cv with ai/i }),
@@ -179,6 +190,11 @@ describe("application form modal", () => {
     );
     expect(submit).toBeEnabled();
     expect(screen.queryByRole("button", { name: /^cancel$/i })).toBeNull();
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: /close application form/i }),
+      ).toBeEnabled(),
+    );
 
     fireEvent.click(
       screen.getByRole("button", { name: /close application form/i }),
@@ -289,10 +305,15 @@ describe("application form modal", () => {
     await waitFor(() =>
       expect(screen.getByLabelText(/drag a cv/i)).toBeVisible(),
     );
-    const file = new File(["cv"], "resume.pdf", { type: "application/pdf" });
+    const file = new File(["%PDF-1.7\n"], "resume.pdf", {
+      type: "application/pdf",
+    });
     fireEvent.change(screen.getByLabelText(/drag a cv/i), {
       target: { files: [file] },
     });
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Import CV" })).toBeVisible(),
+    );
     fireEvent.click(screen.getByRole("button", { name: "Import CV" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     await waitFor(() =>
@@ -354,14 +375,78 @@ describe("application form modal", () => {
     fireEvent.change(screen.getByLabelText(/drag a cv/i), {
       target: { files: [unsupportedFile] },
     });
-    expect(screen.queryByText(/CV files must be PDF, DOC, or DOCX/)).toBeNull();
+    await waitFor(() =>
+      expect(
+        screen.getByText("Only PDF, DOC, or DOCX files are supported."),
+      ).toBeVisible(),
+    );
+    expect(toastError).toHaveBeenCalledWith(
+      "Only PDF, DOC, or DOCX files are supported.",
+      { id: "candidate-cv-upload-error" },
+    );
 
     fireEvent.click(
       screen.getByRole("button", { name: /submit application/i }),
     );
     expect(
-      screen.getByText(/CV files must be PDF, DOC, or DOCX/),
+      screen.getByText("Only PDF, DOC, or DOCX files are supported."),
     ).toBeVisible();
+    vi.unstubAllGlobals();
+  });
+
+  it("shows the server's not-a-CV rejection in a toast and resets the uploader", async () => {
+    const rejection =
+      "The uploaded file does not appear to be a valid CV. Please upload a file containing your resume information (work experience, education, skills, etc.).";
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ ...applicationForm, cvs: [] }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        json: async () => ({ message: rejection }),
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <ApplyFormSection
+        jobId="job-1"
+        jobTitle={applicationForm.jobTitle}
+        open
+        applied={false}
+        onOpenChange={() => undefined}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByLabelText(/drag a cv/i)).toBeVisible(),
+    );
+    fireEvent.change(screen.getByLabelText(/drag a cv/i), {
+      target: {
+        files: [
+          new File(["%PDF-1.7\n"], "not-a-cv.pdf", {
+            type: "application/pdf",
+          }),
+        ],
+      },
+    });
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Import CV" })).toBeVisible(),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Import CV" }));
+
+    await waitFor(() =>
+      expect(toastError).toHaveBeenCalledWith(rejection, {
+        id: "candidate-cv-upload-error",
+      }),
+    );
+    expect(screen.getByText(rejection)).toBeVisible();
+    expect(
+      screen.queryByRole("button", { name: "Import CV" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("Drag a CV here or click to choose")).toBeVisible();
     vi.unstubAllGlobals();
   });
 

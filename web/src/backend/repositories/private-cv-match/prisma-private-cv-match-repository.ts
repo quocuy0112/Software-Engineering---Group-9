@@ -281,6 +281,7 @@ export class PrivateCvMatchRepository {
     workerId: string;
     result: AutomaticMatchingResult;
     calculatedAt: Date;
+    leaseMilliseconds?: number;
   }) {
     return this.withTransaction(async (repository) => {
       const attempt = await repository.database.privateCvMatchAttempt.findFirst(
@@ -335,14 +336,21 @@ export class PrivateCvMatchRepository {
         data: {
           deterministicResultId: result.id,
           state: "AUTOMATIC_READY",
-          leaseExpiresAt: new Date(input.calculatedAt.getTime() + 30_000),
+          leaseExpiresAt: new Date(
+            input.calculatedAt.getTime() + (input.leaseMilliseconds ?? 30_000),
+          ),
         },
       });
       return result;
     });
   }
 
-  async beginAi(input: { attemptId: string; workerId: string; now: Date }) {
+  async beginAi(input: {
+    attemptId: string;
+    workerId: string;
+    now: Date;
+    leaseMilliseconds?: number;
+  }) {
     const updated = await this.database.privateCvMatchAttempt.updateMany({
       where: {
         id: input.attemptId,
@@ -352,7 +360,9 @@ export class PrivateCvMatchRepository {
       },
       data: {
         state: "AI_RUNNING",
-        leaseExpiresAt: new Date(input.now.getTime() + 60_000),
+        leaseExpiresAt: new Date(
+          input.now.getTime() + (input.leaseMilliseconds ?? 60_000),
+        ),
       },
     });
     if (updated.count !== 1) throw new Error("PRIVATE_ATTEMPT_LEASE_LOST");

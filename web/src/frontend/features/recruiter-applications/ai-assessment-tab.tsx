@@ -77,6 +77,31 @@ export function AiAssessmentTab({
       </div>
     );
   }
+  if (state.kind === "FAILED") {
+    return (
+      <div className="ranking-empty-panel" role="alert">
+        <AlertTriangle
+          aria-hidden="true"
+          className="ranking-empty-panel__icon"
+        />
+        <h3>CV scoring failed</h3>
+        <p>
+          The scoring job ended safely without publishing a score
+          {state.safeFailureCode ? ` (${state.safeFailureCode})` : ""}. You can
+          retry it now; the candidate application is still available.
+        </p>
+        {canScore && state.retryAllowed ? (
+          <button
+            type="button"
+            className="ai-ranking-button ai-ranking-button--primary"
+            onClick={onScore}
+          >
+            <BrainCircuit aria-hidden="true" /> Retry scoring
+          </button>
+        ) : null}
+      </div>
+    );
+  }
   if (state.kind === "UNAVAILABLE")
     return (
       <UnavailableAssessment

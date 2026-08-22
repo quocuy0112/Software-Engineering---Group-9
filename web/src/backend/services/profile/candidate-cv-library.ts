@@ -95,6 +95,7 @@ async function confirmedCvImports(
          AND upload."sourceSha256" IS NOT NULL
          AND upload."declaredMediaType" IN (
            'application/pdf',
+           'application/msword',
            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
          )
        ORDER BY upload."confirmedAt" DESC, upload."id" DESC
@@ -122,6 +123,7 @@ async function confirmedCvImports(
       declaredMediaType: {
         in: [
           "application/pdf",
+          "application/msword",
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         ],
       },
@@ -184,7 +186,11 @@ export async function ensureCandidateCvLibrary(
       )
         return;
       const extension =
-        upload.declaredMediaType === "application/pdf" ? "pdf" : "docx";
+        upload.declaredMediaType === "application/pdf"
+          ? "pdf"
+          : upload.declaredMediaType === "application/msword"
+            ? "doc"
+            : "docx";
       const storageKey = "candidate-cv-" + upload.id;
       const desiredId = storageKey;
       const fallbackFileName = "candidate-cv." + extension;

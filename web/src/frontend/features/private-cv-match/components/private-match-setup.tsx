@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   AlignLeft,
   BriefcaseBusiness,
@@ -24,8 +25,11 @@ import { privateMatchCopy } from "../i18n/private-match-copy";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
-import { CV_SOURCE_MAX_BYTES } from "@/shared/contracts/cv-import/common";
 import { candidateCvSummarySchema } from "@/shared/contracts/cv-import/candidate-cv";
+import {
+  CvFileValidationError,
+  validateCvFile,
+} from "@/shared/cv-file-validation";
 import {
   PRIVATE_MATCH_JOB_PICKER_LIMIT,
   privateMatchJobsResponseSchema,
@@ -55,6 +59,7 @@ export type PrivateMatchSetupCv = Readonly<{
   fileName: string;
   mimeType:
     | "application/pdf"
+    | "application/msword"
     | "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
   byteSize: number;
   version: number;
@@ -75,22 +80,15 @@ function bytes(value: number) {
   return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function canImportCv(file: File) {
-  const extension = file.name.toLowerCase().split(".").pop();
-  const mimeType =
-    extension === "pdf"
-      ? "application/pdf"
-      : extension === "docx"
-        ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        : file.type;
-  return (
-    file.size > 0 &&
-    file.size <= CV_SOURCE_MAX_BYTES &&
-    ((mimeType === "application/pdf" && extension === "pdf") ||
-      (mimeType ===
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" &&
-        extension === "docx"))
-  );
+async function validateLocalCv(file: File): Promise<string | null> {
+  try {
+    await validateCvFile(file);
+    return null;
+  } catch (error) {
+    return error instanceof CvFileValidationError
+      ? error.message
+      : "Only PDF, DOC, or DOCX files are supported.";
+  }
 }
 
 function IconRow({
@@ -181,6 +179,7 @@ export function PrivateMatchSetup({
     jobSearchAbort.current?.abort();
     const request = ++jobSearchRequest.current;
     if (!query) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setJobSearchState({ status: "idle" });
       return;
     }
@@ -232,6 +231,18 @@ export function PrivateMatchSetup({
   const isJobSearchLoading = jobSearchState.status === "loading";
   const ready = selectedCv?.parseStatus === "READY";
 
+  function showLocalCvError(message: string) {
+    setLocalUploadError(message);
+    toast.error(message, { id: "candidate-cv-upload-error" });
+  }
+
+  useEffect(() => {
+    if (!create.isError) return;
+    toast.error(privateMatchErrorMessage(create.error, locale), {
+      id: "candidate-cv-upload-error",
+    });
+  }, [create.error, create.isError, locale]);
+
   async function importLocalCv() {
     if (!localFile) return;
     setLocalUploadError(null);
@@ -260,6 +271,7 @@ export function PrivateMatchSetup({
       const mimeType = saved.mimeType;
       if (
         mimeType !== "application/pdf" &&
+        mimeType !== "application/msword" &&
         mimeType !==
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       ) {
@@ -277,9 +289,11 @@ export function PrivateMatchSetup({
       setSelectedCvId(nextCv.id);
       setLocalUploadComplete(true);
     } catch (error) {
-      setLocalUploadError(
-        error instanceof Error ? error.message : setup.importFailure,
-      );
+      const message =
+        error instanceof Error ? error.message : setup.importFailure;
+      setLocalFile(null);
+      if (fileInput.current) fileInput.current.value = "";
+      showLocalCvError(message);
     } finally {
       setLocalUploadState("IDLE");
     }
@@ -604,17 +618,24 @@ export function PrivateMatchSetup({
                 ref={fileInput}
                 className="private-match-visually-hidden"
                 type="file"
-                accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 onChange={(event) => {
+                  const input = event.currentTarget;
                   const file = event.currentTarget.files?.[0] ?? null;
                   setLocalUploadError(null);
                   setLocalUploadComplete(false);
-                  if (file && !canImportCv(file)) {
-                    setLocalFile(null);
-                    setLocalUploadError(setup.invalidFile);
-                    return;
-                  }
-                  setLocalFile(file);
+                  void (async () => {
+                    if (file) {
+                      const errorMessage = await validateLocalCv(file);
+                      if (errorMessage) {
+                        setLocalFile(null);
+                        input.value = "";
+                        showLocalCvError(errorMessage);
+                        return;
+                      }
+                    }
+                    setLocalFile(file);
+                  })();
                 }}
               />
               <div className="private-match-local-import-actions">

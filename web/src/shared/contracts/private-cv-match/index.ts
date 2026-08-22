@@ -46,6 +46,7 @@ export const privateMatchCvSchema = z
     fileName: z.string().min(1).max(255),
     mimeType: z.enum([
       "application/pdf",
+      "application/msword",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ]),
     byteSize: z.number().int().positive().max(5_000_000),

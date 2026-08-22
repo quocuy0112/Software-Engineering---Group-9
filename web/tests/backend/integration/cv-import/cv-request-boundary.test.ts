@@ -174,6 +174,46 @@ describe("CvAccountRequestBoundary Foundation middleware harness", () => {
     ).rejects.toMatchObject({ status: 413, code: "PAYLOAD_TOO_LARGE" });
   });
 
+  it("allows upload endpoints to keep type and size validation messages specific", async () => {
+    const { boundary } = harness();
+    const schema = z
+      .object({
+        declaredMediaType: z.enum(["application/pdf"]),
+        declaredBytes: z.number().int().max(5_000_000),
+      })
+      .strict();
+    const message = (issue: { path: PropertyKey[]; code: string }) =>
+      issue.path[0] === "declaredMediaType"
+        ? "Only PDF, DOC, or DOCX files are supported."
+        : issue.path[0] === "declaredBytes" && issue.code === "too_big"
+          ? "File size must not exceed 5MB."
+          : undefined;
+
+    await expect(
+      boundary.readJson(
+        request("POST", { declaredMediaType: "text/plain", declaredBytes: 1 }),
+        schema,
+        256,
+        { validationMessage: message },
+      ),
+    ).rejects.toMatchObject({
+      message: "Only PDF, DOC, or DOCX files are supported.",
+    });
+    await expect(
+      boundary.readJson(
+        request("POST", {
+          declaredMediaType: "application/pdf",
+          declaredBytes: 5_000_001,
+        }),
+        schema,
+        256,
+        { validationMessage: message },
+      ),
+    ).rejects.toMatchObject({
+      message: "File size must not exceed 5MB.",
+    });
+  });
+
   it("enforces bounded raw bodies without accepting forged content lengths", async () => {
     const { boundary } = harness();
     const valid = new Request("http://localhost:3001/upload", {

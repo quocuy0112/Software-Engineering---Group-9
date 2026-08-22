@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DocumentsTab } from "@/frontend/features/recruiter-applications/documents-tab";
 import type { AutomaticMatch } from "@/shared/contracts/scoring";
@@ -162,5 +162,47 @@ describe("DocumentsTab", () => {
     );
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
+  });
+
+  it("bypasses a stale server preview cache when the recruiter retries", async () => {
+    let cvAttempts = 0;
+    const fetchMock = vi.fn(async (input: string | URL) => {
+      const url = String(input);
+      if (url.includes("cover-letter")) {
+        return new Response(
+          JSON.stringify({ message: "The document is not available." }),
+          { status: 404 },
+        );
+      }
+      cvAttempts += 1;
+      if (cvAttempts === 1) {
+        return new Response(
+          JSON.stringify({ message: "Document preview unavailable." }),
+          { status: 500 },
+        );
+      }
+      return new Response(JSON.stringify(cvPreview), { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <DocumentsTab
+        jobId="job-retry"
+        applicationId="application-retry"
+        automatic={automatic}
+      />,
+    );
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Retry preview" }),
+    );
+    await screen.findByText(/Original CV PDF preview ready/u);
+
+    const cvRequests = fetchMock.mock.calls
+      .map(([input]) => String(input))
+      .filter((url) => url.includes("/documents/cv/text"));
+    expect(cvRequests).toHaveLength(2);
+    expect(cvRequests[0]).not.toContain("cacheVersion=");
+    expect(cvRequests[1]).toContain("cacheVersion=retry-1");
   });
 });

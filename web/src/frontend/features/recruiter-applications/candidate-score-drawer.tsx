@@ -168,6 +168,7 @@ export function CandidateScoreDrawer({
     scoring.kind === "SCORED"
       ? (finalScore?.value ?? null)
       : scoring.kind === "UNAVAILABLE" ||
+          scoring.kind === "FAILED" ||
           scoring.kind === "PENDING" ||
           scoring.kind === "PROCESSING"
         ? null
@@ -176,6 +177,7 @@ export function CandidateScoreDrawer({
     scoring.kind === "SCORED"
       ? (finalScore?.band ?? null)
       : scoring.kind === "UNAVAILABLE" ||
+          scoring.kind === "FAILED" ||
           scoring.kind === "PENDING" ||
           scoring.kind === "PROCESSING"
         ? null
@@ -194,7 +196,9 @@ export function CandidateScoreDrawer({
         ? "Retrying AI"
         : scoring.kind === "UNAVAILABLE"
           ? "Rule-based only"
-          : "Not calculated");
+          : scoring.kind === "FAILED"
+            ? "Scoring failed"
+            : "Not calculated");
   const headerCode =
     badge?.code ??
     (scoring.kind === "UNAVAILABLE" ? "RULE_BASED" : scoring.kind);
@@ -204,9 +208,14 @@ export function CandidateScoreDrawer({
       : (scoreSummary.aiBand ?? null);
   const canScoreCandidate =
     detail?.scoring.kind === "NOT_CALCULATED" ||
+    detail?.scoring.kind === "FAILED" ||
     detail?.scoring.kind === "SCORED";
   const scoreActionLabel =
-    detail?.scoring.kind === "SCORED" ? "Rescore candidate" : "Score candidate";
+    detail?.scoring.kind === "SCORED"
+      ? "Rescore candidate"
+      : detail?.scoring.kind === "FAILED"
+        ? "Retry scoring"
+        : "Score candidate";
   const canShortlist = !readOnly && candidate.stage === "VIEWED";
   const canOpenRecruitmentChat =
     !readOnly &&
@@ -377,9 +386,11 @@ export function CandidateScoreDrawer({
               <span>
                 {scoring.kind === "UNAVAILABLE"
                   ? "Hybrid score unavailable"
-                  : scoring.kind === "PENDING"
-                    ? "Hybrid score pending"
-                    : "Final score"}
+                  : scoring.kind === "FAILED"
+                    ? "Scoring job failed"
+                    : scoring.kind === "PENDING"
+                      ? "Hybrid score pending"
+                      : "Final score"}
               </span>
             </div>
             <ScoreBadgeFromLabel code={headerCode} label={headerLabel} />
@@ -513,7 +524,29 @@ export function CandidateScoreDrawer({
               </button>
             </div>
           ) : null}
-          {scoring.kind === "UNAVAILABLE" ? (
+          {scoring.kind === "FAILED" ? (
+            <div
+              className="drawer-state-banner drawer-state-banner--warning"
+              role="alert"
+            >
+              <AlertTriangle aria-hidden="true" />
+              <div>
+                <strong>CV scoring failed</strong>
+                <span>
+                  The job stopped safely
+                  {scoring.safeFailureCode
+                    ? ` (${scoring.safeFailureCode})`
+                    : ""}
+                  . Retry scoring after correcting the CV or provider issue.
+                </span>
+              </div>
+              {!readOnly && scoring.retryAllowed ? (
+                <button type="button" onClick={() => setScoreConfirm(true)}>
+                  <RefreshCw aria-hidden="true" /> Retry scoring
+                </button>
+              ) : null}
+            </div>
+          ) : scoring.kind === "UNAVAILABLE" ? (
             <div
               className="drawer-state-banner drawer-state-banner--warning"
               role="status"
@@ -691,6 +724,13 @@ function scoreSummaryForCandidate(candidate: CandidateScoreDrawerCandidate) {
 
 function rowToScoring(candidate: CandidateScoreDrawerCandidate): ScoringState {
   if ("score" in candidate) {
+    if (candidate.score?.state === "FAILED")
+      return {
+        kind: "FAILED",
+        label: "Scoring failed",
+        safeFailureCode: null,
+        retryAllowed: true,
+      };
     if (candidate.score?.state === "PROCESSING")
       return {
         kind: "PROCESSING",
@@ -706,6 +746,13 @@ function rowToScoring(candidate: CandidateScoreDrawerCandidate): ScoringState {
       };
     return { kind: "NOT_CALCULATED", label: "Not calculated" };
   }
+  if (candidate.scoring.kind === "FAILED")
+    return {
+      kind: "FAILED",
+      label: "Scoring failed",
+      safeFailureCode: null,
+      retryAllowed: true,
+    };
   if (candidate.scoring.kind === "PROCESSING")
     return {
       kind: "PROCESSING",

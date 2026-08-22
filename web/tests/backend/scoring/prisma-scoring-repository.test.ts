@@ -60,8 +60,8 @@ describe("PrismaScoringRepository scoring detail compatibility", () => {
             promptVersion: "prompt-v4-ai-cv-assessment",
             sensitiveAttributePolicyVersion: "sensitive-attributes-v1",
             overallSummaryEncrypted: "Relevant evidence is available.",
-            technicalAbilitySummaryEncrypted: "Technical evidence.",
-            roleFitSummaryEncrypted: "Role fit evidence.",
+            technicalAbilitySummaryEncrypted: "T".repeat(420),
+            roleFitSummaryEncrypted: "R".repeat(360),
             deductionSummaryEncrypted: "One item remains to verify.",
             complianceStatementLabel:
               "Sensitive personal attributes are excluded from scoring.",
@@ -100,6 +100,10 @@ describe("PrismaScoringRepository scoring detail compatibility", () => {
       "INSUFFICIENT_DATA",
     );
     expect(result?.ai?.suggestedQuestions).toEqual([]);
+    expect(result?.ai?.breakdown).toHaveLength(3);
+    expect(result?.ai?.breakdown.every((item) => item.length <= 300)).toBe(
+      true,
+    );
   });
 
   it("uses fresh database ids for findings on every rescore", async () => {

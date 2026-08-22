@@ -15,6 +15,7 @@ type CvFailureOptions = Readonly<{
   fieldErrors?: CvApiError["error"]["fieldErrors"];
   latest?: CvApiError["error"]["latest"];
   retryAfterSeconds?: number;
+  userMessage?: string;
 }>;
 
 type CvHttpErrorContext = Readonly<Record<string, string | number | boolean>>;
@@ -24,6 +25,7 @@ export class CvImportServiceError extends Error {
   readonly fieldErrors: CvApiError["error"]["fieldErrors"];
   readonly latest: CvApiError["error"]["latest"];
   readonly retryAfterSeconds: number | null;
+  readonly userMessage: string | null;
 
   constructor(
     readonly code: CvServiceFailureCode,
@@ -44,6 +46,7 @@ export class CvImportServiceError extends Error {
       options.retryAfterSeconds > 0
         ? Math.min(options.retryAfterSeconds, 86_400)
         : null;
+    this.userMessage = options.userMessage?.trim().slice(0, 500) || null;
   }
 
   toJSON() {
@@ -86,7 +89,7 @@ const errorPresentation: Record<
   PAYLOAD_TOO_LARGE: { status: 413, message: "The request is too large." },
   UNSUPPORTED_MEDIA_TYPE: {
     status: 415,
-    message: "Only the reserved PDF or DOCX media type is accepted.",
+    message: "Only PDF, DOC, or DOCX files are supported.",
   },
   DOCUMENT_REJECTED: {
     status: 422,
@@ -201,7 +204,7 @@ export function mapCvHttpError(
   const body = cvApiErrorSchema.parse({
     error: {
       code: failure.code,
-      message: presentation.message,
+      message: failure.userMessage ?? presentation.message,
       requestId: safeRequestId,
       fieldErrors: failure.fieldErrors,
       latest: failure.latest,

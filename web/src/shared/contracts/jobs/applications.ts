@@ -66,6 +66,26 @@ export const applicationStageNextStep: Record<ApplicationStage, string> = {
 
 const isoDateTime = z.string().datetime();
 
+/** Safe, candidate-facing scoring failure identifiers. Internal diagnostics
+ * must never cross the candidate API boundary. */
+export const candidateScoringFailureCodeSchema = z.enum([
+  "SCORING_CV_TEXT_UNAVAILABLE",
+  "CV_TEXT_UNAVAILABLE",
+  "CV_TEXT_TOO_SHORT",
+  "CV_TEXT_INVALID",
+  "CV_NOT_RECOGNIZED_AS_CV",
+  "CV_CLASSIFICATION_TIMEOUT",
+  "CV_CLASSIFICATION_UNAVAILABLE",
+  "CV_CLASSIFICATION_MALFORMED",
+  "CV_CLASSIFICATION_NOT_CONFIGURED",
+  "SCORING_TIMEOUT",
+  "SCORING_RETRY_LIMIT_REACHED",
+]);
+
+export type CandidateScoringFailureCode = z.infer<
+  typeof candidateScoringFailureCodeSchema
+>;
+
 export const candidateApplicationStageEventSchema = z
   .object({
     eventId: z.string().min(1).max(128),
@@ -98,6 +118,7 @@ export const candidateApplicationSummarySchema = z
     scoringStatus: z
       .enum(["NOT_REQUESTED", "PENDING", "PROCESSING", "COMPLETED", "FAILED"])
       .optional(),
+    scoringFailureCode: candidateScoringFailureCodeSchema.nullable().optional(),
     aiMatchScore: z.number().int().min(0).max(100).nullable().optional(),
   })
   .strict();

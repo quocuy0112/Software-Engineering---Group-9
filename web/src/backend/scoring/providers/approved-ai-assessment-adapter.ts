@@ -844,9 +844,12 @@ function buildPublishedAssessment(input: BuildAssessmentInput): AiAssessment {
       ? "Assessment is limited by CV data quality. The CV could not be assessed reliably; manual review is required."
       : clip(input.rawOverallAssessment),
     breakdown: [
-      breakdown.slice(0, 2).join("; "),
-      breakdown.slice(2, 4).join("; "),
-      `${breakdown[4]}; AI total: ${normalized.score}/100 (${reasoning.matchLabel}); confidence: ${confidence.percent}% (${reasoning.confidence.level})`,
+      clip(breakdown.slice(0, 2).join("; "), 300),
+      clip(breakdown.slice(2, 4).join("; "), 300),
+      clip(
+        `${breakdown[4]}; AI total: ${normalized.score}/100 (${reasoning.matchLabel}); confidence: ${confidence.percent}% (${reasoning.confidence.level})`,
+        300,
+      ),
     ],
     scoreReasoning: reasoning,
     strengths,

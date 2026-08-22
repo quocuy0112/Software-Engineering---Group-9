@@ -8,6 +8,10 @@ const boolEnv = (name: string) =>
 
 export const scoringProviderConfig = Object.freeze({
   timeoutMilliseconds: intEnv("SCORING_AI_TIMEOUT_MS", 15_000),
+  classificationTimeoutMilliseconds: Math.min(
+    10_000,
+    intEnv("SCORING_CV_CLASSIFICATION_TIMEOUT_MS", 5_000),
+  ),
   maxAttempts: Math.min(3, intEnv("SCORING_AI_MAX_ATTEMPTS", 3)),
   circuitFailureThreshold: intEnv("SCORING_AI_CIRCUIT_FAILURE_THRESHOLD", 5),
   circuitResetMilliseconds: intEnv("SCORING_AI_CIRCUIT_RESET_MS", 60_000),
@@ -15,6 +19,11 @@ export const scoringProviderConfig = Object.freeze({
     process.env.SCORING_AI_MODEL_VERSION ??
     process.env.CV_OPENAI_MODEL ??
     "gpt-5.4-mini-2026-03-17",
+  // CV classification only needs a binary document-shape decision. Keep it
+  // independently configurable so production can use a lower-cost model
+  // without changing the main scoring model.
+  classificationModelVersion:
+    process.env.SCORING_CV_CLASSIFICATION_MODEL ?? "gpt-4o-mini",
   promptVersion:
     process.env.SCORING_AI_PROMPT_VERSION ?? "prompt-v5-ai-cv-assessment",
   policyVersion:

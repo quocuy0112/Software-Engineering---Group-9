@@ -99,6 +99,13 @@ function normalizedEvidenceText(value: string): string {
     .trim();
 }
 
+function boundedDisplaySummary(value: unknown, maximum = 300): string {
+  const text = typeof value === "string" ? value.trim() : "";
+  if (!text) return "Not provided";
+  if (text.length <= maximum) return text;
+  return `${text.slice(0, Math.max(0, maximum - 3)).trimEnd()}...`;
+}
+
 function deterministicStrengthFallback(
   automatic: AutomaticMatch,
   findings: AiAssessment["findings"],
@@ -681,9 +688,9 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
         ? "Low data quality — assessment limited. The CV could not be assessed reliably; manual review is required."
         : row.overallSummaryEncrypted,
       breakdown: [
-        row.technicalAbilitySummaryEncrypted,
-        row.roleFitSummaryEncrypted,
-        row.deductionSummaryEncrypted,
+        boundedDisplaySummary(row.technicalAbilitySummaryEncrypted),
+        boundedDisplaySummary(row.roleFitSummaryEncrypted),
+        boundedDisplaySummary(row.deductionSummaryEncrypted),
       ],
       scoreReasoning,
       strengths: visibleStrengths,
@@ -727,7 +734,27 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
         select: { scoringGeneration: true },
       });
       if (!application) throw new Error("APPLICATION_UNAVAILABLE");
-      const generation = application.scoringGeneration + 1;
+      if (
+        input.expectedGeneration !== undefined &&
+        application.scoringGeneration !== input.expectedGeneration
+      ) {
+        throw new Error("SCORING_GENERATION_CONFLICT");
+      }
+      if (input.workItemId) {
+        const lease = await tx.scoringWorkItem.findFirst({
+          where: {
+            id: input.workItemId,
+            operationId: input.operationId,
+            jobApplicationId: input.applicationId,
+            state: "LEASED",
+            ...(input.workerId ? { leaseOwner: input.workerId } : {}),
+          },
+          select: { id: true },
+        });
+        if (!lease) throw new Error("SCORING_WORK_LEASE_LOST");
+      }
+      const generation =
+        (input.expectedGeneration ?? application.scoringGeneration) + 1;
       const automatic = await tx.automaticMatchResult.create({
         data: {
           jobApplicationId: input.applicationId,
@@ -928,10 +955,17 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
           publishedAt: new Date(),
         },
       });
-      await tx.scoringWorkItem.updateMany({
+      const workItemChanged = await tx.scoringWorkItem.updateMany({
         where: {
+          ...(input.workItemId ? { id: input.workItemId } : {}),
           operationId: input.operationId,
           jobApplicationId: input.applicationId,
+          ...(input.workItemId
+            ? {
+                state: "LEASED",
+                ...(input.workerId ? { leaseOwner: input.workerId } : {}),
+              }
+            : {}),
         },
         data: input.finalScore
           ? {
@@ -946,10 +980,13 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
                 : { consecutiveAiFailureCount: input.consecutiveFailures }),
             },
       });
+      if (input.workItemId && workItemChanged.count !== 1)
+        throw new Error("SCORING_WORK_LEASE_LOST");
       const fenced = await tx.jobApplication.updateMany({
         where: {
           id: input.applicationId,
-          scoringGeneration: application.scoringGeneration,
+          scoringGeneration:
+            input.expectedGeneration ?? application.scoringGeneration,
         },
         data: {
           scoringGeneration: { increment: 1 },

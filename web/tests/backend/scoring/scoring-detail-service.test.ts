@@ -11,6 +11,7 @@ function database(stage: "APPLIED" | "VIEWED") {
         stage,
         stageVersion: stage === "APPLIED" ? 1 : 2,
         scoringStatus: "NOT_REQUESTED",
+        scoringWorkItems: [],
         scoringOperations: [],
         jobPosting: { scoringOperations: [] },
       }),
@@ -47,7 +48,9 @@ describe("scoring detail review tracking", () => {
     const stageService = { transition: vi.fn() };
     const service = new ScoringDetailService(
       db as never,
-      { authorizeApplication: vi.fn().mockResolvedValue({ authorized: true }) } as never,
+      {
+        authorizeApplication: vi.fn().mockResolvedValue({ authorized: true }),
+      } as never,
       { findCurrent: vi.fn().mockResolvedValue(null) } as never,
       stageService as never,
     );
@@ -65,6 +68,7 @@ describe("scoring detail review tracking", () => {
       stage: "VIEWED",
       stageVersion: 2,
       scoringStatus: "COMPLETED",
+      scoringWorkItems: [],
       scoringOperations: [{ id: "rescore-1", kind: "JOB_RESCORE" }],
       jobPosting: { scoringOperations: [] },
     });
@@ -90,7 +94,9 @@ describe("scoring detail review tracking", () => {
     };
     const service = new ScoringDetailService(
       db as never,
-      { authorizeApplication: vi.fn().mockResolvedValue({ authorized: true }) } as never,
+      {
+        authorizeApplication: vi.fn().mockResolvedValue({ authorized: true }),
+      } as never,
       scoring as never,
       { transition: vi.fn() } as never,
     );
@@ -99,5 +105,38 @@ describe("scoring detail review tracking", () => {
 
     expect(result.rescoreInProgress).toBe(true);
     expect(result.scoring.kind).toBe("SCORED");
+  });
+
+  it("exposes a terminal scoring failure instead of not calculated", async () => {
+    const db = database("VIEWED");
+    db.jobApplication.findUnique.mockResolvedValue({
+      id: "application-1",
+      jobPostingId: "job-1",
+      stage: "VIEWED",
+      stageVersion: 2,
+      scoringStatus: "FAILED",
+      scoringWorkItems: [
+        { lastSafeFailureCode: "CV_CLASSIFICATION_UNAVAILABLE" },
+      ],
+      scoringOperations: [],
+      jobPosting: { scoringOperations: [] },
+    });
+    const service = new ScoringDetailService(
+      db as never,
+      {
+        authorizeApplication: vi.fn().mockResolvedValue({ authorized: true }),
+      } as never,
+      { findCurrent: vi.fn().mockResolvedValue(null) } as never,
+      { transition: vi.fn() } as never,
+    );
+
+    const result = await service.get("recruiter-1", "application-1");
+
+    expect(result.scoring).toEqual({
+      kind: "FAILED",
+      label: "Scoring failed",
+      safeFailureCode: "CV_CLASSIFICATION_UNAVAILABLE",
+      retryAllowed: true,
+    });
   });
 });

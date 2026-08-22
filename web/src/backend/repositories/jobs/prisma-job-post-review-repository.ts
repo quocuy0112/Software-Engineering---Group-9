@@ -363,6 +363,7 @@ export class PrismaJobPostReviewRepository {
             jobPostingId: publicJob.id,
             skillId: stored.id,
             displayName: skill.displayName,
+            required: skill.required,
             position: skill.position,
           },
         });
