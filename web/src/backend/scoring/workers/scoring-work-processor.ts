@@ -32,6 +32,7 @@ import {
   createCvWorkerIntegrityReader,
   createCvWorkerStorage,
 } from "@/backend/cv/workers/cv-worker-resources";
+import { partitionJobSkillsForMatching } from "../domain/job-skill-requirement-policy";
 
 function record(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -100,10 +101,7 @@ export function createScoringWorkProcessor(
       }),
     ]);
     if (!row || !operation) throw new Error("SCORING_INPUT_UNAVAILABLE");
-    const matchingSkills = {
-      requiredSkills: row.jobPosting.skills.filter((skill) => skill.required),
-      preferredSkills: row.jobPosting.skills.filter((skill) => !skill.required),
-    };
+    const matchingSkills = partitionJobSkillsForMatching(row.jobPosting.skills);
     const cv = record(row.cvSnapshot);
     const job = record(row.jobSnapshot);
     const cvText =

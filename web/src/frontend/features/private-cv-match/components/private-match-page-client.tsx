@@ -84,8 +84,41 @@ function LoadingScreen({ data }: { data?: PrivateMatchStatus }) {
   );
 }
 
-function FailedScreen({ retryHref }: { retryHref: string }) {
+function failureDescription(
+  errors: ReturnType<typeof privateMatchCopy>["errors"],
+  failureCode: string | null | undefined,
+) {
+  switch (failureCode) {
+    case "CV_NOT_RECOGNIZED_AS_CV":
+      return errors.CV_NOT_RECOGNIZED_AS_CV;
+    case "CV_TEXT_UNAVAILABLE":
+    case "SCORING_CV_TEXT_UNAVAILABLE":
+    case "CV_TEXT_TOO_SHORT":
+    case "CV_TEXT_INVALID":
+      return errors.CV_CONTENT_UNREADABLE;
+    case "SCORING_TIMEOUT":
+      return errors.SCORING_TIMEOUT;
+    case "CV_CLASSIFICATION_TIMEOUT":
+    case "CV_CLASSIFICATION_UNAVAILABLE":
+    case "CV_CLASSIFICATION_MALFORMED":
+    case "CV_CLASSIFICATION_NOT_CONFIGURED":
+      return errors.SCORING_UNAVAILABLE;
+    default:
+      return null;
+  }
+}
+
+function FailedScreen({
+  retryHref,
+  failureCode,
+}: {
+  retryHref: string;
+  failureCode?: string | null;
+}) {
   const copy = privateMatchCopy(useWorkspaceLocale());
+  const description =
+    failureDescription(copy.errors, failureCode) ??
+    copy.pageStates.failedDescription;
   return (
     <main className="private-match-page private-match-state-page">
       <div className="private-match-breadcrumb">
@@ -95,7 +128,7 @@ function FailedScreen({ retryHref }: { retryHref: string }) {
         <TriangleAlert aria-hidden="true" />
         <div>
           <h1>{copy.pageStates.failedTitle}</h1>
-          <p>{copy.pageStates.failedDescription}</p>
+          <p>{description}</p>
           <div className="private-match-state-actions">
             <Link className="private-match-primary-button" href={retryHref}>
               <RefreshCw aria-hidden="true" /> {copy.common.tryAgain}
@@ -174,6 +207,7 @@ export function PrivateMatchPageClient({ checkId }: { checkId: string }) {
   const [opened, setOpened] = useState(false);
   const [retryRequested, setRetryRequested] = useState(false);
   const [retryWasRunning, setRetryWasRunning] = useState(false);
+  const [statusTimedOut, setStatusTimedOut] = useState(false);
   const retrySubmissionInFlight = useRef(false);
   const data: PrivateMatchResponse | undefined = query.data;
 
@@ -183,9 +217,24 @@ export function PrivateMatchPageClient({ checkId }: { checkId: string }) {
       data?.view === "LIMITED_REPORT" &&
       data.retryInProgress
     ) {
+      // This effect mirrors an already-running retry reported by the server.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRetryWasRunning(true);
     }
   }, [data, retryRequested]);
+
+  useEffect(() => {
+    const isActiveStatus =
+      data?.view === "STATUS" &&
+      (data.state === "QUEUED" || data.state === "ANALYZING");
+    if (!isActiveStatus) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setStatusTimedOut(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setStatusTimedOut(true), 65_000);
+    return () => window.clearTimeout(timer);
+  }, [checkId, data?.view, data?.state]);
 
   const retryAi = async () => {
     if (
@@ -216,9 +265,14 @@ export function PrivateMatchPageClient({ checkId }: { checkId: string }) {
   }
   if (!data) return <LoadingScreen />;
   if (data.view === "STATUS") {
-    if (data.state === "FAILED") {
-      const retryHref = `/cv-match-check/new?jobId=${encodeURIComponent(data.job.jobId)}&cvVersionId=${encodeURIComponent(data.cv.versionId)}`;
-      return <FailedScreen retryHref={retryHref} />;
+    const retryHref = `/cv-match-check/new?jobId=${encodeURIComponent(data.job.jobId)}&cvVersionId=${encodeURIComponent(data.cv.versionId)}`;
+    if (data.state === "FAILED" || statusTimedOut) {
+      return (
+        <FailedScreen
+          retryHref={retryHref}
+          failureCode={statusTimedOut ? "SCORING_TIMEOUT" : data.failureCode}
+        />
+      );
     }
     return <LoadingScreen data={data} />;
   }

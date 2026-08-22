@@ -2,6 +2,8 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PrivateMatchSetup } from "@/frontend/features/private-cv-match/components/private-match-setup";
 
+const toastError = vi.hoisted(() => vi.fn());
+vi.mock("sonner", () => ({ toast: { error: toastError } }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 vi.mock(
   "@/frontend/features/private-cv-match/client/use-private-cv-match",
@@ -14,18 +16,15 @@ vi.mock(
     }),
   }),
 );
-vi.mock(
-  "@/frontend/features/authentication/client/csrf-proof-context",
-  () => ({ useCsrfProof: () => null }),
-);
-vi.mock(
-  "@/frontend/features/authentication/client/current-csrf-proof",
-  () => ({ mutateWithCurrentCsrf: vi.fn() }),
-);
-vi.mock(
-  "@/frontend/features/dashboard/client/workspace-locale",
-  () => ({ useWorkspaceLocale: () => "en" }),
-);
+vi.mock("@/frontend/features/authentication/client/csrf-proof-context", () => ({
+  useCsrfProof: () => null,
+}));
+vi.mock("@/frontend/features/authentication/client/current-csrf-proof", () => ({
+  mutateWithCurrentCsrf: vi.fn(),
+}));
+vi.mock("@/frontend/features/dashboard/client/workspace-locale", () => ({
+  useWorkspaceLocale: () => "en",
+}));
 
 const jobs = [
   {
@@ -57,8 +56,30 @@ const cvs = [
 
 describe("PrivateMatchSetup job search", () => {
   afterEach(() => {
+    toastError.mockReset();
     vi.useRealTimers();
     vi.unstubAllGlobals();
+  });
+
+  it("toasts and clears an invalid local CV selection", async () => {
+    render(<PrivateMatchSetup jobs={jobs} cvs={cvs} />);
+    const input = document.querySelector(
+      '.private-match-local-import input[type="file"]',
+    ) as HTMLInputElement;
+    fireEvent.change(input, {
+      target: {
+        files: [new File(["notes"], "notes.txt", { type: "text/plain" })],
+      },
+    });
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Only PDF, DOC, or DOCX files are supported.",
+    );
+    expect(toastError).toHaveBeenCalledWith(
+      "Only PDF, DOC, or DOCX files are supported.",
+      { id: "candidate-cv-upload-error" },
+    );
+    expect(input).toHaveValue("");
   });
 
   it("keeps an error distinct from an empty result and retries the same query", async () => {
@@ -94,7 +115,9 @@ describe("PrivateMatchSetup job search", () => {
     expect(screen.getByRole("alert")).toHaveTextContent(
       "We could not search jobs right now",
     );
-    expect(screen.queryByText("No eligible jobs match that keyword or company.")).toBeNull();
+    expect(
+      screen.queryByText("No eligible jobs match that keyword or company."),
+    ).toBeNull();
 
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     await act(async () => {

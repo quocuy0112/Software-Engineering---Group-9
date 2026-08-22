@@ -45,6 +45,11 @@ describe("job-post review policy", () => {
       "postgresql",
       "distributed systems",
     ]);
+    expect(projection.skills.map((skill) => skill.required)).toEqual([
+      true,
+      true,
+      true,
+    ]);
     expect(() =>
       projectJobReviewSnapshot(buildJobReviewSnapshot({ level: "wizard" })),
     ).toThrow("UNPUBLISHABLE_JOB_MAPPING");

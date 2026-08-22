@@ -61,6 +61,7 @@ function base(check: PrivateCheckRecord) {
     fileName: string;
     mimeType:
       | "application/pdf"
+      | "application/msword"
       | "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     byteSize: number;
     pageCount: number | null;

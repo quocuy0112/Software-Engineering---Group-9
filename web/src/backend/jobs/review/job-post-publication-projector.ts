@@ -54,7 +54,10 @@ export function projectJobReviewSnapshot(value: unknown) {
     new Map(
       snapshot.skillTags.map((displayName, position) => {
         const normalizedName = normalizedSearch(displayName.trim());
-        return [normalizedName, { displayName, normalizedName, position }];
+        return [
+          normalizedName,
+          { displayName, normalizedName, position, required: true },
+        ];
       }),
     ).values(),
   );

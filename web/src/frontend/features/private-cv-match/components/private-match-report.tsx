@@ -820,7 +820,11 @@ export function PrivateMatchReport({
               </h3>
               <span className="text-[11px] text-slate-400">
                 {copy.report.parsedFrom(
-                  report.cv.mimeType === "application/pdf" ? "PDF" : "DOCX",
+                  report.cv.mimeType === "application/pdf"
+                    ? "PDF"
+                    : report.cv.mimeType === "application/msword"
+                      ? "DOC"
+                      : "DOCX",
                 )}
               </span>
             </div>

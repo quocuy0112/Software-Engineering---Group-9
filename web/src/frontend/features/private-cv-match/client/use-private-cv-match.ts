@@ -191,6 +191,20 @@ export function privateMatchErrorMessage(
       return copy.CONFLICT;
     case "UNAVAILABLE":
       return copy.UNAVAILABLE;
+    case "CV_NOT_RECOGNIZED_AS_CV":
+      return copy.CV_NOT_RECOGNIZED_AS_CV;
+    case "CV_TEXT_UNAVAILABLE":
+    case "SCORING_CV_TEXT_UNAVAILABLE":
+    case "CV_TEXT_TOO_SHORT":
+    case "CV_TEXT_INVALID":
+      return copy.CV_CONTENT_UNREADABLE;
+    case "SCORING_TIMEOUT":
+      return copy.SCORING_TIMEOUT;
+    case "CV_CLASSIFICATION_TIMEOUT":
+    case "CV_CLASSIFICATION_UNAVAILABLE":
+    case "CV_CLASSIFICATION_MALFORMED":
+    case "CV_CLASSIFICATION_NOT_CONFIGURED":
+      return copy.SCORING_UNAVAILABLE;
     default:
       return copy.default;
   }

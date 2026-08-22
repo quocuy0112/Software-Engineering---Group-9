@@ -1,6 +1,10 @@
 import "server-only";
 
 import { createHash } from "node:crypto";
+import {
+  logCvClassificationOutcome,
+  logCvScoringFailure,
+} from "@/backend/cv/upload-observability";
 import { prisma } from "@/backend/database/prisma";
 import {
   CV_EXTRACTION_LIMITS,
@@ -8,6 +12,7 @@ import {
 } from "@/backend/cv/extraction/document-extractor";
 import { extractDocx } from "@/backend/cv/extraction/docx";
 import { extractPdf } from "@/backend/cv/extraction/pdf";
+import { extractLegacyDocText } from "@/backend/cv/extraction/legacy-doc";
 import {
   createCvWorkerCryptor,
   createCvWorkerIntegrityReader,
@@ -19,6 +24,13 @@ import {
   Feature012AutomaticMatchingAdapter,
   isAiProviderError,
 } from "@/backend/scoring-engine/scoring-engine-adapter";
+import { validateExtractedCvText } from "@/backend/scoring/domain/cv-content-validation";
+import { resolveMatchingSkillRequirements } from "@/backend/scoring/domain/job-skill-requirement-policy";
+import {
+  ApprovedCvClassificationAdapter,
+  decideCvClassification,
+  type CvClassificationPort,
+} from "@/backend/scoring/providers/cv-classification-adapter";
 import type { AiEvaluationPort } from "@/backend/scoring-engine/ai-evaluation-port";
 import type { AutomaticMatchingPort } from "@/backend/scoring-engine/automatic-matching-port";
 import { calculatePrivateHybridScore } from "@/backend/scoring-engine/hybrid-score-policy";
@@ -40,6 +52,28 @@ import {
 import { jsonRecord } from "./private-match-types";
 
 const AI_FALLBACK_CODE = "AI_EVALUATION_UNAVAILABLE";
+const positiveInteger = (name: string, fallback: number) => {
+  const value = Number(process.env[name]);
+  return Number.isSafeInteger(value) && value > 0 ? value : fallback;
+};
+
+export const privateMatchWorkerConfig = Object.freeze({
+  // This is the outer deadline for extraction, deterministic matching,
+  // classification, and the AI evaluation together. Individual providers
+  // have shorter deadlines, but the worker must also have a final escape
+  // hatch if a dependency ignores cancellation.
+  timeoutMilliseconds: Math.min(
+    60_000,
+    positiveInteger("PRIVATE_CV_MATCH_TIMEOUT_MS", 60_000),
+  ),
+  leaseMilliseconds: Math.max(
+    90_000,
+    Math.min(
+      75_000,
+      positiveInteger("PRIVATE_CV_MATCH_TIMEOUT_MS", 60_000) + 15_000,
+    ),
+  ),
+});
 const sensitiveAttributePattern =
   /\b(?:gender|sex|male|female|age|date of birth|dob|marital status|nationality|religion|ethnicity|pregnan\w*|citizenship|identity card|national id|căn cước|cccd)\b/iu;
 const sensitiveFieldPattern =
@@ -133,9 +167,19 @@ async function bytesFrom(
 
 async function extractText(
   extractor: IsolatedDocumentExtractor,
-  kind: "PDF" | "DOCX",
+  kind: "PDF" | "DOC" | "DOCX",
   source: Uint8Array,
 ): Promise<{ text: string; pageCount: number | null }> {
+  if (kind === "DOC") {
+    const extracted = extractLegacyDocText(source);
+    return {
+      text: extracted.segments
+        .map((segment) => segment.text)
+        .join("\n")
+        .trim(),
+      pageCount: extracted.pageCount,
+    };
+  }
   try {
     const extracted = await extractor.extract({
       kind,
@@ -174,10 +218,12 @@ async function sourceCandidateCvText(input: {
   const kind =
     input.mimeType === "application/pdf"
       ? "PDF"
-      : input.mimeType ===
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        ? "DOCX"
-        : null;
+      : input.mimeType === "application/msword"
+        ? "DOC"
+        : input.mimeType ===
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          ? "DOCX"
+          : null;
   if (!kind) throw new Error("CV_FORMAT_UNSUPPORTED");
   const cv = await prisma.candidateCv.findFirst({
     where: { id: input.cvVersionId, candidateUserId: input.candidateUserId },
@@ -336,34 +382,34 @@ function scoringInput(
   automatic?: AutomaticMatchingResult,
 ): ScoringInput {
   const job = jsonRecord(attempt.check.jdSnapshot);
-  const requiredSkills = Array.isArray(job.requiredSkills)
+  const requiredSkillCandidates = Array.isArray(job.requiredSkills)
     ? job.requiredSkills.flatMap((item) => {
         const skill = jsonRecord(item as never);
         return typeof skill.code === "string" && typeof skill.label === "string"
-          ? [
-              {
-                code: skill.code,
-                label: skill.label,
-                kind: "REQUIRED" as const,
-              },
-            ]
+          ? [{ code: skill.code, label: skill.label }]
           : [];
       })
     : [];
-  const preferredSkills = Array.isArray(job.preferredSkills)
+  const preferredSkillCandidates = Array.isArray(job.preferredSkills)
     ? job.preferredSkills.flatMap((item) => {
         const skill = jsonRecord(item as never);
         return typeof skill.code === "string" && typeof skill.label === "string"
-          ? [
-              {
-                code: skill.code,
-                label: skill.label,
-                kind: "PREFERRED" as const,
-              },
-            ]
+          ? [{ code: skill.code, label: skill.label }]
           : [];
       })
     : [];
+  const matchingSkills = resolveMatchingSkillRequirements(
+    requiredSkillCandidates,
+    preferredSkillCandidates,
+  );
+  const requiredSkills = matchingSkills.requiredSkills.map((skill) => ({
+    ...skill,
+    kind: "REQUIRED" as const,
+  }));
+  const preferredSkills = matchingSkills.preferredSkills.map((skill) => ({
+    ...skill,
+    kind: "PREFERRED" as const,
+  }));
   return {
     inputId: attempt.check.id,
     cvText: sanitizeCvText(cvText),
@@ -477,8 +523,10 @@ export class PrivateMatchWorker {
       repository?: PrivateCvMatchRepository;
       automatic?: AutomaticMatchingPort;
       ai?: AiEvaluationPort;
+      classifier?: CvClassificationPort;
       now?: () => Date;
       workerId?: string;
+      timeoutMilliseconds?: number;
     }> = {},
   ) {}
 
@@ -488,146 +536,224 @@ export class PrivateMatchWorker {
     const now = this.dependencies.now?.() ?? new Date();
     const workerId =
       this.dependencies.workerId ?? `private-match-worker-${process.pid}`;
-    const attempt = await repository.claimNextAttempt(workerId, now);
+    const timeoutMilliseconds = Math.min(
+      60_000,
+      this.dependencies.timeoutMilliseconds ??
+        privateMatchWorkerConfig.timeoutMilliseconds,
+    );
+    const leaseMilliseconds = Math.max(90_000, timeoutMilliseconds + 15_000);
+    const attempt = await repository.claimNextAttempt(
+      workerId,
+      now,
+      leaseMilliseconds,
+    );
     if (!attempt) return "IDLE";
     const checkId = attempt.check.id;
     let deterministicPublished = Boolean(
       attempt.deterministicResultId || attempt.deterministicResultByAttempt,
     );
-    try {
-      await repository.setCheckAnalyzing(checkId, now);
-      let cvText = attempt.check.cvTextSnapshot;
-      let pageCount: number | null = null;
-      if (!cvText?.trim()) {
-        const cv = jsonRecord(attempt.check.cvSnapshot);
-        const extracted = await sourceCandidateCvText({
-          candidateUserId: attempt.check.candidateUserId,
-          cvVersionId: attempt.check.cvVersionId,
-          checksumSha256: attempt.check.cvDigest,
-          mimeType: text(cv.mimeType),
-          byteSize: number(cv.byteSize),
+    const processClaimedAttempt = async (): Promise<WorkerResult> => {
+      try {
+        await repository.setCheckAnalyzing(checkId, now);
+        let cvText = attempt.check.cvTextSnapshot;
+        let pageCount: number | null = null;
+        if (!cvText?.trim()) {
+          const cv = jsonRecord(attempt.check.cvSnapshot);
+          const extracted = await sourceCandidateCvText({
+            candidateUserId: attempt.check.candidateUserId,
+            cvVersionId: attempt.check.cvVersionId,
+            checksumSha256: attempt.check.cvDigest,
+            mimeType: text(cv.mimeType),
+            byteSize: number(cv.byteSize),
+          });
+          cvText = extracted.text;
+          pageCount = extracted.pageCount;
+          if (!cvText.trim()) throw new Error("CV_TEXT_UNAVAILABLE");
+          await repository.setCvTextSnapshot(checkId, sanitizeCvText(cvText));
+        }
+        const validatedCvText = validateExtractedCvText(cvText ?? "");
+        const classification = await (
+          this.dependencies.classifier ?? new ApprovedCvClassificationAdapter()
+        ).classify({ cvText: validatedCvText.text });
+        const classificationDecision = decideCvClassification({
+          cvText: validatedCvText.text,
+          classification,
         });
-        cvText = extracted.text;
-        pageCount = extracted.pageCount;
-        if (!cvText.trim()) throw new Error("CV_TEXT_UNAVAILABLE");
-        await repository.setCvTextSnapshot(checkId, sanitizeCvText(cvText));
-      }
-      // A lease may be recovered after the deterministic result was saved or
-      // while the AI call was running. In both cases the fixed deterministic
-      // component must be reused instead of being recalculated.
-      const initialAutomatic =
-        attempt.trigger === "INITIAL" &&
-        !attempt.deterministicResultId &&
-        !attempt.deterministicResultByAttempt;
-      let automatic: AutomaticMatchingResult;
-      if (initialAutomatic) {
-        automatic = await (
-          this.dependencies.automatic ??
-          new Feature012AutomaticMatchingAdapter()
-        ).match(scoringInput(attempt, cvText));
-        await repository.saveAutomaticResult({
+        logCvClassificationOutcome({
+          isCv: classification.isCv,
+          confidence: classification.confidence,
+          accepted: classificationDecision.accepted,
+          source: classification.source,
+          decisionBasis: classificationDecision.basis,
+          structuralConfidence:
+            classificationDecision.structuralClassification.confidence,
+        });
+        if (!classificationDecision.accepted)
+          throw new Error("CV_NOT_RECOGNIZED_AS_CV");
+        cvText = validatedCvText.text;
+        // A lease may be recovered after the deterministic result was saved or
+        // while the AI call was running. In both cases the fixed deterministic
+        // component must be reused instead of being recalculated.
+        const initialAutomatic =
+          attempt.trigger === "INITIAL" &&
+          !attempt.deterministicResultId &&
+          !attempt.deterministicResultByAttempt;
+        let automatic: AutomaticMatchingResult;
+        if (initialAutomatic) {
+          automatic = await (
+            this.dependencies.automatic ??
+            new Feature012AutomaticMatchingAdapter()
+          ).match(scoringInput(attempt, cvText));
+          await repository.saveAutomaticResult({
+            attemptId: attempt.id,
+            workerId,
+            result: automatic,
+            calculatedAt: new Date(),
+            leaseMilliseconds,
+          });
+          deterministicPublished = true;
+        } else {
+          const stored = await deterministicForRetry(repository, attempt);
+          if (!stored)
+            throw new Error("PRIVATE_DETERMINISTIC_RESULT_UNAVAILABLE");
+          automatic = automaticFromStoredResult(stored, attempt);
+        }
+        if (pageCount !== null) {
+          // Page count is display metadata only. The immutable scoring payload
+          // and score components remain independent of this best-effort value.
+          void pageCount;
+        }
+        await repository.beginAi({
           attemptId: attempt.id,
           workerId,
-          result: automatic,
-          calculatedAt: new Date(),
+          now: new Date(),
+          leaseMilliseconds,
         });
-        deterministicPublished = true;
-      } else {
-        const stored = await deterministicForRetry(repository, attempt);
-        if (!stored)
-          throw new Error("PRIVATE_DETERMINISTIC_RESULT_UNAVAILABLE");
-        automatic = automaticFromStoredResult(stored, attempt);
-      }
-      if (pageCount !== null) {
-        // Page count is display metadata only. The immutable scoring payload
-        // and score components remain independent of this best-effort value.
-        void pageCount;
-      }
-      await repository.beginAi({
-        attemptId: attempt.id,
-        workerId,
-        now: new Date(),
-      });
-      const rawAi = await (
-        this.dependencies.ai ?? new Feature012AiEvaluationAdapter()
-      ).evaluate(scoringInput(attempt, cvText, automatic));
-      const ai = sanitizeAiEvaluation(rawAi);
-      const hybrid = calculatePrivateHybridScore(automatic, ai);
-      await repository.publishHybrid({
-        attemptId: attempt.id,
-        workerId,
-        result: ai,
-        hybridScore: hybrid.value,
-        matchBand: hybrid.band,
-        completedAt: new Date(),
-      });
-      safeLog({ checkId, state: "READY" });
-      return "READY";
-    } catch (error) {
-      const completedAt = new Date();
-      const message = safePrivateFailureCode(error);
-      if (!deterministicPublished && attempt.trigger === "INITIAL") {
+        const rawAi = await (
+          this.dependencies.ai ?? new Feature012AiEvaluationAdapter()
+        ).evaluate(scoringInput(attempt, cvText, automatic));
+        const ai = sanitizeAiEvaluation(rawAi);
+        const hybrid = calculatePrivateHybridScore(automatic, ai);
+        await repository.publishHybrid({
+          attemptId: attempt.id,
+          workerId,
+          result: ai,
+          hybridScore: hybrid.value,
+          matchBand: hybrid.band,
+          completedAt: new Date(),
+        });
+        safeLog({ checkId, state: "READY" });
+        return "READY";
+      } catch (error) {
+        const completedAt = new Date();
+        const message = safePrivateFailureCode(error);
+        logCvScoringFailure({ reason: message, workItemId: checkId });
+        if (!deterministicPublished && attempt.trigger === "INITIAL") {
+          await repository
+            .markFailed({
+              attemptId: attempt.id,
+              workerId,
+              failureCode: message.startsWith("CV_")
+                ? message
+                : "AUTOMATIC_MATCH_FAILED",
+              completedAt,
+            })
+            .catch(() => false);
+          safeLog({
+            checkId,
+            state: "FAILED",
+            // `message` is already reduced to the allow-listed safe failure
+            // code. Keep the public attempt failure coarse, but retain the
+            // safe diagnostic code in logs so an operator can distinguish a
+            // missing source from a deterministic matcher failure without
+            // logging CV text, quotes, prompts, or provider payloads.
+            failureCode: message,
+          });
+          return "FAILED";
+        }
+        // AI provider outages, timeouts, malformed output, and circuit-open
+        // responses all publish the deterministic result as LIMITED. The
+        // diagnostic provider message is intentionally discarded.
+        if (deterministicPublished || attempt.trigger === "AI_RETRY") {
+          const failureCode = isAiProviderError(error)
+            ? error.code
+            : AI_FALLBACK_CODE;
+          await repository
+            .publishLimited({
+              attemptId: attempt.id,
+              workerId,
+              failureCode: failureCode.slice(0, 80),
+              completedAt,
+            })
+            .catch(() => undefined);
+          safeLog({
+            checkId,
+            state: "LIMITED",
+            failureCode: failureCode.slice(0, 80),
+          });
+          return "LIMITED";
+        }
         await repository
           .markFailed({
             attemptId: attempt.id,
             workerId,
-            failureCode:
-              message === "CV_TEXT_UNAVAILABLE"
-                ? "CV_TEXT_UNAVAILABLE"
-                : "AUTOMATIC_MATCH_FAILED",
+            failureCode: "PRIVATE_MATCH_FAILED",
             completedAt,
           })
           .catch(() => false);
         safeLog({
           checkId,
           state: "FAILED",
-          // `message` is already reduced to the allow-listed safe failure
-          // code. Keep the public attempt failure coarse, but retain the
-          // safe diagnostic code in logs so an operator can distinguish a
-          // missing source from a deterministic matcher failure without
-          // logging CV text, quotes, prompts, or provider payloads.
-          failureCode: message,
+          failureCode: "PRIVATE_MATCH_FAILED",
         });
         return "FAILED";
       }
-      // AI provider outages, timeouts, malformed output, and circuit-open
-      // responses all publish the deterministic result as LIMITED. The
-      // diagnostic provider message is intentionally discarded.
-      if (deterministicPublished || attempt.trigger === "AI_RETRY") {
-        const failureCode = isAiProviderError(error)
-          ? error.code
-          : AI_FALLBACK_CODE;
-        await repository
-          .publishLimited({
-            attemptId: attempt.id,
-            workerId,
-            failureCode: failureCode.slice(0, 80),
-            completedAt,
-          })
-          .catch(() => undefined);
-        safeLog({
-          checkId,
-          state: "LIMITED",
-          failureCode: failureCode.slice(0, 80),
-        });
-        return "LIMITED";
-      }
+    };
+
+    try {
+      return await withTimeout(processClaimedAttempt(), timeoutMilliseconds);
+    } catch (error) {
+      const failureCode = safePrivateFailureCode(error);
+      logCvScoringFailure({ reason: failureCode, workItemId: checkId });
       await repository
         .markFailed({
           attemptId: attempt.id,
           workerId,
-          failureCode: "PRIVATE_MATCH_FAILED",
-          completedAt,
+          failureCode:
+            failureCode === "INTERNAL_FAILURE"
+              ? "SCORING_TIMEOUT"
+              : failureCode,
+          completedAt: new Date(),
         })
         .catch(() => false);
       safeLog({
         checkId,
         state: "FAILED",
-        failureCode: "PRIVATE_MATCH_FAILED",
+        failureCode:
+          failureCode === "INTERNAL_FAILURE" ? "SCORING_TIMEOUT" : failureCode,
       });
       return "FAILED";
     }
   }
+}
+
+function withTimeout<T>(promise: Promise<T>, milliseconds: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error("SCORING_TIMEOUT")),
+      milliseconds,
+    );
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error: unknown) => {
+        clearTimeout(timer);
+        reject(error);
+      },
+    );
+  });
 }
 
 export async function processPrivateMatchWorkOnce(

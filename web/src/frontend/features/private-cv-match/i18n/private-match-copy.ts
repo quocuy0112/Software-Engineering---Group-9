@@ -173,7 +173,8 @@ const english = {
     items: (value: number) => `${value} items`,
     noGaps: "No gaps were identified in the deterministic comparison.",
     evidenceTitle: "Evidence found in your CV",
-    parsedFrom: (kind: "PDF" | "DOCX") => `Parsed from attached ${kind}`,
+    parsedFrom: (kind: "PDF" | "DOC" | "DOCX") =>
+      `Parsed from attached ${kind}`,
     noEvidence: "No bounded evidence quotes are available.",
     evidenceTypes: {
       PROJECT: "Project",
@@ -316,15 +317,15 @@ const english = {
       "No profile CVs are available yet. You can import a local CV below without updating your profile.",
     importTitle: "Import a CV from your device",
     importDescription:
-      "PDF or DOCX, up to 5 MB. No skills or headline update is required; the file is kept for this application.",
-    invalidFile: "Choose a PDF or DOCX file up to 5 MB.",
+      "PDF, DOC, or DOCX, up to 5 MB. No skills or headline update is required; the file is kept for this application.",
+    invalidFile: "Choose a PDF, DOC, or DOCX file up to 5 MB.",
     chooseLocalFile: "Choose local file",
     uploading: "Uploading…",
     importCv: "Import CV",
     uploadingSecurely: "Uploading your CV securely…",
     importFailure:
       "The CV could not be imported. Check the file and try again.",
-    unsupportedFile: "Only PDF and DOCX files can be assessed here.",
+    unsupportedFile: "Only PDF, DOC, or DOCX files can be assessed here.",
     cvReady:
       "Your CV is ready and selected for this check. It will be included for the recruiter when you submit the application.",
     cvVersionOnly:
@@ -372,6 +373,14 @@ const english = {
     INVALID_REQUEST: "Choose an available job and a ready CV before analyzing.",
     CONFLICT: "This private check is already being processed.",
     UNAVAILABLE: "This report is no longer available.",
+    CV_NOT_RECOGNIZED_AS_CV:
+      "This file does not appear to be a CV or resume. Upload a CV and try again.",
+    CV_CONTENT_UNREADABLE:
+      "We couldn't read any content from this file. Please make sure it's a text-based CV, not a scanned image.",
+    SCORING_TIMEOUT:
+      "Scoring took too long and was stopped safely. Upload the CV again or try again.",
+    SCORING_UNAVAILABLE:
+      "Scoring is temporarily unavailable. Please try again shortly.",
     default:
       "We could not complete the private CV match check. Please try again.",
   },
@@ -545,7 +554,8 @@ const vietnamese = {
     noGaps:
       "Không xác định được khoảng thiếu trong phần đối chiếu theo quy tắc.",
     evidenceTitle: "Bằng chứng tìm thấy trong CV của bạn",
-    parsedFrom: (kind: "PDF" | "DOCX") => `Trích xuất từ tệp ${kind} đính kèm`,
+    parsedFrom: (kind: "PDF" | "DOC" | "DOCX") =>
+      `Trích xuất từ tệp ${kind} đính kèm`,
     noEvidence: "Không có trích dẫn bằng chứng giới hạn nào.",
     evidenceTypes: {
       PROJECT: "Dự án",
@@ -623,6 +633,14 @@ const vietnamese = {
       "Chọn một công việc khả dụng và CV đã sẵn sàng trước khi phân tích.",
     CONFLICT: "Lần kiểm tra riêng tư này đang được xử lý.",
     UNAVAILABLE: "Báo cáo này không còn khả dụng.",
+    CV_NOT_RECOGNIZED_AS_CV:
+      "Tệp này không giống CV hoặc sơ yếu lý lịch. Hãy tải lên một CV và thử lại.",
+    CV_CONTENT_UNREADABLE:
+      "Không thể đọc đủ nội dung từ tệp này. Hãy tải lên CV có văn bản và thử lại.",
+    SCORING_TIMEOUT:
+      "Việc chấm điểm mất quá nhiều thời gian và đã được dừng an toàn. Hãy tải lại CV hoặc thử lại.",
+    SCORING_UNAVAILABLE:
+      "Dịch vụ chấm điểm tạm thời không khả dụng. Hãy thử lại sau ít phút.",
     default: "Không thể hoàn tất kiểm tra đối chiếu CV riêng tư. Hãy thử lại.",
   },
 } as const;
@@ -709,14 +727,14 @@ const vietnameseSetup = {
     "Chưa có CV nào trong hồ sơ. Bạn có thể nhập CV từ thiết bị bên dưới mà không cập nhật hồ sơ.",
   importTitle: "Nhập CV từ thiết bị của bạn",
   importDescription:
-    "PDF hoặc DOCX, tối đa 5 MB. Không cần cập nhật kỹ năng hoặc tiêu đề hồ sơ; tệp được lưu cho hồ sơ ứng tuyển này.",
-  invalidFile: "Chọn tệp PDF hoặc DOCX có dung lượng tối đa 5 MB.",
+    "PDF, DOC hoặc DOCX, tối đa 5 MB. Không cần cập nhật kỹ năng hoặc tiêu đề hồ sơ; tệp được lưu cho hồ sơ ứng tuyển này.",
+  invalidFile: "Chọn tệp PDF, DOC hoặc DOCX có dung lượng tối đa 5 MB.",
   chooseLocalFile: "Chọn tệp trên thiết bị",
   uploading: "Đang tải lên…",
   importCv: "Nhập CV",
   uploadingSecurely: "Đang tải CV lên an toàn…",
   importFailure: "Không thể nhập CV. Hãy kiểm tra tệp và thử lại.",
-  unsupportedFile: "Chỉ có thể đánh giá tệp PDF và DOCX tại đây.",
+  unsupportedFile: "Chỉ có thể đánh giá tệp PDF, DOC hoặc DOCX tại đây.",
   cvReady:
     "CV của bạn đã sẵn sàng và được chọn cho lần kiểm tra này. CV sẽ được dùng khi bạn nộp hồ sơ ứng tuyển.",
   cvVersionOnly:

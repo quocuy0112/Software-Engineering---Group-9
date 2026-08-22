@@ -47,6 +47,7 @@ export async function PrivateMatchSetupRoute({
     .filter(
       (cv): cv is typeof cv & { mimeType: PrivateMatchSetupCv["mimeType"] } =>
         cv.mimeType === "application/pdf" ||
+        cv.mimeType === "application/msword" ||
         cv.mimeType ===
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     )
