@@ -175,6 +175,7 @@ export async function GET(
       applicationId,
       kind,
       preview: false,
+      streamPolicy: "SKIP_PDF",
     });
     const previewVersion =
       result.document.mediaType === "application/pdf"

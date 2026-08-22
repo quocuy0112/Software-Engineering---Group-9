@@ -88,6 +88,7 @@ async function loadPreview(
   applicationId: string,
   kind: DocumentKind,
   signal: AbortSignal,
+  retryToken = 0,
 ): Promise<PreviewState> {
   const controller = new AbortController();
   let timedOut = false;
@@ -98,8 +99,12 @@ async function loadPreview(
   const abort = () => controller.abort();
   signal.addEventListener("abort", abort, { once: true });
   try {
+    const retryQuery =
+      retryToken > 0
+        ? `?cacheVersion=${encodeURIComponent(`retry-${retryToken}`)}`
+        : "";
     const response = await fetch(
-      `/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(applicationId)}/documents/${kind}/text`,
+      `/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(applicationId)}/documents/${kind}/text${retryQuery}`,
       { cache: "no-store", signal: controller.signal },
     );
     const payload = (await response.json().catch(() => null)) as Record<
@@ -179,7 +184,13 @@ export function DocumentsTab({
       const cached = retryToken === 0 ? readPreviewCache(key) : null;
       const request = cached
         ? Promise.resolve(cached)
-        : loadPreview(jobId, applicationId, kind, controller.signal);
+        : loadPreview(
+            jobId,
+            applicationId,
+            kind,
+            controller.signal,
+            retryToken,
+          );
       void request
         .then((state) => {
           if (controller.signal.aborted) return;

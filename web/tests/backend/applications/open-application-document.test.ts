@@ -2,7 +2,21 @@ import { describe, expect, it, vi } from "vitest";
 import { OpenApplicationDocumentService } from "@/backend/applications/services/open-application-document";
 import type { ApplicationRepositoryPort } from "@/backend/repositories/applications/application-repository";
 
-function document(stage: "APPLIED" | "VIEWED") {
+type TestDocument = {
+  applicationId: string;
+  jobId: string;
+  stage: "APPLIED" | "VIEWED";
+  stageVersion: number;
+  kind: "cv";
+  fileName: string;
+  mediaType: string;
+  byteLength: number;
+  storageKey: string | null;
+  text: string | null;
+  previewSupported: boolean;
+};
+
+function document(stage: "APPLIED" | "VIEWED"): TestDocument {
   return {
     applicationId: "application-1",
     jobId: "job-1",
@@ -62,7 +76,9 @@ describe("recruiter document review tracking", () => {
     const stageService = { transition: vi.fn() };
     const service = new OpenApplicationDocumentService(
       repo,
-      { authorizeApplication: vi.fn().mockResolvedValue({ authorized: true }) } as never,
+      {
+        authorizeApplication: vi.fn().mockResolvedValue({ authorized: true }),
+      } as never,
       undefined,
       stageService as never,
     );
@@ -77,5 +93,39 @@ describe("recruiter document review tracking", () => {
     });
 
     expect(stageService.transition).not.toHaveBeenCalled();
+  });
+
+  it("does not open PDF storage when only structured-preview metadata is needed", async () => {
+    const repo = repository({
+      ...document("VIEWED"),
+      storageKey: "applications/application-1/cv.pdf",
+      text: null,
+    });
+    const storage = {
+      assertReady: vi.fn(),
+      open: vi.fn(),
+    };
+    const service = new OpenApplicationDocumentService(
+      repo,
+      {
+        authorizeApplication: vi.fn().mockResolvedValue({ authorized: true }),
+      } as never,
+      storage as never,
+      { transition: vi.fn() } as never,
+    );
+
+    const result = await service.execute({
+      userId: "recruiter-1",
+      sessionId: "session-1",
+      jobId: "job-1",
+      applicationId: "application-1",
+      kind: "cv",
+      preview: false,
+      streamPolicy: "SKIP_PDF",
+    });
+
+    expect(result.stream).toBeNull();
+    expect(storage.assertReady).not.toHaveBeenCalled();
+    expect(storage.open).not.toHaveBeenCalled();
   });
 });
