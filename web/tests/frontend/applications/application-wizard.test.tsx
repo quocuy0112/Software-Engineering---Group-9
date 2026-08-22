@@ -1,10 +1,15 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ApplicationWizard } from "@/frontend/features/candidate-applications/components/application-wizard";
+
+const toastError = vi.hoisted(() => vi.fn());
+vi.mock("sonner", () => ({ toast: { error: toastError } }));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
+
+beforeEach(() => toastError.mockReset());
 
 const draft = {
   draftId: "draft-1",
@@ -27,6 +32,46 @@ const draft = {
 } as const;
 
 describe("candidate application wizard", () => {
+  it("shows an invalid CV file rejection as a toast", async () => {
+    render(
+      <ApplicationWizard
+        slug="role"
+        job={{
+          id: "job-1",
+          title: "Role",
+          companyName: "Company",
+          location: "Remote",
+        }}
+        initialDraft={draft}
+        initialCvs={[]}
+        csrfProof="csrf-proof"
+        initialStep={2}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: /upload from device/i }));
+    const input = document.querySelector(
+      'input[accept^=".pdf,.doc,.docx"]',
+    ) as HTMLInputElement;
+    const file = new File(["not a cv"], "notes.txt", { type: "text/plain" });
+    fireEvent.change(input, {
+      target: {
+        files: {
+          0: file,
+          length: 1,
+          item: () => file,
+        },
+      },
+    });
+
+    await waitFor(() =>
+      expect(toastError).toHaveBeenCalledWith(
+        "Only PDF, DOC, or DOCX files are supported.",
+        { id: "candidate-cv-upload-error" },
+      ),
+    );
+  });
+
   it("allows a missing profile phone to be added before continuing", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,

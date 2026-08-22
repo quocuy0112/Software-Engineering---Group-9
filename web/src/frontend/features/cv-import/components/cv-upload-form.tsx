@@ -7,23 +7,19 @@ import {
   useSyncExternalStore,
   type FormEvent,
 } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/frontend/components/ui/button";
 import { SelectableCard } from "@/frontend/components/ui/cv-import-primitives";
 import type { CvParserClass } from "@/shared/contracts/cv-import/common";
 import { CV_SOURCE_MAX_BYTES } from "@/shared/contracts/cv-import/common";
+import { validateCvFile } from "@/shared/cv-file-validation";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 import { cvCopy } from "../i18n/cv-import-copy";
 import { CvProcessingNotice } from "./cv-processing-notice";
 import styles from "./cv-upload-form.module.css";
 
-const accepted = new Map([
-  ["application/pdf", ".pdf"],
-  [
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ".docx",
-  ],
-]);
+const acceptedExtensions = new Set(["pdf", "doc", "docx"]);
 
 const subscribeToHydration = () => () => undefined;
 
@@ -71,27 +67,55 @@ export function CvUploadForm({
   function showError(value: string, focusFile = false) {
     focusFileAfterError.current = focusFile;
     setError(value);
+    toast.error(value, { id: "candidate-cv-upload-error" });
   }
 
-  function choose(candidate: File | null) {
+  function clearSelection() {
+    setFile(null);
+    if (fileRef.current) fileRef.current.value = "";
+  }
+
+  async function choose(candidate: File | null) {
     setError(null);
-    if (!candidate) return setFile(null);
-    const extension = accepted.get(candidate.type);
-    if (!extension || !candidate.name.toLowerCase().endsWith(extension)) {
-      setFile(null);
+    if (!candidate) {
+      clearSelection();
+      setMessage(copy.upload.ready);
+      return;
+    }
+    const extension = candidate.name.toLowerCase().split(".").pop();
+    if (!extension || !acceptedExtensions.has(extension)) {
+      clearSelection();
+      setMessage(copy.upload.ready);
       return showError(
         locale === "vi"
-          ? "Hãy chọn tệp PDF hoặc DOCX có phần mở rộng khớp với loại tệp."
-          : "Choose a PDF or DOCX file whose extension matches its type.",
+          ? "Hãy chọn tệp PDF hoặc DOCX có phần mở rộng phù hợp."
+          : "Only PDF, DOC, or DOCX files are supported.",
         true,
       );
     }
     if (candidate.size < 1 || candidate.size > CV_SOURCE_MAX_BYTES) {
-      setFile(null);
+      clearSelection();
+      setMessage(copy.upload.ready);
       return showError(
         locale === "vi"
           ? "CV không được lớn hơn 5 MB (5.000.000 byte)."
-          : "The CV must be no larger than 5 MB (5,000,000 bytes).",
+          : candidate.size > CV_SOURCE_MAX_BYTES
+            ? "File size must not exceed 5MB."
+            : "The uploaded file is empty.",
+        true,
+      );
+    }
+    try {
+      await validateCvFile(candidate);
+    } catch (cause) {
+      clearSelection();
+      setMessage(copy.upload.ready);
+      return showError(
+        cause instanceof Error
+          ? cause.message
+          : locale === "vi"
+            ? "Chỉ hỗ trợ tệp PDF hoặc DOCX hợp lệ."
+            : "Only valid PDF, DOC, or DOCX files are supported.",
         true,
       );
     }
@@ -122,7 +146,7 @@ export function CvUploadForm({
       return showError(
         locale === "vi"
           ? "Hãy chọn CV PDF hoặc DOCX trước khi tải lên."
-          : "Choose a PDF or DOCX CV before uploading.",
+          : "Choose a PDF, DOC, or DOCX CV before uploading.",
       );
     if (!parserClass)
       return showError(
@@ -142,6 +166,7 @@ export function CvUploadForm({
           : "CV upload submitted for secure processing.",
       );
     } catch (cause) {
+      clearSelection();
       showError(
         cause instanceof Error && !cause.message.startsWith("CV_")
           ? cause.message
@@ -182,8 +207,10 @@ export function CvUploadForm({
           id="cv-upload-file"
           ref={fileRef}
           type="file"
-          accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          onChange={(event) => choose(event.currentTarget.files?.[0] ?? null)}
+          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          onChange={(event) =>
+            void choose(event.currentTarget.files?.[0] ?? null)
+          }
           disabled={busy || !hydrated}
         />
         <small id="cv-upload-guidance">{copy.upload.fileGuidance}</small>

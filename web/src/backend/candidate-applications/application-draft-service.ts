@@ -4,6 +4,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { Prisma } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
 import { createApplicationDocumentStorage } from "@/backend/applications/storage/factory";
+import { logCvUploadRejection } from "@/backend/cv/upload-observability";
 import { ensureCandidateCvLibrary } from "@/backend/services/profile/candidate-cv-library";
 import type { CandidateActor } from "@/backend/services/jobs/job-types";
 import {
@@ -23,6 +24,11 @@ import {
   MAX_APPLICATION_ATTEMPTS,
   MAX_APPLICATION_ATTEMPTS_MESSAGE,
 } from "@/shared/contracts/jobs/actions";
+import {
+  CV_MAX_FILE_BYTES,
+  CvFileValidationError,
+  validateCvFileBytes,
+} from "@/shared/cv-file-validation";
 import { CandidateApplicationError } from "./candidate-application-errors";
 
 const MAX_MESSAGE_LENGTH = 2_000;
@@ -33,8 +39,6 @@ const supportedCvMimeTypes = new Set([
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]);
-
-const coverLetterMimeTypes = new Set([...supportedCvMimeTypes]);
 
 export type StoredCoverLetterDraft = {
   kind: "FILE";
@@ -187,21 +191,6 @@ function safeFilename(value: string) {
     .trim()
     .slice(0, 255);
   return normalized || "cover-letter";
-}
-
-function fileStream(file: File): AsyncIterable<Uint8Array> {
-  return (async function* () {
-    const reader = file.stream().getReader();
-    try {
-      while (true) {
-        const result = await reader.read();
-        if (result.done) return;
-        yield result.value;
-      }
-    } finally {
-      reader.releaseLock();
-    }
-  })();
 }
 
 function fileDescriptor(row: {
@@ -1125,41 +1114,48 @@ export class ApplicationDraftService {
     assertApplicationAttemptsAvailable(
       await applicationCount(this.db, actor.userId, draft.jobPostingId),
     );
-    const extension = file.name.toLowerCase().split(".").pop();
-    const mimeType = coverLetterMimeTypes.has(file.type)
-      ? file.type
-      : extension === "pdf"
-        ? "application/pdf"
-        : extension === "doc"
-          ? "application/msword"
-          : extension === "docx"
-            ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            : null;
-    if (
-      !mimeType ||
-      file.size < 1 ||
-      file.size > MAX_FILE_BYTES ||
-      !["pdf", "doc", "docx"].includes(extension ?? "")
-    ) {
+    if (file.size < 1 || file.size > CV_MAX_FILE_BYTES) {
       throw new CandidateApplicationError(
         400,
         "APPLICATION_COVER_LETTER_INELIGIBLE",
         "Cover letters must be PDF, DOC, or DOCX files between 1 and 5 MB.",
       );
     }
+    let sourceBytes: Uint8Array;
+    let mimeType: string;
+    try {
+      sourceBytes = new Uint8Array(await file.arrayBuffer());
+      const validated = validateCvFileBytes({
+        bytes: sourceBytes,
+        fileName: file.name,
+        declaredMimeType: file.type,
+      });
+      mimeType = validated.mimeType;
+    } catch (error) {
+      if (error instanceof CvFileValidationError) {
+        logCvUploadRejection({
+          reason: error.code,
+          byteSize: file.size,
+          declaredMimeType: file.type,
+        });
+      }
+      throw new CandidateApplicationError(
+        400,
+        "APPLICATION_COVER_LETTER_INELIGIBLE",
+        error instanceof CvFileValidationError
+          ? error.message
+          : "The cover letter could not be read. Upload it again.",
+      );
+    }
     const storage = createApplicationDocumentStorage();
     await storage.assertReady();
-    const hash = createHash("sha256");
+    const hash = createHash("sha256").update(sourceBytes);
     let stored: Awaited<ReturnType<typeof storage.put>>;
     try {
       stored = await storage.put({
-        expectedBytes: file.size,
+        expectedBytes: sourceBytes.byteLength,
         source: (async function* () {
-          for await (const chunk of fileStream(file)) {
-            const bytes = Buffer.from(chunk);
-            hash.update(bytes);
-            yield bytes;
-          }
+          yield sourceBytes;
         })(),
       });
     } catch {
@@ -1176,7 +1172,7 @@ export class ApplicationDraftService {
         displayName: safeFilename(file.name),
         fileName: safeFilename(file.name),
         mimeType,
-        byteSize: file.size,
+        byteSize: sourceBytes.byteLength,
         parseStatus: "NOT_APPLICABLE",
         storageKey: stored.locator,
         checksumSha256: hash.digest("hex"),

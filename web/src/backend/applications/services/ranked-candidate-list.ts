@@ -49,6 +49,7 @@ type RankingFilters = Readonly<{
     | "PROCESSING"
     | "SCORED"
     | "UNAVAILABLE"
+    | "FAILED"
     | "NOT_CALCULATED";
 }>;
 
@@ -77,7 +78,7 @@ function stateFor(row: RankedSourceRow) {
     if (row.scoringStatus === "NOT_REQUESTED")
       return { kind: "NOT_CALCULATED", label: "Not calculated" } as const;
     if (row.scoringStatus === "FAILED")
-      return { kind: "NOT_CALCULATED", label: "Not calculated" } as const;
+      return { kind: "FAILED", label: "Scoring failed" } as const;
     return {
       kind: "PROCESSING",
       label: "Processing",
@@ -101,6 +102,7 @@ function snapshotStateFor(
     return { kind: "UNAVAILABLE", label: "Unavailable" };
   if (state === "NOT_CALCULATED")
     return { kind: "NOT_CALCULATED", label: "Not calculated" };
+  if (state === "FAILED") return { kind: "FAILED", label: "Scoring failed" };
   if (state === "PENDING")
     return {
       kind: "PENDING",

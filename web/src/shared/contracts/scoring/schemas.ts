@@ -314,6 +314,15 @@ const notCalculatedStateSchema = z
   })
   .strict();
 
+const failedStateSchema = z
+  .object({
+    kind: z.literal("FAILED"),
+    label: z.literal("Scoring failed"),
+    safeFailureCode: z.string().min(1).nullable(),
+    retryAllowed: z.boolean(),
+  })
+  .strict();
+
 const pendingStateSchema = z
   .object({
     kind: z.literal("PENDING"),
@@ -362,6 +371,7 @@ const scoredStateSchema = z
 
 export const scoringStateSchema = z.discriminatedUnion("kind", [
   notCalculatedStateSchema,
+  failedStateSchema,
   pendingStateSchema,
   processingStateSchema,
   unavailableStateSchema,
@@ -393,6 +403,12 @@ const rankedRowScoringStateSchema = z.discriminatedUnion("kind", [
     .object({
       kind: z.literal("NOT_CALCULATED"),
       label: z.literal("Not calculated"),
+    })
+    .strict(),
+  z
+    .object({
+      kind: z.literal("FAILED"),
+      label: z.literal("Scoring failed"),
     })
     .strict(),
   z
@@ -554,7 +570,14 @@ export const rankedListQuerySchema = z
       ])
       .default("ACTIVE_PIPELINE"),
     scoringStatus: z
-      .enum(["ALL", "PROCESSING", "SCORED", "UNAVAILABLE", "NOT_CALCULATED"])
+      .enum([
+        "ALL",
+        "PROCESSING",
+        "SCORED",
+        "UNAVAILABLE",
+        "FAILED",
+        "NOT_CALCULATED",
+      ])
       .default("ALL"),
   })
   .strict()

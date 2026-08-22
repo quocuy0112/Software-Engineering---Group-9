@@ -49,7 +49,7 @@ export const submittedCandidateSchema = z
       z.object({ kind: z.literal("NONE") }).strict(),
       z
         .object({
-          kind: z.enum(["TEXT", "PDF", "DOCX"]),
+          kind: z.enum(["TEXT", "PDF", "DOC", "DOCX"]),
           available: z.boolean(),
           previewSupported: z.boolean(),
         })

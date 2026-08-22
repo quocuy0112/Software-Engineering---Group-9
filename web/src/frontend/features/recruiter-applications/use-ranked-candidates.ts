@@ -28,6 +28,7 @@ export type RankedCandidateQuery = Readonly<{
     | "PROCESSING"
     | "SCORED"
     | "UNAVAILABLE"
+    | "FAILED"
     | "NOT_CALCULATED";
 }>;
 

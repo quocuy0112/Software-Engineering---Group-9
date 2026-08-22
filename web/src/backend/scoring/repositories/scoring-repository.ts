@@ -38,6 +38,10 @@ export type ScoringRepositoryPort = Readonly<{
   publish(input: {
     applicationId: string;
     operationId: string;
+    /** Optional lease fence supplied by the scoring worker. */
+    workItemId?: string;
+    expectedGeneration?: number;
+    workerId?: string;
     automatic: AutomaticMatch;
     ai: AiAssessment | null;
     finalScore: FinalScore | null;
@@ -61,7 +65,9 @@ export type ScoringRepositoryPort = Readonly<{
   }): Promise<void>;
 }>;
 
-export function scoringStateFromPublished(record: PublishedScoringRecord | null): ScoringState {
+export function scoringStateFromPublished(
+  record: PublishedScoringRecord | null,
+): ScoringState {
   if (!record) return { kind: "NOT_CALCULATED", label: "Not calculated" };
   if (record.state === "SCORED" && record.ai && record.finalScore) {
     return {
@@ -80,9 +86,10 @@ export function scoringStateFromPublished(record: PublishedScoringRecord | null)
       kind: "UNAVAILABLE",
       label: "Unavailable",
       safeFailureCode: record.safeFailureCode ?? "AI_PROVIDER_UNAVAILABLE",
-      supportGuidance: record.consecutiveFailures >= 3
-        ? "Repeated AI failure — try later or contact support."
-        : null,
+      supportGuidance:
+        record.consecutiveFailures >= 3
+          ? "Repeated AI failure — try later or contact support."
+          : null,
     },
     finalScore: { kind: "NOT_CALCULATED", label: "Not calculated" },
     retryAllowed: true,

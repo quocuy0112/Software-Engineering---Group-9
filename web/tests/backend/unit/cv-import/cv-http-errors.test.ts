@@ -35,4 +35,16 @@ describe("CV HTTP error boundary", () => {
     cvHttpErrorResponse(new CvImportServiceError("VALIDATION_ERROR"));
     expect(log).not.toHaveBeenCalled();
   });
+
+  it("preserves safe upload-specific messages for client-visible rejection", async () => {
+    const response = cvHttpErrorResponse(
+      new CvImportServiceError("DOCUMENT_REJECTED", {
+        userMessage: "File size must not exceed 5MB.",
+      }),
+    );
+    const body = (await response.json()) as { error: { message: string } };
+
+    expect(response.status).toBe(422);
+    expect(body.error.message).toBe("File size must not exceed 5MB.");
+  });
 });

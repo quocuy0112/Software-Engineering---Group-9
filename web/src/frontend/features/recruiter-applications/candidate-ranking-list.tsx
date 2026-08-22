@@ -805,6 +805,7 @@ export function CandidateRankingList({
                   <option value="PROCESSING">Processing</option>
                   <option value="SCORED">Scored</option>
                   <option value="UNAVAILABLE">AI unavailable</option>
+                  <option value="FAILED">Scoring failed</option>
                   <option value="NOT_CALCULATED">Not calculated</option>
                 </select>
               </label>

@@ -1181,6 +1181,7 @@ export type ApplicationStageActorType = (typeof ApplicationStageActorType)[keyof
 
 export const CvDocumentKind = {
   PDF: 'PDF',
+  DOC: 'DOC',
   DOCX: 'DOCX'
 } as const
 

@@ -53,15 +53,17 @@ export default async function CvImportsPage() {
                 : `of ${maximumImports} imports retained`
             }
             sublabel={
-              vi ? "PDF hoặc DOCX · tối đa 5 MB" : "PDF or DOCX · up to 5 MB"
+              vi
+                ? "PDF, DOC hoặc DOCX · tối đa 5 MB"
+                : "PDF, DOC, or DOCX · up to 5 MB"
             }
           />
         }
       >
         <p className={styles.lede}>
           {vi
-            ? "Tải lên PDF hoặc DOCX, để SmartHire xử lý riêng tư, sau đó xem xét từng đề xuất trước khi hồ sơ của bạn thay đổi."
-            : "Upload a PDF or DOCX, let SmartHire process it privately, then review every suggestion before anything changes on your profile."}
+            ? "Tải lên PDF, DOC hoặc DOCX, để SmartHire xử lý riêng tư, sau đó xem xét từng đề xuất trước khi hồ sơ của bạn thay đổi."
+            : "Upload a PDF, DOC, or DOCX, let SmartHire process it privately, then review every suggestion before anything changes on your profile."}
         </p>
       </Panel>
 

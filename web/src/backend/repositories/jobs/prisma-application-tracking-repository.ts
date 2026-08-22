@@ -6,6 +6,7 @@ import {
   applicationStageSchema,
   candidateApplicationDetailSchema,
   candidateApplicationListResponseSchema,
+  candidateScoringFailureCodeSchema,
   type ApplicationStage,
   type ApplicationStageGroup,
   type CandidateApplicationDetail,
@@ -37,6 +38,11 @@ const summarySelect = {
   aiAnalysisConsent: true,
   aiMatchScore: true,
   scoringStatus: true,
+  scoringWorkItems: {
+    orderBy: { updatedAt: "desc" },
+    take: 1,
+    select: { lastSafeFailureCode: true },
+  },
   jobPosting: {
     select: {
       slug: true,
@@ -96,6 +102,7 @@ function summary(row: SummaryRow): CandidateApplicationSummary {
       lastStageChangedAt: true,
       jobAvailable: true,
       scoringStatus: true,
+      scoringFailureCode: true,
       aiMatchScore: true,
     })
     .parse({
@@ -118,6 +125,11 @@ function summary(row: SummaryRow): CandidateApplicationSummary {
       jobAvailable:
         row.jobPosting.status === "ACTIVE" && row.jobPosting.removedAt === null,
       scoringStatus: row.scoringStatus,
+      scoringFailureCode: candidateScoringFailureCodeSchema.safeParse(
+        row.scoringWorkItems?.[0]?.lastSafeFailureCode,
+      ).success
+        ? (row.scoringWorkItems?.[0]?.lastSafeFailureCode ?? null)
+        : null,
       aiMatchScore: row.aiMatchScore,
     });
 }

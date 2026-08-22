@@ -14,6 +14,7 @@ import {
   cvImportStatusResponseSchema,
   type CreateCvImportRequest,
 } from "@/shared/contracts/cv-import/upload";
+import { validateCvFile } from "@/shared/cv-file-validation";
 import {
   cvKnownError,
   cvStageLabel,
@@ -259,7 +260,7 @@ function terminalMessage(locale: CvLocale, resource: CvStatusResource): string {
     guidance.push(
       locale === "vi"
         ? "Hãy thay CV này bằng PDF hoặc DOCX khác."
-        : "Replace this CV with another PDF or DOCX.",
+        : "Replace this CV with another PDF, DOC, or DOCX.",
     );
   if (resource.failure?.suggestedActions.includes("RETRY"))
     guidance.push(
@@ -296,7 +297,7 @@ export function useCvImport(input: { csrfProof: string }) {
       message:
         locale === "vi"
           ? "Chọn PDF hoặc DOCX để bắt đầu."
-          : "Choose a PDF or DOCX CV to begin.",
+          : "Choose a PDF, DOC, or DOCX CV to begin.",
       uploadId: null,
       parserClass: null,
     };
@@ -426,6 +427,7 @@ export function useCvImport(input: { csrfProof: string }) {
   const upload = useCallback(
     async (file: File, parserClass: CreateCvImportRequest["parserClass"]) => {
       stop();
+      const validatedFile = await validateCvFile(file);
       const idempotencyKey = requestKey();
       setProgress({
         state: "RESERVING",
@@ -455,7 +457,7 @@ export function useCvImport(input: { csrfProof: string }) {
           },
           body: JSON.stringify({
             displayFilename: file.name,
-            declaredMediaType: file.type,
+            declaredMediaType: validatedFile.mimeType,
             declaredBytes: file.size,
             parserClass,
           }),
@@ -477,7 +479,7 @@ export function useCvImport(input: { csrfProof: string }) {
           const request = new XMLHttpRequest();
           activeRequest.current = request;
           request.open("PUT", reservation.contentUrl);
-          request.setRequestHeader("content-type", file.type);
+          request.setRequestHeader("content-type", validatedFile.mimeType);
           request.setRequestHeader("idempotency-key", idempotencyKey);
           request.setRequestHeader("x-csrf-token", input.csrfProof);
           request.upload.onprogress = (event) => {

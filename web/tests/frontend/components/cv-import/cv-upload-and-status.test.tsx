@@ -17,11 +17,14 @@ const navigation = vi.hoisted(() => ({
   prefetch: vi.fn(),
   replace: vi.fn(),
 }));
+const toastError = vi.hoisted(() => vi.fn());
 vi.mock("next/navigation", () => ({ useRouter: () => navigation }));
+vi.mock("sonner", () => ({ toast: { error: toastError } }));
 
 beforeEach(() => {
   navigation.prefetch.mockClear();
   navigation.replace.mockClear();
+  toastError.mockReset();
 });
 
 afterEach(() => vi.useRealTimers());
@@ -87,7 +90,10 @@ describe("CV upload and authoritative status UI", () => {
         ],
       },
     });
-    expect(await screen.findByRole("alert")).toHaveTextContent("5 MB");
+    expect(await screen.findByRole("alert")).toHaveTextContent("5MB");
+    expect(toastError).toHaveBeenCalledWith("File size must not exceed 5MB.", {
+      id: "candidate-cv-upload-error",
+    });
     expect(input).toHaveFocus();
 
     fireEvent.change(input, {
@@ -99,6 +105,11 @@ describe("CV upload and authoritative status UI", () => {
         ],
       },
     });
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent(
+        /synthetic\.pdf is ready/i,
+      ),
+    );
     fireEvent.keyDown(screen.getByRole("button", { name: /upload cv/i }), {
       key: "Enter",
     });

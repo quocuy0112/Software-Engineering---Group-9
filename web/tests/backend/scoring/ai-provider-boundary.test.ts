@@ -187,6 +187,25 @@ describe("approved AI provider boundary", () => {
     expect(prompt).toContain(SUGGESTED_QUESTIONS_UNAVAILABLE_MESSAGE);
   });
 
+  it("bounds display breakdown summaries before publication", async () => {
+    const longNote = "Detailed provider explanation ".repeat(30);
+    const base = validV5();
+    const result = await new ApprovedAiAssessmentAdapter(async () =>
+      validV5({
+        scoreReasoning: {
+          ...base.scoreReasoning,
+          breakdown: base.scoreReasoning.breakdown.map((item, index) => ({
+            ...item,
+            note: index < 4 ? longNote : null,
+          })),
+        },
+      }),
+    ).assess(input);
+
+    expect(result.breakdown).toHaveLength(3);
+    expect(result.breakdown.every((item) => item.length <= 300)).toBe(true);
+  });
+
   it("uses a Responses-compatible schema for the 0-or-3 question rule", () => {
     const questionsSchema = cvAiAssessmentJsonSchema.properties
       .suggestedQuestions;

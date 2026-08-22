@@ -17,14 +17,19 @@ import type {
 import { S3PrivateCvStorage } from "@/backend/cv/storage/s3";
 import { prisma } from "@/backend/database/prisma";
 import { serverEnvironment } from "@/backend/env/runtime";
+import {
+  CvFileValidationError,
+  validateCvFileBytes,
+} from "@/shared/cv-file-validation";
 import { CV_SOURCE_MAX_BYTES } from "@/shared/contracts/cv-import/common";
 import { CvImportServiceError } from "./cv-http-errors";
+import { logCvUploadRejection } from "@/backend/cv/upload-observability";
 
 type Reservation = Readonly<{
   uploadId: string;
   accountId: string;
   artifactId: string;
-  documentKind: "PDF" | "DOCX";
+  documentKind: "PDF" | "DOC" | "DOCX";
   declaredMediaType: string;
   declaredBytes: number;
   status: "AWAITING_CONTENT" | "VALIDATION_QUEUED";
@@ -106,7 +111,7 @@ function defaultDependencies(): Dependencies {
         Array<{
           uploadId: string;
           accountId: string;
-          documentKind: "PDF" | "DOCX";
+          documentKind: "PDF" | "DOC" | "DOCX";
           declaredMediaType: string;
           declaredBytes: number;
           status: "AWAITING_CONTENT" | "VALIDATION_QUEUED";
@@ -306,7 +311,15 @@ export class ReceiveCvContentService {
         input.contentLength < 1 ||
         input.contentLength > CV_SOURCE_MAX_BYTES
       ) {
-        throw new CvImportServiceError("PAYLOAD_TOO_LARGE");
+        logCvUploadRejection({
+          reason: "PAYLOAD_TOO_LARGE",
+          byteSize: input.contentLength,
+          declaredMimeType: input.contentType,
+          uploadId: input.uploadId,
+        });
+        throw new CvImportServiceError("PAYLOAD_TOO_LARGE", {
+          userMessage: "File size must not exceed 5MB.",
+        });
       }
       reservation = await this.dependencies.findReservation(
         input.accountId,
@@ -315,35 +328,87 @@ export class ReceiveCvContentService {
       );
       if (!reservation) throw new CvImportServiceError("CV_IMPORT_NOT_FOUND");
       if (input.contentType !== reservation.declaredMediaType) {
+        logCvUploadRejection({
+          reason: "UNSUPPORTED_MEDIA_TYPE",
+          byteSize: input.contentLength,
+          declaredMimeType: input.contentType,
+          uploadId: input.uploadId,
+        });
         throw new CvImportServiceError("UNSUPPORTED_MEDIA_TYPE");
       }
       if (input.contentLength !== reservation.declaredBytes) {
+        logCvUploadRejection({
+          reason: "CONTENT_LENGTH_MISMATCH",
+          byteSize: input.contentLength,
+          declaredMimeType: input.contentType,
+          uploadId: input.uploadId,
+        });
         throw new CvImportServiceError("DOCUMENT_REJECTED");
+      }
+      // Buffer only the already bounded upload so signature validation happens
+      // before any ciphertext reaches durable storage. The maximum is 5 MB,
+      // so this also keeps the validation path deterministic and replay-safe.
+      const chunks: Uint8Array[] = [];
+      let received = 0;
+      for await (const sourceChunk of input.body) {
+        const chunk = Uint8Array.from(sourceChunk);
+        received += chunk.byteLength;
+        if (received > input.contentLength || received > CV_SOURCE_MAX_BYTES) {
+          logCvUploadRejection({
+            reason: "PAYLOAD_TOO_LARGE",
+            byteSize: received,
+            declaredMimeType: input.contentType,
+            uploadId: input.uploadId,
+          });
+          throw new CvImportServiceError("PAYLOAD_TOO_LARGE", {
+            userMessage: "File size must not exceed 5MB.",
+          });
+        }
+        chunks.push(chunk);
+      }
+      if (received !== input.contentLength) {
+        logCvUploadRejection({
+          reason: "CONTENT_LENGTH_MISMATCH",
+          byteSize: received,
+          declaredMimeType: input.contentType,
+          uploadId: input.uploadId,
+        });
+        throw new CvImportServiceError("DOCUMENT_REJECTED");
+      }
+      const source = new Uint8Array(received);
+      let sourceOffset = 0;
+      for (const chunk of chunks) {
+        source.set(chunk, sourceOffset);
+        sourceOffset += chunk.byteLength;
+      }
+      try {
+        validateCvFileBytes({
+          bytes: source,
+          declaredMimeType: reservation.declaredMediaType,
+        });
+      } catch (error) {
+        if (error instanceof CvFileValidationError) {
+          logCvUploadRejection({
+            reason: error.code,
+            byteSize: source.byteLength,
+            declaredMimeType: reservation.declaredMediaType,
+            uploadId: reservation.uploadId,
+          });
+          throw new CvImportServiceError("DOCUMENT_REJECTED", {
+            userMessage: error.message,
+          });
+        }
+        throw error;
       }
       sink = normalizeSink(
         await this.dependencies.createCiphertextSink(reservation),
       );
-      const hash = createHash("sha256");
-      let received = 0;
-      const plaintext = async function* () {
-        for await (const sourceChunk of input.body) {
-          const chunk = Buffer.from(sourceChunk);
-          received += chunk.byteLength;
-          if (
-            received > input.contentLength ||
-            received > CV_SOURCE_MAX_BYTES
-          ) {
-            throw new CvImportServiceError("PAYLOAD_TOO_LARGE");
-          }
-          hash.update(chunk);
-          yield chunk;
-        }
-        if (received !== input.contentLength) {
-          throw new CvImportServiceError("DOCUMENT_REJECTED");
-        }
-      };
+      const hash = createHash("sha256").update(source);
+      const plaintext = (async function* () {
+        yield source;
+      })();
       const envelope = await this.dependencies.cryptor.encrypt({
-        plaintext: plaintext(),
+        plaintext,
         ciphertext: sink.writable,
         context: {
           accountId: reservation.accountId,

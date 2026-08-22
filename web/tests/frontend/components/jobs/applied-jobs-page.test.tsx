@@ -96,6 +96,27 @@ describe("AppliedJobsPage", () => {
     ).toHaveAttribute("href", "/jobs/applied/application-8");
   });
 
+  it("shows a recoverable state when CV scoring fails", () => {
+    render(
+      <AppliedJobsPage
+        applications={[
+          {
+            ...applications[0]!,
+            scoringStatus: "FAILED",
+            scoringFailureCode: "CV_NOT_RECOGNIZED_AS_CV",
+          },
+        ]}
+      />,
+    );
+    const card = screen.getByRole("article");
+    expect(within(card).getByRole("alert")).toHaveTextContent(
+      /does not appear to be a valid CV/i,
+    );
+    expect(
+      within(card).getByRole("link", { name: /re-upload your CV/i }),
+    ).toHaveAttribute("href", "/jobs/job-0/apply");
+  });
+
   it("loads the next database page without duplicating applications", async () => {
     const next = application("APPLIED", 20);
     const fetchMock = vi.fn().mockResolvedValue(
