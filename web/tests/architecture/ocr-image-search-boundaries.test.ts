@@ -25,6 +25,7 @@ describe("Feature 005 architecture boundaries", () => {
       homeHeader,
       jobHeader,
       workspaceShell,
+      liveJobSearch,
     ] = await Promise.all([
       readFile(resolve(source, "app/layout.tsx"), "utf8"),
       readFile(resolve(source, "app/(auth)/layout.tsx"), "utf8"),
@@ -53,6 +54,13 @@ describe("Feature 005 architecture boundaries", () => {
         ),
         "utf8",
       ),
+      readFile(
+        resolve(
+          source,
+          "frontend/features/jobs/components/live-job-search-experience.tsx",
+        ),
+        "utf8",
+      ),
     ]);
 
     expect(rootLayout).not.toContain("<GlobalImageSearch");
@@ -61,7 +69,8 @@ describe("Feature 005 architecture boundaries", () => {
     expect(homeHeader).toContain("<GlobalImageSearch");
     expect(jobHeader).toContain("<GlobalImageSearch");
     expect(workspaceShell).toContain('contentMode === "job-board"');
-    expect(workspaceShell).toContain("<GlobalImageSearch");
+    expect(workspaceShell).not.toContain("<GlobalImageSearch");
+    expect(liveJobSearch).toContain("<GlobalImageSearch");
   });
 
   it("preserves scanner signatures when resetting the local database", async () => {

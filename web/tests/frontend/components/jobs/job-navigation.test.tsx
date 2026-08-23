@@ -101,10 +101,15 @@ describe("job board navigation", () => {
     );
 
     expect(source).toContain('className="jobs-fixed-region"');
+    expect(source).toContain('className="jobs-search-sticky-region"');
+    expect(source).toContain("data-docked={searchDocked}");
+    expect(source).toContain("dockToWorkspaceHeader={searchDocked}");
     expect(source).toContain('className="job-filter-column"');
     expect(source).toContain('className="job-results"');
     expect(source).not.toContain("tabIndex={0}");
     expect(styles).toContain(".job-list");
+    expect(styles).toContain(".jobs-search-sticky-region {");
+    expect(styles).toContain('.jobs-search-sticky-region[data-docked="true"]');
     expect(styles).not.toContain(
       '.job-board-public-main .jobs-page,\n  .workspace-content[data-content-mode="job-board"] > .jobs-page',
     );
@@ -177,7 +182,9 @@ describe("job board navigation", () => {
       "utf8",
     );
     expect(cardSource).toContain('href={"/jobs/" + job.slug + "/apply"}');
-    expect(detailSource).toContain('const applyPath = "/jobs/" + job.slug + "/apply";');
+    expect(detailSource).toContain(
+      'const applyPath = "/jobs/" + job.slug + "/apply";',
+    );
     expect(detailSource).toContain("href={applyPath}");
     expect(cardSource).not.toContain("?apply=true");
     expect(detailSource).not.toContain('params.get("apply")');

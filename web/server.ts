@@ -9,7 +9,16 @@ const hostname = process.env.HOSTNAME ?? "127.0.0.1";
 const port = Number.parseInt(process.env.PORT ?? "3001", 10);
 const internalShellHeader = "x-smarthire-internal-shell";
 loadEnvConfig(process.cwd(), development);
-const app = next({ dev: development, port });
+const app = next({
+  dev: development,
+  port,
+  // Turbopack is the default in Next.js 16. Keep Webpack as an opt-in
+  // development fallback for Windows environments where a loader subprocess
+  // is unexpectedly interrupted.
+  ...(development && process.env.NEXT_DEV_BUNDLER === "webpack"
+    ? { webpack: true }
+    : {}),
+});
 const handle = app.getRequestHandler();
 
 function expectedHost(origin: string | undefined, fallback: string) {

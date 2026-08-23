@@ -16,7 +16,6 @@ import { CsrfProofProvider } from "@/frontend/features/authentication/client/csr
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
 import { ThemeToggle } from "@/frontend/components/ui/theme-toggle";
-import { GlobalImageSearch } from "@/frontend/features/jobs/image-search/components/global-image-search";
 import {
   ACCOUNT_NAME_UPDATED_EVENT,
   type AccountNameUpdatedDetail,
@@ -426,7 +425,10 @@ function WorkspaceShellContent({
               </p>
             </div>
             {workspaceMode === "candidate" && contentMode === "job-board" ? (
-              <GlobalImageSearch csrfProof={csrfProof} />
+              <div
+                id="workspace-job-search-slot"
+                className="workspace-header-job-search-slot"
+              />
             ) : null}
             <div className="workspace-header-actions">
               <NotificationCenter csrfProof={csrfProof} locale={locale} />

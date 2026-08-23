@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node --import ./scripts/register-server-runtime.mjs --import tsx server.ts",
     "dev:web": "node --import ./scripts/register-server-runtime.mjs --import tsx server.ts",
+    "dev:webpack": "node --import ./scripts/register-server-runtime.mjs --import tsx scripts/run-webpack-development.mjs",
     "start": "node --import ./scripts/register-server-runtime.mjs --import tsx server.ts",
     "email:worker": "tsx scripts/run-email-worker.mjs",
     "cv:worker": "node --conditions=react-server --import tsx scripts/run-cv-worker.mjs",

@@ -13,6 +13,7 @@ import {
 } from "@/frontend/features/jobs/image-search/components/global-image-search";
 import type { SearchIntent } from "@/shared/contracts/jobs/search-intent";
 import { WorkspaceLocaleProvider } from "@/frontend/features/dashboard/client/workspace-locale";
+import type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
 
 const toast = vi.hoisted(() => ({
   error: vi.fn(),
@@ -72,6 +73,42 @@ const intent: SearchIntent = {
   ],
 };
 
+const taxonomy: JobSearchTaxonomy = {
+  industries: [
+    {
+      code: "r01",
+      name: "Sales & Business Development",
+      count: 4,
+      subIndustries: [
+        {
+          name: "B2B Sales",
+          count: 4,
+          titles: [
+            {
+              name: "Key Account Manager",
+              categoryIds: ["r01-b2b-sales"],
+              count: 2,
+            },
+            {
+              name: "Account Executive",
+              categoryIds: ["r01-b2b-sales"],
+              count: 1,
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  locations: [
+    { label: "Ho Chi Minh City", value: "Ho Chi Minh City", count: 4 },
+    {
+      label: "Ho Chi Minh City · District 1",
+      value: "District 1, Ho Chi Minh City",
+      count: 2,
+    },
+  ],
+};
+
 describe("image-assisted job-search controls", () => {
   it("keeps an English text-and-camera search bar available in the global header", () => {
     window.history.replaceState(null, "", "/jobs?q=Sidebar%20keyword");
@@ -118,6 +155,25 @@ describe("image-assisted job-search controls", () => {
     ).toBeVisible();
   });
 
+  it("moves the existing search controls into the workspace toolbar when docked", () => {
+    const headerSlot = document.createElement("div");
+    headerSlot.id = "workspace-job-search-slot";
+    document.body.append(headerSlot);
+    let unmount: (() => void) | undefined;
+
+    try {
+      ({ unmount } = render(
+        <GlobalImageSearch taxonomy={taxonomy} dockToWorkspaceHeader />,
+      ));
+
+      expect(headerSlot.querySelector('[role="search"]')).not.toBeNull();
+      expect(headerSlot.querySelector("#global-image-search")).not.toBeNull();
+    } finally {
+      unmount?.();
+      headerSlot.remove();
+    }
+  });
+
   it("replaces only the keyword and keeps active filters from the header", () => {
     expect(
       jobTextSearchHref(
@@ -125,6 +181,145 @@ describe("image-assisted job-search controls", () => {
         "product designer",
       ),
     ).toBe("/jobs?q=product+designer&location=Da+Nang&workArrangement=REMOTE");
+    expect(
+      jobTextSearchHref(
+        "https://smarthire.test/jobs?q=old&location=Da%20Nang&workArrangement=REMOTE",
+        "product designer",
+        "Ha Noi",
+      ),
+    ).toBe("/jobs?q=product+designer&location=Ha+Noi&workArrangement=REMOTE");
+  });
+
+  it("shows a server-derived category flyout and location choices", () => {
+    render(<GlobalImageSearch taxonomy={taxonomy} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Job Category" }));
+    expect(
+      screen.getAllByText("Sales & Business Development").at(0),
+    ).toBeVisible();
+    expect(screen.getByRole("heading", { name: /b2b sales/i })).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: /key account manager/i }),
+    ).toBeVisible();
+    expect(screen.getByLabelText("Location")).toHaveDisplayValue(
+      "All locations",
+    );
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(
+      screen.queryByRole("dialog", { name: "Job categories" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Job Category" })).toHaveFocus();
+  });
+
+  it("opens and changes job categories only when clicked", () => {
+    const clickTaxonomy: JobSearchTaxonomy = {
+      ...taxonomy,
+      industries: [
+        {
+          ...taxonomy.industries[0]!,
+          name: "Marketing / PR / Advertising / Communications",
+          count: 428,
+        },
+        {
+          code: "r03",
+          name: "Information Technology (IT)",
+          count: 2,
+          subIndustries: [
+            {
+              name: "Software Engineering",
+              count: 2,
+              titles: [
+                {
+                  name: "Software Engineer",
+                  categoryIds: ["r03-software-engineering"],
+                  count: 2,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    render(<GlobalImageSearch taxonomy={clickTaxonomy} />);
+
+    const trigger = screen.getByRole("button", { name: "Job Category" });
+    fireEvent.mouseEnter(trigger);
+    expect(screen.queryByRole("dialog", { name: "Job categories" })).toBeNull();
+
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    const technology = screen.getByRole("button", {
+      name: /information technology.*2 open roles/i,
+    });
+    fireEvent.mouseEnter(technology);
+    expect(
+      document.querySelector(".job-category-detail-title"),
+    ).toHaveTextContent("Marketing / PR / Advertising / Communications");
+    expect(technology).toHaveAttribute("data-active", "false");
+    expect(technology.closest("li")).toHaveClass("job-category-industry-item");
+
+    fireEvent.click(technology);
+    expect(technology).toHaveAttribute("aria-pressed", "true");
+    expect(technology).toHaveAttribute("data-active", "true");
+    expect(
+      document.querySelector(".job-category-detail-title"),
+    ).toHaveTextContent("Information Technology (IT)");
+  });
+
+  it("closes the category flyout from its close control or an outside click", () => {
+    render(<GlobalImageSearch taxonomy={taxonomy} />);
+    const trigger = screen.getByRole("button", { name: "Job Category" });
+
+    fireEvent.click(trigger);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Close job categories" }),
+    );
+    expect(screen.queryByRole("dialog", { name: "Job categories" })).toBeNull();
+
+    fireEvent.click(trigger);
+    fireEvent.pointerDown(document.body);
+    expect(screen.queryByRole("dialog", { name: "Job categories" })).toBeNull();
+  });
+
+  it("renders every industry supplied by the precomputed taxonomy", () => {
+    const allIndustries: JobSearchTaxonomy = {
+      ...taxonomy,
+      industries: Array.from({ length: 28 }, (_, index) => ({
+        ...taxonomy.industries[0]!,
+        code: `r${String(index + 1).padStart(2, "0")}`,
+        name: `Industry ${String(index + 1).padStart(2, "0")}`,
+      })),
+    };
+    render(<GlobalImageSearch taxonomy={allIndustries} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Job Category" }));
+    expect(screen.getAllByRole("button", { name: /^Industry /u })).toHaveLength(
+      28,
+    );
+  });
+
+  it("keeps exactly one in-flow active row while selecting all 28 categories", () => {
+    const allIndustries: JobSearchTaxonomy = {
+      ...taxonomy,
+      industries: Array.from({ length: 28 }, (_, index) => ({
+        ...taxonomy.industries[0]!,
+        code: `r${String(index + 1).padStart(2, "0")}`,
+        name: `Industry ${String(index + 1).padStart(2, "0")}`,
+      })),
+    };
+    render(<GlobalImageSearch taxonomy={allIndustries} />);
+    fireEvent.click(screen.getByRole("button", { name: "Job Category" }));
+
+    for (let index = 1; index <= 28; index += 1) {
+      const category = screen.getByRole("button", {
+        name: new RegExp(`^Industry ${String(index).padStart(2, "0")}`, "u"),
+      });
+      fireEvent.click(category);
+      expect(category).toHaveAttribute("data-active", "true");
+      expect(
+        document.querySelectorAll('.job-category-industry[data-active="true"]'),
+      ).toHaveLength(1);
+    }
   });
 
   it("accepts a PNG/JPEG file through the accessible labeled input", () => {
