@@ -2,115 +2,138 @@
 
 _Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Quốc Thành | Edited by: Lưu Chí Hải_
 
-**Architecture scope:** Frontend components that represent the implemented Features 001–005 baseline, with emphasis on candidate profile/CV workflows, deterministic job discovery, image-assisted search, and application submission.
+**Architecture scope:** Major frontend components of the final implemented SmartHire product, covering public, candidate, recruiter/company-member, communication, and platform-administration experiences.
 
-**C4 modeling note:** Level 2 contains one deployable `Next.js Web Application`. This diagram is the **frontend logical component view** of that container. `Server-side Services & API Routes` is shown only as the in-container backend interface used by frontend components; its internal decomposition is documented separately in the Backend Component Diagram.
+**C4 modeling note:** The current structure, `web/next.config.ts`, `web/server.ts`, `compose.yaml`, and `tech_stack.md` continue to support one deployable `Next.js Web Application`. The frontend and backend diagrams are logical Level 3 views of that container, not separately deployed frontend and API services. `Server-side Services & API Routes` is shown only as the in-container backend interface used by the frontend; its internal decomposition remains in the Backend Component Diagram.
 
 ```mermaid
-flowchart TD
+%%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 24, "rankSpacing": 38}}}%%
+flowchart LR
     %% Styling
     classDef component fill:#1168bd,stroke:#0b4884,stroke-width:2px,color:#fff,rx:8px,ry:8px
     classDef backend fill:#666666,stroke:#444444,stroke-width:2px,color:#fff,rx:8px,ry:8px
-    classDef boundary fill:none,stroke:#444,stroke-width:2px,stroke-dasharray: 5 5,color:#333
-    classDef containerBoundary fill:none,stroke:#1168bd,stroke-width:3px,stroke-dasharray: 5 5,color:#1168bd
+    classDef boundary fill:none,stroke:#444,stroke-width:2px,stroke-dasharray:5 5,color:#333
+    classDef containerBoundary fill:none,stroke:#1168bd,stroke-width:3px,stroke-dasharray:5 5,color:#1168bd
 
-    %% Next.js Web Application Container Boundary
-    subgraph Container_Frontend ["Next.js Web Application [Container]"]
+    subgraph Container_Web ["Next.js Web Application [Container]"]
+        direction LR
         subgraph Frontend_View ["Frontend Logical Component View"]
-            %% Candidate Profile Management Boundary
-            subgraph Boundary_Profile ["Candidate Profile Management"]
-                C_Profile["<b>Profile Overview UI</b><br/>[Component: React/Next.js]<br/><br/>Displays and manages professional<br/>profile data (skills, experience)"]:::component
-                C_Account["<b>Account Identity UI</b><br/>[Component: React/Next.js]<br/><br/>Manages account name<br/>and email change requests"]:::component
-                C_Security["<b>Security & Prefs UI</b><br/>[Component: React/Next.js]<br/><br/>Manages passwords, 2FA,<br/>and notification settings"]:::component
-                C_CV["<b>CV Import Workspace UI</b><br/>[Component: React/Next.js]<br/><br/>Uploads and reviews CV imports,<br/>tracks processing and manages CV library"]:::component
+            direction TB
+            Shell["<b>Application Shells & Providers</b><br/>[Component: Next.js/React]<br/><br/>Role-aware layouts, navigation,<br/>theme, locale, CSRF and client state"]:::component
+
+            subgraph Candidate_Boundary ["Public & Candidate Experience"]
+                direction TB
+                PublicJobs["<b>Public Home & Job Discovery UI</b><br/>[Component Group: React/Next.js]<br/><br/>Landing, approved jobs, filters,<br/>details, save/report and image search"]:::component
+                Identity["<b>Authentication & Account Security UI</b><br/>[Component Group: React/Next.js]<br/><br/>Registration, login, verification,<br/>recovery, sessions and 2FA"]:::component
+                ProfileCv["<b>Candidate Profile & CV UI</b><br/>[Component Group: React/Next.js]<br/><br/>Profile/account settings and<br/>CV upload, review and library"]:::component
+                CandidateApps["<b>Candidate Applications & Match UI</b><br/>[Component Group: React/Next.js]<br/><br/>Application wizard/tracking, offers<br/>and private CV-to-job matching"]:::component
             end
 
-            %% Job Board & Advanced Search Boundary
-            subgraph Boundary_Jobs ["Job Board & Advanced Search"]
-                C_Search["<b>Job Discovery UI</b><br/>[Component: React/Next.js]<br/><br/>Displays job listings<br/>and advanced search filters"]:::component
-                C_ImageSearch["<b>Image Search UI</b><br/>[Component group: React/Next.js]<br/><br/>Uploads an image, manages consent,<br/>shows progress and reviews filter proposals"]:::component
-                C_Detail["<b>Job Detail & Actions UI</b><br/>[Component: React/Next.js]<br/><br/>Shows job details, handles<br/>save and report actions"]:::component
-                C_Apply["<b>Job Application UI</b><br/>[Component: React/Next.js]<br/><br/>Handles CV selection<br/>and application submission"]:::component
+            Engagement["<b>Communication & Engagement UI</b><br/>[Component Group: React/Next.js]<br/><br/>Messaging, recruitment threads,<br/>connections, notifications and support"]:::component
+
+            subgraph Recruiter_Boundary ["Recruiter / Company-Member Experience"]
+                direction TB
+                CompanyJobs["<b>Company Access & Job Management UI</b><br/>[Component Group: React/Next.js]<br/><br/>Employer verification, company/team<br/>settings and job-post lifecycle"]:::component
+                RecruiterOps["<b>Applicant Operations UI</b><br/>[Component Group: React/Next.js]<br/><br/>Review, scoring/ranking, Kanban,<br/>decisions, analytics and exports"]:::component
             end
+
+            Admin["<b>Platform Administration UI</b><br/>[Component Group: React Admin/MUI]<br/><br/>Verification, moderation, platform<br/>management, analytics and backups"]:::component
         end
 
-        %% Backend Services & API (Inside the Next.js Container)
-        API["<b>Server-side Services & API Routes</b><br/>[Component Group: Next.js App Router]<br/><br/>Handles business logic,<br/>services and data access"]:::backend
-
+        API["<b>Server-side Services & API Routes</b><br/>[Backend Interface: Next.js App Router]<br/><br/>Authenticated services, business rules,<br/>Route Handlers and realtime gateways"]:::backend
     end
 
-    %% Relationships - Profile
-    C_Profile -. "GET, PATCH<br/>/api/account/profile" .-> API
-    C_Account -. "PATCH /api/account/identity<br/>POST /api/account/email-change/request" .-> API
-    C_Security -. "POST /api/account/password/change<br/>PUT /api/account/preferences" .-> API
-    C_CV -. "POST reserve; PUT content; GET status;<br/>retry/consent/cancel; review/confirm draft;<br/>mutate Candidate CV library" .-> API
+    Shell -. "Shared shell and providers" .-> PublicJobs
+    Shell -. "Account workspace" .-> Identity
+    Shell -. "Candidate workspace" .-> ProfileCv
+    Shell -. "Communication surfaces" .-> Engagement
+    Shell -. "Recruiter workspace" .-> CompanyJobs
+    Shell -. "Admin console" .-> Admin
 
-    %% Relationships - Jobs
-    C_Search -. "Server-side job search<br/>request" .-> API
-    C_ImageSearch -. "POST reserve; PUT content;<br/>GET status; POST result/consent;<br/>DELETE cancel" .-> API
-    C_ImageSearch -. "Applies user-approved<br/>filter proposals" .-> C_Search
-    C_Detail -. "PUT/DEL saved-jobs<br/>POST reports" .-> API
-    C_Apply -. "GET application-form<br/>POST applications" .-> API
+    PublicJobs -->|"Apply / private match"| CandidateApps
+    ProfileCv -->|"Reuse profile / CV"| CandidateApps
+    CandidateApps -->|"Threads / notification links"| Engagement
+    CompanyJobs -->|"Company / job context"| RecruiterOps
+    RecruiterOps -->|"Recruitment threads"| Engagement
 
-    C_Detail -. "Triggers application<br/>form" .-> C_Apply
+    Shell -. "RSC in-process context" .-> API
+    PublicJobs -. "RSC + HTTP /api/jobs" .-> API
+    Identity -. "HTTP identity/security APIs" .-> API
+    ProfileCv -. "RSC + HTTP /api/account" .-> API
+    CandidateApps -. "RSC + HTTP /api/candidate" .-> API
+    Engagement -. "REST + Socket.IO" .-> API
+    CompanyJobs -. "RSC + HTTP recruiter APIs" .-> API
+    RecruiterOps -. "Polling + recruiter mutations" .-> API
+    Admin -. "React Admin HTTP + Socket.IO" .-> API
 
-    %% Layout constraints
-    class Boundary_Profile,Boundary_Jobs,Frontend_View boundary
-    class Container_Frontend containerBoundary
+    class Candidate_Boundary,Recruiter_Boundary,Frontend_View boundary
+    class Container_Web containerBoundary
 ```
 
 ## Component Descriptions
 
 _Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Quốc Thành | Edited by: Lưu Chí Hải_
 
-**Group 1: Candidate Profile Management**
+**1. Application Shells & Providers**
 
-- **Profile Overview UI (`profile-overview.tsx`)**
+- **Main source:** `web/src/app/layout.tsx`, `web/src/app/(workspace)/layout.tsx`, `web/src/app/recruiter/layout.tsx`, `web/src/frontend/features/dashboard/components/workspace-shell.tsx`, `web/src/frontend/features/admin/layout/admin-layout.tsx`, and `web/src/frontend/providers/`.
+- **Responsibility and workflows:** Establishes the root theme and global feedback surface, authenticated candidate/recruiter shells, workspace-mode navigation, locale, account/recruiter header status, CSRF context, TanStack Query provider, and the administration layout. It routes users among candidate, recruiter, notification, messaging, support, and administration areas without turning those areas into separate deployable applications.
+- **Backend interaction:** React Server Component layouts call `getWorkspaceContext()` in process to validate the session and project display-safe account/company-access state. Client providers then supply CSRF proof and cached client state to browser components.
 
-- **Responsibilities:** Displays the candidate's profile dashboard, including personal information, skills, experience, education, and social links.
+**2. Public Home & Job Discovery UI**
 
-- **Backend Interaction:** Fetches initial data via server-side `GetProfileAggregateService`. Client-side interactions send requests to `GET /api/account/profile` and `PATCH /api/account/profile` to save section updates.
+- **Main source:** `web/src/app/page.tsx`, `web/src/app/jobs/page.tsx`, `web/src/app/jobs/[slug]/page.tsx`, `web/src/frontend/features/home/`, `web/src/frontend/features/jobs/`, and `web/src/frontend/features/jobs/image-search/`.
+- **Responsibility and workflows:** Renders the landing experience, approved job catalogue, live search/filter/pagination, job details, saved-job and report actions, preferences/rule-based suggestions, and consent-aware image-assisted search. It leads authenticated candidates into application or private-match workflows.
+- **Backend interaction:** The initial home, search, and detail models are loaded by React Server Components through `getHomePageContext()` and `JobDiscoveryService` as in-process TypeScript calls. Interactive search uses `GET /api/jobs`; saved/report actions use `/api/saved-jobs/{jobId}` and `/api/jobs/{jobId}/reports`; image-search components reserve, upload, poll, consume, consent, and cancel through `/api/jobs/image-searches/...`.
 
-- **Account Identity UI (`profile-account-view.tsx`)**
+**3. Authentication & Account Security UI**
 
-- **Responsibilities:** Provides forms for users to view and update their account name and request email changes.
+- **Main source:** `web/src/app/(auth)/`, `web/src/frontend/features/authentication/`, `web/src/app/(workspace)/settings/`, and the security/session components under `web/src/frontend/features/profile/`.
+- **Responsibility and workflows:** Supports account registration, email verification, password login, two-factor challenge, forgotten-password reset, full account recovery, password changes, TOTP enrollment/disablement, backup-code regeneration, and session listing/revocation.
+- **Backend interaction:** Client components send HTTP requests to implemented Route Handlers under `/api/identity/...`, `/api/auth/[...all]`, `/api/account/password/change`, and the session/two-factor subroutes. The frontend stores no bearer token in browser storage; authentication is carried by the server-managed cookie session and CSRF proof.
 
-- **Backend Interaction:** Submits updates to `PATCH /api/account/identity` and initiates email changes via `POST /api/account/email-change/request`.
+**4. Candidate Profile & CV UI**
 
-- **Security & Preferences UI (`profile-security-view.tsx`, `profile-preferences-view.tsx`)**
+- **Main source:** `web/src/app/(workspace)/profile/`, `web/src/frontend/features/profile/`, and `web/src/frontend/features/cv-import/`.
+- **Responsibility and workflows:** Manages professional profile sections, avatar, account name/email, preferences, notification settings, and the candidate CV library. The CV workspace uploads PDF/DOCX files, shows malware/extraction/OCR processing state, records external-processing consent, supports retry/cancel, lets the Candidate reconcile extracted fields, and confirms reusable CV versions.
+- **Backend interaction:** Profile pages load through `GetProfileAggregateService`, `AccountIdentityService`, `AccountPreferencesService`, and CV projection/library services in process. Browser edits use `/api/account/profile`, `/api/account/identity`, `/api/account/preferences`, `/api/account/cv-imports/...`, `/api/account/cv-drafts/...`, and `/api/account/candidate-cvs/...`; long-running imports are polled through their status Route Handler.
 
-- **Responsibilities:** Wraps the security and preference settings, allowing users to change passwords, manage 2FA (TOTP), and update notification/timezone preferences.
+**5. Candidate Applications & Match UI**
 
-- **Backend Interaction:** Sends requests to `POST /api/account/password/change`, `/api/identity/two-factor/...` for security, and `PUT /api/account/preferences` for user settings.
+- **Main source:** `web/src/app/jobs/[slug]/apply/`, `web/src/app/jobs/applied/`, `web/src/app/(workspace)/cv-match-check/`, `web/src/frontend/features/candidate-applications/`, and `web/src/frontend/features/private-cv-match/`.
+- **Responsibility and workflows:** Provides the multi-step application draft and submission flow, CV and cover-letter selection, processing/retry state, application list and detailed stage history, notification preferences, withdrawal and offer response, plus private pre-application CV-to-job match checks with deterministic/AI status and explanations.
+- **Backend interaction:** Server pages call `ApplicationDraftService`, `CandidateApplicationTrackingService`, and candidate CV services directly. Client orchestration uses `/api/candidate/application-drafts`, `/api/candidate/applications/...`, `/api/candidate/private-cv-matches/...`, and the public application endpoints under `/api/jobs/{jobId}/...`; asynchronous application/scoring or private-match progress is polled.
 
-- **CV Import Workspace UI (`cv-import-workspace.tsx`)**
+**6. Communication & Engagement UI**
 
-- **Responsibilities:** Provides the workspace for uploading PDF/DOCX CVs, tracking import progress and history, reviewing and editing extracted CV data, confirming the import, and managing confirmed Candidate CV entries.
+- **Main source:** `web/src/app/(workspace)/messages/`, `web/src/app/(workspace)/notifications/`, `web/src/app/(workspace)/connections/`, `web/src/app/(workspace)/support/`, `web/src/app/jobs/applied/[applicationId]/messages/`, `web/src/app/recruiter/messages/`, and the `messaging/`, `recruitment-messaging/`, `notifications/`, `connections/`, and `support/` directories under `web/src/frontend/features/`.
+- **Responsibility and workflows:** Provides eligible-participant messaging, blocking/reporting and read state, application-specific candidate/recruiter threads and assignment/owner oversight, professional connection proposals, deep-linked in-app notifications, and requester support conversations.
+- **Backend interaction:** Initial messaging and connection contexts can be loaded in process. REST Route Handlers under `/api/messaging`, `/api/recruitment-threads`, `/api/notifications`, `/api/connections`, and `/api/support` provide authoritative queries and mutations. Socket.IO clients use the same web application at the `/chat` transport path with `/chat`, `/connections`, and `/support` namespaces over WebSocket for general-message delivery and connection/support invalidation; HTTP refetch remains authoritative after reconnect. Application-specific recruitment threads use REST and explicit refetch after writes, not Socket.IO.
 
-- **Backend Interaction:** Reserves an import with metadata through `POST /api/account/cv-imports`, then uploads the raw file through `PUT` to the returned `/api/account/cv-imports/{uploadId}/content` URL. It retrieves processing status with `GET /api/account/cv-imports/{uploadId}`; requests retries and manages consent through the import subresources; cancels an import with `DELETE`; retrieves and edits review data through `/api/account/cv-drafts/{draftId}`; confirms through `/api/account/cv-drafts/{draftId}/confirm`; and updates or removes confirmed Candidate CV library entries through `/api/account/candidate-cvs/{cvId}`.
+**7. Company Access & Job Management UI**
 
-**Group 2: Job Board & Advanced Search**
+- **Main source:** `web/src/app/(workspace)/dashboard/employer-verification/page.tsx`, `web/src/frontend/features/employer-verification/`, `web/src/app/recruiter/company-settings/`, `web/src/app/recruiter/company-invitation/`, `web/src/app/recruiter/job-postings/`, and `web/src/frontend/features/recruiter-workspace/`.
+- **Responsibility and workflows:** Guides a user through tax-ID lookup, company-email proof, protected business-evidence submission, status/correction/resubmission, and entry into the recruiter workspace. Approved company members manage company details and job drafts/previews/review submission; Owners manage team invitations and membership roles. Recruiter access remains bound to an active company membership.
+- **Backend interaction:** Recruiter pages load company/job data through `readRecruiterCompanySettings()`, `readRecruiterJobManagementData()`, and `CompanyTeamService` in process after `getWorkspaceContext()`. Client commands use `/api/employer-verifications/...`, `/api/recruiter/company`, `/api/recruiter/company/team/...`, and `/api/recruiter/job-postings/...`.
 
-- **Job Discovery UI (`job-search-form.tsx`)**
+**8. Applicant Operations UI**
 
-- **Responsibilities:** Renders the main job search page, including advanced filtering forms (keyword, location, salary, skills) and displays the list of job cards.
+- **Main source:** `web/src/app/recruiter/candidates/`, `web/src/app/recruiter/pipeline/`, `web/src/app/recruiter/analytics/`, `web/src/frontend/features/recruiter-applications/`, and `web/src/frontend/features/recruitment-analytics/`.
+- **Responsibility and workflows:** Lets authorized company members browse submitted applicants, safely preview/download application documents, inspect automatic and optional AI assessment details, rank/shortlist/prioritize candidates, retry or rescore processing, make interview/rejection decisions, and move applications through a drag-and-drop Kanban pipeline. It also displays qualified views, applications, conversion/funnel performance, and creates downloadable CSV/Excel exports.
+- **Backend interaction:** Server pages resolve authenticated managed-job context in process. Browser hooks query and mutate company-scoped routes under `/api/recruiter/jobs/...`, `/api/recruiter/applications/...`, and `/api/recruiter/analytics/...`. Kanban moves use CSRF-protected, idempotent `PATCH` requests with expected stage versions; ranking, scoring summaries, pipelines, analytics, and export status use client polling where necessary.
 
-- **Backend Interaction:** Performs server-side queries via `JobDiscoveryService.search(...)`.
+**9. Platform Administration UI**
 
-- **Image Search UI (`global-image-search.tsx`, `use-image-search.ts`)**
+- **Main source:** `web/src/app/(admin-console)/admin-console/page.tsx` and `web/src/frontend/features/admin/`.
+- **Responsibility and workflows:** A React Admin/Material UI console provides designated-session login and two-factor step-up, platform dashboard and growth analytics, notification handling, account/company/membership lifecycle controls, employer-verification evidence review and decisions, job-post review and enforcement, general moderation and messaging-report review, professional-connection proposal management, support-case handling, and encrypted backup settings/history with manual or scheduled runs.
+- **Backend interaction:** `admin-app.tsx` composes resources through `auth-provider.ts` and `data-provider.ts`. Browser requests use `/api/admin/...`; the support and professional-connection resources subscribe to the `/support` and `/connections` Socket.IO namespaces for invalidation. Sensitive mutations and backup reads/writes surface `STEP_UP_REQUIRED` when the recent two-factor proof is stale. The console does not call repositories directly.
 
-- **Responsibilities:** Coordinates image selection, privacy notice and consent, upload progress, processing status, recovery states, and review of evidence-bound search-filter proposals. Proposed filters are not applied until the user accepts them; ordinary deterministic job search remains authoritative.
+**10. Server-side Services & API Routes (backend interface)**
 
-- **Backend Interaction:** Reserves a query through `POST /api/jobs/image-searches`, uploads the image through `PUT /api/jobs/image-searches/{queryId}/content`, polls `GET /api/jobs/image-searches/{queryId}`, consumes the result through `POST /api/jobs/image-searches/{queryId}/result`, updates or revokes consent through `POST /api/jobs/image-searches/{queryId}/consent`, and cancels through `DELETE /api/jobs/image-searches/{queryId}`. The client orchestration is implemented in `web/src/frontend/features/jobs/image-search/client/use-image-search.ts` and `image-search-api.ts`.
+- **Main source:** `web/src/backend/`, `web/src/app/api/`, and `web/server.ts`.
+- **Responsibility:** Represents only the server-side interface visible to this frontend view: authenticated business services called by Server Components, Next.js Route Handlers called by the browser, and same-process Socket.IO gateways. Database access, workers, provider adapters, storage, OCR, and other backend internals are deliberately not duplicated in this frontend Level 3 diagram.
+- **Communication model:** React Server Components execute server-only TypeScript services in process and pass serialized display data to React. Client Components use same-origin HTTP/HTTPS requests for queries, mutations, uploads, and polling, plus authenticated `ws`/`wss` Socket.IO transport for realtime events. A repository-wide search finds no `"use server"` directives, so the document does not claim that Server Actions are used.
 
-- **Job Detail & Actions UI (`job-detail.tsx`, `save-job-action.tsx`, `report-job-dialog.tsx`)**
+## Frontend Technology Summary
 
-- **Responsibilities:** Displays comprehensive job details, company information, requirements, and benefits. It also houses interactive actions to save, report, or apply for the job.
-
-- **Backend Interaction:** Fetches data via `JobDiscoveryService.detail(...)`. Saves jobs using `PUT/DELETE /api/saved-jobs/{jobId}` and submits reports via `POST /api/jobs/{jobId}/reports`.
-
-- **Job Application UI (`job-application-form.tsx`)**
-
-- **Responsibilities:** Renders the application submission form, allowing candidates to select an imported CV, answer job-specific questions, and write a cover letter.
-
-- **Backend Interaction:** Retrieves the form template via `GET /api/jobs/{jobId}/application-form` and submits the final application to `POST /api/jobs/{jobId}/applications`.
+The implemented frontend uses **Next.js 16.3**, **React 19**, and **TypeScript 5.9** with App Router Server and Client Components. **Tailwind CSS 4** is imported by `web/src/app/globals.css` and works alongside project CSS modules/tokens. Interactive forms and contracts use **React Hook Form** and **Zod** where applicable; **TanStack Query** manages client caching, polling, mutations, and invalidation; **Socket.IO Client** provides realtime transport; **dnd-kit** powers the recruitment pipeline; and the administration console uses **React Admin 5** with **Material UI 7**.
