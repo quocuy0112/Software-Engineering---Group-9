@@ -69,6 +69,9 @@ export function parseJobSearchCriteria(raw: unknown): NormalizedJobSearch {
     normalizedQuery: normalizeSearchText(parsed.q),
     searchBy: parsed.searchBy,
     normalizedLocation: normalizeSearchText(parsed.location, 160),
+    normalizedDistricts: parsed.district.map((district) =>
+      normalizeSearchText(district, 160),
+    ),
     normalizedSkills: parsed.skills.map((skill) =>
       normalizeSearchText(skill, 80),
     ),
@@ -304,6 +307,7 @@ export class JobDiscoveryService {
         q: criteria.normalizedQuery,
         searchBy: criteria.searchBy,
         location: criteria.normalizedLocation,
+        district: criteria.normalizedDistricts,
         employmentType: criteria.employmentType,
         experienceLevel: criteria.experienceLevel,
         workArrangement: criteria.workArrangement,

@@ -89,12 +89,34 @@ function criteriaFromLocation(): ManualSearchContext {
   };
 }
 
+function districtsFromLocation() {
+  if (typeof window === "undefined") return [];
+  return [
+    ...new Set(
+      new URL(window.location.href).searchParams
+        .getAll("district")
+        .map((item) => item.trim().slice(0, 160))
+        .filter(Boolean),
+    ),
+  ].slice(0, 20);
+}
+
+function normalizeLocationSearch(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/đ/gu, "d")
+    .toLocaleLowerCase();
+}
+
 export function jobTextSearchHref(
   href: string,
   query: string,
   location?: string,
+  districts?: readonly string[],
 ) {
-  const parameters = new URL(href, "http://localhost").searchParams;
+  const currentUrl = new URL(href, "http://localhost");
+  const parameters = currentUrl.searchParams;
   parameters.delete("cursor");
   const value = query.trim();
   if (value) parameters.set("q", value.slice(0, 200));
@@ -103,6 +125,12 @@ export function jobTextSearchHref(
     const locationValue = location.trim();
     if (locationValue) parameters.set("location", locationValue.slice(0, 160));
     else parameters.delete("location");
+  }
+  if (districts !== undefined) {
+    parameters.delete("district");
+    for (const district of [...new Set(districts.map((item) => item.trim()))]) {
+      if (district) parameters.append("district", district.slice(0, 160));
+    }
   }
   return parameters.size ? `/jobs?${parameters.toString()}` : "/jobs";
 }
@@ -309,6 +337,230 @@ function JobCategoryMenu({
   );
 }
 
+function LocationPicker({
+  taxonomy,
+  location,
+  districts,
+  onApply,
+  onClear,
+  vi,
+}: Readonly<{
+  taxonomy: JobSearchTaxonomy;
+  location: string;
+  districts: readonly string[];
+  onApply(city: string, districts: string[]): void;
+  onClear(): void;
+  vi: boolean;
+}>) {
+  const groups = taxonomy.locationGroups ?? [];
+  const [open, setOpen] = useState(false);
+  const [provinceQuery, setProvinceQuery] = useState("");
+  const [draftCity, setDraftCity] = useState("");
+  const [draftDistricts, setDraftDistricts] = useState<string[]>([]);
+  const picker = useRef<HTMLDivElement>(null);
+
+  const selectedGroup =
+    groups.find((group) => group.city === draftCity) ?? groups[0];
+  const visibleGroups = groups.filter((group) =>
+    normalizeLocationSearch(group.city).includes(
+      normalizeLocationSearch(provinceQuery),
+    ),
+  );
+  const displayValue = !location
+    ? ""
+    : districts.length === 0
+      ? location
+      : `${location} (${districts.length} ${vi ? "quận/huyện" : "districts"})`;
+  const placeholder = vi ? "Tỉnh/thành, quận..." : "Province/city, district...";
+
+  const openPicker = () => {
+    setDraftCity(location || groups[0]?.city || "");
+    setDraftDistricts([...districts]);
+    setProvinceQuery("");
+    setOpen(true);
+  };
+
+  const beginEditing = () => {
+    if (open) return;
+    openPicker();
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    const closeOutside = (event: PointerEvent) => {
+      if (!picker.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    document.addEventListener("pointerdown", closeOutside);
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("pointerdown", closeOutside);
+    };
+  }, [open]);
+
+  if (!groups.length) return null;
+
+  return (
+    <div className="job-location-picker" ref={picker}>
+      <div className="global-image-search-location">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11Z" />
+          <circle cx="12" cy="10" r="2" />
+        </svg>
+        <input
+          className="job-location-picker-input"
+          type="search"
+          value={open ? provinceQuery : displayValue}
+          placeholder={placeholder}
+          aria-label={vi ? "Địa điểm" : "Location"}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          aria-controls="job-location-picker-dialog"
+          onFocus={beginEditing}
+          onChange={(event) => {
+            if (!open) openPicker();
+            setProvinceQuery(event.currentTarget.value);
+          }}
+        />
+        {location ? (
+          <button
+            className="job-location-picker-clear"
+            type="button"
+            aria-label={vi ? "Xóa địa điểm" : "Clear location"}
+            onClick={() => {
+              onClear();
+              setProvinceQuery("");
+            }}
+          >
+            &times;
+          </button>
+        ) : null}
+        <span className="job-location-picker-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m7 10 5 5 5-5" />
+          </svg>
+        </span>
+      </div>
+
+      {open ? (
+        <div
+          id="job-location-picker-dialog"
+          className="job-location-picker-flyout"
+          role="dialog"
+          aria-label={vi ? "Chọn địa điểm" : "Choose location"}
+        >
+          <header className="job-location-picker-heading">
+            <strong>
+              <span>{vi ? "Địa điểm" : "Location"}:</span>
+              <span>{draftCity || displayValue}</span>
+            </strong>
+            <button
+              type="button"
+              aria-label={vi ? "Đóng" : "Close"}
+              onClick={() => setOpen(false)}
+            >
+              ×
+            </button>
+          </header>
+          <div className="job-location-picker-panels">
+            <section
+              className="job-location-provinces"
+              aria-label={vi ? "Tỉnh thành" : "Provinces"}
+            >
+              <label className="sr-only" htmlFor="job-location-province-search">
+                {vi ? "Tìm Tỉnh/Thành" : "Find province"}
+              </label>
+              <input
+                id="job-location-province-search"
+                type="search"
+                placeholder={vi ? "Tìm Tỉnh/Thành..." : "Find province..."}
+                value={provinceQuery}
+                onChange={(event) =>
+                  setProvinceQuery(event.currentTarget.value)
+                }
+              />
+              <div className="job-location-province-list" role="radiogroup">
+                {visibleGroups.map((group) => (
+                  <button
+                    className="job-location-province"
+                    data-active={group.city === selectedGroup?.city}
+                    key={group.city}
+                    type="button"
+                    role="radio"
+                    aria-checked={group.city === selectedGroup?.city}
+                    onClick={() => {
+                      setDraftCity(group.city);
+                      setDraftDistricts([]);
+                    }}
+                  >
+                    <span aria-hidden="true" className="job-location-radio" />
+                    <span>{group.city}</span>
+                    <small aria-hidden="true">{group.count}</small>
+                  </button>
+                ))}
+              </div>
+            </section>
+            <section
+              className="job-location-districts"
+              aria-label={vi ? "Quận huyện" : "Districts"}
+            >
+              <header>
+                <strong>{vi ? "Quận/Huyện" : "Districts"}</strong>
+                <button
+                  className="job-location-apply"
+                  type="button"
+                  onClick={() => {
+                    onApply(selectedGroup?.city ?? "", draftDistricts);
+                    setOpen(false);
+                  }}
+                >
+                  {vi ? "Áp dụng" : "Apply"}
+                </button>
+              </header>
+              <label className="job-location-district-option job-location-district-all">
+                <input
+                  type="checkbox"
+                  checked={draftDistricts.length === 0}
+                  onChange={() => setDraftDistricts([])}
+                />
+                <span>{vi ? "Tất cả" : "All"}</span>
+              </label>
+              <div className="job-location-district-list">
+                {selectedGroup?.districts.map((district) => {
+                  const checked = draftDistricts.includes(district.name);
+                  return (
+                    <label
+                      className="job-location-district-option"
+                      key={district.name}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() =>
+                          setDraftDistricts((current) =>
+                            checked
+                              ? current.filter((item) => item !== district.name)
+                              : [...current, district.name],
+                          )
+                        }
+                      />
+                      <span>{district.name}</span>
+                      <small aria-hidden="true">{district.count}</small>
+                    </label>
+                  );
+                })}
+              </div>
+            </section>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function BeforeAfterDemo({ vi }: { vi: boolean }) {
   return (
     <div className="image-search-demo" aria-hidden="true">
@@ -326,10 +578,12 @@ function BeforeAfterDemo({ vi }: { vi: boolean }) {
 export function GlobalImageSearch({
   csrfProof,
   taxonomy,
+  onJobSearchNavigate,
   dockToWorkspaceHeader = false,
 }: {
   csrfProof?: string;
   taxonomy?: JobSearchTaxonomy;
+  onJobSearchNavigate?(href: string): void;
   dockToWorkspaceHeader?: boolean;
 } = {}) {
   const locale = useWorkspaceLocale();
@@ -341,6 +595,10 @@ export function GlobalImageSearch({
   const [panelOpen, setPanelOpen] = useState(false);
   const [query, setQuery] = useState(() => criteria.q);
   const [location, setLocation] = useState(() => criteria.location);
+  const [districts, setDistricts] = useState(districtsFromLocation);
+  const [headerSlotReady, setHeaderSlotReady] = useState(
+    !dockToWorkspaceHeader,
+  );
   const cameraButton = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const search = useImageSearch({
@@ -349,10 +607,16 @@ export function GlobalImageSearch({
   });
   const busy = search.phase === "UPLOADING" || search.phase === "PROCESSING";
   const showPanel = panelOpen || search.phase !== "IDLE";
+  const navigateJobSearch =
+    onJobSearchNavigate ?? ((href: string) => window.location.assign(href));
   const workspaceHeaderSlot =
-    dockToWorkspaceHeader && typeof document !== "undefined"
+    dockToWorkspaceHeader && headerSlotReady && typeof document !== "undefined"
       ? document.getElementById("workspace-job-search-slot")
       : null;
+
+  useEffect(() => {
+    if (dockToWorkspaceHeader) setHeaderSlotReady(true);
+  }, [dockToWorkspaceHeader]);
 
   useEffect(() => {
     if (!taxonomy || process.env.NODE_ENV !== "development") return;
@@ -384,6 +648,20 @@ export function GlobalImageSearch({
     cameraButton.current?.focus();
   };
 
+  const submitJobTextSearch = (
+    nextLocation = location,
+    nextDistricts: readonly string[] = districts,
+  ) => {
+    navigateJobSearch(
+      jobTextSearchHref(
+        window.location.href,
+        query,
+        nextLocation,
+        nextDistricts,
+      ),
+    );
+  };
+
   const searchControls = (
     <div
       id="global-image-search"
@@ -406,8 +684,13 @@ export function GlobalImageSearch({
               taxonomy={taxonomy}
               vi={vi}
               onSelect={(title) =>
-                window.location.assign(
-                  jobTextSearchHref(window.location.href, title, location),
+                navigateJobSearch(
+                  jobTextSearchHref(
+                    window.location.href,
+                    title,
+                    location,
+                    districts,
+                  ),
                 )
               }
             />
@@ -419,9 +702,7 @@ export function GlobalImageSearch({
             aria-label={vi ? "Tìm kiếm việc làm toàn cục" : "Global job search"}
             onSubmit={(event) => {
               event.preventDefault();
-              window.location.assign(
-                jobTextSearchHref(window.location.href, query, location),
-              );
+              submitJobTextSearch();
             }}
           >
             <button
@@ -450,6 +731,7 @@ export function GlobalImageSearch({
             <input
               id="global-job-search-query"
               type="search"
+              autoComplete="off"
               value={query}
               maxLength={200}
               placeholder={
@@ -459,26 +741,22 @@ export function GlobalImageSearch({
               }
               onChange={(event) => setQuery(event.currentTarget.value)}
             />
-            {taxonomy?.locations.length ? (
-              <label className="global-image-search-location">
-                <span className="sr-only">Location</span>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11Z" />
-                  <circle cx="12" cy="10" r="2" />
-                </svg>
-                <select
-                  value={location}
-                  aria-label="Location"
-                  onChange={(event) => setLocation(event.currentTarget.value)}
-                >
-                  <option value="">All locations</option>
-                  {taxonomy.locations.map((item) => (
-                    <option key={item.value} value={item.value}>
-                      {item.label} ({item.count})
-                    </option>
-                  ))}
-                </select>
-              </label>
+            {taxonomy ? (
+              <LocationPicker
+                taxonomy={taxonomy}
+                location={location}
+                districts={districts}
+                vi={vi}
+                onApply={(nextLocation, nextDistricts) => {
+                  setLocation(nextLocation);
+                  setDistricts(nextDistricts);
+                  submitJobTextSearch(nextLocation, nextDistricts);
+                }}
+                onClear={() => {
+                  setLocation("");
+                  setDistricts([]);
+                }}
+              />
             ) : null}
             {!taxonomy ? (
               <button
@@ -521,7 +799,9 @@ export function GlobalImageSearch({
     <>
       {workspaceHeaderSlot
         ? createPortal(searchControls, workspaceHeaderSlot)
-        : searchControls}
+        : dockToWorkspaceHeader
+          ? null
+          : searchControls}
       {showPanel
         ? createPortal(
             <div

@@ -33,6 +33,18 @@ export function normalizeSearchText(value: string, maximum = 200): string {
     .replace(/\s+/gu, " ");
 }
 
+/**
+ * Public job locations are projected as "district, city" before being
+ * normalized. Compose the same canonical value for a district-level filter
+ * so it can be matched exactly instead of as a broad text fragment.
+ */
+export function normalizedDistrictLocation(
+  city: string,
+  district: string,
+): string {
+  return [district, city].filter(Boolean).join(" ");
+}
+
 export function encodeJobCursor(cursor: JobSearchCursor): string {
   const parsed = cursorSchema.parse(cursor);
   return Buffer.from(JSON.stringify(parsed), "utf8").toString("base64url");

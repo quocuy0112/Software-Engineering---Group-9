@@ -12,8 +12,6 @@ import {
 } from "./job-search-form";
 import { JobResultsList } from "./job-results-list";
 import { JobsWorkspaceNav } from "./jobs-workspace";
-import { GlobalImageSearch } from "@/frontend/features/jobs/image-search/components/global-image-search";
-import type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
 
 const scalarCriteriaNames = [
   "q",
@@ -30,6 +28,7 @@ const scalarCriteriaNames = [
 ] as const;
 
 const arrayCriteriaNames = [
+  "district",
   "employmentType",
   "experienceLevel",
   "workArrangement",
@@ -141,13 +140,11 @@ export function LiveJobSearchExperience({
   initialResult,
   initialError,
   copy,
-  taxonomy,
 }: Readonly<{
   initialCriteria: Record<string, string | string[] | undefined>;
   initialResult: JobSearchResponse | null;
   initialError: string | null;
   copy: JobsLiveCopy;
-  taxonomy?: JobSearchTaxonomy;
 }>) {
   const [criteria, setCriteria] = useState<JobSearchCriteria>(() =>
     criteriaFromInitial(initialCriteria),
@@ -160,34 +157,9 @@ export function LiveJobSearchExperience({
     initialError ? copy.tryAgain : null,
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [searchDocked, setSearchDocked] = useState(false);
   const requestId = useRef(0);
   const abortController = useRef<AbortController | null>(null);
   const debounceTimer = useRef<number | null>(null);
-  const searchDockAnchor = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const updateSearchDock = () => {
-      const anchor = searchDockAnchor.current;
-      const header = document.querySelector<HTMLElement>(
-        ".workspace-main[data-content-mode='job-board'] .workspace-header",
-      );
-      if (!anchor || !header) return;
-
-      setSearchDocked(
-        anchor.getBoundingClientRect().top <=
-          header.getBoundingClientRect().bottom,
-      );
-    };
-
-    updateSearchDock();
-    window.addEventListener("scroll", updateSearchDock, { passive: true });
-    window.addEventListener("resize", updateSearchDock);
-    return () => {
-      window.removeEventListener("scroll", updateSearchDock);
-      window.removeEventListener("resize", updateSearchDock);
-    };
-  }, []);
 
   const updateUrl = useCallback(
     (nextCriteria: JobSearchCriteria, nextPage: number, mode: HistoryMode) => {
@@ -344,17 +316,6 @@ export function LiveJobSearchExperience({
             </span>
           ) : null}
         </header>
-      </div>
-
-      <div
-        ref={searchDockAnchor}
-        className="jobs-search-sticky-region"
-        data-docked={searchDocked}
-      >
-        <GlobalImageSearch
-          taxonomy={taxonomy}
-          dockToWorkspaceHeader={searchDocked}
-        />
       </div>
 
       <div className="jobs-grid">

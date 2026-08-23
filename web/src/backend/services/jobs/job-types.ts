@@ -19,6 +19,7 @@ export type NormalizedJobSearch = {
   normalizedQuery: string;
   searchBy?: "TITLE" | "COMPANY" | "BOTH";
   normalizedLocation: string;
+  normalizedDistricts?: string[];
   normalizedSkills: string[];
   employmentType: Array<
     "FULL_TIME" | "PART_TIME" | "CONTRACT" | "INTERNSHIP" | "TEMPORARY"

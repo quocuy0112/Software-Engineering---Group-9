@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   decodeJobCursor,
   encodeJobCursor,
+  normalizedDistrictLocation,
   normalizeSearchText,
 } from "@/backend/services/jobs/search-normalization";
 
@@ -19,6 +20,12 @@ describe("Vietnamese job search normalization", () => {
     expect(() => normalizeSearchText("x".repeat(201), 200)).toThrow(
       "JOB_SEARCH_TEXT_TOO_LONG",
     );
+  });
+
+  it("builds an exact normalized location key for a selected district", () => {
+    expect(
+      normalizedDistrictLocation("ba ria vung tau", "vung tau city center"),
+    ).toBe("vung tau city center ba ria vung tau");
   });
 
   it("round-trips a versioned cursor", () => {

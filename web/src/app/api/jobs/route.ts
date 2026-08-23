@@ -5,13 +5,14 @@ import {
   publicJobJson,
 } from "@/backend/security/job-request-boundary";
 
-function query(request: Request) {
+export function jobSearchRequestQuery(request: Request) {
   const params = new URL(request.url).searchParams;
   const value = (name: string) => params.get(name) ?? undefined;
   return {
     q: value("q"),
     searchBy: value("searchBy"),
     location: value("location"),
+    district: params.getAll("district"),
     employmentType: params.getAll("employmentType"),
     experienceLevel: params.getAll("experienceLevel"),
     workArrangement: params.getAll("workArrangement"),
@@ -33,7 +34,7 @@ export async function GET(request: Request) {
   try {
     const actor = await optionalJobActor(request.headers);
     const result = await new JobDiscoveryService().search(
-      query(request),
+      jobSearchRequestQuery(request),
       actor,
     );
     return publicJobJson(result, actor);

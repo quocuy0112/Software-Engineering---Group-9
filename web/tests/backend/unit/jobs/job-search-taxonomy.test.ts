@@ -98,5 +98,10 @@ describe("job search taxonomy", () => {
         value: "Hai Chau, Da Nang",
       }),
     );
+    expect(taxonomy.locationGroups).toContainEqual({
+      city: "Da Nang",
+      count: 1,
+      districts: [{ name: "Hai Chau", count: 1 }],
+    });
   });
 });

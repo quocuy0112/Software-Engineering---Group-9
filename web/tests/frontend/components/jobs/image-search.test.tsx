@@ -107,6 +107,13 @@ const taxonomy: JobSearchTaxonomy = {
       count: 2,
     },
   ],
+  locationGroups: [
+    {
+      city: "Ho Chi Minh City",
+      count: 4,
+      districts: [{ name: "District 1", count: 2 }],
+    },
+  ],
 };
 
 describe("image-assisted job-search controls", () => {
@@ -120,6 +127,9 @@ describe("image-assisted job-search controls", () => {
     expect(
       screen.getByPlaceholderText("Search jobs, skills, or companies"),
     ).toHaveValue("Sidebar keyword");
+    expect(
+      screen.getByPlaceholderText("Search jobs, skills, or companies"),
+    ).toHaveAttribute("autocomplete", "off");
     expect(
       screen.getByRole("button", { name: "Search jobs from an image" }),
     ).toBeVisible();
@@ -155,7 +165,7 @@ describe("image-assisted job-search controls", () => {
     ).toBeVisible();
   });
 
-  it("moves the existing search controls into the workspace toolbar when docked", () => {
+  it("keeps one search instance in the persistent workspace header slot", () => {
     const headerSlot = document.createElement("div");
     headerSlot.id = "workspace-job-search-slot";
     document.body.append(headerSlot);
@@ -166,8 +176,8 @@ describe("image-assisted job-search controls", () => {
         <GlobalImageSearch taxonomy={taxonomy} dockToWorkspaceHeader />,
       ));
 
-      expect(headerSlot.querySelector('[role="search"]')).not.toBeNull();
       expect(headerSlot.querySelector("#global-image-search")).not.toBeNull();
+      expect(document.querySelectorAll("#global-image-search")).toHaveLength(1);
     } finally {
       unmount?.();
       headerSlot.remove();
@@ -188,6 +198,20 @@ describe("image-assisted job-search controls", () => {
         "Ha Noi",
       ),
     ).toBe("/jobs?q=product+designer&location=Ha+Noi&workArrangement=REMOTE");
+    expect(
+      jobTextSearchHref(
+        "https://smarthire.test/jobs?location=Da%20Nang",
+        "",
+        "Da Nang",
+        ["Hai Chau", "Son Tra"],
+      ),
+    ).toBe("/jobs?location=Da+Nang&district=Hai+Chau&district=Son+Tra");
+    expect(
+      jobTextSearchHref(
+        "https://smarthire.test/jobs/saved?q=old",
+        "product designer",
+      ),
+    ).toBe("/jobs?q=product+designer");
   });
 
   it("shows a server-derived category flyout and location choices", () => {
@@ -201,14 +225,62 @@ describe("image-assisted job-search controls", () => {
     expect(
       screen.getByRole("button", { name: /key account manager/i }),
     ).toBeVisible();
-    expect(screen.getByLabelText("Location")).toHaveDisplayValue(
-      "All locations",
-    );
+    expect(screen.getByRole("searchbox", { name: "Location" })).toHaveValue("");
     fireEvent.keyDown(document, { key: "Escape" });
     expect(
       screen.queryByRole("dialog", { name: "Job categories" }),
     ).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Job Category" })).toHaveFocus();
+  });
+
+  it("picks a province and one or more districts from the two-panel location picker", () => {
+    const navigate = vi.fn();
+    window.history.replaceState(null, "", "/jobs");
+    render(
+      <GlobalImageSearch taxonomy={taxonomy} onJobSearchNavigate={navigate} />,
+    );
+
+    fireEvent.change(
+      screen.getByPlaceholderText("Search jobs, skills, or companies"),
+      { target: { value: "project manager" } },
+    );
+
+    const locationField = screen.getByRole("searchbox", { name: "Location" });
+    expect(locationField).toHaveAttribute(
+      "placeholder",
+      "Province/city, district...",
+    );
+    fireEvent.change(locationField, { target: { value: "ho chi" } });
+    expect(
+      screen.getByRole("dialog", { name: "Choose location" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("radio", { name: /ho chi minh city/i }),
+    ).toBeVisible();
+    fireEvent.click(screen.getByRole("checkbox", { name: /district 1/iu }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    expect(navigate).toHaveBeenCalledTimes(1);
+    expect(navigate).toHaveBeenCalledWith(
+      "/jobs?q=project+manager&location=Ho+Chi+Minh+City&district=District+1",
+    );
+    expect(locationField).toHaveValue("Ho Chi Minh City (1 districts)");
+    expect(
+      screen.getByRole("button", { name: "Clear location" }),
+    ).toBeVisible();
+    expect(
+      locationField.closest(".global-image-search-location")?.children,
+    ).toHaveLength(4);
+    expect(
+      locationField
+        .closest(".global-image-search-location")
+        ?.querySelector("button.job-location-picker-chevron"),
+    ).toBeNull();
+    fireEvent.focus(locationField);
+    expect(locationField).toHaveValue("");
+    fireEvent.pointerDown(document.body);
+    expect(locationField).toHaveValue("Ho Chi Minh City (1 districts)");
+    fireEvent.click(screen.getByRole("button", { name: "Clear location" }));
+    expect(locationField).toHaveValue("");
   });
 
   it("opens and changes job categories only when clicked", () => {

@@ -30,6 +30,15 @@ paths:
         - name: location
           in: query
           schema: { type: string, maxLength: 160 }
+        - name: district
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            maxItems: 20
+            uniqueItems: true
+            items: { type: string, minLength: 1, maxLength: 160 }
         - name: employmentType
           in: query
           style: form

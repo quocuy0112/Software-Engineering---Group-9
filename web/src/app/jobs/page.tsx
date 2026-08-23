@@ -1,9 +1,5 @@
 import { headers } from "next/headers";
 import { JobDiscoveryService } from "@/backend/services/jobs/job-discovery-service";
-import {
-  listJobSearchTaxonomy,
-  reportJobSearchTaxonomySerialization,
-} from "@/backend/services/jobs/job-search-taxonomy";
 import { optionalJobActor } from "@/backend/security/job-request-boundary";
 import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
 import {
@@ -32,6 +28,7 @@ export function jobsPageQuery(
     location: Array.isArray(input.location)
       ? input.location[0]
       : input.location,
+    district: array("district").filter(Boolean),
     employmentType: array("employmentType").filter(Boolean),
     experienceLevel: array("experienceLevel").filter(Boolean),
     workArrangement: array("workArrangement").filter(Boolean),
@@ -119,15 +116,10 @@ export default async function JobsPage({ searchParams }: PageProps) {
   const copy = workspace?.initialLocale === "vi" ? vietnameseCopy : englishCopy;
   const actor = await optionalJobActor(await headers());
   const initialQuery = jobsPageQuery(raw);
-  const [search, taxonomy] = await Promise.all([
-    new JobDiscoveryService()
-      .search(initialQuery, actor)
-      .then((result) => ({ result, error: null }))
-      .catch(() => ({ result: null, error: copy.tryAgain })),
-    // The menu is derived before render so client hover only switches panels.
-    listJobSearchTaxonomy().catch(() => ({ industries: [], locations: [] })),
-  ]);
-  reportJobSearchTaxonomySerialization(taxonomy);
+  const search = await new JobDiscoveryService()
+    .search(initialQuery, actor)
+    .then((result) => ({ result, error: null }))
+    .catch(() => ({ result: null, error: copy.tryAgain }));
 
   return (
     <div className="jobs-page">
@@ -136,7 +128,6 @@ export default async function JobsPage({ searchParams }: PageProps) {
         initialResult={search.result}
         initialError={search.error}
         copy={copy}
-        taxonomy={taxonomy}
       />
     </div>
   );

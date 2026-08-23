@@ -5,7 +5,10 @@ import type {
   NormalizedJobSearch,
   PublicJobState,
 } from "@/backend/services/jobs/job-types";
-import { encodeJobCursor } from "@/backend/services/jobs/search-normalization";
+import {
+  encodeJobCursor,
+  normalizedDistrictLocation,
+} from "@/backend/services/jobs/search-normalization";
 import { careerPathSearchTerms } from "@/shared/contracts/jobs/career-paths";
 import {
   candidateVisibleJobSql,
@@ -168,6 +171,19 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
     clauses.push(
       Prisma.sql`j."normalizedLocation" LIKE ${`%${input.normalizedLocation}%`}`,
     );
+  }
+  const normalizedDistricts = input.normalizedDistricts ?? [];
+  if (normalizedDistricts.length) {
+    const districtClauses = input.normalizedLocation
+      ? normalizedDistricts.map(
+          (district) =>
+            Prisma.sql`j."normalizedLocation" = ${normalizedDistrictLocation(input.normalizedLocation, district)}`,
+        )
+      : normalizedDistricts.map(
+          (district) =>
+            Prisma.sql`j."normalizedLocation" LIKE ${`%${district}%`}`,
+        );
+    clauses.push(Prisma.sql`(${Prisma.join(districtClauses, " OR ")})`);
   }
   if (input.employmentType.length) {
     clauses.push(

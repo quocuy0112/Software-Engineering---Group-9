@@ -2,6 +2,7 @@
 
 import { TopBar } from "@/frontend/components/layout/top-bar";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { useSearchParams } from "next/navigation";
 
 export const jobsWorkspaceTabs = [
   { id: "search", href: "/jobs" },
@@ -18,6 +19,16 @@ export function JobsWorkspaceNav({
   activeTab: JobsWorkspaceTab;
 }) {
   const locale = useWorkspaceLocale();
+  const searchParams = useSearchParams();
+  const sharedSearch = new URLSearchParams();
+  for (const name of ["q", "location", "district"]) {
+    for (const value of searchParams.getAll(name)) {
+      if (value) sharedSearch.append(name, value);
+    }
+  }
+  const sharedSearchSuffix = sharedSearch.size
+    ? `?${sharedSearch.toString()}`
+    : "";
   const labels =
     locale === "vi"
       ? {
@@ -40,7 +51,7 @@ export function JobsWorkspaceNav({
       className="jobs-workspace-nav"
       ariaLabel={labels.navigation}
       tabs={jobsWorkspaceTabs.map((tab) => ({
-        href: tab.href,
+        href: `${tab.href}${sharedSearchSuffix}`,
         label: labels[tab.id],
         active: activeTab === tab.id,
       }))}

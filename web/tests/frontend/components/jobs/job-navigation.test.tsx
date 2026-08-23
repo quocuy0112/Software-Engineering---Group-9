@@ -10,14 +10,67 @@ import { resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { WorkspaceShell } from "@/frontend/features/dashboard/components/workspace-shell";
 import { JobBoardHeader } from "@/frontend/features/jobs/components/job-board-header";
+import { JobWorkspaceSearch } from "@/frontend/features/jobs/components/job-workspace-search";
 import { ThemeProvider } from "@/frontend/providers/theme-provider";
+import type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
 
-vi.mock("next/navigation", () => ({
-  usePathname: () => "/jobs",
-  useRouter: () => ({ replace: vi.fn() }),
+const navigation = vi.hoisted(() => ({
+  pathname: "/jobs",
+  push: vi.fn(),
+  replace: vi.fn(),
+  refresh: vi.fn(),
 }));
 
+vi.mock("next/navigation", () => ({
+  usePathname: () => navigation.pathname,
+  useRouter: () => ({
+    push: navigation.push,
+    replace: navigation.replace,
+    refresh: navigation.refresh,
+  }),
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+const taxonomy: JobSearchTaxonomy = {
+  industries: [],
+  locations: [],
+  locationGroups: [],
+};
+
 describe("job board navigation", () => {
+  it("keeps one header search across every Jobs workspace tab", async () => {
+    const headerSlot = document.createElement("div");
+    headerSlot.id = "workspace-job-search-slot";
+    document.body.append(headerSlot);
+    navigation.push.mockClear();
+    navigation.pathname = "/jobs/saved";
+    window.history.replaceState(null, "", "/jobs/saved");
+    const rendered = render(<JobWorkspaceSearch taxonomy={taxonomy} />);
+
+    try {
+      await waitFor(() => {
+        expect(headerSlot.querySelector("#global-image-search")).not.toBeNull();
+      });
+      fireEvent.change(
+        within(headerSlot).getByPlaceholderText(
+          "Search jobs, skills, or companies",
+        ),
+        { target: { value: "designer" } },
+      );
+      fireEvent.submit(within(headerSlot).getByRole("search"));
+      expect(navigation.push).toHaveBeenCalledWith("/jobs?q=designer");
+
+      navigation.pathname = "/jobs/settings";
+      rendered.rerender(<JobWorkspaceSearch taxonomy={taxonomy} />);
+      expect(headerSlot.querySelector("#global-image-search")).not.toBeNull();
+    } finally {
+      rendered.unmount();
+      headerSlot.remove();
+      navigation.pathname = "/jobs";
+      window.history.replaceState(null, "", "/jobs");
+    }
+  });
+
   it("gives visitors direct browse and authentication paths", () => {
     render(<JobBoardHeader authenticated={false} />);
 
@@ -95,21 +148,39 @@ describe("job board navigation", () => {
       ),
       "utf8",
     );
+    const layoutSource = await readFile(
+      resolve(process.cwd(), "src/app/jobs/layout.tsx"),
+      "utf8",
+    );
+    const headerSearchSource = await readFile(
+      resolve(
+        process.cwd(),
+        "src/frontend/features/jobs/components/job-workspace-search.tsx",
+      ),
+      "utf8",
+    );
     const styles = await readFile(
       resolve(process.cwd(), "src/frontend/features/jobs/styles/job-board.css"),
       "utf8",
     );
 
     expect(source).toContain('className="jobs-fixed-region"');
-    expect(source).toContain('className="jobs-search-sticky-region"');
-    expect(source).toContain("data-docked={searchDocked}");
-    expect(source).toContain("dockToWorkspaceHeader={searchDocked}");
+    expect(source).not.toContain("searchDocked");
     expect(source).toContain('className="job-filter-column"');
     expect(source).toContain('className="job-results"');
     expect(source).not.toContain("tabIndex={0}");
+    expect(layoutSource).toContain("JobWorkspaceSearch");
+    expect(headerSearchSource).toContain("dockToWorkspaceHeader");
+    expect(headerSearchSource).toContain('"/jobs/saved"');
+    expect(headerSearchSource).toContain('"/jobs/matches"');
+    expect(headerSearchSource).toContain('"/jobs/settings"');
+    expect(headerSearchSource).toContain('new PopStateEvent("popstate")');
     expect(styles).toContain(".job-list");
     expect(styles).toContain(".jobs-search-sticky-region {");
-    expect(styles).toContain('.jobs-search-sticky-region[data-docked="true"]');
+    expect(styles).toContain("position: sticky;");
+    expect(styles).toContain(
+      "top: calc(var(--sh-topbar-height) + var(--sh-space-2));",
+    );
     expect(styles).not.toContain(
       '.job-board-public-main .jobs-page,\n  .workspace-content[data-content-mode="job-board"] > .jobs-page',
     );
