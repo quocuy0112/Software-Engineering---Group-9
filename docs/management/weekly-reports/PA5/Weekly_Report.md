@@ -152,3 +152,146 @@
 *Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
 
 ![Notion Task Tracker](notion_task_09_08.png)
+
+# =============12/08, Sprint 5=============
+
+## 1. Attendance
+
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+**Team members present:**
+
+* Nguyễn Gia Quốc Uy
+* Nguyễn Quốc Thành
+* Ngô Quốc Tuấn
+* Lưu Chí Hải
+* Nguyễn Minh Khôi
+
+**Team members absent:**
+
+* None
+
+---
+
+## 2. Status Reports
+
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+### Nguyễn Gia Quốc Uy
+
+* **Completed tasks:**
+
+  * Build Landing Home Page.
+  * Sprint Planning Preparation.
+  * UI Utilizing.
+  * Generate Specs for the additional feature group related to Notifications and In-App Alerts (Feature Group 9).
+
+* **To-do Tasks:**
+
+  * Upgrade the overall UI and build additional minor features.
+
+* **Issues/Obstacles:**
+
+  * None
+
+### Nguyễn Quốc Thành
+
+* **Completed tasks:**
+
+  * Build Chat Messaging.
+  * Create the base Admin role (Feature Group 11).
+  * Build the Recruiter approval mechanism in Admin.
+  * Generate Specs for the feature groups related to Admin functionality (Feature Groups 10 and 11).
+
+* **To-do Tasks:**
+
+  * Build the job-posting flow for Recruiters.
+  * Build the Admin-side approval flow for Recruiter job posts.
+  * Complete the logic for Admin features.
+  * Backup data.
+
+* **Issues/Obstacles:**
+
+  * None
+
+### Ngô Quốc Tuấn
+
+* **Completed tasks:**
+
+  * Create the base Recruiter role.
+  * Generate Specs for the feature groups related to Recruiter functionality (Feature Groups 5, 7, and 12).
+  * Build the RBAC mechanism from Recruiter to Admin.
+  * Build the Scoring mechanism for both Recruiter and Candidate roles.
+
+* **To-do Tasks:**
+
+  * Complete the logic for Recruiter features.
+
+* **Issues/Obstacles:**
+
+  * None
+
+### Lưu Chí Hải
+
+* **Completed tasks:**
+
+  * Write the PA5 Weekly Report.
+  * Research the Test Plans and Test Cases for the entire system.
+
+* **To-do Tasks:**
+
+  * Update Project Plan, System Context and Frontend Component Diagram.
+  * Generate Specs for Feature Group 8 – Kanban.
+
+* **Issues/Obstacles:**
+
+  * None
+
+### Nguyễn Minh Khôi
+
+* **Completed tasks:**
+
+  * Research the Test Plans and Test Cases for the entire system.
+  * Review and understand the testing requirements for the completed features.
+
+* **To-do Tasks:**
+
+  * Update Container, BE and Deployment Diagrams.
+  * Assist in reviewing and fixing Admin notification emails that have missing formatting or expose raw keywords to users.
+
+* **Issues/Obstacles:**
+
+  * None
+
+---
+
+## 3. Actions & Summary
+
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+**Actions:**
+
+* Uy: Upgrade the overall UI and build additional minor features.
+* Thành: Build the Recruiter job-posting flow and its Admin-side approval flow, complete the Admin feature logic, and back up data.
+* Tuấn: Complete the Recruiter feature logic, following his completed Recruiter Spec-Kit work for Feature Groups 5, 7, and 12.
+* Hải: Complete the PA5 report-related work, continue updating the Project Plan, System Context, and Frontend Component Diagram, and generate Specs for Feature Group 8 – Kanban.
+* Khôi: Continue testing-related work, update the Container, BE and Deployment Diagrams, and assist Thành in reviewing and fixing Admin notification email formatting and content issues.
+* All Members: Continue with the new Recruiter, Admin, UI, Spec-Kit, documentation, and testing assignments for PA5.
+
+**Summary of the meeting:**
+
+* The team completed the previous set of initial PA5 tasks, except for Hải's Project Plan, System Context, and Frontend Component Diagram update, which remains unfinished because it depends on further implementation progress.
+* Development is moving toward additional Recruiter and Admin functionality and completion of the overall UI, with the new Recruiter, Admin, and UI tasks now forming the next work set.
+* Thành will build the Recruiter job-posting flow and its Admin-side approval flow, complete the Admin feature logic, and back up data, while Uy will upgrade the overall UI and build additional minor features.
+* Tuấn completed the Recruiter Spec-Kit work for Feature Groups 5, 7, and 12 and will complete the Recruiter feature logic. His responsibility for Feature Group 8 – Kanban was transferred to Hải.
+* Hải completed the PA5 Weekly Report and test-plan research, will generate Specs for Feature Group 8 – Kanban, and will continue the unfinished Project Plan, System Context, and Frontend Component Diagram update when implementation has progressed sufficiently.
+* Khôi completed the assigned test-plan research and testing-requirement review, and will continue updating the Container, BE, and Deployment Diagrams while also assisting Thành in reviewing and fixing formatting and content issues in Admin notification emails.
+
+---
+
+## 4. Task Screenshots
+
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+![Notion Task Tracker](notion_task_12_08.png)
+
+![Task Assignment Proof](chat_task_assignments_12_08.png)
