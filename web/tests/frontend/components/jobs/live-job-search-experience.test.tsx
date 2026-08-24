@@ -23,6 +23,7 @@ vi.mock("@/frontend/features/jobs/components/jobs-workspace", () => ({
 }));
 
 const copy: JobsLiveCopy = {
+  locale: "en",
   kicker: "Smart Hire opportunities",
   title: "Jobs",
   intro: "Find work that fits.",
@@ -84,20 +85,19 @@ afterEach(() => {
 });
 
 describe("live job search experience", () => {
-  it("updates the search mode and synchronizes the filter to the URL", async () => {
-    const fetchMock = vi.fn().mockResolvedValue(response(3));
-    vi.stubGlobal("fetch", fetchMock);
+  it("keeps search scope implicit and only exposes result sorting", () => {
     renderExperience();
 
-    fireEvent.click(screen.getByRole("button", { name: "Job title" }));
-    expect(window.location.search).toBe("?searchBy=TITLE");
-    expect(fetchMock).toHaveBeenCalledWith(
-      "/api/jobs?searchBy=TITLE",
-      expect.objectContaining({ signal: expect.any(AbortSignal) }),
-    );
-    await waitFor(() =>
-      expect(screen.getAllByText("3 matching jobs").at(0)).toBeVisible(),
-    );
+    expect(screen.queryByText("Search by:")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Job title" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("Sort by:")).toBeVisible();
+    expect(
+      screen
+        .getByRole("button", { name: /best match for your profile/i })
+        .querySelector(".job-results-sort-chevron"),
+    ).not.toBeNull();
   });
 
   it("keeps only the latest response when filters change quickly", async () => {

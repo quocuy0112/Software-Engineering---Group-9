@@ -39,7 +39,7 @@ describe("two-factor challenge", () => {
     expect(backupCode).toHaveAttribute("aria-pressed", "true");
   });
 
-  it("focuses, labels, pastes numeric input and submits with Enter", async () => {
+  it("shows a complete authenticator code across six cells and submits it", async () => {
     const fetch = vi
       .spyOn(globalThis, "fetch")
       .mockResolvedValue(
@@ -52,15 +52,46 @@ describe("two-factor challenge", () => {
     const input = screen.getByLabelText(
       "Authentication code",
     ) as HTMLInputElement;
+    const cells = document.querySelectorAll(".totp-code-cell");
+    expect(cells).toHaveLength(6);
     expect(document.activeElement).toBe(input);
     fireEvent.change(input, { target: { value: "12 34-56" } });
-    expect(input.value).toBe("123456");
+    expect([...cells].map((cell) => cell.textContent)).toEqual([
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+    ]);
     fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
     fireEvent.submit(input.closest("form")!);
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
     expect(fetch.mock.calls[0][1]?.body as string).toContain("123456");
-    expect(input.value).toBe("");
+    expect([...cells].map((cell) => cell.textContent)).toEqual([
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ]);
   });
+
+  it("keeps a normal numeric input for authenticator and virtual keyboards", () => {
+    render(<TwoFactorChallenge />);
+    const input = screen.getByLabelText(
+      "Authentication code",
+    ) as HTMLInputElement;
+
+    expect(input).toHaveAttribute("inputmode", "numeric");
+    expect(input).toHaveAttribute("autocomplete", "one-time-code");
+    fireEvent.change(input, { target: { value: "123456" } });
+    expect(input.value).toBe("123456");
+    fireEvent.change(input, { target: { value: "12345" } });
+    expect(input.value).toBe("12345");
+  });
+
   it("shows a specific invalid-code message and locks after repeated failures", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response("{}", { status: 401 }),

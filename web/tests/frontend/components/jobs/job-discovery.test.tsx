@@ -6,6 +6,7 @@ import {
 } from "@/frontend/features/jobs/components/job-card";
 import { JobSearchForm } from "@/frontend/features/jobs/components/job-search-form";
 import { CompanyAvatar } from "@/frontend/features/jobs/components/company-avatar";
+import { WorkspaceLocaleProvider } from "@/frontend/features/dashboard/client/workspace-locale";
 import JobsLoading from "@/app/jobs/loading";
 
 const job = {
@@ -147,8 +148,10 @@ describe("job discovery presentation", () => {
   it("exposes redesigned filters and a clear action", () => {
     render(<JobSearchForm criteria={{}} />);
     expect(screen.getByText("Refine search")).toBeVisible();
-    expect(screen.getByText("Job category")).toBeVisible();
+    expect(screen.queryByText("Job category")).not.toBeInTheDocument();
     expect(screen.getByText("Salary")).toBeVisible();
+    expect(screen.getByText("10 - 15M")).toBeVisible();
+    expect(screen.queryByText("10 - 15 triệu")).not.toBeInTheDocument();
     expect(screen.getByLabelText(/work arrangement/i)).toBeVisible();
     fireEvent.change(screen.getByLabelText(/skill/i), {
       target: { value: "Đà Nẵng" },
@@ -159,6 +162,22 @@ describe("job discovery presentation", () => {
     expect(
       screen.getAllByRole("link", { name: /clear filters/i }).at(-1),
     ).toHaveAttribute("href", "/jobs");
+  });
+
+  it("uses one consistent Vietnamese locale for redesigned filters", () => {
+    render(
+      <WorkspaceLocaleProvider initialLocale="vi">
+        <JobSearchForm criteria={{}} />
+      </WorkspaceLocaleProvider>,
+    );
+
+    expect(screen.getByText("Mức lương")).toBeVisible();
+    expect(screen.getByText("10 - 15 triệu")).toBeVisible();
+    expect(screen.getByText("Không yêu cầu kinh nghiệm")).toBeVisible();
+    expect(screen.queryByText("Salary")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("No experience required"),
+    ).not.toBeInTheDocument();
   });
 
   it("reports redesigned filter changes with the right trigger", () => {

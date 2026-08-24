@@ -572,12 +572,17 @@
   color: var(--sh-color-text-inverse);
   border-color: var(--sh-color-brand-primary);
   background: var(--sh-color-brand-primary);
-  box-shadow: 0 8px 18px -12px color-mix(in srgb, var(--sh-color-brand-primary) 78%, transparent);
+  box-shadow: 0 8px 18px -12px
+    color-mix(in srgb, var(--sh-color-brand-primary) 78%, transparent);
 }
 
 .auth-card .factor-mode-switcher button:not([aria-pressed="true"]):hover {
   color: var(--sh-color-brand-primary);
-  border-color: color-mix(in srgb, var(--sh-color-brand-primary) 24%, var(--sh-color-border-default));
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-brand-primary) 24%,
+    var(--sh-color-border-default)
+  );
   background: var(--sh-color-info-bg);
 }
 
@@ -591,7 +596,10 @@
   background: var(--sh-color-surface-subtle);
 }
 
-:root[data-theme="dark"] .auth-card .factor-mode-switcher button:not([aria-pressed="true"]) {
+:root[data-theme="dark"]
+  .auth-card
+  .factor-mode-switcher
+  button:not([aria-pressed="true"]) {
   color: var(--sh-color-text-primary);
 }
 
@@ -1042,5 +1050,81 @@
   .auth-navigation a {
     padding: 0 8px;
     font-size: 12px;
+  }
+}
+
+/* One native field drives the six visual TOTP cells, including authenticator autofill. */
+.auth-card .factor-mode-switcher button {
+  white-space: nowrap;
+}
+
+.totp-code-inputs {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  width: min(100%, 372px);
+}
+
+.auth-card .totp-native-input {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  cursor: text;
+  opacity: 0;
+}
+
+.auth-card .totp-code-cell {
+  display: grid;
+  min-width: 0;
+  height: 54px;
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: 12px;
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--sh-font-weight-bold);
+  letter-spacing: 0;
+  line-height: 1;
+  place-items: center;
+  text-align: center;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.totp-code-inputs:hover .totp-code-cell {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-brand-primary) 42%,
+    var(--sh-color-border-default)
+  );
+}
+
+.totp-code-inputs:focus-within .totp-code-cell {
+  border-color: var(--sh-color-brand-primary);
+}
+
+:root[data-theme="dark"] .auth-card .totp-code-cell {
+  border-color: var(--sh-color-border-default);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+}
+
+@media (max-width: 400px) {
+  .totp-code-inputs {
+    gap: 7px;
+  }
+
+  .auth-card .totp-code-cell {
+    height: 48px;
+    border-radius: 10px;
+    font-size: 21px;
   }
 }

@@ -59,6 +59,10 @@ export const jobSearchQuerySchema = z
     categoryFamily: stringArray(z.string().trim().min(1).max(80), 28).default(
       [],
     ),
+    categoryId: stringArray(z.string().trim().min(1).max(128), 20).default([]),
+    categoryTitle: stringArray(z.string().trim().min(1).max(160), 20).default(
+      [],
+    ),
     employmentType: stringArray(employmentTypeSchema, 5).default([]),
     experienceLevel: stringArray(experienceLevelSchema, 6).default([]),
     workArrangement: stringArray(workArrangementSchema, 3).default([]),

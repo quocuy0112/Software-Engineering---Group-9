@@ -74,6 +74,10 @@ export function parseJobSearchCriteria(raw: unknown): NormalizedJobSearch {
       normalizeSearchText(district, 160),
     ),
     categoryFamily: parsed.categoryFamily,
+    categoryIds: parsed.categoryId,
+    normalizedRoleTitles: parsed.categoryTitle.map((title) =>
+      normalizeSearchText(title, 160),
+    ),
     normalizedSkills: parsed.skills.map((skill) =>
       normalizeSearchText(skill, 80),
     ),
@@ -294,9 +298,10 @@ export class JobDiscoveryService {
       new (
         await import("@/backend/repositories/jobs/prisma-public-job-repository")
       ).PrismaPublicJobRepository();
-    const taxonomy = criteria.categoryFamily?.length
-      ? await listJobSearchTaxonomy()
-      : null;
+    const taxonomy =
+      criteria.categoryFamily?.length || criteria.categoryIds?.length
+        ? await listJobSearchTaxonomy()
+        : null;
     const normalizedCategoryNames = taxonomy
       ? taxonomy.industries
           .filter((industry) =>
@@ -304,9 +309,25 @@ export class JobDiscoveryService {
           )
           .map((industry) => normalizeSearchText(industry.name, 160))
       : undefined;
-    const repositoryCriteria = normalizedCategoryNames?.length
-      ? { ...criteria, normalizedCategoryNames }
-      : criteria;
+    const normalizedCategoryTitleNames = taxonomy
+      ? taxonomy.industries
+          .flatMap((industry) => industry.subIndustries)
+          .flatMap((subIndustry) => subIndustry.titles)
+          .filter((title) =>
+            title.categoryIds.some((id) => criteria.categoryIds?.includes(id)),
+          )
+          .map((title) => normalizeSearchText(title.name, 160))
+      : undefined;
+    const repositoryCriteria = {
+      ...criteria,
+      ...(normalizedCategoryNames?.length ? { normalizedCategoryNames } : {}),
+      ...(normalizedCategoryTitleNames?.length
+        ? { normalizedCategoryTitleNames }
+        : {}),
+      ...(criteria.normalizedRoleTitles?.length
+        ? { normalizedRoleTitles: criteria.normalizedRoleTitles }
+        : {}),
+    };
     const result = await repository.search(
       repositoryCriteria,
       actor.kind === "user" ? actor.userId : null,
@@ -324,6 +345,8 @@ export class JobDiscoveryService {
         location: criteria.normalizedLocation,
         district: criteria.normalizedDistricts,
         categoryFamily: criteria.categoryFamily,
+        categoryId: criteria.categoryIds,
+        categoryTitle: criteria.normalizedRoleTitles,
         employmentType: criteria.employmentType,
         experienceLevel: criteria.experienceLevel,
         workArrangement: criteria.workArrangement,

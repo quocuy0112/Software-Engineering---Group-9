@@ -1,7 +1,43 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import {
+  Briefcase,
+  Building2,
+  Calculator,
+  CarFront,
+  Check,
+  CircleDot,
+  Code2,
+  Cross,
+  Factory,
+  GraduationCap,
+  Headphones,
+  House,
+  Landmark,
+  Languages,
+  Layers,
+  Megaphone,
+  Newspaper,
+  Palette,
+  Settings,
+  ShieldCheck,
+  Shirt,
+  ShoppingBag,
+  ShoppingCart,
+  Search as SearchIcon,
+  Sparkles,
+  Sprout,
+  TrendingUp,
+  Truck,
+  Umbrella,
+  UsersRound,
+  UtensilsCrossed,
+  X,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
@@ -31,6 +67,43 @@ const defaults: ManualSearchContext = {
   postedWithinDays: null,
   sort: "RELEVANCE",
 };
+
+/** Semantic icons for the 28 first-level groups in the bundled job taxonomy. */
+const industryIcons: Readonly<Record<string, LucideIcon>> = {
+  r01: TrendingUp,
+  r02: Megaphone,
+  r03: Code2,
+  r04: Calculator,
+  r05: Briefcase,
+  r06: UsersRound,
+  r07: Zap,
+  r08: Settings,
+  r09: Building2,
+  r10: Truck,
+  r11: Factory,
+  r12: Headphones,
+  r13: Palette,
+  r14: ShieldCheck,
+  r15: Landmark,
+  r16: Umbrella,
+  r17: House,
+  r18: Cross,
+  r19: ShoppingBag,
+  r20: UtensilsCrossed,
+  r21: GraduationCap,
+  r22: ShoppingCart,
+  r23: Sparkles,
+  r24: Languages,
+  r25: Newspaper,
+  r26: Shirt,
+  r27: Sprout,
+  r28: CarFront,
+};
+
+function IndustryIcon({ code }: Readonly<{ code: string }>) {
+  const Icon = industryIcons[code] ?? Briefcase;
+  return <Icon aria-hidden="true" />;
+}
 
 function criteriaFromLocation(): ManualSearchContext {
   if (typeof window === "undefined") return defaults;
@@ -89,26 +162,6 @@ function criteriaFromLocation(): ManualSearchContext {
   };
 }
 
-function districtsFromLocation() {
-  if (typeof window === "undefined") return [];
-  return [
-    ...new Set(
-      new URL(window.location.href).searchParams
-        .getAll("district")
-        .map((item) => item.trim().slice(0, 160))
-        .filter(Boolean),
-    ),
-  ].slice(0, 20);
-}
-
-function normalizeLocationSearch(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .replace(/đ/gu, "d")
-    .toLocaleLowerCase();
-}
-
 export function jobTextSearchHref(
   href: string,
   query: string,
@@ -145,41 +198,148 @@ export function jobIndustrySearchHref(
 ) {
   const next = jobTextSearchHref(href, "", location, districts);
   const parameters = new URL(next, "http://localhost").searchParams;
+  parameters.delete("categoryFamily");
+  parameters.delete("categoryId");
+  parameters.delete("categoryTitle");
   parameters.set("categoryFamily", industryCode.trim().slice(0, 80));
   return `/jobs?${parameters.toString()}`;
 }
 
+type JobCategorySelection = Readonly<{
+  industryCode?: string;
+  roleTitles?: readonly string[];
+}>;
+
+/** Retain normal criteria while applying either an industry or exact roles. */
+export function jobCategoryFilterHref(
+  href: string,
+  selection: JobCategorySelection,
+) {
+  const currentUrl = new URL(href, "http://localhost");
+  const parameters = currentUrl.searchParams;
+  parameters.delete("cursor");
+  parameters.delete("categoryFamily");
+  parameters.delete("categoryId");
+  parameters.delete("categoryTitle");
+
+  const industryCode = selection.industryCode?.trim();
+  if (industryCode) {
+    parameters.set("categoryFamily", industryCode.slice(0, 80));
+  } else {
+    for (const title of [
+      ...new Set(
+        (selection.roleTitles ?? [])
+          .map((roleTitle) => roleTitle.trim())
+          .filter(Boolean),
+      ),
+    ].slice(0, 20)) {
+      parameters.append("categoryTitle", title.slice(0, 160));
+    }
+  }
+  return parameters.size ? `/jobs?${parameters.toString()}` : "/jobs";
+}
+
+export function jobIndustryClearHref(href: string) {
+  const currentUrl = new URL(href, "http://localhost");
+  const parameters = currentUrl.searchParams;
+  parameters.delete("categoryFamily");
+  parameters.delete("categoryId");
+  parameters.delete("categoryTitle");
+  parameters.delete("cursor");
+  return parameters.size ? `/jobs?${parameters.toString()}` : "/jobs";
+}
+
+type TaxonomyRole =
+  JobSearchTaxonomy["industries"][number]["subIndustries"][number]["titles"][number];
+
+/** A role is a title in an industry/sub-industry context, not its shared
+ * categoryId. Multiple roles may intentionally belong to one category. */
+function roleSelectionKey(
+  industryCode: string,
+  subIndustryName: string,
+  role: Pick<TaxonomyRole, "name">,
+) {
+  return [industryCode, subIndustryName, role.name].join("\u0001");
+}
+
+function roleSelectionsFromTitles(
+  taxonomy: JobSearchTaxonomy,
+  roleTitles: readonly string[],
+) {
+  const selectedTitles = new Set(roleTitles);
+  const selections: Record<string, string> = {};
+  for (const industry of taxonomy.industries) {
+    for (const subIndustry of industry.subIndustries) {
+      for (const title of subIndustry.titles) {
+        if (!selectedTitles.has(title.name)) continue;
+        selections[roleSelectionKey(industry.code, subIndustry.name, title)] =
+          title.name;
+      }
+    }
+  }
+  return selections;
+}
+
 function JobCategoryMenu({
   taxonomy,
-  onSelect,
-  onSelectIndustry,
+  onApply,
+  onClear,
   selectedCode,
+  selectedRoleTitles,
   vi,
 }: Readonly<{
   taxonomy: JobSearchTaxonomy;
-  onSelect(title: string): void;
-  onSelectIndustry(code: string): void;
+  onApply(selection: JobCategorySelection): void;
+  onClear(): void;
   selectedCode?: string;
+  selectedRoleTitles: readonly string[];
   vi: boolean;
 }>) {
   const [open, setOpen] = useState(false);
   const [activeCode, setActiveCode] = useState(
     selectedCode ?? taxonomy.industries[0]?.code ?? "",
   );
+  const [filterQuery, setFilterQuery] = useState("");
+  const [draftIndustryCode, setDraftIndustryCode] = useState<string>();
+  const [draftRoles, setDraftRoles] = useState<Record<string, string>>({});
   const menu = useRef<HTMLDivElement>(null);
+  const explorer = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const categoryButtons = useRef<Record<string, HTMLButtonElement | null>>({});
   const active =
     taxonomy.industries.find((industry) => industry.code === activeCode) ??
     taxonomy.industries[0];
+  const resetDraft = useCallback(() => {
+    setDraftIndustryCode(selectedCode);
+    setDraftRoles(roleSelectionsFromTitles(taxonomy, selectedRoleTitles));
+    setFilterQuery("");
+  }, [selectedCode, selectedRoleTitles, taxonomy]);
 
   useEffect(() => {
-    if (selectedCode) setActiveCode(selectedCode);
-  }, [selectedCode]);
+    const frame = window.requestAnimationFrame(() =>
+      setActiveCode(selectedCode ?? taxonomy.industries[0]?.code ?? ""),
+    );
+    return () => window.cancelAnimationFrame(frame);
+  }, [selectedCode, taxonomy]);
 
-  const close = () => {
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(resetDraft);
+    return () => window.cancelAnimationFrame(frame);
+  }, [resetDraft]);
+
+  const close = useCallback(() => {
+    resetDraft();
     setOpen(false);
     trigger.current?.focus();
+  }, [resetDraft]);
+
+  const openMenu = () => {
+    if (open) {
+      close();
+      return;
+    }
+    resetDraft();
+    setOpen(true);
   };
 
   const selectIndustry = (code: string) => {
@@ -201,6 +361,34 @@ function JobCategoryMenu({
     categoryButtons.current[next.code]?.focus();
   };
 
+  const roleCount = Object.keys(draftRoles).length;
+  const selectionCount = draftIndustryCode ? 1 : roleCount;
+  const hasSelection = selectionCount > 0;
+  const hasAppliedSelection =
+    Boolean(selectedCode) || selectedRoleTitles.length > 0;
+  const canApply = hasSelection || hasAppliedSelection;
+  const appliedRoleCount = Object.keys(
+    roleSelectionsFromTitles(taxonomy, selectedRoleTitles),
+  ).length;
+  const appliedSelectionLabel = selectedCode
+    ? active?.name
+    : appliedRoleCount
+      ? vi
+        ? `${appliedRoleCount} vị trí đã chọn`
+        : `${appliedRoleCount} roles selected`
+      : undefined;
+  const normalizedFilter = filterQuery.trim().toLocaleLowerCase();
+  const visibleSubIndustries = active?.subIndustries
+    .map((subIndustry) => ({
+      ...subIndustry,
+      titles: subIndustry.titles.filter((title) =>
+        `${subIndustry.name} ${title.name}`
+          .toLocaleLowerCase()
+          .includes(normalizedFilter),
+      ),
+    }))
+    .filter((subIndustry) => subIndustry.titles.length > 0);
+
   useEffect(() => {
     if (!open) return;
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -210,13 +398,42 @@ function JobCategoryMenu({
       }
     };
     const closeOutside = (event: PointerEvent) => {
-      if (!menu.current?.contains(event.target as Node)) setOpen(false);
+      if (!menu.current?.contains(event.target as Node)) {
+        resetDraft();
+        setOpen(false);
+      }
     };
     document.addEventListener("keydown", closeOnEscape);
     document.addEventListener("pointerdown", closeOutside);
     return () => {
       document.removeEventListener("keydown", closeOnEscape);
       document.removeEventListener("pointerdown", closeOutside);
+    };
+  }, [close, open, resetDraft]);
+
+  useEffect(() => {
+    if (!open) return;
+    const preventBackgroundScroll = (event: Event) => {
+      const target = event.target;
+      if (target instanceof Node && explorer.current?.contains(target)) return;
+      event.preventDefault();
+    };
+
+    // Do not lock html/body: that can also make a fixed explorer unscrollable
+    // inside the workspace shell. Instead, preserve wheel/touch input for the
+    // dialog and reject it only when it originates behind the dialog.
+    document.addEventListener("wheel", preventBackgroundScroll, {
+      capture: true,
+      passive: false,
+    });
+    document.addEventListener("touchmove", preventBackgroundScroll, {
+      capture: true,
+      passive: false,
+    });
+
+    return () => {
+      document.removeEventListener("wheel", preventBackgroundScroll, true);
+      document.removeEventListener("touchmove", preventBackgroundScroll, true);
     };
   }, [open]);
 
@@ -231,16 +448,18 @@ function JobCategoryMenu({
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls="job-category-flyout"
-        onClick={() => setOpen((value) => !value)}
+        data-selected={Boolean(appliedSelectionLabel)}
+        title={appliedSelectionLabel}
+        onClick={openMenu}
       >
         <span className="job-category-trigger-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
             <path d="M5 7h14M5 12h14M5 17h14" />
           </svg>
         </span>
-        <span>
-          {selectedCode && active
-            ? active.name
+        <span className="job-category-trigger-label">
+          {appliedSelectionLabel
+            ? appliedSelectionLabel
             : vi
               ? "Job categories"
               : "Job Category"}
@@ -253,125 +472,311 @@ function JobCategoryMenu({
           <path d="m7 10 5 5 5-5" />
         </svg>
       </button>
+      {appliedSelectionLabel ? (
+        <button
+          className="job-category-selection-clear"
+          type="button"
+          aria-label={
+            vi
+              ? `Bỏ chọn nhóm ngành ${active?.name ?? ""}`
+              : `Clear job category ${active?.name ?? ""}`
+          }
+          title={vi ? "Bỏ chọn nhóm ngành" : "Clear job category"}
+          onClick={() => {
+            setOpen(false);
+            onClear();
+            trigger.current?.focus();
+          }}
+        >
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <path d="m6 6 8 8M14 6l-8 8" />
+          </svg>
+        </button>
+      ) : null}
 
       {open && active ? (
         <div
+          ref={explorer}
           id="job-category-flyout"
           className="job-category-flyout"
           role="dialog"
-          aria-label={vi ? "Job categories" : "Job categories"}
+          aria-modal="true"
+          aria-label={vi ? "Nhóm ngành việc làm" : "Job categories"}
         >
-          <ul className="job-category-industries" aria-label="Job categories">
-            {taxonomy.industries.map((industry) => {
-              const selected = industry.code === active.code;
-              return (
-                <li className="job-category-industry-item" key={industry.code}>
-                  <button
-                    ref={(element) => {
-                      categoryButtons.current[industry.code] = element;
-                    }}
-                    className="job-category-industry"
-                    data-active={selected}
-                    type="button"
-                    aria-pressed={selected}
-                    onClick={() => selectIndustry(industry.code)}
-                    onKeyDown={(event) => {
-                      if (event.key === "ArrowDown") {
-                        event.preventDefault();
-                        moveIndustryFocus(industry.code, 1);
-                      } else if (event.key === "ArrowUp") {
-                        event.preventDefault();
-                        moveIndustryFocus(industry.code, -1);
-                      } else if (event.key === "Home") {
-                        event.preventDefault();
-                        const first = taxonomy.industries[0];
-                        if (!first) return;
-                        selectIndustry(first.code);
-                        categoryButtons.current[first.code]?.focus();
-                      } else if (event.key === "End") {
-                        event.preventDefault();
-                        const last = taxonomy.industries.at(-1);
-                        if (!last) return;
-                        selectIndustry(last.code);
-                        categoryButtons.current[last.code]?.focus();
-                      }
-                    }}
-                  >
-                    <span
-                      className="job-category-industry-marker"
-                      aria-hidden="true"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="4" />
-                      </svg>
-                    </span>
-                    <span className="job-category-industry-copy">
-                      <strong>{industry.name}</strong>
-                      <small>{industry.count} open roles</small>
-                    </span>
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="m9 6 6 6-6 6" />
-                    </svg>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="job-category-detail">
-            <header className="job-category-detail-heading">
+          <header className="job-category-explorer-header">
+            <div className="job-category-explorer-intro">
+              <span className="job-category-explorer-logo" aria-hidden="true">
+                <Layers />
+              </span>
               <div>
-                <p className="job-category-detail-title">{active.name}</p>
-                <p className="job-category-open-roles">
-                  Open roles ({active.count})
+                <p>
+                  {vi
+                    ? "Khám phá cơ hội theo ngành"
+                    : "Browse opportunities by industry"}
                 </p>
+                <small>
+                  {vi
+                    ? "Chọn vị trí cụ thể hoặc toàn bộ ngành để lọc việc làm"
+                    : "Select roles or an entire field to refine your job search"}
+                </small>
               </div>
-              <button
-                className="job-category-close"
-                type="button"
-                aria-label="Close job categories"
-                onClick={close}
-              >
-                <span aria-hidden="true">×</span>
-              </button>
-            </header>
+            </div>
+            <label className="job-category-explorer-search">
+              <SearchIcon aria-hidden="true" />
+              <span className="sr-only">
+                {vi ? "Lọc vị trí" : "Filter roles"}
+              </span>
+              <input
+                type="search"
+                value={filterQuery}
+                placeholder={
+                  vi
+                    ? "Lọc kỹ năng hoặc vị trí..."
+                    : "Filter skills or titles..."
+                }
+                onChange={(event) => setFilterQuery(event.currentTarget.value)}
+              />
+            </label>
             <button
-              className="job-category-industry-pill"
+              className="job-category-close"
               type="button"
-              aria-label={`${vi ? "Select all jobs in" : "Select entire industry"}: ${active.name}`}
-              onClick={() => {
-                onSelectIndustry(active.code);
-                close();
-              }}
+              aria-label={vi ? "Đóng" : "Close job categories"}
+              onClick={close}
             >
-              <span aria-hidden="true">◉</span>
-              <strong>{active.name}</strong>
-              <small>{vi ? "Toàn ngành" : "Entire industry"}</small>
+              <X aria-hidden="true" />
             </button>
-            {active.subIndustries.map((subIndustry) => (
-              <section
-                className="job-category-subindustry"
-                key={subIndustry.name}
+          </header>
+          <div className="job-category-explorer-body">
+            <aside className="job-category-explorer-sidebar">
+              <p className="job-category-industry-count">
+                {vi
+                  ? `Ngành nghề (${taxonomy.industries.length})`
+                  : `Industries (${taxonomy.industries.length})`}
+              </p>
+              <ul
+                className="job-category-industries"
+                aria-label={vi ? "Nhóm ngành" : "Job categories"}
               >
-                <h2>
-                  {subIndustry.name} <span>({subIndustry.count})</span>
-                </h2>
-                <div>
-                  {subIndustry.titles.map((title) => (
-                    <button
-                      className="job-category-title-pill"
-                      key={title.name}
-                      type="button"
-                      title={title.categoryIds.join(", ") || undefined}
-                      onClick={() => onSelect(title.name)}
+                {taxonomy.industries.map((industry, index) => {
+                  const selected = industry.code === active.code;
+                  return (
+                    <li
+                      className="job-category-industry-item"
+                      key={industry.code}
                     >
-                      {title.name}
-                      {title.count > 1 ? <small>{title.count}</small> : null}
-                    </button>
-                  ))}
+                      <button
+                        ref={(element) => {
+                          categoryButtons.current[industry.code] = element;
+                        }}
+                        className="job-category-industry"
+                        data-active={selected}
+                        type="button"
+                        aria-pressed={selected}
+                        onClick={() => selectIndustry(industry.code)}
+                        onKeyDown={(event) => {
+                          if (event.key === "ArrowDown") {
+                            event.preventDefault();
+                            moveIndustryFocus(industry.code, 1);
+                          } else if (event.key === "ArrowUp") {
+                            event.preventDefault();
+                            moveIndustryFocus(industry.code, -1);
+                          } else if (event.key === "Home") {
+                            event.preventDefault();
+                            const first = taxonomy.industries[0];
+                            if (!first) return;
+                            selectIndustry(first.code);
+                            categoryButtons.current[first.code]?.focus();
+                          } else if (event.key === "End") {
+                            event.preventDefault();
+                            const last = taxonomy.industries.at(-1);
+                            if (!last) return;
+                            selectIndustry(last.code);
+                            categoryButtons.current[last.code]?.focus();
+                          }
+                        }}
+                      >
+                        <span
+                          className="job-category-industry-icon"
+                          data-industry-code={industry.code}
+                          data-tone={(index % 5) + 1}
+                          aria-hidden="true"
+                        >
+                          <IndustryIcon code={industry.code} />
+                        </span>
+                        <span className="job-category-industry-copy">
+                          <strong>{industry.name}</strong>
+                          <small>{industry.count} open roles</small>
+                        </span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="m9 6 6 6-6 6" />
+                        </svg>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </aside>
+            <div className="job-category-detail">
+              <header className="job-category-detail-heading">
+                <div>
+                  <div className="job-category-detail-title-row">
+                    <p className="job-category-detail-title">{active.name}</p>
+                    <span className="job-category-total-count">
+                      {active.count}
+                    </span>
+                  </div>
+                  <p className="job-category-open-roles">
+                    {vi
+                      ? "Chọn vị trí cụ thể để thêm vào bộ lọc"
+                      : "Select specific roles to add them to your filter"}
+                  </p>
                 </div>
-              </section>
-            ))}
+                <button
+                  className="job-category-industry-pill"
+                  type="button"
+                  data-selected={draftIndustryCode === active.code}
+                  aria-pressed={draftIndustryCode === active.code}
+                  aria-label={
+                    draftIndustryCode === active.code
+                      ? `${vi ? "Bỏ chọn toàn ngành" : "Clear entire industry"}: ${active.name}`
+                      : `${vi ? "Chọn toàn ngành" : "Select entire industry"}: ${active.name}`
+                  }
+                  onClick={() => {
+                    setDraftIndustryCode((current) =>
+                      current === active.code ? undefined : active.code,
+                    );
+                    setDraftRoles({});
+                  }}
+                >
+                  <CircleDot aria-hidden="true" />
+                  <strong>
+                    {draftIndustryCode === active.code
+                      ? vi
+                        ? "Đã chọn toàn ngành"
+                        : "Entire industry selected"
+                      : vi
+                        ? "Chọn toàn ngành"
+                        : "Select entire industry"}
+                  </strong>
+                  <small>
+                    {draftIndustryCode === active.code
+                      ? vi
+                        ? "Đang chọn · nhấn để bỏ"
+                        : "Selected · click to clear"
+                      : vi
+                        ? "Toàn ngành"
+                        : "Entire industry"}
+                  </small>
+                </button>
+              </header>
+              {visibleSubIndustries?.map((subIndustry) => (
+                <section
+                  className="job-category-subindustry"
+                  key={subIndustry.name}
+                >
+                  <h2>
+                    {subIndustry.name} <span>({subIndustry.count})</span>
+                  </h2>
+                  <div>
+                    {subIndustry.titles.map((title) => {
+                      const key = roleSelectionKey(
+                        active.code,
+                        subIndustry.name,
+                        title,
+                      );
+                      const selected = Boolean(draftRoles[key]);
+                      return (
+                        <button
+                          className="job-category-title-pill"
+                          key={title.name}
+                          type="button"
+                          data-selected={selected}
+                          aria-pressed={selected}
+                          title={title.name}
+                          onClick={() => {
+                            setDraftIndustryCode(undefined);
+                            setDraftRoles((current) => {
+                              if (current[key]) {
+                                const next = { ...current };
+                                delete next[key];
+                                return next;
+                              }
+                              return { ...current, [key]: title.name };
+                            });
+                          }}
+                        >
+                          {selected ? <Check aria-hidden="true" /> : null}
+                          {title.name}
+                          {title.count > 1 ? (
+                            <small className="job-category-title-count">
+                              {title.count}
+                            </small>
+                          ) : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+              ))}
+              {!visibleSubIndustries?.length ? (
+                <p className="job-category-empty-roles">
+                  {vi
+                    ? "Không tìm thấy vị trí phù hợp."
+                    : "No matching roles found."}
+                </p>
+              ) : null}
+            </div>
           </div>
+          <footer className="job-category-explorer-footer">
+            <div className="job-category-selection-summary" aria-live="polite">
+              <strong>{selectionCount}</strong>
+              <span>
+                {draftIndustryCode
+                  ? vi
+                    ? "ngành đã chọn"
+                    : "industry selected"
+                  : vi
+                    ? "vị trí đã chọn"
+                    : "roles selected"}
+              </span>
+              {hasSelection ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDraftIndustryCode(undefined);
+                    setDraftRoles({});
+                  }}
+                >
+                  {vi ? "Xóa tất cả" : "Clear all"}
+                </button>
+              ) : null}
+            </div>
+            <div className="job-category-explorer-actions">
+              <button type="button" onClick={close}>
+                {vi ? "Hủy" : "Cancel"}
+              </button>
+              <button
+                className="job-category-apply"
+                type="button"
+                disabled={!canApply}
+                onClick={() => {
+                  onApply({
+                    industryCode: draftIndustryCode,
+                    roleTitles: draftIndustryCode
+                      ? []
+                      : Object.values(draftRoles),
+                  });
+                  setOpen(false);
+                  trigger.current?.focus();
+                }}
+              >
+                <Check aria-hidden="true" />
+                {vi
+                  ? `Áp dụng bộ lọc (${selectionCount})`
+                  : `Apply filters (${selectionCount})`}
+              </button>
+            </div>
+          </footer>
         </div>
       ) : null}
     </div>
@@ -397,7 +802,7 @@ function ClearFieldButton({
   );
 }
 
-function LocationPicker({
+export function LocationPicker({
   taxonomy,
   location,
   districts,
@@ -414,18 +819,12 @@ function LocationPicker({
 }>) {
   const groups = taxonomy.locationGroups ?? [];
   const [open, setOpen] = useState(false);
-  const [provinceQuery, setProvinceQuery] = useState("");
   const [draftCity, setDraftCity] = useState("");
   const [draftDistricts, setDraftDistricts] = useState<string[]>([]);
   const picker = useRef<HTMLDivElement>(null);
 
   const selectedGroup =
     groups.find((group) => group.city === draftCity) ?? groups[0];
-  const visibleGroups = groups.filter((group) =>
-    normalizeLocationSearch(group.city).includes(
-      normalizeLocationSearch(provinceQuery),
-    ),
-  );
   const displayValue = location ? [location, ...districts].join(", ") : "";
   const selectedLocationTitle = displayValue || undefined;
   const tooltipId = "job-location-picker-tooltip";
@@ -434,7 +833,6 @@ function LocationPicker({
   const openPicker = () => {
     setDraftCity(location || groups[0]?.city || "");
     setDraftDistricts([...districts]);
-    setProvinceQuery("");
     setOpen(true);
   };
 
@@ -471,9 +869,10 @@ function LocationPicker({
         <div className="job-location-picker-value">
           <input
             className="job-location-picker-input"
-            type="search"
-            value={open ? provinceQuery : displayValue}
+            type="text"
+            value={displayValue}
             placeholder={placeholder}
+            readOnly
             data-selected={Boolean(location) && !open}
             aria-label={vi ? "Địa điểm" : "Location"}
             aria-describedby={selectedLocationTitle ? tooltipId : undefined}
@@ -481,10 +880,7 @@ function LocationPicker({
             aria-expanded={open}
             aria-controls="job-location-picker-dialog"
             onFocus={beginEditing}
-            onChange={(event) => {
-              if (!open) openPicker();
-              setProvinceQuery(event.currentTarget.value);
-            }}
+            onClick={beginEditing}
           />
           {!open && location ? (
             <span className="job-location-picker-display" aria-hidden="true">
@@ -497,10 +893,7 @@ function LocationPicker({
         {location ? (
           <ClearFieldButton
             label={vi ? "Xóa địa điểm" : "Clear location"}
-            onClear={() => {
-              onClear();
-              setProvinceQuery("");
-            }}
+            onClear={onClear}
           />
         ) : null}
         <span className="job-location-picker-chevron" aria-hidden="true">
@@ -526,56 +919,61 @@ function LocationPicker({
           role="dialog"
           aria-label={vi ? "Chọn địa điểm" : "Choose location"}
         >
-          <header className="job-location-picker-heading">
-            <strong>
-              <span>{vi ? "Địa điểm" : "Location"}:</span>
-              <span>{draftCity || displayValue}</span>
-            </strong>
-            <button
-              type="button"
-              aria-label={vi ? "Đóng" : "Close"}
-              onClick={() => setOpen(false)}
-            >
-              ×
-            </button>
-          </header>
           <div className="job-location-picker-panels">
             <section
               className="job-location-provinces"
               aria-label={vi ? "Tỉnh thành" : "Provinces"}
             >
-              <label className="sr-only" htmlFor="job-location-province-search">
-                {vi ? "Tìm Tỉnh/Thành" : "Find province"}
-              </label>
-              <input
-                id="job-location-province-search"
-                type="search"
-                placeholder={vi ? "Tìm Tỉnh/Thành..." : "Find province..."}
-                value={provinceQuery}
-                onChange={(event) =>
-                  setProvinceQuery(event.currentTarget.value)
-                }
-              />
-              <div className="job-location-province-list" role="radiogroup">
-                {visibleGroups.map((group) => (
-                  <button
-                    className="job-location-province"
-                    data-active={group.city === selectedGroup?.city}
-                    key={group.city}
-                    type="button"
-                    role="radio"
-                    aria-checked={group.city === selectedGroup?.city}
-                    onClick={() => {
-                      setDraftCity(group.city);
-                      setDraftDistricts([]);
-                    }}
-                  >
-                    <span aria-hidden="true" className="job-location-radio" />
-                    <span>{group.city}</span>
-                    <small aria-hidden="true">{group.count}</small>
-                  </button>
-                ))}
+              <div className="job-location-provinces-heading">
+                <div>
+                  <strong>{vi ? "Tỉnh/Thành" : "Province / city"}</strong>
+                  <small>
+                    {groups.length} {vi ? "địa điểm" : "locations"}
+                  </small>
+                </div>
+                <button
+                  className="job-location-picker-close"
+                  type="button"
+                  aria-label={vi ? "Đóng" : "Close"}
+                  onClick={() => setOpen(false)}
+                >
+                  <svg viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="m6 6 8 8M14 6l-8 8" />
+                  </svg>
+                </button>
               </div>
+              <div className="job-location-province-select">
+                <select
+                  id="job-location-province-select"
+                  aria-label={vi ? "Tỉnh/Thành khả dụng" : "Available province"}
+                  value={selectedGroup?.city ?? ""}
+                  onChange={(event) => {
+                    setDraftCity(event.currentTarget.value);
+                    setDraftDistricts([]);
+                  }}
+                >
+                  {groups.map((group) => (
+                    <option value={group.city} key={group.city}>
+                      {group.city}
+                    </option>
+                  ))}
+                </select>
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="m5.5 7.5 4.5 4.5 4.5-4.5" />
+                </svg>
+              </div>
+              <p className="job-location-province-meta">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 7V5.8A1.8 1.8 0 0 1 9.8 4h4.4A1.8 1.8 0 0 1 16 5.8V7M4 9.5h16v9.25A1.25 1.25 0 0 1 18.75 20H5.25A1.25 1.25 0 0 1 4 18.75V9.5Z" />
+                  <path d="M4 13h16M10 13v1.5h4V13" />
+                </svg>
+                <span>
+                  <strong>{selectedGroup?.count ?? 0}</strong>{" "}
+                  {vi
+                    ? "việc đang tuyển tại tỉnh này"
+                    : "open jobs in this province"}
+                </span>
+              </p>
             </section>
             <section
               className="job-location-districts"
@@ -664,21 +1062,16 @@ export function GlobalImageSearch({
   const vi = locale === "vi";
   const contextCsrfProof = useCsrfProof();
   const activeCsrfProof = csrfProof ?? contextCsrfProof;
-  const criteria = useMemo(() => criteriaFromLocation(), []);
+  // Keep the server render and the first client render byte-for-byte stable.
+  // URL-backed values are applied only after hydration; reading window in a
+  // state initializer made the clear button appear on the client only.
+  const [criteria, setCriteria] = useState<ManualSearchContext>(defaults);
   const [externalConsent, setExternalConsent] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
-  const [query, setQuery] = useState(() => criteria.q);
-  const [location, setLocation] = useState(() => criteria.location);
-  const [districts, setDistricts] = useState(districtsFromLocation);
-  const [selectedCategoryCode, setSelectedCategoryCode] = useState(() => {
-    if (typeof window === "undefined") return "";
-    return (
-      new URL(window.location.href).searchParams.get("categoryFamily") ?? ""
-    );
-  });
-  const [headerSlotReady, setHeaderSlotReady] = useState(
-    !dockToWorkspaceHeader,
-  );
+  const [query, setQuery] = useState("");
+  const [selectedCategoryCode, setSelectedCategoryCode] = useState("");
+  const [selectedRoleTitles, setSelectedRoleTitles] = useState<string[]>([]);
+  const [clientReady, setClientReady] = useState(false);
   const cameraButton = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const search = useImageSearch({
@@ -690,13 +1083,34 @@ export function GlobalImageSearch({
   const navigateJobSearch =
     onJobSearchNavigate ?? ((href: string) => window.location.assign(href));
   const workspaceHeaderSlot =
-    dockToWorkspaceHeader && headerSlotReady && typeof document !== "undefined"
+    dockToWorkspaceHeader && clientReady && typeof document !== "undefined"
       ? document.getElementById("workspace-job-search-slot")
       : null;
 
   useEffect(() => {
-    if (dockToWorkspaceHeader) setHeaderSlotReady(true);
-  }, [dockToWorkspaceHeader]);
+    // Defer both URL synchronization and portal attachment until after the
+    // hydration commit. This also avoids React trying to reconcile a portal
+    // whose target may be replaced by the persistent workspace shell.
+    const frame = window.requestAnimationFrame(() => {
+      const nextCriteria = criteriaFromLocation();
+      setCriteria(nextCriteria);
+      setQuery(nextCriteria.q);
+      setSelectedCategoryCode(
+        new URL(window.location.href).searchParams.get("categoryFamily") ?? "",
+      );
+      setSelectedRoleTitles(
+        [
+          ...new Set(
+            new URL(window.location.href).searchParams
+              .getAll("categoryTitle")
+              .filter(Boolean),
+          ),
+        ].slice(0, 20),
+      );
+      setClientReady(true);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   useEffect(() => {
     if (!taxonomy || process.env.NODE_ENV !== "development") return;
@@ -728,18 +1142,14 @@ export function GlobalImageSearch({
     cameraButton.current?.focus();
   };
 
-  const submitJobTextSearch = (
-    nextLocation = location,
-    nextDistricts: readonly string[] = districts,
-  ) => {
-    navigateJobSearch(
-      jobTextSearchHref(
-        window.location.href,
-        query,
-        nextLocation,
-        nextDistricts,
-      ),
-    );
+  const submitJobTextSearch = () => {
+    navigateJobSearch(jobTextSearchHref(window.location.href, query));
+  };
+
+  const clearSelectedIndustry = () => {
+    setSelectedCategoryCode("");
+    setSelectedRoleTitles([]);
+    navigateJobSearch(jobIndustryClearHref(window.location.href));
   };
 
   const searchControls = (
@@ -764,27 +1174,17 @@ export function GlobalImageSearch({
               taxonomy={taxonomy}
               vi={vi}
               selectedCode={selectedCategoryCode || undefined}
-              onSelectIndustry={(industryCode) => {
-                setSelectedCategoryCode(industryCode);
+              selectedRoleTitles={selectedRoleTitles}
+              onClear={clearSelectedIndustry}
+              onApply={(selection) => {
+                setSelectedCategoryCode(selection.industryCode ?? "");
+                setSelectedRoleTitles(
+                  [...new Set(selection.roleTitles ?? [])].slice(0, 20),
+                );
                 navigateJobSearch(
-                  jobIndustrySearchHref(
-                    window.location.href,
-                    industryCode,
-                    location,
-                    districts,
-                  ),
+                  jobCategoryFilterHref(window.location.href, selection),
                 );
               }}
-              onSelect={(title) =>
-                navigateJobSearch(
-                  jobTextSearchHref(
-                    window.location.href,
-                    title,
-                    location,
-                    districts,
-                  ),
-                )
-              }
             />
           ) : null}
           <form
@@ -821,6 +1221,15 @@ export function GlobalImageSearch({
                 : "Search jobs, skills, or companies"}
             </label>
             <div className="global-image-search-query-field">
+              <span
+                className="global-image-search-query-icon"
+                aria-hidden="true"
+              >
+                <svg viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="6.5" />
+                  <path d="m16 16 4 4" />
+                </svg>
+              </span>
               <input
                 id="global-job-search-query"
                 type="search"
@@ -841,23 +1250,6 @@ export function GlobalImageSearch({
                 />
               ) : null}
             </div>
-            {taxonomy ? (
-              <LocationPicker
-                taxonomy={taxonomy}
-                location={location}
-                districts={districts}
-                vi={vi}
-                onApply={(nextLocation, nextDistricts) => {
-                  setLocation(nextLocation);
-                  setDistricts(nextDistricts);
-                  submitJobTextSearch(nextLocation, nextDistricts);
-                }}
-                onClear={() => {
-                  setLocation("");
-                  setDistricts([]);
-                }}
-              />
-            ) : null}
             {!taxonomy ? (
               <button
                 className="global-image-search-submit"

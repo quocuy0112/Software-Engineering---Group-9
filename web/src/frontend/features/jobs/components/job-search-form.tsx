@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { LocationPicker } from "@/frontend/features/jobs/image-search/components/global-image-search";
 import type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
 
 export type JobSearchCriteria = Partial<
@@ -134,6 +135,15 @@ function removeCriterion(
   return next;
 }
 
+function removeActiveFilter(
+  criteria: JobSearchCriteria,
+  filter: Pick<ActiveFilter, "name" | "value">,
+) {
+  const next = removeCriterion(criteria, filter.name, filter.value);
+  if (filter.name === "location") delete next.district;
+  return next;
+}
+
 function activeFilters(
   criteria: JobSearchCriteria,
   locale: "vi" | "en",
@@ -143,6 +153,7 @@ function activeFilters(
       ? {
           q: "Từ khóa",
           location: "Địa điểm",
+          district: "Quận/Huyện",
           employmentType: "Loại việc",
           experienceLevel: "Cấp độ",
           workArrangement: "Hình thức",
@@ -156,6 +167,7 @@ function activeFilters(
       : {
           q: "Keyword",
           location: "Location",
+          district: "District",
           employmentType: "Employment type",
           experienceLevel: "Experience level",
           workArrangement: "Work arrangement",
@@ -186,6 +198,7 @@ function activeFilters(
   for (const name of [
     "q",
     "location",
+    "district",
     "employmentType",
     "experienceLevel",
     "workArrangement",
@@ -277,13 +290,13 @@ export function JobSearchForm({
     [criteria, locale],
   );
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [showAllCategories, setShowAllCategories] = useState(false);
   const [customSalaryMin, setCustomSalaryMin] = useState("");
   const [customSalaryMax, setCustomSalaryMax] = useState("");
   const drawer = useRef<HTMLElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const form = useRef<HTMLFormElement>(null);
   const live = Boolean(onCriteriaChange);
+  const showLegacyFilters = false;
   const optionLabel = (value: string) =>
     (vi ? valueLabelsVi : valueLabels)[value] ?? value;
 
@@ -397,13 +410,9 @@ export function JobSearchForm({
     onCriteriaChange(next, "immediate");
   };
 
-  const categories = taxonomy?.industries ?? [];
-  const visibleCategories = showAllCategories
-    ? categories
-    : categories.slice(0, 5);
   const selectedEmployment = selectedValues("employmentType")[0] ?? "";
   const selectedExperience = selectedValues("experienceLevel");
-  const selectedCategories = selectedValues("categoryFamily");
+  const selectedDistricts = selectedValues("district");
   const salaryMinimum = Number(one(criteria.salaryMin) || 0);
   const salaryMaximum = Number(one(criteria.salaryMax) || 0);
   const selectedSalaryPreset: string =
@@ -457,7 +466,7 @@ export function JobSearchForm({
                   type="button"
                   onClick={() =>
                     onCriteriaChange(
-                      removeCriterion(criteria, filter.name, filter.value),
+                      removeActiveFilter(criteria, filter),
                       "immediate",
                     )
                   }
@@ -549,7 +558,7 @@ export function JobSearchForm({
             </button>
           </header>
           <p className="job-filter-copy">{copy.intro}</p>
-          {false ? (
+          {showLegacyFilters ? (
             <div className="job-filter-fields">
               <label>
                 {copy.keywords}
@@ -741,46 +750,31 @@ export function JobSearchForm({
             </div>
           ) : null}
           <div className="job-filter-fields job-filter-fields--redesigned">
-            <fieldset className="job-filter-section">
-              <legend>{vi ? "Lọc theo danh mục nghề" : "Job category"}</legend>
-              <div className="job-filter-option-list">
-                {visibleCategories.map((category) => (
-                  <label className="job-filter-option" key={category.code}>
-                    <input
-                      type="checkbox"
-                      checked={selectedCategories.includes(category.code)}
-                      onChange={() =>
-                        toggleCriterionValue("categoryFamily", category.code)
-                      }
-                    />
-                    <span>{category.name}</span>
-                    <small>
-                      (
-                      {new Intl.NumberFormat(vi ? "vi-VN" : "en-US").format(
-                        category.count,
-                      )}
-                      )
-                    </small>
-                  </label>
-                ))}
-              </div>
-              {categories.length > 5 ? (
-                <button
-                  className="job-filter-show-more"
-                  type="button"
-                  onClick={() => setShowAllCategories((current) => !current)}
-                >
-                  {showAllCategories
-                    ? vi
-                      ? "Thu gọn"
-                      : "Show less"
-                    : vi
-                      ? "Xem thêm"
-                      : "Show more"}
-                </button>
-              ) : null}
-            </fieldset>
-
+            {taxonomy ? (
+              <fieldset className="job-filter-section job-filter-location-section">
+                <legend>{copy.location}</legend>
+                <LocationPicker
+                  taxonomy={taxonomy}
+                  location={one(criteria.location)}
+                  districts={selectedDistricts}
+                  vi={vi}
+                  onApply={(nextLocation, nextDistricts) => {
+                    const next = { ...criteria };
+                    if (nextLocation) next.location = nextLocation;
+                    else delete next.location;
+                    if (nextDistricts.length) next.district = nextDistricts;
+                    else delete next.district;
+                    onCriteriaChange?.(next, "immediate");
+                  }}
+                  onClear={() => {
+                    const next = { ...criteria };
+                    delete next.location;
+                    delete next.district;
+                    onCriteriaChange?.(next, "immediate");
+                  }}
+                />
+              </fieldset>
+            ) : null}
             <fieldset className="job-filter-section">
               <legend>{vi ? "Mức lương" : "Salary"}</legend>
               <div className="job-filter-option-grid job-filter-option-grid--salary">
@@ -792,11 +786,36 @@ export function JobSearchForm({
                     undefined,
                     10_000_000,
                   ],
-                  ["10-15", "10 - 15 triệu", 10_000_000, 15_000_000],
-                  ["15-20", "15 - 20 triệu", 15_000_000, 20_000_000],
-                  ["20-25", "20 - 25 triệu", 20_000_000, 25_000_000],
-                  ["25-30", "25 - 30 triệu", 25_000_000, 30_000_000],
-                  ["30-50", "30 - 50 triệu", 30_000_000, 50_000_000],
+                  [
+                    "10-15",
+                    vi ? "10 - 15 triệu" : "10 - 15M",
+                    10_000_000,
+                    15_000_000,
+                  ],
+                  [
+                    "15-20",
+                    vi ? "15 - 20 triệu" : "15 - 20M",
+                    15_000_000,
+                    20_000_000,
+                  ],
+                  [
+                    "20-25",
+                    vi ? "20 - 25 triệu" : "20 - 25M",
+                    20_000_000,
+                    25_000_000,
+                  ],
+                  [
+                    "25-30",
+                    vi ? "25 - 30 triệu" : "25 - 30M",
+                    25_000_000,
+                    30_000_000,
+                  ],
+                  [
+                    "30-50",
+                    vi ? "30 - 50 triệu" : "30 - 50M",
+                    30_000_000,
+                    50_000_000,
+                  ],
                   [
                     "over-50",
                     vi ? "Trên 50 triệu" : "Over 50M",
@@ -918,15 +937,16 @@ export function JobSearchForm({
               <legend>{vi ? "Kinh nghiệm" : "Experience"}</legend>
               <div className="job-filter-option-grid job-filter-option-grid--experience">
                 {[
-                  ["ENTRY", vi ? "Không yêu cầu" : "No requirement"],
-                  ["JUNIOR", vi ? "Dưới 1 năm" : "Under 1 year"],
-                  ["JUNIOR", "1 năm"],
-                  ["MID", "2 năm"],
-                  ["MID", "3 năm"],
-                  ["SENIOR", "4 năm"],
-                  ["SENIOR", "5 năm"],
-                  ["LEAD", vi ? "Trên 5 năm" : "Over 5 years"],
-                ].map(([value, label], index) => (
+                  [
+                    "ENTRY",
+                    vi ? "Không yêu cầu kinh nghiệm" : "No experience required",
+                  ],
+                  ["JUNIOR", vi ? "1 - 2 năm" : "1 - 2 years"],
+                  ["MID", vi ? "3 - 4 năm" : "3 - 4 years"],
+                  ["SENIOR", vi ? "Từ 5 năm" : "5+ years"],
+                  ["LEAD", vi ? "Trưởng nhóm" : "Team lead"],
+                  ["MANAGER", vi ? "Quản lý" : "Manager"],
+                ].map(([value, label]) => (
                   <label
                     className="job-filter-option"
                     key={`${value}-${label}`}
