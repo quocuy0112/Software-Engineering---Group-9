@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import { z } from "zod";
 import { jobReviewSnapshotSchema } from "@/shared/contracts/recruiter-job-posting";
 import type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
+import { defaultJobIndustryFiles } from "@/backend/repositories/jobs/job-industry-files";
 
 export type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
 
@@ -46,7 +47,7 @@ type TaxonomyEntry = Readonly<{
 }>;
 
 const emptyTaxonomy: JobSearchTaxonomy = { industries: [], locations: [] };
-const expectedIndustryCount = 28;
+const expectedIndustryCount = 29;
 
 const taxonomyCatalogJobSchema = z.object({
   industry: z.string().trim().min(1),
@@ -246,12 +247,7 @@ function buildTaxonomy(entries: readonly TaxonomyEntry[]): JobSearchTaxonomy {
 
 let catalogTaxonomyPromise: Promise<JobSearchTaxonomy> | null = null;
 
-async function readTaxonomyCatalog(): Promise<unknown> {
-  const configuredPath = process.env.JOB_CATALOGUE_PATH?.trim();
-  const path = configuredPath
-    ? resolve(process.cwd(), configuredPath)
-    : resolve(process.cwd(), "data", "jobs", "jobs.json");
-  const text = await readFile(path, "utf8");
+function parseTaxonomyJson(text: string): unknown {
   try {
     return JSON.parse(text) as unknown;
   } catch (error) {
@@ -266,12 +262,58 @@ async function readTaxonomyCatalog(): Promise<unknown> {
   }
 }
 
+async function readTaxonomyCatalog(): Promise<unknown> {
+  const configuredPath = process.env.JOB_CATALOGUE_PATH?.trim();
+  const path = configuredPath
+    ? resolve(process.cwd(), configuredPath)
+    : resolve(process.cwd(), "data", "jobs", "jobs.json");
+  const useSplitFallback =
+    !configuredPath ||
+    path === resolve(process.cwd(), "data", "jobs", "jobs.json");
+  try {
+    return parseTaxonomyJson(await readFile(path, "utf8"));
+  } catch (error) {
+    if (
+      (error as NodeJS.ErrnoException).code !== "ENOENT" ||
+      !useSplitFallback
+    ) {
+      throw error;
+    }
+
+    // jobs.json is the legacy monolith. Once it is removed, the generated
+    // industry files are the complete catalogue and must all be present.
+    const splitDocuments = await Promise.all(
+      defaultJobIndustryFiles().map(async ({ filePath }) =>
+        parseTaxonomyJson(await readFile(filePath, "utf8")),
+      ),
+    );
+    return splitDocuments.flatMap((document) => {
+      if (!Array.isArray(document)) throw new Error("JOB_CATALOGUE_MALFORMED");
+      return document;
+    });
+  }
+}
+
 export async function listJobSearchTaxonomy(): Promise<JobSearchTaxonomy> {
   catalogTaxonomyPromise ??= readTaxonomyCatalog().then((catalog) => {
     const jobs = z.array(taxonomyCatalogJobSchema).parse(catalog);
-    const taxonomy = jobs.length
+    const computedTaxonomy = jobs.length
       ? buildCatalogJobSearchTaxonomy(jobs)
       : emptyTaxonomy;
+    // Keep the explicit catch-all category visible even when its split file
+    // is currently empty. Jobs added later with industryCode r29 will reuse
+    // this same entry and contribute their normal counts.
+    const taxonomy = computedTaxonomy.industries.some(
+      ({ code }) => code === "r29",
+    )
+      ? computedTaxonomy
+      : {
+          ...computedTaxonomy,
+          industries: [
+            ...computedTaxonomy.industries,
+            { code: "r29", name: "Other", count: 0, subIndustries: [] },
+          ],
+        };
     reportTaxonomyStage("catalog precompute", taxonomy);
     return taxonomy;
   });

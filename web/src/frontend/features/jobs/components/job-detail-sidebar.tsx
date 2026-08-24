@@ -6,7 +6,7 @@ import { RatingRow } from "@/frontend/components/ui/rating-row";
 import { RelatedJobRow } from "@/frontend/components/ui/related-job-row";
 import type { JobCard, JobDetail } from "@/shared/contracts/jobs/discovery";
 import { formatSalary } from "@/shared/utils/jobs/job-display";
-import companyCatalog from "../../../../../data/jobs/companies.json";
+import companyCatalog from "../../../../../data/companies/companies.json";
 import { CompanyAvatar } from "./company-avatar";
 import { JobMetaIcon, type JobMetaIconName } from "./job-meta-icon";
 import { ReportJobDialog } from "./report-job-dialog";
