@@ -1,46 +1,17 @@
+import { Eye, FileText, MailCheck, Sparkles, type LucideIcon } from "lucide-react";
 import { homeCopy } from "../home-copy";
 import type { HomeLocale } from "../home-page-model";
 
+const workflowIcons: Record<string, LucideIcon> = {
+  profile: FileText,
+  analysis: Sparkles,
+  review: Eye,
+  feedback: MailCheck,
+};
+
 function WorkflowIcon({ kind }: { kind: string }) {
-  if (kind === "analysis") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="m12 3 1.25 4.01L17.25 8.25l-4 1.24L12 13.5l-1.25-4.01-4-1.24 4-1.24L12 3Z" />
-        <path d="m18.25 13.25.77 2.23 2.23.77-2.23.77-.77 2.23-.77-2.23-2.23-.77 2.23-.77.77-2.23Z" />
-        <path d="m5.25 14.25.6 1.9 1.9.6-1.9.6-.6 1.9-.6-1.9-1.9-.6 1.9-.6.6-1.9Z" />
-      </svg>
-    );
-  }
-
-  if (kind === "review") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M3.5 12s3.15-5.25 8.5-5.25S20.5 12 20.5 12 17.35 17.25 12 17.25 3.5 12 3.5 12Z" />
-        <circle cx="12" cy="12" r="2.4" />
-      </svg>
-    );
-  }
-
-  if (kind === "feedback") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M4 5.5h16v13H4z" />
-        <path d="m4.5 7 7.5 5.5L19.5 7" />
-        <path d="M16.5 3.5h3v3" />
-        <path d="m19.5 3.5-4.2 4.2" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24">
-      <path d="M6.5 3.5h7.1l3.9 3.9v13.1H6.5z" />
-      <path d="M13.5 3.8v4h4" />
-      <path d="M9 14.75h3.25" />
-      <path d="m14.1 12.8 2.4 2.4" />
-      <path d="m13.7 16 3.45-3.45 1.15 1.15-3.45 3.45-1.55.4z" />
-    </svg>
-  );
+  const Icon = workflowIcons[kind] ?? FileText;
+  return <Icon aria-hidden="true" />;
 }
 
 export function HomeHowItWorks({ locale }: { locale: HomeLocale }) {

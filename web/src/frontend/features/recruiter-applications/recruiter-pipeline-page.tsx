@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ChevronDown, Inbox } from "lucide-react";
+import { BriefcaseBusiness, ChevronDown, Inbox, Plus } from "lucide-react";
+import { PageHeader } from "@/frontend/components/layout/page-header";
 import type { RecruiterJob } from "@/shared/contracts/recruiter-job-posting";
 import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
 import { RecruitmentPipelineBoard } from "./recruitment-pipeline-board";
@@ -55,9 +57,18 @@ export function RecruiterPipelinePage({
       className="page recruiter-management recruiter-pipeline-page"
       aria-label="Recruiter pipeline"
     >
+      <PageHeader
+        className="pipeline-page-heading"
+        eyebrow="Recruiter workspace"
+        title="Candidate pipeline"
+        subtitle="Review candidate progress across each stage of your hiring workflow."
+      />
       <div className="job-bar pipeline-job-selector recruiter-surface-card">
-        <div>
-          <div className="job-bar-label">Job posting</div>
+        <div className="pipeline-job-selector__copy">
+          <div className="job-bar-label">
+            <BriefcaseBusiness aria-hidden="true" />
+            Job posting
+          </div>
           <div className="job-bar-sub">
             Select one managed job to view its candidate pipeline.
           </div>
@@ -102,19 +113,43 @@ export function RecruiterPipelinePage({
           className="pipeline-page-empty recruiter-surface-card"
           role="status"
         >
-          <Inbox aria-hidden="true" />
-          <div>
-            <h2>No job postings available</h2>
-            <p>Create or publish a job posting before opening its pipeline.</p>
+          <div className="pipeline-page-empty__ghost" aria-hidden="true">
+            <span />
+            <span />
+            <span />
           </div>
+          <span className="pipeline-page-empty__icon" aria-hidden="true">
+            <Inbox />
+          </span>
+          <div className="pipeline-page-empty__content">
+            <h2>No job postings available</h2>
+            <p>
+              Create or publish a job posting before opening its candidate
+              evaluation pipeline.
+            </p>
+          </div>
+          <Link
+            className="pipeline-page-empty__action"
+            href={recruiterRoutes.jobPostingCreate}
+          >
+            <Plus aria-hidden="true" />
+            Create a job posting
+          </Link>
         </div>
       ) : !selectedJob ? (
         <div
           className="pipeline-page-empty recruiter-surface-card"
           role="status"
         >
-          <Inbox aria-hidden="true" />
-          <div>
+          <div className="pipeline-page-empty__ghost" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          <span className="pipeline-page-empty__icon" aria-hidden="true">
+            <Inbox />
+          </span>
+          <div className="pipeline-page-empty__content">
             <h2>Select a job posting</h2>
             <p>Choose a job above to see its candidates grouped by stage.</p>
           </div>

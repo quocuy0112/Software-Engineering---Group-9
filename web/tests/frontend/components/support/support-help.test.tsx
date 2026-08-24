@@ -14,7 +14,7 @@ describe("Support help flow", () => {
   });
 
   it("filters FAQ questions and opens a popular answer", () => {
-    render(<SupportFaq />);
+    render(<SupportFaq locale="en" />);
 
     const search = screen.getByRole("searchbox", {
       name: "Search frequently asked questions",

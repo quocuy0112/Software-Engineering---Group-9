@@ -1422,8 +1422,8 @@
 
 .candidate-profile-page .candidate-avatar-modal .profile-avatar-save:disabled {
   border-color: var(--sh-profile-border);
-  color: var(--sh-profile-text-faint);
-  background: color-mix(in srgb, var(--sh-color-brand-primary) 42%, #fff);
+  color: var(--sh-color-disabled-text);
+  background: var(--sh-color-disabled-bg);
   cursor: not-allowed;
 }
 

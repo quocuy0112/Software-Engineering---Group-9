@@ -32,8 +32,8 @@
 .phead {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 22px;
+  align-items: center;
+  margin-bottom: 24px;
   gap: 16px;
   flex-wrap: wrap;
 }
@@ -58,9 +58,9 @@
 }
 
 .ptitle {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   max-width: 640px;
   line-height: 1.3;
   color: var(--sh-color-text-primary, #10142b);
@@ -70,7 +70,7 @@
   font-size: 13px;
   color: var(--sh-color-text-secondary, #6c7288);
   max-width: 560px;
-  margin: 4px 0 0;
+  margin: 0;
   line-height: 1.5;
 }
 

@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import type { HomeLocale } from "../home-page-model";
 import {
   emptyHomeSearchDraft,
@@ -19,6 +26,7 @@ const HomeLocaleContext = createContext<HomeLocaleValue>({
   searchDraft: emptyHomeSearchDraft,
   setSearchDraft: () => undefined,
 });
+const homeLocaleStorageKey = "smarthire.home.locale";
 
 export function HomeLocaleProvider({
   children,
@@ -32,11 +40,19 @@ export function HomeLocaleProvider({
     emptyHomeSearchDraft,
   );
   useEffect(() => {
+    const stored = window.localStorage.getItem(homeLocaleStorageKey);
+    if (stored === "vi" || stored === "en") setLocale(stored);
+  }, []);
+  useEffect(() => {
     document.documentElement.lang = locale;
+    window.localStorage.setItem(homeLocaleStorageKey, locale);
   }, [locale]);
+  const updateLocale = useCallback((nextLocale: HomeLocale) => {
+    setLocale(nextLocale);
+  }, []);
   const value = useMemo(
-    () => ({ locale, setLocale, searchDraft, setSearchDraft }),
-    [locale, searchDraft],
+    () => ({ locale, setLocale: updateLocale, searchDraft, setSearchDraft }),
+    [locale, searchDraft, updateLocale],
   );
   return (
     <HomeLocaleContext.Provider value={value}>

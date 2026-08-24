@@ -28,7 +28,7 @@ const themeBootstrapScript = [
   '      "/", "/home", "/login", "/register", "/forgot-password",',
   '      "/reset-password", "/two-factor", "/check-email", "/verify-email",',
   '      "/verify-company-email", "/verify-email-change", "/account-recovery",',
-  '      "/business", "/legal"',
+      '      "/business", "/help", "/legal"',
   "    ];",
   "    var forceLight = publicRoutes.some(function (route) {",
   '      return pathname === route || (route !== "/" && pathname.indexOf(route + "/") === 0);',

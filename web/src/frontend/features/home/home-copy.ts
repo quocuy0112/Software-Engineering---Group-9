@@ -219,6 +219,26 @@ export type HomeCopy = {
     employerEyebrow: string;
     employerTitle: string;
   };
+  aiCvPolicy: {
+    backToHome: string;
+    effective: string;
+    policyVersion: string;
+    eyebrow: string;
+    title: string;
+    description: string;
+    principles: readonly (CuratedCard & {
+      key: "optional" | "human" | "integrity";
+    })[];
+    sections: readonly {
+      title: string;
+      paragraphs: readonly string[];
+    }[];
+    importantNoticeLabel: string;
+    importantNotice: string;
+    dataHighlights: readonly string[];
+    supportAction: string;
+    copyright: string;
+  };
   footer: {
     description: string;
     label: string;
@@ -227,6 +247,10 @@ export type HomeCopy = {
     informationLabel: string;
     jobs: string;
     companies: string;
+    support: string;
+    privacy: string;
+    terms: string;
+    cookies: string;
     aiCvPolicy: string;
     establishedYear: number;
     copyright: string;
@@ -606,6 +630,69 @@ export const homeCopy = {
       employerEyebrow: "FOR EMPLOYERS",
       employerTitle: "Find the right candidates for your open roles.",
     },
+    aiCvPolicy: {
+      backToHome: "Back to Home",
+      effective: "Effective",
+      policyVersion: "Policy version",
+      eyebrow: "SMART HIRE POLICY & TRANSPARENCY",
+      title: "AI & CV analysis policy",
+      description:
+        "Smart Hire may use AI to provide a reference assessment of how well your CV fits the role you apply for. This policy is published independently by Smart Hire on this platform.",
+      principles: [
+        {
+          key: "optional",
+          title: "Always optional",
+          body: "AI analysis is never required to submit an application.",
+        },
+        {
+          key: "human",
+          title: "No automatic rejection",
+          body: "AI results are a reference for you and recruiters, never a hiring decision.",
+        },
+        {
+          key: "integrity",
+          title: "Your CV stays intact",
+          body: "AI analysis does not alter the content of your original CV.",
+        },
+      ],
+      sections: [
+        {
+          title: "How AI is used",
+          paragraphs: [
+            "When you actively choose to give consent, Smart Hire analyzes skills, experience, and professional information in your CV to provide a fit estimate and a short explanation.",
+          ],
+        },
+        {
+          title: "Your choice",
+          paragraphs: [
+            "AI analysis is optional and is not required to apply.",
+            "If you do not consent, your application is still sent to the recruiter as usual. Smart Hire simply does not generate an AI fit score or recommendation for that application.",
+          ],
+        },
+        {
+          title: "Data and transparency",
+          paragraphs: [
+            "Smart Hire uses your CV and the role you apply for only to the extent needed for the stated purpose. The result remains connected to that specific application.",
+            "You can contact Smart Hire to ask about an analysis result or request human support.",
+          ],
+        },
+        {
+          title: "Contact and concerns",
+          paragraphs: [
+            "If you have questions about this policy or want to share feedback about how AI is used, contact the Smart Hire support team from your account.",
+          ],
+        },
+      ],
+      importantNoticeLabel: "Important",
+      importantNotice:
+        "AI assessments are informational only and are never the final hiring decision.",
+      dataHighlights: [
+        "Your original CV is not changed",
+        "Candidates are not rejected automatically",
+      ],
+      supportAction: "Open account support",
+      copyright: "© {year} Smart Hire. All rights reserved.",
+    },
     footer: {
       description:
         "An intelligent recruitment platform and professional career community.",
@@ -615,6 +702,10 @@ export const homeCopy = {
       informationLabel: "Company information",
       jobs: "Jobs",
       companies: "Hiring companies",
+      support: "Help & support",
+      privacy: "Privacy",
+      terms: "Terms",
+      cookies: "Cookies",
       aiCvPolicy: "AI & CV policy",
       establishedYear: 2026,
       copyright: "© {year} Smart Hire. All rights reserved.",
@@ -990,6 +1081,69 @@ export const homeCopy = {
       employerEyebrow: "DÀNH CHO DOANH NGHIỆP",
       employerTitle: "Tìm ứng viên phù hợp cho vị trí đang tuyển.",
     },
+    aiCvPolicy: {
+      backToHome: "Quay lại trang chủ",
+      effective: "Hiệu lực",
+      policyVersion: "Phiên bản chính sách",
+      eyebrow: "CHÍNH SÁCH & MINH BẠCH SMART HIRE",
+      title: "Chính sách phân tích CV bằng AI",
+      description:
+        "Smart Hire có thể dùng AI để tạo một nhận định tham khảo về mức độ phù hợp giữa CV của bạn và vị trí bạn đang ứng tuyển. Đây là nội dung độc lập của Smart Hire và được công bố riêng trên nền tảng này.",
+      principles: [
+        {
+          key: "optional",
+          title: "Tùy chọn tự nguyện",
+          body: "Không bắt buộc phải bật AI để nộp hồ sơ ứng tuyển.",
+        },
+        {
+          key: "human",
+          title: "Không tự động loại",
+          body: "Điểm AI chỉ mang tính tham khảo cho bạn và nhà tuyển dụng.",
+        },
+        {
+          key: "integrity",
+          title: "Bảo mật nguyên vẹn",
+          body: "Không làm thay đổi hay chỉnh sửa nội dung file CV gốc.",
+        },
+      ],
+      sections: [
+        {
+          title: "AI được dùng để làm gì?",
+          paragraphs: [
+            "Khi bạn chủ động bật lựa chọn đồng ý, Smart Hire phân tích các kỹ năng, kinh nghiệm và thông tin nghề nghiệp có trong CV để đưa ra điểm phù hợp và phần giải thích ngắn.",
+          ],
+        },
+        {
+          title: "Quyền lựa chọn của bạn",
+          paragraphs: [
+            "Đồng ý phân tích AI là tùy chọn và không phải điều kiện bắt buộc để ứng tuyển.",
+            "Nếu không đồng ý, hồ sơ của bạn vẫn được chuyển tới nhà tuyển dụng bình thường; Smart Hire chỉ không tạo điểm số hoặc gợi ý phù hợp bằng AI cho lần ứng tuyển đó.",
+          ],
+        },
+        {
+          title: "Dữ liệu và tính minh bạch",
+          paragraphs: [
+            "Smart Hire chỉ sử dụng CV và vị trí ứng tuyển trong phạm vi cần thiết cho mục đích đã thông báo. Kết quả được gắn liền với lần ứng tuyển tương ứng.",
+            "Bạn luôn có quyền liên hệ với Smart Hire để giải đáp về kết quả phân tích hoặc yêu cầu hỗ trợ đối soát thủ công từ chuyên viên.",
+          ],
+        },
+        {
+          title: "Liên hệ & Khiếu nại",
+          paragraphs: [
+            "Nếu bạn có bất kỳ câu hỏi nào về chính sách này hoặc muốn phản hồi về cơ chế AI, hãy liên hệ trực tiếp với đội ngũ hỗ trợ Smart Hire từ trang tài khoản của bạn.",
+          ],
+        },
+      ],
+      importantNoticeLabel: "Lưu ý quan trọng",
+      importantNotice:
+        "Kết quả đánh giá chỉ mang tính tham khảo, không phải quyết định tuyển dụng cuối cùng.",
+      dataHighlights: [
+        "Không thay đổi nội dung CV",
+        "Không tự động loại ứng viên",
+      ],
+      supportAction: "Mở trung tâm hỗ trợ tài khoản",
+      copyright: "© {year} Smart Hire. Bảo lưu mọi quyền.",
+    },
     footer: {
       description:
         "Nền tảng tuyển dụng thông minh và cộng đồng nghề nghiệp chuyên nghiệp.",
@@ -999,6 +1153,10 @@ export const homeCopy = {
       informationLabel: "Thông tin doanh nghiệp",
       jobs: "Việc làm",
       companies: "Doanh nghiệp tuyển dụng",
+      support: "Trợ giúp & hỗ trợ",
+      privacy: "Quyền riêng tư",
+      terms: "Điều khoản sử dụng",
+      cookies: "Cookie",
       aiCvPolicy: "Chính sách AI & CV",
       establishedYear: 2026,
       copyright: "© {year} Smart Hire. Bảo lưu mọi quyền.",
