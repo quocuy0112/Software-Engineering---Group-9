@@ -1,4 +1,11 @@
-import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import {
+  mkdir,
+  mkdtemp,
+  readFile,
+  readdir,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -7,6 +14,7 @@ import {
   type JobCatalogueLeaseClaim,
   type JobCatalogueLeaseCoordinator,
 } from "@/backend/repositories/jobs/json-job-catalogue-repository";
+import { defaultJobIndustryFiles } from "@/backend/repositories/jobs/job-industry-files";
 import { buildJobReviewSnapshot } from "../../../helpers/job-post-reviews/job-post-review-fixtures";
 
 class FakeLeaseCoordinator implements JobCatalogueLeaseCoordinator {
@@ -124,5 +132,87 @@ describe("JSON job catalogue repository", () => {
         return jobs;
       }),
     ).rejects.toThrow("JOB_CATALOGUE_CHECKSUM_CONFLICT");
+  });
+
+  it("reads the complete catalogue from split industry files when jobs.json is absent", async () => {
+    const directory = await mkdtemp(
+      join(tmpdir(), "smarthire-split-catalogue-"),
+    );
+    directories.push(directory);
+    const files = defaultJobIndustryFiles(directory);
+    await mkdir(join(directory, "data", "jobs"), { recursive: true });
+    await Promise.all(
+      files.map(({ filePath, code }) =>
+        writeFile(
+          filePath,
+          JSON.stringify(
+            code === "r01" ? [{ id: "job-r01", industryCode: code }] : [],
+          ),
+          "utf8",
+        ),
+      ),
+    );
+
+    const repository = new JsonJobCatalogueRepository({
+      filePath: join(directory, "data", "jobs", "jobs.json"),
+      fallbackFiles: files,
+      mode: "readonly",
+      writerHostId: null,
+      leaseCoordinator: new FakeLeaseCoordinator(),
+      leaseTtlMs: 30_000,
+    });
+
+    await expect(repository.read()).resolves.toEqual([
+      { id: "job-r01", industryCode: "r01" },
+    ]);
+  });
+
+  it("writes a split catalogue back to the matching industry files", async () => {
+    const directory = await mkdtemp(
+      join(tmpdir(), "smarthire-split-catalogue-writer-"),
+    );
+    directories.push(directory);
+    const files = defaultJobIndustryFiles(directory);
+    await mkdir(join(directory, "data", "jobs"), { recursive: true });
+    await Promise.all(
+      files.map(({ filePath, code }) =>
+        writeFile(
+          filePath,
+          JSON.stringify(
+            code === "r01" ? [{ id: "job-r01", industryCode: code }] : [],
+          ),
+          "utf8",
+        ),
+      ),
+    );
+
+    const repository = new JsonJobCatalogueRepository<{
+      id: string;
+      industryCode: string;
+      title?: string;
+    }>({
+      filePath: join(directory, "data", "jobs", "jobs.json"),
+      fallbackFiles: files,
+      mode: "writer",
+      writerHostId: "writer-fixture-1",
+      leaseCoordinator: new FakeLeaseCoordinator(),
+      leaseTtlMs: 30_000,
+    });
+
+    await repository.mutate((jobs) => [
+      ...jobs,
+      { id: "job-r03", industryCode: "r03", title: "IT job" },
+    ]);
+    expect(JSON.parse(await readFile(files[0].filePath, "utf8"))).toEqual([
+      { id: "job-r01", industryCode: "r01" },
+    ]);
+    expect(
+      JSON.parse(
+        await readFile(
+          files.find(({ code }) => code === "r03")!.filePath,
+          "utf8",
+        ),
+      ),
+    ).toEqual([{ id: "job-r03", industryCode: "r03", title: "IT job" }]);
   });
 });

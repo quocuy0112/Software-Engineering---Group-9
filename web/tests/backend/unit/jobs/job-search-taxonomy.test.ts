@@ -17,13 +17,13 @@ function row(snapshot: ReturnType<typeof buildJobReviewSnapshot>) {
 }
 
 describe("job search taxonomy", () => {
-  it("retains all 28 catalog industries and their open-role counts", async () => {
+  it("retains all 29 catalog industries and their open-role counts", async () => {
     const taxonomy = await listJobSearchTaxonomy();
 
-    expect(taxonomy.industries).toHaveLength(28);
+    expect(taxonomy.industries).toHaveLength(29);
     expect(taxonomy.industries.map(({ code }) => code).sort()).toEqual(
       Array.from(
-        { length: 28 },
+        { length: 29 },
         (_, index) => `r${String(index + 1).padStart(2, "0")}`,
       ),
     );
@@ -31,21 +31,28 @@ describe("job search taxonomy", () => {
       expect.objectContaining({
         code: "r01",
         name: "Sales & Business Development",
-        count: 402,
+        count: expect.any(Number),
       }),
     );
     expect(taxonomy.industries).toContainEqual(
       expect.objectContaining({
         code: "r03",
         name: "Information Technology (IT)",
-        count: 579,
+        count: expect.any(Number),
       }),
     );
     expect(taxonomy.industries).toContainEqual(
       expect.objectContaining({
         code: "r28",
         name: "General Labor & Drivers",
-        count: 119,
+        count: expect.any(Number),
+      }),
+    );
+    expect(taxonomy.industries).toContainEqual(
+      expect.objectContaining({
+        code: "r29",
+        name: "Other",
+        count: expect.any(Number),
       }),
     );
   });

@@ -659,6 +659,7 @@ function buildJobId() {
 function jobFromCommand(
   raw: unknown,
   companyId: string,
+  createdByUserId: string,
   status: JobPostingStatus,
   now: string,
   id = buildJobId(),
@@ -672,6 +673,7 @@ function jobFromCommand(
     id,
     slug: `${slugPart(title)}-${slugPart(locationPart)}-${id.slice(-8)}`,
     companyId,
+    createdByUserId,
     status,
     approvalComment: input.approvalComment ?? null,
     postedAt: input.postedAt || now,
@@ -697,7 +699,7 @@ export async function createRecruiterJob(
     if (missingProfileFields.length) {
       throw new Error("Company profile is incomplete.");
     }
-    const job = jobFromCommand(raw, company.id, status, now);
+    const job = jobFromCommand(raw, company.id, userId, status, now);
     await jobsRepository.mutate(() => [...rawJobs, job]);
     return { ...job, company } satisfies RecruiterJob;
   });
@@ -750,6 +752,7 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
       id: current.id,
       slug: current.slug,
       companyId: current.companyId,
+      createdByUserId: current.createdByUserId ?? null,
       approvalComment: input.approvalComment ?? current.approvalComment ?? null,
       postedAt: current.postedAt,
       updatedAt: now,

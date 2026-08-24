@@ -44,6 +44,9 @@ export const jobCatalogSchema = z
     id: z.string().min(1).max(128),
     slug: z.string().min(1).max(220),
     companyId: z.string().min(1).max(128),
+    // Null/omitted for the immutable shared catalogue. User-created jobs
+    // carry the account id so a user reset can remove only owned records.
+    createdByUserId: z.string().min(1).max(128).nullable().optional(),
     industry: z.string().min(1).max(160),
     industryCode: z.string().max(80),
     subIndustry: z.string().min(1).max(160),

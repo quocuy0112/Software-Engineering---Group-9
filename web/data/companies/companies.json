@@ -1,0 +1,3620 @@
+[
+  {
+    "id": "comp-0115-compass-capital",
+    "slug": "compass-capital-115",
+    "name": "Compass Capital",
+    "logo": "https://example.com/compass-capital/logo.png",
+    "size": "1-50 employees",
+    "industry": "Information Technology (IT)",
+    "address": "Hai Chau District, Da Nang",
+    "website": "https://example.com/compass-capital",
+    "description": "A verified SmartHire employer operating in Information Technology (IT), based in Da Nang.",
+    "rating": {
+      "score": 4.4,
+      "reviewCount": 424
+    },
+    "jobCount": 118,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6203854978",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0003-sky-partners",
+    "slug": "sky-partners-3",
+    "name": "Sky Partners",
+    "logo": "https://example.com/sky-partners/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Information Technology (IT)",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/sky-partners",
+    "description": "A verified SmartHire employer operating in Information Technology (IT), based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 483
+    },
+    "jobCount": 115,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6714650348",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0031-prime-digital",
+    "slug": "prime-digital-31",
+    "name": "Prime Digital",
+    "logo": "https://example.com/prime-digital/logo.png",
+    "size": "201-500 employees",
+    "industry": "Information Technology (IT)",
+    "address": "Hong Bang District, Hai Phong",
+    "website": "https://example.com/prime-digital",
+    "description": "A verified SmartHire employer operating in Information Technology (IT), based in Hai Phong.",
+    "rating": {
+      "score": 4.4,
+      "reviewCount": 358
+    },
+    "jobCount": 114,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "4428077521",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0087-alpha-international",
+    "slug": "alpha-international-87",
+    "name": "Alpha International",
+    "logo": "https://example.com/alpha-international/logo.png",
+    "size": "1-50 employees",
+    "industry": "Information Technology (IT)",
+    "address": "Cai Rang District, Can Tho",
+    "website": "https://example.com/alpha-international",
+    "description": "A verified SmartHire employer operating in Information Technology (IT), based in Can Tho.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 613
+    },
+    "jobCount": 111,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6471011476",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0059-alpha-corp",
+    "slug": "alpha-corp-59",
+    "name": "Alpha Corp",
+    "logo": "https://example.com/alpha-corp/logo.png",
+    "size": "1000+ employees",
+    "industry": "Information Technology (IT)",
+    "address": "Cai Rang District, Can Tho",
+    "website": "https://example.com/alpha-corp",
+    "description": "A verified SmartHire employer operating in Information Technology (IT), based in Can Tho.",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 71
+    },
+    "jobCount": 105,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1334586195",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0143-blue-ocean-holdings",
+    "slug": "blue-ocean-holdings-143",
+    "name": "Blue Ocean Holdings",
+    "logo": "https://example.com/blue-ocean-holdings/logo.png",
+    "size": "201-500 employees",
+    "industry": "Information Technology (IT)",
+    "address": "Thuan An City, Binh Duong",
+    "website": "https://example.com/blue-ocean-holdings",
+    "description": "A verified SmartHire employer operating in Information Technology (IT), based in Binh Duong.",
+    "rating": {
+      "score": 4,
+      "reviewCount": 166
+    },
+    "jobCount": 105,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "5712685544",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0058-blue-ocean-enterprises",
+    "slug": "blue-ocean-enterprises-58",
+    "name": "Blue Ocean Enterprises",
+    "logo": "https://example.com/blue-ocean-enterprises/logo.png",
+    "size": "201-500 employees",
+    "industry": "Marketing / PR / Advertising / Communications",
+    "address": "Le Chan District, Hai Phong",
+    "website": "https://example.com/blue-ocean-enterprises",
+    "description": "A verified SmartHire employer operating in Marketing / PR / Advertising / Communications, based in Hai Phong.",
+    "rating": {
+      "score": 4.3,
+      "reviewCount": 407
+    },
+    "jobCount": 100,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "5975754076",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0171-apex-trading-co",
+    "slug": "apex-trading-co-171",
+    "name": "Apex Trading Co.",
+    "logo": "https://example.com/apex-trading-co/logo.png",
+    "size": "201-500 employees",
+    "industry": "Information Technology (IT)",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/apex-trading-co",
+    "description": "A verified SmartHire employer operating in Information Technology (IT), based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 4,
+      "reviewCount": 587
+    },
+    "jobCount": 99,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "4555931754",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0002-unity-trading-co",
+    "slug": "unity-trading-co-2",
+    "name": "Unity Trading Co.",
+    "logo": "https://example.com/unity-trading-co/logo.png",
+    "size": "51-200 employees",
+    "industry": "Marketing / PR / Advertising / Communications",
+    "address": "Bac Ninh City, Bac Ninh",
+    "website": "https://example.com/unity-trading-co",
+    "description": "A verified SmartHire employer operating in Marketing / PR / Advertising / Communications, based in Bac Ninh.",
+    "rating": {
+      "score": 3.6,
+      "reviewCount": 238
+    },
+    "jobCount": 95,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9302333671",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0030-bridge-vietnam",
+    "slug": "bridge-vietnam-30",
+    "name": "Bridge Vietnam",
+    "logo": "https://example.com/bridge-vietnam/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Marketing / PR / Advertising / Communications",
+    "address": "Le Chan District, Hai Phong",
+    "website": "https://example.com/bridge-vietnam",
+    "description": "A verified SmartHire employer operating in Marketing / PR / Advertising / Communications, based in Hai Phong.",
+    "rating": {
+      "score": 4.3,
+      "reviewCount": 66
+    },
+    "jobCount": 95,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9823200744",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0029-willow-international",
+    "slug": "willow-international-29",
+    "name": "Willow International",
+    "logo": "https://example.com/willow-international/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Sales & Business Development",
+    "address": "Thu Dau Mot City, Binh Duong",
+    "website": "https://example.com/willow-international",
+    "description": "A verified SmartHire employer operating in Sales & Business Development, based in Binh Duong.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 406
+    },
+    "jobCount": 87,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "0192820600",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0085-anchor-digital",
+    "slug": "anchor-digital-85",
+    "name": "Anchor Digital",
+    "logo": "https://example.com/anchor-digital/logo.png",
+    "size": "201-500 employees",
+    "industry": "Sales & Business Development",
+    "address": "Hong Bang District, Hai Phong",
+    "website": "https://example.com/anchor-digital",
+    "description": "A verified SmartHire employer operating in Sales & Business Development, based in Hai Phong.",
+    "rating": {
+      "score": 4.3,
+      "reviewCount": 609
+    },
+    "jobCount": 87,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1751829749",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0114-vantage-capital",
+    "slug": "vantage-capital-114",
+    "name": "Vantage Capital",
+    "logo": "https://example.com/vantage-capital/logo.png",
+    "size": "1000+ employees",
+    "industry": "Marketing / PR / Advertising / Communications",
+    "address": "Ngo Quyen District, Hai Phong",
+    "website": "https://example.com/vantage-capital",
+    "description": "A verified SmartHire employer operating in Marketing / PR / Advertising / Communications, based in Hai Phong.",
+    "rating": {
+      "score": 4.6,
+      "reviewCount": 105
+    },
+    "jobCount": 86,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9790888489",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0086-unity-retail-group",
+    "slug": "unity-retail-group-86",
+    "name": "Unity Retail Group",
+    "logo": "https://example.com/unity-retail-group/logo.png",
+    "size": "51-200 employees",
+    "industry": "Marketing / PR / Advertising / Communications",
+    "address": "Thu Dau Mot City, Binh Duong",
+    "website": "https://example.com/unity-retail-group",
+    "description": "A verified SmartHire employer operating in Marketing / PR / Advertising / Communications, based in Binh Duong.",
+    "rating": {
+      "score": 4,
+      "reviewCount": 92
+    },
+    "jobCount": 81,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1703772520",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0169-prime-solutions",
+    "slug": "prime-solutions-169",
+    "name": "Prime Solutions",
+    "logo": "https://example.com/prime-solutions/logo.png",
+    "size": "1-50 employees",
+    "industry": "Sales & Business Development",
+    "address": "Thanh Xuan District, Hanoi",
+    "website": "https://example.com/prime-solutions",
+    "description": "A verified SmartHire employer operating in Sales & Business Development, based in Hanoi.",
+    "rating": {
+      "score": 3.7,
+      "reviewCount": 488
+    },
+    "jobCount": 80,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "4183092703",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0170-green-valley-logistics",
+    "slug": "green-valley-logistics-170",
+    "name": "Green Valley Logistics",
+    "logo": "https://example.com/green-valley-logistics/logo.png",
+    "size": "51-200 employees",
+    "industry": "Marketing / PR / Advertising / Communications",
+    "address": "Long Thanh District, Dong Nai",
+    "website": "https://example.com/green-valley-logistics",
+    "description": "A verified SmartHire employer operating in Marketing / PR / Advertising / Communications, based in Dong Nai.",
+    "rating": {
+      "score": 4.9,
+      "reviewCount": 526
+    },
+    "jobCount": 78,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "4202528840",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0113-pioneer-tech",
+    "slug": "pioneer-tech-113",
+    "name": "Pioneer Tech",
+    "logo": "https://example.com/pioneer-tech/logo.png",
+    "size": "1-50 employees",
+    "industry": "Sales & Business Development",
+    "address": "Thu Dau Mot City, Binh Duong",
+    "website": "https://example.com/pioneer-tech",
+    "description": "A verified SmartHire employer operating in Sales & Business Development, based in Binh Duong.",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 22
+    },
+    "jobCount": 74,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "4094437729",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0141-sky-consulting",
+    "slug": "sky-consulting-141",
+    "name": "Sky Consulting",
+    "logo": "https://example.com/sky-consulting/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Sales & Business Development",
+    "address": "Cai Rang District, Can Tho",
+    "website": "https://example.com/sky-consulting",
+    "description": "A verified SmartHire employer operating in Sales & Business Development, based in Can Tho.",
+    "rating": {
+      "score": 4.2,
+      "reviewCount": 448
+    },
+    "jobCount": 69,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9635669758",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0001-halo-consulting",
+    "slug": "halo-consulting-1",
+    "name": "Halo Consulting",
+    "logo": "https://example.com/halo-consulting/logo.png",
+    "size": "1000+ employees",
+    "industry": "Sales & Business Development",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/halo-consulting",
+    "description": "A verified SmartHire employer operating in Sales & Business Development, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 4.4,
+      "reviewCount": 108
+    },
+    "jobCount": 68,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3619263297",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0057-north-star-international",
+    "slug": "north-star-international-57",
+    "name": "North Star International",
+    "logo": "https://example.com/north-star-international/logo.png",
+    "size": "201-500 employees",
+    "industry": "Sales & Business Development",
+    "address": "Cai Rang District, Can Tho",
+    "website": "https://example.com/north-star-international",
+    "description": "A verified SmartHire employer operating in Sales & Business Development, based in Can Tho.",
+    "rating": {
+      "score": 3.5,
+      "reviewCount": 220
+    },
+    "jobCount": 68,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "2377720211",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0032-trident-logistics",
+    "slug": "trident-logistics-32",
+    "name": "Trident Logistics",
+    "logo": "https://example.com/trident-logistics/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Accounting / Auditing / Tax / Corporate Finance",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/trident-logistics",
+    "description": "A verified SmartHire employer operating in Accounting / Auditing / Tax / Corporate Finance, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 333
+    },
+    "jobCount": 64,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3974870756",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0142-crown-holdings",
+    "slug": "crown-holdings-142",
+    "name": "Crown Holdings",
+    "logo": "https://example.com/crown-holdings/logo.png",
+    "size": "51-200 employees",
+    "industry": "Marketing / PR / Advertising / Communications",
+    "address": "District 2 (Thu Duc), Ho Chi Minh City",
+    "website": "https://example.com/crown-holdings",
+    "description": "A verified SmartHire employer operating in Marketing / PR / Advertising / Communications, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 199
+    },
+    "jobCount": 63,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8217162056",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0004-fusion-tech",
+    "slug": "fusion-tech-4",
+    "name": "Fusion Tech",
+    "logo": "https://example.com/fusion-tech/logo.png",
+    "size": "1-50 employees",
+    "industry": "Accounting / Auditing / Tax / Corporate Finance",
+    "address": "Binh Thanh District, Ho Chi Minh City",
+    "website": "https://example.com/fusion-tech",
+    "description": "A verified SmartHire employer operating in Accounting / Auditing / Tax / Corporate Finance, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 626
+    },
+    "jobCount": 53,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8239845796",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0144-phoenix-international",
+    "slug": "phoenix-international-144",
+    "name": "Phoenix International",
+    "logo": "https://example.com/phoenix-international/logo.png",
+    "size": "201-500 employees",
+    "industry": "Accounting / Auditing / Tax / Corporate Finance",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/phoenix-international",
+    "description": "A verified SmartHire employer operating in Accounting / Auditing / Tax / Corporate Finance, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 4.6,
+      "reviewCount": 591
+    },
+    "jobCount": 49,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "2353508724",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0088-fusion-retail-group",
+    "slug": "fusion-retail-group-88",
+    "name": "Fusion Retail Group",
+    "logo": "https://example.com/fusion-retail-group/logo.png",
+    "size": "1000+ employees",
+    "industry": "Accounting / Auditing / Tax / Corporate Finance",
+    "address": "Nam Tu Liem District, Hanoi",
+    "website": "https://example.com/fusion-retail-group",
+    "description": "A verified SmartHire employer operating in Accounting / Auditing / Tax / Corporate Finance, based in Hanoi.",
+    "rating": {
+      "score": 3.6,
+      "reviewCount": 286
+    },
+    "jobCount": 47,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "2979138634",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0060-orion-manufacturing",
+    "slug": "orion-manufacturing-60",
+    "name": "Orion Manufacturing",
+    "logo": "https://example.com/orion-manufacturing/logo.png",
+    "size": "51-200 employees",
+    "industry": "Accounting / Auditing / Tax / Corporate Finance",
+    "address": "Long Thanh District, Dong Nai",
+    "website": "https://example.com/orion-manufacturing",
+    "description": "A verified SmartHire employer operating in Accounting / Auditing / Tax / Corporate Finance, based in Dong Nai.",
+    "rating": {
+      "score": 4.6,
+      "reviewCount": 125
+    },
+    "jobCount": 43,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "0683261599",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0145-green-valley-media",
+    "slug": "green-valley-media-145",
+    "name": "Green Valley Media",
+    "logo": "https://example.com/green-valley-media/logo.png",
+    "size": "1-50 employees",
+    "industry": "Administration / Office / Executive Support / Legal",
+    "address": "Bien Hoa City, Dong Nai",
+    "website": "https://example.com/green-valley-media",
+    "description": "A verified SmartHire employer operating in Administration / Office / Executive Support / Legal, based in Dong Nai.",
+    "rating": {
+      "score": 4,
+      "reviewCount": 583
+    },
+    "jobCount": 43,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6816430459",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0063-golden-enterprises",
+    "slug": "golden-enterprises-63",
+    "name": "Golden Enterprises",
+    "logo": "https://example.com/golden-enterprises/logo.png",
+    "size": "51-200 employees",
+    "industry": "Electrical / Electronics / M&E / Energy",
+    "address": "Ha Dong District, Hanoi",
+    "website": "https://example.com/golden-enterprises",
+    "description": "A verified SmartHire employer operating in Electrical / Electronics / M&E / Energy, based in Hanoi.",
+    "rating": {
+      "score": 4,
+      "reviewCount": 345
+    },
+    "jobCount": 42,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "4384735077",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0116-harbor-vietnam",
+    "slug": "harbor-vietnam-116",
+    "name": "Harbor Vietnam",
+    "logo": "https://example.com/harbor-vietnam/logo.png",
+    "size": "1-50 employees",
+    "industry": "Accounting / Auditing / Tax / Corporate Finance",
+    "address": "District 10, Ho Chi Minh City",
+    "website": "https://example.com/harbor-vietnam",
+    "description": "A verified SmartHire employer operating in Accounting / Auditing / Tax / Corporate Finance, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 499
+    },
+    "jobCount": 41,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "5440435882",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0172-halo-tech",
+    "slug": "halo-tech-172",
+    "name": "Halo Tech",
+    "logo": "https://example.com/halo-tech/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Accounting / Auditing / Tax / Corporate Finance",
+    "address": "Le Chan District, Hai Phong",
+    "website": "https://example.com/halo-tech",
+    "description": "A verified SmartHire employer operating in Accounting / Auditing / Tax / Corporate Finance, based in Hai Phong.",
+    "rating": {
+      "score": 4,
+      "reviewCount": 303
+    },
+    "jobCount": 41,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9406651251",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0007-unity-manufacturing",
+    "slug": "unity-manufacturing-7",
+    "name": "Unity Manufacturing",
+    "logo": "https://example.com/unity-manufacturing/logo.png",
+    "size": "1000+ employees",
+    "industry": "Electrical / Electronics / M&E / Energy",
+    "address": "Di An City, Binh Duong",
+    "website": "https://example.com/unity-manufacturing",
+    "description": "A verified SmartHire employer operating in Electrical / Electronics / M&E / Energy, based in Binh Duong.",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 625
+    },
+    "jobCount": 39,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "2652665035",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0089-vantage-industries",
+    "slug": "vantage-industries-89",
+    "name": "Vantage Industries",
+    "logo": "https://example.com/vantage-industries/logo.png",
+    "size": "51-200 employees",
+    "industry": "Administration / Office / Executive Support / Legal",
+    "address": "Son Tra District, Da Nang",
+    "website": "https://example.com/vantage-industries",
+    "description": "A verified SmartHire employer operating in Administration / Office / Executive Support / Legal, based in Da Nang.",
+    "rating": {
+      "score": 4,
+      "reviewCount": 268
+    },
+    "jobCount": 39,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1902651823",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0117-halo-global",
+    "slug": "halo-global-117",
+    "name": "Halo Global",
+    "logo": "https://example.com/halo-global/logo.png",
+    "size": "1000+ employees",
+    "industry": "Administration / Office / Executive Support / Legal",
+    "address": "Le Chan District, Hai Phong",
+    "website": "https://example.com/halo-global",
+    "description": "A verified SmartHire employer operating in Administration / Office / Executive Support / Legal, based in Hai Phong.",
+    "rating": {
+      "score": 3.9,
+      "reviewCount": 481
+    },
+    "jobCount": 39,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1656547368",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0005-blue-ocean-media",
+    "slug": "blue-ocean-media-5",
+    "name": "Blue Ocean Media",
+    "logo": "https://example.com/blue-ocean-media/logo.png",
+    "size": "1-50 employees",
+    "industry": "Administration / Office / Executive Support / Legal",
+    "address": "Thuan An City, Binh Duong",
+    "website": "https://example.com/blue-ocean-media",
+    "description": "A verified SmartHire employer operating in Administration / Office / Executive Support / Legal, based in Binh Duong.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 632
+    },
+    "jobCount": 37,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1811347560",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0056-cascade-systems",
+    "slug": "cascade-systems-56",
+    "name": "Cascade Systems",
+    "logo": "https://example.com/cascade-systems/logo.png",
+    "size": "501-1000 employees",
+    "industry": "General Labor & Drivers",
+    "address": "Ngo Quyen District, Hai Phong",
+    "website": "https://example.com/cascade-systems",
+    "description": "A verified SmartHire employer operating in General Labor & Drivers, based in Hai Phong.",
+    "rating": {
+      "score": 4.2,
+      "reviewCount": 284
+    },
+    "jobCount": 37,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6763065928",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0061-green-valley-corp",
+    "slug": "green-valley-corp-61",
+    "name": "Green Valley Corp",
+    "logo": "https://example.com/green-valley-corp/logo.png",
+    "size": "201-500 employees",
+    "industry": "Administration / Office / Executive Support / Legal",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/green-valley-corp",
+    "description": "A verified SmartHire employer operating in Administration / Office / Executive Support / Legal, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 154
+    },
+    "jobCount": 37,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3434692996",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0173-lotus-consulting",
+    "slug": "lotus-consulting-173",
+    "name": "Lotus Consulting",
+    "logo": "https://example.com/lotus-consulting/logo.png",
+    "size": "1-50 employees",
+    "industry": "Administration / Office / Executive Support / Legal",
+    "address": "Thu Dau Mot City, Binh Duong",
+    "website": "https://example.com/lotus-consulting",
+    "description": "A verified SmartHire employer operating in Administration / Office / Executive Support / Legal, based in Binh Duong.",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 222
+    },
+    "jobCount": 37,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "0081797355",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0033-halo-industries",
+    "slug": "halo-industries-33",
+    "name": "Halo Industries",
+    "logo": "https://example.com/halo-industries/logo.png",
+    "size": "1-50 employees",
+    "industry": "Administration / Office / Executive Support / Legal",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/halo-industries",
+    "description": "A verified SmartHire employer operating in Administration / Office / Executive Support / Legal, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 69
+    },
+    "jobCount": 36,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "5938312969",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0127-delta-retail-group",
+    "slug": "delta-retail-group-127",
+    "name": "Delta Retail Group",
+    "logo": "https://example.com/delta-retail-group/logo.png",
+    "size": "1-50 employees",
+    "industry": "Finance / Banking / Securities",
+    "address": "Thuan An City, Binh Duong",
+    "website": "https://example.com/delta-retail-group",
+    "description": "A verified SmartHire employer operating in Finance / Banking / Securities, based in Binh Duong.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 317
+    },
+    "jobCount": 35,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1576311248",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0006-unity-logistics",
+    "slug": "unity-logistics-6",
+    "name": "Unity Logistics",
+    "logo": "https://example.com/unity-logistics/logo.png",
+    "size": "51-200 employees",
+    "industry": "Human Resources (HR)",
+    "address": "Bien Hoa City, Dong Nai",
+    "website": "https://example.com/unity-logistics",
+    "description": "A verified SmartHire employer operating in Human Resources (HR), based in Dong Nai.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 639
+    },
+    "jobCount": 32,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "7207822869",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0091-vantage-holdings",
+    "slug": "vantage-holdings-91",
+    "name": "Vantage Holdings",
+    "logo": "https://example.com/vantage-holdings/logo.png",
+    "size": "1-50 employees",
+    "industry": "Electrical / Electronics / M&E / Energy",
+    "address": "Hong Bang District, Hai Phong",
+    "website": "https://example.com/vantage-holdings",
+    "description": "A verified SmartHire employer operating in Electrical / Electronics / M&E / Energy, based in Hai Phong.",
+    "rating": {
+      "score": 4.3,
+      "reviewCount": 504
+    },
+    "jobCount": 32,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "7226462900",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0112-prime-enterprises",
+    "slug": "prime-enterprises-112",
+    "name": "Prime Enterprises",
+    "logo": "https://example.com/prime-enterprises/logo.png",
+    "size": "201-500 employees",
+    "industry": "General Labor & Drivers",
+    "address": "District 7, Ho Chi Minh City",
+    "website": "https://example.com/prime-enterprises",
+    "description": "A verified SmartHire employer operating in General Labor & Drivers, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 352
+    },
+    "jobCount": 32,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "2334915721",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0119-river-tech",
+    "slug": "river-tech-119",
+    "name": "River Tech",
+    "logo": "https://example.com/river-tech/logo.png",
+    "size": "1-50 employees",
+    "industry": "Electrical / Electronics / M&E / Energy",
+    "address": "Long Thanh District, Dong Nai",
+    "website": "https://example.com/river-tech",
+    "description": "A verified SmartHire employer operating in Electrical / Electronics / M&E / Energy, based in Dong Nai.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 145
+    },
+    "jobCount": 32,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8559795622",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0028-harbor-manufacturing",
+    "slug": "harbor-manufacturing-28",
+    "name": "Harbor Manufacturing",
+    "logo": "https://example.com/harbor-manufacturing/logo.png",
+    "size": "501-1000 employees",
+    "industry": "General Labor & Drivers",
+    "address": "Thu Dau Mot City, Binh Duong",
+    "website": "https://example.com/harbor-manufacturing",
+    "description": "A verified SmartHire employer operating in General Labor & Drivers, based in Binh Duong.",
+    "rating": {
+      "score": 3.5,
+      "reviewCount": 106
+    },
+    "jobCount": 30,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8580180410",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0090-anchor-group",
+    "slug": "anchor-group-90",
+    "name": "Anchor Group",
+    "logo": "https://example.com/anchor-group/logo.png",
+    "size": "1000+ employees",
+    "industry": "Human Resources (HR)",
+    "address": "Cau Giay District, Hanoi",
+    "website": "https://example.com/anchor-group",
+    "description": "A verified SmartHire employer operating in Human Resources (HR), based in Hanoi.",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 387
+    },
+    "jobCount": 30,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6058674684",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0147-vertex-international",
+    "slug": "vertex-international-147",
+    "name": "Vertex International",
+    "logo": "https://example.com/vertex-international/logo.png",
+    "size": "1000+ employees",
+    "industry": "Electrical / Electronics / M&E / Energy",
+    "address": "Thanh Xuan District, Hanoi",
+    "website": "https://example.com/vertex-international",
+    "description": "A verified SmartHire employer operating in Electrical / Electronics / M&E / Energy, based in Hanoi.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 68
+    },
+    "jobCount": 30,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1099019234",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0160-harbor-group",
+    "slug": "harbor-group-160",
+    "name": "Harbor Group",
+    "logo": "https://example.com/harbor-group/logo.png",
+    "size": "1-50 employees",
+    "industry": "Hospitality / Restaurant / Tourism",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/harbor-group",
+    "description": "A verified SmartHire employer operating in Hospitality / Restaurant / Tourism, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 520
+    },
+    "jobCount": 30,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8194065922",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0035-unity-tech",
+    "slug": "unity-tech-35",
+    "name": "Unity Tech",
+    "logo": "https://example.com/unity-tech/logo.png",
+    "size": "201-500 employees",
+    "industry": "Electrical / Electronics / M&E / Energy",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/unity-tech",
+    "description": "A verified SmartHire employer operating in Electrical / Electronics / M&E / Energy, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 556
+    },
+    "jobCount": 29,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3473530723",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0074-nova-enterprises",
+    "slug": "nova-enterprises-74",
+    "name": "Nova Enterprises",
+    "logo": "https://example.com/nova-enterprises/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Healthcare / Medical / Pharmaceuticals",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/nova-enterprises",
+    "description": "A verified SmartHire employer operating in Healthcare / Medical / Pharmaceuticals, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 344
+    },
+    "jobCount": 29,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3129854756",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0034-unity-media",
+    "slug": "unity-media-34",
+    "name": "Unity Media",
+    "logo": "https://example.com/unity-media/logo.png",
+    "size": "1-50 employees",
+    "industry": "Human Resources (HR)",
+    "address": "Hong Bang District, Hai Phong",
+    "website": "https://example.com/unity-media",
+    "description": "A verified SmartHire employer operating in Human Resources (HR), based in Hai Phong.",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 418
+    },
+    "jobCount": 28,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1604596392",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0132-pacific-vietnam",
+    "slug": "pacific-vietnam-132",
+    "name": "Pacific Vietnam",
+    "logo": "https://example.com/pacific-vietnam/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Hospitality / Restaurant / Tourism",
+    "address": "Long Thanh District, Dong Nai",
+    "website": "https://example.com/pacific-vietnam",
+    "description": "A verified SmartHire employer operating in Hospitality / Restaurant / Tourism, based in Dong Nai.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 616
+    },
+    "jobCount": 27,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1691105762",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0174-orion-corp",
+    "slug": "orion-corp-174",
+    "name": "Orion Corp",
+    "logo": "https://example.com/orion-corp/logo.png",
+    "size": "51-200 employees",
+    "industry": "Human Resources (HR)",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/orion-corp",
+    "description": "A verified SmartHire employer operating in Human Resources (HR), based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 4.3,
+      "reviewCount": 451
+    },
+    "jobCount": 27,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "2747307221",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0043-titan-logistics",
+    "slug": "titan-logistics-43",
+    "name": "Titan Logistics",
+    "logo": "https://example.com/titan-logistics/logo.png",
+    "size": "1000+ employees",
+    "industry": "Finance / Banking / Securities",
+    "address": "Hoan Kiem District, Hanoi",
+    "website": "https://example.com/titan-logistics",
+    "description": "A verified SmartHire employer operating in Finance / Banking / Securities, based in Hanoi.",
+    "rating": {
+      "score": 4.2,
+      "reviewCount": 167
+    },
+    "jobCount": 26,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6845454231",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0048-jade-industries",
+    "slug": "jade-industries-48",
+    "name": "Jade Industries",
+    "logo": "https://example.com/jade-industries/logo.png",
+    "size": "1-50 employees",
+    "industry": "Hospitality / Restaurant / Tourism",
+    "address": "Ngo Quyen District, Hai Phong",
+    "website": "https://example.com/jade-industries",
+    "description": "A verified SmartHire employer operating in Hospitality / Restaurant / Tourism, based in Hai Phong.",
+    "rating": {
+      "score": 3.5,
+      "reviewCount": 212
+    },
+    "jobCount": 26,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1192214805",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0093-crown-industries",
+    "slug": "crown-industries-93",
+    "name": "Crown Industries",
+    "logo": "https://example.com/crown-industries/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Construction / Architecture / Interior Design",
+    "address": "Son Tra District, Da Nang",
+    "website": "https://example.com/crown-industries",
+    "description": "A verified SmartHire employer operating in Construction / Architecture / Interior Design, based in Da Nang.",
+    "rating": {
+      "score": 4.2,
+      "reviewCount": 105
+    },
+    "jobCount": 26,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8407054573",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0008-harbor-enterprises",
+    "slug": "harbor-enterprises-8",
+    "name": "Harbor Enterprises",
+    "logo": "https://example.com/harbor-enterprises/logo.png",
+    "size": "51-200 employees",
+    "industry": "Mechanical / Automotive / Automation",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/harbor-enterprises",
+    "description": "A verified SmartHire employer operating in Mechanical / Automotive / Automation, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 4.2,
+      "reviewCount": 460
+    },
+    "jobCount": 25,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3774117196",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0009-zenith-capital",
+    "slug": "zenith-capital-9",
+    "name": "Zenith Capital",
+    "logo": "https://example.com/zenith-capital/logo.png",
+    "size": "1-50 employees",
+    "industry": "Construction / Architecture / Interior Design",
+    "address": "Tu Son City, Bac Ninh",
+    "website": "https://example.com/zenith-capital",
+    "description": "A verified SmartHire employer operating in Construction / Architecture / Interior Design, based in Bac Ninh.",
+    "rating": {
+      "score": 4.2,
+      "reviewCount": 414
+    },
+    "jobCount": 25,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3760518267",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0020-anchor-tech",
+    "slug": "anchor-tech-20",
+    "name": "Anchor Tech",
+    "logo": "https://example.com/anchor-tech/logo.png",
+    "size": "1-50 employees",
+    "industry": "Hospitality / Restaurant / Tourism",
+    "address": "Cau Giay District, Hanoi",
+    "website": "https://example.com/anchor-tech",
+    "description": "A verified SmartHire employer operating in Hospitality / Restaurant / Tourism, based in Hanoi.",
+    "rating": {
+      "score": 4.9,
+      "reviewCount": 484
+    },
+    "jobCount": 25,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6809849869",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0062-orion-group",
+    "slug": "orion-group-62",
+    "name": "Orion Group",
+    "logo": "https://example.com/orion-group/logo.png",
+    "size": "51-200 employees",
+    "industry": "Human Resources (HR)",
+    "address": "Hong Bang District, Hai Phong",
+    "website": "https://example.com/orion-group",
+    "description": "A verified SmartHire employer operating in Human Resources (HR), based in Hai Phong.",
+    "rating": {
+      "score": 4.4,
+      "reviewCount": 273
+    },
+    "jobCount": 25,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8355271956",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0168-titan-capital",
+    "slug": "titan-capital-168",
+    "name": "Titan Capital",
+    "logo": "https://example.com/titan-capital/logo.png",
+    "size": "501-1000 employees",
+    "industry": "General Labor & Drivers",
+    "address": "Le Chan District, Hai Phong",
+    "website": "https://example.com/titan-capital",
+    "description": "A verified SmartHire employer operating in General Labor & Drivers, based in Hai Phong.",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 25
+    },
+    "jobCount": 25,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6428157356",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0041-emerald-corp",
+    "slug": "emerald-corp-41",
+    "name": "Emerald Corp",
+    "logo": "https://example.com/emerald-corp/logo.png",
+    "size": "51-200 employees",
+    "industry": "Design / Graphics / Creative Arts",
+    "address": "Ha Dong District, Hanoi",
+    "website": "https://example.com/emerald-corp",
+    "description": "A verified SmartHire employer operating in Design / Graphics / Creative Arts, based in Hanoi.",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 288
+    },
+    "jobCount": 24,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "7260840458",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0045-heritage-trading-co",
+    "slug": "heritage-trading-co-45",
+    "name": "Heritage Trading Co.",
+    "logo": "https://example.com/heritage-trading-co/logo.png",
+    "size": "51-200 employees",
+    "industry": "Real Estate",
+    "address": "Bien Hoa City, Dong Nai",
+    "website": "https://example.com/heritage-trading-co",
+    "description": "A verified SmartHire employer operating in Real Estate, based in Dong Nai.",
+    "rating": {
+      "score": 3.7,
+      "reviewCount": 242
+    },
+    "jobCount": 24,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1592977236",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0076-falcon-enterprises",
+    "slug": "falcon-enterprises-76",
+    "name": "Falcon Enterprises",
+    "logo": "https://example.com/falcon-enterprises/logo.png",
+    "size": "1000+ employees",
+    "industry": "Hospitality / Restaurant / Tourism",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/falcon-enterprises",
+    "description": "A verified SmartHire employer operating in Hospitality / Restaurant / Tourism, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 4.2,
+      "reviewCount": 537
+    },
+    "jobCount": 24,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6990795490",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0104-harbor-trading-co",
+    "slug": "harbor-trading-co-104",
+    "name": "Harbor Trading Co.",
+    "logo": "https://example.com/harbor-trading-co/logo.png",
+    "size": "201-500 employees",
+    "industry": "Hospitality / Restaurant / Tourism",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/harbor-trading-co",
+    "description": "A verified SmartHire employer operating in Hospitality / Restaurant / Tourism, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 3.9,
+      "reviewCount": 573
+    },
+    "jobCount": 24,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "5168664872",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0135-grand-tech",
+    "slug": "grand-tech-135",
+    "name": "Grand Tech",
+    "logo": "https://example.com/grand-tech/logo.png",
+    "size": "51-200 employees",
+    "industry": "Cosmetics / Spa / Beauty",
+    "address": "Ninh Kieu District, Can Tho",
+    "website": "https://example.com/grand-tech",
+    "description": "A verified SmartHire employer operating in Cosmetics / Spa / Beauty, based in Can Tho.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 575
+    },
+    "jobCount": 24,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "5215864328",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0155-heritage-holdings",
+    "slug": "heritage-holdings-155",
+    "name": "Heritage Holdings",
+    "logo": "https://example.com/heritage-holdings/logo.png",
+    "size": "1-50 employees",
+    "industry": "Finance / Banking / Securities",
+    "address": "Tu Son City, Bac Ninh",
+    "website": "https://example.com/heritage-holdings",
+    "description": "A verified SmartHire employer operating in Finance / Banking / Securities, based in Bac Ninh.",
+    "rating": {
+      "score": 4,
+      "reviewCount": 632
+    },
+    "jobCount": 24,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9594518771",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0158-crown-group",
+    "slug": "crown-group-158",
+    "name": "Crown Group",
+    "logo": "https://example.com/crown-group/logo.png",
+    "size": "201-500 employees",
+    "industry": "Healthcare / Medical / Pharmaceuticals",
+    "address": "Thuan An City, Binh Duong",
+    "website": "https://example.com/crown-group",
+    "description": "A verified SmartHire employer operating in Healthcare / Medical / Pharmaceuticals, based in Binh Duong.",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 316
+    },
+    "jobCount": 24,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "0295511527",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0175-zenith-international",
+    "slug": "zenith-international-175",
+    "name": "Zenith International",
+    "logo": "https://example.com/zenith-international/logo.png",
+    "size": "201-500 employees",
+    "industry": "Electrical / Electronics / M&E / Energy",
+    "address": "District 7, Ho Chi Minh City",
+    "website": "https://example.com/zenith-international",
+    "description": "A verified SmartHire employer operating in Electrical / Electronics / M&E / Energy, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 4,
+      "reviewCount": 255
+    },
+    "jobCount": 24,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9301428617",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0064-pioneer-global",
+    "slug": "pioneer-global-64",
+    "name": "Pioneer Global",
+    "logo": "https://example.com/pioneer-global/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Mechanical / Automotive / Automation",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/pioneer-global",
+    "description": "A verified SmartHire employer operating in Mechanical / Automotive / Automation, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 173
+    },
+    "jobCount": 23,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1983353171",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0130-blue-ocean-vietnam",
+    "slug": "blue-ocean-vietnam-130",
+    "name": "Blue Ocean Vietnam",
+    "logo": "https://example.com/blue-ocean-vietnam/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Healthcare / Medical / Pharmaceuticals",
+    "address": "Bien Hoa City, Dong Nai",
+    "website": "https://example.com/blue-ocean-vietnam",
+    "description": "A verified SmartHire employer operating in Healthcare / Medical / Pharmaceuticals, based in Dong Nai.",
+    "rating": {
+      "score": 4.2,
+      "reviewCount": 56
+    },
+    "jobCount": 23,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6922710240",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0148-orion-vietnam",
+    "slug": "orion-vietnam-148",
+    "name": "Orion Vietnam",
+    "logo": "https://example.com/orion-vietnam/logo.png",
+    "size": "1-50 employees",
+    "industry": "Mechanical / Automotive / Automation",
+    "address": "Hong Bang District, Hai Phong",
+    "website": "https://example.com/orion-vietnam",
+    "description": "A verified SmartHire employer operating in Mechanical / Automotive / Automation, based in Hai Phong.",
+    "rating": {
+      "score": 3.9,
+      "reviewCount": 494
+    },
+    "jobCount": 23,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8047607331",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0165-vantage-trading-co",
+    "slug": "vantage-trading-co-165",
+    "name": "Vantage Trading Co.",
+    "logo": "https://example.com/vantage-trading-co/logo.png",
+    "size": "51-200 employees",
+    "industry": "Media / Journalism / Publishing",
+    "address": "Tu Son City, Bac Ninh",
+    "website": "https://example.com/vantage-trading-co",
+    "description": "A verified SmartHire employer operating in Media / Journalism / Publishing, based in Bac Ninh.",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 365
+    },
+    "jobCount": 23,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9335147218",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0046-vantage-solutions",
+    "slug": "vantage-solutions-46",
+    "name": "Vantage Solutions",
+    "logo": "https://example.com/vantage-solutions/logo.png",
+    "size": "51-200 employees",
+    "industry": "Healthcare / Medical / Pharmaceuticals",
+    "address": "Dong Da District, Hanoi",
+    "website": "https://example.com/vantage-solutions",
+    "description": "A verified SmartHire employer operating in Healthcare / Medical / Pharmaceuticals, based in Hanoi.",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 488
+    },
+    "jobCount": 22,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1172340548",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0051-compass-media",
+    "slug": "compass-media-51",
+    "name": "Compass Media",
+    "logo": "https://example.com/compass-media/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Cosmetics / Spa / Beauty",
+    "address": "Hoan Kiem District, Hanoi",
+    "website": "https://example.com/compass-media",
+    "description": "A verified SmartHire employer operating in Cosmetics / Spa / Beauty, based in Hanoi.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 382
+    },
+    "jobCount": 22,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "5408104442",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0102-fusion-global",
+    "slug": "fusion-global-102",
+    "name": "Fusion Global",
+    "logo": "https://example.com/fusion-global/logo.png",
+    "size": "201-500 employees",
+    "industry": "Healthcare / Medical / Pharmaceuticals",
+    "address": "Cau Giay District, Hanoi",
+    "website": "https://example.com/fusion-global",
+    "description": "A verified SmartHire employer operating in Healthcare / Medical / Pharmaceuticals, based in Hanoi.",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 489
+    },
+    "jobCount": 22,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "5661313113",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0118-phoenix-consulting",
+    "slug": "phoenix-consulting-118",
+    "name": "Phoenix Consulting",
+    "logo": "https://example.com/phoenix-consulting/logo.png",
+    "size": "1-50 employees",
+    "industry": "Human Resources (HR)",
+    "address": "Cau Giay District, Hanoi",
+    "website": "https://example.com/phoenix-consulting",
+    "description": "A verified SmartHire employer operating in Human Resources (HR), based in Hanoi.",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 539
+    },
+    "jobCount": 22,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "7250763492",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0149-quartz-capital",
+    "slug": "quartz-capital-149",
+    "name": "Quartz Capital",
+    "logo": "https://example.com/quartz-capital/logo.png",
+    "size": "51-200 employees",
+    "industry": "Construction / Architecture / Interior Design",
+    "address": "Thu Dau Mot City, Binh Duong",
+    "website": "https://example.com/quartz-capital",
+    "description": "A verified SmartHire employer operating in Construction / Architecture / Interior Design, based in Binh Duong.",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 640
+    },
+    "jobCount": 22,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "5849960625",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0015-summit-digital",
+    "slug": "summit-digital-15",
+    "name": "Summit Digital",
+    "logo": "https://example.com/summit-digital/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Finance / Banking / Securities",
+    "address": "Long Thanh District, Dong Nai",
+    "website": "https://example.com/summit-digital",
+    "description": "A verified SmartHire employer operating in Finance / Banking / Securities, based in Dong Nai.",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 422
+    },
+    "jobCount": 21,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "2014754485",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0039-unity-international",
+    "slug": "unity-international-39",
+    "name": "Unity International",
+    "logo": "https://example.com/unity-international/logo.png",
+    "size": "201-500 employees",
+    "industry": "Manufacturing / Assembly / Processing",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/unity-international",
+    "description": "A verified SmartHire employer operating in Manufacturing / Assembly / Processing, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 4,
+      "reviewCount": 426
+    },
+    "jobCount": 21,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9060820076",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0109-vertex-manufacturing",
+    "slug": "vertex-manufacturing-109",
+    "name": "Vertex Manufacturing",
+    "logo": "https://example.com/vertex-manufacturing/logo.png",
+    "size": "201-500 employees",
+    "industry": "Media / Journalism / Publishing",
+    "address": "Ha Dong District, Hanoi",
+    "website": "https://example.com/vertex-manufacturing",
+    "description": "A verified SmartHire employer operating in Media / Journalism / Publishing, based in Hanoi.",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 131
+    },
+    "jobCount": 21,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1042350794",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0150-pacific-solutions",
+    "slug": "pacific-solutions-150",
+    "name": "Pacific Solutions",
+    "logo": "https://example.com/pacific-solutions/logo.png",
+    "size": "1-50 employees",
+    "industry": "Supply Chain / Logistics / Import-Export",
+    "address": "Hong Bang District, Hai Phong",
+    "website": "https://example.com/pacific-solutions",
+    "description": "A verified SmartHire employer operating in Supply Chain / Logistics / Import-Export, based in Hai Phong.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 578
+    },
+    "jobCount": 21,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9268953115",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0178-union-global",
+    "slug": "union-global-178",
+    "name": "Union Global",
+    "logo": "https://example.com/union-global/logo.png",
+    "size": "51-200 employees",
+    "industry": "Supply Chain / Logistics / Import-Export",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/union-global",
+    "description": "A verified SmartHire employer operating in Supply Chain / Logistics / Import-Export, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 4.2,
+      "reviewCount": 273
+    },
+    "jobCount": 21,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8930720802",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0065-quartz-digital",
+    "slug": "quartz-digital-65",
+    "name": "Quartz Digital",
+    "logo": "https://example.com/quartz-digital/logo.png",
+    "size": "1000+ employees",
+    "industry": "Construction / Architecture / Interior Design",
+    "address": "Bac Ninh City, Bac Ninh",
+    "website": "https://example.com/quartz-digital",
+    "description": "A verified SmartHire employer operating in Construction / Architecture / Interior Design, based in Bac Ninh.",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 154
+    },
+    "jobCount": 20,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8975018585",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0094-willow-manufacturing",
+    "slug": "willow-manufacturing-94",
+    "name": "Willow Manufacturing",
+    "logo": "https://example.com/willow-manufacturing/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Supply Chain / Logistics / Import-Export",
+    "address": "Go Vap District, Ho Chi Minh City",
+    "website": "https://example.com/willow-manufacturing",
+    "description": "A verified SmartHire employer operating in Supply Chain / Logistics / Import-Export, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 602
+    },
+    "jobCount": 20,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9801046298",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0107-pioneer-consulting",
+    "slug": "pioneer-consulting-107",
+    "name": "Pioneer Consulting",
+    "logo": "https://example.com/pioneer-consulting/logo.png",
+    "size": "201-500 employees",
+    "industry": "Cosmetics / Spa / Beauty",
+    "address": "Thuan An City, Binh Duong",
+    "website": "https://example.com/pioneer-consulting",
+    "description": "A verified SmartHire employer operating in Cosmetics / Spa / Beauty, based in Binh Duong.",
+    "rating": {
+      "score": 3.6,
+      "reviewCount": 39
+    },
+    "jobCount": 20,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6181431201",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0121-pacific-trading-co",
+    "slug": "pacific-trading-co-121",
+    "name": "Pacific Trading Co.",
+    "logo": "https://example.com/pacific-trading-co/logo.png",
+    "size": "51-200 employees",
+    "industry": "Construction / Architecture / Interior Design",
+    "address": "Thuan An City, Binh Duong",
+    "website": "https://example.com/pacific-trading-co",
+    "description": "A verified SmartHire employer operating in Construction / Architecture / Interior Design, based in Binh Duong.",
+    "rating": {
+      "score": 3.6,
+      "reviewCount": 221
+    },
+    "jobCount": 20,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3888316683",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0125-harbor-media",
+    "slug": "harbor-media-125",
+    "name": "Harbor Media",
+    "logo": "https://example.com/harbor-media/logo.png",
+    "size": "1000+ employees",
+    "industry": "Design / Graphics / Creative Arts",
+    "address": "Di An City, Binh Duong",
+    "website": "https://example.com/harbor-media",
+    "description": "A verified SmartHire employer operating in Design / Graphics / Creative Arts, based in Binh Duong.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 553
+    },
+    "jobCount": 20,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1132888828",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0010-river-media",
+    "slug": "river-media-10",
+    "name": "River Media",
+    "logo": "https://example.com/river-media/logo.png",
+    "size": "1000+ employees",
+    "industry": "Supply Chain / Logistics / Import-Export",
+    "address": "Di An City, Binh Duong",
+    "website": "https://example.com/river-media",
+    "description": "A verified SmartHire employer operating in Supply Chain / Logistics / Import-Export, based in Binh Duong.",
+    "rating": {
+      "score": 3.9,
+      "reviewCount": 472
+    },
+    "jobCount": 19,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8760067774",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0013-zenith-solutions",
+    "slug": "zenith-solutions-13",
+    "name": "Zenith Solutions",
+    "logo": "https://example.com/zenith-solutions/logo.png",
+    "size": "201-500 employees",
+    "industry": "Design / Graphics / Creative Arts",
+    "address": "Thanh Khe District, Da Nang",
+    "website": "https://example.com/zenith-solutions",
+    "description": "A verified SmartHire employer operating in Design / Graphics / Creative Arts, based in Da Nang.",
+    "rating": {
+      "score": 3.5,
+      "reviewCount": 142
+    },
+    "jobCount": 19,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8929073543",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0019-nova-manufacturing",
+    "slug": "nova-manufacturing-19",
+    "name": "Nova Manufacturing",
+    "logo": "https://example.com/nova-manufacturing/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Retail / Wholesale / Store Management",
+    "address": "Thuan An City, Binh Duong",
+    "website": "https://example.com/nova-manufacturing",
+    "description": "A verified SmartHire employer operating in Retail / Wholesale / Store Management, based in Binh Duong.",
+    "rating": {
+      "score": 4.6,
+      "reviewCount": 606
+    },
+    "jobCount": 19,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6210239505",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0038-river-international",
+    "slug": "river-international-38",
+    "name": "River International",
+    "logo": "https://example.com/river-international/logo.png",
+    "size": "51-200 employees",
+    "industry": "Supply Chain / Logistics / Import-Export",
+    "address": "Ninh Kieu District, Can Tho",
+    "website": "https://example.com/river-international",
+    "description": "A verified SmartHire employer operating in Supply Chain / Logistics / Import-Export, based in Can Tho.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 509
+    },
+    "jobCount": 19,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3701385804",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0071-union-tech",
+    "slug": "union-tech-71",
+    "name": "Union Tech",
+    "logo": "https://example.com/union-tech/logo.png",
+    "size": "1000+ employees",
+    "industry": "Finance / Banking / Securities",
+    "address": "Ninh Kieu District, Can Tho",
+    "website": "https://example.com/union-tech",
+    "description": "A verified SmartHire employer operating in Finance / Banking / Securities, based in Can Tho.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 360
+    },
+    "jobCount": 19,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9516634221",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0099-golden-group",
+    "slug": "golden-group-99",
+    "name": "Golden Group",
+    "logo": "https://example.com/golden-group/logo.png",
+    "size": "201-500 employees",
+    "industry": "Finance / Banking / Securities",
+    "address": "Bac Ninh City, Bac Ninh",
+    "website": "https://example.com/golden-group",
+    "description": "A verified SmartHire employer operating in Finance / Banking / Securities, based in Bac Ninh.",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 382
+    },
+    "jobCount": 19,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "4223266021",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0163-meridian-consulting",
+    "slug": "meridian-consulting-163",
+    "name": "Meridian Consulting",
+    "logo": "https://example.com/meridian-consulting/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Cosmetics / Spa / Beauty",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/meridian-consulting",
+    "description": "A verified SmartHire employer operating in Cosmetics / Spa / Beauty, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 4.6,
+      "reviewCount": 259
+    },
+    "jobCount": 19,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "2642712096",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0177-jade-vietnam",
+    "slug": "jade-vietnam-177",
+    "name": "Jade Vietnam",
+    "logo": "https://example.com/jade-vietnam/logo.png",
+    "size": "201-500 employees",
+    "industry": "Construction / Architecture / Interior Design",
+    "address": "Binh Thanh District, Ho Chi Minh City",
+    "website": "https://example.com/jade-vietnam",
+    "description": "A verified SmartHire employer operating in Construction / Architecture / Interior Design, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 4,
+      "reviewCount": 538
+    },
+    "jobCount": 19,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "2838915284",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0079-anchor-corp",
+    "slug": "anchor-corp-79",
+    "name": "Anchor Corp",
+    "logo": "https://example.com/anchor-corp/logo.png",
+    "size": "1000+ employees",
+    "industry": "Cosmetics / Spa / Beauty",
+    "address": "Ngu Hanh Son District, Da Nang",
+    "website": "https://example.com/anchor-corp",
+    "description": "A verified SmartHire employer operating in Cosmetics / Spa / Beauty, based in Da Nang.",
+    "rating": {
+      "score": 4.2,
+      "reviewCount": 548
+    },
+    "jobCount": 18,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6966145811",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0140-grand-logistics",
+    "slug": "grand-logistics-140",
+    "name": "Grand Logistics",
+    "logo": "https://example.com/grand-logistics/logo.png",
+    "size": "1000+ employees",
+    "industry": "General Labor & Drivers",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/grand-logistics",
+    "description": "A verified SmartHire employer operating in General Labor & Drivers, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 3.6,
+      "reviewCount": 245
+    },
+    "jobCount": 18,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "5195273051",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0162-cascade-vietnam",
+    "slug": "cascade-vietnam-162",
+    "name": "Cascade Vietnam",
+    "logo": "https://example.com/cascade-vietnam/logo.png",
+    "size": "1-50 employees",
+    "industry": "E-Commerce",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/cascade-vietnam",
+    "description": "A verified SmartHire employer operating in E-Commerce, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 3.7,
+      "reviewCount": 273
+    },
+    "jobCount": 18,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9472245839",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0016-kite-global",
+    "slug": "kite-global-16",
+    "name": "Kite Global",
+    "logo": "https://example.com/kite-global/logo.png",
+    "size": "1000+ employees",
+    "industry": "Insurance",
+    "address": "District 1, Ho Chi Minh City",
+    "website": "https://example.com/kite-global",
+    "description": "A verified SmartHire employer operating in Insurance, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 444
+    },
+    "jobCount": 17,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6349194829",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0023-union-systems",
+    "slug": "union-systems-23",
+    "name": "Union Systems",
+    "logo": "https://example.com/union-systems/logo.png",
+    "size": "1-50 employees",
+    "industry": "Cosmetics / Spa / Beauty",
+    "address": "Ninh Kieu District, Can Tho",
+    "website": "https://example.com/union-systems",
+    "description": "A verified SmartHire employer operating in Cosmetics / Spa / Beauty, based in Can Tho.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 510
+    },
+    "jobCount": 17,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "7397942349",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0047-ivory-digital",
+    "slug": "ivory-digital-47",
+    "name": "Ivory Digital",
+    "logo": "https://example.com/ivory-digital/logo.png",
+    "size": "51-200 employees",
+    "industry": "Retail / Wholesale / Store Management",
+    "address": "Ngu Hanh Son District, Da Nang",
+    "website": "https://example.com/ivory-digital",
+    "description": "A verified SmartHire employer operating in Retail / Wholesale / Store Management, based in Da Nang.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 503
+    },
+    "jobCount": 17,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "7295650078",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0077-silver-digital",
+    "slug": "silver-digital-77",
+    "name": "Silver Digital",
+    "logo": "https://example.com/silver-digital/logo.png",
+    "size": "201-500 employees",
+    "industry": "Education / Training",
+    "address": "Bac Ninh City, Bac Ninh",
+    "website": "https://example.com/silver-digital",
+    "description": "A verified SmartHire employer operating in Education / Training, based in Bac Ninh.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 193
+    },
+    "jobCount": 17,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3615359112",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0092-sky-global",
+    "slug": "sky-global-92",
+    "name": "Sky Global",
+    "logo": "https://example.com/sky-global/logo.png",
+    "size": "201-500 employees",
+    "industry": "Mechanical / Automotive / Automation",
+    "address": "Tu Son City, Bac Ninh",
+    "website": "https://example.com/sky-global",
+    "description": "A verified SmartHire employer operating in Mechanical / Automotive / Automation, based in Bac Ninh.",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 35
+    },
+    "jobCount": 17,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "2534640149",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0122-unity-capital",
+    "slug": "unity-capital-122",
+    "name": "Unity Capital",
+    "logo": "https://example.com/unity-capital/logo.png",
+    "size": "201-500 employees",
+    "industry": "Supply Chain / Logistics / Import-Export",
+    "address": "Long Thanh District, Dong Nai",
+    "website": "https://example.com/unity-capital",
+    "description": "A verified SmartHire employer operating in Supply Chain / Logistics / Import-Export, based in Dong Nai.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 86
+    },
+    "jobCount": 17,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "5144872854",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0036-vantage-digital",
+    "slug": "vantage-digital-36",
+    "name": "Vantage Digital",
+    "logo": "https://example.com/vantage-digital/logo.png",
+    "size": "1000+ employees",
+    "industry": "Mechanical / Automotive / Automation",
+    "address": "Bac Ninh City, Bac Ninh",
+    "website": "https://example.com/vantage-digital",
+    "description": "A verified SmartHire employer operating in Mechanical / Automotive / Automation, based in Bac Ninh.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 295
+    },
+    "jobCount": 16,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "7134187773",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0069-falcon-holdings",
+    "slug": "falcon-holdings-69",
+    "name": "Falcon Holdings",
+    "logo": "https://example.com/falcon-holdings/logo.png",
+    "size": "1000+ employees",
+    "industry": "Design / Graphics / Creative Arts",
+    "address": "Ba Dinh District, Hanoi",
+    "website": "https://example.com/falcon-holdings",
+    "description": "A verified SmartHire employer operating in Design / Graphics / Creative Arts, based in Hanoi.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 182
+    },
+    "jobCount": 16,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3128890075",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0097-trident-trading-co",
+    "slug": "trident-trading-co-97",
+    "name": "Trident Trading Co.",
+    "logo": "https://example.com/trident-trading-co/logo.png",
+    "size": "51-200 employees",
+    "industry": "Design / Graphics / Creative Arts",
+    "address": "Thu Dau Mot City, Binh Duong",
+    "website": "https://example.com/trident-trading-co",
+    "description": "A verified SmartHire employer operating in Design / Graphics / Creative Arts, based in Binh Duong.",
+    "rating": {
+      "score": 4.4,
+      "reviewCount": 490
+    },
+    "jobCount": 16,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "7155424186",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0146-vantage-enterprises",
+    "slug": "vantage-enterprises-146",
+    "name": "Vantage Enterprises",
+    "logo": "https://example.com/vantage-enterprises/logo.png",
+    "size": "1000+ employees",
+    "industry": "Human Resources (HR)",
+    "address": "Hong Bang District, Hai Phong",
+    "website": "https://example.com/vantage-enterprises",
+    "description": "A verified SmartHire employer operating in Human Resources (HR), based in Hai Phong.",
+    "rating": {
+      "score": 3.6,
+      "reviewCount": 22
+    },
+    "jobCount": 16,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "0353955181",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0049-compass-enterprises",
+    "slug": "compass-enterprises-49",
+    "name": "Compass Enterprises",
+    "logo": "https://example.com/compass-enterprises/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Education / Training",
+    "address": "Ngo Quyen District, Hai Phong",
+    "website": "https://example.com/compass-enterprises",
+    "description": "A verified SmartHire employer operating in Education / Training, based in Hai Phong.",
+    "rating": {
+      "score": 4.6,
+      "reviewCount": 605
+    },
+    "jobCount": 15,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6227101583",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0066-apex-industries",
+    "slug": "apex-industries-66",
+    "name": "Apex Industries",
+    "logo": "https://example.com/apex-industries/logo.png",
+    "size": "51-200 employees",
+    "industry": "Supply Chain / Logistics / Import-Export",
+    "address": "Thanh Khe District, Da Nang",
+    "website": "https://example.com/apex-industries",
+    "description": "A verified SmartHire employer operating in Supply Chain / Logistics / Import-Export, based in Da Nang.",
+    "rating": {
+      "score": 3.6,
+      "reviewCount": 442
+    },
+    "jobCount": 15,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "0829278304",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0081-vertex-vietnam",
+    "slug": "vertex-vietnam-81",
+    "name": "Vertex Vietnam",
+    "logo": "https://example.com/vertex-vietnam/logo.png",
+    "size": "51-200 employees",
+    "industry": "Media / Journalism / Publishing",
+    "address": "Di An City, Binh Duong",
+    "website": "https://example.com/vertex-vietnam",
+    "description": "A verified SmartHire employer operating in Media / Journalism / Publishing, based in Binh Duong.",
+    "rating": {
+      "score": 3.9,
+      "reviewCount": 155
+    },
+    "jobCount": 15,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "2878362211",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0095-fusion-trading-co",
+    "slug": "fusion-trading-co-95",
+    "name": "Fusion Trading Co.",
+    "logo": "https://example.com/fusion-trading-co/logo.png",
+    "size": "1-50 employees",
+    "industry": "Manufacturing / Assembly / Processing",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/fusion-trading-co",
+    "description": "A verified SmartHire employer operating in Manufacturing / Assembly / Processing, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 245
+    },
+    "jobCount": 15,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "4598707575",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0156-horizon-corp",
+    "slug": "horizon-corp-156",
+    "name": "Horizon Corp",
+    "logo": "https://example.com/horizon-corp/logo.png",
+    "size": "51-200 employees",
+    "industry": "Insurance",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/horizon-corp",
+    "description": "A verified SmartHire employer operating in Insurance, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 623
+    },
+    "jobCount": 15,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9156255796",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0159-pacific-consulting",
+    "slug": "pacific-consulting-159",
+    "name": "Pacific Consulting",
+    "logo": "https://example.com/pacific-consulting/logo.png",
+    "size": "51-200 employees",
+    "industry": "Retail / Wholesale / Store Management",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/pacific-consulting",
+    "description": "A verified SmartHire employer operating in Retail / Wholesale / Store Management, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 4.4,
+      "reviewCount": 232
+    },
+    "jobCount": 15,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "0795417050",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0167-grand-global",
+    "slug": "grand-global-167",
+    "name": "Grand Global",
+    "logo": "https://example.com/grand-global/logo.png",
+    "size": "1000+ employees",
+    "industry": "Agriculture / Forestry / Fisheries & Science",
+    "address": "Di An City, Binh Duong",
+    "website": "https://example.com/grand-global",
+    "description": "A verified SmartHire employer operating in Agriculture / Forestry / Fisheries & Science, based in Binh Duong.",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 261
+    },
+    "jobCount": 15,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "7783133535",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0021-quartz-tech",
+    "slug": "quartz-tech-21",
+    "name": "Quartz Tech",
+    "logo": "https://example.com/quartz-tech/logo.png",
+    "size": "1000+ employees",
+    "industry": "Education / Training",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/quartz-tech",
+    "description": "A verified SmartHire employer operating in Education / Training, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 4.6,
+      "reviewCount": 155
+    },
+    "jobCount": 14,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1649617524",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0050-delta-enterprises",
+    "slug": "delta-enterprises-50",
+    "name": "Delta Enterprises",
+    "logo": "https://example.com/delta-enterprises/logo.png",
+    "size": "1-50 employees",
+    "industry": "E-Commerce",
+    "address": "Bac Ninh City, Bac Ninh",
+    "website": "https://example.com/delta-enterprises",
+    "description": "A verified SmartHire employer operating in E-Commerce, based in Bac Ninh.",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 126
+    },
+    "jobCount": 14,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "0160411854",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0053-zenith-global",
+    "slug": "zenith-global-53",
+    "name": "Zenith Global",
+    "logo": "https://example.com/zenith-global/logo.png",
+    "size": "1000+ employees",
+    "industry": "Media / Journalism / Publishing",
+    "address": "Hong Bang District, Hai Phong",
+    "website": "https://example.com/zenith-global",
+    "description": "A verified SmartHire employer operating in Media / Journalism / Publishing, based in Hai Phong.",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 110
+    },
+    "jobCount": 14,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "4195092026",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0078-prime-capital",
+    "slug": "prime-capital-78",
+    "name": "Prime Capital",
+    "logo": "https://example.com/prime-capital/logo.png",
+    "size": "201-500 employees",
+    "industry": "E-Commerce",
+    "address": "Bien Hoa City, Dong Nai",
+    "website": "https://example.com/prime-capital",
+    "description": "A verified SmartHire employer operating in E-Commerce, based in Dong Nai.",
+    "rating": {
+      "score": 3.9,
+      "reviewCount": 159
+    },
+    "jobCount": 14,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "2193566914",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0084-cascade-manufacturing",
+    "slug": "cascade-manufacturing-84",
+    "name": "Cascade Manufacturing",
+    "logo": "https://example.com/cascade-manufacturing/logo.png",
+    "size": "1000+ employees",
+    "industry": "General Labor & Drivers",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/cascade-manufacturing",
+    "description": "A verified SmartHire employer operating in General Labor & Drivers, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 97
+    },
+    "jobCount": 14,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3693271869",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0101-river-global",
+    "slug": "river-global-101",
+    "name": "River Global",
+    "logo": "https://example.com/river-global/logo.png",
+    "size": "1000+ employees",
+    "industry": "Real Estate",
+    "address": "Ninh Kieu District, Can Tho",
+    "website": "https://example.com/river-global",
+    "description": "A verified SmartHire employer operating in Real Estate, based in Can Tho.",
+    "rating": {
+      "score": 4.3,
+      "reviewCount": 62
+    },
+    "jobCount": 14,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9757527636",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0103-kite-logistics",
+    "slug": "kite-logistics-103",
+    "name": "Kite Logistics",
+    "logo": "https://example.com/kite-logistics/logo.png",
+    "size": "1-50 employees",
+    "industry": "Retail / Wholesale / Store Management",
+    "address": "Thu Dau Mot City, Binh Duong",
+    "website": "https://example.com/kite-logistics",
+    "description": "A verified SmartHire employer operating in Retail / Wholesale / Store Management, based in Binh Duong.",
+    "rating": {
+      "score": 3.5,
+      "reviewCount": 404
+    },
+    "jobCount": 14,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9703307127",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0120-kite-capital",
+    "slug": "kite-capital-120",
+    "name": "Kite Capital",
+    "logo": "https://example.com/kite-capital/logo.png",
+    "size": "51-200 employees",
+    "industry": "Mechanical / Automotive / Automation",
+    "address": "Ninh Kieu District, Can Tho",
+    "website": "https://example.com/kite-capital",
+    "description": "A verified SmartHire employer operating in Mechanical / Automotive / Automation, based in Can Tho.",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 66
+    },
+    "jobCount": 14,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9066536910",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0152-bridge-holdings",
+    "slug": "bridge-holdings-152",
+    "name": "Bridge Holdings",
+    "logo": "https://example.com/bridge-holdings/logo.png",
+    "size": "1000+ employees",
+    "industry": "Customer Service",
+    "address": "Thanh Khe District, Da Nang",
+    "website": "https://example.com/bridge-holdings",
+    "description": "A verified SmartHire employer operating in Customer Service, based in Da Nang.",
+    "rating": {
+      "score": 4.3,
+      "reviewCount": 68
+    },
+    "jobCount": 14,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3684049391",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0154-phoenix-corp",
+    "slug": "phoenix-corp-154",
+    "name": "Phoenix Corp",
+    "logo": "https://example.com/phoenix-corp/logo.png",
+    "size": "1-50 employees",
+    "industry": "Health, Safety & Environment (HSE)",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/phoenix-corp",
+    "description": "A verified SmartHire employer operating in Health, Safety & Environment (HSE), based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 525
+    },
+    "jobCount": 14,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3576594156",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0157-jade-logistics",
+    "slug": "jade-logistics-157",
+    "name": "Jade Logistics",
+    "logo": "https://example.com/jade-logistics/logo.png",
+    "size": "51-200 employees",
+    "industry": "Real Estate",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/jade-logistics",
+    "description": "A verified SmartHire employer operating in Real Estate, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 3.5,
+      "reviewCount": 481
+    },
+    "jobCount": 14,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8479835036",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0161-union-industries",
+    "slug": "union-industries-161",
+    "name": "Union Industries",
+    "logo": "https://example.com/union-industries/logo.png",
+    "size": "51-200 employees",
+    "industry": "Education / Training",
+    "address": "Ninh Kieu District, Can Tho",
+    "website": "https://example.com/union-industries",
+    "description": "A verified SmartHire employer operating in Education / Training, based in Can Tho.",
+    "rating": {
+      "score": 3.7,
+      "reviewCount": 99
+    },
+    "jobCount": 14,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "5111737378",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0176-bridge-corp",
+    "slug": "bridge-corp-176",
+    "name": "Bridge Corp",
+    "logo": "https://example.com/bridge-corp/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Mechanical / Automotive / Automation",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/bridge-corp",
+    "description": "A verified SmartHire employer operating in Mechanical / Automotive / Automation, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 3.5,
+      "reviewCount": 492
+    },
+    "jobCount": 14,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "2423525956",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0022-heritage-retail-group",
+    "slug": "heritage-retail-group-22",
+    "name": "Heritage Retail Group",
+    "logo": "https://example.com/heritage-retail-group/logo.png",
+    "size": "51-200 employees",
+    "industry": "E-Commerce",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/heritage-retail-group",
+    "description": "A verified SmartHire employer operating in E-Commerce, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 471
+    },
+    "jobCount": 13,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6240788243",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0025-apex-media",
+    "slug": "apex-media-25",
+    "name": "Apex Media",
+    "logo": "https://example.com/apex-media/logo.png",
+    "size": "1-50 employees",
+    "industry": "Media / Journalism / Publishing",
+    "address": "Cai Rang District, Can Tho",
+    "website": "https://example.com/apex-media",
+    "description": "A verified SmartHire employer operating in Media / Journalism / Publishing, based in Can Tho.",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 485
+    },
+    "jobCount": 13,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "7695831359",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0072-lotus-global",
+    "slug": "lotus-global-72",
+    "name": "Lotus Global",
+    "logo": "https://example.com/lotus-global/logo.png",
+    "size": "51-200 employees",
+    "industry": "Insurance",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/lotus-global",
+    "description": "A verified SmartHire employer operating in Insurance, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 3.9,
+      "reviewCount": 242
+    },
+    "jobCount": 13,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1441024672",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0083-cascade-holdings",
+    "slug": "cascade-holdings-83",
+    "name": "Cascade Holdings",
+    "logo": "https://example.com/cascade-holdings/logo.png",
+    "size": "1000+ employees",
+    "industry": "Agriculture / Forestry / Fisheries & Science",
+    "address": "Thuan An City, Binh Duong",
+    "website": "https://example.com/cascade-holdings",
+    "description": "A verified SmartHire employer operating in Agriculture / Forestry / Fisheries & Science, based in Binh Duong.",
+    "rating": {
+      "score": 3.7,
+      "reviewCount": 490
+    },
+    "jobCount": 13,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1784728918",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0133-apex-solutions",
+    "slug": "apex-solutions-133",
+    "name": "Apex Solutions",
+    "logo": "https://example.com/apex-solutions/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Education / Training",
+    "address": "Cau Giay District, Hanoi",
+    "website": "https://example.com/apex-solutions",
+    "description": "A verified SmartHire employer operating in Education / Training, based in Hanoi.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 37
+    },
+    "jobCount": 13,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6272478172",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0134-titan-solutions",
+    "slug": "titan-solutions-134",
+    "name": "Titan Solutions",
+    "logo": "https://example.com/titan-solutions/logo.png",
+    "size": "201-500 employees",
+    "industry": "E-Commerce",
+    "address": "Ngo Quyen District, Hai Phong",
+    "website": "https://example.com/titan-solutions",
+    "description": "A verified SmartHire employer operating in E-Commerce, based in Hai Phong.",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 468
+    },
+    "jobCount": 13,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8498375445",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0153-onyx-tech",
+    "slug": "onyx-tech-153",
+    "name": "Onyx Tech",
+    "logo": "https://example.com/onyx-tech/logo.png",
+    "size": "1000+ employees",
+    "industry": "Design / Graphics / Creative Arts",
+    "address": "Dong Da District, Hanoi",
+    "website": "https://example.com/onyx-tech",
+    "description": "A verified SmartHire employer operating in Design / Graphics / Creative Arts, based in Hanoi.",
+    "rating": {
+      "score": 3.9,
+      "reviewCount": 587
+    },
+    "jobCount": 13,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6059972158",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0018-crown-retail-group",
+    "slug": "crown-retail-group-18",
+    "name": "Crown Retail Group",
+    "logo": "https://example.com/crown-retail-group/logo.png",
+    "size": "51-200 employees",
+    "industry": "Healthcare / Medical / Pharmaceuticals",
+    "address": "Ninh Kieu District, Can Tho",
+    "website": "https://example.com/crown-retail-group",
+    "description": "A verified SmartHire employer operating in Healthcare / Medical / Pharmaceuticals, based in Can Tho.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 110
+    },
+    "jobCount": 12,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3501970224",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0037-halo-international",
+    "slug": "halo-international-37",
+    "name": "Halo International",
+    "logo": "https://example.com/halo-international/logo.png",
+    "size": "1-50 employees",
+    "industry": "Construction / Architecture / Interior Design",
+    "address": "Ngu Hanh Son District, Da Nang",
+    "website": "https://example.com/halo-international",
+    "description": "A verified SmartHire employer operating in Construction / Architecture / Interior Design, based in Da Nang.",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 105
+    },
+    "jobCount": 12,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1847987620",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0067-alpha-partners",
+    "slug": "alpha-partners-67",
+    "name": "Alpha Partners",
+    "logo": "https://example.com/alpha-partners/logo.png",
+    "size": "51-200 employees",
+    "industry": "Manufacturing / Assembly / Processing",
+    "address": "Ngu Hanh Son District, Da Nang",
+    "website": "https://example.com/alpha-partners",
+    "description": "A verified SmartHire employer operating in Manufacturing / Assembly / Processing, based in Da Nang.",
+    "rating": {
+      "score": 4.2,
+      "reviewCount": 453
+    },
+    "jobCount": 12,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1262388651",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0073-phoenix-partners",
+    "slug": "phoenix-partners-73",
+    "name": "Phoenix Partners",
+    "logo": "https://example.com/phoenix-partners/logo.png",
+    "size": "1-50 employees",
+    "industry": "Real Estate",
+    "address": "Ninh Kieu District, Can Tho",
+    "website": "https://example.com/phoenix-partners",
+    "description": "A verified SmartHire employer operating in Real Estate, based in Can Tho.",
+    "rating": {
+      "score": 4.2,
+      "reviewCount": 560
+    },
+    "jobCount": 12,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3563438328",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0106-apex-international",
+    "slug": "apex-international-106",
+    "name": "Apex International",
+    "logo": "https://example.com/apex-international/logo.png",
+    "size": "201-500 employees",
+    "industry": "E-Commerce",
+    "address": "Bac Ninh City, Bac Ninh",
+    "website": "https://example.com/apex-international",
+    "description": "A verified SmartHire employer operating in E-Commerce, based in Bac Ninh.",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 80
+    },
+    "jobCount": 12,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3972299312",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0011-heritage-logistics",
+    "slug": "heritage-logistics-11",
+    "name": "Heritage Logistics",
+    "logo": "https://example.com/heritage-logistics/logo.png",
+    "size": "1000+ employees",
+    "industry": "Manufacturing / Assembly / Processing",
+    "address": "District 1, Ho Chi Minh City",
+    "website": "https://example.com/heritage-logistics",
+    "description": "A verified SmartHire employer operating in Manufacturing / Assembly / Processing, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 447
+    },
+    "jobCount": 11,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "7726721613",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0044-golden-international",
+    "slug": "golden-international-44",
+    "name": "Golden International",
+    "logo": "https://example.com/golden-international/logo.png",
+    "size": "1000+ employees",
+    "industry": "Insurance",
+    "address": "Son Tra District, Da Nang",
+    "website": "https://example.com/golden-international",
+    "description": "A verified SmartHire employer operating in Insurance, based in Da Nang.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 483
+    },
+    "jobCount": 11,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "5037329776",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0075-crown-tech",
+    "slug": "crown-tech-75",
+    "name": "Crown Tech",
+    "logo": "https://example.com/crown-tech/logo.png",
+    "size": "1-50 employees",
+    "industry": "Retail / Wholesale / Store Management",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/crown-tech",
+    "description": "A verified SmartHire employer operating in Retail / Wholesale / Store Management, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 4.6,
+      "reviewCount": 518
+    },
+    "jobCount": 11,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "0067914037",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0105-alpha-manufacturing",
+    "slug": "alpha-manufacturing-105",
+    "name": "Alpha Manufacturing",
+    "logo": "https://example.com/alpha-manufacturing/logo.png",
+    "size": "201-500 employees",
+    "industry": "Education / Training",
+    "address": "Thanh Khe District, Da Nang",
+    "website": "https://example.com/alpha-manufacturing",
+    "description": "A verified SmartHire employer operating in Education / Training, based in Da Nang.",
+    "rating": {
+      "score": 4.9,
+      "reviewCount": 207
+    },
+    "jobCount": 11,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "0524362556",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0110-nova-holdings",
+    "slug": "nova-holdings-110",
+    "name": "Nova Holdings",
+    "logo": "https://example.com/nova-holdings/logo.png",
+    "size": "51-200 employees",
+    "industry": "Textiles / Footwear / Fashion",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/nova-holdings",
+    "description": "A verified SmartHire employer operating in Textiles / Footwear / Fashion, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 419
+    },
+    "jobCount": 11,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6461965332",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0124-trident-group",
+    "slug": "trident-group-124",
+    "name": "Trident Group",
+    "logo": "https://example.com/trident-group/logo.png",
+    "size": "51-200 employees",
+    "industry": "Customer Service",
+    "address": "Hai Chau District, Da Nang",
+    "website": "https://example.com/trident-group",
+    "description": "A verified SmartHire employer operating in Customer Service, based in Da Nang.",
+    "rating": {
+      "score": 3.6,
+      "reviewCount": 370
+    },
+    "jobCount": 11,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9363815228",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0012-pioneer-group",
+    "slug": "pioneer-group-12",
+    "name": "Pioneer Group",
+    "logo": "https://example.com/pioneer-group/logo.png",
+    "size": "51-200 employees",
+    "industry": "Customer Service",
+    "address": "Ha Dong District, Hanoi",
+    "website": "https://example.com/pioneer-group",
+    "description": "A verified SmartHire employer operating in Customer Service, based in Hanoi.",
+    "rating": {
+      "score": 4.6,
+      "reviewCount": 51
+    },
+    "jobCount": 10,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "2114573620",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0014-grand-capital",
+    "slug": "grand-capital-14",
+    "name": "Grand Capital",
+    "logo": "https://example.com/grand-capital/logo.png",
+    "size": "201-500 employees",
+    "industry": "Health, Safety & Environment (HSE)",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/grand-capital",
+    "description": "A verified SmartHire employer operating in Health, Safety & Environment (HSE), based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 4.2,
+      "reviewCount": 510
+    },
+    "jobCount": 10,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "7957622828",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0017-jade-group",
+    "slug": "jade-group-17",
+    "name": "Jade Group",
+    "logo": "https://example.com/jade-group/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Real Estate",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/jade-group",
+    "description": "A verified SmartHire employer operating in Real Estate, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 3.6,
+      "reviewCount": 160
+    },
+    "jobCount": 10,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3852858101",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0042-quartz-corp",
+    "slug": "quartz-corp-42",
+    "name": "Quartz Corp",
+    "logo": "https://example.com/quartz-corp/logo.png",
+    "size": "51-200 employees",
+    "industry": "Health, Safety & Environment (HSE)",
+    "address": "Cai Rang District, Can Tho",
+    "website": "https://example.com/quartz-corp",
+    "description": "A verified SmartHire employer operating in Health, Safety & Environment (HSE), based in Can Tho.",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 504
+    },
+    "jobCount": 10,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "0416937053",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0068-sky-capital",
+    "slug": "sky-capital-68",
+    "name": "Sky Capital",
+    "logo": "https://example.com/sky-capital/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Customer Service",
+    "address": "Binh Thanh District, Ho Chi Minh City",
+    "website": "https://example.com/sky-capital",
+    "description": "A verified SmartHire employer operating in Customer Service, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 528
+    },
+    "jobCount": 10,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6671555226",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0070-emerald-solutions",
+    "slug": "emerald-solutions-70",
+    "name": "Emerald Solutions",
+    "logo": "https://example.com/emerald-solutions/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Health, Safety & Environment (HSE)",
+    "address": "Ninh Kieu District, Can Tho",
+    "website": "https://example.com/emerald-solutions",
+    "description": "A verified SmartHire employer operating in Health, Safety & Environment (HSE), based in Can Tho.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 351
+    },
+    "jobCount": 10,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "7626221331",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0123-north-star-consulting",
+    "slug": "north-star-consulting-123",
+    "name": "North Star Consulting",
+    "logo": "https://example.com/north-star-consulting/logo.png",
+    "size": "51-200 employees",
+    "industry": "Manufacturing / Assembly / Processing",
+    "address": "Bac Ninh City, Bac Ninh",
+    "website": "https://example.com/north-star-consulting",
+    "description": "A verified SmartHire employer operating in Manufacturing / Assembly / Processing, based in Bac Ninh.",
+    "rating": {
+      "score": 4,
+      "reviewCount": 614
+    },
+    "jobCount": 10,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9991306092",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0126-echo-systems",
+    "slug": "echo-systems-126",
+    "name": "Echo Systems",
+    "logo": "https://example.com/echo-systems/logo.png",
+    "size": "1-50 employees",
+    "industry": "Health, Safety & Environment (HSE)",
+    "address": "Hong Bang District, Hai Phong",
+    "website": "https://example.com/echo-systems",
+    "description": "A verified SmartHire employer operating in Health, Safety & Environment (HSE), based in Hai Phong.",
+    "rating": {
+      "score": 3.9,
+      "reviewCount": 450
+    },
+    "jobCount": 10,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8609723623",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0129-pacific-industries",
+    "slug": "pacific-industries-129",
+    "name": "Pacific Industries",
+    "logo": "https://example.com/pacific-industries/logo.png",
+    "size": "1000+ employees",
+    "industry": "Real Estate",
+    "address": "District 3, Ho Chi Minh City",
+    "website": "https://example.com/pacific-industries",
+    "description": "A verified SmartHire employer operating in Real Estate, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 363
+    },
+    "jobCount": 10,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "5764570422",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0136-apex-holdings",
+    "slug": "apex-holdings-136",
+    "name": "Apex Holdings",
+    "logo": "https://example.com/apex-holdings/logo.png",
+    "size": "51-200 employees",
+    "industry": "Translation / Interpretation",
+    "address": "Tan Binh District, Ho Chi Minh City",
+    "website": "https://example.com/apex-holdings",
+    "description": "A verified SmartHire employer operating in Translation / Interpretation, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 110
+    },
+    "jobCount": 10,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1175912695",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0137-ivory-logistics",
+    "slug": "ivory-logistics-137",
+    "name": "Ivory Logistics",
+    "logo": "https://example.com/ivory-logistics/logo.png",
+    "size": "1-50 employees",
+    "industry": "Media / Journalism / Publishing",
+    "address": "Dong Da District, Hanoi",
+    "website": "https://example.com/ivory-logistics",
+    "description": "A verified SmartHire employer operating in Media / Journalism / Publishing, based in Hanoi.",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 385
+    },
+    "jobCount": 10,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8540536731",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0151-vantage-vietnam",
+    "slug": "vantage-vietnam-151",
+    "name": "Vantage Vietnam",
+    "logo": "https://example.com/vantage-vietnam/logo.png",
+    "size": "1-50 employees",
+    "industry": "Manufacturing / Assembly / Processing",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/vantage-vietnam",
+    "description": "A verified SmartHire employer operating in Manufacturing / Assembly / Processing, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 282
+    },
+    "jobCount": 10,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9536288090",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0040-lotus-international",
+    "slug": "lotus-international-40",
+    "name": "Lotus International",
+    "logo": "https://example.com/lotus-international/logo.png",
+    "size": "201-500 employees",
+    "industry": "Customer Service",
+    "address": "Cai Rang District, Can Tho",
+    "website": "https://example.com/lotus-international",
+    "description": "A verified SmartHire employer operating in Customer Service, based in Can Tho.",
+    "rating": {
+      "score": 4,
+      "reviewCount": 116
+    },
+    "jobCount": 9,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6699609300",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0096-blue-ocean-capital",
+    "slug": "blue-ocean-capital-96",
+    "name": "Blue Ocean Capital",
+    "logo": "https://example.com/blue-ocean-capital/logo.png",
+    "size": "51-200 employees",
+    "industry": "Customer Service",
+    "address": "District 10, Ho Chi Minh City",
+    "website": "https://example.com/blue-ocean-capital",
+    "description": "A verified SmartHire employer operating in Customer Service, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 435
+    },
+    "jobCount": 9,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3731485539",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0111-sunrise-solutions",
+    "slug": "sunrise-solutions-111",
+    "name": "Sunrise Solutions",
+    "logo": "https://example.com/sunrise-solutions/logo.png",
+    "size": "1000+ employees",
+    "industry": "Agriculture / Forestry / Fisheries & Science",
+    "address": "Ngo Quyen District, Hai Phong",
+    "website": "https://example.com/sunrise-solutions",
+    "description": "A verified SmartHire employer operating in Agriculture / Forestry / Fisheries & Science, based in Hai Phong.",
+    "rating": {
+      "score": 4.6,
+      "reviewCount": 593
+    },
+    "jobCount": 9,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9688041331",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0128-silver-global",
+    "slug": "silver-global-128",
+    "name": "Silver Global",
+    "logo": "https://example.com/silver-global/logo.png",
+    "size": "1-50 employees",
+    "industry": "Insurance",
+    "address": "Bien Hoa City, Dong Nai",
+    "website": "https://example.com/silver-global",
+    "description": "A verified SmartHire employer operating in Insurance, based in Dong Nai.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 587
+    },
+    "jobCount": 9,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "9230477376",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0138-jade-systems",
+    "slug": "jade-systems-138",
+    "name": "Jade Systems",
+    "logo": "https://example.com/jade-systems/logo.png",
+    "size": "201-500 employees",
+    "industry": "Textiles / Footwear / Fashion",
+    "address": "Thuan An City, Binh Duong",
+    "website": "https://example.com/jade-systems",
+    "description": "A verified SmartHire employer operating in Textiles / Footwear / Fashion, based in Binh Duong.",
+    "rating": {
+      "score": 4,
+      "reviewCount": 219
+    },
+    "jobCount": 9,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3353027571",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0180-north-star-manufacturing",
+    "slug": "north-star-manufacturing-180",
+    "name": "North Star Manufacturing",
+    "logo": "https://example.com/north-star-manufacturing/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Customer Service",
+    "address": "Bac Ninh City, Bac Ninh",
+    "website": "https://example.com/north-star-manufacturing",
+    "description": "A verified SmartHire employer operating in Customer Service, based in Bac Ninh.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 539
+    },
+    "jobCount": 9,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3259278875",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0054-cascade-media",
+    "slug": "cascade-media-54",
+    "name": "Cascade Media",
+    "logo": "https://example.com/cascade-media/logo.png",
+    "size": "1000+ employees",
+    "industry": "Textiles / Footwear / Fashion",
+    "address": "Cai Rang District, Can Tho",
+    "website": "https://example.com/cascade-media",
+    "description": "A verified SmartHire employer operating in Textiles / Footwear / Fashion, based in Can Tho.",
+    "rating": {
+      "score": 3.6,
+      "reviewCount": 587
+    },
+    "jobCount": 8,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1868191340",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0055-trident-capital",
+    "slug": "trident-capital-55",
+    "name": "Trident Capital",
+    "logo": "https://example.com/trident-capital/logo.png",
+    "size": "201-500 employees",
+    "industry": "Agriculture / Forestry / Fisheries & Science",
+    "address": "Go Vap District, Ho Chi Minh City",
+    "website": "https://example.com/trident-capital",
+    "description": "A verified SmartHire employer operating in Agriculture / Forestry / Fisheries & Science, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 3.9,
+      "reviewCount": 543
+    },
+    "jobCount": 8,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3390205615",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0082-union-corp",
+    "slug": "union-corp-82",
+    "name": "Union Corp",
+    "logo": "https://example.com/union-corp/logo.png",
+    "size": "51-200 employees",
+    "industry": "Textiles / Footwear / Fashion",
+    "address": "Bien Hoa City, Dong Nai",
+    "website": "https://example.com/union-corp",
+    "description": "A verified SmartHire employer operating in Textiles / Footwear / Fashion, based in Dong Nai.",
+    "rating": {
+      "score": 4.4,
+      "reviewCount": 630
+    },
+    "jobCount": 8,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8327688426",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0131-summit-international",
+    "slug": "summit-international-131",
+    "name": "Summit International",
+    "logo": "https://example.com/summit-international/logo.png",
+    "size": "51-200 employees",
+    "industry": "Retail / Wholesale / Store Management",
+    "address": "Thanh Khe District, Da Nang",
+    "website": "https://example.com/summit-international",
+    "description": "A verified SmartHire employer operating in Retail / Wholesale / Store Management, based in Da Nang.",
+    "rating": {
+      "score": 4.7,
+      "reviewCount": 515
+    },
+    "jobCount": 8,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8524205098",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0139-titan-media",
+    "slug": "titan-media-139",
+    "name": "Titan Media",
+    "logo": "https://example.com/titan-media/logo.png",
+    "size": "201-500 employees",
+    "industry": "Agriculture / Forestry / Fisheries & Science",
+    "address": "Tu Son City, Bac Ninh",
+    "website": "https://example.com/titan-media",
+    "description": "A verified SmartHire employer operating in Agriculture / Forestry / Fisheries & Science, based in Bac Ninh.",
+    "rating": {
+      "score": 4,
+      "reviewCount": 512
+    },
+    "jobCount": 8,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "1417840231",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0026-anchor-retail-group",
+    "slug": "anchor-retail-group-26",
+    "name": "Anchor Retail Group",
+    "logo": "https://example.com/anchor-retail-group/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Textiles / Footwear / Fashion",
+    "address": "Cai Rang District, Can Tho",
+    "website": "https://example.com/anchor-retail-group",
+    "description": "A verified SmartHire employer operating in Textiles / Footwear / Fashion, based in Can Tho.",
+    "rating": {
+      "score": 4.4,
+      "reviewCount": 290
+    },
+    "jobCount": 7,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8597415361",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0027-silver-partners",
+    "slug": "silver-partners-27",
+    "name": "Silver Partners",
+    "logo": "https://example.com/silver-partners/logo.png",
+    "size": "1000+ employees",
+    "industry": "Agriculture / Forestry / Fisheries & Science",
+    "address": "District 7, Ho Chi Minh City",
+    "website": "https://example.com/silver-partners",
+    "description": "A verified SmartHire employer operating in Agriculture / Forestry / Fisheries & Science, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 4.8,
+      "reviewCount": 330
+    },
+    "jobCount": 7,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "7548688189",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0100-ivory-manufacturing",
+    "slug": "ivory-manufacturing-100",
+    "name": "Ivory Manufacturing",
+    "logo": "https://example.com/ivory-manufacturing/logo.png",
+    "size": "1-50 employees",
+    "industry": "Insurance",
+    "address": "Hong Bang District, Hai Phong",
+    "website": "https://example.com/ivory-manufacturing",
+    "description": "A verified SmartHire employer operating in Insurance, based in Hai Phong.",
+    "rating": {
+      "score": 3.7,
+      "reviewCount": 483
+    },
+    "jobCount": 7,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8768923032",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0024-grand-solutions",
+    "slug": "grand-solutions-24",
+    "name": "Grand Solutions",
+    "logo": "https://example.com/grand-solutions/logo.png",
+    "size": "1000+ employees",
+    "industry": "Translation / Interpretation",
+    "address": "Vung Tau City Center, Vung Tau (Ba Ria - Vung Tau)",
+    "website": "https://example.com/grand-solutions",
+    "description": "A verified SmartHire employer operating in Translation / Interpretation, based in Vung Tau (Ba Ria - Vung Tau).",
+    "rating": {
+      "score": 4,
+      "reviewCount": 206
+    },
+    "jobCount": 6,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "4208918802",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0098-golden-manufacturing",
+    "slug": "golden-manufacturing-98",
+    "name": "Golden Manufacturing",
+    "logo": "https://example.com/golden-manufacturing/logo.png",
+    "size": "51-200 employees",
+    "industry": "Health, Safety & Environment (HSE)",
+    "address": "Ngu Hanh Son District, Da Nang",
+    "website": "https://example.com/golden-manufacturing",
+    "description": "A verified SmartHire employer operating in Health, Safety & Environment (HSE), based in Da Nang.",
+    "rating": {
+      "score": 3.9,
+      "reviewCount": 489
+    },
+    "jobCount": 6,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6372103769",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0108-compass-logistics",
+    "slug": "compass-logistics-108",
+    "name": "Compass Logistics",
+    "logo": "https://example.com/compass-logistics/logo.png",
+    "size": "51-200 employees",
+    "industry": "Translation / Interpretation",
+    "address": "Bien Hoa City, Dong Nai",
+    "website": "https://example.com/compass-logistics",
+    "description": "A verified SmartHire employer operating in Translation / Interpretation, based in Dong Nai.",
+    "rating": {
+      "score": 3.5,
+      "reviewCount": 525
+    },
+    "jobCount": 6,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "6740033218",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0052-pioneer-logistics",
+    "slug": "pioneer-logistics-52",
+    "name": "Pioneer Logistics",
+    "logo": "https://example.com/pioneer-logistics/logo.png",
+    "size": "201-500 employees",
+    "industry": "Translation / Interpretation",
+    "address": "Nha Trang City Center, Nha Trang (Khanh Hoa)",
+    "website": "https://example.com/pioneer-logistics",
+    "description": "A verified SmartHire employer operating in Translation / Interpretation, based in Nha Trang (Khanh Hoa).",
+    "rating": {
+      "score": 4.5,
+      "reviewCount": 152
+    },
+    "jobCount": 5,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "0103301655",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0080-falcon-group",
+    "slug": "falcon-group-80",
+    "name": "Falcon Group",
+    "logo": "https://example.com/falcon-group/logo.png",
+    "size": "1000+ employees",
+    "industry": "Translation / Interpretation",
+    "address": "District 7, Ho Chi Minh City",
+    "website": "https://example.com/falcon-group",
+    "description": "A verified SmartHire employer operating in Translation / Interpretation, based in Ho Chi Minh City.",
+    "rating": {
+      "score": 3.7,
+      "reviewCount": 103
+    },
+    "jobCount": 5,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "0822893808",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0166-meridian-digital",
+    "slug": "meridian-digital-166",
+    "name": "Meridian Digital",
+    "logo": "https://example.com/meridian-digital/logo.png",
+    "size": "501-1000 employees",
+    "industry": "Textiles / Footwear / Fashion",
+    "address": "Cai Rang District, Can Tho",
+    "website": "https://example.com/meridian-digital",
+    "description": "A verified SmartHire employer operating in Textiles / Footwear / Fashion, based in Can Tho.",
+    "rating": {
+      "score": 3.8,
+      "reviewCount": 80
+    },
+    "jobCount": 5,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8081938994",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0179-sunrise-industries",
+    "slug": "sunrise-industries-179",
+    "name": "Sunrise Industries",
+    "logo": "https://example.com/sunrise-industries/logo.png",
+    "size": "1-50 employees",
+    "industry": "Manufacturing / Assembly / Processing",
+    "address": "Hai Chau District, Da Nang",
+    "website": "https://example.com/sunrise-industries",
+    "description": "A verified SmartHire employer operating in Manufacturing / Assembly / Processing, based in Da Nang.",
+    "rating": {
+      "score": 4.1,
+      "reviewCount": 343
+    },
+    "jobCount": 5,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "3654065084",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "comp-0164-horizon-manufacturing",
+    "slug": "horizon-manufacturing-164",
+    "name": "Horizon Manufacturing",
+    "logo": "https://example.com/horizon-manufacturing/logo.png",
+    "size": "51-200 employees",
+    "industry": "Translation / Interpretation",
+    "address": "Dong Da District, Hanoi",
+    "website": "https://example.com/horizon-manufacturing",
+    "description": "A verified SmartHire employer operating in Translation / Interpretation, based in Hanoi.",
+    "rating": {
+      "score": 4.3,
+      "reviewCount": 613
+    },
+    "jobCount": 4,
+    "ownerUserId": null,
+    "memberUserIds": [],
+    "taxCode": "8052760290",
+    "verificationStatus": "approved"
+  },
+  {
+    "id": "cmt74htdn000kjotuv25w7wwe",
+    "slug": "co-ng-ty-tnhh-pha-n-me-m-fpt-bdf9eed3",
+    "name": "CÔNG TY TNHH PHẦN MỀM FPT",
+    "entityType": null,
+    "logo": "data:image/webp;base64,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",
+    "size": "1",
+    "industry": "Game Development",
+    "address": "Ho Chi Minh, District 8",
+    "website": "https://example.com/Dava",
+    "description": "game",
+    "ownerUserId": "f09569ee-9f05-4525-830d-33b4e12b12bd",
+    "memberUserIds": [
+      "f09569ee-9f05-4525-830d-33b4e12b12bd"
+    ],
+    "taxCode": "0101601092",
+    "verificationStatus": "approved"
+  }
+]

@@ -56,7 +56,7 @@ export const jobSearchQuerySchema = z
     searchBy: jobSearchBySchema.default("BOTH"),
     location: z.string().trim().max(160).default(""),
     district: stringArray(z.string().trim().min(1).max(160), 20).default([]),
-    categoryFamily: stringArray(z.string().trim().min(1).max(80), 28).default(
+    categoryFamily: stringArray(z.string().trim().min(1).max(80), 29).default(
       [],
     ),
     employmentType: stringArray(employmentTypeSchema, 5).default([]),

@@ -497,7 +497,7 @@ describe("image-assisted job-search controls", () => {
   it("renders every industry supplied by the precomputed taxonomy", () => {
     const allIndustries: JobSearchTaxonomy = {
       ...taxonomy,
-      industries: Array.from({ length: 28 }, (_, index) => ({
+      industries: Array.from({ length: 29 }, (_, index) => ({
         ...taxonomy.industries[0]!,
         code: `r${String(index + 1).padStart(2, "0")}`,
         name: `Industry ${String(index + 1).padStart(2, "0")}`,
@@ -507,14 +507,14 @@ describe("image-assisted job-search controls", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Job Category" }));
     expect(screen.getAllByRole("button", { name: /^Industry /u })).toHaveLength(
-      28,
+      29,
     );
   });
 
-  it("keeps exactly one in-flow active row while selecting all 28 categories", () => {
+  it("keeps exactly one in-flow active row while selecting all 29 categories", () => {
     const allIndustries: JobSearchTaxonomy = {
       ...taxonomy,
-      industries: Array.from({ length: 28 }, (_, index) => ({
+      industries: Array.from({ length: 29 }, (_, index) => ({
         ...taxonomy.industries[0]!,
         code: `r${String(index + 1).padStart(2, "0")}`,
         name: `Industry ${String(index + 1).padStart(2, "0")}`,
@@ -523,7 +523,7 @@ describe("image-assisted job-search controls", () => {
     render(<GlobalImageSearch taxonomy={allIndustries} />);
     fireEvent.click(screen.getByRole("button", { name: "Job Category" }));
 
-    for (let index = 1; index <= 28; index += 1) {
+    for (let index = 1; index <= 29; index += 1) {
       const category = screen.getByRole("button", {
         name: new RegExp(`^Industry ${String(index).padStart(2, "0")}`, "u"),
       });
