@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { TWO_FACTOR_GENERIC_ERROR } from "@/shared/contracts/identity/two-factor";
@@ -10,6 +10,7 @@ const MAX_TWO_FACTOR_ATTEMPTS = 5;
 const TWO_FACTOR_ATTEMPTS_WINDOW_SECONDS = 10 * 60;
 const TWO_FACTOR_ATTEMPTS_STORAGE_KEY_PREFIX =
   "smarthire-two-factor-challenge-attempts:";
+const TOTP_LENGTH = 6;
 
 type AttemptState = {
   count: number;
@@ -74,16 +75,31 @@ function getLockedMessage(lockedUntil: number) {
 
 export function TwoFactorChallenge() {
   const router = useRouter(),
-    input = useRef<HTMLInputElement>(null),
+    backupCodeInput = useRef<HTMLInputElement>(null),
+    totpInput = useRef<HTMLInputElement>(null),
     [factor, setFactor] = useState<"totp" | "backup-code">("totp"),
-    [code, setCode] = useState(""),
+    [totp, setTotp] = useState(""),
+    [backupCode, setBackupCode] = useState(""),
     { status, setStatus } = useReplayableStatus(""),
     [tone, setTone] = useState<"error" | "success">("error"),
     [busy, setBusy] = useState(false),
     [isLocked, setIsLocked] = useState(false);
 
+  const code = factor === "totp" ? totp : backupCode;
+  const clearCode = () => {
+    if (factor === "totp") setTotp("");
+    else setBackupCode("");
+  };
+  const focusActiveCode = useCallback(() => {
+    if (factor === "totp") totpInput.current?.focus();
+    else backupCodeInput.current?.focus();
+  }, [factor]);
+
+  const updateTotp = (value: string) =>
+    setTotp(value.replace(/\D/g, "").slice(0, TOTP_LENGTH));
+
   useEffect(() => {
-    input.current?.focus();
+    focusActiveCode();
     const timer = window.setTimeout(() => {
       const state = readAttemptState(factor);
       if (state.lockedUntil && state.lockedUntil > Date.now()) {
@@ -96,7 +112,7 @@ export function TwoFactorChallenge() {
       }
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [factor, setStatus]);
+  }, [factor, focusActiveCode, setStatus]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -113,7 +129,7 @@ export function TwoFactorChallenge() {
     setBusy(true);
     setStatus("");
     const sent = code;
-    setCode("");
+    clearCode();
     try {
       const r = await fetch("/api/identity/two-factor/complete", {
         method: "POST",
@@ -142,7 +158,7 @@ export function TwoFactorChallenge() {
               : `That backup code is invalid. (${remainingAttempts} attempt${remainingAttempts === 1 ? "" : "s"} remaining)`,
           );
         }
-        input.current?.focus();
+        focusActiveCode();
         return;
       }
       writeAttemptState(factor, 0);
@@ -174,7 +190,7 @@ export function TwoFactorChallenge() {
             type="button"
             onClick={() => {
               setFactor("totp");
-              setCode("");
+              setTotp("");
             }}
             aria-pressed={factor === "totp"}
           >
@@ -184,7 +200,7 @@ export function TwoFactorChallenge() {
             type="button"
             onClick={() => {
               setFactor("backup-code");
-              setCode("");
+              setBackupCode("");
             }}
             aria-pressed={factor === "backup-code"}
           >
@@ -192,28 +208,53 @@ export function TwoFactorChallenge() {
           </button>
         </div>
         <div className="field">
-          <label htmlFor="totp-code">
-            {factor === "totp" ? "Authentication code" : "Backup code"}
-          </label>
-          <input
-            ref={input}
-            id="totp-code"
-            name="code"
-            type="text"
-            inputMode={factor === "totp" ? "numeric" : "text"}
-            autoComplete="one-time-code"
-            maxLength={factor === "totp" ? 6 : 128}
-            value={code}
-            onChange={(e) =>
-              setCode(
-                factor === "totp"
-                  ? e.target.value.replace(/\D/g, "").slice(0, 6)
-                  : e.target.value.slice(0, 128),
-              )
-            }
-            aria-describedby="two-factor-status"
-            required
-          />
+          {factor === "totp" ? (
+            <div
+              className="totp-code-inputs"
+              role="group"
+              aria-label="Six-digit authentication code"
+              aria-describedby="two-factor-status"
+            >
+              <input
+                ref={totpInput}
+                id="totp-code"
+                name="code"
+                className="totp-native-input"
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                autoComplete="one-time-code"
+                enterKeyHint="done"
+                maxLength={TOTP_LENGTH}
+                value={totp}
+                aria-label="Authentication code"
+                onChange={(event) => updateTotp(event.currentTarget.value)}
+                required
+              />
+              {Array.from({ length: TOTP_LENGTH }, (_, index) => (
+                <span className="totp-code-cell" aria-hidden="true" key={index}>
+                  {totp[index] ?? ""}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <input
+              ref={backupCodeInput}
+              id="backup-code"
+              name="code"
+              type="text"
+              inputMode="text"
+              autoComplete="one-time-code"
+              maxLength={128}
+              value={backupCode}
+              aria-label="Backup code"
+              onChange={(event) =>
+                setBackupCode(event.currentTarget.value.slice(0, 128))
+              }
+              aria-describedby="two-factor-status"
+              required
+            />
+          )}
         </div>
         <button
           type="submit"

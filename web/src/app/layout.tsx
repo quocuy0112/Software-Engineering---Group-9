@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/500.css";
 import "@fontsource/be-vietnam-pro/600.css";
@@ -28,7 +29,7 @@ const themeBootstrapScript = [
   '      "/", "/home", "/login", "/register", "/forgot-password",',
   '      "/reset-password", "/two-factor", "/check-email", "/verify-email",',
   '      "/verify-company-email", "/verify-email-change", "/account-recovery",',
-      '      "/business", "/help", "/legal"',
+  '      "/business", "/help", "/legal"',
   "    ];",
   "    var forceLight = publicRoutes.some(function (route) {",
   '      return pathname === route || (route !== "/" && pathname.indexOf(route + "/") === 0);',
@@ -61,8 +62,9 @@ export default function RootLayout({
     >
       <head>
         <meta charSet="utf-8" />
-        <script
+        <Script
           id="smarthire-theme-bootstrap"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
         />
       </head>

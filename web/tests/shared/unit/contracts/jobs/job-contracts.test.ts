@@ -23,6 +23,15 @@ describe("job board transport contracts", () => {
       jobSearchQuerySchema.parse({ salaryMin: "10", salaryMax: "2" }),
     ).toThrow();
     expect(() => jobSearchQuerySchema.parse({ limit: "51" })).toThrow();
+    expect(
+      jobSearchQuerySchema.parse({
+        categoryId: ["r03-software-development"],
+      }).categoryId,
+    ).toEqual(["r03-software-development"]);
+    expect(
+      jobSearchQuerySchema.parse({ categoryTitle: ["Software Engineer"] })
+        .categoryTitle,
+    ).toEqual(["Software Engineer"]);
   });
 
   it("rejects ownership fields and unsafe report shapes", () => {

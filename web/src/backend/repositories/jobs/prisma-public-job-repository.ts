@@ -208,6 +208,35 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
     }
     clauses.push(Prisma.sql`(${Prisma.join(categoryMatches, " OR ")})`);
   }
+  if (input.categoryIds?.length) {
+    const roleMatches: Prisma.Sql[] = [
+      Prisma.sql`EXISTS (
+        SELECT 1
+        FROM "JobPostReviewAggregate" aggregate
+        JOIN "JobPostReviewVersion" version
+          ON version."id" = aggregate."approvedVersionId"
+        WHERE aggregate."publicJobPostingId" = j."id"
+          AND EXISTS (
+            SELECT 1
+            FROM jsonb_array_elements_text(
+              COALESCE(version."snapshot" -> 'categoryIds', '[]'::jsonb)
+            ) AS selected_category(id)
+            WHERE selected_category.id IN (${Prisma.join(input.categoryIds)})
+          )
+      )`,
+    ];
+    for (const name of input.normalizedCategoryTitleNames ?? []) {
+      roleMatches.push(
+        Prisma.sql`j."searchDocumentNormalized" LIKE ${`%${name}%`}`,
+      );
+    }
+    clauses.push(Prisma.sql`(${Prisma.join(roleMatches, " OR ")})`);
+  }
+  if (input.normalizedRoleTitles?.length) {
+    clauses.push(
+      Prisma.sql`j."normalizedTitle" IN (${Prisma.join(input.normalizedRoleTitles)})`,
+    );
+  }
   if (input.employmentType.length) {
     clauses.push(
       Prisma.sql`j."employmentType"::text IN (${Prisma.join(input.employmentType)})`,

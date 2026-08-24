@@ -5,16 +5,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { GlobalImageSearch } from "@/frontend/features/jobs/image-search/components/global-image-search";
 import type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
 
-const searchableJobWorkspacePaths = new Set([
-  "/jobs",
-  "/jobs/saved",
-  "/jobs/matches",
-  "/jobs/settings",
-]);
-
 /**
- * The search control belongs to the Jobs layout, not an individual tab. This
- * keeps its component state alive while switching between job-list views.
+ * The enterprise omnibar belongs to Find Jobs only. Scoped pages reuse the
+ * same workspace header without reserving a search track.
  */
 export function JobWorkspaceSearch({
   taxonomy,
@@ -38,7 +31,7 @@ export function JobWorkspaceSearch({
     [pathname, router],
   );
 
-  if (!searchableJobWorkspacePaths.has(pathname)) return null;
+  if (pathname !== "/jobs") return null;
 
   return (
     <GlobalImageSearch
