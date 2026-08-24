@@ -337,6 +337,25 @@ function JobCategoryMenu({
   );
 }
 
+function ClearFieldButton({
+  label,
+  onClear,
+}: Readonly<{
+  label: string;
+  onClear(): void;
+}>) {
+  return (
+    <button
+      className="global-image-search-clear"
+      type="button"
+      aria-label={label}
+      onClick={onClear}
+    >
+      &times;
+    </button>
+  );
+}
+
 function LocationPicker({
   taxonomy,
   location,
@@ -366,11 +385,9 @@ function LocationPicker({
       normalizeLocationSearch(provinceQuery),
     ),
   );
-  const displayValue = !location
-    ? ""
-    : districts.length === 0
-      ? location
-      : `${location} (${districts.length} ${vi ? "quận/huyện" : "districts"})`;
+  const displayValue = location ? [location, ...districts].join(", ") : "";
+  const selectedLocationTitle = displayValue || undefined;
+  const tooltipId = "job-location-picker-tooltip";
   const placeholder = vi ? "Tỉnh/thành, quận..." : "Province/city, district...";
 
   const openPicker = () => {
@@ -410,33 +427,40 @@ function LocationPicker({
           <path d="M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11Z" />
           <circle cx="12" cy="10" r="2" />
         </svg>
-        <input
-          className="job-location-picker-input"
-          type="search"
-          value={open ? provinceQuery : displayValue}
-          placeholder={placeholder}
-          aria-label={vi ? "Địa điểm" : "Location"}
-          aria-haspopup="dialog"
-          aria-expanded={open}
-          aria-controls="job-location-picker-dialog"
-          onFocus={beginEditing}
-          onChange={(event) => {
-            if (!open) openPicker();
-            setProvinceQuery(event.currentTarget.value);
-          }}
-        />
+        <div className="job-location-picker-value">
+          <input
+            className="job-location-picker-input"
+            type="search"
+            value={open ? provinceQuery : displayValue}
+            placeholder={placeholder}
+            data-selected={Boolean(location) && !open}
+            aria-label={vi ? "Địa điểm" : "Location"}
+            aria-describedby={selectedLocationTitle ? tooltipId : undefined}
+            aria-haspopup="dialog"
+            aria-expanded={open}
+            aria-controls="job-location-picker-dialog"
+            onFocus={beginEditing}
+            onChange={(event) => {
+              if (!open) openPicker();
+              setProvinceQuery(event.currentTarget.value);
+            }}
+          />
+          {!open && location ? (
+            <span className="job-location-picker-display" aria-hidden="true">
+              <span className="job-location-picker-selection">
+                {displayValue}
+              </span>
+            </span>
+          ) : null}
+        </div>
         {location ? (
-          <button
-            className="job-location-picker-clear"
-            type="button"
-            aria-label={vi ? "Xóa địa điểm" : "Clear location"}
-            onClick={() => {
+          <ClearFieldButton
+            label={vi ? "Xóa địa điểm" : "Clear location"}
+            onClear={() => {
               onClear();
               setProvinceQuery("");
             }}
-          >
-            &times;
-          </button>
+          />
         ) : null}
         <span className="job-location-picker-chevron" aria-hidden="true">
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -444,6 +468,15 @@ function LocationPicker({
           </svg>
         </span>
       </div>
+      {!open && selectedLocationTitle ? (
+        <span
+          id={tooltipId}
+          className="job-location-picker-tooltip"
+          role="tooltip"
+        >
+          {selectedLocationTitle}
+        </span>
+      ) : null}
 
       {open ? (
         <div
@@ -728,19 +761,27 @@ export function GlobalImageSearch({
                 ? "Tìm công việc, kỹ năng hoặc công ty"
                 : "Search jobs, skills, or companies"}
             </label>
-            <input
-              id="global-job-search-query"
-              type="search"
-              autoComplete="off"
-              value={query}
-              maxLength={200}
-              placeholder={
-                vi
-                  ? "Tìm công việc, kỹ năng hoặc công ty"
-                  : "Search jobs, skills, or companies"
-              }
-              onChange={(event) => setQuery(event.currentTarget.value)}
-            />
+            <div className="global-image-search-query-field">
+              <input
+                id="global-job-search-query"
+                type="search"
+                autoComplete="off"
+                value={query}
+                maxLength={200}
+                placeholder={
+                  vi
+                    ? "Tìm công việc, kỹ năng hoặc công ty"
+                    : "Search jobs, skills, or companies"
+                }
+                onChange={(event) => setQuery(event.currentTarget.value)}
+              />
+              {query.length > 0 ? (
+                <ClearFieldButton
+                  label={vi ? "Xóa tìm kiếm" : "Clear search"}
+                  onClear={() => setQuery("")}
+                />
+              ) : null}
+            </div>
             {taxonomy ? (
               <LocationPicker
                 taxonomy={taxonomy}

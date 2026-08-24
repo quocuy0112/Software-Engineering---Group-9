@@ -145,6 +145,36 @@ describe("image-assisted job-search controls", () => {
     window.history.replaceState(null, "", "/");
   });
 
+  it("shows the search clear control solely while the query has a value", () => {
+    render(<GlobalImageSearch taxonomy={taxonomy} />);
+
+    const searchField = screen.getByRole("searchbox", {
+      name: "Search jobs, skills, or companies",
+    });
+    expect(
+      screen.queryByRole("button", { name: "Clear search" }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.focus(searchField);
+    fireEvent.change(searchField, { target: { value: "com" } });
+    expect(screen.getByRole("button", { name: "Clear search" })).toBeVisible();
+
+    fireEvent.blur(searchField);
+    expect(screen.getByRole("button", { name: "Clear search" })).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
+    expect(searchField).toHaveValue("");
+    expect(
+      screen.queryByRole("button", { name: "Clear search" }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.change(searchField, { target: { value: "c" } });
+    fireEvent.change(searchField, { target: { value: "" } });
+    expect(
+      screen.queryByRole("button", { name: "Clear search" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("keeps the complete image-search panel in Vietnamese when selected", () => {
     window.history.replaceState(null, "", "/jobs");
     render(
@@ -263,7 +293,29 @@ describe("image-assisted job-search controls", () => {
     expect(navigate).toHaveBeenCalledWith(
       "/jobs?q=project+manager&location=Ho+Chi+Minh+City&district=District+1",
     );
-    expect(locationField).toHaveValue("Ho Chi Minh City (1 districts)");
+    expect(locationField).toHaveValue("Ho Chi Minh City, District 1");
+    expect(
+      locationField.parentElement?.querySelector(
+        ".job-location-picker-selection",
+      ),
+    ).toHaveTextContent("Ho Chi Minh City, District 1");
+    expect(locationField).toHaveAttribute(
+      "aria-describedby",
+      "job-location-picker-tooltip",
+    );
+    expect(screen.getByRole("tooltip")).toHaveTextContent(
+      "Ho Chi Minh City, District 1",
+    );
+    expect(
+      screen.getByRole("button", { name: "Clear location" }),
+    ).toBeVisible();
+    expect(screen.getByRole("button", { name: "Clear search" })).toHaveClass(
+      "global-image-search-clear",
+    );
+    expect(screen.getByRole("button", { name: "Clear location" })).toHaveClass(
+      "global-image-search-clear",
+    );
+    fireEvent.blur(locationField);
     expect(
       screen.getByRole("button", { name: "Clear location" }),
     ).toBeVisible();
@@ -277,10 +329,71 @@ describe("image-assisted job-search controls", () => {
     ).toBeNull();
     fireEvent.focus(locationField);
     expect(locationField).toHaveValue("");
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
     fireEvent.pointerDown(document.body);
-    expect(locationField).toHaveValue("Ho Chi Minh City (1 districts)");
+    expect(locationField).toHaveValue("Ho Chi Minh City, District 1");
+    expect(screen.getByRole("tooltip")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Clear location" }));
     expect(locationField).toHaveValue("");
+  });
+
+  it("shows a long province's comma-separated district list and exposes it in a tooltip", () => {
+    const longLocationTaxonomy: JobSearchTaxonomy = {
+      ...taxonomy,
+      locations: [
+        {
+          label: "Bà Rịa - Vũng Tàu",
+          value: "Bà Rịa - Vũng Tàu",
+          count: 2,
+        },
+      ],
+      locationGroups: [
+        {
+          city: "Bà Rịa - Vũng Tàu",
+          count: 2,
+          districts: [
+            { name: "Long Hải", count: 1 },
+            { name: "Phước Hải", count: 1 },
+          ],
+        },
+      ],
+    };
+    render(<GlobalImageSearch taxonomy={longLocationTaxonomy} />);
+
+    const locationField = screen.getByRole("searchbox", { name: "Location" });
+    fireEvent.change(locationField, { target: { value: "bà rịa" } });
+    fireEvent.click(screen.getByRole("checkbox", { name: "Long Hải" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Phước Hải" }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+
+    expect(
+      locationField.parentElement?.querySelector(
+        ".job-location-picker-selection",
+      ),
+    ).toHaveTextContent("Bà Rịa - Vũng Tàu, Long Hải, Phước Hải");
+    expect(screen.getByRole("tooltip")).toHaveTextContent(
+      "Bà Rịa - Vũng Tàu, Long Hải, Phước Hải",
+    );
+  });
+
+  it("shows only the province when all districts are selected", () => {
+    render(<GlobalImageSearch taxonomy={taxonomy} />);
+
+    const locationField = screen.getByRole("searchbox", { name: "Location" });
+    expect(locationField).toHaveAttribute(
+      "placeholder",
+      "Province/city, district...",
+    );
+    fireEvent.change(locationField, { target: { value: "ho chi" } });
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+
+    expect(locationField).toHaveValue("Ho Chi Minh City");
+    expect(
+      locationField.parentElement?.querySelector(
+        ".job-location-picker-selection",
+      ),
+    ).toHaveTextContent("Ho Chi Minh City");
+    expect(screen.getByRole("tooltip")).toHaveTextContent("Ho Chi Minh City");
   });
 
   it("opens and changes job categories only when clicked", () => {
