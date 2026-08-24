@@ -18,4 +18,12 @@ export type JobSearchTaxonomy = Readonly<{
     value: string;
     count: number;
   }>;
+  locationGroups?: ReadonlyArray<{
+    city: string;
+    count: number;
+    districts: ReadonlyArray<{
+      name: string;
+      count: number;
+    }>;
+  }>;
 }>;

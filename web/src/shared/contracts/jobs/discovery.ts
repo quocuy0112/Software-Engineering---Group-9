@@ -18,7 +18,13 @@ export const experienceLevelSchema = z.enum([
 ]);
 export const workArrangementSchema = z.enum(["ONSITE", "HYBRID", "REMOTE"]);
 export const salaryPeriodSchema = z.enum(["HOUR", "MONTH", "YEAR"]);
-export const jobSortSchema = z.enum(["RELEVANCE", "NEWEST", "SALARY_DESC"]);
+export const jobSortSchema = z.enum([
+  "RELEVANCE",
+  "NEWEST",
+  "SALARY_DESC",
+  "UPDATED",
+  "URGENT",
+]);
 export const jobSearchBySchema = z.enum(["TITLE", "COMPANY", "BOTH"]);
 
 const omitEmptyControlValue = (value: unknown) =>
@@ -49,6 +55,10 @@ export const jobSearchQuerySchema = z
     q: z.string().trim().max(200).default(""),
     searchBy: jobSearchBySchema.default("BOTH"),
     location: z.string().trim().max(160).default(""),
+    district: stringArray(z.string().trim().min(1).max(160), 20).default([]),
+    categoryFamily: stringArray(z.string().trim().min(1).max(80), 28).default(
+      [],
+    ),
     employmentType: stringArray(employmentTypeSchema, 5).default([]),
     experienceLevel: stringArray(experienceLevelSchema, 6).default([]),
     workArrangement: stringArray(workArrangementSchema, 3).default([]),

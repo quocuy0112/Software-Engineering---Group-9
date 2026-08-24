@@ -7,6 +7,8 @@ import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
 import { WorkspaceShell } from "@/frontend/features/dashboard/components/workspace-shell";
 import { JobBoardHeader } from "@/frontend/features/jobs/components/job-board-header";
 import { JobInteractionProvider } from "@/frontend/features/jobs/components/job-interaction-provider";
+import { JobWorkspaceSearch } from "@/frontend/features/jobs/components/job-workspace-search";
+import { listJobSearchTaxonomy } from "@/backend/services/jobs/job-search-taxonomy";
 
 export default async function JobsLayout({
   children,
@@ -14,6 +16,10 @@ export default async function JobsLayout({
   const context = await getWorkspaceContext();
 
   if (context) {
+    const taxonomy = await listJobSearchTaxonomy().catch(() => ({
+      industries: [],
+      locations: [],
+    }));
     return (
       <WorkspaceShell
         initialRecruiterStatus={context.initialRecruiterStatus}
@@ -23,7 +29,10 @@ export default async function JobsLayout({
         contentMode="job-board"
         initialWorkspaceMode="candidate"
       >
-        <JobInteractionProvider>{children}</JobInteractionProvider>
+        <JobInteractionProvider>
+          <JobWorkspaceSearch taxonomy={taxonomy} />
+          {children}
+        </JobInteractionProvider>
       </WorkspaceShell>
     );
   }

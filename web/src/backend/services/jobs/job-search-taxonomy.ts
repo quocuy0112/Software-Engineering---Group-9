@@ -138,6 +138,10 @@ function buildTaxonomy(entries: readonly TaxonomyEntry[]): JobSearchTaxonomy {
     string,
     { label: string; value: string; count: number }
   >();
+  const locationGroups = new Map<
+    string,
+    { city: string; count: number; districts: Map<string, number> }
+  >();
 
   const addLocation = (label: string, value: string) => {
     const location = locations.get(value) ?? { label, value, count: 0 };
@@ -174,10 +178,21 @@ function buildTaxonomy(entries: readonly TaxonomyEntry[]): JobSearchTaxonomy {
       title.categoryIds.add(categoryId);
 
     addLocation(entry.location.city, entry.location.city);
+    const locationGroup = locationGroups.get(entry.location.city) ?? {
+      city: entry.location.city,
+      count: 0,
+      districts: new Map(),
+    };
+    locationGroups.set(entry.location.city, locationGroup);
+    locationGroup.count += 1;
     if (entry.location.district) {
       addLocation(
         `${entry.location.city} · ${entry.location.district}`,
         `${entry.location.district}, ${entry.location.city}`,
+      );
+      locationGroup.districts.set(
+        entry.location.district,
+        (locationGroup.districts.get(entry.location.district) ?? 0) + 1,
       );
     }
   }
@@ -217,6 +232,15 @@ function buildTaxonomy(entries: readonly TaxonomyEntry[]): JobSearchTaxonomy {
       (left, right) =>
         right.count - left.count || left.label.localeCompare(right.label),
     ),
+    locationGroups: [...locationGroups.values()]
+      .sort((left, right) => left.city.localeCompare(right.city))
+      .map((locationGroup) => ({
+        city: locationGroup.city,
+        count: locationGroup.count,
+        districts: [...locationGroup.districts.entries()]
+          .map(([name, count]) => ({ name, count }))
+          .sort((left, right) => left.name.localeCompare(right.name)),
+      })),
   };
 }
 

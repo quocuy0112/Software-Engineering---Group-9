@@ -7,6 +7,7 @@ const cursorSchema = z
     v: z.literal(1),
     sort: jobSortSchema,
     score: z.number().finite().optional(),
+    urgent: z.boolean().optional(),
     publishedAt: z.string().datetime(),
     salaryMaximum: z
       .string()
@@ -31,6 +32,18 @@ export function normalizeSearchText(value: string, maximum = 200): string {
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim()
     .replace(/\s+/gu, " ");
+}
+
+/**
+ * Public job locations are projected as "district, city" before being
+ * normalized. Compose the same canonical value for a district-level filter
+ * so it can be matched exactly instead of as a broad text fragment.
+ */
+export function normalizedDistrictLocation(
+  city: string,
+  district: string,
+): string {
+  return [district, city].filter(Boolean).join(" ");
 }
 
 export function encodeJobCursor(cursor: JobSearchCursor): string {

@@ -16,6 +16,7 @@ import {
   jobSearchQuerySchema,
   type JobCard,
 } from "@/shared/contracts/jobs/discovery";
+import { listJobSearchTaxonomy } from "./job-search-taxonomy";
 import {
   computeDiscoveryJobs,
   computeRelatedJobs,
@@ -69,6 +70,10 @@ export function parseJobSearchCriteria(raw: unknown): NormalizedJobSearch {
     normalizedQuery: normalizeSearchText(parsed.q),
     searchBy: parsed.searchBy,
     normalizedLocation: normalizeSearchText(parsed.location, 160),
+    normalizedDistricts: parsed.district.map((district) =>
+      normalizeSearchText(district, 160),
+    ),
+    categoryFamily: parsed.categoryFamily,
     normalizedSkills: parsed.skills.map((skill) =>
       normalizeSearchText(skill, 80),
     ),
@@ -289,8 +294,21 @@ export class JobDiscoveryService {
       new (
         await import("@/backend/repositories/jobs/prisma-public-job-repository")
       ).PrismaPublicJobRepository();
+    const taxonomy = criteria.categoryFamily?.length
+      ? await listJobSearchTaxonomy()
+      : null;
+    const normalizedCategoryNames = taxonomy
+      ? taxonomy.industries
+          .filter((industry) =>
+            criteria.categoryFamily?.includes(industry.code),
+          )
+          .map((industry) => normalizeSearchText(industry.name, 160))
+      : undefined;
+    const repositoryCriteria = normalizedCategoryNames?.length
+      ? { ...criteria, normalizedCategoryNames }
+      : criteria;
     const result = await repository.search(
-      criteria,
+      repositoryCriteria,
       actor.kind === "user" ? actor.userId : null,
       now,
     );
@@ -304,6 +322,8 @@ export class JobDiscoveryService {
         q: criteria.normalizedQuery,
         searchBy: criteria.searchBy,
         location: criteria.normalizedLocation,
+        district: criteria.normalizedDistricts,
+        categoryFamily: criteria.categoryFamily,
         employmentType: criteria.employmentType,
         experienceLevel: criteria.experienceLevel,
         workArrangement: criteria.workArrangement,

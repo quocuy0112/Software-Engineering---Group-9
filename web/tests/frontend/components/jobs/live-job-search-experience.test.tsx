@@ -84,31 +84,20 @@ afterEach(() => {
 });
 
 describe("live job search experience", () => {
-  it("debounces text input and synchronizes the filter to the URL", async () => {
-    vi.useFakeTimers();
+  it("updates the search mode and synchronizes the filter to the URL", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response(3));
     vi.stubGlobal("fetch", fetchMock);
     renderExperience();
 
-    fireEvent.change(screen.getByLabelText("Keywords"), {
-      target: { value: "React" },
-    });
-    expect(window.location.search).toBe("?q=React");
-    expect(fetchMock).not.toHaveBeenCalled();
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(399);
-    });
-    expect(fetchMock).not.toHaveBeenCalled();
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(1);
-    });
+    fireEvent.click(screen.getByRole("button", { name: "Job title" }));
+    expect(window.location.search).toBe("?searchBy=TITLE");
     expect(fetchMock).toHaveBeenCalledWith(
-      "/api/jobs?q=React",
+      "/api/jobs?searchBy=TITLE",
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
-    expect(screen.getAllByText("3 matching jobs").at(0)).toBeVisible();
+    await waitFor(() =>
+      expect(screen.getAllByText("3 matching jobs").at(0)).toBeVisible(),
+    );
   });
 
   it("keeps only the latest response when filters change quickly", async () => {
@@ -124,9 +113,7 @@ describe("live job search experience", () => {
     vi.stubGlobal("fetch", fetchMock);
     renderExperience();
 
-    fireEvent.change(screen.getByLabelText("Employment type"), {
-      target: { value: "FULL_TIME" },
-    });
+    fireEvent.click(screen.getByLabelText("Full-time"));
     fireEvent.change(screen.getByLabelText("Work arrangement"), {
       target: { value: "REMOTE" },
     });

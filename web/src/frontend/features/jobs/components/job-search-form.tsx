@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
 
 export type JobSearchCriteria = Partial<
   Record<string, string | string[] | number | undefined>
@@ -27,6 +28,7 @@ type JobSearchFormProps = Readonly<{
   onClear?: () => void;
   resultCount?: number;
   isLoading?: boolean;
+  taxonomy?: JobSearchTaxonomy;
 }>;
 
 const valueLabels: Record<string, string> = {
@@ -211,6 +213,7 @@ export function JobSearchForm({
   onClear,
   resultCount,
   isLoading = false,
+  taxonomy,
 }: JobSearchFormProps) {
   const locale = useWorkspaceLocale();
   const vi = locale === "vi";
@@ -274,6 +277,9 @@ export function JobSearchForm({
     [criteria, locale],
   );
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const [customSalaryMin, setCustomSalaryMin] = useState("");
+  const [customSalaryMax, setCustomSalaryMax] = useState("");
   const drawer = useRef<HTMLElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const form = useRef<HTMLFormElement>(null);
@@ -361,6 +367,63 @@ export function JobSearchForm({
     else delete next[name];
     onCriteriaChange(next, trigger);
   };
+
+  const selectedValues = (name: string) => {
+    const value = criteria[name];
+    return Array.isArray(value) ? value : value ? [String(value)] : [];
+  };
+
+  const toggleCriterionValue = (name: string, value: string) => {
+    if (!onCriteriaChange) return;
+    const current = selectedValues(name);
+    const next = current.includes(value)
+      ? current.filter((item) => item !== value)
+      : [...current, value];
+    onCriteriaChange(
+      next.length
+        ? { ...criteria, [name]: next }
+        : removeCriterion(criteria, name),
+      "immediate",
+    );
+  };
+
+  const setSalaryRange = (minimum?: number, maximum?: number) => {
+    if (!onCriteriaChange) return;
+    const next = { ...criteria };
+    if (minimum === undefined) delete next.salaryMin;
+    else next.salaryMin = String(minimum);
+    if (maximum === undefined) delete next.salaryMax;
+    else next.salaryMax = String(maximum);
+    onCriteriaChange(next, "immediate");
+  };
+
+  const categories = taxonomy?.industries ?? [];
+  const visibleCategories = showAllCategories
+    ? categories
+    : categories.slice(0, 5);
+  const selectedEmployment = selectedValues("employmentType")[0] ?? "";
+  const selectedExperience = selectedValues("experienceLevel");
+  const selectedCategories = selectedValues("categoryFamily");
+  const salaryMinimum = Number(one(criteria.salaryMin) || 0);
+  const salaryMaximum = Number(one(criteria.salaryMax) || 0);
+  const selectedSalaryPreset: string =
+    !salaryMinimum && !salaryMaximum
+      ? "all"
+      : salaryMaximum === 10_000_000
+        ? "under-10"
+        : salaryMinimum === 10_000_000 && salaryMaximum === 15_000_000
+          ? "10-15"
+          : salaryMinimum === 15_000_000 && salaryMaximum === 20_000_000
+            ? "15-20"
+            : salaryMinimum === 20_000_000 && salaryMaximum === 25_000_000
+              ? "20-25"
+              : salaryMinimum === 25_000_000 && salaryMaximum === 30_000_000
+                ? "25-30"
+                : salaryMinimum === 30_000_000 && salaryMaximum === 50_000_000
+                  ? "30-50"
+                  : salaryMinimum === 50_000_000 && !salaryMaximum
+                    ? "over-50"
+                    : "custom";
 
   const countText =
     resultCount === undefined
@@ -486,81 +549,403 @@ export function JobSearchForm({
             </button>
           </header>
           <p className="job-filter-copy">{copy.intro}</p>
-          <div className="job-filter-fields">
-            <label>
-              {copy.keywords}
-              <input
-                name="q"
-                type="search"
-                maxLength={200}
-                placeholder={copy.keywordPlaceholder}
-                {...valueProps("q")}
-                onChange={(event) =>
-                  updateCriterion("q", event.currentTarget.value, "debounced")
-                }
-              />
-            </label>
-            <label>
-              {copy.location}
-              <input
-                name="location"
-                maxLength={160}
-                placeholder="Ho Chi Minh City"
-                {...valueProps("location")}
-                onChange={(event) =>
-                  updateCriterion(
-                    "location",
-                    event.currentTarget.value,
-                    "debounced",
-                  )
-                }
-              />
-            </label>
-            <label>
-              {copy.employment}
-              <select
-                name="employmentType"
-                {...valueProps("employmentType")}
-                onChange={(event) =>
-                  updateCriterion(
-                    "employmentType",
-                    event.currentTarget.value,
-                    "immediate",
-                  )
-                }
-              >
-                <option value="">{copy.any}</option>
-                <option value="FULL_TIME">{optionLabel("FULL_TIME")}</option>
-                <option value="PART_TIME">{optionLabel("PART_TIME")}</option>
-                <option value="CONTRACT">{optionLabel("CONTRACT")}</option>
-                <option value="INTERNSHIP">{optionLabel("INTERNSHIP")}</option>
-                <option value="TEMPORARY">{optionLabel("TEMPORARY")}</option>
-              </select>
-            </label>
-            <label>
-              {copy.experience}
-              <select
-                name="experienceLevel"
-                {...valueProps("experienceLevel")}
-                onChange={(event) =>
-                  updateCriterion(
-                    "experienceLevel",
-                    event.currentTarget.value,
-                    "immediate",
-                  )
-                }
-              >
-                <option value="">{copy.any}</option>
-                <option value="ENTRY">{optionLabel("ENTRY")}</option>
-                <option value="JUNIOR">Junior</option>
-                <option value="MID">{optionLabel("MID")}</option>
-                <option value="SENIOR">{optionLabel("SENIOR")}</option>
-                <option value="LEAD">{optionLabel("LEAD")}</option>
-                <option value="MANAGER">{optionLabel("MANAGER")}</option>
-              </select>
-            </label>
-            <label>
-              {copy.arrangement}
+          {false ? (
+            <div className="job-filter-fields">
+              <label>
+                {copy.keywords}
+                <input
+                  name="q"
+                  type="search"
+                  maxLength={200}
+                  placeholder={copy.keywordPlaceholder}
+                  {...valueProps("q")}
+                  onChange={(event) =>
+                    updateCriterion("q", event.currentTarget.value, "debounced")
+                  }
+                />
+              </label>
+              <label>
+                {copy.location}
+                <input
+                  name="location"
+                  maxLength={160}
+                  placeholder="Ho Chi Minh City"
+                  {...valueProps("location")}
+                  onChange={(event) =>
+                    updateCriterion(
+                      "location",
+                      event.currentTarget.value,
+                      "debounced",
+                    )
+                  }
+                />
+              </label>
+              <label>
+                {copy.employment}
+                <select
+                  name="employmentType"
+                  {...valueProps("employmentType")}
+                  onChange={(event) =>
+                    updateCriterion(
+                      "employmentType",
+                      event.currentTarget.value,
+                      "immediate",
+                    )
+                  }
+                >
+                  <option value="">{copy.any}</option>
+                  <option value="FULL_TIME">{optionLabel("FULL_TIME")}</option>
+                  <option value="PART_TIME">{optionLabel("PART_TIME")}</option>
+                  <option value="CONTRACT">{optionLabel("CONTRACT")}</option>
+                  <option value="INTERNSHIP">
+                    {optionLabel("INTERNSHIP")}
+                  </option>
+                  <option value="TEMPORARY">{optionLabel("TEMPORARY")}</option>
+                </select>
+              </label>
+              <label>
+                {copy.experience}
+                <select
+                  name="experienceLevel"
+                  {...valueProps("experienceLevel")}
+                  onChange={(event) =>
+                    updateCriterion(
+                      "experienceLevel",
+                      event.currentTarget.value,
+                      "immediate",
+                    )
+                  }
+                >
+                  <option value="">{copy.any}</option>
+                  <option value="ENTRY">{optionLabel("ENTRY")}</option>
+                  <option value="JUNIOR">Junior</option>
+                  <option value="MID">{optionLabel("MID")}</option>
+                  <option value="SENIOR">{optionLabel("SENIOR")}</option>
+                  <option value="LEAD">{optionLabel("LEAD")}</option>
+                  <option value="MANAGER">{optionLabel("MANAGER")}</option>
+                </select>
+              </label>
+              <label>
+                {copy.arrangement}
+                <select
+                  name="workArrangement"
+                  {...valueProps("workArrangement")}
+                  onChange={(event) =>
+                    updateCriterion(
+                      "workArrangement",
+                      event.currentTarget.value,
+                      "immediate",
+                    )
+                  }
+                >
+                  <option value="">{copy.any}</option>
+                  <option value="ONSITE">{optionLabel("ONSITE")}</option>
+                  <option value="HYBRID">{optionLabel("HYBRID")}</option>
+                  <option value="REMOTE">{optionLabel("REMOTE")}</option>
+                </select>
+              </label>
+              <label>
+                {copy.salaryMin}
+                <input
+                  name="salaryMin"
+                  type="number"
+                  min="0"
+                  inputMode="numeric"
+                  {...valueProps("salaryMin")}
+                  onChange={(event) =>
+                    updateCriterion(
+                      "salaryMin",
+                      event.currentTarget.value,
+                      "debounced",
+                    )
+                  }
+                />
+              </label>
+              <label>
+                {copy.salaryMax}
+                <input
+                  name="salaryMax"
+                  type="number"
+                  min="0"
+                  inputMode="numeric"
+                  {...valueProps("salaryMax")}
+                  onChange={(event) =>
+                    updateCriterion(
+                      "salaryMax",
+                      event.currentTarget.value,
+                      "debounced",
+                    )
+                  }
+                />
+              </label>
+              <label>
+                {copy.skill}
+                <input
+                  name="skills"
+                  maxLength={80}
+                  placeholder="TypeScript"
+                  {...valueProps("skills")}
+                  onChange={(event) =>
+                    updateCriterion(
+                      "skills",
+                      event.currentTarget.value,
+                      "debounced",
+                    )
+                  }
+                />
+              </label>
+              <label>
+                {copy.posted}
+                <select
+                  name="postedWithinDays"
+                  {...valueProps("postedWithinDays")}
+                  onChange={(event) =>
+                    updateCriterion(
+                      "postedWithinDays",
+                      event.currentTarget.value,
+                      "immediate",
+                    )
+                  }
+                >
+                  <option value="">{copy.anyTime}</option>
+                  <option value="1">{optionLabel("1")}</option>
+                  <option value="3">{optionLabel("3")}</option>
+                  <option value="7">{optionLabel("7")}</option>
+                  <option value="14">{optionLabel("14")}</option>
+                  <option value="30">{optionLabel("30")}</option>
+                </select>
+              </label>
+              <label>
+                {copy.sort}
+                <select
+                  name="sort"
+                  value={live ? one(criteria.sort) || "RELEVANCE" : undefined}
+                  defaultValue={
+                    live ? undefined : one(criteria.sort) || "RELEVANCE"
+                  }
+                  onChange={(event) =>
+                    updateCriterion(
+                      "sort",
+                      event.currentTarget.value,
+                      "immediate",
+                    )
+                  }
+                >
+                  <option value="RELEVANCE">{optionLabel("RELEVANCE")}</option>
+                  <option value="NEWEST">{optionLabel("NEWEST")}</option>
+                  <option value="SALARY_DESC">
+                    {optionLabel("SALARY_DESC")}
+                  </option>
+                </select>
+              </label>
+            </div>
+          ) : null}
+          <div className="job-filter-fields job-filter-fields--redesigned">
+            <fieldset className="job-filter-section">
+              <legend>{vi ? "Lọc theo danh mục nghề" : "Job category"}</legend>
+              <div className="job-filter-option-list">
+                {visibleCategories.map((category) => (
+                  <label className="job-filter-option" key={category.code}>
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.includes(category.code)}
+                      onChange={() =>
+                        toggleCriterionValue("categoryFamily", category.code)
+                      }
+                    />
+                    <span>{category.name}</span>
+                    <small>
+                      (
+                      {new Intl.NumberFormat(vi ? "vi-VN" : "en-US").format(
+                        category.count,
+                      )}
+                      )
+                    </small>
+                  </label>
+                ))}
+              </div>
+              {categories.length > 5 ? (
+                <button
+                  className="job-filter-show-more"
+                  type="button"
+                  onClick={() => setShowAllCategories((current) => !current)}
+                >
+                  {showAllCategories
+                    ? vi
+                      ? "Thu gọn"
+                      : "Show less"
+                    : vi
+                      ? "Xem thêm"
+                      : "Show more"}
+                </button>
+              ) : null}
+            </fieldset>
+
+            <fieldset className="job-filter-section">
+              <legend>{vi ? "Mức lương" : "Salary"}</legend>
+              <div className="job-filter-option-grid job-filter-option-grid--salary">
+                {[
+                  ["all", vi ? "Tất cả" : "All", undefined, undefined],
+                  [
+                    "under-10",
+                    vi ? "Dưới 10 triệu" : "Under 10M",
+                    undefined,
+                    10_000_000,
+                  ],
+                  ["10-15", "10 - 15 triệu", 10_000_000, 15_000_000],
+                  ["15-20", "15 - 20 triệu", 15_000_000, 20_000_000],
+                  ["20-25", "20 - 25 triệu", 20_000_000, 25_000_000],
+                  ["25-30", "25 - 30 triệu", 25_000_000, 30_000_000],
+                  ["30-50", "30 - 50 triệu", 30_000_000, 50_000_000],
+                  [
+                    "over-50",
+                    vi ? "Trên 50 triệu" : "Over 50M",
+                    50_000_000,
+                    undefined,
+                  ],
+                ].map(([value, label, minimum, maximum]) => (
+                  <label className="job-filter-option" key={String(value)}>
+                    <input
+                      type="radio"
+                      name="salary-preset"
+                      checked={selectedSalaryPreset === value}
+                      onChange={() =>
+                        setSalaryRange(
+                          minimum as number | undefined,
+                          maximum as number | undefined,
+                        )
+                      }
+                    />
+                    <span>{label}</span>
+                  </label>
+                ))}
+                <label className="job-filter-option">
+                  <input
+                    type="radio"
+                    name="salary-preset"
+                    checked={selectedSalaryPreset === "negotiable"}
+                    onChange={() => setSalaryRange()}
+                  />
+                  <span>{vi ? "Thoả thuận" : "Negotiable"}</span>
+                </label>
+              </div>
+              <div className="job-filter-custom-salary">
+                <label>
+                  <span>{vi ? "Từ" : "From"}</span>
+                  <input
+                    type="number"
+                    min="0"
+                    inputMode="numeric"
+                    placeholder="0"
+                    value={customSalaryMin}
+                    onChange={(event) =>
+                      setCustomSalaryMin(event.currentTarget.value)
+                    }
+                  />
+                </label>
+                <span aria-hidden="true">–</span>
+                <label>
+                  <span>{vi ? "Đến" : "To"}</span>
+                  <input
+                    type="number"
+                    min="0"
+                    inputMode="numeric"
+                    placeholder="0"
+                    value={customSalaryMax}
+                    onChange={(event) =>
+                      setCustomSalaryMax(event.currentTarget.value)
+                    }
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSalaryRange(
+                      customSalaryMin
+                        ? Number(customSalaryMin) * 1_000_000
+                        : undefined,
+                      customSalaryMax
+                        ? Number(customSalaryMax) * 1_000_000
+                        : undefined,
+                    )
+                  }
+                >
+                  {vi ? "Áp dụng" : "Apply"}
+                </button>
+              </div>
+            </fieldset>
+
+            <fieldset className="job-filter-section">
+              <legend>{vi ? "Loại hình làm việc" : "Employment type"}</legend>
+              <div className="job-filter-option-grid">
+                {[
+                  ["", vi ? "Tất cả" : "All"],
+                  ["FULL_TIME", vi ? "Toàn thời gian" : "Full-time"],
+                  ["PART_TIME", vi ? "Bán thời gian" : "Part-time"],
+                  ["INTERNSHIP", vi ? "Thực tập" : "Internship"],
+                  ["OTHER", vi ? "Khác" : "Other"],
+                ].map(([value, label]) => (
+                  <label className="job-filter-option" key={value}>
+                    <input
+                      type="radio"
+                      name="employment-type"
+                      checked={
+                        value === "OTHER"
+                          ? selectedEmployment === "CONTRACT" ||
+                            selectedEmployment === "TEMPORARY"
+                          : selectedEmployment === value
+                      }
+                      onChange={() => {
+                        if (value === "OTHER")
+                          onCriteriaChange?.(
+                            {
+                              ...criteria,
+                              employmentType: ["CONTRACT", "TEMPORARY"],
+                            },
+                            "immediate",
+                          );
+                        else
+                          updateCriterion("employmentType", value, "immediate");
+                      }}
+                    />
+                    <span>{label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset className="job-filter-section">
+              <legend>{vi ? "Kinh nghiệm" : "Experience"}</legend>
+              <div className="job-filter-option-grid job-filter-option-grid--experience">
+                {[
+                  ["ENTRY", vi ? "Không yêu cầu" : "No requirement"],
+                  ["JUNIOR", vi ? "Dưới 1 năm" : "Under 1 year"],
+                  ["JUNIOR", "1 năm"],
+                  ["MID", "2 năm"],
+                  ["MID", "3 năm"],
+                  ["SENIOR", "4 năm"],
+                  ["SENIOR", "5 năm"],
+                  ["LEAD", vi ? "Trên 5 năm" : "Over 5 years"],
+                ].map(([value, label], index) => (
+                  <label
+                    className="job-filter-option"
+                    key={`${value}-${label}`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedExperience.includes(value)}
+                      onChange={() =>
+                        toggleCriterionValue("experienceLevel", value)
+                      }
+                    />
+                    <span>{label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <label className="job-filter-standard-control">
+              <span>{copy.arrangement}</span>
               <select
                 name="workArrangement"
                 {...valueProps("workArrangement")}
@@ -578,42 +963,8 @@ export function JobSearchForm({
                 <option value="REMOTE">{optionLabel("REMOTE")}</option>
               </select>
             </label>
-            <label>
-              {copy.salaryMin}
-              <input
-                name="salaryMin"
-                type="number"
-                min="0"
-                inputMode="numeric"
-                {...valueProps("salaryMin")}
-                onChange={(event) =>
-                  updateCriterion(
-                    "salaryMin",
-                    event.currentTarget.value,
-                    "debounced",
-                  )
-                }
-              />
-            </label>
-            <label>
-              {copy.salaryMax}
-              <input
-                name="salaryMax"
-                type="number"
-                min="0"
-                inputMode="numeric"
-                {...valueProps("salaryMax")}
-                onChange={(event) =>
-                  updateCriterion(
-                    "salaryMax",
-                    event.currentTarget.value,
-                    "debounced",
-                  )
-                }
-              />
-            </label>
-            <label>
-              {copy.skill}
+            <label className="job-filter-standard-control">
+              <span>{copy.skill}</span>
               <input
                 name="skills"
                 maxLength={80}
@@ -627,50 +978,6 @@ export function JobSearchForm({
                   )
                 }
               />
-            </label>
-            <label>
-              {copy.posted}
-              <select
-                name="postedWithinDays"
-                {...valueProps("postedWithinDays")}
-                onChange={(event) =>
-                  updateCriterion(
-                    "postedWithinDays",
-                    event.currentTarget.value,
-                    "immediate",
-                  )
-                }
-              >
-                <option value="">{copy.anyTime}</option>
-                <option value="1">{optionLabel("1")}</option>
-                <option value="3">{optionLabel("3")}</option>
-                <option value="7">{optionLabel("7")}</option>
-                <option value="14">{optionLabel("14")}</option>
-                <option value="30">{optionLabel("30")}</option>
-              </select>
-            </label>
-            <label>
-              {copy.sort}
-              <select
-                name="sort"
-                value={live ? one(criteria.sort) || "RELEVANCE" : undefined}
-                defaultValue={
-                  live ? undefined : one(criteria.sort) || "RELEVANCE"
-                }
-                onChange={(event) =>
-                  updateCriterion(
-                    "sort",
-                    event.currentTarget.value,
-                    "immediate",
-                  )
-                }
-              >
-                <option value="RELEVANCE">{optionLabel("RELEVANCE")}</option>
-                <option value="NEWEST">{optionLabel("NEWEST")}</option>
-                <option value="SALARY_DESC">
-                  {optionLabel("SALARY_DESC")}
-                </option>
-              </select>
             </label>
           </div>
           <div className="job-filter-actions">

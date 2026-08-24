@@ -113,7 +113,9 @@ type JobCatalog = {
 let catalogPromise: Promise<JobCatalog> | undefined;
 
 async function readCatalog(): Promise<JobCatalog> {
-  catalogPromise ??= Promise.all([
+  if (catalogPromise) return catalogPromise;
+
+  const pendingCatalog = Promise.all([
     workspaceJobsRepository.read(),
     workspaceCompaniesRepository.read(),
   ]).then(async ([jobValues, companyValues]) => {
@@ -192,6 +194,10 @@ async function readCatalog(): Promise<JobCatalog> {
       jobs: selectedJobs,
       companies: new Map(companies.map((company) => [company.id, company])),
     };
+  });
+  catalogPromise = pendingCatalog;
+  void pendingCatalog.catch(() => {
+    if (catalogPromise === pendingCatalog) catalogPromise = undefined;
   });
   return catalogPromise;
 }
