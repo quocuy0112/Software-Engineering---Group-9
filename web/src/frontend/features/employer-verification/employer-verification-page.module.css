@@ -1,14 +1,20 @@
 .page {
-  --ev-bg: #f1f3fa;
-  --ev-card: #ffffff;
-  --ev-border: #e5e8f2;
-  --ev-ink: #10142b;
-  --ev-ink-soft: #6c7288;
-  --ev-ink-faint: #9aa0b4;
-  --ev-accent: #4453e8;
-  --ev-accent-soft: #edeffc;
-  --ev-good: #12946b;
-  --ev-good-soft: #e7f7f1;
+  --ev-bg: var(--sh-color-surface-page);
+  --ev-card: var(--sh-color-surface-card);
+  --ev-border: var(--sh-color-border-subtle);
+  --ev-ink: var(--sh-color-text-primary);
+  --ev-ink-soft: var(--sh-color-text-secondary);
+  --ev-ink-faint: var(--sh-color-text-muted);
+  --ev-accent: var(--sh-color-brand-primary);
+  --ev-accent-soft: var(--sh-color-brand-soft);
+  --ev-good: var(--sh-color-success);
+  --ev-good-soft: var(--sh-color-success-bg);
+  --ev-warning: var(--sh-color-warning);
+  --ev-warning-soft: var(--sh-color-warning-bg);
+  --ev-danger: var(--sh-color-error);
+  --ev-danger-soft: var(--sh-color-error-bg);
+  --ev-info: var(--sh-color-info);
+  --ev-info-soft: var(--sh-color-info-bg);
 
   width: min(100%, 1080px);
   margin: 0 auto;
@@ -412,7 +418,7 @@
 }
 
 .primaryButton:hover:not(:disabled) {
-  background: #3947d2;
+  background: var(--sh-color-brand-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -474,7 +480,7 @@
 
 .trustHead p {
   margin: 0;
-  color: #3a7a5e;
+  color: var(--ev-good);
   font-size: 11.5px;
   line-height: 1.45;
 }
@@ -530,8 +536,8 @@
 }
 
 .signalNum2 {
-  color: #8a4de0;
-  background: #f2ecfc;
+  color: var(--ev-info);
+  background: var(--ev-info-soft);
 }
 
 .signalNum3 {
@@ -660,13 +666,13 @@
 }
 
 .statusBadge[data-tone="info"] {
-  color: var(--ev-accent);
-  background: #eff1ff;
+  color: var(--ev-info);
+  background: var(--ev-info-soft);
 }
 
 .statusBadge[data-tone="warning"] {
-  color: #a16a00;
-  background: #fff6d8;
+  color: var(--ev-warning);
+  background: var(--ev-warning-soft);
 }
 
 .statusBadge[data-tone="success"] {
@@ -675,8 +681,8 @@
 }
 
 .statusBadge[data-tone="danger"] {
-  color: #b42318;
-  background: #fff0ee;
+  color: var(--ev-danger);
+  background: var(--ev-danger-soft);
 }
 
 .applicationMeta {
@@ -715,7 +721,7 @@
   gap: 12px;
   padding: 16px;
   border-top: 1px solid var(--ev-border);
-  background: #fff8df;
+  background: var(--ev-warning-soft);
 }
 
 .histEmpty {

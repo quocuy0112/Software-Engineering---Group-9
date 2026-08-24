@@ -12,9 +12,6 @@ export function JobBoardHeader({ authenticated }: { authenticated: boolean }) {
 
         <div className="job-board-header-actions">
           <nav className="job-board-navigation" aria-label="Job board">
-            <Link href="/jobs">Browse jobs</Link>
-            <Link href="#global-image-search">Image search</Link>
-
             {authenticated ? (
               <>
                 <Link href="/dashboard">Dashboard</Link>

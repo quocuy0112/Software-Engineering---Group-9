@@ -30,6 +30,7 @@ export function WorkspaceNavigation({
           closeMenu: "Đóng menu không gian làm việc",
           signOut: "Đăng xuất",
           signingOut: "Đang đăng xuất…",
+          findJobs: "Tìm việc",
           savedJobs: "Việc đã lưu",
           applications: "Việc đã ứng tuyển",
           suggestedJobs: "Việc làm đề xuất",
@@ -48,6 +49,7 @@ export function WorkspaceNavigation({
           closeMenu: "Close workspace menu",
           signOut: "Sign out",
           signingOut: "Signing out…",
+          findJobs: "Find Jobs",
           savedJobs: "Saved Jobs",
           applications: "Applications",
           suggestedJobs: "Suggested Jobs",
@@ -65,6 +67,7 @@ export function WorkspaceNavigation({
     { href: "/profile", label: copy.profile, icon: "profile" },
   ] as const;
   const jobsSubnav = [
+    { href: "/jobs", label: copy.findJobs },
     { href: "/jobs/saved", label: copy.savedJobs },
     { href: "/jobs/matches", label: copy.suggestedJobs },
     { href: "/jobs/settings", label: copy.recommendationSettings },
@@ -165,8 +168,10 @@ export function WorkspaceNavigation({
                   <div className="workspace-navigation-subnav">
                     {jobsSubnav.map((subnav) => {
                       const subnavActive =
-                        pathname === subnav.href ||
-                        pathname.startsWith(`${subnav.href}/`);
+                        subnav.href === "/jobs"
+                          ? pathname === "/jobs"
+                          : pathname === subnav.href ||
+                            pathname.startsWith(`${subnav.href}/`);
                       return (
                         <Link
                           key={subnav.href}

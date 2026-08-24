@@ -65,7 +65,7 @@ function Icon({
     | "arrow"
     | "edit"
     | "close"
-    | "check";
+    | "lock";
 }) {
   const paths = {
     briefcase: (
@@ -111,6 +111,12 @@ function Icon({
       </>
     ),
     close: <path d="M6 6l12 12M18 6 6 18" />,
+    lock: (
+      <>
+        <rect width="16" height="12" x="4" y="10" rx="2" />
+        <path d="M8 10V7a4 4 0 0 1 8 0v3M12 15v2" />
+      </>
+    ),
     check: <path d="m5 12 4 4L19 6" />,
     warning: (
       <>
@@ -490,26 +496,36 @@ function CompanyProfileRequiredState({
     logo: "Company logo",
   };
   return (
-    <section className="recruiter-empty-state recruiter-company-required">
-      <span className="recruiter-empty-state__icon">
+    <section className="recruiter-company-required">
+      <span className="recruiter-company-required__illustration" aria-hidden="true">
         <Icon name="briefcase" />
+        <span className="recruiter-company-required__lock">
+          <Icon name="lock" />
+        </span>
       </span>
-      <div>
+      <div className="recruiter-company-required__content">
+        <span className="recruiter-company-required__eyebrow">
+          Action required
+        </span>
         <h2>Complete company profile before posting</h2>
         <p>
           Create job posting is locked until the following fields are complete.
         </p>
         <ul className="recruiter-company-required__list">
           {missingFields.map((field) => (
-            <li key={field}>{labels[field]}</li>
+            <li key={field}>
+              <Icon name="warning" />
+              <span>{labels[field]}</span>
+            </li>
           ))}
         </ul>
       </div>
       <Link
-        className="recruiter-primary-button"
+        className="recruiter-company-required__action"
         href="/recruiter/company-settings?required=profile"
       >
         Open company settings
+        <Icon name="arrow" />
       </Link>
     </section>
   );

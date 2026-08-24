@@ -71,7 +71,7 @@ describe("job board navigation", () => {
     }
   });
 
-  it("gives visitors direct browse and authentication paths", () => {
+  it("gives visitors focused authentication paths without redundant navigation", () => {
     render(<JobBoardHeader authenticated={false} />);
 
     expect(
@@ -80,10 +80,12 @@ describe("job board navigation", () => {
       }),
     ).toBeVisible();
 
-    expect(screen.getByRole("link", { name: /browse jobs/i })).toHaveAttribute(
-      "href",
-      "/jobs",
-    );
+    expect(
+      screen.queryByRole("link", { name: /browse jobs/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: /image search/i }),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: /sign in/i })).toHaveAttribute(
       "href",
       "/login?returnTo=%2Fjobs",

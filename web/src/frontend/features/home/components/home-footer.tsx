@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CircleCheck } from "lucide-react";
 import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
 import { homeCopy } from "../home-copy";
 import type { HomeLocale } from "../home-page-model";
@@ -41,17 +42,26 @@ export function HomeFooter({
             {copy.footer.information}
           </span>
           <div className="home-footer-links">
+            <Link href="/help">{copy.footer.support}</Link>
             <Link href="/legal/ai-cv-analysis-policy">
               {copy.footer.aiCvPolicy}
             </Link>
           </div>
         </nav>
       </div>
+      <div className="home-footer-ai-notice">
+        <CircleCheck aria-hidden="true" />
+        <p>{copy.footer.aiNotice}</p>
+      </div>
       <div className="home-footer-meta">
         <p>
           {copy.footer.copyright.replace("{year}", copyrightYear)}
         </p>
-        <p>{copy.footer.aiNotice}</p>
+        <nav aria-label={copy.footer.informationLabel}>
+          <Link href="/legal/privacy">{copy.footer.privacy}</Link>
+          <Link href="/legal/terms">{copy.footer.terms}</Link>
+          <Link href="/legal/cookies">{copy.footer.cookies}</Link>
+        </nav>
       </div>
     </footer>
   );

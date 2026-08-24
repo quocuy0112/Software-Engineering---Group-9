@@ -13,9 +13,11 @@
 .recruitment-messaging__thread header p {
   margin: 0;
   color: #3158d8;
-  font-size: 0.74rem;
-  font-weight: 800;
+  font-family: var(--sh-font-family);
+  font-size: 11.5px;
+  font-weight: var(--sh-font-weight-bold);
   letter-spacing: 0.1em;
+  line-height: var(--sh-line-height-caption);
   text-transform: uppercase;
 }
 .recruitment-messaging__header h1,
@@ -24,7 +26,12 @@
   letter-spacing: -0.035em;
 }
 .recruitment-messaging__header h1 {
-  font-size: clamp(1.7rem, 3vw, 2.25rem);
+  color: var(--sh-color-text-primary);
+  font-family: var(--sh-font-family);
+  font-size: 24px;
+  font-weight: var(--sh-font-weight-bold);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
 }
 .recruitment-messaging__header span,
 .recruitment-messaging__thread header span,
@@ -32,6 +39,12 @@
 .recruitment-messaging__list button span {
   display: block;
   color: #61708f;
+}
+.recruitment-messaging__header span {
+  font-family: var(--sh-font-family);
+  font-size: 13px;
+  font-weight: var(--sh-font-weight-regular);
+  line-height: 1.5;
 }
 .recruitment-messaging__grid {
   display: grid;
@@ -474,6 +487,114 @@
   margin: 0;
   justify-self: auto;
   white-space: nowrap;
+}
+
+/* The messaging workspace predates the shared semantic tokens. Keep its
+ * light presentation intact, while mapping all conversation surfaces to the
+ * active theme in dark mode. */
+:root[data-theme="dark"] .recruitment-messaging {
+  color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__header h1,
+:root[data-theme="dark"] .recruitment-messaging__thread h2,
+:root[data-theme="dark"] .recruitment-chat-header h1,
+:root[data-theme="dark"] .recruitment-chat-header h2 {
+  color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__header span,
+:root[data-theme="dark"] .recruitment-messaging__thread header span,
+:root[data-theme="dark"] .recruitment-messaging__list small,
+:root[data-theme="dark"] .recruitment-messaging__list button span,
+:root[data-theme="dark"] .recruitment-chat-header span,
+:root[data-theme="dark"] .recruitment-messaging__empty {
+  color: var(--sh-color-text-secondary);
+}
+
+/* Shared recruiter page-header rhythm. */
+.recruitment-messaging--recruiter .recruitment-messaging__header {
+  position: relative;
+  margin: 0 0 24px;
+  padding-left: 0;
+  border-left: 0;
+}
+
+.recruitment-messaging--recruiter .recruitment-messaging__header > p {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+  color: var(--sh-color-brand-primary);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+.recruitment-messaging--recruiter .recruitment-messaging__header > p::before {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+}
+
+.recruitment-messaging--recruiter .recruitment-messaging__header h1 {
+  margin: 0 0 5px;
+  color: var(--sh-color-text-primary);
+  font-family: var(--sh-font-family-label);
+  font-size: 24px;
+  font-weight: var(--sh-font-weight-bold);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.recruitment-messaging--recruiter .recruitment-messaging__header > span {
+  color: var(--sh-color-text-secondary);
+  font-family: var(--sh-font-family-label);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+:root[data-theme="dark"] .recruitment-messaging__grid,
+:root[data-theme="dark"] .recruitment-messaging--candidate .recruitment-messaging__thread {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-card);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__list {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__thread,
+:root[data-theme="dark"] .recruitment-messaging--recruiter .recruitment-messaging__thread > header {
+  background: var(--sh-color-surface-card);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__list label,
+:root[data-theme="dark"] .recruitment-messaging__thread form label {
+  color: var(--sh-color-text-secondary);
+}
+
+:root[data-theme="dark"] .recruitment-messaging input,
+:root[data-theme="dark"] .recruitment-messaging select,
+:root[data-theme="dark"] .recruitment-messaging textarea {
+  border-color: var(--sh-color-border-default);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__list button {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__list button.is-selected {
+  border-color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
 }
 
 @media (max-width: 520px) {

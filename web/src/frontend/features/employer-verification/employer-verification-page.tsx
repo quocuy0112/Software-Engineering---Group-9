@@ -1148,7 +1148,7 @@ export function EmployerVerificationPage({
                         />
                       </label>
                       <button
-                        className={styles.secondaryButton}
+                        className={styles.primaryButton}
                         disabled={busy === "email"}
                         type="button"
                         onClick={() => void issueEmail()}

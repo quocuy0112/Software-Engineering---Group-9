@@ -8,6 +8,7 @@ import {
   Eye,
   FileText,
   Percent,
+  Plus,
   RefreshCw,
   UserRoundX,
   UsersRound,
@@ -487,6 +488,7 @@ export function RecruiterAnalyticsOverview({
               href={recruiterRoutes.jobPostingCreate}
               className="recruiter-analytics-primary-link"
             >
+              <Plus aria-hidden="true" />
               Create a job posting
             </Link>
           </div>

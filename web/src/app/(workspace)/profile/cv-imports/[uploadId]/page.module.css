@@ -1,18 +1,18 @@
 .page {
-  --cv-bg: #f1f3fa;
-  --cv-card: #ffffff;
-  --cv-border: #e5e8f2;
-  --cv-ink: #10142b;
-  --cv-ink-soft: #6c7288;
-  --cv-ink-faint: #9aa0b4;
-  --cv-accent: #4453e8;
-  --cv-accent-soft: #edeffc;
-  --cv-good: #12946b;
-  --cv-good-soft: #e7f7f1;
-  --cv-warn: #c9820f;
-  --cv-warn-soft: #fbf1e1;
-  --cv-danger: #d9534f;
-  --cv-danger-soft: #fbeceb;
+  --cv-bg: var(--sh-color-surface-page);
+  --cv-card: var(--sh-color-surface-card);
+  --cv-border: var(--sh-color-border-subtle);
+  --cv-ink: var(--sh-color-text-primary);
+  --cv-ink-soft: var(--sh-color-text-secondary);
+  --cv-ink-faint: var(--sh-color-text-muted);
+  --cv-accent: var(--sh-color-brand-primary);
+  --cv-accent-soft: var(--sh-color-brand-soft);
+  --cv-good: var(--sh-color-success);
+  --cv-good-soft: var(--sh-color-success-bg);
+  --cv-warn: var(--sh-color-warning);
+  --cv-warn-soft: var(--sh-color-warning-bg);
+  --cv-danger: var(--sh-color-error);
+  --cv-danger-soft: var(--sh-color-error-bg);
 
   width: 100%;
   min-width: 0;
@@ -85,7 +85,7 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  border: 1px solid #bfe4d2;
+  border: 1px solid color-mix(in srgb, var(--cv-good) 44%, var(--cv-border));
   border-radius: 20px;
   color: var(--cv-good);
   background: var(--cv-good-soft);

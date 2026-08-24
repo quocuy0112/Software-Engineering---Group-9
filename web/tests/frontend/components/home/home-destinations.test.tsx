@@ -77,6 +77,10 @@ describe("Home destination map", () => {
     );
     for (const destination of [
       "/jobs",
+      "/help",
+      "/legal/privacy",
+      "/legal/terms",
+      "/legal/cookies",
       "/legal/ai-cv-analysis-policy",
       "#career-paths",
       "#jobs",
