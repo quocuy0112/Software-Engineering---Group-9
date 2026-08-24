@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 type ThreadSummary = {
   id: string;
@@ -68,6 +68,8 @@ export function RecruitmentMessagingWorkspace({
     Array<{ id: string; role: string; user: { name: string } }>
   >([]);
   const [assigneeId, setAssigneeId] = useState("");
+  const initialListHydrated = useRef(false);
+  const hasInitialItems = initialItems.length > 0;
 
   const visible = useMemo(
     () =>
@@ -80,6 +82,14 @@ export function RecruitmentMessagingWorkspace({
   );
 
   useEffect(() => {
+    // The route already authorizes and renders the initial list on the
+    // server. Avoid making the same query again during hydration; a later
+    // assignment/filter change still refreshes the list as before.
+    if (!initialListHydrated.current && hasInitialItems) {
+      initialListHydrated.current = true;
+      return;
+    }
+    initialListHydrated.current = true;
     void responseJson<{ items: ThreadSummary[] }>(
       ownerOversight
         ? "/api/recruiter/messages/oversight"
@@ -94,7 +104,7 @@ export function RecruitmentMessagingWorkspace({
         );
       })
       .catch(() => setError("Could not load recruitment conversations."));
-  }, [assignment, ownerOversight]);
+  }, [assignment, hasInitialItems, ownerOversight]);
 
   useEffect(() => {
     if (!selectedId) return;

@@ -156,7 +156,89 @@ type RecruiterCatalog = {
   rawJobs: unknown[];
   rawCompanies: unknown[];
 };
+type RecruiterCompanyCatalog = {
+  companies: RecruiterCompany[];
+  rawCompanies: unknown[];
+};
+
+// The split catalogue is intentionally large (the development fixture is
+// over 200 MB). Keep parsed data warm between route requests in a long-lived
+// server process. Tests run with NODE_ENV=test and bypass these caches so
+// their in-memory file fixtures remain deterministic.
 let catalogRead: Promise<RecruiterCatalog> | null = null;
+let companyCatalogRead: Promise<RecruiterCompanyCatalog> | null = null;
+let rawJobsRead: Promise<unknown[]> | null = null;
+let rawCompaniesRead: Promise<unknown[]> | null = null;
+let catalogReadAt = 0;
+let companyCatalogReadAt = 0;
+let rawJobsReadAt = 0;
+let rawCompaniesReadAt = 0;
+const CATALOGUE_CACHE_TTL_MS = 30_000;
+// The management projection is scoped by user and short-lived so adjacent
+// route/API requests share the same work without keeping authorization changes
+// stale for a meaningful period. All local mutations invalidate it eagerly.
+const MANAGEMENT_DATA_CACHE_TTL_MS = 5_000;
+const managementDataRead = new Map<
+  string,
+  { value: Promise<RecruiterJobManagementData>; createdAt: number }
+>();
+
+function shouldCacheCatalogue() {
+  return process.env.NODE_ENV !== "test";
+}
+
+function invalidateCatalogueCache() {
+  catalogRead = null;
+  companyCatalogRead = null;
+  rawJobsRead = null;
+  rawCompaniesRead = null;
+  catalogReadAt = 0;
+  companyCatalogReadAt = 0;
+  rawJobsReadAt = 0;
+  rawCompaniesReadAt = 0;
+  managementDataRead.clear();
+}
+
+async function readRawJobs() {
+  if (!shouldCacheCatalogue()) return jobsRepository.read();
+  if (rawJobsRead && Date.now() - rawJobsReadAt < CATALOGUE_CACHE_TTL_MS)
+    return rawJobsRead;
+
+  const next = jobsRepository.read();
+  rawJobsRead = next;
+  rawJobsReadAt = Date.now();
+  try {
+    return await next;
+  } catch (error) {
+    if (rawJobsRead === next) {
+      rawJobsRead = null;
+      rawJobsReadAt = 0;
+    }
+    throw error;
+  }
+}
+
+async function readRawCompanies() {
+  if (!shouldCacheCatalogue()) return companiesRepository.read();
+  if (
+    rawCompaniesRead &&
+    Date.now() - rawCompaniesReadAt < CATALOGUE_CACHE_TTL_MS
+  )
+    return rawCompaniesRead;
+
+  const next = companiesRepository.read();
+  rawCompaniesRead = next;
+  rawCompaniesReadAt = Date.now();
+  try {
+    return await next;
+  } catch (error) {
+    if (rawCompaniesRead === next) {
+      rawCompaniesRead = null;
+      rawCompaniesReadAt = 0;
+    }
+    throw error;
+  }
+}
 
 function withWriteLock<T>(operation: () => Promise<T>) {
   const next = writeQueue.then(operation, operation);
@@ -335,9 +417,10 @@ async function authorizedCompanies(
 }
 
 async function readCatalog() {
-  if (catalogRead) return catalogRead;
+  if (catalogRead && Date.now() - catalogReadAt < CATALOGUE_CACHE_TTL_MS)
+    return catalogRead;
 
-  catalogRead = Promise.all([jobsRepository.read(), companiesRepository.read()])
+  const next = Promise.all([readRawJobs(), readRawCompanies()])
     .then(([jobsValue, companiesValue]) => {
       const rawJobs = z.array(z.unknown()).parse(jobsValue);
       const rawCompanies = z.array(z.unknown()).parse(companiesValue);
@@ -346,11 +429,61 @@ async function readCatalog() {
       return { jobs, companies, rawJobs, rawCompanies };
     })
     .then((catalog) => catalog);
+  if (!shouldCacheCatalogue()) return next;
+
+  catalogRead = next;
+  catalogReadAt = Date.now();
   try {
     return await catalogRead;
-  } finally {
+  } catch (error) {
     catalogRead = null;
+    catalogReadAt = 0;
+    throw error;
   }
+}
+
+async function readCompanyCatalog(): Promise<RecruiterCompanyCatalog> {
+  if (
+    companyCatalogRead &&
+    Date.now() - companyCatalogReadAt < CATALOGUE_CACHE_TTL_MS
+  )
+    return companyCatalogRead;
+
+  const next = readRawCompanies().then((companiesValue) => {
+    const rawCompanies = z.array(z.unknown()).parse(companiesValue);
+    return {
+      rawCompanies,
+      companies: rawCompanies.map(normalizeCompany),
+    };
+  });
+  if (!shouldCacheCatalogue()) return next;
+
+  companyCatalogRead = next;
+  companyCatalogReadAt = Date.now();
+  try {
+    return await companyCatalogRead;
+  } catch (error) {
+    companyCatalogRead = null;
+    companyCatalogReadAt = 0;
+    throw error;
+  }
+}
+
+async function readRecruiterJobs(companyIds: ReadonlySet<string>) {
+  if (companyIds.size === 0) return [];
+
+  // Filter before the expensive Zod projection. The recruiter only needs its
+  // own postings, while the public catalogue contains tens of thousands of
+  // unrelated jobs.
+  const rawJobs = await readRawJobs();
+  return rawJobs
+    .filter((value) => {
+      if (!value || typeof value !== "object" || Array.isArray(value))
+        return false;
+      const companyId = (value as { companyId?: unknown }).companyId;
+      return typeof companyId === "string" && companyIds.has(companyId);
+    })
+    .map(normalizeJob);
 }
 
 export async function authorizeLegacyRecruiterJobs(
@@ -518,12 +651,13 @@ export async function readMockAppliedJobIds(userId: string) {
     .map((application) => application.jobId);
 }
 
-export async function readRecruiterJobManagementData(
+async function loadRecruiterJobManagementData(
   userId: string,
 ): Promise<RecruiterJobManagementData> {
-  const { jobs, companies } = await readCatalog();
+  const { companies } = await readCompanyCatalog();
   const ownedCompanies = await authorizedCompanies(companies, userId);
   const ownedCompanyIds = new Set(ownedCompanies.map((company) => company.id));
+  const jobs = await readRecruiterJobs(ownedCompanyIds);
   const companyById = new Map(
     [...companies, ...ownedCompanies].map((company) => [company.id, company]),
   );
@@ -533,13 +667,43 @@ export async function readRecruiterJobManagementData(
   const reviewAggregates = ownedJobIds.length
     ? await prisma.jobPostReviewAggregate.findMany({
         where: { jobId: { in: ownedJobIds } },
-        include: {
-          pendingVersion: true,
-          versions: { orderBy: { sequence: "desc" }, take: 1 },
+        select: {
+          jobId: true,
+          version: true,
+          pendingVersion: {
+            select: {
+              id: true,
+              sequence: true,
+              state: true,
+              reasonCode: true,
+              publicExplanation: true,
+              submittedAt: true,
+              decidedAt: true,
+            },
+          },
+          versions: {
+            orderBy: { sequence: "desc" },
+            take: 1,
+            select: {
+              id: true,
+              sequence: true,
+              state: true,
+              reasonCode: true,
+              publicExplanation: true,
+              submittedAt: true,
+              decidedAt: true,
+            },
+          },
           correctionRequests: {
             where: { state: "OPEN" },
             orderBy: { createdAt: "desc" },
             take: 1,
+            select: {
+              id: true,
+              publicExplanation: true,
+              hideImmediately: true,
+              createdAt: true,
+            },
           },
         },
       })
@@ -608,6 +772,31 @@ export async function readRecruiterJobManagementData(
     ),
     missingCompanyProfileFields: missingProfileFields,
   };
+}
+
+export async function readRecruiterJobManagementData(
+  userId: string,
+): Promise<RecruiterJobManagementData> {
+  if (!shouldCacheCatalogue()) return loadRecruiterJobManagementData(userId);
+
+  const now = Date.now();
+  const cached = managementDataRead.get(userId);
+  if (cached && now - cached.createdAt < MANAGEMENT_DATA_CACHE_TTL_MS)
+    return cached.value;
+
+  const value = loadRecruiterJobManagementData(userId);
+  managementDataRead.set(userId, { value, createdAt: now });
+  if (managementDataRead.size > 100) {
+    const oldest = managementDataRead.keys().next().value;
+    if (oldest) managementDataRead.delete(oldest);
+  }
+  try {
+    return await value;
+  } catch (error) {
+    const current = managementDataRead.get(userId);
+    if (current?.value === value) managementDataRead.delete(userId);
+    throw error;
+  }
 }
 
 export async function readRecruiterJobReviewSource(
@@ -701,6 +890,7 @@ export async function createRecruiterJob(
     }
     const job = jobFromCommand(raw, company.id, userId, status, now);
     await jobsRepository.mutate(() => [...rawJobs, job]);
+    invalidateCatalogueCache();
     return { ...job, company } satisfies RecruiterJob;
   });
 }
@@ -762,6 +952,7 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
       },
     });
     await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
+    invalidateCatalogueCache();
     if (company.databaseBacked && company.databaseId) {
       await applyRecruiterCapacityIncrease({
         jobId: updated.id,
@@ -800,6 +991,7 @@ export async function closeRecruiterJob(userId: string, jobId: string) {
       updatedAt: new Date().toISOString(),
     });
     await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
+    invalidateCatalogueCache();
     return { ...updated, company } satisfies RecruiterJob;
   });
 }
@@ -832,6 +1024,7 @@ export async function ensureRecruiterCompany(
       jobCount: 0,
     });
     await companiesRepository.mutate(() => [...rawCompanies, company]);
+    invalidateCatalogueCache();
     return { ...company, ownerUserId: userId } satisfies RecruiterCompany;
   });
 }
@@ -860,7 +1053,7 @@ function settingsFromCompany(
 }
 
 export async function readRecruiterCompanySettings(userId: string) {
-  const { companies } = await readCatalog();
+  const { companies } = await readCompanyCatalog();
   const company = (await authorizedCompanies(companies, userId))[0] ?? null;
   return company ? settingsFromCompany(company) : null;
 }
@@ -918,6 +1111,7 @@ export async function updateRecruiterCompanySettings(
         replaceOrAppendRawCompany(rawCompanies, updated),
       );
     }
+    invalidateCatalogueCache();
     return settingsFromCompany({
       ...updated,
       ownerUserId: updated.ownerUserId ?? null,
@@ -949,6 +1143,7 @@ export async function recordApplication(
       },
     });
     await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
+    invalidateCatalogueCache();
     await applicationsRepository.mutate(
       () =>
         [
