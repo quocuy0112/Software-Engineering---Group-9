@@ -329,6 +329,31 @@ describe("recruiter job posting management", () => {
       screen.getByRole("button", { name: "Create job posting" }),
     ).toBeDisabled();
   });
+
+  it("guides recruiters to the missing company-profile fields before posting", () => {
+    render(
+      <RecruiterJobPostingManagement
+        initialData={{
+          ...initialData,
+          companyProfileComplete: false,
+          missingCompanyProfileFields: ["industry", "address"],
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        name: "Complete company profile before posting",
+      }),
+    ).toBeVisible();
+    expect(screen.getByText("Action required")).toBeVisible();
+    expect(screen.getByText("Industry")).toBeVisible();
+    expect(screen.getByText("Address")).toBeVisible();
+    expect(screen.queryByText("Company logo")).toBeNull();
+    expect(
+      screen.getByRole("link", { name: /Open company settings/ }),
+    ).toHaveAttribute("href", "/recruiter/company-settings?required=profile");
+  });
   it("extends a closing-soon active job without closing it", async () => {
     const deadline = new Date(Date.now() + 2 * 86_400_000).toISOString();
     const closingJob = { ...initialData.jobs[0], applyDeadline: deadline };

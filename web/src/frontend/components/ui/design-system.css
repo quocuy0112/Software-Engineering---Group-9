@@ -615,7 +615,10 @@
   min-width: 0;
 }
 .sh-page-header__eyebrow {
-  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 6px;
   color: var(--sh-color-brand-primary);
   font-family: var(--sh-font-family);
   font-size: 11px;
@@ -660,19 +663,19 @@
   content: "";
 }
 .sh-page-header h1 {
-  margin: 0 0 8px;
+  margin: 0 0 5px;
   color: var(--sh-profile-text);
-  font-size: 30px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
   line-height: 1.2;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.025em;
 }
 .sh-page-header__subtitle {
   max-width: 600px;
   margin: 0;
   color: var(--sh-profile-text-muted);
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .sh-topbar {
@@ -982,6 +985,39 @@
 }
 .sh-status-strip__action {
   justify-self: end;
+}
+
+/* Profile-derived blue surfaces use a darker brand token in light mode. In
+ * dark mode that token is not legible on tinted surfaces, so these shared
+ * CV-import primitives use the semantic info pair instead. */
+:root[data-theme="dark"] .sh-info-banner {
+  color: var(--sh-color-info);
+  background: var(--sh-color-info-bg);
+}
+
+:root[data-theme="dark"] .sh-info-banner .sh-icon-badge {
+  color: var(--sh-color-info);
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] .sh-selectable-card[data-selected="true"]
+  .sh-selectable-card__status {
+  color: var(--sh-color-brand-accent);
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] .sh-status-strip {
+  color: var(--sh-color-info);
+  background: var(--sh-color-info-bg);
+}
+
+:root[data-theme="dark"] .sh-status-strip__dot,
+:root[data-theme="dark"] .sh-status-strip__track span {
+  background: var(--sh-color-brand-accent);
+}
+
+:root[data-theme="dark"] .sh-status-strip__track {
+  background: color-mix(in srgb, var(--sh-color-brand-accent) 28%, transparent);
 }
 
 @media (max-width: 760px) {

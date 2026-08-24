@@ -554,6 +554,47 @@
   box-shadow: var(--sh-shadow-card);
 }
 
+/* Verification-method tabs need an unambiguous selected state: this is a
+ * security choice, so the label must stay readable independently of theme. */
+.auth-card .factor-mode-switcher button {
+  border: 1px solid transparent;
+  border-radius: calc(var(--sh-radius-sm) + 2px);
+  color: var(--sh-color-text-secondary);
+  font-weight: var(--sh-font-weight-semibold);
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.auth-card .factor-mode-switcher button[aria-pressed="true"] {
+  color: var(--sh-color-text-inverse);
+  border-color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-primary);
+  box-shadow: 0 8px 18px -12px color-mix(in srgb, var(--sh-color-brand-primary) 78%, transparent);
+}
+
+.auth-card .factor-mode-switcher button:not([aria-pressed="true"]):hover {
+  color: var(--sh-color-brand-primary);
+  border-color: color-mix(in srgb, var(--sh-color-brand-primary) 24%, var(--sh-color-border-default));
+  background: var(--sh-color-info-bg);
+}
+
+.auth-card .factor-mode-switcher button:focus-visible {
+  outline: 3px solid var(--sh-color-focus-ring-bg);
+  outline-offset: 2px;
+}
+
+:root[data-theme="dark"] .auth-card .factor-mode-switcher {
+  border-color: var(--sh-color-border-default);
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] .auth-card .factor-mode-switcher button:not([aria-pressed="true"]) {
+  color: var(--sh-color-text-primary);
+}
+
 @media (max-width: 320px) {
   .auth-page {
     overflow-x: hidden;
