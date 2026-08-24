@@ -89,6 +89,8 @@ type RankedRow = {
   id: string;
   score: number;
   publishedAt: Date;
+  updatedAt: Date;
+  urgent: boolean;
   salaryMaximum: string | null;
 };
 
@@ -185,6 +187,19 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
         );
     clauses.push(Prisma.sql`(${Prisma.join(districtClauses, " OR ")})`);
   }
+  if (input.categoryFamily?.length) {
+    clauses.push(Prisma.sql`EXISTS (
+      SELECT 1
+      FROM "JobPostReviewAggregate" aggregate
+      JOIN "JobPostReviewVersion" version
+        ON version."id" = aggregate."approvedVersionId"
+      WHERE aggregate."publicJobPostingId" = j."id"
+        AND (
+          version."snapshot" ->> 'categoryFamily' IN (${Prisma.join(input.categoryFamily)})
+          OR version."snapshot" ->> 'industryCode' IN (${Prisma.join(input.categoryFamily)})
+        )
+    )`);
+  }
   if (input.employmentType.length) {
     clauses.push(
       Prisma.sql`j."employmentType"::text IN (${Prisma.join(input.employmentType)})`,
@@ -242,6 +257,7 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
 function cursorClause(
   input: NormalizedJobSearch,
   scoreExpression: Prisma.Sql,
+  now: Date,
 ): Prisma.Sql | null {
   const cursor = input.cursor;
   if (!cursor) return null;
@@ -262,6 +278,17 @@ function cursorClause(
             (j."publishedAt" < ${publishedAt} OR (j."publishedAt" = ${publishedAt} AND j."id" > ${cursor.id})))
         )`;
   }
+  if (input.sort === "UPDATED") {
+    return Prisma.sql`(j."updatedAt" < ${publishedAt} OR (j."updatedAt" = ${publishedAt} AND j."id" > ${cursor.id}))`;
+  }
+  if (input.sort === "URGENT") {
+    const urgent = Prisma.sql`CASE WHEN j."applicationDeadline" IS NOT NULL AND j."applicationDeadline" > ${now} AND j."applicationDeadline" <= ${new Date(now.getTime() + 14 * 86_400_000)} THEN 1 ELSE 0 END`;
+    const cursorUrgent = cursor.urgent ? 1 : 0;
+    return Prisma.sql`(
+      ${urgent} < ${cursorUrgent}
+      OR (${urgent} = ${cursorUrgent} AND (j."publishedAt" < ${publishedAt} OR (j."publishedAt" = ${publishedAt} AND j."id" > ${cursor.id})))
+    )`;
+  }
   return Prisma.sql`(j."publishedAt" < ${publishedAt} OR (j."publishedAt" = ${publishedAt} AND j."id" > ${cursor.id}))`;
 }
 
@@ -276,7 +303,8 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
     const score = query
       ? Prisma.sql`(similarity(j."normalizedTitle", ${query}) * 3 + similarity(j."searchDocumentNormalized", ${query}))`
       : Prisma.sql`0::double precision`;
-    const cursor = cursorClause(input, score);
+    const cursor = cursorClause(input, score, now);
+    const urgent = Prisma.sql`CASE WHEN j."applicationDeadline" IS NOT NULL AND j."applicationDeadline" > ${now} AND j."applicationDeadline" <= ${new Date(now.getTime() + 14 * 86_400_000)} THEN 1 ELSE 0 END`;
     const offset = cursor
       ? Prisma.empty
       : Prisma.sql`OFFSET ${((input.page ?? 1) - 1) * input.limit}`;
@@ -284,12 +312,17 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
     const order =
       input.sort === "SALARY_DESC"
         ? Prisma.sql`j."salaryMax" DESC NULLS LAST, j."publishedAt" DESC, j."id" ASC`
-        : input.sort === "NEWEST"
-          ? Prisma.sql`j."publishedAt" DESC, j."id" ASC`
-          : Prisma.sql`score DESC, j."publishedAt" DESC, j."id" ASC`;
+        : input.sort === "UPDATED"
+          ? Prisma.sql`j."updatedAt" DESC, j."id" ASC`
+          : input.sort === "URGENT"
+            ? Prisma.sql`${urgent} DESC, j."publishedAt" DESC, j."id" ASC`
+            : input.sort === "NEWEST"
+              ? Prisma.sql`j."publishedAt" DESC, j."id" ASC`
+              : Prisma.sql`score DESC, j."publishedAt" DESC, j."id" ASC`;
 
     const rankedPromise = prisma.$queryRaw<RankedRow[]>(Prisma.sql`
       SELECT j."id", ${score} AS score, j."publishedAt" AS "publishedAt",
+             j."updatedAt" AS "updatedAt", (${urgent} = 1) AS urgent,
              j."salaryMax"::text AS "salaryMaximum"
       FROM "JobPosting" j
       WHERE ${where} ${cursor ? Prisma.sql`AND ${cursor}` : Prisma.empty}
@@ -316,7 +349,10 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
             score: input.sort === "RELEVANCE" ? Number(last.score) : undefined,
             salaryMaximum:
               input.sort === "SALARY_DESC" ? last.salaryMaximum : undefined,
-            publishedAt: new Date(last.publishedAt).toISOString(),
+            publishedAt: new Date(
+              input.sort === "UPDATED" ? last.updatedAt : last.publishedAt,
+            ).toISOString(),
+            urgent: input.sort === "URGENT" ? last.urgent : undefined,
             id: last.id,
           })
         : null,

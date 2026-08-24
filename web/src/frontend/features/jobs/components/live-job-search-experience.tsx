@@ -12,6 +12,7 @@ import {
 } from "./job-search-form";
 import { JobResultsList } from "./job-results-list";
 import { JobsWorkspaceNav } from "./jobs-workspace";
+import type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
 
 const scalarCriteriaNames = [
   "q",
@@ -29,6 +30,7 @@ const scalarCriteriaNames = [
 
 const arrayCriteriaNames = [
   "district",
+  "categoryFamily",
   "employmentType",
   "experienceLevel",
   "workArrangement",
@@ -140,11 +142,13 @@ export function LiveJobSearchExperience({
   initialResult,
   initialError,
   copy,
+  taxonomy,
 }: Readonly<{
   initialCriteria: Record<string, string | string[] | undefined>;
   initialResult: JobSearchResponse | null;
   initialError: string | null;
   copy: JobsLiveCopy;
+  taxonomy?: JobSearchTaxonomy;
 }>) {
   const [criteria, setCriteria] = useState<JobSearchCriteria>(() =>
     criteriaFromInitial(initialCriteria),
@@ -157,6 +161,7 @@ export function LiveJobSearchExperience({
     initialError ? copy.tryAgain : null,
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const requestId = useRef(0);
   const abortController = useRef<AbortController | null>(null);
   const debounceTimer = useRef<number | null>(null);
@@ -293,6 +298,25 @@ export function LiveJobSearchExperience({
   const pageSize = Number(one(criteria.limit) ?? "20") || 20;
   const resultStart = result && result.total ? (page - 1) * pageSize + 1 : 0;
   const resultEnd = result ? Math.min(page * pageSize, result.total) : 0;
+  const searchBy = one(criteria.searchBy) || "BOTH";
+  const sort = one(criteria.sort) || "RELEVANCE";
+  const searchByOptions = [
+    ["TITLE", "Tên việc làm", "Job title"],
+    ["COMPANY", "Tên công ty", "Company name"],
+    ["BOTH", "Cả hai", "Both"],
+  ] as const;
+  const sortOptions = [
+    [
+      "RELEVANCE",
+      "Phù hợp nhất với hồ sơ của bạn",
+      "Best match for your profile",
+    ],
+    ["NEWEST", "Ngày đăng", "Date posted"],
+    ["UPDATED", "Ngày cập nhật", "Date updated"],
+    ["URGENT", "Cần tuyển gấp", "Urgent hiring first"],
+  ] as const;
+  const activeSort =
+    sortOptions.find(([value]) => value === sort) ?? sortOptions[0];
 
   return (
     <>
@@ -326,6 +350,7 @@ export function LiveJobSearchExperience({
             onClear={clearFilters}
             resultCount={total}
             isLoading={isLoading}
+            taxonomy={taxonomy}
           />
         </aside>
 
@@ -334,6 +359,82 @@ export function LiveJobSearchExperience({
           aria-labelledby="job-results-heading"
           aria-busy={isLoading}
         >
+          <div
+            className="job-results-toolbar"
+            aria-label="Search result controls"
+          >
+            <div
+              className="job-search-by-toggle"
+              role="group"
+              aria-label="Search by"
+            >
+              <span>
+                {copy.kicker.startsWith("Kh") ? "Tìm kiếm theo:" : "Search by:"}
+              </span>
+              <div>
+                {searchByOptions.map(([value, vietnamese, english]) => (
+                  <button
+                    key={value}
+                    className={searchBy === value ? "is-active" : undefined}
+                    type="button"
+                    aria-pressed={searchBy === value}
+                    onClick={() =>
+                      runCriteriaChange(
+                        { ...criteria, searchBy: value },
+                        "immediate",
+                      )
+                    }
+                  >
+                    {copy.kicker.startsWith("Kh") ? vietnamese : english}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="job-results-sort">
+              <span>
+                {copy.kicker.startsWith("Kh") ? "Sắp xếp theo:" : "Sort by:"}
+              </span>
+              <button
+                type="button"
+                aria-expanded={sortMenuOpen}
+                aria-haspopup="listbox"
+                onClick={() => setSortMenuOpen((open) => !open)}
+              >
+                {copy.kicker.startsWith("Kh") ? activeSort[1] : activeSort[2]}
+                <span aria-hidden="true">⌄</span>
+              </button>
+              {sortMenuOpen ? (
+                <div
+                  className="job-results-sort-menu"
+                  role="listbox"
+                  aria-label="Sort options"
+                >
+                  {sortOptions.map(([value, vietnamese, english]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      role="option"
+                      aria-selected={sort === value}
+                      onClick={() => {
+                        setSortMenuOpen(false);
+                        runCriteriaChange(
+                          { ...criteria, sort: value },
+                          "immediate",
+                        );
+                      }}
+                    >
+                      <span>
+                        {copy.kicker.startsWith("Kh") ? vietnamese : english}
+                      </span>
+                      {sort === value ? (
+                        <strong aria-label="Selected">✓</strong>
+                      ) : null}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </div>
           <header className="job-results-header">
             <p className="panel-kicker" id="job-results-heading">
               {error ? copy.loadFailed : copy.results}

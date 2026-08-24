@@ -13,6 +13,7 @@ export function jobSearchRequestQuery(request: Request) {
     searchBy: value("searchBy"),
     location: value("location"),
     district: params.getAll("district"),
+    categoryFamily: params.getAll("categoryFamily"),
     employmentType: params.getAll("employmentType"),
     experienceLevel: params.getAll("experienceLevel"),
     workArrangement: params.getAll("workArrangement"),

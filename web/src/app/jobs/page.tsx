@@ -7,6 +7,7 @@ import {
   type JobsLiveCopy,
 } from "@/frontend/features/jobs/components/live-job-search-experience";
 import { jobSearchBySchema } from "@/shared/contracts/jobs/discovery";
+import { listJobSearchTaxonomy } from "@/backend/services/jobs/job-search-taxonomy";
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -29,6 +30,7 @@ export function jobsPageQuery(
       ? input.location[0]
       : input.location,
     district: array("district").filter(Boolean),
+    categoryFamily: array("categoryFamily").filter(Boolean),
     employmentType: array("employmentType").filter(Boolean),
     experienceLevel: array("experienceLevel").filter(Boolean),
     workArrangement: array("workArrangement").filter(Boolean),
@@ -116,10 +118,13 @@ export default async function JobsPage({ searchParams }: PageProps) {
   const copy = workspace?.initialLocale === "vi" ? vietnameseCopy : englishCopy;
   const actor = await optionalJobActor(await headers());
   const initialQuery = jobsPageQuery(raw);
-  const search = await new JobDiscoveryService()
-    .search(initialQuery, actor)
-    .then((result) => ({ result, error: null }))
-    .catch(() => ({ result: null, error: copy.tryAgain }));
+  const [search, taxonomy] = await Promise.all([
+    new JobDiscoveryService()
+      .search(initialQuery, actor)
+      .then((result) => ({ result, error: null }))
+      .catch(() => ({ result: null, error: copy.tryAgain })),
+    listJobSearchTaxonomy().catch(() => ({ industries: [], locations: [] })),
+  ]);
 
   return (
     <div className="jobs-page">
@@ -128,6 +133,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
         initialResult={search.result}
         initialError={search.error}
         copy={copy}
+        taxonomy={taxonomy}
       />
     </div>
   );

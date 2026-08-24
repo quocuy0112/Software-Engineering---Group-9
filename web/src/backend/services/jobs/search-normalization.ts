@@ -7,6 +7,7 @@ const cursorSchema = z
     v: z.literal(1),
     sort: jobSortSchema,
     score: z.number().finite().optional(),
+    urgent: z.boolean().optional(),
     publishedAt: z.string().datetime(),
     salaryMaximum: z
       .string()

@@ -144,13 +144,13 @@ describe("job discovery presentation", () => {
     ]);
   });
 
-  it("exposes labeled filters and a clear action", () => {
-    render(<JobSearchForm criteria={{ q: "TypeScript" }} />);
+  it("exposes redesigned filters and a clear action", () => {
+    render(<JobSearchForm criteria={{}} />);
     expect(screen.getByText("Refine search")).toBeVisible();
-    expect(screen.getByLabelText(/keywords/i)).toHaveValue("TypeScript");
-    expect(screen.getByLabelText(/maximum salary/i)).toBeVisible();
-    expect(screen.getByRole("option", { name: "3 days" })).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText(/location/i), {
+    expect(screen.getByText("Job category")).toBeVisible();
+    expect(screen.getByText("Salary")).toBeVisible();
+    expect(screen.getByLabelText(/work arrangement/i)).toBeVisible();
+    fireEvent.change(screen.getByLabelText(/skill/i), {
       target: { value: "Đà Nẵng" },
     });
     expect(
@@ -161,21 +161,17 @@ describe("job discovery presentation", () => {
     ).toHaveAttribute("href", "/jobs");
   });
 
-  it("reports text and discrete filter changes with the right trigger", () => {
+  it("reports redesigned filter changes with the right trigger", () => {
     const onCriteriaChange = vi.fn();
     render(<JobSearchForm criteria={{}} onCriteriaChange={onCriteriaChange} />);
 
-    fireEvent.change(screen.getByLabelText(/keywords/i), {
-      target: { value: "TypeScript" },
-    });
+    fireEvent.click(screen.getByLabelText("Under 10M"));
     expect(onCriteriaChange).toHaveBeenLastCalledWith(
-      { q: "TypeScript" },
-      "debounced",
+      { salaryMax: "10000000" },
+      "immediate",
     );
 
-    fireEvent.change(screen.getByLabelText(/employment type/i), {
-      target: { value: "FULL_TIME" },
-    });
+    fireEvent.click(screen.getByLabelText("Full-time"));
     expect(onCriteriaChange).toHaveBeenLastCalledWith(
       { employmentType: "FULL_TIME" },
       "immediate",

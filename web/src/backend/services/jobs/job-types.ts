@@ -20,6 +20,7 @@ export type NormalizedJobSearch = {
   searchBy?: "TITLE" | "COMPANY" | "BOTH";
   normalizedLocation: string;
   normalizedDistricts?: string[];
+  categoryFamily?: string[];
   normalizedSkills: string[];
   employmentType: Array<
     "FULL_TIME" | "PART_TIME" | "CONTRACT" | "INTERNSHIP" | "TEMPORARY"
@@ -34,7 +35,7 @@ export type NormalizedJobSearch = {
   salaryCurrency: string;
   salaryPeriod: "HOUR" | "MONTH" | "YEAR";
   postedWithinDays?: number;
-  sort: "RELEVANCE" | "NEWEST" | "SALARY_DESC";
+  sort: "RELEVANCE" | "NEWEST" | "SALARY_DESC" | "UPDATED" | "URGENT";
   cursor?: import("./search-normalization").JobSearchCursor;
   page?: number;
   limit: number;
