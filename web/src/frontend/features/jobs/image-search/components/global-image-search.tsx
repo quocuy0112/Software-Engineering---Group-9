@@ -135,18 +135,36 @@ export function jobTextSearchHref(
   return parameters.size ? `/jobs?${parameters.toString()}` : "/jobs";
 }
 
+/** Build a broad search URL for the selected industry, while preserving the
+ * other search-bar filters (location, districts, and non-text criteria). */
+export function jobIndustrySearchHref(
+  href: string,
+  industryCode: string,
+  location?: string,
+  districts?: readonly string[],
+) {
+  const next = jobTextSearchHref(href, "", location, districts);
+  const parameters = new URL(next, "http://localhost").searchParams;
+  parameters.set("categoryFamily", industryCode.trim().slice(0, 80));
+  return `/jobs?${parameters.toString()}`;
+}
+
 function JobCategoryMenu({
   taxonomy,
   onSelect,
+  onSelectIndustry,
+  selectedCode,
   vi,
 }: Readonly<{
   taxonomy: JobSearchTaxonomy;
   onSelect(title: string): void;
+  onSelectIndustry(code: string): void;
+  selectedCode?: string;
   vi: boolean;
 }>) {
   const [open, setOpen] = useState(false);
   const [activeCode, setActiveCode] = useState(
-    taxonomy.industries[0]?.code ?? "",
+    selectedCode ?? taxonomy.industries[0]?.code ?? "",
   );
   const menu = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -154,6 +172,10 @@ function JobCategoryMenu({
   const active =
     taxonomy.industries.find((industry) => industry.code === activeCode) ??
     taxonomy.industries[0];
+
+  useEffect(() => {
+    if (selectedCode) setActiveCode(selectedCode);
+  }, [selectedCode]);
 
   const close = () => {
     setOpen(false);
@@ -216,7 +238,13 @@ function JobCategoryMenu({
             <path d="M5 7h14M5 12h14M5 17h14" />
           </svg>
         </span>
-        <span>{vi ? "Job categories" : "Job Category"}</span>
+        <span>
+          {selectedCode && active
+            ? active.name
+            : vi
+              ? "Job categories"
+              : "Job Category"}
+        </span>
         <svg
           className="job-category-trigger-chevron"
           viewBox="0 0 24 24"
@@ -306,6 +334,19 @@ function JobCategoryMenu({
                 <span aria-hidden="true">×</span>
               </button>
             </header>
+            <button
+              className="job-category-industry-pill"
+              type="button"
+              aria-label={`${vi ? "Select all jobs in" : "Select entire industry"}: ${active.name}`}
+              onClick={() => {
+                onSelectIndustry(active.code);
+                close();
+              }}
+            >
+              <span aria-hidden="true">◉</span>
+              <strong>{active.name}</strong>
+              <small>{vi ? "Toàn ngành" : "Entire industry"}</small>
+            </button>
             {active.subIndustries.map((subIndustry) => (
               <section
                 className="job-category-subindustry"
@@ -629,6 +670,12 @@ export function GlobalImageSearch({
   const [query, setQuery] = useState(() => criteria.q);
   const [location, setLocation] = useState(() => criteria.location);
   const [districts, setDistricts] = useState(districtsFromLocation);
+  const [selectedCategoryCode, setSelectedCategoryCode] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return (
+      new URL(window.location.href).searchParams.get("categoryFamily") ?? ""
+    );
+  });
   const [headerSlotReady, setHeaderSlotReady] = useState(
     !dockToWorkspaceHeader,
   );
@@ -716,6 +763,18 @@ export function GlobalImageSearch({
             <JobCategoryMenu
               taxonomy={taxonomy}
               vi={vi}
+              selectedCode={selectedCategoryCode || undefined}
+              onSelectIndustry={(industryCode) => {
+                setSelectedCategoryCode(industryCode);
+                navigateJobSearch(
+                  jobIndustrySearchHref(
+                    window.location.href,
+                    industryCode,
+                    location,
+                    districts,
+                  ),
+                );
+              }}
               onSelect={(title) =>
                 navigateJobSearch(
                   jobTextSearchHref(

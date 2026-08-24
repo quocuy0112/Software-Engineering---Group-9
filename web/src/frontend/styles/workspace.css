@@ -368,7 +368,7 @@
   display: grid;
   width: 100%;
   min-height: var(--sh-topbar-height);
-  grid-template-columns: max-content minmax(280px, 1fr) max-content;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
   align-items: center;
   gap: var(--sh-space-4);
   padding: var(--sh-space-2) var(--sh-space-6);
@@ -401,8 +401,8 @@
 }
 
 .workspace-header-job-search-slot {
-  width: min(100%, 1050px);
-  max-width: 1050px;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   justify-self: center;
 }
@@ -418,6 +418,14 @@
   align-items: center;
   justify-self: end;
   gap: var(--sh-space-3);
+}
+
+.workspace-main[data-content-mode="job-board"]
+  .workspace-header:has(
+    .workspace-header-job-search-slot > .global-image-search
+  )
+  .recruiter-header-action {
+  flex: 0 0 auto;
 }
 
 .workspace-topbar-kicker,
@@ -1113,6 +1121,25 @@
   }
 }
 
+@media (min-width: 1024px) and (max-width: 1600px) {
+  .workspace-main[data-content-mode="job-board"]
+    .workspace-header:has(
+      .workspace-header-job-search-slot > .global-image-search
+    ) {
+    gap: var(--sh-space-2);
+    padding-inline: var(--sh-space-4);
+  }
+
+  .workspace-main[data-content-mode="job-board"]
+    .workspace-header:has(
+      .workspace-header-job-search-slot > .global-image-search
+    )
+    .workspace-account-chip
+    > span:last-child {
+    display: none;
+  }
+}
+
 @media (max-width: 760px) {
   .workspace-page,
   .workspace-layout {
@@ -1500,6 +1527,15 @@
 }
 
 @media (max-width: 1023px) {
+  .workspace-main[data-content-mode="job-board"]
+    .workspace-header:has(
+      .workspace-header-job-search-slot > .global-image-search
+    )
+    .workspace-account-chip
+    > span:last-child {
+    display: none;
+  }
+
   .workspace-header-actions {
     gap: 8px;
     padding-right: 16px;

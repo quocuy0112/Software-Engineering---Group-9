@@ -188,17 +188,25 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
     clauses.push(Prisma.sql`(${Prisma.join(districtClauses, " OR ")})`);
   }
   if (input.categoryFamily?.length) {
-    clauses.push(Prisma.sql`EXISTS (
-      SELECT 1
-      FROM "JobPostReviewAggregate" aggregate
-      JOIN "JobPostReviewVersion" version
-        ON version."id" = aggregate."approvedVersionId"
-      WHERE aggregate."publicJobPostingId" = j."id"
-        AND (
-          version."snapshot" ->> 'categoryFamily' IN (${Prisma.join(input.categoryFamily)})
-          OR version."snapshot" ->> 'industryCode' IN (${Prisma.join(input.categoryFamily)})
-        )
-    )`);
+    const categoryMatches: Prisma.Sql[] = [
+      Prisma.sql`EXISTS (
+        SELECT 1
+        FROM "JobPostReviewAggregate" aggregate
+        JOIN "JobPostReviewVersion" version
+          ON version."id" = aggregate."approvedVersionId"
+        WHERE aggregate."publicJobPostingId" = j."id"
+          AND (
+            version."snapshot" ->> 'categoryFamily' IN (${Prisma.join(input.categoryFamily)})
+            OR version."snapshot" ->> 'industryCode' IN (${Prisma.join(input.categoryFamily)})
+          )
+      )`,
+    ];
+    for (const name of input.normalizedCategoryNames ?? []) {
+      categoryMatches.push(
+        Prisma.sql`j."searchDocumentNormalized" LIKE ${`%${name}%`}`,
+      );
+    }
+    clauses.push(Prisma.sql`(${Prisma.join(categoryMatches, " OR ")})`);
   }
   if (input.employmentType.length) {
     clauses.push(

@@ -16,6 +16,7 @@ import {
   jobSearchQuerySchema,
   type JobCard,
 } from "@/shared/contracts/jobs/discovery";
+import { listJobSearchTaxonomy } from "./job-search-taxonomy";
 import {
   computeDiscoveryJobs,
   computeRelatedJobs,
@@ -293,8 +294,21 @@ export class JobDiscoveryService {
       new (
         await import("@/backend/repositories/jobs/prisma-public-job-repository")
       ).PrismaPublicJobRepository();
+    const taxonomy = criteria.categoryFamily?.length
+      ? await listJobSearchTaxonomy()
+      : null;
+    const normalizedCategoryNames = taxonomy
+      ? taxonomy.industries
+          .filter((industry) =>
+            criteria.categoryFamily?.includes(industry.code),
+          )
+          .map((industry) => normalizeSearchText(industry.name, 160))
+      : undefined;
+    const repositoryCriteria = normalizedCategoryNames?.length
+      ? { ...criteria, normalizedCategoryNames }
+      : criteria;
     const result = await repository.search(
-      criteria,
+      repositoryCriteria,
       actor.kind === "user" ? actor.userId : null,
       now,
     );

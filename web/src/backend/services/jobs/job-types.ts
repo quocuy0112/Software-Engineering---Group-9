@@ -21,6 +21,8 @@ export type NormalizedJobSearch = {
   normalizedLocation: string;
   normalizedDistricts?: string[];
   categoryFamily?: string[];
+  /** Normalized industry display names used for legacy rows without review snapshots. */
+  normalizedCategoryNames?: string[];
   normalizedSkills: string[];
   employmentType: Array<
     "FULL_TIME" | "PART_TIME" | "CONTRACT" | "INTERNSHIP" | "TEMPORARY"

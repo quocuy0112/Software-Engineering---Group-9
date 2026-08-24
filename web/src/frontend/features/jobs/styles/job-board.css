@@ -9093,6 +9093,53 @@
   background: var(--sh-color-brand-soft);
 }
 
+.global-image-search .job-category-industry-pill {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 38px;
+  align-items: center;
+  gap: 8px;
+  margin: var(--sh-space-5) 0 2px;
+  padding: 7px 12px;
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--sh-color-brand-primary) 48%,
+      var(--sh-color-border-default)
+    );
+  border-radius: var(--sh-radius-full);
+  color: var(--sh-color-brand-primary);
+  background: color-mix(
+    in srgb,
+    var(--sh-color-brand-soft) 62%,
+    var(--sh-color-surface-card)
+  );
+  font: inherit;
+  cursor: pointer;
+}
+
+.global-image-search .job-category-industry-pill:hover {
+  border-color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+}
+
+.job-category-industry-pill > span {
+  font-size: 13px;
+}
+
+.job-category-industry-pill strong {
+  font-size: var(--sh-font-size-caption);
+}
+
+.job-category-industry-pill small {
+  padding-left: 6px;
+  border-left: 1px solid
+    color-mix(in srgb, var(--sh-color-brand-primary) 24%, transparent);
+  color: var(--sh-color-text-secondary);
+  font-size: 11px;
+  font-weight: var(--sh-font-weight-semibold);
+}
+
 .job-category-subindustry:first-of-type {
   margin-top: var(--sh-space-5);
 }
@@ -9164,6 +9211,17 @@
 
   .job-search-row > .global-image-search-submit {
     margin-left: auto;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1600px) {
+  .workspace-header-job-search-slot .job-search-discovery > .global-image-search-bar {
+    grid-template-columns: 44px minmax(5rem, 1fr) minmax(11rem, 16rem);
+  }
+
+  .workspace-header-job-search-slot .global-image-search-submit {
+    min-width: 84px;
+    padding-inline: var(--sh-space-2);
   }
 }
 

@@ -9,6 +9,7 @@ import { ImageSearchRecovery } from "@/frontend/features/jobs/image-search/compo
 import { ImageSearchFeedback } from "@/frontend/features/jobs/image-search/components/image-search-feedback";
 import {
   GlobalImageSearch,
+  jobIndustrySearchHref,
   jobTextSearchHref,
 } from "@/frontend/features/jobs/image-search/components/global-image-search";
 import type { SearchIntent } from "@/shared/contracts/jobs/search-intent";
@@ -261,6 +262,33 @@ describe("image-assisted job-search controls", () => {
       screen.queryByRole("dialog", { name: "Job categories" }),
     ).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Job Category" })).toHaveFocus();
+  });
+
+  it("offers a broad whole-industry search pill before title pills", () => {
+    const navigate = vi.fn();
+    render(
+      <GlobalImageSearch taxonomy={taxonomy} onJobSearchNavigate={navigate} />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Job Category" }));
+    const industryPill = screen.getByRole("button", {
+      name: /select entire industry: sales & business development/i,
+    });
+    expect(industryPill).toBeVisible();
+    fireEvent.click(industryPill);
+    expect(navigate).toHaveBeenCalledWith("/jobs?categoryFamily=r01");
+    expect(
+      screen.queryByRole("dialog", { name: "Job categories" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("builds an industry URL without retaining a title query", () => {
+    expect(
+      jobIndustrySearchHref(
+        "https://smarthire.test/jobs?q=old&location=Da%20Nang&cursor=next",
+        "r03",
+      ),
+    ).toBe("/jobs?location=Da+Nang&categoryFamily=r03");
   });
 
   it("picks a province and one or more districts from the two-panel location picker", () => {

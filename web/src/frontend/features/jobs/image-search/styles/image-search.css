@@ -94,10 +94,12 @@
 .global-image-search .global-image-search-camera-button,
 .global-image-search .global-image-search-submit {
   display: inline-grid;
+  box-sizing: border-box;
   width: 46px;
   min-height: 46px;
   place-items: center;
   padding: 0;
+  overflow: hidden;
   border: 0;
   border-radius: var(--sh-radius-full);
   box-shadow: none;
@@ -142,6 +144,16 @@
 .global-image-search-submit svg {
   width: 21px;
   height: 21px;
+  display: block;
+  flex: 0 0 auto;
+}
+
+.global-image-search-submit > span:first-child {
+  display: inline-grid;
+  width: 21px;
+  height: 21px;
+  place-items: center;
+  line-height: 0;
 }
 
 .global-image-search[data-phase="ready"] .global-image-search-camera-button {
