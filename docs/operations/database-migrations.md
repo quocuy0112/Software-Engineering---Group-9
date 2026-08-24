@@ -14,7 +14,9 @@ npm run db:verify
 
 `db:verify` waits for Compose PostgreSQL, creates explicitly named temporary verification and shadow databases inside the container, applies every committed migration from empty, checks migration status and drift, executes a Prisma connectivity query, and removes the temporary databases. It never invokes host `psql`.
 
-Use `npm run db:down` to stop PostgreSQL while retaining the named volume. `npm run db:reset` deletes local database data and must be used only intentionally.
+Use `npm run db:down` to stop PostgreSQL while retaining the named volume. `npm run db:reset` resets all local users' profile/application data and authentication state, removes admin grants/notifications and non-baseline review workflow data, and deletes company memberships. It also removes companies owned by the reset user (including their tax identifier) and jobs created by that user, together with their dependent applications, reports, messages, and review rows. A company where the user is only a member is preserved as shared data; only the user's membership and submitted verification evidence are removed. The shared job, company, and skill catalog plus imported review baselines remain intact. Memberships referenced by an imported baseline are retained to protect that baseline. It anonymizes and marks each account row deleted only to retain catalog foreign-key relationships, releasing previous emails for registration. Use `npm run db:reset:empty` only when you intentionally want to delete the entire local database. Run `npm run db:seed:jobs` separately when the local catalogue needs to be loaded or updated.
+
+After an unqualified reset, create a new local account before provisioning an administrator grant with `npm run admin:provision -- user@example.com`. A reset targeted with an email or user ID removes only that account's administrator grant and preserves grants for other administrators.
 
 ## Migration sequence normalization
 

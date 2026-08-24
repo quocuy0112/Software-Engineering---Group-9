@@ -63,7 +63,8 @@ runNpm([
   "smarthire",
 ]);
 
-console.log("Importing the split local company and job fixtures...");
-runNpm(["run", "db:seed:jobs"]);
+console.log(
+  "Skipping job/company/skill fixture import. Run `npm run db:seed:jobs` when the local catalogue needs updating.",
+);
 
-console.log("Local database reset completed with demo job data.");
+console.log("Local database reset completed without importing job fixtures.");
