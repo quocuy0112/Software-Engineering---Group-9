@@ -919,7 +919,6 @@ export function JobPostingEditor({
     return () => window.clearTimeout(timer);
   }, [autoSaveEnabled, hasUnsavedChanges, job, persist, readOnly, saving]);
 
-  const department = job.description.generalInfo.department ?? "";
   const minDeadline = new Date().toISOString().slice(0, 10);
   const maxDeadline = "9999-12-31";
   const sectionCompletion = [
@@ -948,9 +947,7 @@ export function JobPostingEditor({
       ? copy.unsaved
       : hasSavedDraft
         ? copy.saved
-        : autoSaveEnabled
-          ? copy.autoSaveOn
-          : "";
+        : "";
   const setSectionOpen = (index: number, open: boolean) =>
     setOpenSections((current) =>
       current[index] === open
@@ -977,21 +974,25 @@ export function JobPostingEditor({
               {job.id === "new-job" ? copy.create : job.title || copy.edit}
             </h1>
           </div>
-          {saveStatus ? (
+          <button
+            type="button"
+            className="recruiter-editor-auto-save"
+            role="switch"
+            aria-checked={autoSaveEnabled}
+            aria-label={`${copy.automaticSave}: ${autoSaveEnabled ? copy.on : copy.off}`}
+            onClick={toggleAutomaticDraftSave}
+          >
+            <span className="recruiter-editor-auto-save__label">AutoSave</span>
             <span
-              className={[
-                "recruiter-editor-save-status",
-                saving ? "is-saving" : "",
-                hasUnsavedChanges ? "is-dirty" : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              role="status"
+              className="recruiter-editor-auto-save__track"
+              aria-hidden="true"
             >
-              <span aria-hidden="true" />
-              {saveStatus}
+              <span className="recruiter-editor-auto-save__state">
+                {autoSaveEnabled ? copy.on : copy.off}
+              </span>
+              <span className="recruiter-editor-auto-save__thumb" />
             </span>
-          ) : null}
+          </button>
         </div>
         <p>
           Build a complete, structured listing and review exactly what
@@ -1183,17 +1184,6 @@ export function JobPostingEditor({
                 ) : null}
                 <FieldError field="subIndustry" errors={displayedErrors} />
               </div>
-            </div>
-            <div className="recruiter-form-grid">
-              <label>
-                Department
-                <input
-                  disabled={readOnly}
-                  readOnly
-                  value={department}
-                  aria-readonly="true"
-                />
-              </label>
             </div>
           </EditorSection>
 
@@ -1871,24 +1861,9 @@ export function JobPostingEditor({
           ) : null}
 
           <div className="recruiter-editor__actions recruiter-surface-card">
-            {saveStatus ? (
-              <span className="recruiter-editor__action-status" role="status">
-                {saveStatus}
-              </span>
-            ) : null}
-            <button
-              type="button"
-              className={[
-                "recruiter-outline-button",
-                autoSaveEnabled ? "is-active" : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              aria-pressed={autoSaveEnabled}
-              onClick={toggleAutomaticDraftSave}
-            >
-              {copy.automaticSave}: {autoSaveEnabled ? copy.on : copy.off}
-            </button>
+            <span className="recruiter-editor__action-status" role="status">
+              {saveStatus}
+            </span>
             <button
               type="button"
               className="recruiter-outline-button"
