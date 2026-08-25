@@ -20,6 +20,24 @@ function formatBytes(byteSize: number) {
   return `${(byteSize / 1_000_000).toFixed(1)} MB`;
 }
 
+function CheckChip({ label, status }: { label: string; status: string }) {
+  const normalized = status.toUpperCase();
+  const color =
+    normalized === "PASS"
+      ? "success"
+      : normalized === "PENDING"
+        ? "warning"
+        : "error";
+  return (
+    <Chip
+      label={`${label}: ${status}`}
+      size="small"
+      color={color}
+      variant={normalized === "PASS" ? "filled" : "outlined"}
+    />
+  );
+}
+
 type PdfDocument = {
   numPages: number;
   getPage(page: number): Promise<{
@@ -43,6 +61,14 @@ export function ProtectedEvidenceViewer(props: {
   createdAt: string;
   submissionVersion: number;
   accessible: boolean;
+  unavailabilityReason?:
+    | "DELETED"
+    | "CONTENT_RESTRICTED"
+    | "SUPERSEDED"
+    | "NOT_CURRENT_SUBMISSION"
+    | "SAFETY_CHECK_INCOMPLETE"
+    | "TARGET_COMPANY_INACTIVE"
+    | null;
   readOnly?: boolean;
 }) {
   const [imageUrl, setImageUrl] = useState<string>();
@@ -60,6 +86,21 @@ export function ProtectedEvidenceViewer(props: {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const popupRef = useRef<Window | null>(null);
   const headingId = `business-license-evidence-${props.evidenceId}`;
+  const unavailableExplanation = {
+    DELETED: "This file was deleted and cannot be retrieved for review.",
+    CONTENT_RESTRICTED:
+      "The stored file is no longer accessible to administrators.",
+    SUPERSEDED: "A newer submission has replaced this file.",
+    NOT_CURRENT_SUBMISSION:
+      "This file is not the current submission for this request.",
+    SAFETY_CHECK_INCOMPLETE:
+      "At least one file safety or validation check is not complete or did not pass.",
+    TARGET_COMPANY_INACTIVE:
+      "The linked company is not currently active, so this evidence cannot be reviewed.",
+  } as const;
+  const unavailableMessage = props.unavailabilityReason
+    ? unavailableExplanation[props.unavailabilityReason]
+    : "This evidence is not currently available for review.";
 
   const evidenceUrl = `/api/admin/verification-requests/${encodeURIComponent(props.requestId)}/evidence/${encodeURIComponent(props.evidenceId)}`;
 
@@ -269,21 +310,35 @@ export function ProtectedEvidenceViewer(props: {
         />
         <Chip label={props.mediaType} variant="outlined" />
       </Box>
-      <Typography color="text.secondary" variant="body2">
-        Submission {props.submissionVersion}; uploaded{" "}
-        {new Date(props.createdAt).toLocaleString()}; size{" "}
-        {formatBytes(props.byteSize)}.
-      </Typography>
+      <Box
+        aria-label="Evidence file details"
+        sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}
+      >
+        <Chip
+          label={`Submission ${props.submissionVersion}`}
+          size="small"
+          variant="outlined"
+        />
+        <Chip
+          label={`Uploaded ${new Date(props.createdAt).toLocaleString()}`}
+          size="small"
+          variant="outlined"
+        />
+        <Chip
+          label={formatBytes(props.byteSize)}
+          size="small"
+          variant="outlined"
+        />
+      </Box>
       <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-        <Chip label={`Malware scan: ${props.malwareStatus}`} size="small" />
-        <Chip label={`File type: ${props.typeStatus}`} size="small" />
-        <Chip label={`Structure: ${props.structureStatus}`} size="small" />
-        <Chip label={`Preview: ${props.previewStatus}`} size="small" />
+        <CheckChip label="Malware scan" status={props.malwareStatus} />
+        <CheckChip label="File type" status={props.typeStatus} />
+        <CheckChip label="Structure" status={props.structureStatus} />
+        <CheckChip label="Preview" status={props.previewStatus} />
       </Box>
       {!props.accessible && (
         <Alert severity="warning">
-          This evidence is not qualified, has expired, or is inaccessible.
-          {!props.readOnly && " Decisions are disabled."}
+          <strong>Evidence unavailable for review.</strong> {unavailableMessage}
         </Alert>
       )}
       {failed && (

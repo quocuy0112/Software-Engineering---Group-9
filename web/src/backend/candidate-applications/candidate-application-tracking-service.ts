@@ -317,6 +317,10 @@ function tracker(row: CandidateApplicationTrackerRow): ApplicationTracker {
     updates: publicUpdates(row),
     files: files.slice(0, 2),
     notificationPreference: preference,
+    contactConsent: {
+      shared: Boolean(row.contactConsent?.sharedAt && !row.contactConsent.withdrawnAt),
+      version: row.contactConsent?.version ?? 1,
+    },
     canWithdraw: withdrawableStages.has(canonicalStage) && !row.withdrawalOutcome,
   });
 }

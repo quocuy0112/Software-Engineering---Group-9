@@ -50,6 +50,23 @@ function evidenceAccessibility(item: {
   return "AVAILABLE" as const;
 }
 
+function evidenceUnavailabilityReason(input: {
+  contentInaccessibleAt: Date | null;
+  deletedAt: Date | null;
+  supersededAt: Date | null;
+  isCurrentSubmission: boolean;
+  safetyState: "PENDING" | "PASS" | "FAIL" | "ERROR";
+  targetCompanyIsActive: boolean;
+}) {
+  if (input.deletedAt) return "DELETED" as const;
+  if (input.contentInaccessibleAt) return "CONTENT_RESTRICTED" as const;
+  if (input.supersededAt) return "SUPERSEDED" as const;
+  if (!input.isCurrentSubmission) return "NOT_CURRENT_SUBMISSION" as const;
+  if (input.safetyState !== "PASS") return "SAFETY_CHECK_INCOMPLETE" as const;
+  if (!input.targetCompanyIsActive) return "TARGET_COMPANY_INACTIVE" as const;
+  return null;
+}
+
 function evidenceFileName(mediaType: string, version: number) {
   const extension =
     mediaType === "application/pdf"
@@ -164,11 +181,18 @@ export class PrismaVerificationRepository {
         applicantId: row.applicantUserId,
         companyName: row.submittedCompanyName,
         taxCode: row.normalizedTaxIdentifier,
+        targetCompanyId: row.targetCompanyId,
         state: row.state,
         applicantEligibility: row.applicant.state,
         submittedAt: row.createdAt.toISOString(),
         resubmissionCount: row.resubmissionCount,
         assignedAdminRef: row.assignedAdminUserId,
+        assignmentStatus:
+          row.assignedAdminUserId === null
+            ? "UNASSIGNED"
+            : row.assignedAdminUserId === input.adminUserId
+              ? "MINE"
+              : "ASSIGNED_TO_OTHER",
         version: row.version,
       })),
       page: filter.page,
@@ -178,7 +202,7 @@ export class PrismaVerificationRepository {
     });
   }
 
-  async reviewDetail(id: string) {
+  async reviewDetail(id: string, adminUserId: string) {
     const now = new Date();
     const row = await prisma.recruiterVerificationRequest.findUnique({
       where: { id },
@@ -205,12 +229,19 @@ export class PrismaVerificationRepository {
     );
     const metadata = row.evidence.map((item) => {
       const safetyState = evidenceSafetyState(item);
-      const qualified =
-        item.id === row.currentEvidenceId &&
-        item.submissionVersion === row.currentSubmissionVersion &&
-        safetyState === "PASS" &&
-        (!row.targetCompany ||
-          row.targetCompany.verificationState === "ACTIVE");
+      const unavailabilityReason = evidenceUnavailabilityReason({
+        contentInaccessibleAt: item.contentInaccessibleAt,
+        deletedAt: item.deletedAt,
+        supersededAt: item.supersededAt,
+        isCurrentSubmission:
+          item.id === row.currentEvidenceId &&
+          item.submissionVersion === row.currentSubmissionVersion,
+        safetyState,
+        targetCompanyIsActive:
+          !row.targetCompany ||
+          row.targetCompany.verificationState === "ACTIVE",
+      });
+      const qualified = unavailabilityReason === null;
       return {
         id: item.id,
         version: item.submissionVersion,
@@ -227,6 +258,7 @@ export class PrismaVerificationRepository {
           supersededAt: item.supersededAt,
           qualified,
         }),
+        unavailabilityReason,
       };
     });
     const current =
@@ -238,39 +270,53 @@ export class PrismaVerificationRepository {
       (prerequisite?.state === "AVAILABLE" &&
         (!prerequisite.expiresAt || prerequisite.expiresAt > now));
     const evidenceAvailable = current?.accessibility === "AVAILABLE";
-    const canDecide =
+    const assignmentStatus =
+      row.assignedAdminUserId === null
+        ? "UNASSIGNED"
+        : row.assignedAdminUserId === adminUserId
+          ? "MINE"
+          : "ASSIGNED_TO_OTHER";
+    const workflowEligible =
       row.state === "PENDING_REVIEW" &&
       applicantActive &&
       Boolean(evidenceAvailable) &&
       prerequisiteAvailable &&
       (!row.submissionIdempotencyKey || Boolean(row.businessFacts));
+    const canDecide = workflowEligible && assignmentStatus === "MINE";
     const blockReason = canDecide
       ? null
-      : !applicantActive
-        ? "APPLICANT_SUSPENDED"
-        : row.state !== "PENDING_REVIEW"
-          ? "INVALID_STATE"
-          : !evidenceAvailable
-            ? "EVIDENCE_UNAVAILABLE"
-            : !prerequisiteAvailable
-              ? "RELATIONSHIP_REQUIRED"
-              : "ENRICHED_FACTS_REQUIRED";
+      : row.state !== "PENDING_REVIEW"
+        ? "INVALID_STATE"
+        : assignmentStatus === "UNASSIGNED"
+          ? "CLAIM_REQUIRED"
+          : assignmentStatus === "ASSIGNED_TO_OTHER"
+            ? "ASSIGNED_TO_OTHER"
+            : !applicantActive
+              ? "APPLICANT_SUSPENDED"
+              : !evidenceAvailable
+                ? "EVIDENCE_UNAVAILABLE"
+                : !prerequisiteAvailable
+                  ? "RELATIONSHIP_REQUIRED"
+                  : "ENRICHED_FACTS_REQUIRED";
     const request = {
       id: row.id,
       applicantId: row.applicantUserId,
       companyName: row.submittedCompanyName,
       taxCode: row.normalizedTaxIdentifier,
+      targetCompanyId: row.targetCompanyId,
       state: row.state,
       applicantEligibility:
         row.applicant.state === "ACTIVE" ? "ACTIVE" : "SUSPENDED",
       submittedAt: row.createdAt.toISOString(),
       resubmissionCount: row.resubmissionCount,
       assignedAdminRef: row.assignedAdminUserId,
+      assignmentStatus,
       version: row.version,
     };
     return verificationReviewDetailSchema.parse({
       request,
       company: {
+        id: row.targetCompanyId,
         name: row.submittedCompanyName,
         taxCode: row.normalizedTaxIdentifier,
         targetKind: row.targetCompanyId ? "EXISTING_COMPANY" : "NEW_COMPANY",
@@ -303,6 +349,12 @@ export class PrismaVerificationRepository {
         createdAt: note.createdAt.toISOString(),
       })),
       applicantComment: row.adminComment ?? null,
+      assignment: {
+        status: assignmentStatus,
+        assignedAdminRef: row.assignedAdminUserId,
+        canClaim:
+          row.state === "PENDING_REVIEW" && assignmentStatus === "UNASSIGNED",
+      },
       canDecide,
       blockReason,
       calculatedAt: now.toISOString(),

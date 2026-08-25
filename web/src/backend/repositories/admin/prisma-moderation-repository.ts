@@ -58,6 +58,7 @@ export class PrismaModerationRepository {
     };
     const rows = await prisma.moderationReport.findMany({
       where,
+      include: { reporter: { select: { name: true } } },
       orderBy: [{ createdAt: "asc" }, { id: "asc" }],
     });
     rows.sort(
@@ -75,6 +76,7 @@ export class PrismaModerationRepository {
       data: page.map((row) => ({
         id: row.id,
         reporterAccountId: row.reporterUserId,
+        reporterDisplayName: row.reporter.name,
         targetType: row.targetType,
         targetReference: row.targetReference,
         companyReference: row.companyReference,

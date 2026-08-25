@@ -21,13 +21,14 @@ import type {
 } from "@/shared/contracts/scoring";
 import type { PipelineApplicationCard } from "@/shared/contracts/applications";
 import { scoringDetailSchema } from "@/shared/contracts/scoring";
+import type { RecruiterCandidateProfile } from "@/shared/contracts/recruiter-candidate-profile";
 import { AutomaticMatchTab } from "./automatic-match-tab";
 import { AiAssessmentTab } from "./ai-assessment-tab";
 import { DocumentsTab } from "./documents-tab";
 import { RankingModalFrame } from "./ranking-modal-frame";
 import { ScoreBadgeFromLabel, formatScore } from "./candidate-ranking-ui";
 
-type Tab = "automatic" | "ai" | "documents";
+type Tab = "automatic" | "ai" | "documents" | "profile";
 type CandidateScoreDrawerCandidate =
   | RankedApplicationRow
   | PipelineApplicationCard;
@@ -72,6 +73,7 @@ export function CandidateScoreDrawer({
     "cv" | "cover-letter" | null
   >(null);
   const [openDocumentRequest, setOpenDocumentRequest] = useState(0);
+  const [profileReview, setProfileReview] = useState<RecruiterCandidateProfile | null>(null);
   const acknowledgedApplicationId = useRef<string | null>(null);
 
   useEffect(() => {
@@ -339,6 +341,18 @@ export function CandidateScoreDrawer({
     setOpenDocumentRequest((current) => current + 1);
     changeTab("documents");
   };
+  const openProfileReview = async () => {
+    setActiveTab("profile");
+    setError(null);
+    try {
+      const response = await fetch(`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(candidate.applicationId)}/profile`, { cache: "no-store" });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.message ?? "Candidate profile is not available.");
+      setProfileReview(body as RecruiterCandidateProfile);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Candidate profile is not available.");
+    }
+  };
 
   return (
     <div
@@ -417,6 +431,9 @@ export function CandidateScoreDrawer({
             >
               <Mail aria-hidden="true" /> View cover letter
             </button>
+            <button type="button" className="ai-ranking-button ai-ranking-button--secondary" onClick={() => void openProfileReview()}>
+              <UserRoundCheck aria-hidden="true" /> View profile
+            </button>
             {canShortlist ? (
               <button
                 type="button"
@@ -491,6 +508,9 @@ export function CandidateScoreDrawer({
             onClick={() => changeTab("documents")}
           >
             <span>CV &amp; Cover letter</span>
+          </button>
+          <button type="button" role="tab" aria-selected={activeTab === "profile"} className={activeTab === "profile" ? "is-active" : ""} onClick={() => void openProfileReview()}>
+            <span>Profile</span>
           </button>
         </nav>
 
@@ -614,7 +634,7 @@ export function CandidateScoreDrawer({
               canScore={!readOnly}
               onScore={() => setScoreConfirm(true)}
             />
-          ) : (
+          ) : activeTab === "documents" ? (
             <DocumentsTab
               key={`${openDocument ?? "documents"}-${openDocumentRequest}`}
               jobId={jobId}
@@ -623,6 +643,17 @@ export function CandidateScoreDrawer({
               openKind={openDocument}
               openRequest={openDocumentRequest}
             />
+          ) : (
+            <section aria-label="Candidate profile review">
+              <p><strong>Submitted profile</strong> is the application-time snapshot. <strong>Current profile</strong> reflects the candidate&apos;s current sharing choices.</p>
+              {profileReview?.submittedProfileAvailable ? (
+                <div><h3>Submitted profile</h3><p>{profileReview.submittedProfile?.headline ?? "No headline"}</p><p>{profileReview.submittedProfile?.summary ?? "No summary"}</p><p>{profileReview.submittedProfile?.skills.join(" · ")}</p></div>
+              ) : <p>Submitted profile is no longer available.</p>}
+              {profileReview?.liveProfile ? (
+                <div><h3>Current profile</h3><p>{profileReview.liveProfile.sections.headline ?? "No headline shared"}</p><p>{profileReview.liveProfile.sections.summary ?? "No summary shared"}</p><p>{profileReview.liveProfile.sections.skills?.join(" · ")}</p></div>
+              ) : <p>Current profile has no sections shared with recruiters.</p>}
+              <p>{profileReview?.contactShared ? "Candidate has shared contact details for this application." : "Contact details are not shared for this application."}</p>
+            </section>
           )}
         </div>
 

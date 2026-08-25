@@ -23,12 +23,13 @@ const approve = z
     protectedNote: normalizedText(0, 2000).optional(),
   })
   .strict();
+const claim = z.object({}).strict();
 export async function readVerificationCommand(
   request: Request,
-  action: "reject" | "approve",
+  action: "reject" | "approve" | "claim",
 ) {
   const schema: z.ZodType<Record<string, unknown>> = (
-    action === "reject" ? reject : approve
+    action === "reject" ? reject : action === "approve" ? approve : claim
   ) as z.ZodType<Record<string, unknown>>;
   const body = await parseAdminJson(request, schema);
   const headers = commandHeaders(request, { strictIfMatch: true });
@@ -51,6 +52,7 @@ export async function readVerificationCommand(
       ...headers,
     };
   }
+  if (action === "claim") return { ...body, ...headers };
   const approval = body as { protectedNote?: string };
   return {
     ...body,

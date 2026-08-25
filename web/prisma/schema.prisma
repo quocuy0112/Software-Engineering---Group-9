@@ -1278,6 +1278,7 @@ model CandidateIdentity {
   updatedAt       DateTime          @updatedAt
   user            UserAccount       @relation(fields: [userId], references: [id], onDelete: Restrict)
   profile         CandidateProfile?
+  profileVisibility CandidateProfileVisibility?
   cvs             CandidateCv[]
   jobApplications JobApplication[]
   applicationAttemptCounters JobApplicationAttemptCounter[]
@@ -1304,6 +1305,19 @@ model CandidateProfile {
   cvConfirmations CvImportConfirmation[]
 
   @@index([candidateUserId])
+}
+
+model CandidateProfileVisibility {
+  candidateUserId         String            @id
+  discoverableByExactId   Boolean           @default(false)
+  candidateSections       Json             @default("[]")
+  recruiterSections       Json             @default("[]")
+  version                 Int              @default(0)
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
+  candidate               CandidateIdentity @relation(fields: [candidateUserId], references: [userId], onDelete: Cascade)
+
+  @@index([discoverableByExactId, candidateUserId])
 }
 
 model ProfileExperience {
@@ -2907,6 +2921,8 @@ model JobApplication {
   documentAccessDeniedAt  DateTime?
   documentDeletionDueAt   DateTime?
   documentDeletedAt       DateTime?
+  profileSnapshotReviewDueAt DateTime?
+  profileSnapshotAccessDeniedAt DateTime?
   legacyDocumentState     ApplicationLegacyDocumentState @default(CURRENT)
   currentScoringResultId  String?                       @unique
   scoringGeneration       Int                           @default(0)
@@ -2935,6 +2951,7 @@ model JobApplication {
   intake                  ApplicationIntake?
   publicUpdates           ApplicationPublicUpdate[]
   notificationPreference  ApplicationNotificationPreference?
+  contactConsent          JobApplicationContactConsent?
 
   @@unique([candidateUserId, idempotencyKey])
   @@unique([candidateUserId, jobPostingId, applicationAttemptNumber])
@@ -2943,7 +2960,20 @@ model JobApplication {
   @@index([candidateUserId, aiAnalysisConsent])
   @@index([jobPostingId, submittedAt(sort: Desc), id(sort: Desc)])
   @@index([documentDeletedAt, documentDeletionDueAt])
+  @@index([profileSnapshotAccessDeniedAt, profileSnapshotReviewDueAt])
   @@index([jobPostingId, currentScoringResultId, submittedAt(sort: Desc), id(sort: Desc)])
+}
+
+model JobApplicationContactConsent {
+  applicationId String         @id
+  sharedAt      DateTime?
+  withdrawnAt   DateTime?
+  version       Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  application   JobApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([sharedAt, withdrawnAt])
 }
 
 model JobApplicationAttemptCounter {

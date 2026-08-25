@@ -294,6 +294,7 @@ export class RankedCandidateListService {
             },
           },
         },
+        contactConsent: { select: { sharedAt: true, withdrawnAt: true } },
         manualPriorities: {
           where: { active: true },
           take: 1,
@@ -338,7 +339,10 @@ export class RankedCandidateListService {
           submittedAt: row.submittedAt.toISOString(),
           candidate: {
             displayName: row.candidate.user.name,
-            verifiedEmail: row.candidate.user.email,
+            verifiedEmail:
+              row.contactConsent?.sharedAt && !row.contactConsent.withdrawnAt
+                ? row.candidate.user.email
+                : null,
             avatarUrl: /^https:\/\//iu.test(row.candidate.user.image ?? "")
               ? row.candidate.user.image
               : null,

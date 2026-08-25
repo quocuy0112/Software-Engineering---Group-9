@@ -14,15 +14,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-const categories = [
-  "SECURITY_COMPROMISE",
-  "POLICY_VIOLATION",
-  "USER_REQUEST",
-  "VERIFICATION_FAILURE",
-  "INCIDENT_RESOLVED",
-  "ACCESS_CLEANUP",
-  "OTHER",
-];
+import {
+  adminReasonLabel,
+  privilegedReasonCategories,
+} from "../shared/admin-reason-label";
 export function AccountStateDialog(props: {
   open: boolean;
   title: string;
@@ -75,9 +70,9 @@ export function AccountStateDialog(props: {
             value={category}
             onChange={(event) => setCategory(event.target.value)}
           >
-            {categories.map((value) => (
+            {privilegedReasonCategories.map((value) => (
               <MenuItem key={value} value={value}>
-                {value}
+                {adminReasonLabel(value)}
               </MenuItem>
             ))}
           </Select>

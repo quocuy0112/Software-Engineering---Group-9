@@ -11,7 +11,6 @@ export function messagingCopy(locale: WorkspaceLocale) {
         connecting: "Đang kết nối",
         reconnecting: "Đang kết nối lại",
         offline: "Ngoại tuyến",
-        inbox: "HỘP THƯ",
         recentConversations: "Cuộc trò chuyện gần đây",
         conversations: "cuộc trò chuyện",
         noConversations: "Chưa có cuộc trò chuyện nào",
@@ -36,7 +35,7 @@ export function messagingCopy(locale: WorkspaceLocale) {
         backToConversations: "Quay lại danh sách cuộc trò chuyện",
         threadWith: "Cuộc trò chuyện với",
         loadConversationError: "Không thể tải cuộc trò chuyện này",
-        inboxTitle: "Hộp thư của bạn",
+        inboxTitle: "Cuộc trò chuyện",
         selectConversation: "Chọn một cuộc trò chuyện để xem tin nhắn.",
         privacyNotice:
           "Tin nhắn được bảo mật riêng tư, lưu trữ lâu dài và được bảo vệ trong phiên đăng nhập SmartHire của bạn.",
@@ -108,7 +107,6 @@ export function messagingCopy(locale: WorkspaceLocale) {
         connecting: "Connecting",
         reconnecting: "Reconnecting",
         offline: "Offline",
-        inbox: "INBOX",
         recentConversations: "Recent conversations",
         conversations: "conversations",
         noConversations: "No conversations yet",
@@ -133,7 +131,7 @@ export function messagingCopy(locale: WorkspaceLocale) {
         backToConversations: "Back to conversations",
         threadWith: "Conversation with",
         loadConversationError: "Unable to load this conversation",
-        inboxTitle: "Your inbox",
+        inboxTitle: "Conversations",
         selectConversation: "Select a conversation to read messages.",
         privacyNotice:
           "Messages are private, durable, and protected by your SmartHire session.",

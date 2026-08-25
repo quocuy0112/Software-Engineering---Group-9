@@ -180,6 +180,7 @@ export class CandidateApplicationSubmissionService {
           phone,
           location: personalInfo.currentLocation,
         },
+        shareContactWithRecruiter: command.shareContactWithRecruiter,
         answers: [],
         coverLetter,
         message: draft.messageDraft,

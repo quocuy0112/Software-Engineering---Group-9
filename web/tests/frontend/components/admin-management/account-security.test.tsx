@@ -9,6 +9,7 @@ import {
   AccessRolesField,
   AccessRolesLegend,
 } from "@/frontend/features/admin/accounts/access-roles-field";
+import { AccountActivityField } from "@/frontend/features/admin/accounts/account-activity-field";
 
 describe("account security components", () => {
   it("shows compact, labelled Candidate, Recruiter, and Admin access roles", () => {
@@ -41,6 +42,47 @@ describe("account security components", () => {
     expect(screen.getByLabelText("Platform Administrator")).toHaveTextContent(
       "A",
     );
+  });
+
+  it("keeps account activity compact while exposing all counts", () => {
+    const { rerender } = render(
+      <RecordContextProvider
+        value={{
+          id: "candidate-1",
+          counts: { kind: "CANDIDATE", cvCount: 3, applicationCount: 12 },
+        }}
+      >
+        <AccountActivityField />
+      </RecordContextProvider>,
+    );
+    expect(
+      screen.getByLabelText("Candidate activity: CVs: 3; applications: 12"),
+    ).toBeVisible();
+    expect(screen.getByText("3 CVs")).toBeVisible();
+    expect(screen.getByText("12 applications")).toBeVisible();
+
+    rerender(
+      <RecordContextProvider
+        value={{
+          id: "recruiter-1",
+          counts: {
+            kind: "RECRUITER",
+            active: 8,
+            pendingReview: 3,
+            rejected: 2,
+            draft: 1,
+            closed: 4,
+          },
+        }}
+      >
+        <AccountActivityField />
+      </RecordContextProvider>,
+    );
+    expect(
+      screen.getByLabelText(/Recruiter activity: Active: 8/u),
+    ).toBeVisible();
+    expect(screen.getByText("18 job posts")).toBeVisible();
+    expect(screen.getByText("Review 3")).toBeVisible();
   });
 
   it("names the exact target and disables an incomplete destructive action", () => {

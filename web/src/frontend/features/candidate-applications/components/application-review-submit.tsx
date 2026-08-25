@@ -63,6 +63,7 @@ export function ApplicationReviewSubmit({
     initialReview.draft.confirmationAccepted,
   );
   const [message, setMessage] = useState(initialReview.draft.message ?? "");
+  const [shareContactWithRecruiter, setShareContactWithRecruiter] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const errorRef = useRef<HTMLParagraphElement>(null);
@@ -151,6 +152,7 @@ export function ApplicationReviewSubmit({
             draftId: updated.draftId,
             expectedRevision: updated.revision,
             informationConfirmed: true,
+            shareContactWithRecruiter,
           }),
         },
         csrfProof,
@@ -349,6 +351,10 @@ export function ApplicationReviewSubmit({
                 disabled={pending}
               />
               <span>{copy.confirmation}</span>
+            </label>
+            <label className="application-review-submit__confirm">
+              <input type="checkbox" checked={shareContactWithRecruiter} onChange={(event) => setShareContactWithRecruiter(event.target.checked)} />
+              <span>Share my email and phone with this recruiter for this application. You can withdraw this later.</span>
             </label>
           </section>
         </div>

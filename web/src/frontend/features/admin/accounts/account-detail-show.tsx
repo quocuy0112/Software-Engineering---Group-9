@@ -13,6 +13,7 @@ import {
 import { Show, useRecordContext, useRefresh } from "react-admin";
 import { ProtectedEvidenceViewer } from "../verification/protected-evidence-viewer";
 import { AccountModerationPanel } from "./account-moderation-panel";
+import { adminReasonLabel } from "../shared/admin-reason-label";
 
 type CountProjection =
   | { kind: "CANDIDATE"; cvCount: number; applicationCount: number }
@@ -60,6 +61,14 @@ type AccountDetail = {
     byteSize: number;
     safetyState: "PENDING" | "PASS" | "FAIL" | "ERROR";
     accessibility: "AVAILABLE" | "INACCESSIBLE" | "DELETED";
+    unavailabilityReason:
+      | "DELETED"
+      | "CONTENT_RESTRICTED"
+      | "SUPERSEDED"
+      | "NOT_CURRENT_SUBMISSION"
+      | "SAFETY_CHECK_INCOMPLETE"
+      | "TARGET_COMPANY_INACTIVE"
+      | null;
   }>;
   moderation: {
     canSuspend: boolean;
@@ -388,6 +397,7 @@ function Content() {
                       createdAt={evidence.submittedAt}
                       submissionVersion={evidence.version}
                       accessible={evidence.accessibility === "AVAILABLE"}
+                      unavailabilityReason={evidence.unavailabilityReason}
                       readOnly
                     />
                   </Stack>
@@ -438,7 +448,7 @@ function Content() {
                       {item.action} · {item.result}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {item.category} ·{" "}
+                      {adminReasonLabel(item.category)} ·{" "}
                       {new Date(item.occurredAt).toLocaleString()} ·{" "}
                       {item.actorRef}
                     </Typography>

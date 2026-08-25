@@ -6,6 +6,26 @@ const isoDateSchema = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/u, "Use an ISO calendar date.");
 
+export const profileVisibilitySectionSchema = z.enum([
+  "avatar",
+  "headline",
+  "summary",
+  "location",
+  "skills",
+  "experience",
+  "education",
+  "links",
+]);
+
+export const profileVisibilitySchema = z
+  .object({
+    discoverableByExactId: z.boolean(),
+    candidateSections: z.array(profileVisibilitySectionSchema).max(8),
+    recruiterSections: z.array(profileVisibilitySectionSchema).max(8),
+    version: z.number().int().nonnegative(),
+  })
+  .strict();
+
 export const profileBasicsSchema = z
   .object({
     headline: nullableText(200),
@@ -62,6 +82,7 @@ export const candidateProfileSchema = z
     experience: z.array(profileExperienceSchema).max(50),
     education: z.array(profileEducationSchema).max(50),
     socialLinks: z.array(profileSocialLinkSchema).max(10),
+    visibility: profileVisibilitySchema.optional(),
   })
   .strict();
 
@@ -86,6 +107,13 @@ const socialLinkMutationSchema = profileSocialLinkSchema
   .strict();
 
 export const profileSectionMutationSchema = z.discriminatedUnion("section", [
+  z
+    .object({
+      section: z.literal("visibility"),
+      baseRevision: baseRevisionSchema,
+      visibility: profileVisibilitySchema.omit({ version: true }),
+    })
+    .strict(),
   z
     .object({
       section: z.literal("basics"),
