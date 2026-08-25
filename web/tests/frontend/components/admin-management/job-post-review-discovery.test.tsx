@@ -24,6 +24,9 @@ describe("Administrator review discovery UI", () => {
       "Submission version",
       "Version comparison",
       "Open protected verification viewer",
+      "Deleted archive",
+      "WITHDRAWN",
+      'state: "PENDING_REVIEW"',
     ])
       expect(source).toContain(marker);
   });

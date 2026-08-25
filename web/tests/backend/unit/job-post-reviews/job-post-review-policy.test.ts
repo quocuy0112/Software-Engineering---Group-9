@@ -62,5 +62,6 @@ describe("job-post review policy", () => {
       false,
     );
     expect(canTransitionJobPostReview("REJECTED", "APPROVED")).toBe(false);
+    expect(canTransitionJobPostReview("WITHDRAWN", "APPROVED")).toBe(false);
   });
 });

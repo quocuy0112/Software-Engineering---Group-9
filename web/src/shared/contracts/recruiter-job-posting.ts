@@ -107,6 +107,7 @@ export type RecruiterJobManagementData = {
   jobs: RecruiterJob[];
   companies: RecruiterCompanyView[];
   companyId: string | null;
+  recruiterUserId?: string;
   companyProfileComplete?: boolean;
   missingCompanyProfileFields?: Array<
     "name" | "industry" | "size" | "address" | "logo"
@@ -126,13 +127,11 @@ export function parseVndInput(value: string): number {
   const normalized = value.trim().toLowerCase();
   if (!normalized) return 0;
 
-  const hasMillionSuffix =
-    /(?:tr|trieu|triÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡u|m)\s*$/iu.test(
-      normalized,
-    );
+  const millionSuffix = /(?:tr|trieu|triệu|m)\s*$/iu;
+  const hasMillionSuffix = millionSuffix.test(normalized);
   if (hasMillionSuffix) {
     const numericPart = normalized
-      .replace(/(?:tr|trieu|triÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡u|m)\s*$/iu, "")
+      .replace(millionSuffix, "")
       .replace(/\s+/gu, "")
       .replace(",", ".");
     const millions = Number.parseFloat(numericPart);
@@ -258,7 +257,7 @@ export function validateRecruiterJobForSave(
   }
   if (!classification.valid) {
     errors.subIndustry = classification.subIndustry
-      ? "Choose a sub-industry from the selected industry."
+      ? "Enter a valid sub-industry."
       : "Enter a sub-industry.";
   }
 

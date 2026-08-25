@@ -5,7 +5,11 @@ import { z } from "zod";
 import { prisma } from "@/backend/database/prisma";
 import { configuredJsonJobCatalogueRepository } from "@/backend/repositories/jobs/job-catalogue-repository-factory";
 import { adoptActiveJobBaseline } from "@/backend/jobs/review/job-post-active-baseline-service";
-import { closeManagedJobPost } from "@/backend/jobs/review/job-post-review-service";
+import {
+  closeManagedJobPost,
+  softDeleteManagedJobPost,
+  withdrawManagedJobPostReview,
+} from "@/backend/jobs/review/job-post-review-service";
 import { applyRecruiterCapacityIncrease } from "@/backend/services/jobs/recruiter-capacity-service";
 import {
   companyCatalogSchema,
@@ -186,9 +190,14 @@ const CATALOGUE_CACHE_TTL_MS = 30_000;
 // route/API requests share the same work without keeping authorization changes
 // stale for a meaningful period. All local mutations invalidate it eagerly.
 const MANAGEMENT_DATA_CACHE_TTL_MS = 15_000;
+const RECRUITER_JOB_CACHE_TTL_MS = 60_000;
 const managementDataRead = new Map<
   string,
   { value: Promise<RecruiterJobManagementData>; createdAt: number }
+>();
+const recruiterJobsRead = new Map<
+  string,
+  { value: Promise<JobCatalogItem[]>; createdAt: number }
 >();
 
 function shouldCacheCatalogue() {
@@ -205,6 +214,7 @@ export function invalidateRecruiterJobCatalogueCache() {
   rawJobsReadAt = 0;
   rawCompaniesReadAt = 0;
   managementDataRead.clear();
+  recruiterJobsRead.clear();
 }
 
 // Keep the old local name for mutation call sites in this module. The
@@ -484,18 +494,42 @@ async function readCompanyCatalog(): Promise<RecruiterCompanyCatalog> {
 async function readRecruiterJobs(companyIds: ReadonlySet<string>) {
   if (companyIds.size === 0) return [];
 
-  // Filter before the expensive Zod projection. The recruiter only needs its
-  // own postings, while the public catalogue contains tens of thousands of
-  // unrelated jobs.
-  const rawJobs = await readRawJobs();
-  return rawJobs
-    .filter((value) => {
+  const cacheKey = [...companyIds].sort().join("\u0000");
+  const cached = recruiterJobsRead.get(cacheKey);
+  if (
+    shouldCacheCatalogue() &&
+    cached &&
+    Date.now() - cached.createdAt < RECRUITER_JOB_CACHE_TTL_MS
+  ) {
+    return cached.value;
+  }
+
+  // Parse split files sequentially and retain only this tenant's records. A
+  // recruiter page must not materialize/cache the entire ~200 MB catalogue.
+  const next = jobsRepository
+    .readMatching((value) => {
       if (!value || typeof value !== "object" || Array.isArray(value))
         return false;
       const companyId = (value as { companyId?: unknown }).companyId;
       return typeof companyId === "string" && companyIds.has(companyId);
     })
-    .map(normalizeJob);
+    .then((rawJobs) => rawJobs.map(normalizeJob));
+  if (!shouldCacheCatalogue()) return next;
+
+  recruiterJobsRead.set(cacheKey, { value: next, createdAt: Date.now() });
+  try {
+    return await next;
+  } catch (error) {
+    if (recruiterJobsRead.get(cacheKey)?.value === next) {
+      recruiterJobsRead.delete(cacheKey);
+    }
+    throw error;
+  }
+}
+
+async function recruiterActionCompanies(userId: string) {
+  const { companies } = await readCompanyCatalog();
+  return authorizedCompanies(companies, userId);
 }
 
 export async function authorizeLegacyRecruiterJobs(
@@ -575,6 +609,36 @@ function replaceRawJob(rawJobs: unknown[], updated: JobCatalogItem) {
   });
   if (!replaced) throw new Error("Job posting not found.");
   return next;
+}
+
+function replaceOrAppendRawJob(rawJobs: unknown[], updated: JobCatalogItem) {
+  let replaced = false;
+  const next = rawJobs.map((value) => {
+    if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      (value as Record<string, unknown>).id === updated.id
+    ) {
+      replaced = true;
+      return updated;
+    }
+    return value;
+  });
+  if (!replaced) next.push(updated);
+  return next;
+}
+
+function removeRawJob(rawJobs: unknown[], jobId: string) {
+  return rawJobs.filter(
+    (value) =>
+      !(
+        value &&
+        typeof value === "object" &&
+        !Array.isArray(value) &&
+        (value as Record<string, unknown>).id === jobId
+      ),
+  );
 }
 
 function replaceOrAppendRawCompany(
@@ -685,12 +749,12 @@ async function loadRecruiterJobManagementData(
       ? [{ companyId: { in: ownedDatabaseCompanyIds } }]
       : []),
   ];
-  // Tenant boundary is still anchored to the owned job set:
-  // where: { jobId: { in: ownedJobIds } } (plus DB company ids for pending
-  // snapshots that do not have a JSON catalogue row yet).
+  // Tenant boundary is anchored to the owned job set. The DB company ids also
+  // retain compatibility with legacy pending snapshots and recover a posting
+  // if its draft catalogue write was interrupted before review submission.
   const reviewAggregates = reviewWhere.length
     ? await prisma.jobPostReviewAggregate.findMany({
-        where: { OR: reviewWhere },
+        where: { softDeletedAt: null, OR: reviewWhere },
         select: {
           jobId: true,
           companyId: true,
@@ -783,9 +847,11 @@ async function loadRecruiterJobManagementData(
         ? ("pending_approval" as const)
         : current?.state === "REJECTED"
           ? ("rejected" as const)
-          : current?.state === "APPROVED"
-            ? ("active" as const)
-            : undefined,
+          : current?.state === "WITHDRAWN"
+            ? ("draft" as const)
+            : current?.state === "APPROVED"
+              ? ("active" as const)
+              : undefined,
       correction: correctionRequest
         ? {
             id: correctionRequest.id,
@@ -806,7 +872,14 @@ async function loadRecruiterJobManagementData(
       if (!aggregate) return { ...job, company } satisfies RecruiterJob;
       const projection = reviewProjection(aggregate, company);
       let projectedJob: JobCatalogItem = job;
-      if (projection.current?.snapshot) {
+      // A withdrawn review is historical. Its JSON row is the new mutable
+      // working draft written by the withdraw command, so projecting the old
+      // immutable snapshot here would also replace the draft's updatedAt and
+      // make the next submission fail the catalogue concurrency check.
+      if (
+        projection.current?.snapshot &&
+        projection.current.state !== "WITHDRAWN"
+      ) {
         const snapshot = jobReviewSnapshotSchema.safeParse(
           projection.current.snapshot,
         );
@@ -837,9 +910,9 @@ async function loadRecruiterJobManagementData(
     })
     .filter((job): job is RecruiterJob => job !== null);
 
-  // A newly submitted posting intentionally has no catalogue row until an
-  // administrator approves it. Project its immutable review snapshot into
-  // the recruiter view so the pending card remains visible after navigation.
+  // New submissions normally retain their draft catalogue row while review is
+  // pending. This fallback projects the immutable review snapshot for legacy
+  // submissions or an interrupted catalogue write so the card stays visible.
   for (const aggregate of reviewAggregates) {
     if (recruiterJobs.some((job) => job.id === aggregate.jobId)) continue;
     const company = companyForAggregate(aggregate.companyId);
@@ -884,6 +957,7 @@ async function loadRecruiterJobManagementData(
     jobs: recruiterJobs,
     companies: ownedCompanies,
     companyId: primaryCompany?.id ?? null,
+    recruiterUserId: userId,
     companyProfileComplete: Boolean(
       primaryCompany && missingProfileFields.length === 0,
     ),
@@ -1072,7 +1146,7 @@ export async function createRecruiterJob(
   status: Extract<JobPostingStatus, "draft">,
 ) {
   return withWriteLock(async () => {
-    const { companies, rawJobs } = await readCatalog();
+    const { companies } = await readCompanyCatalog();
     const company = (await authorizedCompanies(companies, userId))[0] ?? null;
     if (!company) throw new Error("A recruiter-owned company is required.");
     const now = new Date().toISOString();
@@ -1081,7 +1155,10 @@ export async function createRecruiterJob(
       throw new Error("Company profile is incomplete.");
     }
     const job = jobFromCommand(raw, company.id, userId, status, now);
-    await jobsRepository.mutate(() => [...rawJobs, job]);
+    await jobsRepository.mutateIndustryPartition(job.industryCode, (jobs) => [
+      ...jobs,
+      job,
+    ]);
     invalidateCatalogueCache();
     return { ...job, company } satisfies RecruiterJob;
   });
@@ -1192,6 +1269,165 @@ export async function closeRecruiterJob(userId: string, jobId: string) {
     await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
     invalidateCatalogueCache();
     return { ...updated, company } satisfies RecruiterJob;
+  });
+}
+
+async function invalidateCandidateJobCatalogueCache() {
+  await import("@/backend/services/jobs/job-workspace-data")
+    .then(({ invalidateJobWorkspaceCatalogueCache }) =>
+      invalidateJobWorkspaceCatalogueCache(),
+    )
+    .catch(() => undefined);
+}
+
+export async function withdrawRecruiterJobReview(
+  userId: string,
+  actorSessionId: string | null,
+  jobId: string,
+  industryCode: string,
+) {
+  return withWriteLock(async () => {
+    // Release any legacy whole-catalogue projections before allocating the
+    // target partition. This is especially important for long-lived dev
+    // servers that loaded the old ~200 MB recruiter projection.
+    invalidateCatalogueCache();
+    await invalidateCandidateJobCatalogueCache();
+    const ownedCompanies = await recruiterActionCompanies(userId);
+    let result: RecruiterJob | null = null;
+    await jobsRepository.mutateIndustryPartition(industryCode, async (jobs) => {
+      const rawJob = jobs.find(
+        (value) =>
+          value &&
+          typeof value === "object" &&
+          !Array.isArray(value) &&
+          (value as Record<string, unknown>).id === jobId,
+      );
+      const current = rawJob ? normalizeJob(rawJob) : null;
+      const aggregate = current
+        ? null
+        : await prisma.jobPostReviewAggregate.findUnique({
+            where: { jobId },
+            select: { companyId: true, softDeletedAt: true },
+          });
+      const company = ownedCompanies.find((candidate) =>
+        current
+          ? candidate.id === current.companyId
+          : candidate.databaseId === aggregate?.companyId,
+      );
+      if (!company) throw new Error("Job posting not found.");
+      if (aggregate?.softDeletedAt) throw new Error("Job posting not found.");
+      if (!company.databaseBacked || !company.databaseId) {
+        throw new Error("JOB_POST_REVIEW_UNAVAILABLE");
+      }
+      await recruiterCompanyMembership(userId, company);
+
+      const withdrawn = await withdrawManagedJobPostReview({
+        jobId,
+        companyId: company.databaseId,
+        actorUserId: userId,
+        actorSessionId,
+      });
+      const draft = jobCatalogSchema.parse({
+        ...withdrawn.snapshot,
+        id: jobId,
+        companyId: current?.companyId ?? company.id,
+        status: "draft",
+        approvalComment: null,
+        isVerified: current?.isVerified ?? false,
+        createdByUserId: current?.createdByUserId ?? userId,
+        postedAt: current?.postedAt ?? withdrawn.submittedAt.toISOString(),
+        updatedAt: new Date().toISOString(),
+        stats: current?.stats ?? { viewCount: 0, applicantCount: 0 },
+      });
+      result = { ...draft, company };
+      return replaceOrAppendRawJob(jobs, draft);
+    });
+    if (!result) throw new Error("Job posting not found.");
+    invalidateCatalogueCache();
+    await invalidateCandidateJobCatalogueCache();
+    return result;
+  });
+}
+
+export async function deleteRecruiterJob(
+  userId: string,
+  actorSessionId: string | null,
+  jobId: string,
+  industryCode: string,
+) {
+  return withWriteLock(async () => {
+    invalidateCatalogueCache();
+    await invalidateCandidateJobCatalogueCache();
+    const ownedCompanies = await recruiterActionCompanies(userId);
+    await jobsRepository.mutateIndustryPartition(industryCode, async (jobs) => {
+      const rawJob = jobs.find(
+        (value) =>
+          value &&
+          typeof value === "object" &&
+          !Array.isArray(value) &&
+          (value as Record<string, unknown>).id === jobId,
+      );
+      const current = rawJob ? normalizeJob(rawJob) : null;
+      const aggregate = current
+        ? null
+        : await prisma.jobPostReviewAggregate.findUnique({
+            where: { jobId },
+            select: {
+              companyId: true,
+              pendingVersionId: true,
+              closedAt: true,
+              softDeletedAt: true,
+            },
+          });
+      const company = ownedCompanies.find((candidate) =>
+        current
+          ? candidate.id === current.companyId
+          : candidate.databaseId === aggregate?.companyId,
+      );
+      if (!company) throw new Error("Job posting not found.");
+      if (aggregate?.softDeletedAt) return jobs;
+      if (aggregate?.pendingVersionId) {
+        throw new Error(
+          "Withdraw this job from review before deleting its draft.",
+        );
+      }
+      if (aggregate?.closedAt) {
+        throw new Error(
+          "This job posting cannot be deleted in its current status.",
+        );
+      }
+      if (
+        current &&
+        current.status !== "active" &&
+        current.status !== "draft" &&
+        current.status !== "rejected"
+      ) {
+        throw new Error(
+          "This job posting cannot be deleted in its current status.",
+        );
+      }
+
+      if (company.databaseBacked && company.databaseId) {
+        await recruiterCompanyMembership(userId, company);
+        if (current?.status === "active") {
+          await adoptActiveJobBaseline({
+            job: current,
+            authoritativeCompanyId: company.databaseId,
+            actorUserId: userId,
+          });
+        }
+        await softDeleteManagedJobPost({
+          jobId,
+          companyId: company.databaseId,
+          actorUserId: userId,
+          actorSessionId,
+        });
+      }
+      return removeRawJob(jobs, jobId);
+    });
+    invalidateCatalogueCache();
+    await invalidateCandidateJobCatalogueCache();
+    return { jobId, deleted: true as const };
   });
 }
 

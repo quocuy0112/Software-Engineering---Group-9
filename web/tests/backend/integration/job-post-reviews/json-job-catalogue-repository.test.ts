@@ -251,4 +251,58 @@ describe("JSON job catalogue repository", () => {
       ),
     ).toEqual([{ id: "job-r03", industryCode: "r03", title: "IT job" }]);
   });
+
+  it("mutates one industry without parsing every split catalogue file", async () => {
+    const directory = await mkdtemp(
+      join(tmpdir(), "smarthire-partition-catalogue-writer-"),
+    );
+    directories.push(directory);
+    const files = defaultJobIndustryFiles(directory);
+    await mkdir(join(directory, "data", "jobs"), { recursive: true });
+    await Promise.all(
+      files.map(({ filePath, code }) =>
+        writeFile(
+          filePath,
+          `${JSON.stringify(
+            code === "r03" ? [{ id: "job-r03", industryCode: code }] : [],
+            null,
+            2,
+          )}\n`,
+          "utf8",
+        ),
+      ),
+    );
+    const unrelated = files.find(({ code }) => code === "r28")!;
+    await writeFile(unrelated.filePath, "{not-json", "utf8");
+
+    const repository = new JsonJobCatalogueRepository<{
+      id: string;
+      industryCode: string;
+      title?: string;
+    }>({
+      filePath: join(directory, "data", "jobs", "jobs.json"),
+      fallbackFiles: files,
+      mode: "writer",
+      writerHostId: "writer-fixture-1",
+      leaseCoordinator: new FakeLeaseCoordinator(),
+      leaseTtlMs: 30_000,
+    });
+
+    await expect(repository.readIndustryPartition("r03")).resolves.toEqual([
+      { id: "job-r03", industryCode: "r03" },
+    ]);
+    await repository.mutateIndustryPartition("r03", (jobs) =>
+      jobs.map((job) => ({ ...job, title: "Updated IT job" })),
+    );
+
+    const itFile = files.find(({ code }) => code === "r03")!;
+    expect(JSON.parse(await readFile(itFile.filePath, "utf8"))).toEqual([
+      {
+        id: "job-r03",
+        industryCode: "r03",
+        title: "Updated IT job",
+      },
+    ]);
+    expect(await readFile(unrelated.filePath, "utf8")).toBe("{not-json");
+  });
 });

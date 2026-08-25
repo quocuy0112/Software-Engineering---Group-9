@@ -278,26 +278,36 @@ function applyCanonicalTaxonomy(
 
       const dynamicBySubIndustry = new Map(
         dynamic?.subIndustries.map((subIndustry) => [
-          subIndustry.name,
+          subIndustry.name.trim().toLowerCase(),
           subIndustry,
         ]),
+      );
+      const canonicalNames = new Set(
+        definition.subIndustries.map(([name]) => name.trim().toLowerCase()),
       );
       return {
         code: definition.code,
         name: definition.label,
         count: dynamic?.count ?? 0,
-        subIndustries: definition.subIndustries.map(([name, categoryId]) => {
-          const observed = dynamicBySubIndustry.get(name);
-          return {
-            name,
-            count: observed?.count ?? 0,
-            titles:
-              observed?.titles.map((title) => ({
-                ...title,
-                categoryIds: [categoryId],
-              })) ?? [],
-          };
-        }),
+        subIndustries: [
+          ...definition.subIndustries.map(([name, categoryId]) => {
+            const observed = dynamicBySubIndustry.get(
+              name.trim().toLowerCase(),
+            );
+            return {
+              name,
+              count: observed?.count ?? 0,
+              titles:
+                observed?.titles.map((title) => ({
+                  ...title,
+                  categoryIds: [categoryId],
+                })) ?? [],
+            };
+          }),
+          ...(dynamic?.subIndustries.filter(
+            ({ name }) => !canonicalNames.has(name.trim().toLowerCase()),
+          ) ?? []),
+        ],
       };
     }),
   };

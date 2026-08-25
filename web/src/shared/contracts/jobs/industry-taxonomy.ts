@@ -317,16 +317,17 @@ export function isRecruiterIndustrySelectionValid(input: {
 }
 
 export function subIndustryOptionFor(
-  industry: Exclude<RecruiterIndustryOption, { subIndustries: null }>,
+  industry: RecruiterIndustryOption,
   value: string,
 ) {
+  if (industry.subIndustries === null) return undefined;
   const normalized = normalizedLabel(value);
   return industry.subIndustries.find(
     ([label]) => normalizedLabel(label) === normalized,
   );
 }
 
-/** Slugifier for recruiter-entered sub-industries under the Other branch. */
+/** Slugifier for recruiter-entered sub-industries under any industry branch. */
 export function slugifyRecruiterSubIndustry(value: string) {
   return value
     .normalize("NFD")
@@ -336,6 +337,37 @@ export function slugifyRecruiterSubIndustry(value: string) {
     .replace(/[^a-z0-9-]+/gu, "")
     .replace(/-+/gu, "-")
     .replace(/^-|-$/gu, "");
+}
+
+export type RecruiterSubIndustrySuggestions = Readonly<
+  Record<string, readonly string[]>
+>;
+
+/** Collect existing labels without turning them into canonical taxonomy ids. */
+export function collectRecruiterSubIndustrySuggestions(
+  jobs: readonly {
+    industry?: string | null;
+    industryCode?: string | null;
+    subIndustry?: string | null;
+  }[],
+): RecruiterSubIndustrySuggestions {
+  const labelsByIndustry = new Map<string, Map<string, string>>();
+  for (const job of jobs) {
+    const label = job.subIndustry?.trim();
+    if (!label) continue;
+    const industry = recruiterIndustryOptionFor(job);
+    const labels = labelsByIndustry.get(industry.code) ?? new Map();
+    labelsByIndustry.set(industry.code, labels);
+    if (!labels.has(normalizedLabel(label))) {
+      labels.set(normalizedLabel(label), label);
+    }
+  }
+  return Object.fromEntries(
+    [...labelsByIndustry].map(([code, labels]) => [
+      code,
+      [...labels.values()].sort((left, right) => left.localeCompare(right)),
+    ]),
+  );
 }
 
 export type RecruiterClassification = {
@@ -363,42 +395,30 @@ export function deriveRecruiterClassification(input: {
     label: input.industry,
   });
 
-  if (industry.subIndustries === null) {
-    const slug = slugifyRecruiterSubIndustry(rawSubIndustry);
-    // TODO: Department for Other is a product decision. Until overridden,
-    // mirror the free-text sub-industry so the field remains deterministic
-    // while still being rendered read-only to recruiters.
-    return {
-      industry: industry.label,
-      industryCode: industry.code,
-      subIndustry: rawSubIndustry,
-      categoryFamily: industry.code,
-      categoryIds: slug ? [`${industry.code}-${slug}`] : [],
-      department: rawSubIndustry || null,
-      valid: industrySelectionValid && Boolean(rawSubIndustry && slug),
-    };
-  }
-
   const selected = subIndustryOptionFor(industry, rawSubIndustry);
-  if (!selected) {
+  if (selected) {
     return {
       industry: industry.label,
       industryCode: industry.code,
-      subIndustry: rawSubIndustry,
+      subIndustry: selected[0],
       categoryFamily: industry.code,
-      categoryIds: [],
-      department: null,
-      valid: false,
+      categoryIds: [selected[1]],
+      department: selected[0],
+      valid: industrySelectionValid,
     };
   }
 
+  const slug = slugifyRecruiterSubIndustry(rawSubIndustry);
   return {
     industry: industry.label,
     industryCode: industry.code,
-    subIndustry: selected[0],
+    subIndustry: rawSubIndustry,
     categoryFamily: industry.code,
-    categoryIds: [selected[1]],
-    department: selected[0],
-    valid: industrySelectionValid,
+    // Keep user-entered labels out of canonical ids. This stable fallback
+    // preserves parent-industry filtering while the label can later be
+    // normalized or promoted into the curated taxonomy.
+    categoryIds: slug ? [`${industry.code}-other`] : [],
+    department: rawSubIndustry || null,
+    valid: industrySelectionValid && Boolean(rawSubIndustry && slug),
   };
 }

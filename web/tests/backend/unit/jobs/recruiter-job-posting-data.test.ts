@@ -244,6 +244,7 @@ describe("recruiter JSON job persistence", () => {
 
     const data = await readRecruiterJobManagementData("recruiter-1");
 
+    expect(data.recruiterUserId).toBe("recruiter-1");
     expect(data.companyId).toBe("db-company-1");
     expect(data.companies).toHaveLength(1);
     expect(data.companyProfileComplete).toBe(true);
@@ -309,6 +310,77 @@ describe("recruiter JSON job persistence", () => {
         state: "PENDING_REVIEW",
         readOnly: true,
       },
+    });
+  });
+
+  it("keeps the current JSON draft timestamp after a review is withdrawn", async () => {
+    prismaMocks.company.findMany.mockResolvedValue([
+      {
+        id: "db-company-1",
+        slug: "northstar-labs",
+        legalName: "Northstar Labs",
+        displayName: "Northstar Labs",
+        logoUrl: "https://example.com/logo.png",
+        websiteUrl: "https://northstar.example.com",
+        publicDescription: "A product company.",
+        publicLocation: "Ho Chi Minh City",
+        size: "51-200 employees",
+        industry: "Technology",
+        address: "Ho Chi Minh City",
+        entityType: null,
+        normalizedTaxIdentifier: "1234567890",
+        memberships: [{ userId: "recruiter-1", role: "OWNER" }],
+      },
+    ]);
+    const submittedJob = {
+      ...completeJob("withdrawn-job"),
+      companyId: "db-company-1",
+      title: "Submitted title",
+      updatedAt: "2026-08-25T00:00:00.000Z",
+    };
+    const workingDraft = {
+      ...submittedJob,
+      title: "Current draft title",
+      status: "draft" as const,
+      updatedAt: "2026-08-25T02:00:00.000Z",
+    };
+    const withdrawnVersion = {
+      id: "withdrawn-version-1",
+      sequence: 1,
+      state: "WITHDRAWN",
+      reasonCode: null,
+      publicExplanation: null,
+      submittedAt: new Date("2026-08-25T00:00:00.000Z"),
+      decidedAt: new Date("2026-08-25T01:00:00.000Z"),
+      snapshot: jobReviewSnapshotFromCatalog(
+        submittedJob,
+        "db-company-1",
+      ),
+    };
+    prismaMocks.jobPostReviewAggregate.findMany.mockResolvedValue([
+      {
+        jobId: workingDraft.id,
+        companyId: "db-company-1",
+        version: 2,
+        pendingVersion: null,
+        versions: [withdrawnVersion],
+        correctionRequests: [],
+      },
+    ]);
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return JSON.stringify([workingDraft]);
+      if (path.endsWith("companies.json")) return "[]";
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const data = await readRecruiterJobManagementData("recruiter-1");
+
+    expect(data.jobs[0]).toMatchObject({
+      id: "withdrawn-job",
+      title: "Current draft title",
+      status: "draft",
+      updatedAt: "2026-08-25T02:00:00.000Z",
+      review: { state: "WITHDRAWN", readOnly: false },
     });
   });
 

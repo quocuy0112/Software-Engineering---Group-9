@@ -2,8 +2,13 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { requireSession } from "@/backend/auth/session/require-session";
 import {
+  jobErrorResponse,
+  requireJobActor,
+} from "@/backend/security/job-request-boundary";
+import {
   closeRecruiterJob,
   createRecruiterJob,
+  deleteRecruiterJob,
   readRecruiterJobManagementData,
   updateRecruiterJob,
 } from "@/backend/services/jobs/recruiter-job-posting-data";
@@ -64,6 +69,8 @@ function mutationErrorResponse(error: unknown, fallback: string) {
   if (
     message === "This job posting cannot be edited in its current status." ||
     message === "This job posting cannot be closed in its current status." ||
+    message === "This job posting cannot be deleted in its current status." ||
+    message === "Withdraw this job from review before deleting its draft." ||
     message === "This job posting is locked while review is pending."
   ) {
     return errorResponse(message, 409);
@@ -119,11 +126,31 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const current = await actor(request);
-  if (!current) return errorResponse("Authentication required.", 401);
+  let current: Awaited<ReturnType<typeof requireJobActor>>;
+  try {
+    current = await requireJobActor(request, { mutation: true });
+  } catch (error) {
+    return jobErrorResponse(error);
+  }
   try {
     const jobId = new URL(request.url).searchParams.get("jobId");
     if (!jobId) return errorResponse("A job id is required.");
+    const action = new URL(request.url).searchParams.get("action");
+    if (action === "delete") {
+      const industryCode = new URL(request.url).searchParams.get(
+        "industryCode",
+      );
+      if (!industryCode || industryCode.length > 16) {
+        return errorResponse("A valid industry code is required.", 422);
+      }
+      const result = await deleteRecruiterJob(
+        current.userId,
+        current.sessionId,
+        jobId,
+        industryCode,
+      );
+      return NextResponse.json(result, { headers: noStore });
+    }
     const job = await closeRecruiterJob(current.userId, jobId);
     return NextResponse.json(job, { headers: noStore });
   } catch (error) {

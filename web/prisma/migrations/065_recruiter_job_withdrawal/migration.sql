@@ -1,0 +1,2 @@
+ALTER TYPE "JobPostReviewState" ADD VALUE 'WITHDRAWN';
+ALTER TYPE "JobPostReviewHistoryAction" ADD VALUE 'WITHDRAWN';

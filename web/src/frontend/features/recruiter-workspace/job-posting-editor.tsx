@@ -1,6 +1,14 @@
 "use client";
 
-import { useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import {
   Activity,
   ArrowLeft,
@@ -39,6 +47,7 @@ import {
   recruiterIndustryOptionFor,
   recruiterIndustryTaxonomy,
   type RecruiterIndustryCode,
+  type RecruiterSubIndustrySuggestions,
 } from "@/shared/contracts/jobs/industry-taxonomy";
 import type {
   JobCatalogItem,
@@ -76,6 +85,70 @@ const benefitIconByName: Record<string, LucideIcon> = {
   shield: Shield,
   smile: Smile,
 };
+
+const customSubIndustryValue = "__custom_sub_industry__";
+const recruiterDraftAutoSaveStoragePrefix =
+  "smarthire.recruiter.job-draft-autosave";
+const recruiterDraftAutoSaveChangedEvent =
+  "smarthire:recruiter-draft-autosave-changed";
+const recruiterDraftAutoSaveDelayMs = 1_500;
+
+function useRecruiterDraftAutoSave(storageKey: string) {
+  const subscribe = useCallback(
+    (notify: () => void) => {
+      const handleStorage = (event: StorageEvent) => {
+        if (event.key === storageKey) notify();
+      };
+      window.addEventListener("storage", handleStorage);
+      window.addEventListener(recruiterDraftAutoSaveChangedEvent, notify);
+      return () => {
+        window.removeEventListener("storage", handleStorage);
+        window.removeEventListener(recruiterDraftAutoSaveChangedEvent, notify);
+      };
+    },
+    [storageKey],
+  );
+  const getSnapshot = useCallback(
+    () => window.localStorage.getItem(storageKey) === "enabled",
+    [storageKey],
+  );
+  return useSyncExternalStore(subscribe, getSnapshot, () => false);
+}
+
+function normalizedOption(value: string) {
+  return value.trim().toLowerCase();
+}
+
+function subIndustryLabels(
+  industry: ReturnType<typeof recruiterIndustryOptionFor>,
+  suggestions: RecruiterSubIndustrySuggestions,
+) {
+  const labels = new Map<string, string>();
+  for (const [label] of industry.subIndustries ?? []) {
+    labels.set(normalizedOption(label), label);
+  }
+  for (const label of suggestions[industry.code] ?? []) {
+    const trimmed = label.trim();
+    if (trimmed) labels.set(normalizedOption(trimmed), trimmed);
+  }
+  return [...labels.values()];
+}
+
+function toJobCatalogPayload(job: RecruiterJob): JobCatalogItem {
+  const payload: Record<string, unknown> = { ...job };
+  delete payload.company;
+  delete payload.review;
+  delete payload.correctionRequest;
+  return payload as unknown as JobCatalogItem;
+}
+
+function formLevelError(
+  message: string | undefined,
+  fallback: string,
+  fieldErrors: RecruiterJobFieldErrors,
+) {
+  return Object.keys(fieldErrors).length === 0 ? (message ?? fallback) : "";
+}
 
 function formatReasonCode(code: string): string {
   const reasonLabels: Record<string, string> = {
@@ -269,12 +342,18 @@ function EditorSection({
 export function JobPostingEditor({
   initialJob,
   companyName,
+  autoSavePreferenceScope,
+  subIndustrySuggestions = {},
   onBack,
+  onDraftAutoSaved,
   onSaved,
 }: {
   initialJob: RecruiterJob;
   companyName: string;
+  autoSavePreferenceScope?: string;
+  subIndustrySuggestions?: RecruiterSubIndustrySuggestions;
   onBack: () => void;
+  onDraftAutoSaved?: (job: RecruiterJob) => void;
   onSaved: (job: RecruiterJob) => void;
 }) {
   const normalizedInitialJob: RecruiterJob = {
@@ -304,6 +383,10 @@ export function JobPostingEditor({
   );
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [hasSavedDraft, setHasSavedDraft] = useState(false);
+  const editRevision = useRef(0);
+  const autoSaveBlockedRevision = useRef<number | null>(null);
+  const autoSaveStorageKey = `${recruiterDraftAutoSaveStoragePrefix}:${autoSavePreferenceScope ?? initialJob.companyId}`;
+  const autoSaveEnabled = useRecruiterDraftAutoSave(autoSaveStorageKey);
   const locale = useWorkspaceLocale();
   const copy = recruiterJobPostingCopy(locale);
   const readOnly = job.status === "pending_approval";
@@ -326,7 +409,25 @@ export function JobPostingEditor({
     code: job.industryCode,
     label: job.industry,
   });
-  const isOtherIndustry = selectedIndustry.subIndustries === null;
+  const availableSubIndustries = useMemo(
+    () => subIndustryLabels(selectedIndustry, subIndustrySuggestions),
+    [selectedIndustry, subIndustrySuggestions],
+  );
+  const initialIndustry = recruiterIndustryOptionFor(initialJob);
+  const initialSubIndustryOptions = subIndustryLabels(
+    initialIndustry,
+    subIndustrySuggestions,
+  );
+  const [usesCustomSubIndustry, setUsesCustomSubIndustry] = useState(
+    () =>
+      initialSubIndustryOptions.length === 0 ||
+      (Boolean(initialJob.subIndustry) &&
+        !initialSubIndustryOptions.some(
+          (label) =>
+            normalizedOption(label) ===
+            normalizedOption(initialJob.subIndustry),
+        )),
+  );
 
   const clearFieldErrors = (...fields: string[]) => {
     setFieldErrors((current) => {
@@ -354,6 +455,8 @@ export function JobPostingEditor({
     updater: (current: JobCatalogItem) => JobCatalogItem,
     ...fields: string[]
   ) => {
+    editRevision.current += 1;
+    autoSaveBlockedRevision.current = null;
     setHasUnsavedChanges(true);
     clearFieldErrors(...fields);
     setJob((current) => ({
@@ -373,6 +476,9 @@ export function JobPostingEditor({
       code as RecruiterIndustryCode,
     );
     if (!nextIndustry) return;
+    setUsesCustomSubIndustry(
+      subIndustryLabels(nextIndustry, subIndustrySuggestions).length === 0,
+    );
     changeJob(
       (current) => ({
         ...current,
@@ -498,117 +604,203 @@ export function JobPostingEditor({
       },
     }));
 
-  const persist = async (
-    prepared: RecruiterJob,
-    targetStatus: JobPostingStatus,
-  ) => {
-    setSaving(true);
-    setError("");
-    try {
-      if (targetStatus === "pending_approval") {
-        const {
-          company: _company,
-          review: _review,
-          correctionRequest: _correctionRequest,
-          ...reviewJob
-        } = prepared as JobCatalogItem & {
-          company?: unknown;
-          review?: unknown;
-          correctionRequest?: unknown;
-        };
-        submissionKey.current ??= crypto.randomUUID();
-        const submissionResponse = await fetch(
-          `/api/recruiter/job-postings/${encodeURIComponent(prepared.id)}/submit-review`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "idempotency-key": submissionKey.current,
-              "x-csrf-token": csrfProof,
+  const persist = useCallback(
+    async (
+      prepared: RecruiterJob,
+      targetStatus: JobPostingStatus,
+      options: { stayInEditor?: boolean; revision?: number } = {},
+    ): Promise<boolean> => {
+      setSaving(true);
+      setError("");
+      try {
+        if (targetStatus === "pending_approval") {
+          // Submission is intentionally two-phase: first persist the exact
+          // working copy as a draft, then create the immutable review version.
+          // A failed review request therefore never loses the recruiter's work.
+          let savedDraft: RecruiterJob = { ...prepared, status: "draft" };
+          const shouldPersistDraft =
+            prepared.id === "new-job" ||
+            prepared.status !== "draft" ||
+            prepared.review?.state === "WITHDRAWN" ||
+            hasUnsavedChanges;
+          if (shouldPersistDraft) {
+            const draftJob = toJobCatalogPayload(prepared);
+            const draftMethod = prepared.id === "new-job" ? "POST" : "PATCH";
+            const draftResponse = await fetch("/api/recruiter/job-postings", {
+              method: draftMethod,
+              headers: {
+                "Content-Type": "application/json",
+                "x-csrf-token": csrfProof,
+              },
+              body: JSON.stringify(
+                draftMethod === "POST"
+                  ? { job: draftJob, status: "draft" }
+                  : { ...draftJob, status: "draft" },
+              ),
+            });
+            const draftPayload = (await draftResponse
+              .json()
+              .catch(() => null)) as
+              | (RecruiterJob & {
+                  message?: string;
+                  fieldErrors?: RecruiterJobFieldErrors;
+                })
+              | null;
+            if (!draftResponse.ok || !draftPayload) {
+              const nextFieldErrors = draftPayload?.fieldErrors ?? {};
+              setFieldErrors(nextFieldErrors);
+              setError(
+                formLevelError(
+                  draftPayload?.message,
+                  "Unable to save the draft.",
+                  nextFieldErrors,
+                ),
+              );
+              return false;
+            }
+
+            savedDraft = {
+              ...draftPayload,
+              status: "draft",
+              company: prepared.company,
+            };
+          }
+
+          catalogueUpdatedAt.current = savedDraft.updatedAt;
+          setJob(savedDraft);
+          setHasUnsavedChanges(false);
+          setHasSavedDraft(true);
+
+          const reviewJob = toJobCatalogPayload(savedDraft);
+          submissionKey.current ??= crypto.randomUUID();
+          const submissionResponse = await fetch(
+            `/api/recruiter/job-postings/${encodeURIComponent(savedDraft.id)}/submit-review`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "idempotency-key": submissionKey.current,
+                "x-csrf-token": csrfProof,
+              },
+              body: JSON.stringify({
+                expectedWorkingUpdatedAt: savedDraft.updatedAt,
+                expectedCatalogueUpdatedAt: savedDraft.updatedAt,
+                job: reviewJob,
+              }),
             },
-            body: JSON.stringify({
-              expectedWorkingUpdatedAt: prepared.updatedAt,
-              ...(catalogueUpdatedAt.current
-                ? { expectedCatalogueUpdatedAt: catalogueUpdatedAt.current }
-                : {}),
-              job: reviewJob,
-            }),
+          );
+          const review = (await submissionResponse.json().catch(() => null)) as
+            | (NonNullable<RecruiterJob["review"]> & {
+                message?: string;
+                fieldErrors?: RecruiterJobFieldErrors;
+              })
+            | { message?: string; fieldErrors?: RecruiterJobFieldErrors }
+            | null;
+          if (!submissionResponse.ok || !review || !("reviewId" in review)) {
+            const nextFieldErrors =
+              review && "fieldErrors" in review
+                ? (review.fieldErrors ?? {})
+                : {};
+            setFieldErrors(nextFieldErrors);
+            setError(
+              formLevelError(
+                review && "message" in review ? review.message : undefined,
+                "Unable to submit this posting for review.",
+                nextFieldErrors,
+              ),
+            );
+            return false;
+          }
+          submissionKey.current = null;
+          setHasUnsavedChanges(false);
+          onSaved({
+            ...savedDraft,
+            id: review.jobId,
+            status: "pending_approval",
+            company: savedDraft.company,
+            review: {
+              ...review,
+              reasonCode: review.reasonCode ?? null,
+              publicExplanation: review.publicExplanation ?? null,
+              decidedAt: review.decidedAt ?? null,
+            },
+          });
+          return true;
+        }
+
+        const method = prepared.id === "new-job" ? "POST" : "PATCH";
+        const response = await fetch("/api/recruiter/job-postings", {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+            "x-csrf-token": csrfProof,
           },
-        );
-        const review = (await submissionResponse.json().catch(() => null)) as
-          | (NonNullable<RecruiterJob["review"]> & {
+          body: JSON.stringify(
+            method === "POST"
+              ? { job: prepared, status: "draft" }
+              : { ...prepared, status: "draft" },
+          ),
+        });
+        const payload = (await response.json().catch(() => null)) as
+          | (RecruiterJob & {
               message?: string;
               fieldErrors?: RecruiterJobFieldErrors;
             })
-          | { message?: string; fieldErrors?: RecruiterJobFieldErrors }
           | null;
-        if (!submissionResponse.ok || !review || !("reviewId" in review)) {
-          setFieldErrors(
-            review && "fieldErrors" in review ? (review.fieldErrors ?? {}) : {},
-          );
+        if (!response.ok) {
+          const nextFieldErrors = payload?.fieldErrors ?? {};
+          setFieldErrors(nextFieldErrors);
           setError(
-            review && "message" in review
-              ? (review.message ?? "Unable to submit this posting for review.")
-              : "Unable to submit this posting for review.",
+            formLevelError(
+              payload?.message,
+              "Unable to save posting.",
+              nextFieldErrors,
+            ),
           );
-          return;
+          return false;
         }
-        submissionKey.current = null;
-        setHasUnsavedChanges(false);
-        onSaved({
-          ...prepared,
-          id: review.jobId,
-          status: "pending_approval",
-          company: prepared.company,
-          review: {
-            ...review,
-            reasonCode: review.reasonCode ?? null,
-            publicExplanation: review.publicExplanation ?? null,
-            decidedAt: review.decidedAt ?? null,
-          },
-        });
-        return;
+        if (!payload) {
+          setError("The server returned an invalid response.");
+          return false;
+        }
+        catalogueUpdatedAt.current = payload.updatedAt;
+        setHasSavedDraft(true);
+        if (options.stayInEditor) {
+          const savedRevision = options.revision ?? editRevision.current;
+          const hasNewerChanges = editRevision.current !== savedRevision;
+          setJob((current) =>
+            hasNewerChanges
+              ? {
+                  ...current,
+                  id: payload.id,
+                  slug: payload.slug,
+                  createdByUserId: payload.createdByUserId,
+                  postedAt: payload.postedAt,
+                  status: "draft",
+                }
+              : {
+                  ...payload,
+                  company: current.company,
+                },
+          );
+          setHasUnsavedChanges(hasNewerChanges);
+          onDraftAutoSaved?.({ ...payload, company: prepared.company });
+        } else {
+          setHasUnsavedChanges(false);
+          onSaved(payload);
+        }
+        return true;
+      } catch {
+        setError(
+          "Unable to reach the server. Your changes are still available in this form.",
+        );
+        return false;
+      } finally {
+        setSaving(false);
       }
-
-      const method = prepared.id === "new-job" ? "POST" : "PATCH";
-      const response = await fetch("/api/recruiter/job-postings", {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          "x-csrf-token": csrfProof,
-        },
-        body: JSON.stringify(
-          method === "POST"
-            ? { job: prepared, status: "draft" }
-            : { ...prepared, status: "draft" },
-        ),
-      });
-      const payload = (await response.json().catch(() => null)) as
-        | (RecruiterJob & {
-            message?: string;
-            fieldErrors?: RecruiterJobFieldErrors;
-          })
-        | null;
-      if (!response.ok) {
-        setFieldErrors(payload?.fieldErrors ?? {});
-        setError(payload?.message ?? "Unable to save posting.");
-        return;
-      }
-      if (!payload) {
-        setError("The server returned an invalid response.");
-        return;
-      }
-      setHasUnsavedChanges(false);
-      setHasSavedDraft(true);
-      onSaved(payload);
-    } catch {
-      setError(
-        "Unable to reach the server. Your changes are still available in this form.",
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
+    },
+    [csrfProof, hasUnsavedChanges, onDraftAutoSaved, onSaved],
+  );
 
   const save = async (targetStatus: JobPostingStatus) => {
     if (readOnly) return;
@@ -664,7 +856,7 @@ export function JobPostingEditor({
           next[5] = true;
         return next;
       });
-      setError("Review the highlighted fields before saving this posting.");
+      setError("");
       return;
     }
 
@@ -683,6 +875,49 @@ export function JobPostingEditor({
     setPendingSubmission(null);
     void persist(prepared, "pending_approval");
   };
+
+  const toggleAutomaticDraftSave = () => {
+    const enabled = !autoSaveEnabled;
+    autoSaveBlockedRevision.current = null;
+    if (enabled) {
+      window.localStorage.setItem(autoSaveStorageKey, "enabled");
+    } else {
+      window.localStorage.removeItem(autoSaveStorageKey);
+    }
+    window.dispatchEvent(new Event(recruiterDraftAutoSaveChangedEvent));
+  };
+
+  useEffect(() => {
+    if (
+      !autoSaveEnabled ||
+      readOnly ||
+      saving ||
+      !hasUnsavedChanges ||
+      autoSaveBlockedRevision.current === editRevision.current
+    ) {
+      return;
+    }
+
+    const prepared: RecruiterJob = {
+      ...job,
+      ...prepareRecruiterJobForSave(job),
+      company: job.company,
+    };
+    if (Object.keys(validateRecruiterJobForSave(prepared, "draft")).length) {
+      return;
+    }
+
+    const revision = editRevision.current;
+    const timer = window.setTimeout(() => {
+      void persist(prepared, "draft", {
+        stayInEditor: true,
+        revision,
+      }).then((saved) => {
+        if (!saved) autoSaveBlockedRevision.current = revision;
+      });
+    }, recruiterDraftAutoSaveDelayMs);
+    return () => window.clearTimeout(timer);
+  }, [autoSaveEnabled, hasUnsavedChanges, job, persist, readOnly, saving]);
 
   const department = job.description.generalInfo.department ?? "";
   const minDeadline = new Date().toISOString().slice(0, 10);
@@ -707,6 +942,15 @@ export function JobPostingEditor({
     ),
   ];
   const completedSections = sectionCompletion.filter(Boolean).length;
+  const saveStatus = saving
+    ? copy.saving
+    : hasUnsavedChanges
+      ? copy.unsaved
+      : hasSavedDraft
+        ? copy.saved
+        : autoSaveEnabled
+          ? copy.autoSaveOn
+          : "";
   const setSectionOpen = (index: number, open: boolean) =>
     setOpenSections((current) =>
       current[index] === open
@@ -733,25 +977,21 @@ export function JobPostingEditor({
               {job.id === "new-job" ? copy.create : job.title || copy.edit}
             </h1>
           </div>
-          <span
-            className={[
-              "recruiter-editor-save-status",
-              saving ? "is-saving" : "",
-              hasUnsavedChanges ? "is-dirty" : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            role="status"
-          >
-            <span aria-hidden="true" />
-            {saving
-              ? copy.saving
-              : hasUnsavedChanges
-                ? copy.unsaved
-                : hasSavedDraft
-                  ? copy.saved
-                  : copy.savedManually}
-          </span>
+          {saveStatus ? (
+            <span
+              className={[
+                "recruiter-editor-save-status",
+                saving ? "is-saving" : "",
+                hasUnsavedChanges ? "is-dirty" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              role="status"
+            >
+              <span aria-hidden="true" />
+              {saveStatus}
+            </span>
+          ) : null}
         </div>
         <p>
           Build a complete, structured listing and review exactly what
@@ -880,42 +1120,69 @@ export function JobPostingEditor({
                 </select>
                 <FieldError field="industry" errors={displayedErrors} />
               </label>
-              <label>
-                Sub-industry *
-                {isOtherIndustry ? (
-                  <input
-                    disabled={readOnly}
-                    required
-                    maxLength={160}
-                    value={job.subIndustry}
-                    onChange={(event) =>
-                      updateSubIndustry(event.currentTarget.value)
-                    }
-                    placeholder="e.g. Aerospace Engineering"
-                    {...fieldA11y("subIndustry")}
-                  />
-                ) : (
-                  <select
-                    disabled={readOnly}
-                    required
-                    value={job.subIndustry}
-                    onChange={(event) =>
-                      updateSubIndustry(event.currentTarget.value)
-                    }
-                    {...fieldA11y("subIndustry")}
-                  >
-                    <option value="" disabled>
-                      Choose a sub-industry
-                    </option>
-                    {selectedIndustry.subIndustries.map(([label]) => (
-                      <option key={label} value={label}>
-                        {label}
+              <div className="recruiter-sub-industry-field">
+                {availableSubIndustries.length > 0 ? (
+                  <>
+                    <label htmlFor="recruiter-sub-industry">
+                      Sub-industry *
+                    </label>
+                    <select
+                      id="recruiter-sub-industry"
+                      disabled={readOnly}
+                      required
+                      value={
+                        usesCustomSubIndustry
+                          ? customSubIndustryValue
+                          : job.subIndustry
+                      }
+                      onChange={(event) => {
+                        const value = event.currentTarget.value;
+                        if (value === customSubIndustryValue) {
+                          setUsesCustomSubIndustry(true);
+                          updateSubIndustry("");
+                          return;
+                        }
+                        setUsesCustomSubIndustry(false);
+                        updateSubIndustry(value);
+                      }}
+                      {...fieldA11y("subIndustry")}
+                    >
+                      <option value="" disabled>
+                        Choose a sub-industry
                       </option>
-                    ))}
-                  </select>
-                )}
+                      {availableSubIndustries.map((label) => (
+                        <option key={label} value={label}>
+                          {label}
+                        </option>
+                      ))}
+                      <option value={customSubIndustryValue}>
+                        Add a new sub-industry…
+                      </option>
+                    </select>
+                  </>
+                ) : null}
+                {usesCustomSubIndustry ||
+                availableSubIndustries.length === 0 ? (
+                  <label htmlFor="recruiter-custom-sub-industry">
+                    {availableSubIndustries.length > 0
+                      ? "New sub-industry *"
+                      : "Sub-industry *"}
+                    <input
+                      id="recruiter-custom-sub-industry"
+                      disabled={readOnly}
+                      required
+                      maxLength={160}
+                      value={job.subIndustry}
+                      onChange={(event) =>
+                        updateSubIndustry(event.currentTarget.value)
+                      }
+                      placeholder="e.g. Aerospace Engineering"
+                      {...fieldA11y("subIndustry")}
+                    />
+                  </label>
+                ) : null}
                 <FieldError field="subIndustry" errors={displayedErrors} />
-              </label>
+              </div>
             </div>
             <div className="recruiter-form-grid">
               <label>
@@ -1565,13 +1832,10 @@ export function JobPostingEditor({
                       event.currentTarget.value = rawValue;
                     }
                     const applyDeadline = dateInputToIso(rawValue);
-                    setHasUnsavedChanges(true);
-                    clearFieldErrors("applyDeadline");
-                    setJob((current) => ({
-                      ...current,
-                      applyDeadline,
-                      updatedAt: new Date().toISOString(),
-                    }));
+                    changeJob(
+                      (current) => ({ ...current, applyDeadline }),
+                      "applyDeadline",
+                    );
                   }}
                   onBlur={(event) => {
                     const rawValue = event.target.value;
@@ -1580,9 +1844,7 @@ export function JobPostingEditor({
                         ...current,
                         applyDeadline: "Enter a valid application deadline.",
                       }));
-                      setError(
-                        "Review the highlighted fields before saving this posting.",
-                      );
+                      setError("");
                     }
                   }}
                   {...fieldA11y("applyDeadline")}
@@ -1609,15 +1871,24 @@ export function JobPostingEditor({
           ) : null}
 
           <div className="recruiter-editor__actions recruiter-surface-card">
-            <span className="recruiter-editor__action-status" role="status">
-              {saving
-                ? copy.saving
-                : hasUnsavedChanges
-                  ? copy.unsaved
-                  : hasSavedDraft
-                    ? copy.saved
-                    : copy.savedManually}
-            </span>
+            {saveStatus ? (
+              <span className="recruiter-editor__action-status" role="status">
+                {saveStatus}
+              </span>
+            ) : null}
+            <button
+              type="button"
+              className={[
+                "recruiter-outline-button",
+                autoSaveEnabled ? "is-active" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-pressed={autoSaveEnabled}
+              onClick={toggleAutomaticDraftSave}
+            >
+              {copy.automaticSave}: {autoSaveEnabled ? copy.on : copy.off}
+            </button>
             <button
               type="button"
               className="recruiter-outline-button"

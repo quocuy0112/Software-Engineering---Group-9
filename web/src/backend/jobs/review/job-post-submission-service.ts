@@ -251,8 +251,8 @@ export class JobPostSubmissionService {
         version: aggregate.version + 1,
       };
     });
-    // A draft may already be present in the short-lived recruiter management
-    // cache. Once submission commits, force the next read to project the
+    // The recruiter flow persists the working draft before reaching this
+    // command. Once submission commits, force the next read to project the
     // aggregate's pendingVersionId as pending_approval. Assignment changes,
     // including losing the final administrator, never affect that status.
     invalidateRecruiterJobCatalogueCache();

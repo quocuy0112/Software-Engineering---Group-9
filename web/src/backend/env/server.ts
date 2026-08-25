@@ -107,6 +107,12 @@ const schema = z
     CV_UNCONFIRMED_RETENTION_DAYS: z.literal("30").transform(Number),
     CV_CONFIRMED_RETENTION_DAYS: z.literal("7").transform(Number),
     CV_CANDIDATE_DELETE_RETENTION_HOURS: z.literal("24").transform(Number),
+    JOB_REVIEW_DELETED_RETENTION_DAYS: z.coerce
+      .number()
+      .int()
+      .min(30)
+      .max(3_650)
+      .default(180),
     OCR_ENGINE_ENABLED: booleanString.optional(),
     OCR_ENGINE_SOCKET_PATH: z.string().optional(),
     OCR_ENGINE_NAME: z.string().optional(),

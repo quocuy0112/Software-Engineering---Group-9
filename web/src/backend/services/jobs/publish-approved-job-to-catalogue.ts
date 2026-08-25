@@ -59,7 +59,9 @@ export async function publishApprovedJobToCatalogue(input: {
   status?: "active" | "closed";
 }) {
   const snapshot = jobReviewSnapshotSchema.parse(input.snapshot);
-  const rawJobs = await jobsRepository.read();
+  const rawJobs = await jobsRepository.readIndustryPartition(
+    snapshot.industryCode,
+  );
   const existingRaw = rawJobs.find(
     (value) =>
       value &&
@@ -82,17 +84,20 @@ export async function publishApprovedJobToCatalogue(input: {
     stats: existingJob?.stats ?? { viewCount: 0, applicantCount: 0 },
   });
 
-  await jobsRepository.mutate((values) => {
-    const next = values.filter(
-      (value) =>
-        !(
-          value &&
-          typeof value === "object" &&
-          !Array.isArray(value) &&
-          (value as { id?: unknown }).id === approved.id
-        ),
-    );
-    return [...next, approved];
-  });
+  await jobsRepository.mutateIndustryPartition(
+    approved.industryCode,
+    (values) => {
+      const next = values.filter(
+        (value) =>
+          !(
+            value &&
+            typeof value === "object" &&
+            !Array.isArray(value) &&
+            (value as { id?: unknown }).id === approved.id
+          ),
+      );
+      return [...next, approved];
+    },
+  );
   return approved;
 }
