@@ -37,14 +37,38 @@ const taxonomy: JobSearchTaxonomy = {
   locationGroups: [],
 };
 
+const visitorTaxonomy: JobSearchTaxonomy = {
+  ...taxonomy,
+  industries: [
+    {
+      code: "software",
+      name: "IT & Software",
+      count: 1,
+      subIndustries: [
+        {
+          name: "Software Engineering",
+          count: 1,
+          titles: [
+            {
+              name: "Software Engineer",
+              categoryIds: ["software-engineer"],
+              count: 1,
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
 describe("job board navigation", () => {
-  it("keeps one header search across every Jobs workspace tab", async () => {
+  it("shows the header search on Find Jobs only", async () => {
     const headerSlot = document.createElement("div");
     headerSlot.id = "workspace-job-search-slot";
     document.body.append(headerSlot);
     navigation.push.mockClear();
-    navigation.pathname = "/jobs/saved";
-    window.history.replaceState(null, "", "/jobs/saved");
+    navigation.pathname = "/jobs";
+    window.history.replaceState(null, "", "/jobs");
     const rendered = render(<JobWorkspaceSearch taxonomy={taxonomy} />);
 
     try {
@@ -58,11 +82,12 @@ describe("job board navigation", () => {
         { target: { value: "designer" } },
       );
       fireEvent.submit(within(headerSlot).getByRole("search"));
-      expect(navigation.push).toHaveBeenCalledWith("/jobs?q=designer");
+      expect(window.location.pathname).toBe("/jobs");
+      expect(window.location.search).toBe("?q=designer");
 
-      navigation.pathname = "/jobs/settings";
+      navigation.pathname = "/jobs/saved";
       rendered.rerender(<JobWorkspaceSearch taxonomy={taxonomy} />);
-      expect(headerSlot.querySelector("#global-image-search")).not.toBeNull();
+      expect(headerSlot.querySelector("#global-image-search")).toBeNull();
     } finally {
       rendered.unmount();
       headerSlot.remove();
@@ -71,12 +96,36 @@ describe("job board navigation", () => {
     }
   });
 
+  it.each(["/jobs/saved", "/jobs/matches", "/jobs/settings", "/jobs/applied"])(
+    "omits the header search on %s",
+    (pathname) => {
+      const headerSlot = document.createElement("div");
+      headerSlot.id = "workspace-job-search-slot";
+      document.body.append(headerSlot);
+      navigation.pathname = pathname;
+      const rendered = render(<JobWorkspaceSearch taxonomy={taxonomy} />);
+
+      try {
+        expect(headerSlot.querySelector("#global-image-search")).toBeNull();
+      } finally {
+        rendered.unmount();
+        headerSlot.remove();
+        navigation.pathname = "/jobs";
+      }
+    },
+  );
+
   it("gives visitors focused authentication paths without redundant navigation", () => {
-    render(<JobBoardHeader authenticated={false} />);
+    render(<JobBoardHeader authenticated={false} taxonomy={visitorTaxonomy} />);
 
     expect(
       within(screen.getByRole("banner")).getByRole("search", {
         name: "Global job search",
+      }),
+    ).toBeVisible();
+    expect(
+      within(screen.getByRole("banner")).getByRole("button", {
+        name: /job category/i,
       }),
     ).toBeVisible();
 
@@ -173,9 +222,10 @@ describe("job board navigation", () => {
     expect(source).not.toContain("tabIndex={0}");
     expect(layoutSource).toContain("JobWorkspaceSearch");
     expect(headerSearchSource).toContain("dockToWorkspaceHeader");
-    expect(headerSearchSource).toContain('"/jobs/saved"');
-    expect(headerSearchSource).toContain('"/jobs/matches"');
-    expect(headerSearchSource).toContain('"/jobs/settings"');
+    expect(headerSearchSource).toContain('pathname !== "/jobs"');
+    expect(headerSearchSource).not.toContain('"/jobs/saved"');
+    expect(headerSearchSource).not.toContain('"/jobs/matches"');
+    expect(headerSearchSource).not.toContain('"/jobs/settings"');
     expect(headerSearchSource).toContain('new PopStateEvent("popstate")');
     expect(styles).toContain(".job-list");
     expect(styles).toContain(".jobs-search-sticky-region {");

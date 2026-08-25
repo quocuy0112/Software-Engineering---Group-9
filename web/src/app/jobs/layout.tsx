@@ -14,12 +14,12 @@ export default async function JobsLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const context = await getWorkspaceContext();
+  const taxonomy = await listJobSearchTaxonomy().catch(() => ({
+    industries: [],
+    locations: [],
+  }));
 
   if (context) {
-    const taxonomy = await listJobSearchTaxonomy().catch(() => ({
-      industries: [],
-      locations: [],
-    }));
     return (
       <WorkspaceShell
         initialRecruiterStatus={context.initialRecruiterStatus}
@@ -39,7 +39,7 @@ export default async function JobsLayout({
 
   return (
     <div className="job-board-layout">
-      <JobBoardHeader authenticated={false} />
+      <JobBoardHeader authenticated={false} taxonomy={taxonomy} />
       <main className="job-board-public-main">
         <JobInteractionProvider>{children}</JobInteractionProvider>
       </main>

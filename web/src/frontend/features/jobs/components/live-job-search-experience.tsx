@@ -31,6 +31,8 @@ const scalarCriteriaNames = [
 const arrayCriteriaNames = [
   "district",
   "categoryFamily",
+  "categoryId",
+  "categoryTitle",
   "employmentType",
   "experienceLevel",
   "workArrangement",
@@ -40,6 +42,7 @@ const arrayCriteriaNames = [
 type HistoryMode = "none" | "replace" | "push";
 
 export type JobsLiveCopy = Readonly<{
+  locale: "vi" | "en";
   kicker: string;
   title: string;
   intro: string;
@@ -298,13 +301,7 @@ export function LiveJobSearchExperience({
   const pageSize = Number(one(criteria.limit) ?? "20") || 20;
   const resultStart = result && result.total ? (page - 1) * pageSize + 1 : 0;
   const resultEnd = result ? Math.min(page * pageSize, result.total) : 0;
-  const searchBy = one(criteria.searchBy) || "BOTH";
   const sort = one(criteria.sort) || "RELEVANCE";
-  const searchByOptions = [
-    ["TITLE", "Tên việc làm", "Job title"],
-    ["COMPANY", "Tên công ty", "Company name"],
-    ["BOTH", "Cả hai", "Both"],
-  ] as const;
   const sortOptions = [
     [
       "RELEVANCE",
@@ -361,53 +358,38 @@ export function LiveJobSearchExperience({
         >
           <div
             className="job-results-toolbar"
-            aria-label="Search result controls"
+            aria-label={
+              copy.locale === "vi"
+                ? "Tùy chọn sắp xếp kết quả"
+                : "Search result sorting"
+            }
           >
-            <div
-              className="job-search-by-toggle"
-              role="group"
-              aria-label="Search by"
-            >
-              <span>
-                {copy.kicker.startsWith("Kh") ? "Tìm kiếm theo:" : "Search by:"}
-              </span>
-              <div>
-                {searchByOptions.map(([value, vietnamese, english]) => (
-                  <button
-                    key={value}
-                    className={searchBy === value ? "is-active" : undefined}
-                    type="button"
-                    aria-pressed={searchBy === value}
-                    onClick={() =>
-                      runCriteriaChange(
-                        { ...criteria, searchBy: value },
-                        "immediate",
-                      )
-                    }
-                  >
-                    {copy.kicker.startsWith("Kh") ? vietnamese : english}
-                  </button>
-                ))}
-              </div>
-            </div>
             <div className="job-results-sort">
-              <span>
-                {copy.kicker.startsWith("Kh") ? "Sắp xếp theo:" : "Sort by:"}
-              </span>
+              <span>{copy.locale === "vi" ? "Sắp xếp theo:" : "Sort by:"}</span>
               <button
                 type="button"
                 aria-expanded={sortMenuOpen}
                 aria-haspopup="listbox"
                 onClick={() => setSortMenuOpen((open) => !open)}
               >
-                {copy.kicker.startsWith("Kh") ? activeSort[1] : activeSort[2]}
-                <span aria-hidden="true">⌄</span>
+                {copy.locale === "vi" ? activeSort[1] : activeSort[2]}
+                <svg
+                  className="job-results-sort-chevron"
+                  viewBox="0 0 20 20"
+                  aria-hidden="true"
+                >
+                  <path d="m5.5 7.5 4.5 4.5 4.5-4.5" />
+                </svg>
               </button>
               {sortMenuOpen ? (
                 <div
                   className="job-results-sort-menu"
                   role="listbox"
-                  aria-label="Sort options"
+                  aria-label={
+                    copy.locale === "vi"
+                      ? "Các tùy chọn sắp xếp"
+                      : "Sort options"
+                  }
                 >
                   {sortOptions.map(([value, vietnamese, english]) => (
                     <button
@@ -423,11 +405,15 @@ export function LiveJobSearchExperience({
                         );
                       }}
                     >
-                      <span>
-                        {copy.kicker.startsWith("Kh") ? vietnamese : english}
-                      </span>
+                      <span>{copy.locale === "vi" ? vietnamese : english}</span>
                       {sort === value ? (
-                        <strong aria-label="Selected">✓</strong>
+                        <strong
+                          aria-label={
+                            copy.locale === "vi" ? "Đang chọn" : "Selected"
+                          }
+                        >
+                          ✓
+                        </strong>
                       ) : null}
                     </button>
                   ))}

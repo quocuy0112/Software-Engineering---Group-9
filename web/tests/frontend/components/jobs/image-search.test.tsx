@@ -1,4 +1,11 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
+import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { ImageSearchConsent } from "@/frontend/features/jobs/image-search/components/image-search-consent";
@@ -9,12 +16,18 @@ import { ImageSearchRecovery } from "@/frontend/features/jobs/image-search/compo
 import { ImageSearchFeedback } from "@/frontend/features/jobs/image-search/components/image-search-feedback";
 import {
   GlobalImageSearch,
+  jobCategoryFilterHref,
+  jobIndustryClearHref,
   jobIndustrySearchHref,
   jobTextSearchHref,
 } from "@/frontend/features/jobs/image-search/components/global-image-search";
 import type { SearchIntent } from "@/shared/contracts/jobs/search-intent";
 import { WorkspaceLocaleProvider } from "@/frontend/features/dashboard/client/workspace-locale";
 import type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
+import {
+  JobSearchForm,
+  type JobSearchCriteria,
+} from "@/frontend/features/jobs/components/job-search-form";
 
 const toast = vi.hoisted(() => ({
   error: vi.fn(),
@@ -117,17 +130,41 @@ const taxonomy: JobSearchTaxonomy = {
   ],
 };
 
+function LocationFilterHarness({
+  taxonomy: filterTaxonomy,
+  initialCriteria = {},
+  onChange,
+}: {
+  taxonomy: JobSearchTaxonomy;
+  initialCriteria?: JobSearchCriteria;
+  onChange?: (criteria: JobSearchCriteria) => void;
+}) {
+  const [criteria, setCriteria] = useState(initialCriteria);
+  return (
+    <JobSearchForm
+      criteria={criteria}
+      taxonomy={filterTaxonomy}
+      onCriteriaChange={(next) => {
+        setCriteria(next);
+        onChange?.(next);
+      }}
+    />
+  );
+}
+
 describe("image-assisted job-search controls", () => {
-  it("keeps an English text-and-camera search bar available in the global header", () => {
+  it("keeps an English text-and-camera search bar available in the global header", async () => {
     window.history.replaceState(null, "", "/jobs?q=Sidebar%20keyword");
     render(<GlobalImageSearch />);
 
     expect(
       screen.getByRole("search", { name: "Global job search" }),
     ).toBeVisible();
-    expect(
-      screen.getByPlaceholderText("Search jobs, skills, or companies"),
-    ).toHaveValue("Sidebar keyword");
+    await waitFor(() => {
+      expect(
+        screen.getByPlaceholderText("Search jobs, skills, or companies"),
+      ).toHaveValue("Sidebar keyword");
+    });
     expect(
       screen.getByPlaceholderText("Search jobs, skills, or companies"),
     ).toHaveAttribute("autocomplete", "off");
@@ -196,7 +233,7 @@ describe("image-assisted job-search controls", () => {
     ).toBeVisible();
   });
 
-  it("keeps one search instance in the persistent workspace header slot", () => {
+  it("keeps one search instance in the persistent workspace header slot", async () => {
     const headerSlot = document.createElement("div");
     headerSlot.id = "workspace-job-search-slot";
     document.body.append(headerSlot);
@@ -207,7 +244,9 @@ describe("image-assisted job-search controls", () => {
         <GlobalImageSearch taxonomy={taxonomy} dockToWorkspaceHeader />,
       ));
 
-      expect(headerSlot.querySelector("#global-image-search")).not.toBeNull();
+      await waitFor(() => {
+        expect(headerSlot.querySelector("#global-image-search")).not.toBeNull();
+      });
       expect(document.querySelectorAll("#global-image-search")).toHaveLength(1);
     } finally {
       unmount?.();
@@ -245,7 +284,72 @@ describe("image-assisted job-search controls", () => {
     ).toBe("/jobs?q=product+designer");
   });
 
-  it("shows a server-derived category flyout and location choices", () => {
+  it("clears only the selected industry while preserving the other filters", () => {
+    expect(
+      jobIndustryClearHref(
+        "https://smarthire.test/jobs?q=engineer&categoryFamily=r03&workArrangement=REMOTE&cursor=next",
+      ),
+    ).toBe("/jobs?q=engineer&workArrangement=REMOTE");
+  });
+
+  it("builds an exact-role URL without retaining a broad industry filter", () => {
+    expect(
+      jobCategoryFilterHref(
+        "https://smarthire.test/jobs?q=engineer&categoryFamily=r03&cursor=next",
+        { roleTitles: ["Key Account Manager", "Key Account Manager"] },
+      ),
+    ).toBe("/jobs?q=engineer&categoryTitle=Key+Account+Manager");
+  });
+
+  it("clears a selected industry from the compact clear control", async () => {
+    const navigate = vi.fn();
+    window.history.replaceState(
+      null,
+      "",
+      "/jobs?categoryFamily=r01&workArrangement=REMOTE",
+    );
+    render(
+      <GlobalImageSearch taxonomy={taxonomy} onJobSearchNavigate={navigate} />,
+    );
+
+    const clear = await screen.findByRole("button", {
+      name: /clear job category sales & business development/i,
+    });
+    fireEvent.click(clear);
+
+    expect(navigate).toHaveBeenCalledWith("/jobs?workArrangement=REMOTE");
+    expect(
+      screen.queryByRole("button", { name: /clear job category/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("clears an applied industry only after the user confirms the draft", async () => {
+    const navigate = vi.fn();
+    window.history.replaceState(null, "", "/jobs?categoryFamily=r01");
+    render(
+      <GlobalImageSearch taxonomy={taxonomy} onJobSearchNavigate={navigate} />,
+    );
+
+    await screen.findByRole("button", {
+      name: /clear job category sales & business development/i,
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: /^sales & business development$/i }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /clear entire industry: sales & business development/i,
+      }),
+    );
+    expect(navigate).not.toHaveBeenCalled();
+    fireEvent.click(
+      screen.getByRole("button", { name: /apply filters \(0\)/i }),
+    );
+
+    expect(navigate).toHaveBeenCalledWith("/jobs");
+  });
+
+  it("shows a server-derived category flyout without crowding the header with location", () => {
     render(<GlobalImageSearch taxonomy={taxonomy} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Job Category" }));
@@ -256,7 +360,9 @@ describe("image-assisted job-search controls", () => {
     expect(
       screen.getByRole("button", { name: /key account manager/i }),
     ).toBeVisible();
-    expect(screen.getByRole("searchbox", { name: "Location" })).toHaveValue("");
+    expect(
+      screen.queryByRole("searchbox", { name: "Location" }),
+    ).not.toBeInTheDocument();
     fireEvent.keyDown(document, { key: "Escape" });
     expect(
       screen.queryByRole("dialog", { name: "Job categories" }),
@@ -264,7 +370,38 @@ describe("image-assisted job-search controls", () => {
     expect(screen.getByRole("button", { name: "Job Category" })).toHaveFocus();
   });
 
-  it("offers a broad whole-industry search pill before title pills", () => {
+  it("keeps wheel and touch input inside the role explorer", () => {
+    render(<GlobalImageSearch taxonomy={taxonomy} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Job Category" }));
+    const explorer = screen.getByRole("dialog", { name: "Job categories" });
+    const dialogWheel = new WheelEvent("wheel", {
+      bubbles: true,
+      cancelable: true,
+    });
+    explorer.dispatchEvent(dialogWheel);
+    expect(dialogWheel.defaultPrevented).toBe(false);
+
+    const backgroundWheel = new WheelEvent("wheel", {
+      bubbles: true,
+      cancelable: true,
+    });
+    document.body.dispatchEvent(backgroundWheel);
+    expect(backgroundWheel.defaultPrevented).toBe(true);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Close job categories" }),
+    );
+
+    const wheelAfterClose = new WheelEvent("wheel", {
+      bubbles: true,
+      cancelable: true,
+    });
+    document.body.dispatchEvent(wheelAfterClose);
+    expect(wheelAfterClose.defaultPrevented).toBe(false);
+  });
+
+  it("applies an industry filter only after confirmation", () => {
     const navigate = vi.fn();
     render(
       <GlobalImageSearch taxonomy={taxonomy} onJobSearchNavigate={navigate} />,
@@ -276,10 +413,37 @@ describe("image-assisted job-search controls", () => {
     });
     expect(industryPill).toBeVisible();
     fireEvent.click(industryPill);
+    expect(navigate).not.toHaveBeenCalled();
+    fireEvent.click(
+      screen.getByRole("button", { name: /apply filters \(1\)/i }),
+    );
     expect(navigate).toHaveBeenCalledWith("/jobs?categoryFamily=r01");
     expect(
       screen.queryByRole("dialog", { name: "Job categories" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("adds exact role categories to the URL through the explorer footer", () => {
+    const navigate = vi.fn();
+    render(
+      <GlobalImageSearch taxonomy={taxonomy} onJobSearchNavigate={navigate} />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Job Category" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /key account manager/i }),
+    );
+    expect(
+      screen.getByRole("button", { name: /account executive/i }),
+    ).toHaveAttribute("aria-pressed", "false");
+    expect(navigate).not.toHaveBeenCalled();
+    fireEvent.click(
+      screen.getByRole("button", { name: /apply filters \(1\)/i }),
+    );
+
+    expect(navigate).toHaveBeenCalledWith(
+      "/jobs?categoryTitle=Key+Account+Manager",
+    );
   });
 
   it("builds an industry URL without retaining a title query", () => {
@@ -291,35 +455,46 @@ describe("image-assisted job-search controls", () => {
     ).toBe("/jobs?location=Da+Nang&categoryFamily=r03");
   });
 
-  it("picks a province and one or more districts from the two-panel location picker", () => {
-    const navigate = vi.fn();
-    window.history.replaceState(null, "", "/jobs");
+  it("picks a province from the dropdown and one or more districts", () => {
+    const onChange = vi.fn();
     render(
-      <GlobalImageSearch taxonomy={taxonomy} onJobSearchNavigate={navigate} />,
+      <LocationFilterHarness
+        taxonomy={taxonomy}
+        initialCriteria={{ q: "project manager" }}
+        onChange={onChange}
+      />,
     );
 
-    fireEvent.change(
-      screen.getByPlaceholderText("Search jobs, skills, or companies"),
-      { target: { value: "project manager" } },
-    );
-
-    const locationField = screen.getByRole("searchbox", { name: "Location" });
+    const locationField = screen.getByRole("textbox", { name: "Location" });
     expect(locationField).toHaveAttribute(
       "placeholder",
       "Province/city, district...",
     );
-    fireEvent.change(locationField, { target: { value: "ho chi" } });
+    fireEvent.focus(locationField);
     expect(
       screen.getByRole("dialog", { name: "Choose location" }),
     ).toBeVisible();
-    expect(
-      screen.getByRole("radio", { name: /ho chi minh city/i }),
-    ).toBeVisible();
+    expect(screen.getByText("Province / city")).toBeVisible();
+    expect(screen.getByText(/locations$/i)).toBeVisible();
+    const provinceSelect = screen.getByRole("combobox", {
+      name: "Available province",
+    });
+    fireEvent.change(provinceSelect, { target: { value: "Ho Chi Minh City" } });
+    expect(provinceSelect).toHaveValue("Ho Chi Minh City");
+    expect(screen.getByText(/open jobs in this province/i)).toBeVisible();
     fireEvent.click(screen.getByRole("checkbox", { name: /district 1/iu }));
-    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
-    expect(navigate).toHaveBeenCalledTimes(1);
-    expect(navigate).toHaveBeenCalledWith(
-      "/jobs?q=project+manager&location=Ho+Chi+Minh+City&district=District+1",
+    fireEvent.click(
+      within(screen.getByRole("dialog", { name: "Choose location" })).getByRole(
+        "button",
+        { name: "Apply" },
+      ),
+    );
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        q: "project manager",
+        location: "Ho Chi Minh City",
+        district: ["District 1"],
+      }),
     );
     expect(locationField).toHaveValue("Ho Chi Minh City, District 1");
     expect(
@@ -337,9 +512,6 @@ describe("image-assisted job-search controls", () => {
     expect(
       screen.getByRole("button", { name: "Clear location" }),
     ).toBeVisible();
-    expect(screen.getByRole("button", { name: "Clear search" })).toHaveClass(
-      "global-image-search-clear",
-    );
     expect(screen.getByRole("button", { name: "Clear location" })).toHaveClass(
       "global-image-search-clear",
     );
@@ -356,13 +528,14 @@ describe("image-assisted job-search controls", () => {
         ?.querySelector("button.job-location-picker-chevron"),
     ).toBeNull();
     fireEvent.focus(locationField);
-    expect(locationField).toHaveValue("");
+    expect(locationField).toHaveValue("Ho Chi Minh City, District 1");
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
     fireEvent.pointerDown(document.body);
     expect(locationField).toHaveValue("Ho Chi Minh City, District 1");
     expect(screen.getByRole("tooltip")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Clear location" }));
     expect(locationField).toHaveValue("");
+    expect(onChange).toHaveBeenLastCalledWith({ q: "project manager" });
   });
 
   it("shows a long province's comma-separated district list and exposes it in a tooltip", () => {
@@ -386,13 +559,18 @@ describe("image-assisted job-search controls", () => {
         },
       ],
     };
-    render(<GlobalImageSearch taxonomy={longLocationTaxonomy} />);
+    render(<LocationFilterHarness taxonomy={longLocationTaxonomy} />);
 
-    const locationField = screen.getByRole("searchbox", { name: "Location" });
-    fireEvent.change(locationField, { target: { value: "bà rịa" } });
+    const locationField = screen.getByRole("textbox", { name: "Location" });
+    fireEvent.focus(locationField);
     fireEvent.click(screen.getByRole("checkbox", { name: "Long Hải" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Phước Hải" }));
-    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    fireEvent.click(
+      within(screen.getByRole("dialog", { name: "Choose location" })).getByRole(
+        "button",
+        { name: "Apply" },
+      ),
+    );
 
     expect(
       locationField.parentElement?.querySelector(
@@ -405,15 +583,24 @@ describe("image-assisted job-search controls", () => {
   });
 
   it("shows only the province when all districts are selected", () => {
-    render(<GlobalImageSearch taxonomy={taxonomy} />);
+    render(<LocationFilterHarness taxonomy={taxonomy} />);
 
-    const locationField = screen.getByRole("searchbox", { name: "Location" });
+    const locationField = screen.getByRole("textbox", { name: "Location" });
     expect(locationField).toHaveAttribute(
       "placeholder",
       "Province/city, district...",
     );
-    fireEvent.change(locationField, { target: { value: "ho chi" } });
-    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    fireEvent.focus(locationField);
+    fireEvent.change(
+      screen.getByRole("combobox", { name: "Available province" }),
+      { target: { value: "Ho Chi Minh City" } },
+    );
+    fireEvent.click(
+      within(screen.getByRole("dialog", { name: "Choose location" })).getByRole(
+        "button",
+        { name: "Apply" },
+      ),
+    );
 
     expect(locationField).toHaveValue("Ho Chi Minh City");
     expect(
@@ -509,6 +696,18 @@ describe("image-assisted job-search controls", () => {
     expect(screen.getAllByRole("button", { name: /^Industry /u })).toHaveLength(
       29,
     );
+    const icons = document.querySelectorAll(".job-category-industry-icon");
+    expect(icons).toHaveLength(28);
+    expect(
+      [...icons].map((icon) => icon.getAttribute("data-industry-code")),
+    ).toEqual(allIndustries.industries.map((industry) => industry.code));
+    expect(
+      new Set(
+        [...icons].map((icon) =>
+          icon.querySelector("svg")?.getAttribute("class"),
+        ),
+      ).size,
+    ).toBe(28);
   });
 
   it("keeps exactly one in-flow active row while selecting all 29 categories", () => {

@@ -31,6 +31,8 @@ export function jobsPageQuery(
       : input.location,
     district: array("district").filter(Boolean),
     categoryFamily: array("categoryFamily").filter(Boolean),
+    categoryId: array("categoryId").filter(Boolean),
+    categoryTitle: array("categoryTitle").filter(Boolean),
     employmentType: array("employmentType").filter(Boolean),
     experienceLevel: array("experienceLevel").filter(Boolean),
     workArrangement: array("workArrangement").filter(Boolean),
@@ -61,6 +63,7 @@ export function jobsPageQuery(
 }
 
 const vietnameseCopy: JobsLiveCopy = {
+  locale: "vi",
   kicker: "Không gian ứng viên",
   title: "Việc làm",
   intro:
@@ -87,6 +90,7 @@ const vietnameseCopy: JobsLiveCopy = {
 };
 
 const englishCopy: JobsLiveCopy = {
+  locale: "en",
   kicker: "Candidate workspace",
   title: "Jobs",
   intro:

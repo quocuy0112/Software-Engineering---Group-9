@@ -378,23 +378,6 @@
   backdrop-filter: blur(14px);
 }
 
-/* Jobs needs its account toolbar available throughout long result lists.
- * Fixed positioning is used here because this is the viewport toolbar, while
- * the Jobs search row itself remains sticky below it in normal page flow. */
-.workspace-main[data-content-mode="job-board"] .workspace-header {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: var(--sh-sidebar-current-width);
-  z-index: 100;
-  box-sizing: border-box;
-  box-shadow: 0 8px 18px rgb(15 23 42 / 8%);
-}
-
-.workspace-main[data-content-mode="job-board"] .workspace-content {
-  padding-top: calc(var(--sh-space-8) + var(--sh-topbar-height));
-}
-
 .workspace-header > .global-image-search {
   width: 100%;
   justify-self: center;
@@ -446,8 +429,13 @@
   line-height: var(--sh-line-height-body-sm);
 }
 
+.workspace-topbar-name {
+  color: var(--sh-color-brand-primary);
+}
+
 .workspace-account-chip {
   display: flex;
+  flex: 0 0 auto;
   min-width: 0;
   min-height: 48px;
   align-items: center;
@@ -462,6 +450,11 @@
 .workspace-account-chip:hover {
   border-color: var(--sh-color-border-subtle);
   background: var(--sh-color-surface-tinted);
+}
+
+.workspace-account-copy {
+  flex: 0 0 auto;
+  min-width: 0;
 }
 
 .workspace-account-avatar,
@@ -498,7 +491,6 @@
   object-fit: cover;
 }
 
-.workspace-account-chip strong,
 .workspace-account-chip small {
   display: block;
   max-width: 220px;
@@ -508,8 +500,10 @@
 }
 
 .workspace-account-chip strong {
+  display: block;
   font-size: var(--sh-font-size-body-sm);
   line-height: var(--sh-line-height-body-sm);
+  white-space: nowrap;
 }
 
 .workspace-account-chip small {
@@ -1121,25 +1115,6 @@
   }
 }
 
-@media (min-width: 1024px) and (max-width: 1600px) {
-  .workspace-main[data-content-mode="job-board"]
-    .workspace-header:has(
-      .workspace-header-job-search-slot > .global-image-search
-    ) {
-    gap: var(--sh-space-2);
-    padding-inline: var(--sh-space-4);
-  }
-
-  .workspace-main[data-content-mode="job-board"]
-    .workspace-header:has(
-      .workspace-header-job-search-slot > .global-image-search
-    )
-    .workspace-account-chip
-    > span:last-child {
-    display: none;
-  }
-}
-
 @media (max-width: 760px) {
   .workspace-page,
   .workspace-layout {
@@ -1277,18 +1252,6 @@
     padding-inline: var(--sh-space-4);
   }
 
-  .workspace-main[data-content-mode="job-board"] .workspace-header {
-    position: fixed;
-    top: var(--sh-topbar-height);
-    right: 0;
-    left: 0;
-    z-index: 100;
-  }
-
-  .workspace-main[data-content-mode="job-board"] .workspace-content {
-    padding-top: calc(var(--sh-space-6) + var(--sh-topbar-height));
-  }
-
   .workspace-header > .global-image-search {
     grid-column: 1 / -1;
     grid-row: 2;
@@ -1298,24 +1261,6 @@
   .workspace-main[data-content-mode="job-board"]
     .workspace-header-job-search-slot:empty {
     display: none;
-  }
-
-  .workspace-main[data-content-mode="job-board"]
-    .workspace-header:has(
-      .workspace-header-job-search-slot > .global-image-search
-    )
-    .workspace-header-job-search-slot {
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
-
-  .workspace-main[data-content-mode="job-board"]
-    .workspace-header:has(
-      .workspace-header-job-search-slot > .global-image-search
-    )
-    .workspace-header-actions {
-    grid-column: 2;
-    grid-row: 1;
   }
 
   .workspace-header-actions {
@@ -1527,15 +1472,6 @@
 }
 
 @media (max-width: 1023px) {
-  .workspace-main[data-content-mode="job-board"]
-    .workspace-header:has(
-      .workspace-header-job-search-slot > .global-image-search
-    )
-    .workspace-account-chip
-    > span:last-child {
-    display: none;
-  }
-
   .workspace-header-actions {
     gap: 8px;
     padding-right: 16px;

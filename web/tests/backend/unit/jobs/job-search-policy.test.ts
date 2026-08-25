@@ -30,10 +30,32 @@ describe("job search policy", () => {
 
   it("accepts only an approved career-path filter", () => {
     expect(
-      parseJobSearchCriteria({ careerPath: "software-engineering" })
-        .careerPath,
+      parseJobSearchCriteria({ careerPath: "software-engineering" }).careerPath,
     ).toBe("software-engineering");
-    expect(() => parseJobSearchCriteria({ careerPath: "made-up-path" })).toThrow();
+    expect(() =>
+      parseJobSearchCriteria({ careerPath: "made-up-path" }),
+    ).toThrow();
+  });
+
+  it("accepts bounded exact role category filters", () => {
+    expect(
+      parseJobSearchCriteria({
+        categoryId: ["r03-software-development"],
+      }).categoryIds,
+    ).toEqual(["r03-software-development"]);
+    expect(() =>
+      parseJobSearchCriteria({
+        categoryId: ["r03-software-development", "r03-software-development"],
+      }),
+    ).toThrow("Use each value only once.");
+  });
+
+  it("normalizes an exact role title independently from its shared category", () => {
+    expect(
+      parseJobSearchCriteria({
+        categoryTitle: ["Key Account Manager"],
+      }).normalizedRoleTitles,
+    ).toEqual(["key account manager"]);
   });
 
   it("treats empty browser filter controls as omitted criteria", () => {
