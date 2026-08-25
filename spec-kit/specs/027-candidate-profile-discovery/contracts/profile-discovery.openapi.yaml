@@ -1,0 +1,128 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Candidate Profile Discovery
+  version: 1.0.0
+paths:
+  /api/account/profile:
+    patch:
+      summary: Save authenticated Candidate visibility policy
+      security: [{ sessionCookie: [] }, { csrfProof: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VisibilityMutation' }
+      responses:
+        '200': { description: Saved visibility projection }
+        '400': { description: Invalid policy or version }
+  /api/people/lookup:
+    get:
+      summary: Find at most one discoverable Candidate by full exact account ID
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - in: query
+          name: userId
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 128 }
+      responses:
+        '200':
+          description: Permitted compact projection or neutral no-result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LookupResponse' }
+        '400': { description: Malformed ID }
+        '429': { description: Temporarily blocked without target disclosure }
+  /api/candidate/applications/{applicationId}/contact-consent:
+    patch:
+      summary: Grant or withdraw the caller's application contact consent
+      security: [{ sessionCookie: [] }, { csrfProof: [] }]
+      parameters: [{ $ref: '#/components/parameters/ApplicationId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [shared, version]
+              properties:
+                shared: { type: boolean }
+                version: { type: integer, minimum: 0 }
+      responses:
+        '200': { description: Current consent state }
+        '403': { description: Caller does not own application }
+        '409': { description: Version conflict }
+  /api/recruiter/jobs/{jobId}/applications/{applicationId}/profile:
+    get:
+      summary: Read authorized applicant snapshot plus allowed live profile
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema: { type: string }
+        - $ref: '#/components/parameters/ApplicationId'
+      responses:
+        '200':
+          description: Private no-store projection
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RecruiterApplicantProfile' }
+        '404': { description: Neutral unavailable response }
+components:
+  securitySchemes:
+    sessionCookie: { type: apiKey, in: cookie, name: session }
+    csrfProof: { type: apiKey, in: header, name: x-csrf-proof }
+  parameters:
+    ApplicationId:
+      in: path
+      name: applicationId
+      required: true
+      schema: { type: string }
+  schemas:
+    ProfileSection:
+      type: string
+      enum: [avatar, headline, summary, location, skills, experience, education, links]
+    VisibilityMutation:
+      type: object
+      required: [section, baseRevision, visibility]
+      properties:
+        section: { const: visibility }
+        baseRevision: { type: integer, minimum: 0 }
+        visibility:
+          type: object
+          required: [discoverableByExactId, candidateSections, recruiterSections]
+          properties:
+            discoverableByExactId: { type: boolean }
+            candidateSections:
+              type: array
+              uniqueItems: true
+              items: { $ref: '#/components/schemas/ProfileSection' }
+            recruiterSections:
+              type: array
+              uniqueItems: true
+              items: { $ref: '#/components/schemas/ProfileSection' }
+    LookupResponse:
+      type: object
+      required: [result]
+      properties:
+        result:
+          oneOf:
+            - type: 'null'
+            - type: object
+              required: [userId, displayName, sections]
+              properties:
+                userId: { type: string }
+                displayName: { type: string }
+                sections: { type: object, additionalProperties: true }
+    RecruiterApplicantProfile:
+      type: object
+      required: [applicationId, snapshot, liveProfile, contact]
+      properties:
+        applicationId: { type: string }
+        snapshot: { type: object, additionalProperties: true }
+        liveProfile: { type: object, additionalProperties: true }
+        contact:
+          oneOf:
+            - type: 'null'
+            - type: object
+              additionalProperties: true
