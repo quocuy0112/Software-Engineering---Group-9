@@ -98,7 +98,9 @@ export function JobBoardExperience({
         (job.experienceMinYears ?? 0) >= minimumYears;
       const matchesCategory =
         !categoryFamily ||
-        (job.categoryFamily ?? "").toLowerCase().includes(categoryFamily);
+        (job.categoryFamily ?? "").toLowerCase().includes(categoryFamily) ||
+        ((categoryFamily === "r29" || categoryFamily === "other") &&
+          ["r29", "other"].includes((job.categoryFamily ?? "").toLowerCase()));
       const matchesSaturday = !saturdayOnly || job.workOnSaturday === true;
       return (
         matchesQuery && matchesExperience && matchesCategory && matchesSaturday

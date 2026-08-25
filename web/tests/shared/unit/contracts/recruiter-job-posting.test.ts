@@ -7,6 +7,10 @@ import {
   prepareRecruiterJobForSave,
   validateRecruiterJobForSave,
 } from "@/shared/contracts/recruiter-job-posting";
+import {
+  collectRecruiterSubIndustrySuggestions,
+  deriveRecruiterClassification,
+} from "@/shared/contracts/jobs/industry-taxonomy";
 
 describe("recruiter job posting editor contract", () => {
   it("reports friendly errors for required posting fields", () => {
@@ -37,10 +41,50 @@ describe("recruiter job posting editor contract", () => {
 
     expect(prepared.title).toBe("Product Designer");
     expect(prepared.subIndustry).toBe("HR Technology");
+    expect(prepared.categoryIds).toEqual(["r03-other"]);
+    expect(prepared.categoryFamily).toBe("r03");
+    expect(prepared.description.generalInfo.department).toBe("HR Technology");
     expect(prepared.skillTags).toEqual(["Figma", "Research"]);
     expect(validateRecruiterJobForSave(prepared, "pending_approval")).toEqual(
       {},
     );
+  });
+
+  it("keeps canonical ids for listed sub-industries and stable fallback ids for custom values", () => {
+    expect(
+      deriveRecruiterClassification({
+        industryCode: "r03",
+        subIndustry: "Software Development",
+      }),
+    ).toMatchObject({
+      industryCode: "r03",
+      categoryIds: ["r03-software-development"],
+      valid: true,
+    });
+    expect(
+      deriveRecruiterClassification({
+        industryCode: "other",
+        subIndustry: "Aerospace Operations",
+      }),
+    ).toMatchObject({
+      industryCode: "r29",
+      categoryFamily: "r29",
+      categoryIds: ["r29-aerospace-operations"],
+      valid: true,
+    });
+  });
+
+  it("collects existing sub-industries as suggestions without promoting them", () => {
+    expect(
+      collectRecruiterSubIndustrySuggestions([
+        { industryCode: "other", subIndustry: "Aerospace Operations" },
+        { industryCode: "r29", subIndustry: " aerospace operations " },
+        { industryCode: "r03", subIndustry: "HR Technology" },
+      ]),
+    ).toEqual({
+      r29: ["Aerospace Operations"],
+      r03: ["HR Technology"],
+    });
   });
 
   it("rejects an invalid salary range", () => {

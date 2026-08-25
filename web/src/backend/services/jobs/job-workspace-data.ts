@@ -112,6 +112,11 @@ type JobCatalog = {
 
 let catalogPromise: Promise<JobCatalog> | undefined;
 
+/** Clear the process-local JSON projection after an approved publication. */
+export function invalidateJobWorkspaceCatalogueCache() {
+  catalogPromise = undefined;
+}
+
 async function readCatalog(): Promise<JobCatalog> {
   if (catalogPromise) return catalogPromise;
 

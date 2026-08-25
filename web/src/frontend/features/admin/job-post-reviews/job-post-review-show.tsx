@@ -31,7 +31,9 @@ import { JobPostReviewActionPanel } from "./job-post-review-action-panel";
 
 type ReviewDetailRecord = {
   id: string;
-  state: "PENDING_REVIEW" | "APPROVED" | "REJECTED";
+  state: "PENDING_REVIEW" | "APPROVED" | "REJECTED" | "WITHDRAWN";
+  recordStatus: "ACTIVE" | "DELETED";
+  deletedAt: string | null;
   assignment: string | null;
   sequence: number;
   version: number;
@@ -259,6 +261,9 @@ function ReviewDetail() {
             </Box>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
               <StatusChip value={sentenceCase(record.state)} />
+              {record.recordStatus === "DELETED" ? (
+                <StatusChip value="Deleted archive" />
+              ) : null}
               <StatusChip
                 value={`Integrity: ${record.integrityState ?? "VALID"}`}
                 ok={(record.integrityState ?? "VALID") === "VALID"}
@@ -273,6 +278,14 @@ function ReviewDetail() {
             are unavailable until integrity is restored.
           </Alert>
         )}
+
+        {record.recordStatus === "DELETED" ? (
+          <Alert severity="info">
+            This recruiter draft was deleted {dateTime(record.deletedAt)}. Its
+            review history is archived and retained according to the deleted
+            draft retention policy.
+          </Alert>
+        ) : null}
 
         <Box
           sx={{

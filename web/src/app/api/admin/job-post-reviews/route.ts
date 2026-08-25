@@ -33,6 +33,7 @@ function listQuery(request: Request) {
     companyId: value("companyId") || undefined,
     minimumAgeHours: numeric("minimumAgeHours"),
     sequence: numeric("sequence"),
+    recordStatus: value("recordStatus") || undefined,
   });
 }
 

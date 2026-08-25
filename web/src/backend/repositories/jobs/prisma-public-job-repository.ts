@@ -188,6 +188,15 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
     clauses.push(Prisma.sql`(${Prisma.join(districtClauses, " OR ")})`);
   }
   if (input.categoryFamily?.length) {
+    const categoryFamilyCodes = [
+      ...new Set(
+        input.categoryFamily.flatMap((category) =>
+          category === "r29" || category === "other"
+            ? ["r29", "other"]
+            : [category],
+        ),
+      ),
+    ];
     const categoryMatches: Prisma.Sql[] = [
       Prisma.sql`EXISTS (
         SELECT 1
@@ -196,8 +205,8 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
           ON version."id" = aggregate."approvedVersionId"
         WHERE aggregate."publicJobPostingId" = j."id"
           AND (
-            version."snapshot" ->> 'categoryFamily' IN (${Prisma.join(input.categoryFamily)})
-            OR version."snapshot" ->> 'industryCode' IN (${Prisma.join(input.categoryFamily)})
+            version."snapshot" ->> 'categoryFamily' IN (${Prisma.join(categoryFamilyCodes)})
+            OR version."snapshot" ->> 'industryCode' IN (${Prisma.join(categoryFamilyCodes)})
           )
       )`,
     ];

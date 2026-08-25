@@ -49,8 +49,8 @@
   font-weight: 600;
 }
 .groupControls button:hover {
-  border-color: #4453e8;
-  color: #4453e8;
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-brand-primary);
   background: var(--sh-color-info-bg);
 }
 .card {
@@ -120,7 +120,7 @@
 .checkbox input {
   inline-size: 18px;
   min-block-size: 18px;
-  accent-color: #4453e8;
+  accent-color: var(--sh-color-brand-primary);
 }
 .choices {
   grid-template-columns: 1fr;
@@ -153,7 +153,7 @@
 .actionOptions input {
   width: 18px;
   height: 18px;
-  accent-color: #4453e8;
+  accent-color: var(--sh-color-brand-primary);
 }
 .decisionTitle {
   margin: 0;

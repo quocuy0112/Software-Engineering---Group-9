@@ -314,6 +314,7 @@ enum JobPostReviewState {
   PENDING_REVIEW
   APPROVED
   REJECTED
+  WITHDRAWN
 }
 
 enum JobPostReviewReasonCode {
@@ -337,6 +338,7 @@ enum JobPostReviewHistoryAction {
   RESUBMITTED
   LEGACY_BASELINE_IMPORTED
   CLOSED
+  WITHDRAWN
 }
 
 enum JobPostVisibilityState {
@@ -2530,7 +2532,6 @@ model JobPostReviewVersion {
   privateNotes             JobPostReviewPrivateNote[]
 
   @@unique([reviewAggregateId, sequence])
-  @@unique([reviewAggregateId, snapshotSha256])
   @@unique([submittedByUserId, submissionIdempotencyKey], map: "JobPostReviewVersion_submission_actor_key")
   @@index([state, submittedAt, id])
   @@index([assignedAdminUserId, state, submittedAt])

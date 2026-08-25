@@ -1,13 +1,15 @@
 "use client";
-
 import { Chip, Stack, Typography } from "@mui/material";
 import {
   Datagrid,
+  ExportButton,
+  FilterButton,
   List,
   NumberInput,
   Pagination,
   SelectInput,
   TextInput,
+  TopToolbar,
   useRecordContext,
 } from "react-admin";
 import { Link as RouterLink } from "react-router-dom";
@@ -19,7 +21,8 @@ type JobPostReviewRecord = {
   companyId: string;
   companyDisplayName: string;
   sequence: number;
-  state: "PENDING_REVIEW" | "APPROVED" | "REJECTED";
+  state: "PENDING_REVIEW" | "APPROVED" | "REJECTED" | "WITHDRAWN";
+  recordStatus?: "ACTIVE" | "DELETED";
   assignment: string | null;
   submittedAt: string;
   ageSeconds: number;
@@ -54,7 +57,9 @@ function ReviewStateChip({ state }: { state: JobPostReviewRecord["state"] }) {
       ? "Needs review"
       : state === "APPROVED"
         ? "Approved"
-        : "Rejected";
+        : state === "WITHDRAWN"
+          ? "Withdrawn"
+          : "Rejected";
   return (
     <Chip
       label={label}
@@ -64,13 +69,15 @@ function ReviewStateChip({ state }: { state: JobPostReviewRecord["state"] }) {
           ? "warning"
           : state === "APPROVED"
             ? "success"
-            : "error"
+            : state === "WITHDRAWN"
+              ? "default"
+              : "error"
       }
     />
   );
 }
 
-function JobField(_props: { label?: string }) {
+function JobField() {
   const record = useRecordContext<JobPostReviewRecord>();
   if (!record) return null;
   return (
@@ -98,7 +105,7 @@ function JobField(_props: { label?: string }) {
   );
 }
 
-function CompanyField(_props: { label?: string }) {
+function CompanyField() {
   const record = useRecordContext<JobPostReviewRecord>();
   if (!record) return null;
   return (
@@ -117,7 +124,7 @@ function CompanyField(_props: { label?: string }) {
   );
 }
 
-function QueueField(_props: { label?: string }) {
+function QueueField() {
   const record = useRecordContext<JobPostReviewRecord>();
   if (!record) return null;
   return (
@@ -140,7 +147,7 @@ function QueueField(_props: { label?: string }) {
   );
 }
 
-function SubmissionField(_props: { label?: string }) {
+function SubmissionField() {
   const record = useRecordContext<JobPostReviewRecord>();
   if (!record) return null;
   const ageColor =
@@ -170,7 +177,7 @@ function SubmissionField(_props: { label?: string }) {
   );
 }
 
-function VersionField(_props: { label?: string }) {
+function VersionField() {
   const record = useRecordContext<JobPostReviewRecord>();
   if (!record) return null;
   return (
@@ -181,6 +188,12 @@ function VersionField(_props: { label?: string }) {
       </Typography>
     </Stack>
   );
+}
+
+function RecordStatusField() {
+  const record = useRecordContext<JobPostReviewRecord>();
+  if (!record?.recordStatus) return null;
+  return <Chip label={record.recordStatus === "DELETED" ? "Archived" : "Current"} size="small" variant="outlined" />;
 }
 
 const filters = [
@@ -198,8 +211,20 @@ const filters = [
       { id: "PENDING_REVIEW", name: "Pending review" },
       { id: "APPROVED", name: "Approved" },
       { id: "REJECTED", name: "Rejected" },
+      { id: "WITHDRAWN", name: "Withdrawn" },
     ]}
     emptyText="All statuses"
+  />,
+  <SelectInput
+    key="recordStatus"
+    source="recordStatus"
+    label="Record status"
+    aria-label="Filter by record status"
+    choices={[
+      { id: "ACTIVE", name: "Current records" },
+      { id: "DELETED", name: "Deleted archive" },
+      { id: "ALL", name: "Current and deleted" },
+    ]}
   />,
   <SelectInput
     key="assignment"
@@ -230,11 +255,25 @@ const filters = [
   />,
 ];
 
+function JobPostReviewListActions() {
+  return (
+    <TopToolbar>
+      <FilterButton />
+      <ExportButton />
+    </TopToolbar>
+  );
+}
+
 export function JobPostReviewList() {
   return (
     <List
       title="Job Post Reviews"
+      actions={<JobPostReviewListActions />}
       filters={filters}
+      filterDefaultValues={{
+        state: "PENDING_REVIEW",
+        recordStatus: "ACTIVE",
+      }}
       perPage={25}
       pagination={<Pagination rowsPerPageOptions={[25, 50, 100]} />}
       sort={{ field: "submittedAt", order: "ASC" }}
@@ -258,6 +297,7 @@ export function JobPostReviewList() {
         <JobField label="Job" />
         <CompanyField label="Company" />
         <QueueField label="Review queue" />
+        <RecordStatusField label="Record" />
         <SubmissionField label="Submitted & age" />
         <VersionField label="Submission" />
       </Datagrid>

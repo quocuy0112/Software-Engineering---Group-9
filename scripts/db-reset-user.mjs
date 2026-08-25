@@ -231,6 +231,7 @@ async function main() {
     ? requestedUserRef.toLowerCase()
     : "";
   const requestedUserId = requestedEmail ? "" : requestedUserRef;
+  const resetAllAccounts = !requestedUserRef;
   let resolvedUserIds = [];
   let resolvedLocalOwnership = { companyIds: [], jobIds: [] };
 
@@ -245,6 +246,7 @@ async function main() {
     const child = spawnSync(
       process.execPath,
       [
+        "--conditions=react-server",
         "--import",
         "tsx",
         fileURLToPath(import.meta.url),
@@ -266,6 +268,8 @@ async function main() {
 
   const { PrismaClient } =
     await import("../web/src/backend/generated/prisma/client.ts");
+  const { distributeUnassignedPendingReviews } =
+    await import("../web/src/backend/jobs/review/job-post-review-assignment.ts");
   const prisma = new PrismaClient({
     adapter: new PrismaPg(process.env.DATABASE_URL),
   });
@@ -342,8 +346,10 @@ async function main() {
             importedBaseline: true,
             submittedByUserId: true,
             submittedMembershipId: true,
+            assignedAdminUserId: true,
           },
         });
+        const resetUserIdSet = new Set(userIds);
         const baselineByAggregate = new Map();
         for (const version of reviewVersions) {
           if (!version.importedBaseline) continue;
@@ -353,7 +359,12 @@ async function main() {
           }
         }
         const transientReviewVersionIds = reviewVersions
-          .filter((version) => !version.importedBaseline)
+          .filter(
+            (version) =>
+              !version.importedBaseline &&
+              (resetAllAccounts ||
+                resetUserIdSet.has(version.submittedByUserId)),
+          )
           .map((version) => version.id);
         const protectedMembershipIds = [
           ...new Set(
@@ -398,6 +409,24 @@ async function main() {
             ownedReviewAggregateIds.includes(version.reviewAggregateId),
           )
           .map(({ id }) => id);
+        const transientReviewVersionIdSet = new Set(transientReviewVersionIds);
+        const reviewAggregateIdsToRestore = [
+          ...new Set(
+            reviewVersions
+              .filter(
+                (version) =>
+                  transientReviewVersionIdSet.has(version.id) &&
+                  !ownedReviewAggregateIds.includes(version.reviewAggregateId),
+              )
+              .map(({ reviewAggregateId }) => reviewAggregateId),
+          ),
+        ];
+        const reviewAggregatePointerResetIds = [
+          ...new Set([
+            ...ownedReviewAggregateIds,
+            ...reviewAggregateIdsToRestore,
+          ]),
+        ];
         const ownedJobPostingIds = [
           ...new Set([
             ...resolvedLocalOwnership.jobIds,
@@ -412,6 +441,24 @@ async function main() {
 
         const results = [];
         const now = new Date();
+
+        // A targeted reset can remove an administrator account without
+        // removing the recruiter who submitted a review. Release only that
+        // administrator's pending assignments; the immutable review version
+        // and aggregate pending pointer must survive for another admin.
+        await updateModel(
+          results,
+          "PendingJobPostReviewAssignment",
+          () =>
+            transaction.jobPostReviewVersion.updateMany({
+              where: {
+                state: "PENDING_REVIEW",
+                assignedAdminUserId: userIdFilter,
+              },
+              data: { assignedAdminUserId: null, assignedAt: null },
+            }),
+          "released",
+        );
 
         // Reset admin-only operational state while retaining the company/job
         // catalog. These rows are safe to recreate during local development.
@@ -451,10 +498,10 @@ async function main() {
         await deleteModel(results, "CompanyTeamActivity", () =>
           transaction.companyTeamActivity.deleteMany(),
         );
-        // Remove review workflow rows created after the imported catalog
-        // baseline. Shared aggregates and their baseline version remain so
-        // catalog jobs continue to be discoverable; owned aggregates are
-        // removed below with the owner's jobs.
+        // A full reset removes post-baseline workflow rows. A targeted reset
+        // removes only versions submitted by that account (plus aggregates
+        // owned by its company below), so deleting an administrator cannot
+        // erase another recruiter's pending submission.
         await deleteModel(results, "JobPostRevisionRequest", () =>
           transaction.jobPostRevisionRequest.deleteMany(),
         );
@@ -507,7 +554,7 @@ async function main() {
           "JobPostReviewAggregatePointers",
           () =>
             transaction.jobPostReviewAggregate.updateMany({
-              where: { id: { in: reviewAggregates.map(({ id }) => id) } },
+              where: { id: { in: reviewAggregatePointerResetIds } },
               data: { pendingVersionId: null, approvedVersionId: null },
             }),
           "cleared",
@@ -528,7 +575,7 @@ async function main() {
           }),
         );
         for (const aggregate of reviewAggregates) {
-          if (ownedReviewAggregateIds.includes(aggregate.id)) continue;
+          if (!reviewAggregateIdsToRestore.includes(aggregate.id)) continue;
           const baseline = baselineByAggregate.get(aggregate.id);
           await transaction.jobPostReviewAggregate.update({
             where: { id: aggregate.id },
@@ -559,8 +606,13 @@ async function main() {
         }
         results.push({
           model: "JobPostReviewAggregateState",
-          count: reviewAggregates.length - ownedReviewAggregateIds.length,
+          count: reviewAggregateIdsToRestore.length,
           action: "restored to baseline",
+        });
+        results.push({
+          model: "PendingJobPostReviewAssignment",
+          count: await distributeUnassignedPendingReviews(transaction, now),
+          action: "reassigned",
         });
 
         const ownedApplicationIds = (

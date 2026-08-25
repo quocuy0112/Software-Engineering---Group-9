@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import { z } from "zod";
 import { jobReviewSnapshotSchema } from "@/shared/contracts/recruiter-job-posting";
 import type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
+import { recruiterIndustryTaxonomy } from "@/shared/contracts/jobs/industry-taxonomy";
 import { defaultJobIndustryFiles } from "@/backend/repositories/jobs/job-industry-files";
 
 export type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
@@ -96,7 +97,7 @@ export function buildJobSearchTaxonomy(
         industry:
           snapshot?.industry || row.company.industry || "Other opportunities",
         industryCode:
-          snapshot?.industryCode || snapshot?.categoryFamily || "other",
+          snapshot?.industryCode || snapshot?.categoryFamily || "r29",
         subIndustry: snapshot?.subIndustry || "Open roles",
         title: snapshot?.title || row.title,
         categoryIds: snapshot?.categoryIds ?? [],
@@ -124,7 +125,7 @@ export function buildCatalogJobSearchTaxonomy(
       )
       .map((job) => ({
         industry: job.industry,
-        industryCode: job.industryCode || job.categoryFamily || "other",
+        industryCode: job.industryCode || job.categoryFamily || "r29",
         subIndustry: job.subIndustry,
         title: job.title,
         categoryIds: job.categoryIds,
@@ -151,13 +152,15 @@ function buildTaxonomy(entries: readonly TaxonomyEntry[]): JobSearchTaxonomy {
   };
 
   for (const entry of entries) {
-    const industry = industries.get(entry.industryCode) ?? {
-      code: entry.industryCode,
+    const industryCode =
+      entry.industryCode === "other" ? "r29" : entry.industryCode;
+    const industry = industries.get(industryCode) ?? {
+      code: industryCode,
       name: entry.industry,
       count: 0,
       subIndustries: new Map(),
     };
-    industries.set(entry.industryCode, industry);
+    industries.set(industryCode, industry);
     industry.count += 1;
 
     const subIndustry = industry.subIndustries.get(entry.subIndustry) ?? {
@@ -245,6 +248,73 @@ function buildTaxonomy(entries: readonly TaxonomyEntry[]): JobSearchTaxonomy {
   };
 }
 
+/**
+ * Reconcile observed counts/titles with the canonical recruiter taxonomy.
+ * Search may still expose counts from the catalogue, but labels, ordering,
+ * standard sub-industries, and predefined ids come from one shared source.
+ * `r29` is the canonical code for Other. Legacy snapshots using `other` are
+ * normalized before counts and sub-industries are reconciled.
+ */
+function applyCanonicalTaxonomy(
+  computed: JobSearchTaxonomy,
+): JobSearchTaxonomy {
+  const dynamicByCode = new Map(
+    computed.industries.map((industry) => [
+      industry.code === "other" ? "r29" : industry.code,
+      industry,
+    ]),
+  );
+
+  return {
+    ...computed,
+    industries: recruiterIndustryTaxonomy.map((definition) => {
+      const dynamic = dynamicByCode.get(definition.code);
+      if (definition.subIndustries === null) {
+        return {
+          code: "r29",
+          name: definition.label,
+          count: dynamic?.count ?? 0,
+          subIndustries: dynamic?.subIndustries ?? [],
+        };
+      }
+
+      const dynamicBySubIndustry = new Map(
+        dynamic?.subIndustries.map((subIndustry) => [
+          subIndustry.name.trim().toLowerCase(),
+          subIndustry,
+        ]),
+      );
+      const canonicalNames = new Set(
+        definition.subIndustries.map(([name]) => name.trim().toLowerCase()),
+      );
+      return {
+        code: definition.code,
+        name: definition.label,
+        count: dynamic?.count ?? 0,
+        subIndustries: [
+          ...definition.subIndustries.map(([name, categoryId]) => {
+            const observed = dynamicBySubIndustry.get(
+              name.trim().toLowerCase(),
+            );
+            return {
+              name,
+              count: observed?.count ?? 0,
+              titles:
+                observed?.titles.map((title) => ({
+                  ...title,
+                  categoryIds: [categoryId],
+                })) ?? [],
+            };
+          }),
+          ...(dynamic?.subIndustries.filter(
+            ({ name }) => !canonicalNames.has(name.trim().toLowerCase()),
+          ) ?? []),
+        ],
+      };
+    }),
+  };
+}
+
 let catalogTaxonomyPromise: Promise<JobSearchTaxonomy> | null = null;
 
 function parseTaxonomyJson(text: string): unknown {
@@ -300,20 +370,7 @@ export async function listJobSearchTaxonomy(): Promise<JobSearchTaxonomy> {
     const computedTaxonomy = jobs.length
       ? buildCatalogJobSearchTaxonomy(jobs)
       : emptyTaxonomy;
-    // Keep the explicit catch-all category visible even when its split file
-    // is currently empty. Jobs added later with industryCode r29 will reuse
-    // this same entry and contribute their normal counts.
-    const taxonomy = computedTaxonomy.industries.some(
-      ({ code }) => code === "r29",
-    )
-      ? computedTaxonomy
-      : {
-          ...computedTaxonomy,
-          industries: [
-            ...computedTaxonomy.industries,
-            { code: "r29", name: "Other", count: 0, subIndustries: [] },
-          ],
-        };
+    const taxonomy = applyCanonicalTaxonomy(computedTaxonomy);
     reportTaxonomyStage("catalog precompute", taxonomy);
     return taxonomy;
   });

@@ -101,12 +101,12 @@
 }
 
 .sstep.current .snum {
-  color: #ffffff;
+  color: var(--sh-color-on-brand);
   background: var(--ev-accent);
 }
 
 .sstep.done .snum {
-  color: #ffffff;
+  color: var(--sh-color-on-success);
   background: var(--ev-good);
 }
 
@@ -413,7 +413,7 @@
 }
 
 .primaryButton {
-  color: #ffffff;
+  color: var(--sh-color-on-brand);
   background: var(--ev-accent);
 }
 
@@ -463,7 +463,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  color: #ffffff;
+  color: var(--sh-color-on-success);
   background: var(--ev-good);
   font-size: 15px;
   font-weight: 800;

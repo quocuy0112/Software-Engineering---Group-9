@@ -595,7 +595,7 @@
 
 .profile-unsaved-navigation-actions .leave-button {
   border: 1px solid var(--sh-color-error);
-  color: #fff;
+  color: var(--sh-color-on-error);
   background: var(--sh-color-error);
 }
 
