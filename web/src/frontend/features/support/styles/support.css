@@ -491,3 +491,567 @@
     max-width: 88%;
   }
 }
+
+/* Web-chat surface inspired by Stream's conversation hierarchy: an always
+   legible channel rail, one spacious thread, and a clearly separated composer. */
+.support-workspace {
+  gap: 18px;
+}
+
+.support-layout {
+  grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
+  min-height: min(720px, calc(100dvh - 210px));
+  gap: 14px;
+}
+
+.support-sidebar,
+.support-thread {
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.support-sidebar {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  padding: 16px;
+  background: var(--sh-color-surface-card);
+}
+
+.support-new-case {
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: 10px;
+  background: var(--sh-color-surface-tinted);
+}
+
+.support-new-case h2,
+.support-case-list h2 {
+  font-size: 15px;
+}
+
+.support-new-case label {
+  gap: 5px;
+  font-size: 12px;
+}
+
+.support-new-case input,
+.support-new-case select {
+  min-height: 38px;
+}
+
+.support-new-case textarea {
+  min-height: 76px;
+}
+
+.support-new-case button {
+  min-height: 38px;
+  border-radius: 7px;
+  box-shadow: none;
+  font-size: 13px;
+}
+
+.support-case-list {
+  min-height: 0;
+  flex: 1;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  overflow-y: auto;
+}
+
+.support-case-list button {
+  position: relative;
+  gap: 3px 10px;
+  padding: 11px 10px 11px 14px;
+  border-radius: 9px;
+}
+
+.support-case-list button.selected::before {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--sh-color-brand-primary);
+  content: "";
+}
+
+.support-case-list button:hover,
+.support-case-list button.selected {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--sh-color-brand-soft) 76%, var(--sh-color-surface-card));
+}
+
+.support-case-list strong {
+  font-size: 13px;
+}
+
+.support-thread {
+  min-height: 0;
+  background: var(--sh-color-surface-card);
+}
+
+.support-thread[data-empty="false"] {
+  min-height: 0;
+}
+
+.support-thread > header {
+  align-items: center;
+  padding: 18px 22px;
+  background: var(--sh-color-surface-card);
+}
+
+.support-thread > header h2 {
+  margin-top: 2px;
+  font-size: 17px;
+}
+
+.support-thread > header p {
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.support-status {
+  min-height: 26px;
+  border: 1px solid var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-subtle);
+}
+
+.support-messages {
+  gap: 14px;
+  padding: 26px clamp(20px, 4vw, 52px);
+  background: var(--sh-color-surface-tinted);
+}
+
+.support-messages article {
+  max-width: min(68%, 650px);
+  padding: 10px 13px;
+  border-radius: 5px 12px 12px 12px;
+  box-shadow: none;
+  font-size: 14px;
+}
+
+.support-messages article[data-author="YOU"] {
+  border-color: var(--sh-color-brand-primary);
+  border-radius: 12px 5px 12px 12px;
+}
+
+.support-messages article strong {
+  font-size: 12px;
+}
+
+.support-messages article p {
+  line-height: 1.55;
+}
+
+.support-reply {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px 12px;
+  align-items: end;
+  padding: 14px 22px 18px;
+  background: var(--sh-color-surface-card);
+}
+
+.support-reply label {
+  grid-column: 1 / -1;
+  font-size: 12px;
+}
+
+.support-reply textarea {
+  min-height: 52px;
+  max-height: 140px;
+  padding: 12px;
+  border-radius: 9px;
+  background: var(--sh-color-surface-tinted);
+}
+
+.support-reply small {
+  grid-column: 1;
+}
+
+.support-reply button {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 104px;
+  min-height: 52px;
+  border-radius: 9px;
+  box-shadow: none;
+  font-size: 13px;
+}
+
+.support-empty {
+  min-height: 100%;
+  background: var(--sh-color-surface-tinted);
+}
+
+@media (max-width: 860px) {
+  .support-layout {
+    min-height: 0;
+  }
+
+  .support-sidebar {
+    max-height: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .support-sidebar {
+    padding: 12px;
+  }
+
+  .support-thread > header,
+  .support-messages,
+  .support-reply {
+    padding-inline: 16px;
+  }
+
+  .support-reply {
+    grid-template-columns: 1fr;
+  }
+
+  .support-reply button,
+  .support-reply small {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .support-reply button {
+    width: 100%;
+    min-height: 42px;
+  }
+}
+
+/* Desktop support desk: compose on the left, read the active conversation in
+   the centre, and revisit previous cases from a separate history rail. */
+@media (min-width: 1041px) {
+  .support-layout {
+    grid-template-columns: minmax(250px, 292px) minmax(0, 1fr) minmax(240px, 286px);
+    align-items: stretch;
+  }
+
+  .support-sidebar {
+    display: contents;
+  }
+
+  .support-new-case {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+  }
+
+  .support-thread {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .support-case-list {
+    grid-column: 3;
+    grid-row: 1;
+    margin: 0;
+    padding: 16px;
+    border: 1px solid var(--sh-color-border-subtle);
+    border-radius: 14px;
+    background: var(--sh-color-surface-card);
+  }
+}
+
+.support-new-case textarea {
+  resize: none;
+}
+
+.support-case-list small[data-state],
+.support-status[data-state] {
+  border: 1px solid transparent;
+}
+
+.support-case-list small[data-state="OPEN"],
+.support-status[data-state="OPEN"] {
+  border-color: color-mix(in srgb, var(--sh-color-brand-primary) 22%, transparent);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+}
+
+.support-case-list small[data-state="WAITING_FOR_USER"],
+.support-status[data-state="WAITING_FOR_USER"] {
+  border-color: color-mix(in srgb, var(--sh-color-warning) 30%, transparent);
+  color: color-mix(in srgb, var(--sh-color-warning) 80%, var(--sh-color-text-primary));
+  background: var(--sh-color-warning-bg);
+}
+
+.support-case-list small[data-state="WAITING_FOR_SUPPORT"],
+.support-status[data-state="WAITING_FOR_SUPPORT"] {
+  border-color: color-mix(in srgb, var(--sh-color-brand-primary) 22%, transparent);
+  color: var(--sh-color-brand-primary);
+  background: color-mix(in srgb, var(--sh-color-brand-soft) 72%, var(--sh-color-surface-card));
+}
+
+.support-case-list small[data-state="RESOLVED"],
+.support-status[data-state="RESOLVED"] {
+  border-color: color-mix(in srgb, var(--sh-color-success) 28%, transparent);
+  color: var(--sh-color-success);
+  background: var(--sh-color-success-bg);
+}
+
+.support-case-list small[data-state="CLOSED"],
+.support-status[data-state="CLOSED"] {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-text-muted);
+  background: var(--sh-color-surface-subtle);
+}
+
+@media (min-width: 861px) and (max-width: 1040px) {
+  .support-layout {
+    grid-template-columns: minmax(260px, 310px) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .support-sidebar {
+    display: contents;
+  }
+
+  .support-new-case {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .support-case-list {
+    grid-column: 1;
+    grid-row: 2;
+    margin: 0;
+    padding: 14px;
+    border: 1px solid var(--sh-color-border-subtle);
+    border-radius: 14px;
+    background: var(--sh-color-surface-card);
+  }
+
+  .support-thread {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
+@media (max-width: 860px) {
+  .support-sidebar {
+    display: grid;
+  }
+}
+
+/* Keep the history rail scannable: subject first, then category and date. */
+.support-case-list strong {
+  grid-column: 1 / -1;
+}
+
+.support-case-list button > span {
+  color: var(--sh-color-text-secondary);
+  font-size: 11px;
+  font-weight: var(--sh-font-weight-medium);
+}
+
+/* Compact history cards and content-sized message bubbles. */
+.support-case-list {
+  flex: initial;
+  align-self: start;
+}
+
+.support-case-list button {
+  min-height: 0;
+}
+
+.support-thread__meta {
+  display: grid;
+  justify-items: end;
+  gap: 7px;
+}
+
+.support-messages article {
+  position: relative;
+  align-self: flex-start;
+  width: fit-content;
+  max-width: min(68%, 650px);
+}
+
+.support-messages article[data-author="YOU"] {
+  align-self: flex-end;
+}
+
+.support-messages article[data-author="YOU"] > strong {
+  display: block;
+  text-align: right;
+}
+
+.support-messages article time {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 1;
+  width: max-content;
+  max-width: 100%;
+  padding: 3px 6px;
+  border-radius: 5px;
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-card);
+  box-shadow: 0 2px 8px color-mix(in srgb, #0f172a 12%, transparent);
+  font-size: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-2px);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.support-messages article[data-author="YOU"] time {
+  color: var(--sh-color-text-secondary);
+}
+
+.support-message-avatar {
+  position: absolute;
+  right: calc(100% + 10px);
+  bottom: 0;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: 50%;
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-card);
+}
+
+.support-message-avatar svg {
+  width: 15px;
+  height: 15px;
+}
+
+.support-messages article[data-author="YOU"] .support-message-avatar {
+  right: auto;
+  left: calc(100% + 10px);
+  border-color: color-mix(in srgb, var(--sh-color-brand-primary) 24%, transparent);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+}
+
+.support-messages article:hover time,
+.support-messages article:focus-within time {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Do not trap the mouse wheel inside a conversation or the history rail.
+   Once either region reaches an edge, normal page scrolling continues. */
+.support-messages,
+.support-case-list {
+  overscroll-behavior: auto;
+}
+
+/* A compact web-chat composer: the message field is the primary surface and
+   the send action is visually quiet until it becomes available. */
+.support-reply {
+  gap: 6px 10px;
+  padding: 14px 20px 16px;
+  background: var(--sh-color-surface-card);
+}
+
+.support-reply label {
+  margin: 0;
+  color: var(--sh-color-text-secondary);
+  font-size: 12px;
+}
+
+.support-reply textarea {
+  height: 54px !important;
+  min-height: 54px !important;
+  max-height: 54px;
+  padding: 15px 14px;
+  border-color: var(--sh-color-border-subtle);
+  border-radius: 10px;
+  background: var(--sh-color-surface-tinted);
+  line-height: 1.45;
+  resize: none;
+}
+
+.support-reply textarea::placeholder {
+  color: var(--sh-color-text-muted);
+}
+
+.support-reply textarea:focus {
+  background: var(--sh-color-surface-card);
+}
+
+.support-reply button {
+  display: inline-flex;
+  min-width: 116px;
+  min-height: 54px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 15px;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.support-reply button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.support-reply button:disabled {
+  border: 1px solid var(--sh-color-border-subtle);
+  color: var(--sh-color-text-muted);
+  background: var(--sh-color-surface-subtle);
+}
+
+/* Keep the workspace itself stable on desktop. Only the message stream scrolls
+   once its content exceeds the available chat height. */
+@media (min-width: 861px) {
+  .support-layout {
+    height: min(720px, calc(100dvh - 245px));
+    min-height: 0;
+  }
+
+  .support-thread,
+  .support-messages {
+    min-height: 0;
+  }
+
+  .support-thread {
+    height: 100%;
+  }
+}
+
+.support-messages {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--sh-color-text-muted) 42%, transparent) transparent;
+}
+
+.support-messages::-webkit-scrollbar {
+  width: 7px;
+}
+
+.support-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.support-messages::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sh-color-text-muted) 42%, transparent);
+  background-clip: padding-box;
+}
+
+.support-messages::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--sh-color-text-muted) 66%, transparent);
+  background-clip: padding-box;
+}
+
+@media (max-width: 600px) {
+  .support-messages article {
+    max-width: 86%;
+  }
+
+  .support-message-avatar {
+    display: none;
+  }
+}

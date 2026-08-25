@@ -498,7 +498,10 @@ export class PrismaSupportRepository {
       include: {
         requester: { select: { name: true, email: true } },
         messages: { orderBy: { sequence: "asc" } },
-        internalNotes: { orderBy: { createdAt: "asc" } },
+        internalNotes: {
+          orderBy: { createdAt: "asc" },
+          include: { author: { select: { name: true } } },
+        },
         assignments: { orderBy: { assignedAt: "asc" } },
         history: { orderBy: { occurredAt: "asc" } },
       },
@@ -521,6 +524,7 @@ export class PrismaSupportRepository {
         : row.internalNotes.map((note) => ({
             id: note.id,
             authorAdminUserId: note.authorAdminUserId,
+            authorAdminDisplayName: note.author.name,
             normalizedText: note.normalizedText,
             createdAt: note.createdAt.toISOString(),
           })),

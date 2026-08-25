@@ -3,19 +3,32 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
+  Avatar,
   Box,
   Button,
   Chip,
+  type ChipProps,
   Divider,
   MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
+import AssignmentIndOutlinedIcon from "@mui/icons-material/AssignmentIndOutlined";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import { Show, useRecordContext, useRefresh } from "react-admin";
 import type { AdminSupportCaseDetail } from "@/shared/contracts/support";
 import { useSupportInvalidation } from "@/frontend/features/support/client/use-support-invalidation";
 import { handleSupportMessageKeyDown } from "@/frontend/features/support/components/support-message-keyboard";
 import { adminDataProvider } from "../app/data-provider";
+
+function supportStateMeta(state: string): { label: string; color: ChipProps["color"] } {
+  if (state === "WAITING_FOR_SUPPORT") return { label: "Needs your reply", color: "warning" };
+  if (state === "WAITING_FOR_USER") return { label: "Waiting for requester", color: "info" };
+  if (state === "RESOLVED") return { label: "Resolved", color: "success" };
+  if (state === "CLOSED") return { label: "Closed", color: "default" };
+  return { label: "Open", color: "primary" };
+}
 
 export function SupportCaseReview() {
   const record = useRecordContext<AdminSupportCaseDetail>();
@@ -43,6 +56,7 @@ export function SupportCaseReview() {
 
   if (!record) return null;
   const currentRecord = record;
+  const state = supportStateMeta(record.state);
 
   async function command(
     action: string,
@@ -80,13 +94,18 @@ export function SupportCaseReview() {
   }
 
   return (
-    <Box sx={{ p: 3, display: "grid", gap: 2, maxWidth: 1100 }}>
+    <Box sx={{ p: 3, mx: "auto", display: "grid", gap: 2, width: "100%", maxWidth: 1540 }}>
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           gap: 2,
           alignItems: "start",
+          p: 2.5,
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 2.5,
+          bgcolor: "background.paper",
         }}
       >
         <Box>
@@ -102,17 +121,7 @@ export function SupportCaseReview() {
         </Box>
         <Box sx={{ display: "grid", justifyItems: "end", gap: 1 }}>
           <Chip label="Online" color="success" size="small" />
-          <Typography
-            sx={{
-              px: 1.5,
-              py: 0.75,
-              borderRadius: 99,
-              bgcolor: "grey.100",
-              fontWeight: 700,
-            }}
-          >
-            {record.state.replaceAll("_", " ")}
-          </Typography>
+          <Chip label={state.label} color={state.color} size="small" variant="outlined" />
         </Box>
       </Box>
 
@@ -127,10 +136,14 @@ export function SupportCaseReview() {
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+          gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1fr) minmax(340px, 0.9fr)" },
           gap: 2,
+          alignItems: "start",
+          gridTemplateRows: { lg: "auto minmax(0, 1fr)" },
         }}
       >
+        <Box sx={{ display: "grid", gap: 2, gridColumn: { lg: 1 }, gridRow: { lg: 1 } }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
         <Box
           sx={{
             p: 2,
@@ -139,7 +152,12 @@ export function SupportCaseReview() {
             borderRadius: 2,
           }}
         >
-          <Typography variant="h6">Requester</Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+            <Avatar sx={{ width: 32, height: 32, bgcolor: "primary.50", color: "primary.main" }}>
+              <PersonOutlineIcon fontSize="small" />
+            </Avatar>
+            <Typography variant="h6">Requester</Typography>
+          </Box>
           <Typography>{record.requesterDisplayName}</Typography>
           <Typography>{record.requesterMaskedEmail}</Typography>
           <Typography variant="body2" color="text.secondary">
@@ -154,7 +172,12 @@ export function SupportCaseReview() {
             borderRadius: 2,
           }}
         >
-          <Typography variant="h6">Assignment</Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+            <Avatar sx={{ width: 32, height: 32, bgcolor: "warning.50", color: "warning.dark" }}>
+              <AssignmentIndOutlinedIcon fontSize="small" />
+            </Avatar>
+            <Typography variant="h6">Assignment</Typography>
+          </Box>
           <Typography>
             {record.currentAssigneeUserId ?? "Unassigned"}
           </Typography>
@@ -197,8 +220,39 @@ export function SupportCaseReview() {
             </Box>
           ) : null}
         </Box>
-      </Box>
-
+          </Box>
+        </Box>
+        <Box sx={{ display: "grid", gap: 2, p: 2, border: "1px solid", borderColor: "divider", borderRadius: 2, bgcolor: "grey.50", gridColumn: { lg: 2 }, gridRow: { lg: "1 / span 2" } }}>
+          <Box>
+            <Typography component="h2" variant="h6">Internal notes</Typography>
+            <Typography variant="body2" color="text.secondary">Private notes and operational context for administrators.</Typography>
+          </Box>
+          {record.notes.length === 0 ? <Typography variant="body2" color="text.secondary">No internal notes yet.</Typography> : record.notes.map((item) => (
+            <Box key={item.id} sx={{ p: 1.5, bgcolor: "warning.50", borderLeft: "4px solid", borderColor: "warning.main", borderRadius: 1 }}>
+              <Typography variant="caption" sx={{ display: "block", mb: 0.5, fontWeight: 800 }}>Internal note · {item.authorAdminDisplayName}</Typography>
+              <Typography>{item.normalizedText}</Typography>
+              <Typography variant="caption" color="text.secondary">{new Date(item.createdAt).toLocaleString()} · Admin ID {item.authorAdminUserId}</Typography>
+            </Box>
+          ))}
+          {record.currentAssigneeUserId && record.state !== "CLOSED" ? (
+            <Box sx={{ display: "grid", gap: 1 }}>
+              <TextField label="Private internal note" multiline minRows={2} value={note} onChange={(event) => setNote(event.target.value)} inputProps={{ maxLength: 2000 }} />
+              <Button disabled={busy || !note.trim()} onClick={() => command("note", { note })}>Add private note</Button>
+            </Box>
+          ) : null}
+          <Divider />
+          <Typography component="h2" variant="h6">Assignment history</Typography>
+          {record.assignments.length === 0 ? <Typography variant="body2" color="text.secondary">No assignment history yet.</Typography> : record.assignments.map((item) => (
+            <Typography key={item.id} variant="body2">{item.assigneeAdminUserId} · {new Date(item.assignedAt).toLocaleString()} · {item.endReason ?? "ACTIVE"}</Typography>
+          ))}
+          {record.currentAssigneeUserId && record.state !== "CLOSED" ? (
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+              {record.state !== "RESOLVED" ? <Button variant="contained" color="success" disabled={busy} onClick={() => command("resolve")}>Resolve case</Button> : null}
+              <Button color="error" disabled={busy} onClick={() => command("close")}>Close case</Button>
+            </Box>
+          ) : null}
+        </Box>
+      <Box sx={{ display: "grid", gap: 2, gridColumn: { lg: 1 }, gridRow: { lg: 2 } }}>
       <Divider />
       <Typography component="h2" variant="h5">
         Conversation
@@ -226,34 +280,43 @@ export function SupportCaseReview() {
             <Box
               key={message.id}
               sx={{
-                justifySelf:
-                  message.senderKind === "ADMINISTRATOR" ? "end" : "start",
-                maxWidth: "78%",
-                p: 1.5,
-                borderRadius: 2,
-                bgcolor:
-                  message.senderKind === "ADMINISTRATOR"
-                    ? "primary.main"
-                    : "grey.100",
-                color:
-                  message.senderKind === "ADMINISTRATOR"
-                    ? "primary.contrastText"
-                    : "text.primary",
+                display: "flex",
+                alignItems: "flex-end",
+                justifyContent: message.senderKind === "ADMINISTRATOR" ? "flex-end" : "flex-start",
+                gap: 1,
               }}
             >
-              <Typography variant="caption" sx={{ fontWeight: 800 }}>
-                {message.senderKind === "ADMINISTRATOR"
-                  ? "SmartHire Support"
-                  : record.requesterDisplayName}
-              </Typography>
-              <Typography
-                sx={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
+              {message.senderKind !== "ADMINISTRATOR" ? (
+                <Avatar sx={{ width: 30, height: 30, bgcolor: "grey.200", color: "text.secondary" }}>
+                  <PersonOutlineIcon fontSize="small" />
+                </Avatar>
+              ) : null}
+              <Box
+                sx={{
+                  maxWidth: "72%",
+                  p: 1.5,
+                  border: "1px solid",
+                  borderColor: message.senderKind === "ADMINISTRATOR" ? "primary.main" : "divider",
+                  borderRadius: message.senderKind === "ADMINISTRATOR" ? "12px 12px 4px 12px" : "12px 12px 12px 4px",
+                  bgcolor: message.senderKind === "ADMINISTRATOR" ? "primary.main" : "grey.50",
+                  color: message.senderKind === "ADMINISTRATOR" ? "primary.contrastText" : "text.primary",
+                }}
               >
-                {message.content}
-              </Typography>
-              <Typography variant="caption">
-                {new Date(message.createdAt).toLocaleString()}
-              </Typography>
+                <Typography variant="caption" sx={{ display: "block", fontWeight: 800, opacity: 0.9 }}>
+                  {message.senderKind === "ADMINISTRATOR" ? "You · SmartHire Support" : `${record.requesterDisplayName} · Requester`}
+                </Typography>
+                <Typography sx={{ mt: 0.4, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>
+                  {message.content}
+                </Typography>
+                <Typography variant="caption" sx={{ display: "block", mt: 0.75, opacity: 0.72 }}>
+                  {new Date(message.createdAt).toLocaleString()}
+                </Typography>
+              </Box>
+              {message.senderKind === "ADMINISTRATOR" ? (
+                <Avatar sx={{ width: 30, height: 30, bgcolor: "primary.50", color: "primary.main" }}>
+                  <SupportAgentOutlinedIcon fontSize="small" />
+                </Avatar>
+              ) : null}
             </Box>
           ))}
         </Box>
@@ -286,7 +349,10 @@ export function SupportCaseReview() {
           </Button>
         </Box>
       ) : null}
+      </Box>
+      </Box>
 
+      <Box sx={{ display: "none" }} aria-hidden="true">
       <Divider />
       <Typography component="h2" variant="h5">
         Internal notes
@@ -301,9 +367,12 @@ export function SupportCaseReview() {
             borderColor: "warning.main",
           }}
         >
+          <Typography variant="caption" sx={{ display: "block", mb: 0.5, fontWeight: 800 }}>
+            Internal note · {item.authorAdminDisplayName}
+          </Typography>
           <Typography>{item.normalizedText}</Typography>
           <Typography variant="caption">
-            {new Date(item.createdAt).toLocaleString()}
+            {new Date(item.createdAt).toLocaleString()} · Admin ID {item.authorAdminUserId}
           </Typography>
         </Box>
       ))}
@@ -359,6 +428,7 @@ export function SupportCaseReview() {
           {item.endReason ?? "ACTIVE"}
         </Typography>
       ))}
+      </Box>
     </Box>
   );
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Headset, SendHorizontal, UserRound } from "lucide-react";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { WorkspacePageHeader } from "@/frontend/features/dashboard/components/page-header";
 import type {
@@ -32,7 +33,7 @@ function supportCopy(locale: "vi" | "en") {
         submitting: "Đang gửi…",
         create: "Tạo yêu cầu",
         disabledHint: "Điền đầy đủ Tiêu đề và Nội dung để gửi yêu cầu",
-        yourCases: "Yêu cầu của bạn",
+        yourCases: "Recently cases",
         noCases: "Chưa có yêu cầu hỗ trợ.",
         selectCase: "Chọn một yêu cầu",
         selectCaseCopy: "Chọn yêu cầu đã có hoặc tạo yêu cầu mới ở bên trái.",
@@ -87,7 +88,7 @@ function supportCopy(locale: "vi" | "en") {
         submitting: "Submitting…",
         create: "Create case",
         disabledHint: "Fill in Subject and Description to submit",
-        yourCases: "Your cases",
+        yourCases: "Recently cases",
         noCases: "No support cases yet.",
         selectCase: "Select a case",
         selectCaseCopy:
@@ -372,7 +373,6 @@ export function SupportWorkspace({
                     {copy.categories[item.category] ??
                       item.category.replaceAll("_", " ")}
                   </span>
-                  <small>{copy.states[item.state]}</small>
                   <time dateTime={item.updatedAt}>
                     {new Date(item.updatedAt).toLocaleDateString(copy.locale)}
                   </time>
@@ -406,13 +406,15 @@ export function SupportWorkspace({
                 <div>
                   <p>{detail.correspondent}</p>
                   <h2>{detail.subject}</h2>
+                </div>
+                <div className="support-thread__meta">
+                  <span className="support-status" data-state={detail.state}>
+                    {copy.states[detail.state]}
+                  </span>
                   <span className="support-online-status">
                     <span aria-hidden="true" /> {copy.online}
                   </span>
                 </div>
-                <span className="support-status">
-                  {copy.states[detail.state]}
-                </span>
               </header>
               <div
                 ref={messagesRef}
@@ -424,6 +426,9 @@ export function SupportWorkspace({
                 ) : (
                   detail.messages.map((message) => (
                     <article key={message.id} data-author={message.author}>
+                      <span className="support-message-avatar" aria-hidden="true">
+                        {message.author === "YOU" ? <UserRound /> : <Headset />}
+                      </span>
                       <strong>
                         {message.author === "YOU"
                           ? copy.you
@@ -453,15 +458,17 @@ export function SupportWorkspace({
                       })
                     }
                     maxLength={4000}
+                    placeholder="Write a reply…"
                     required
                   />
                   <small>{copy.sendHint}</small>
                   <button type="submit" disabled={busy || !reply.trim()}>
-                    {busy
+                    <span>{busy
                       ? copy.sending
                       : detail.state === "RESOLVED"
                         ? copy.reopen
-                        : copy.send}
+                        : copy.send}</span>
+                    {!busy ? <SendHorizontal aria-hidden="true" /> : null}
                   </button>
                 </form>
               ) : (
