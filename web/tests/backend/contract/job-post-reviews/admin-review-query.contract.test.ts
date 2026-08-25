@@ -21,6 +21,7 @@ describe("Administrator review query contract", () => {
       "minimumAgeHours",
       "sequence",
       "assignment.toUpperCase()",
+      "recordStatus",
     ])
       expect(list()).toContain(marker);
     expect(detail()).toContain("reviewId");

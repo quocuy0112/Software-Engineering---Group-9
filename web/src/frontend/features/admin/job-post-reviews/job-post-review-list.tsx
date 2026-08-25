@@ -16,8 +16,20 @@ const filters = [
       { id: "PENDING_REVIEW", name: "Pending review" },
       { id: "APPROVED", name: "Approved" },
       { id: "REJECTED", name: "Rejected" },
+      { id: "WITHDRAWN", name: "Withdrawn" },
     ]}
     emptyText="All statuses"
+  />,
+  <SelectInput
+    key="recordStatus"
+    source="recordStatus"
+    label="Record status"
+    aria-label="Filter by record status"
+    choices={[
+      { id: "ACTIVE", name: "Current records" },
+      { id: "DELETED", name: "Deleted archive" },
+      { id: "ALL", name: "Current and deleted" },
+    ]}
   />,
   <SelectInput
     key="assignment"
@@ -50,11 +62,19 @@ const filters = [
 
 export function JobPostReviewList() {
   return (
-    <List filters={filters} sort={{ field: "submittedAt", order: "ASC" }}>
+    <List
+      filters={filters}
+      filterDefaultValues={{
+        state: "PENDING_REVIEW",
+        recordStatus: "ACTIVE",
+      }}
+      sort={{ field: "submittedAt", order: "ASC" }}
+    >
       <Datagrid bulkActionButtons={false} rowClick="show">
         <TextField source="jobTitle" label="Job" />
         <TextField source="companyDisplayName" label="Company" />
         <TextField source="state" />
+        <TextField source="recordStatus" label="Record" />
         <TextField source="assignment" emptyText="Unassigned" />
         <TextField source="submittedAt" label="Submitted" />
         <TextField source="ageSeconds" label="Age (seconds)" />

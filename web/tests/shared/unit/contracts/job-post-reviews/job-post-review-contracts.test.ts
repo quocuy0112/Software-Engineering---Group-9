@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   adminReviewCommandSchema,
   jobPostReviewReasonCodeSchema,
+  jobPostReviewListQuerySchema,
   jobPostReviewStateSchema,
 } from "@/shared/contracts/admin/job-post-review";
 import { jobReviewSnapshotSchema } from "@/shared/contracts/recruiter-job-posting";
@@ -13,6 +14,7 @@ describe("job-post review contracts", () => {
       "PENDING_REVIEW",
       "APPROVED",
       "REJECTED",
+      "WITHDRAWN",
     ]);
     expect(
       jobPostReviewReasonCodeSchema.safeParse("DUPLICATE_OR_SPAM").success,
@@ -45,6 +47,23 @@ describe("job-post review contracts", () => {
       adminReviewCommandSchema.safeParse({
         command: "APPROVE",
         reason: "forged",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("bounds deleted review archive discovery to explicit record scopes", () => {
+    expect(
+      jobPostReviewListQuerySchema.parse({
+        page: 1,
+        perPage: 25,
+        recordStatus: "DELETED",
+      }).recordStatus,
+    ).toBe("DELETED");
+    expect(
+      jobPostReviewListQuerySchema.safeParse({
+        page: 1,
+        perPage: 25,
+        recordStatus: "PURGED",
       }).success,
     ).toBe(false);
   });

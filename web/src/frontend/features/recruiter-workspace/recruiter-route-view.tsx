@@ -9,6 +9,7 @@ import {
   type RecruiterJobManagementData,
 } from '@/shared/contracts/recruiter-job-posting';
 import { recruiterRoutes } from '@/shared/routing/recruiter-routes';
+import { collectRecruiterSubIndustrySuggestions } from '@/shared/contracts/jobs/industry-taxonomy';
 
 type RecruiterRouteViewProps = {
   view: 'list' | 'create' | 'edit';
@@ -68,6 +69,10 @@ export function RecruiterRouteView({
     <JobPostingEditor
       initialJob={job}
       companyName={companyName}
+      autoSavePreferenceScope={initialData.recruiterUserId}
+      subIndustrySuggestions={collectRecruiterSubIndustrySuggestions(
+        initialData.jobs,
+      )}
       onBack={() => router.back()}
       onSaved={() => router.replace(recruiterRoutes.jobPostings)}
     />

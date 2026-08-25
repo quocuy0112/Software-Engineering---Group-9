@@ -24,6 +24,8 @@ import {
 import { projectJobReviewSnapshot } from "./job-post-publication-projector";
 import { emitJobPostReviewOperation } from "./job-post-review-operations";
 import { appendJobPostingLifecycleFact } from "@/backend/repositories/analytics/prisma-analytics-repository";
+import { publishApprovedJobToCatalogue } from "@/backend/services/jobs/publish-approved-job-to-catalogue";
+import { syncManagedJobPublicProjection } from "@/backend/repositories/jobs/prisma-job-post-management-repository";
 
 /**
  * Application boundary for the review lifecycle. User-story orchestration is
@@ -74,6 +76,7 @@ export class JobPostReviewService {
               calculatedAt.getTime() - input.minimumAgeHours * 60 * 60_000,
             ),
       sequence: input.sequence,
+      recordStatus: input.recordStatus ?? "ACTIVE",
     });
     emitJobPostReviewOperation({
       operation: "queue_read",
@@ -118,6 +121,8 @@ export class JobPostReviewService {
             ),
           ),
           version: row.aggregate.version,
+          recordStatus: row.aggregate.softDeletedAt ? "DELETED" : "ACTIVE",
+          deletedAt: row.aggregate.softDeletedAt?.toISOString() ?? null,
           integrityState: snapshot.success ? "VALID" : "BLOCKED",
         };
       }),
@@ -159,6 +164,8 @@ export class JobPostReviewService {
         Math.floor((Date.now() - row.submittedAt.getTime()) / 1_000),
       ),
       version: row.aggregate.version,
+      recordStatus: row.aggregate.softDeletedAt ? "DELETED" : "ACTIVE",
+      deletedAt: row.aggregate.softDeletedAt?.toISOString() ?? null,
       integrityState: "VALID",
       snapshot: snapshot.data,
       snapshotSchemaVersion: row.snapshotSchemaVersion,
@@ -522,7 +529,43 @@ export class JobPostReviewService {
         return adminReviewCommandResultSchema.parse(decided);
       },
     );
-    return adminReviewCommandResultSchema.parse(result);
+    const parsed = adminReviewCommandResultSchema.parse(result);
+    if (input.command.command === "APPROVE" && parsed.state === "APPROVED") {
+      // PostgreSQL is the review/publication source of truth. The JSON
+      // catalogue is a compatibility/search projection and must only receive
+      // the snapshot after the approval transaction has committed.
+      const approvedVersion = await prisma.jobPostReviewVersion.findUnique({
+        where: { id: input.reviewId },
+        select: { snapshot: true, aggregate: { select: { closedAt: true } } },
+      });
+      if (approvedVersion) {
+        try {
+          await publishApprovedJobToCatalogue({
+            snapshot: approvedVersion.snapshot,
+            now,
+            status: approvedVersion.aggregate.closedAt ? "closed" : "active",
+          });
+          // Avoid serving the pre-approval projection to a recruiter who is
+          // already watching the management screen.
+          await import("@/backend/services/jobs/recruiter-job-posting-data")
+            .then(({ invalidateRecruiterJobCatalogueCache }) =>
+              invalidateRecruiterJobCatalogueCache(),
+            )
+            .catch(() => undefined);
+          await import("@/backend/services/jobs/job-workspace-data")
+            .then(({ invalidateJobWorkspaceCatalogueCache }) =>
+              invalidateJobWorkspaceCatalogueCache(),
+            )
+            .catch(() => undefined);
+        } catch (error) {
+          // Approval is already committed in PostgreSQL. Keep that decision
+          // durable and log a retryable projection failure instead of telling
+          // the admin that a successful approval failed mid-request.
+          console.error("[job-catalogue] approval projection failed", error);
+        }
+      }
+    }
+    return parsed;
   }
 }
 
@@ -603,6 +646,190 @@ export async function closeManagedJobPost(input: {
       result: "SUCCESS",
       correlationId,
       context: { resultingState: "CLOSED", targetVersion: closed.version },
+    });
+    return true;
+  });
+}
+
+/**
+ * Ends a recruiter submission without treating it as an administrator
+ * rejection. The immutable version and its audit trail remain available, but
+ * it immediately leaves every pending-review queue.
+ */
+export async function withdrawManagedJobPostReview(input: {
+  jobId: string;
+  companyId: string;
+  actorUserId: string;
+  actorSessionId?: string | null;
+  now?: Date;
+}) {
+  const now = input.now ?? new Date();
+  return prisma.$transaction(async (transaction) => {
+    const aggregate = await transaction.jobPostReviewAggregate.findUnique({
+      where: { jobId: input.jobId },
+      include: { pendingVersion: true },
+    });
+    const review = aggregate?.pendingVersion;
+    if (
+      !aggregate ||
+      aggregate.companyId !== input.companyId ||
+      aggregate.softDeletedAt ||
+      !review
+    ) {
+      throw new Error("JOB_POST_REVIEW_UNAVAILABLE");
+    }
+    if (review.state !== "PENDING_REVIEW")
+      throw new Error("JOB_POST_REVIEW_CONFLICT");
+
+    const correlationId = randomUUID();
+    const aggregateUpdate = await transaction.jobPostReviewAggregate.updateMany(
+      {
+        where: {
+          id: aggregate.id,
+          version: aggregate.version,
+          pendingVersionId: review.id,
+        },
+        data: { pendingVersionId: null, version: { increment: 1 } },
+      },
+    );
+    if (aggregateUpdate.count !== 1)
+      throw new Error("JOB_POST_REVIEW_CONFLICT");
+
+    const reviewUpdate = await transaction.jobPostReviewVersion.updateMany({
+      where: { id: review.id, state: "PENDING_REVIEW" },
+      data: {
+        state: "WITHDRAWN",
+        assignedAdminUserId: null,
+        assignedAt: null,
+        decidedAt: now,
+      },
+    });
+    if (reviewUpdate.count !== 1) throw new Error("JOB_POST_REVIEW_CONFLICT");
+
+    await transaction.jobPostReviewHistory.create({
+      data: {
+        reviewVersionId: review.id,
+        action: "WITHDRAWN",
+        actorUserId: input.actorUserId,
+        priorState: "PENDING_REVIEW",
+        resultingState: "WITHDRAWN",
+        priorAssigneeUserId: review.assignedAdminUserId,
+        resultingAssigneeUserId: null,
+        resultingAggregateVersion: aggregate.version + 1,
+        correlationId,
+        occurredAt: now,
+      },
+    });
+    await new PrismaAuditRepository(transaction).append({
+      occurredAt: now,
+      actorType: "user",
+      actorUserId: input.actorUserId,
+      actorSessionId: input.actorSessionId ?? null,
+      action: "job_post_review.withdrawn",
+      targetType: "job_post_review",
+      targetId: review.id,
+      result: "SUCCESS",
+      correlationId,
+      context: {
+        priorState: "PENDING_REVIEW",
+        resultingState: "WITHDRAWN",
+        targetVersion: aggregate.version + 1,
+      },
+    });
+    return {
+      reviewId: review.id,
+      sequence: review.sequence,
+      snapshot: jobReviewSnapshotSchema.parse(review.snapshot),
+      submittedAt: review.submittedAt,
+      aggregateVersion: aggregate.version + 1,
+    };
+  });
+}
+
+/**
+ * Recruiter deletion is deliberately a soft delete for managed jobs. Public
+ * visibility and applications are closed while relational history and
+ * applications remain intact.
+ */
+export async function softDeleteManagedJobPost(input: {
+  jobId: string;
+  companyId: string;
+  actorUserId: string;
+  actorSessionId?: string | null;
+  reason?: string;
+  now?: Date;
+}) {
+  const now = input.now ?? new Date();
+  return prisma.$transaction(async (transaction) => {
+    const aggregate = await transaction.jobPostReviewAggregate.findUnique({
+      where: { jobId: input.jobId },
+    });
+    if (!aggregate) return false;
+    if (aggregate.companyId !== input.companyId)
+      throw new Error("JOB_POST_REVIEW_UNAVAILABLE");
+    if (aggregate.pendingVersionId) throw new Error("JOB_POST_REVIEW_CONFLICT");
+    if (aggregate.softDeletedAt) return true;
+
+    const correlationId = randomUUID();
+    const reason = input.reason ?? "Deleted by recruiter";
+    const changed = await transaction.jobPostReviewAggregate.updateMany({
+      where: { id: aggregate.id, version: aggregate.version },
+      data: {
+        visibilityState: "HIDDEN",
+        applicationState: "CLOSED",
+        applicationClosedAt: now,
+        applicationClosedByUserId: input.actorUserId,
+        softDeletedAt: now,
+        softDeletedByUserId: input.actorUserId,
+        softDeleteReason: reason,
+        version: { increment: 1 },
+        operationalVersion: { increment: 1 },
+      },
+    });
+    if (changed.count !== 1) throw new Error("JOB_POST_REVIEW_CONFLICT");
+
+    if (aggregate.publicJobPostingId) {
+      await syncManagedJobPublicProjection(transaction, {
+        publicJobPostingId: aggregate.publicJobPostingId,
+        visibility: "HIDDEN",
+        applicationState: "CLOSED",
+        now,
+        actorUserId: input.actorUserId,
+        correlationId,
+      });
+    }
+    await transaction.jobPostOperationalHistory.create({
+      data: {
+        aggregateId: aggregate.id,
+        action: "RECRUITER_SOFT_DELETE",
+        actorUserId: input.actorUserId,
+        correlationId,
+        priorState: {
+          visibility: aggregate.visibilityState,
+          applicationState: aggregate.applicationState,
+          softDeleted: false,
+        },
+        resultingState: {
+          visibility: "HIDDEN",
+          applicationState: "CLOSED",
+          softDeleted: true,
+        },
+        reason,
+        version: aggregate.version + 1,
+        occurredAt: now,
+      },
+    });
+    await new PrismaAuditRepository(transaction).append({
+      occurredAt: now,
+      actorType: "user",
+      actorUserId: input.actorUserId,
+      actorSessionId: input.actorSessionId ?? null,
+      action: "job_posting.deleted",
+      targetType: "job_posting",
+      targetId: aggregate.publicJobPostingId ?? aggregate.id,
+      result: "SUCCESS",
+      correlationId,
+      context: { reasonCategory: reason, status: "REMOVED" },
     });
     return true;
   });

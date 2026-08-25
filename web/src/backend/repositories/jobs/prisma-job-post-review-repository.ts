@@ -83,6 +83,7 @@ export class PrismaJobPostReviewRepository {
     return this.db.jobPostReviewVersion.findMany({
       where: {
         state: "PENDING_REVIEW",
+        aggregate: { softDeletedAt: null },
         ...(input.assignedAdminUserId === undefined
           ? {}
           : { assignedAdminUserId: input.assignedAdminUserId }),
@@ -103,17 +104,26 @@ export class PrismaJobPostReviewRepository {
   async listReviewQueue(input: {
     page: number;
     perPage: number;
-    state?: "PENDING_REVIEW" | "APPROVED" | "REJECTED";
+    state?: "PENDING_REVIEW" | "APPROVED" | "REJECTED" | "WITHDRAWN";
     q?: string;
     companyId?: string;
     assignedAdminUserId?: string | null;
     submittedBefore?: Date;
     sequence?: number;
+    recordStatus?: "ACTIVE" | "DELETED" | "ALL";
   }) {
     const tokens = input.q ? reviewSearchTokens(input.q) : [];
     const companyNameTokens = input.q
       ? input.q.trim().split(/\s+/u).filter(Boolean).slice(0, 8)
       : [];
+    const aggregateWhere: Prisma.JobPostReviewAggregateWhereInput = {
+      ...(input.recordStatus === "DELETED"
+        ? { softDeletedAt: { not: null } }
+        : input.recordStatus === "ALL"
+          ? {}
+          : { softDeletedAt: null }),
+      ...(input.companyId ? { companyId: input.companyId } : {}),
+    };
     const where: Prisma.JobPostReviewVersionWhereInput = {
       ...(input.q
         ? {
@@ -150,7 +160,7 @@ export class PrismaJobPostReviewRepository {
           }
         : {}),
       ...(input.state ? { state: input.state } : {}),
-      ...(input.companyId ? { aggregate: { companyId: input.companyId } } : {}),
+      aggregate: aggregateWhere,
       ...(input.assignedAdminUserId !== undefined
         ? { assignedAdminUserId: input.assignedAdminUserId }
         : {}),
@@ -193,6 +203,7 @@ export class PrismaJobPostReviewRepository {
     submissionIdempotencyKey: string;
     submissionRequestHash: string;
     submittedAt: Date;
+    assignedAdminUserId: string | null;
     correlationId: string;
     historyAction: "SUBMITTED" | "RESUBMITTED";
     normalizedTitleSearch: string;
@@ -211,6 +222,8 @@ export class PrismaJobPostReviewRepository {
         submissionIdempotencyKey: input.submissionIdempotencyKey,
         submissionRequestHash: input.submissionRequestHash,
         submittedAt: input.submittedAt,
+        assignedAdminUserId: input.assignedAdminUserId,
+        assignedAt: input.assignedAdminUserId ? input.submittedAt : null,
       },
     });
     const aggregateUpdate = await this.db.jobPostReviewAggregate.updateMany({
@@ -232,6 +245,7 @@ export class PrismaJobPostReviewRepository {
         reviewVersionId: version.id,
         action: input.historyAction,
         actorUserId: input.submittedByUserId,
+        resultingAssigneeUserId: input.assignedAdminUserId,
         resultingState: "PENDING_REVIEW",
         resultingAggregateVersion: input.expectedAggregateVersion + 1,
         correlationId: input.correlationId,

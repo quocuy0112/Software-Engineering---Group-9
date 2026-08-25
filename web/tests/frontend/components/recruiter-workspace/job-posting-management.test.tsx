@@ -8,10 +8,12 @@ import {
 } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { RecruiterJobPostingManagement } from "@/frontend/features/recruiter-workspace/job-posting-management";
+import { CsrfProofProvider } from "@/frontend/features/authentication/client/csrf-proof-context";
 import type { RecruiterJobManagementData } from "@/shared/contracts/recruiter-job-posting";
 
 const initialData: RecruiterJobManagementData = {
   companyId: "company-1",
+  recruiterUserId: "recruiter-1",
   companies: [
     {
       id: "company-1",
@@ -19,7 +21,7 @@ const initialData: RecruiterJobManagementData = {
       name: "Northstar Labs",
       logo: null,
       size: "51-200 employees",
-      industry: "Technology",
+      industry: "Information Technology (IT)",
       address: "Ho Chi Minh City",
       website: null,
       description: "A product company.",
@@ -33,11 +35,11 @@ const initialData: RecruiterJobManagementData = {
       companyId: "company-1",
       title: "Senior Product Designer",
       shortPitch: "Design the next generation of hiring tools.",
-      industry: "Technology",
-      industryCode: "technology",
-      subIndustry: "Product design",
-      categoryIds: ["product-design"],
-      categoryFamily: "product",
+      industry: "Information Technology (IT)",
+      industryCode: "r03",
+      subIndustry: "Software Development",
+      categoryIds: ["r03-software-development"],
+      categoryFamily: "r03",
       skillTags: ["Figma", "Product design"],
       location: {
         city: "Ho Chi Minh City",
@@ -73,7 +75,7 @@ const initialData: RecruiterJobManagementData = {
         benefits: [],
         generalInfo: {
           reportsTo: null,
-          department: "Product & Design",
+          department: "Software Development",
           workingHours: null,
           workAddress: null,
         },
@@ -85,7 +87,7 @@ const initialData: RecruiterJobManagementData = {
         name: "Northstar Labs",
         logo: null,
         size: "51-200 employees",
-        industry: "Technology",
+        industry: "Information Technology (IT)",
         address: "Ho Chi Minh City",
         website: null,
         description: "A product company.",
@@ -99,6 +101,7 @@ describe("recruiter job posting management", () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
+    window.localStorage.clear();
   });
 
   it("uses the stable job id when opening candidates from a routed workspace", () => {
@@ -116,7 +119,11 @@ describe("recruiter job posting management", () => {
   });
 
   it("shows live overview metrics and opens the structured editor", () => {
-    render(<RecruiterJobPostingManagement initialData={initialData} />);
+    render(
+      <CsrfProofProvider value="csrf-proof">
+        <RecruiterJobPostingManagement initialData={initialData} />
+      </CsrfProofProvider>,
+    );
 
     expect(screen.getByText("Active jobs")).toBeVisible();
     expect(screen.getByText("Total applicants")).toBeVisible();
@@ -136,8 +143,11 @@ describe("recruiter job posting management", () => {
     ).toBeVisible();
     expect(screen.getByText("Live candidate preview")).toBeVisible();
     expect(screen.getByText("Required skills")).toBeVisible();
-    expect(screen.getByText("Preferred skills")).toBeVisible();
     expect(screen.getByRole("button", { name: "Save changes" })).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Automatic save: Off" }),
+    ).toHaveAttribute("aria-pressed", "false");
+    expect(screen.queryByText("Drafts are saved manually")).toBeNull();
     expect(screen.queryByRole("button", { name: "Save draft" })).toBeNull();
   });
 
@@ -169,7 +179,7 @@ describe("recruiter job posting management", () => {
     ).toBeNull();
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(5_000);
+      await vi.advanceTimersByTimeAsync(15_000);
     });
 
     const card = screen.getByRole("article", {
@@ -195,6 +205,11 @@ describe("recruiter job posting management", () => {
     expect(screen.getByText("Add a short pitch.")).toBeVisible();
     expect(screen.getByText("Add a role overview.")).toBeVisible();
     expect(screen.getByText("Choose an application deadline.")).toBeVisible();
+    expect(
+      screen.queryByText(
+        "Review the highlighted fields before saving this posting.",
+      ),
+    ).toBeNull();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -203,8 +218,8 @@ describe("recruiter job posting management", () => {
       ...initialData.jobs[0],
       id: "job-created",
       title: "Frontend Engineer",
-      subIndustry: "Software development",
-      status: "pending_approval" as const,
+      subIndustry: "Software Development",
+      status: "draft" as const,
     };
     const review = {
       reviewId: "review-created",
@@ -230,7 +245,11 @@ describe("recruiter job posting management", () => {
         }),
       );
     vi.stubGlobal("fetch", fetchMock);
-    render(<RecruiterJobPostingManagement initialData={initialData} />);
+    render(
+      <CsrfProofProvider value="csrf-proof">
+        <RecruiterJobPostingManagement initialData={initialData} />
+      </CsrfProofProvider>,
+    );
 
     fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
     fireEvent.change(screen.getByLabelText(/Job title/), {
@@ -240,7 +259,7 @@ describe("recruiter job posting management", () => {
       target: { value: "Build reliable candidate experiences." },
     });
     fireEvent.change(screen.getByLabelText(/Sub-industry/), {
-      target: { value: "Software development" },
+      target: { value: "Software Development" },
     });
     fireEvent.change(screen.getByLabelText(/Overview/), {
       target: {
@@ -266,10 +285,131 @@ describe("recruiter job posting management", () => {
       job: { subIndustry: string };
     };
     expect(payload.status).toBe("draft");
-    expect(payload.job.subIndustry).toBe("Software development");
+    expect(payload.job.subIndustry).toBe("Software Development");
+    expect(fetchMock.mock.calls[0]?.[0]).toBe("/api/recruiter/job-postings");
+    expect(fetchMock.mock.calls[1]?.[0]).toBe(
+      "/api/recruiter/job-postings/job-created/submit-review",
+    );
+    const reviewRequest = fetchMock.mock.calls[1]?.[1] as RequestInit;
+    const reviewPayload = JSON.parse(String(reviewRequest.body)) as {
+      expectedWorkingUpdatedAt: string;
+      expectedCatalogueUpdatedAt: string;
+    };
+    expect(reviewPayload.expectedWorkingUpdatedAt).toBe(createdJob.updatedAt);
+    expect(reviewPayload.expectedCatalogueUpdatedAt).toBe(createdJob.updatedAt);
     expect(
-      await screen.findByText("Job posting saved to the mock database."),
+      screen.getByRole("tab", { name: /Pending approval1/ }),
+    ).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("offers existing Other sub-industries and accepts a new value", () => {
+    const otherJob = {
+      ...initialData.jobs[0],
+      id: "job-other",
+      industry: "Other",
+      industryCode: "other",
+      categoryFamily: "other",
+      categoryIds: ["other-other"],
+      subIndustry: "Aerospace Operations",
+    };
+    render(
+      <RecruiterJobPostingManagement
+        initialData={{ ...initialData, jobs: [otherJob, ...initialData.jobs] }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
+    fireEvent.change(screen.getByLabelText("Industry *"), {
+      target: { value: "other" },
+    });
+
+    const subIndustry = screen.getByLabelText("Sub-industry *");
+    expect(
+      within(subIndustry).getByRole("option", {
+        name: "Aerospace Operations",
+      }),
     ).toBeVisible();
+    fireEvent.change(subIndustry, {
+      target: { value: "__custom_sub_industry__" },
+    });
+    fireEvent.change(screen.getByLabelText("New sub-industry *"), {
+      target: { value: "Space Tourism" },
+    });
+
+    expect(screen.getByLabelText("New sub-industry *")).toHaveValue(
+      "Space Tourism",
+    );
+  });
+
+  it("automatically saves valid drafts and remembers the setting for the next job", async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(async (_url: string, init?: RequestInit) => {
+        const request = JSON.parse(String(init?.body)) as {
+          job: (typeof initialData.jobs)[0];
+        };
+        return new Response(
+          JSON.stringify({
+            ...request.job,
+            id: "job-auto-saved",
+            slug: "platform-engineer-job-auto-saved",
+            status: "draft",
+            updatedAt: "2026-08-25T10:00:00.000Z",
+            company: initialData.companies[0],
+          }),
+          {
+            status: 201,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      });
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <CsrfProofProvider value="csrf-proof">
+        <RecruiterJobPostingManagement initialData={initialData} />
+      </CsrfProofProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Automatic save: Off" }),
+    );
+    fireEvent.change(screen.getByLabelText(/Job title/), {
+      target: { value: "Platform Engineer" },
+    });
+    fireEvent.change(screen.getByLabelText(/Short pitch/), {
+      target: { value: "Build a dependable hiring platform." },
+    });
+    fireEvent.change(screen.getByLabelText(/Overview/), {
+      target: { value: "Own platform reliability and delivery." },
+    });
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1_500);
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(
+      screen.getByRole("button", { name: "Automatic save: On" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getByRole("heading", { name: "Platform Engineer", level: 1 }),
+    ).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    fireEvent.click(screen.getByRole("tab", { name: /Drafts1/ }));
+    expect(
+      screen.getByRole("heading", { name: "Platform Engineer", level: 2 }),
+    ).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
+    expect(
+      screen.getByRole("button", { name: "Automatic save: On" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Automatic save: On" }));
+    expect(
+      screen.getByRole("button", { name: "Automatic save: Off" }),
+    ).toHaveAttribute("aria-pressed", "false");
   });
 
   it("preserves spaces and commas while editing skills", async () => {
@@ -390,9 +530,217 @@ describe("recruiter job posting management", () => {
     expect(new Date(payload.applyDeadline).getTime()).toBeGreaterThan(
       new Date(deadline).getTime(),
     );
+    expect(screen.getByRole("button", { name: "Close early" })).toBeVisible();
+  });
+
+  it("soft-deletes an active job after confirmation", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ jobId: "job-1", deleted: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <CsrfProofProvider value="csrf-proof">
+        <RecruiterJobPostingManagement initialData={initialData} />
+      </CsrfProofProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete job" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Delete active job?" });
     expect(
-      await screen.findByText("Application deadline extended by 30 days."),
+      within(dialog).getByText(/removed from the public job data/i),
     ).toBeVisible();
+    expect(fetchMock).not.toHaveBeenCalled();
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Delete active job" }),
+    );
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/recruiter/job-postings?jobId=job-1&action=delete&industryCode=r03",
+      {
+        method: "DELETE",
+        headers: { "x-csrf-token": "csrf-proof" },
+      },
+    );
+    await waitFor(() =>
+      expect(screen.queryByText("Senior Product Designer")).toBeNull(),
+    );
+    expect(document.querySelector(".recruiter-toast")).toBeNull();
+  });
+
+  it("keeps action failures inside the confirmation dialog without a toast", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            code: "JOB_SERVICE_UNAVAILABLE",
+            message: "Try again in a moment.",
+          }),
+          { status: 503, headers: { "Content-Type": "application/json" } },
+        ),
+      ),
+    );
+    render(
+      <CsrfProofProvider value="csrf-proof">
+        <RecruiterJobPostingManagement initialData={initialData} />
+      </CsrfProofProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete job" }));
+    const dialog = screen.getByRole("dialog", { name: "Delete active job?" });
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Delete active job" }),
+    );
+
+    expect(
+      await within(dialog).findByText(
+        "Unable to delete this posting right now. Please try again.",
+      ),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("article", { name: "Senior Product Designer" }),
+    ).toBeVisible();
+    expect(document.querySelector(".recruiter-toast")).toBeNull();
+  });
+
+  it("withdraws a pending submission back to Drafts", async () => {
+    const pendingJob = {
+      ...initialData.jobs[0],
+      status: "pending_approval" as const,
+    };
+    const draftJob = { ...pendingJob, status: "draft" as const };
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(draftJob), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <CsrfProofProvider value="csrf-proof">
+        <RecruiterJobPostingManagement
+          initialData={{ ...initialData, jobs: [pendingJob] }}
+        />
+      </CsrfProofProvider>,
+    );
+    fireEvent.click(screen.getByRole("tab", { name: /Pending approval1/ }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Withdraw to draft" }));
+
+    const dialog = screen.getByRole("dialog", {
+      name: "Withdraw submission?",
+    });
+    expect(
+      within(dialog).getByText(/leave the administrator review queue/i),
+    ).toBeVisible();
+    expect(fetchMock).not.toHaveBeenCalled();
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Withdraw to Drafts" }),
+    );
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/recruiter/job-postings/job-1/withdraw-review?industryCode=r03",
+      {
+        method: "POST",
+        headers: { "x-csrf-token": "csrf-proof" },
+      },
+    );
+    expect(screen.getByRole("tab", { name: /Drafts1/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Delete draft" })).toBeVisible();
+    expect(document.querySelector(".recruiter-toast")).toBeNull();
+  });
+
+  it("persists a withdrawn draft before submitting it again", async () => {
+    const withdrawnJob = {
+      ...initialData.jobs[0],
+      status: "draft" as const,
+      updatedAt: "2026-08-07T00:00:00.000Z",
+      review: {
+        reviewId: "withdrawn-review-1",
+        jobId: "job-1",
+        sequence: 1,
+        state: "WITHDRAWN" as const,
+        readOnly: false,
+        reasonCode: null,
+        publicExplanation: null,
+        submittedAt: "2026-08-07T00:00:00.000Z",
+        decidedAt: "2026-08-08T00:00:00.000Z",
+        version: 2,
+      },
+    };
+    const refreshedDraft = {
+      ...withdrawnJob,
+      review: undefined,
+      updatedAt: "2026-08-25T03:00:00.000Z",
+    };
+    const resubmittedReview = {
+      reviewId: "review-resubmitted",
+      jobId: "job-1",
+      sequence: 2,
+      state: "PENDING_REVIEW" as const,
+      readOnly: true,
+      submittedAt: "2026-08-25T03:00:01.000Z",
+      version: 3,
+    };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(refreshedDraft), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(resubmittedReview), {
+          status: 201,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <CsrfProofProvider value="csrf-proof">
+        <RecruiterJobPostingManagement
+          initialData={{ ...initialData, jobs: [withdrawnJob] }}
+        />
+      </CsrfProofProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: /Drafts1/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Edit job posting/ }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Submit for approval" }),
+    );
+    fireEvent.click(
+      within(
+        screen.getByRole("dialog", { name: "Submit job for approval?" }),
+      ).getByRole("button", { name: "Submit for approval" }),
+    );
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(fetchMock.mock.calls[0]?.[0]).toBe("/api/recruiter/job-postings");
+    expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({ method: "PATCH" });
+    expect(fetchMock.mock.calls[1]?.[0]).toBe(
+      "/api/recruiter/job-postings/job-1/submit-review",
+    );
+    const submission = JSON.parse(
+      String((fetchMock.mock.calls[1]?.[1] as RequestInit).body),
+    ) as {
+      expectedWorkingUpdatedAt: string;
+      expectedCatalogueUpdatedAt: string;
+    };
+    expect(submission.expectedWorkingUpdatedAt).toBe(refreshedDraft.updatedAt);
+    expect(submission.expectedCatalogueUpdatedAt).toBe(
+      refreshedDraft.updatedAt,
+    );
   });
   it("provides a progress indicator and independently collapsible sections", () => {
     render(<RecruiterJobPostingManagement initialData={initialData} />);
@@ -568,10 +916,12 @@ describe("recruiter job posting management", () => {
     const preview = screen.getByText("Live candidate preview").closest("aside");
     expect(preview).not.toBeNull();
     expect(within(preview!).getByText("3+ years")).toBeVisible();
-    expect(within(preview!).getByText("Head of Engineering")).toBeVisible();
-    expect(
-      within(preview!).getByText("Own meaningful product decisions"),
-    ).toBeVisible();
+    expect(screen.getByLabelText(/Reports to/)).toHaveValue(
+      "Head of Engineering",
+    );
+    expect(screen.getByLabelText(/Top reason 1/)).toHaveValue(
+      "Own meaningful product decisions",
+    );
 
     fireEvent.change(screen.getByLabelText(/Age range/), {
       target: { value: "23-30" },
@@ -584,19 +934,19 @@ describe("recruiter job posting management", () => {
     fireEvent.click(screen.getByLabelText(/Urgent hiring/));
     fireEvent.click(screen.getByLabelText("Holiday and Tet bonus"));
 
-    expect(within(preview!).getByText("23-30")).toBeVisible();
-    expect(within(preview!).getByText("4")).toBeVisible();
-    expect(within(preview!).getByText("Nationwide")).toBeVisible();
-    expect(within(preview!).getByText("Required")).toBeVisible();
-    expect(within(preview!).getByText("Urgent hiring")).toBeVisible();
-    expect(within(preview!).getByText("Holiday and Tet bonus")).toBeVisible();
+    expect(screen.getByLabelText(/Age range/)).toHaveValue("23-30");
+    expect(screen.getByLabelText(/Number of hires/)).toHaveValue(4);
+    expect(screen.getByLabelText(/Nationwide remote/)).toBeChecked();
+    expect(screen.getByLabelText(/Work on Saturday/)).toBeChecked();
+    expect(screen.getByLabelText(/Urgent hiring/)).toBeChecked();
+    expect(screen.getByLabelText("Holiday and Tet bonus")).toBeChecked();
+    expect(within(preview!).getByText("4 positions")).toBeVisible();
   });
 
   it("keeps benefit selection cards and boolean toggles local to the form", () => {
     render(<RecruiterJobPostingManagement initialData={initialData} />);
     fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
 
-    const preview = screen.getByText("Live candidate preview").closest("aside");
     const urgent = screen.getByLabelText(/Urgent hiring/);
     const saturday = screen.getByLabelText(/Work on Saturday/);
     const nationwide = screen.getByLabelText(/Nationwide remote/);
@@ -616,8 +966,6 @@ describe("recruiter job posting management", () => {
     expect(urgent).toBeChecked();
     expect(locationSection).toHaveAttribute("open");
     expect(hiringSection).toHaveAttribute("open");
-    expect(within(preview!).getByText("Nationwide")).toBeVisible();
-    expect(within(preview!).getByText("Urgent hiring")).toBeVisible();
 
     fireEvent.click(nationwide);
     fireEvent.click(saturday);
@@ -626,8 +974,6 @@ describe("recruiter job posting management", () => {
     expect(nationwide).not.toBeChecked();
     expect(saturday).not.toBeChecked();
     expect(urgent).not.toBeChecked();
-    expect(within(preview!).queryByText("Nationwide")).toBeNull();
-    expect(within(preview!).queryByText("Urgent hiring")).toBeNull();
 
     const benefit = screen.getByRole("checkbox", {
       name: "Holiday and Tet bonus",
