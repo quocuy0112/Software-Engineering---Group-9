@@ -6,6 +6,10 @@ import {
   type JobCatalogItem,
   type JobPostingStatus,
 } from "./jobs/catalog";
+import {
+  deriveRecruiterClassification,
+  isRecruiterIndustrySelectionValid,
+} from "./jobs/industry-taxonomy";
 import { z } from "zod";
 import type { RecruiterReviewProjection } from "./admin/job-post-review";
 
@@ -35,6 +39,10 @@ export const recruiterJobReviewInputSchema = jobReviewSnapshotSchema
 
 export const submitJobReviewCommandSchema = z
   .object({ expectedWorkingUpdatedAt: z.string().datetime() })
+  .extend({
+    job: jobCatalogSchema.optional(),
+    expectedCatalogueUpdatedAt: z.string().datetime().optional(),
+  })
   .strict();
 
 export type JobReviewSnapshot = z.infer<typeof jobReviewSnapshotSchema>;
@@ -166,7 +174,6 @@ const requiredFieldMessages: Record<string, string> = {
   shortPitch: "Add a short pitch.",
   industry: "Enter an industry.",
   subIndustry: "Enter a sub-industry.",
-  categoryFamily: "Enter a job category.",
   "location.city": "Enter a city.",
   "description.overview": "Add a role overview.",
   "experience.label": "Enter an experience level.",
@@ -187,29 +194,19 @@ function nullableTrimmed(value: string | null) {
   return trimmed || null;
 }
 
-function slugPart(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/\p{M}+/gu, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/gu, "-")
-    .replace(/^-|-$/gu, "")
-    .slice(0, 80);
-}
-
 export function prepareRecruiterJobForSave(
   job: JobCatalogItem,
 ): JobCatalogItem {
-  const industry = job.industry.trim();
+  const classification = deriveRecruiterClassification(job);
   return {
     ...job,
     title: job.title.trim(),
     shortPitch: job.shortPitch.trim(),
-    industry,
-    industryCode: job.industryCode.trim() || slugPart(industry),
-    subIndustry: job.subIndustry.trim(),
-    categoryIds: uniqueTrimmed(job.categoryIds),
-    categoryFamily: job.categoryFamily.trim(),
+    industry: classification.industry,
+    industryCode: classification.industryCode,
+    subIndustry: classification.subIndustry,
+    categoryIds: classification.categoryIds,
+    categoryFamily: classification.categoryFamily,
     skillTags: uniqueTrimmed(job.skillTags),
     location: {
       ...job.location,
@@ -239,7 +236,7 @@ export function prepareRecruiterJobForSave(
         .filter((benefit) => benefit.icon && benefit.label),
       generalInfo: {
         reportsTo: nullableTrimmed(job.description.generalInfo.reportsTo),
-        department: nullableTrimmed(job.description.generalInfo.department),
+        department: classification.department,
         workingHours: nullableTrimmed(job.description.generalInfo.workingHours),
         workAddress: nullableTrimmed(job.description.generalInfo.workAddress),
       },
@@ -253,7 +250,17 @@ export function validateRecruiterJobForSave(
   now = new Date(),
 ): RecruiterJobFieldErrors {
   const prepared = prepareRecruiterJobForSave(job);
+  const classification = deriveRecruiterClassification(job);
   const errors: RecruiterJobFieldErrors = {};
+
+  if (!isRecruiterIndustrySelectionValid(job)) {
+    errors.industry = "Choose an industry from the list.";
+  }
+  if (!classification.valid) {
+    errors.subIndustry = classification.subIndustry
+      ? "Choose a sub-industry from the selected industry."
+      : "Enter a sub-industry.";
+  }
 
   for (const [path, message] of Object.entries(requiredFieldMessages)) {
     const value =
@@ -317,11 +324,11 @@ export function createEmptyJobPosting(
     companyId,
     title: "",
     shortPitch: "",
-    industry: "Technology",
-    industryCode: "technology",
-    subIndustry: "Software & Technology Services",
-    categoryIds: [],
-    categoryFamily: "technology",
+    industry: "Information Technology (IT)",
+    industryCode: "r03",
+    subIndustry: "Software Development",
+    categoryIds: ["r03-software-development"],
+    categoryFamily: "r03",
     skillTags: [],
     location: {
       city: "Ho Chi Minh City",
@@ -358,7 +365,7 @@ export function createEmptyJobPosting(
       benefits: [],
       generalInfo: {
         reportsTo: null,
-        department: null,
+        department: "Software Development",
         workingHours: null,
         workAddress: null,
       },

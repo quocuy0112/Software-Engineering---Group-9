@@ -8,6 +8,10 @@ const execute = promisify(execFile);
 const suffix = randomUUID();
 const userId = `operator-command-${suffix}`;
 const email = `${userId}@example.test`;
+const companyId = `operator-company-${suffix}`;
+const aggregateId = `operator-review-aggregate-${suffix}`;
+const reviewId = `operator-review-version-${suffix}`;
+const jobId = `operator-review-job-${suffix}`;
 let grantId: string | undefined;
 
 async function runOperatorScript(script: string) {
@@ -20,10 +24,30 @@ async function runOperatorScript(script: string) {
     grantId: string;
     userId: string;
     state: "ACTIVE" | "REVOKED";
+    releasedPendingReviewAssignments?: number;
+    assignedPendingReviews?: number;
+    reassignedPendingReviews?: number;
   };
 }
 
 afterAll(async () => {
+  await prisma.jobPostReviewAggregate.updateMany({
+    where: { id: aggregateId },
+    data: { pendingVersionId: null, approvedVersionId: null },
+  });
+  await prisma.jobPostReviewHistory.deleteMany({
+    where: { reviewVersion: { reviewAggregateId: aggregateId } },
+  });
+  await prisma.jobPostReviewPrivateNote.deleteMany({
+    where: { reviewVersion: { reviewAggregateId: aggregateId } },
+  });
+  await prisma.jobPostReviewVersion.deleteMany({
+    where: { reviewAggregateId: aggregateId },
+  });
+  await prisma.jobPostReviewAggregate.deleteMany({
+    where: { id: aggregateId },
+  });
+  await prisma.company.deleteMany({ where: { id: companyId } });
   await prisma.platformAdministratorGrant.deleteMany({ where: { userId } });
   await prisma.authenticationChallenge.deleteMany({ where: { userId } });
   await prisma.session.deleteMany({ where: { userId } });
@@ -48,7 +72,11 @@ describe("administrator grant operator commands", () => {
       "scripts/provision-platform-administrator.mjs",
     );
     grantId = provisioned.grantId;
-    expect(provisioned).toMatchObject({ userId, state: "ACTIVE" });
+    expect(provisioned).toMatchObject({
+      userId,
+      state: "ACTIVE",
+      assignedPendingReviews: 0,
+    });
 
     const sessionId = `operator-session-${suffix}`;
     await prisma.session.create({
@@ -70,10 +98,49 @@ describe("administrator grant operator commands", () => {
       },
     });
 
+    await prisma.company.create({
+      data: {
+        id: companyId,
+        slug: `operator-company-${suffix}`,
+        legalName: "Operator Review Fixture Company",
+        displayName: "Operator Review Fixture Company",
+      },
+    });
+    await prisma.jobPostReviewAggregate.create({
+      data: {
+        id: aggregateId,
+        jobId,
+        companyId,
+        latestSequence: 1,
+      },
+    });
+    await prisma.jobPostReviewVersion.create({
+      data: {
+        id: reviewId,
+        reviewAggregateId: aggregateId,
+        sequence: 1,
+        snapshot: { id: jobId, title: "Pending operator review fixture" },
+        snapshotSchemaVersion: "test-v1",
+        snapshotSha256: "a".repeat(64),
+        assignedAdminUserId: userId,
+        assignedAt: new Date(),
+      },
+    });
+    await prisma.jobPostReviewAggregate.update({
+      where: { id: aggregateId },
+      data: { pendingVersionId: reviewId },
+    });
+
     const revoked = await runOperatorScript(
       "scripts/revoke-platform-administrator.mjs",
     );
-    expect(revoked).toMatchObject({ grantId, userId, state: "REVOKED" });
+    expect(revoked).toMatchObject({
+      grantId,
+      userId,
+      state: "REVOKED",
+      releasedPendingReviewAssignments: 1,
+      reassignedPendingReviews: 0,
+    });
     expect(
       await prisma.userAccount.findUniqueOrThrow({ where: { id: userId } }),
     ).toMatchObject({ state: "ACTIVE" });
@@ -91,16 +158,43 @@ describe("administrator grant operator commands", () => {
       initialTwoFactorAt: null,
       latestTwoFactorProofAt: null,
     });
+    expect(
+      await prisma.jobPostReviewVersion.findUniqueOrThrow({
+        where: { id: reviewId },
+      }),
+    ).toMatchObject({
+      state: "PENDING_REVIEW",
+      assignedAdminUserId: null,
+      assignedAt: null,
+    });
+    expect(
+      await prisma.jobPostReviewAggregate.findUniqueOrThrow({
+        where: { id: aggregateId },
+      }),
+    ).toMatchObject({ pendingVersionId: reviewId });
 
     const reactivated = await runOperatorScript(
       "scripts/provision-platform-administrator.mjs",
     );
-    expect(reactivated).toMatchObject({ grantId, userId, state: "ACTIVE" });
+    expect(reactivated).toMatchObject({
+      grantId,
+      userId,
+      state: "ACTIVE",
+      assignedPendingReviews: 1,
+    });
     expect(
       await prisma.administratorSessionPolicy.findUniqueOrThrow({
         where: { grantId },
       }),
     ).toMatchObject({ designatedSessionId: null });
+    expect(
+      await prisma.jobPostReviewVersion.findUniqueOrThrow({
+        where: { id: reviewId },
+      }),
+    ).toMatchObject({
+      state: "PENDING_REVIEW",
+      assignedAdminUserId: userId,
+    });
     expect(
       await prisma.auditEvent.count({
         where: {

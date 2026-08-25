@@ -8,9 +8,10 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   JsonJobCatalogueRepository,
+  replaceFileWithRetry,
   type JobCatalogueLeaseClaim,
   type JobCatalogueLeaseCoordinator,
 } from "@/backend/repositories/jobs/json-job-catalogue-repository";
@@ -92,6 +93,36 @@ async function fixture(mode: "writer" | "readonly" = "writer") {
 }
 
 describe("JSON job catalogue repository", () => {
+  it("retries transient Windows file-sharing failures", async () => {
+    const locked = Object.assign(new Error("file is temporarily locked"), {
+      code: "EPERM",
+    });
+    const renameFile = vi
+      .fn<typeof import("node:fs/promises").rename>()
+      .mockRejectedValueOnce(locked)
+      .mockRejectedValueOnce(locked)
+      .mockResolvedValue(undefined);
+
+    await expect(
+      replaceFileWithRetry("jobs.tmp", "jobs.json", renameFile),
+    ).resolves.toBeUndefined();
+    expect(renameFile).toHaveBeenCalledTimes(3);
+  });
+
+  it("does not retry a non-transient replacement error", async () => {
+    const missing = Object.assign(new Error("temporary file is missing"), {
+      code: "ENOENT",
+    });
+    const renameFile = vi
+      .fn<typeof import("node:fs/promises").rename>()
+      .mockRejectedValue(missing);
+
+    await expect(
+      replaceFileWithRetry("jobs.tmp", "jobs.json", renameFile),
+    ).rejects.toBe(missing);
+    expect(renameFile).toHaveBeenCalledOnce();
+  });
+
   it("fails closed on a read-only host and serializes a fenced atomic replacement", async () => {
     const readonly = await fixture("readonly");
     await expect(readonly.repository.mutate((jobs) => jobs)).rejects.toThrow(
@@ -145,14 +176,15 @@ describe("JSON job catalogue repository", () => {
       files.map(({ filePath, code }) =>
         writeFile(
           filePath,
-          JSON.stringify(
+          `${JSON.stringify(
             code === "r01" ? [{ id: "job-r01", industryCode: code }] : [],
-          ),
+            null,
+            2,
+          )}\n`,
           "utf8",
         ),
       ),
     );
-
     const repository = new JsonJobCatalogueRepository({
       filePath: join(directory, "data", "jobs", "jobs.json"),
       fallbackFiles: files,
@@ -178,13 +210,16 @@ describe("JSON job catalogue repository", () => {
       files.map(({ filePath, code }) =>
         writeFile(
           filePath,
-          JSON.stringify(
+          `${JSON.stringify(
             code === "r01" ? [{ id: "job-r01", industryCode: code }] : [],
-          ),
+            null,
+            2,
+          )}\n`,
           "utf8",
         ),
       ),
     );
+    const unchangedSalesFile = await readFile(files[0].filePath, "utf8");
 
     const repository = new JsonJobCatalogueRepository<{
       id: string;
@@ -203,6 +238,7 @@ describe("JSON job catalogue repository", () => {
       ...jobs,
       { id: "job-r03", industryCode: "r03", title: "IT job" },
     ]);
+    expect(await readFile(files[0].filePath, "utf8")).toBe(unchangedSalesFile);
     expect(JSON.parse(await readFile(files[0].filePath, "utf8"))).toEqual([
       { id: "job-r01", industryCode: "r01" },
     ]);

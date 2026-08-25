@@ -19,4 +19,24 @@ describe("Recruiter submission transaction", () => {
     ])
       expect(service).toContain(marker);
   });
+
+  it("accepts the submission as pending without depending on an active administrator", () => {
+    expect(service).toContain('state: "PENDING_REVIEW" as const');
+    expect(service).toContain("readOnly: true");
+    expect(service).not.toContain("platformAdministratorGrant");
+  });
+
+  it("automatically selects an eligible reviewer without changing pending state", () => {
+    expect(service).toContain("leastLoadedReviewAdministrator");
+    expect(service).toContain("assignedAdminUserId");
+    expect(service).toContain("preferredRecipientUserId");
+    expect(service).not.toContain('state: "DRAFT"');
+  });
+
+  it("invalidates a cached draft after the pending submission commits", () => {
+    expect(service).toContain("invalidateRecruiterJobCatalogueCache");
+    expect(service).toMatch(
+      /await prisma\.\$transaction[\s\S]*invalidateRecruiterJobCatalogueCache\(\)/u,
+    );
+  });
 });

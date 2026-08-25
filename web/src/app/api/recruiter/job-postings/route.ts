@@ -49,6 +49,12 @@ function mutationErrorResponse(error: unknown, fallback: string) {
   if (message === "Company profile is incomplete.") {
     return errorResponse(message, 409);
   }
+  if (message === "Invalid recruiter job classification.") {
+    return errorResponse(message, 422, {
+      industry: "Choose an industry from the list.",
+      subIndustry: "Choose or enter a valid sub-industry.",
+    });
+  }
   if (message === "A recruiter-owned company is required.") {
     return errorResponse(message, 409);
   }

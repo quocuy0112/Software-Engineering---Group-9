@@ -193,6 +193,7 @@ export class PrismaJobPostReviewRepository {
     submissionIdempotencyKey: string;
     submissionRequestHash: string;
     submittedAt: Date;
+    assignedAdminUserId: string | null;
     correlationId: string;
     historyAction: "SUBMITTED" | "RESUBMITTED";
     normalizedTitleSearch: string;
@@ -211,6 +212,8 @@ export class PrismaJobPostReviewRepository {
         submissionIdempotencyKey: input.submissionIdempotencyKey,
         submissionRequestHash: input.submissionRequestHash,
         submittedAt: input.submittedAt,
+        assignedAdminUserId: input.assignedAdminUserId,
+        assignedAt: input.assignedAdminUserId ? input.submittedAt : null,
       },
     });
     const aggregateUpdate = await this.db.jobPostReviewAggregate.updateMany({
@@ -232,6 +235,7 @@ export class PrismaJobPostReviewRepository {
         reviewVersionId: version.id,
         action: input.historyAction,
         actorUserId: input.submittedByUserId,
+        resultingAssigneeUserId: input.assignedAdminUserId,
         resultingState: "PENDING_REVIEW",
         resultingAggregateVersion: input.expectedAggregateVersion + 1,
         correlationId: input.correlationId,

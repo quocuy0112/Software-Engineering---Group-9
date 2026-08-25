@@ -33,6 +33,13 @@ import {
   type RecruiterJob,
   type RecruiterJobFieldErrors,
 } from "@/shared/contracts/recruiter-job-posting";
+import {
+  deriveRecruiterClassification,
+  recruiterIndustryByCode,
+  recruiterIndustryOptionFor,
+  recruiterIndustryTaxonomy,
+  type RecruiterIndustryCode,
+} from "@/shared/contracts/jobs/industry-taxonomy";
 import type {
   JobCatalogItem,
   JobPostingStatus,
@@ -270,11 +277,18 @@ export function JobPostingEditor({
   onBack: () => void;
   onSaved: (job: RecruiterJob) => void;
 }) {
-  const [job, setJob] = useState(initialJob);
+  const normalizedInitialJob: RecruiterJob = {
+    ...initialJob,
+    ...prepareRecruiterJobForSave(initialJob),
+  };
+  const [job, setJob] = useState<RecruiterJob>(normalizedInitialJob);
+  const catalogueUpdatedAt = useRef(
+    initialJob.id === "new-job" ? null : initialJob.updatedAt,
+  );
   const csrfProof = useCsrfProof();
   const [saving, setSaving] = useState(false);
   const [pendingSubmission, setPendingSubmission] =
-    useState<JobCatalogItem | null>(null);
+    useState<RecruiterJob | null>(null);
   const submissionKey = useRef<string | null>(null);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<RecruiterJobFieldErrors>({});
@@ -282,10 +296,12 @@ export function JobPostingEditor({
     sectionNames.map(() => true),
   );
   const [salaryInputs, setSalaryInputs] = useState({
-    min: formatVndInput(initialJob.salary.min),
-    max: formatVndInput(initialJob.salary.max),
+    min: formatVndInput(normalizedInitialJob.salary.min),
+    max: formatVndInput(normalizedInitialJob.salary.max),
   });
-  const [skillInput, setSkillInput] = useState(initialJob.skillTags.join(", "));
+  const [skillInput, setSkillInput] = useState(
+    normalizedInitialJob.skillTags.join(", "),
+  );
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [hasSavedDraft, setHasSavedDraft] = useState(false);
   const locale = useWorkspaceLocale();
@@ -305,6 +321,12 @@ export function JobPostingEditor({
           "Maximum salary must be greater than or equal to minimum salary.",
       }
     : fieldErrors;
+
+  const selectedIndustry = recruiterIndustryOptionFor({
+    code: job.industryCode,
+    label: job.industry,
+  });
+  const isOtherIndustry = selectedIndustry.subIndustries === null;
 
   const clearFieldErrors = (...fields: string[]) => {
     setFieldErrors((current) => {
@@ -345,6 +367,64 @@ export function JobPostingEditor({
     field: K,
     value: JobCatalogItem[K],
   ) => changeJob((current) => ({ ...current, [field]: value }), String(field));
+
+  const updateIndustry = (code: string) => {
+    const nextIndustry = recruiterIndustryByCode.get(
+      code as RecruiterIndustryCode,
+    );
+    if (!nextIndustry) return;
+    changeJob(
+      (current) => ({
+        ...current,
+        industry: nextIndustry.label,
+        industryCode: nextIndustry.code,
+        subIndustry: "",
+        categoryFamily: nextIndustry.code,
+        categoryIds: [],
+        description: {
+          ...current.description,
+          generalInfo: {
+            ...current.description.generalInfo,
+            department: null,
+          },
+        },
+      }),
+      "industry",
+      "subIndustry",
+      "categoryFamily",
+      "categoryIds",
+      "description.generalInfo.department",
+    );
+  };
+
+  const updateSubIndustry = (value: string) => {
+    const classification = deriveRecruiterClassification({
+      industry: selectedIndustry.label,
+      industryCode: selectedIndustry.code,
+      subIndustry: value,
+    });
+    changeJob(
+      (current) => ({
+        ...current,
+        industry: classification.industry,
+        industryCode: classification.industryCode,
+        subIndustry: classification.subIndustry,
+        categoryFamily: classification.categoryFamily,
+        categoryIds: classification.categoryIds,
+        description: {
+          ...current.description,
+          generalInfo: {
+            ...current.description.generalInfo,
+            department: classification.department,
+          },
+        },
+      }),
+      "subIndustry",
+      "categoryFamily",
+      "categoryIds",
+      "description.generalInfo.department",
+    );
+  };
 
   const updateSalary = (field: "min" | "max", input: string) => {
     const hasLetters = /[a-zA-ZÀ-ỹ]/u.test(input);
@@ -419,12 +499,77 @@ export function JobPostingEditor({
     }));
 
   const persist = async (
-    prepared: JobCatalogItem,
+    prepared: RecruiterJob,
     targetStatus: JobPostingStatus,
   ) => {
     setSaving(true);
     setError("");
     try {
+      if (targetStatus === "pending_approval") {
+        const {
+          company: _company,
+          review: _review,
+          correctionRequest: _correctionRequest,
+          ...reviewJob
+        } = prepared as JobCatalogItem & {
+          company?: unknown;
+          review?: unknown;
+          correctionRequest?: unknown;
+        };
+        submissionKey.current ??= crypto.randomUUID();
+        const submissionResponse = await fetch(
+          `/api/recruiter/job-postings/${encodeURIComponent(prepared.id)}/submit-review`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "idempotency-key": submissionKey.current,
+              "x-csrf-token": csrfProof,
+            },
+            body: JSON.stringify({
+              expectedWorkingUpdatedAt: prepared.updatedAt,
+              ...(catalogueUpdatedAt.current
+                ? { expectedCatalogueUpdatedAt: catalogueUpdatedAt.current }
+                : {}),
+              job: reviewJob,
+            }),
+          },
+        );
+        const review = (await submissionResponse.json().catch(() => null)) as
+          | (NonNullable<RecruiterJob["review"]> & {
+              message?: string;
+              fieldErrors?: RecruiterJobFieldErrors;
+            })
+          | { message?: string; fieldErrors?: RecruiterJobFieldErrors }
+          | null;
+        if (!submissionResponse.ok || !review || !("reviewId" in review)) {
+          setFieldErrors(
+            review && "fieldErrors" in review ? (review.fieldErrors ?? {}) : {},
+          );
+          setError(
+            review && "message" in review
+              ? (review.message ?? "Unable to submit this posting for review.")
+              : "Unable to submit this posting for review.",
+          );
+          return;
+        }
+        submissionKey.current = null;
+        setHasUnsavedChanges(false);
+        onSaved({
+          ...prepared,
+          id: review.jobId,
+          status: "pending_approval",
+          company: prepared.company,
+          review: {
+            ...review,
+            reasonCode: review.reasonCode ?? null,
+            publicExplanation: review.publicExplanation ?? null,
+            decidedAt: review.decidedAt ?? null,
+          },
+        });
+        return;
+      }
+
       const method = prepared.id === "new-job" ? "POST" : "PATCH";
       const response = await fetch("/api/recruiter/job-postings", {
         method,
@@ -453,41 +598,6 @@ export function JobPostingEditor({
         setError("The server returned an invalid response.");
         return;
       }
-      if (targetStatus === "pending_approval") {
-        submissionKey.current ??= crypto.randomUUID();
-        const submissionResponse = await fetch(
-          `/api/recruiter/job-postings/${encodeURIComponent(payload.id)}/submit-review`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "idempotency-key": submissionKey.current,
-              "x-csrf-token": csrfProof,
-            },
-            body: JSON.stringify({
-              expectedWorkingUpdatedAt: payload.updatedAt,
-            }),
-          },
-        );
-        const review = (await submissionResponse.json().catch(() => null)) as
-          | RecruiterJob["review"]
-          | { message?: string; fieldErrors?: RecruiterJobFieldErrors }
-          | null;
-        if (!submissionResponse.ok || !review || !("reviewId" in review)) {
-          setFieldErrors(
-            review && "fieldErrors" in review ? (review.fieldErrors ?? {}) : {},
-          );
-          setError(
-            review && "message" in review
-              ? (review.message ?? "Unable to submit this posting for review.")
-              : "Unable to submit this posting for review.",
-          );
-          return;
-        }
-        submissionKey.current = null;
-        onSaved({ ...payload, status: "pending_approval", review });
-        return;
-      }
       setHasUnsavedChanges(false);
       setHasSavedDraft(true);
       onSaved(payload);
@@ -502,12 +612,13 @@ export function JobPostingEditor({
 
   const save = async (targetStatus: JobPostingStatus) => {
     if (readOnly) return;
-    const prepared = prepareRecruiterJobForSave(job);
+    const prepared: RecruiterJob = {
+      ...job,
+      ...prepareRecruiterJobForSave(job),
+      company: job.company,
+    };
     const nextErrors = validateRecruiterJobForSave(prepared, targetStatus);
-    setJob((current) => ({
-      ...prepared,
-      company: current.company,
-    }));
+    setJob(prepared);
     setFieldErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
       setOpenSections((current) => {
@@ -752,99 +863,71 @@ export function JobPostingEditor({
             <div className="recruiter-form-grid">
               <label>
                 Industry *
-                <input
+                <select
                   disabled={readOnly}
                   required
-                  maxLength={160}
-                  value={job.industry}
+                  value={selectedIndustry.code}
                   onChange={(event) =>
-                    changeJob(
-                      (current) => ({
-                        ...current,
-                        industry: event.target.value,
-                        industryCode: "",
-                      }),
-                      "industry",
-                    )
+                    updateIndustry(event.currentTarget.value)
                   }
                   {...fieldA11y("industry")}
-                />
+                >
+                  {recruiterIndustryTaxonomy.map((industry) => (
+                    <option key={industry.code} value={industry.code}>
+                      {industry.label}
+                    </option>
+                  ))}
+                </select>
                 <FieldError field="industry" errors={displayedErrors} />
               </label>
               <label>
                 Sub-industry *
-                <input
-                  disabled={readOnly}
-                  required
-                  maxLength={160}
-                  value={job.subIndustry}
-                  onChange={(event) =>
-                    update("subIndustry", event.target.value)
-                  }
-                  placeholder="e.g. Software development"
-                  {...fieldA11y("subIndustry")}
-                />
+                {isOtherIndustry ? (
+                  <input
+                    disabled={readOnly}
+                    required
+                    maxLength={160}
+                    value={job.subIndustry}
+                    onChange={(event) =>
+                      updateSubIndustry(event.currentTarget.value)
+                    }
+                    placeholder="e.g. Aerospace Engineering"
+                    {...fieldA11y("subIndustry")}
+                  />
+                ) : (
+                  <select
+                    disabled={readOnly}
+                    required
+                    value={job.subIndustry}
+                    onChange={(event) =>
+                      updateSubIndustry(event.currentTarget.value)
+                    }
+                    {...fieldA11y("subIndustry")}
+                  >
+                    <option value="" disabled>
+                      Choose a sub-industry
+                    </option>
+                    {selectedIndustry.subIndustries.map(([label]) => (
+                      <option key={label} value={label}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                )}
                 <FieldError field="subIndustry" errors={displayedErrors} />
               </label>
             </div>
             <div className="recruiter-form-grid">
               <label>
-                Job category *
-                <input
-                  disabled={readOnly}
-                  required
-                  maxLength={80}
-                  value={job.categoryFamily}
-                  onChange={(event) =>
-                    update("categoryFamily", event.target.value)
-                  }
-                  placeholder="e.g. Engineering"
-                  {...fieldA11y("categoryFamily")}
-                />
-                <FieldError field="categoryFamily" errors={displayedErrors} />
-              </label>
-              <label>
                 Department
                 <input
                   disabled={readOnly}
-                  maxLength={160}
+                  readOnly
                   value={department}
-                  onChange={(event) =>
-                    changeJob((current) => ({
-                      ...current,
-                      description: {
-                        ...current.description,
-                        generalInfo: {
-                          ...current.description.generalInfo,
-                          department: event.target.value || null,
-                        },
-                      },
-                    }))
-                  }
-                  placeholder="e.g. Product & Design"
+                  aria-readonly="true"
                 />
               </label>
             </div>
-            <label>
-              Category IDs
-              <span className="recruiter-field-help">
-                Separate structured category IDs with commas.
-              </span>
-              <input
-                disabled={readOnly}
-                value={job.categoryIds.join(", ")}
-                onChange={(event) =>
-                  update(
-                    "categoryIds",
-                    event.target.value
-                      .split(",")
-                      .map((item) => item.trim())
-                      .filter(Boolean),
-                  )
-                }
-                placeholder="engineering, frontend"
-              />
-            </label>
           </EditorSection>
 
           <EditorSection
@@ -1583,6 +1666,7 @@ export function JobPostingEditor({
         <JobPostingPreview companyName={companyName} job={job} />
       </div>
 
+      {/* The accessible Modal is the confirmation equivalent of window.confirm. */}
       <Modal
         open={Boolean(pendingSubmission)}
         title="Submit job for approval?"

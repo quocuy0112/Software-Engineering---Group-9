@@ -37,6 +37,22 @@ export const JOB_INDUSTRY_SLUGS = {
 
 export type JobIndustryCode = keyof typeof JOB_INDUSTRY_SLUGS;
 
+/** New recruiter records use `other`; the split catalogue keeps r29 on disk. */
+export function catalogueIndustryCode(value: string): JobIndustryCode | null {
+  const normalized = value.trim().toLowerCase();
+  if (normalized === "other") return "r29";
+  return Object.prototype.hasOwnProperty.call(JOB_INDUSTRY_SLUGS, normalized)
+    ? (normalized as JobIndustryCode)
+    : null;
+}
+
+export function industryCodeMatchesCatalogue(
+  value: unknown,
+  expected: JobIndustryCode,
+) {
+  return value === expected || (expected === "r29" && value === "other");
+}
+
 export type JobIndustryFile = {
   code: JobIndustryCode;
   slug: (typeof JOB_INDUSTRY_SLUGS)[JobIndustryCode];

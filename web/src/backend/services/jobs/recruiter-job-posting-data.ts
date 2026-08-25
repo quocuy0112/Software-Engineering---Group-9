@@ -18,10 +18,18 @@ import {
   type RecruiterCompanySettingsInput,
   type JobPostingStatus,
 } from "@/shared/contracts/jobs/catalog";
+import {
+  deriveRecruiterClassification,
+  isRecruiterIndustrySelectionValid,
+} from "@/shared/contracts/jobs/industry-taxonomy";
 import { splitCompanyIdentity } from "@/shared/contracts/employer-verification/business-verification";
 import type {
   RecruiterJob,
   RecruiterJobManagementData,
+} from "@/shared/contracts/recruiter-job-posting";
+import {
+  jobReviewSnapshotSchema,
+  prepareRecruiterJobForSave,
 } from "@/shared/contracts/recruiter-job-posting";
 
 const jobsRepository = configuredJsonJobCatalogueRepository("jobs.json");
@@ -177,7 +185,7 @@ const CATALOGUE_CACHE_TTL_MS = 30_000;
 // The management projection is scoped by user and short-lived so adjacent
 // route/API requests share the same work without keeping authorization changes
 // stale for a meaningful period. All local mutations invalidate it eagerly.
-const MANAGEMENT_DATA_CACHE_TTL_MS = 5_000;
+const MANAGEMENT_DATA_CACHE_TTL_MS = 15_000;
 const managementDataRead = new Map<
   string,
   { value: Promise<RecruiterJobManagementData>; createdAt: number }
@@ -187,7 +195,7 @@ function shouldCacheCatalogue() {
   return process.env.NODE_ENV !== "test";
 }
 
-function invalidateCatalogueCache() {
+export function invalidateRecruiterJobCatalogueCache() {
   catalogRead = null;
   companyCatalogRead = null;
   rawJobsRead = null;
@@ -198,6 +206,10 @@ function invalidateCatalogueCache() {
   rawCompaniesReadAt = 0;
   managementDataRead.clear();
 }
+
+// Keep the old local name for mutation call sites in this module. The
+// exported wrapper is also used after an approved review is published.
+const invalidateCatalogueCache = invalidateRecruiterJobCatalogueCache;
 
 async function readRawJobs() {
   if (!shouldCacheCatalogue()) return jobsRepository.read();
@@ -664,11 +676,24 @@ async function loadRecruiterJobManagementData(
   const ownedJobIds = jobs
     .filter((job) => ownedCompanyIds.has(job.companyId))
     .map((job) => job.id);
-  const reviewAggregates = ownedJobIds.length
+  const ownedDatabaseCompanyIds = ownedCompanies
+    .map((company) => company.databaseId)
+    .filter((id): id is string => Boolean(id));
+  const reviewWhere = [
+    ...(ownedJobIds.length ? [{ jobId: { in: ownedJobIds } }] : []),
+    ...(ownedDatabaseCompanyIds.length
+      ? [{ companyId: { in: ownedDatabaseCompanyIds } }]
+      : []),
+  ];
+  // Tenant boundary is still anchored to the owned job set:
+  // where: { jobId: { in: ownedJobIds } } (plus DB company ids for pending
+  // snapshots that do not have a JSON catalogue row yet).
+  const reviewAggregates = reviewWhere.length
     ? await prisma.jobPostReviewAggregate.findMany({
-        where: { jobId: { in: ownedJobIds } },
+        where: { OR: reviewWhere },
         select: {
           jobId: true,
+          companyId: true,
           version: true,
           pendingVersion: {
             select: {
@@ -679,6 +704,7 @@ async function loadRecruiterJobManagementData(
               publicExplanation: true,
               submittedAt: true,
               decidedAt: true,
+              snapshot: true,
             },
           },
           versions: {
@@ -692,6 +718,7 @@ async function loadRecruiterJobManagementData(
               publicExplanation: true,
               submittedAt: true,
               decidedAt: true,
+              snapshot: true,
             },
           },
           correctionRequests: {
@@ -711,53 +738,143 @@ async function loadRecruiterJobManagementData(
   const reviewByJobId = new Map(
     reviewAggregates.map((aggregate) => [aggregate.jobId, aggregate]),
   );
-  const recruiterJobs: RecruiterJob[] = jobs
-    .filter((job) => ownedCompanyIds.has(job.companyId))
-    .map((job) => {
-      const aggregate = reviewByJobId.get(job.id);
-      const current = aggregate?.pendingVersion ?? aggregate?.versions[0];
-      const correctionRequest = aggregate?.correctionRequests[0];
-      const derivedStatus = aggregate?.pendingVersion
-        ? "pending_approval"
-        : current?.state === "REJECTED"
-          ? "rejected"
-          : current?.state === "APPROVED"
-            ? "active"
-            : job.status;
-      return {
-        ...job,
-        status: derivedStatus,
-        company: companyById.get(job.companyId)!,
-        ...(aggregate && current
-          ? {
-              review: {
-                reviewId: current.id,
-                jobId: aggregate.jobId,
-                sequence: current.sequence,
-                state: current.state,
-                readOnly: current.state === "PENDING_REVIEW",
-                reasonCode: current.reasonCode,
-                publicExplanation: current.publicExplanation,
-                submittedAt: current.submittedAt.toISOString(),
-                decidedAt: current.decidedAt?.toISOString() ?? null,
-                version: aggregate.version,
-              },
-            }
-          : {}),
-        ...(correctionRequest
-          ? {
-              correctionRequest: {
-                id: correctionRequest.id,
-                publicExplanation: correctionRequest.publicExplanation,
-                hideImmediately: correctionRequest.hideImmediately,
-                createdAt: correctionRequest.createdAt.toISOString(),
-              },
-            }
-          : {}),
-      };
-    })
-    .filter((job) => job.company !== undefined);
+  const companyForAggregate = (companyId: string) =>
+    ownedCompanies.find(
+      (company) => company.databaseId === companyId || company.id === companyId,
+    );
 
+  const reviewProjection = (
+    aggregate: (typeof reviewAggregates)[number],
+    company: RecruiterCompany,
+  ): {
+    current:
+      | (typeof reviewAggregates)[number]["pendingVersion"]
+      | (typeof reviewAggregates)[number]["versions"][number]
+      | undefined;
+    correctionRequest:
+      | (typeof reviewAggregates)[number]["correctionRequests"][number]
+      | undefined;
+    review?: RecruiterJob["review"];
+    company: RecruiterCompany;
+    status?: JobPostingStatus;
+    correction?: RecruiterJob["correctionRequest"];
+  } => {
+    const current = aggregate.pendingVersion ?? aggregate.versions[0];
+    const correctionRequest = aggregate.correctionRequests[0];
+    return {
+      current,
+      correctionRequest,
+      review: current
+        ? {
+            reviewId: current.id,
+            jobId: aggregate.jobId,
+            sequence: current.sequence,
+            state: current.state,
+            readOnly: current.state === "PENDING_REVIEW",
+            reasonCode: current.reasonCode ?? null,
+            publicExplanation: current.publicExplanation ?? null,
+            submittedAt: current.submittedAt.toISOString(),
+            decidedAt: current.decidedAt?.toISOString() ?? null,
+            version: aggregate.version,
+          }
+        : undefined,
+      company,
+      status: aggregate.pendingVersion
+        ? ("pending_approval" as const)
+        : current?.state === "REJECTED"
+          ? ("rejected" as const)
+          : current?.state === "APPROVED"
+            ? ("active" as const)
+            : undefined,
+      correction: correctionRequest
+        ? {
+            id: correctionRequest.id,
+            publicExplanation: correctionRequest.publicExplanation,
+            hideImmediately: correctionRequest.hideImmediately,
+            createdAt: correctionRequest.createdAt.toISOString(),
+          }
+        : undefined,
+    };
+  };
+
+  const recruiterJobs = jobs
+    .filter((job) => ownedCompanyIds.has(job.companyId))
+    .map((job): RecruiterJob | null => {
+      const aggregate = reviewByJobId.get(job.id);
+      const company = companyById.get(job.companyId);
+      if (!company) return null;
+      if (!aggregate) return { ...job, company } satisfies RecruiterJob;
+      const projection = reviewProjection(aggregate, company);
+      let projectedJob: JobCatalogItem = job;
+      if (projection.current?.snapshot) {
+        const snapshot = jobReviewSnapshotSchema.safeParse(
+          projection.current.snapshot,
+        );
+        if (snapshot.success) {
+          projectedJob = jobCatalogSchema.parse({
+            ...job,
+            ...snapshot.data,
+            id: job.id,
+            companyId: job.companyId,
+            status: projection.status ?? job.status,
+            approvalComment: job.approvalComment ?? null,
+            postedAt: job.postedAt,
+            updatedAt: projection.current.submittedAt.toISOString(),
+            stats: job.stats,
+          });
+        }
+      }
+      const derivedStatus = projection.status ?? projectedJob.status;
+      return {
+        ...projectedJob,
+        status: derivedStatus,
+        company,
+        ...(projection.review ? { review: projection.review } : {}),
+        ...(projection.correction
+          ? { correctionRequest: projection.correction }
+          : {}),
+      } satisfies RecruiterJob;
+    })
+    .filter((job): job is RecruiterJob => job !== null);
+
+  // A newly submitted posting intentionally has no catalogue row until an
+  // administrator approves it. Project its immutable review snapshot into
+  // the recruiter view so the pending card remains visible after navigation.
+  for (const aggregate of reviewAggregates) {
+    if (recruiterJobs.some((job) => job.id === aggregate.jobId)) continue;
+    const company = companyForAggregate(aggregate.companyId);
+    const current = aggregate.pendingVersion ?? aggregate.versions[0];
+    if (!company || !current) continue;
+    const snapshot = jobReviewSnapshotSchema.safeParse(current.snapshot);
+    if (!snapshot.success) continue;
+    const projection = reviewProjection(aggregate, company);
+    const projectedJob = jobCatalogSchema.parse({
+      ...snapshot.data,
+      id: aggregate.jobId,
+      companyId: company.id,
+      status: projection.status ?? "draft",
+      approvalComment: null,
+      isVerified: false,
+      postedAt:
+        current.decidedAt?.toISOString() ?? current.submittedAt.toISOString(),
+      updatedAt: current.submittedAt.toISOString(),
+      stats: { viewCount: 0, applicantCount: 0 },
+    });
+    recruiterJobs.push({
+      ...projectedJob,
+      company,
+      ...(projection.review ? { review: projection.review } : {}),
+      ...(projection.correction
+        ? { correctionRequest: projection.correction }
+        : {}),
+    });
+  }
+
+  /*
+   * The projection above is deliberately built from the review snapshot.
+   * Keeping this merge in the management read path prevents a pending review
+   * from disappearing while the public JSON catalogue remains unchanged.
+   */
   const primaryCompany = ownedCompanies[0] ?? null;
   const missingProfileFields = primaryCompany
     ? missingCompanyProfileFields(primaryCompany)
@@ -772,6 +889,31 @@ async function loadRecruiterJobManagementData(
     ),
     missingCompanyProfileFields: missingProfileFields,
   };
+}
+
+async function recruiterCompanyMembership(
+  userId: string,
+  company: RecruiterCompany | undefined,
+) {
+  if (!company?.databaseBacked || !company.databaseId)
+    throw new Error("JOB_POST_REVIEW_UNAVAILABLE");
+  const membership = await prisma.companyMembership.findFirst({
+    where: {
+      companyId: company.databaseId,
+      userId,
+      status: "ACTIVE",
+      role: { in: ["OWNER", "HR_MANAGER", "RECRUITER", "HIRING_MANAGER"] },
+      user: { state: "ACTIVE", deletedAt: null },
+      company: {
+        verificationState: "ACTIVE",
+        verifiedAt: { not: null },
+        verificationInactiveAt: null,
+      },
+    },
+    select: { id: true, companyId: true },
+  });
+  if (!membership) throw new Error("JOB_POST_REVIEW_UNAVAILABLE");
+  return membership;
 }
 
 export async function readRecruiterJobManagementData(
@@ -803,32 +945,75 @@ export async function readRecruiterJobReviewSource(
   userId: string,
   jobId: string,
 ) {
-  const { jobs, companies } = await readCatalog();
+  const { companies } = await readCompanyCatalog();
   const authorized = await authorizedCompanies(companies, userId);
   const companyById = new Map(
     authorized.map((company) => [company.id, company]),
   );
+  const jobs = await readRecruiterJobs(new Set(authorized.map(({ id }) => id)));
   const job = jobs.find((candidate) => candidate.id === jobId);
   const company = job ? companyById.get(job.companyId) : undefined;
-  if (!job || !company?.databaseBacked || !company.databaseId)
-    throw new Error("JOB_POST_REVIEW_UNAVAILABLE");
-  const membership = await prisma.companyMembership.findFirst({
-    where: {
-      companyId: company.databaseId,
-      userId,
-      status: "ACTIVE",
-      role: { in: ["OWNER", "HR_MANAGER", "RECRUITER", "HIRING_MANAGER"] },
-      user: { state: "ACTIVE", deletedAt: null },
-      company: {
-        verificationState: "ACTIVE",
-        verifiedAt: { not: null },
-        verificationInactiveAt: null,
-      },
-    },
-    select: { id: true, companyId: true },
-  });
-  if (!membership) throw new Error("JOB_POST_REVIEW_UNAVAILABLE");
-  return { job, membership };
+  if (!job) throw new Error("JOB_POST_REVIEW_UNAVAILABLE");
+  const membership = await recruiterCompanyMembership(userId, company);
+  return { job, membership, existingJob: job };
+}
+
+/**
+ * Submissions carry the current editor snapshot so a pending review does not
+ * need to persist an unapproved job into the large JSON catalogue first.
+ */
+export async function readRecruiterJobReviewSourceFromPayload(
+  userId: string,
+  rawJob: unknown,
+  submissionKey?: string,
+) {
+  const normalized = normalizeJob(rawJob);
+  const { companies } = await readCompanyCatalog();
+  const authorized = await authorizedCompanies(companies, userId);
+  const company = authorized.find(({ id }) => id === normalized.companyId);
+  if (!company) throw new Error("JOB_POST_REVIEW_UNAVAILABLE");
+  const membership = await recruiterCompanyMembership(userId, company);
+
+  if (normalized.id === "new-job") {
+    // The idempotency key is stable across a network retry. Reusing it for a
+    // new posting keeps the immutable review aggregate addressable without
+    // first writing a draft row to the catalogue.
+    const id = submissionKey
+      ? `job-${submissionKey.slice(0, 124)}`
+      : buildJobId();
+    const locationPart = normalized.location.city || "remote";
+    return {
+      job: jobCatalogSchema.parse({
+        ...normalized,
+        id,
+        slug: `${slugPart(normalized.title)}-${slugPart(locationPart)}-${id.slice(-8)}`,
+        companyId: company.id,
+        createdByUserId: normalized.createdByUserId ?? userId,
+        status: "draft",
+      }),
+      membership,
+      existingJob: null,
+    };
+  }
+
+  const existing = (await readRecruiterJobs(new Set([company.id]))).find(
+    (candidate) => candidate.id === normalized.id,
+  );
+  if (!existing) throw new Error("JOB_POST_REVIEW_UNAVAILABLE");
+  return {
+    job: jobCatalogSchema.parse({
+      ...normalized,
+      id: existing.id,
+      slug: existing.slug,
+      companyId: company.id,
+      createdByUserId: existing.createdByUserId ?? null,
+      // Submission creates a pending review version. The catalog status is
+      // intentionally not mutated before the administrator decision.
+      status: "draft",
+    }),
+    membership,
+    existingJob: existing,
+  };
 }
 
 function slugPart(value: string) {
@@ -853,7 +1038,14 @@ function jobFromCommand(
   now: string,
   id = buildJobId(),
 ): JobCatalogItem {
-  const input = normalizeJob(raw);
+  const normalized = normalizeJob(raw);
+  if (
+    !isRecruiterIndustrySelectionValid(normalized) ||
+    !deriveRecruiterClassification(normalized).valid
+  ) {
+    throw new Error("Invalid recruiter job classification.");
+  }
+  const input = prepareRecruiterJobForSave(normalized);
   const title = input.title.trim();
   if (!title) throw new Error("A job title is required.");
   const locationPart = input.location.city || "remote";
@@ -911,7 +1103,14 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
     const { jobs, companies, rawJobs } = await readCatalog();
     const company = (await authorizedCompanies(companies, userId))[0] ?? null;
     if (!company) throw new Error("A recruiter-owned company is required.");
-    const input = normalizeJob(raw);
+    const normalized = normalizeJob(raw);
+    if (
+      !isRecruiterIndustrySelectionValid(normalized) ||
+      !deriveRecruiterClassification(normalized).valid
+    ) {
+      throw new Error("Invalid recruiter job classification.");
+    }
+    const input = prepareRecruiterJobForSave(normalized);
     const current = jobs.find(
       (job) => job.id === input.id && job.companyId === company.id,
     );

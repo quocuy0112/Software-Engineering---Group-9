@@ -27,7 +27,7 @@ export async function POST(
     const command = await parseBoundedJson(
       request,
       submitJobReviewCommandSchema,
-      8 * 1024,
+      768 * 1024,
     );
     const { jobId } = await context.params;
     if (!jobId || jobId.length > 128)
@@ -40,7 +40,9 @@ export async function POST(
       actorSessionId: actor.sessionId,
       jobId,
       expectedWorkingUpdatedAt: command.expectedWorkingUpdatedAt,
+      expectedCatalogueUpdatedAt: command.expectedCatalogueUpdatedAt,
       idempotencyKey,
+      job: command.job,
     });
     return jobJson(recruiterReviewProjectionSchema.parse(result), {
       status: 201,

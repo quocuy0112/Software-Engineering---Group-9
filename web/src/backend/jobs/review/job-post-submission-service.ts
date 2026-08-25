@@ -4,7 +4,12 @@ import { prisma } from "@/backend/database/prisma";
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
 import { PrismaJobPostReviewRepository } from "@/backend/repositories/jobs/prisma-job-post-review-repository";
 import { notifyActionableAdministrators } from "@/backend/notifications/admin-notification-fanout";
-import { readRecruiterJobReviewSource } from "@/backend/services/jobs/recruiter-job-posting-data";
+import { adoptActiveJobBaseline } from "./job-post-active-baseline-service";
+import {
+  invalidateRecruiterJobCatalogueCache,
+  readRecruiterJobReviewSource,
+  readRecruiterJobReviewSourceFromPayload,
+} from "@/backend/services/jobs/recruiter-job-posting-data";
 import {
   JOB_REVIEW_SNAPSHOT_SCHEMA_VERSION,
   jobReviewSnapshotFromCatalog,
@@ -13,6 +18,7 @@ import {
 import { projectJobReviewSnapshot } from "./job-post-publication-projector";
 import { normalizedReviewTitleSearch } from "./job-post-review-search";
 import { JobPostReviewError } from "./job-post-review-errors";
+import { leastLoadedReviewAdministrator } from "./job-post-review-assignment";
 
 const requestHash = (value: string) =>
   createHash("sha256").update(value).digest("hex");
@@ -23,19 +29,47 @@ export class JobPostSubmissionService {
     actorSessionId: string;
     jobId: string;
     expectedWorkingUpdatedAt: string;
+    expectedCatalogueUpdatedAt?: string;
     idempotencyKey: string;
+    job?: unknown;
     now?: Date;
   }) {
     const now = input.now ?? new Date();
-    const { job, membership } = await readRecruiterJobReviewSource(
-      input.actorUserId,
-      input.jobId,
+    const source = await (
+      input.job
+        ? readRecruiterJobReviewSourceFromPayload(
+            input.actorUserId,
+            input.job,
+            input.idempotencyKey,
+          )
+        : readRecruiterJobReviewSource(input.actorUserId, input.jobId)
     ).catch(() => {
       throw new JobPostReviewError(
         "JOB_POST_REVIEW_UNAVAILABLE",
         "Review unavailable.",
       );
     });
+    const { job, membership, existingJob } = source;
+    if (
+      input.job &&
+      input.jobId !== "new-job" &&
+      existingJob?.id !== input.jobId
+    )
+      throw new JobPostReviewError(
+        "JOB_POST_REVIEW_CONFLICT",
+        "The working job changed. Reload and try again.",
+      );
+    if (
+      input.job &&
+      existingJob &&
+      input.expectedCatalogueUpdatedAt &&
+      existingJob.updatedAt !== input.expectedCatalogueUpdatedAt
+    )
+      throw new JobPostReviewError(
+        "JOB_POST_REVIEW_CONFLICT",
+        "The working job changed. Reload and try again.",
+      );
+    const jobId = job.id;
     if (job.updatedAt !== input.expectedWorkingUpdatedAt)
       throw new JobPostReviewError(
         "JOB_POST_REVIEW_CONFLICT",
@@ -46,6 +80,18 @@ export class JobPostSubmissionService {
         "JOB_POST_REVIEW_CONFLICT",
         "The job cannot be submitted in its current state.",
       );
+
+    // The old flow first changed an active catalogue row to draft and adopted
+    // its PostgreSQL baseline. Preserve that lifecycle fact even though the
+    // new fast path skips the pre-review catalogue write entirely.
+    if (existingJob?.status === "active") {
+      await adoptActiveJobBaseline({
+        job: existingJob,
+        authoritativeCompanyId: membership.companyId,
+        actorUserId: input.actorUserId,
+        now,
+      });
+    }
 
     const snapshot = jobReviewSnapshotFromCatalog(job, membership.companyId);
     try {
@@ -65,14 +111,14 @@ export class JobPostSubmissionService {
     const snapshotSha256 = jobReviewSnapshotSha256(snapshot);
     const submissionRequestHash = requestHash(
       JSON.stringify({
-        jobId: input.jobId,
+        jobId,
         expectedWorkingUpdatedAt: input.expectedWorkingUpdatedAt,
         snapshotSha256,
       }),
     );
     const correlationId = randomUUID();
 
-    return prisma.$transaction(async (transaction) => {
+    const result = await prisma.$transaction(async (transaction) => {
       const reviews = new PrismaJobPostReviewRepository(transaction);
       const replay = await reviews.findSubmissionReplay(
         input.actorUserId,
@@ -81,7 +127,7 @@ export class JobPostSubmissionService {
       if (replay) {
         if (
           replay.submissionRequestHash !== submissionRequestHash ||
-          replay.aggregate.jobId !== input.jobId
+          replay.aggregate.jobId !== jobId
         )
           throw new JobPostReviewError(
             "JOB_POST_REVIEW_CONFLICT",
@@ -120,13 +166,13 @@ export class JobPostSubmissionService {
         );
 
       let aggregate = await transaction.jobPostReviewAggregate.findUnique({
-        where: { jobId: input.jobId },
+        where: { jobId },
       });
       let sequence: number;
       if (!aggregate) {
         aggregate = await transaction.jobPostReviewAggregate.create({
           data: {
-            jobId: input.jobId,
+            jobId,
             companyId: membership.companyId,
             latestSequence: 1,
             adoptedAt: now,
@@ -147,6 +193,10 @@ export class JobPostSubmissionService {
       }
 
       const reviewId = randomUUID();
+      const assignedAdminUserId = await leastLoadedReviewAdministrator(
+        transaction,
+        now,
+      );
       await reviews.createPendingVersion({
         aggregateId: aggregate.id,
         expectedAggregateVersion: aggregate.version,
@@ -161,6 +211,7 @@ export class JobPostSubmissionService {
         submissionIdempotencyKey: input.idempotencyKey,
         submissionRequestHash,
         submittedAt: now,
+        assignedAdminUserId,
         correlationId,
         historyAction: sequence === 1 ? "SUBMITTED" : "RESUBMITTED",
       });
@@ -176,6 +227,7 @@ export class JobPostSubmissionService {
         correlationId,
         context: {
           resultingState: "PENDING_REVIEW",
+          eligible: assignedAdminUserId !== null,
           targetVersion: aggregate.version + 1,
         },
       });
@@ -186,11 +238,12 @@ export class JobPostSubmissionService {
         occurredAt: now,
         contextType: "JOB_POST_REVIEW",
         contextId: reviewId,
+        preferredRecipientUserId: assignedAdminUserId,
         state: "PENDING_REVIEW",
       });
       return {
         reviewId,
-        jobId: input.jobId,
+        jobId,
         sequence,
         state: "PENDING_REVIEW" as const,
         readOnly: true,
@@ -198,5 +251,11 @@ export class JobPostSubmissionService {
         version: aggregate.version + 1,
       };
     });
+    // A draft may already be present in the short-lived recruiter management
+    // cache. Once submission commits, force the next read to project the
+    // aggregate's pendingVersionId as pending_approval. Assignment changes,
+    // including losing the final administrator, never affect that status.
+    invalidateRecruiterJobCatalogueCache();
+    return result;
   }
 }

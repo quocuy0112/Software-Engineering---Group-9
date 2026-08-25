@@ -24,6 +24,7 @@ import {
 import { projectJobReviewSnapshot } from "./job-post-publication-projector";
 import { emitJobPostReviewOperation } from "./job-post-review-operations";
 import { appendJobPostingLifecycleFact } from "@/backend/repositories/analytics/prisma-analytics-repository";
+import { publishApprovedJobToCatalogue } from "@/backend/services/jobs/publish-approved-job-to-catalogue";
 
 /**
  * Application boundary for the review lifecycle. User-story orchestration is
@@ -522,7 +523,43 @@ export class JobPostReviewService {
         return adminReviewCommandResultSchema.parse(decided);
       },
     );
-    return adminReviewCommandResultSchema.parse(result);
+    const parsed = adminReviewCommandResultSchema.parse(result);
+    if (input.command.command === "APPROVE" && parsed.state === "APPROVED") {
+      // PostgreSQL is the review/publication source of truth. The JSON
+      // catalogue is a compatibility/search projection and must only receive
+      // the snapshot after the approval transaction has committed.
+      const approvedVersion = await prisma.jobPostReviewVersion.findUnique({
+        where: { id: input.reviewId },
+        select: { snapshot: true, aggregate: { select: { closedAt: true } } },
+      });
+      if (approvedVersion) {
+        try {
+          await publishApprovedJobToCatalogue({
+            snapshot: approvedVersion.snapshot,
+            now,
+            status: approvedVersion.aggregate.closedAt ? "closed" : "active",
+          });
+          // Avoid serving the pre-approval projection to a recruiter who is
+          // already watching the management screen.
+          await import("@/backend/services/jobs/recruiter-job-posting-data")
+            .then(({ invalidateRecruiterJobCatalogueCache }) =>
+              invalidateRecruiterJobCatalogueCache(),
+            )
+            .catch(() => undefined);
+          await import("@/backend/services/jobs/job-workspace-data")
+            .then(({ invalidateJobWorkspaceCatalogueCache }) =>
+              invalidateJobWorkspaceCatalogueCache(),
+            )
+            .catch(() => undefined);
+        } catch (error) {
+          // Approval is already committed in PostgreSQL. Keep that decision
+          // durable and log a retryable projection failure instead of telling
+          // the admin that a successful approval failed mid-request.
+          console.error("[job-catalogue] approval projection failed", error);
+        }
+      }
+    }
+    return parsed;
   }
 }
 

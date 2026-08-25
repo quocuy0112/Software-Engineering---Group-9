@@ -15,6 +15,8 @@ describe("Recruiter submission failure boundaries", () => {
     expect(catalogue).toContain("JOB_CATALOGUE_CHECKSUM_CONFLICT");
     expect(catalogue).toContain("assertOwned");
     expect(catalogue).toContain("handle.sync()");
-    expect(catalogue).toContain("rename(temporaryPath, this.filePath)");
+    expect(catalogue).toContain(
+      "replaceFileWithRetry(temporaryPath, this.filePath)",
+    );
   });
 });

@@ -2,7 +2,12 @@ import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { open, readFile, rename, rm, stat } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import type { JobIndustryFile } from "./job-industry-files";
+import { setTimeout as delay } from "node:timers/promises";
+import {
+  catalogueIndustryCode,
+  industryCodeMatchesCatalogue,
+  type JobIndustryFile,
+} from "./job-industry-files";
 
 export type JobCatalogueLeaseClaim = {
   catalogueKey: string;
@@ -43,6 +48,33 @@ export type JsonJobCatalogueRepositoryConfig = {
 
 const sha256 = (value: string) =>
   createHash("sha256").update(value).digest("hex");
+
+const REPLACE_RETRY_DELAYS_MS = [25, 50, 100, 200, 400, 800] as const;
+const RETRYABLE_REPLACE_CODES = new Set(["EACCES", "EBUSY", "EPERM"]);
+
+/**
+ * Antivirus, indexing, and editor processes can briefly deny replacement of
+ * an existing file on Windows. Retrying only sharing/permission failures
+ * preserves atomic rename semantics without hiding path or data errors.
+ */
+export async function replaceFileWithRetry(
+  temporaryPath: string,
+  targetPath: string,
+  renameFile: typeof rename = rename,
+) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      await renameFile(temporaryPath, targetPath);
+      return;
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      const retryDelay = REPLACE_RETRY_DELAYS_MS[attempt];
+      if (!code || !RETRYABLE_REPLACE_CODES.has(code) || !retryDelay)
+        throw error;
+      await delay(retryDelay);
+    }
+  }
+}
 
 export class JsonJobCatalogueRepository<T = unknown> {
   private readonly filePath: string;
@@ -109,8 +141,10 @@ export class JsonJobCatalogueRepository<T = unknown> {
               entry &&
               typeof entry === "object" &&
               "industryCode" in entry &&
-              (entry as { industryCode?: unknown }).industryCode !==
+              !industryCodeMatchesCatalogue(
+                (entry as { industryCode?: unknown }).industryCode,
                 expectedCode,
+              ),
           )
         ) {
           throw new Error("industry file contains a different industryCode");
@@ -261,7 +295,7 @@ export class JsonJobCatalogueRepository<T = unknown> {
       const finalObserved = await readFile(this.filePath, "utf8");
       if (sha256(finalObserved) !== expectedCatalogueSha256)
         throw new Error("JOB_CATALOGUE_CHECKSUM_CONFLICT");
-      await rename(temporaryPath, this.filePath);
+      await replaceFileWithRetry(temporaryPath, this.filePath);
       return next;
     } finally {
       await rm(temporaryPath, { force: true }).catch(() => undefined);
@@ -269,7 +303,11 @@ export class JsonJobCatalogueRepository<T = unknown> {
     }
   }
 
-  private async writeSplitFiles(next: T[], ownerTokenHash: string) {
+  private async writeSplitFiles(
+    next: T[],
+    originalTexts: readonly string[],
+    ownerTokenHash: string,
+  ) {
     const byCode = new Map(
       this.fallbackFiles.map(({ code }) => [code, [] as T[]]),
     );
@@ -278,27 +316,37 @@ export class JsonJobCatalogueRepository<T = unknown> {
         value && typeof value === "object"
           ? (value as Record<string, unknown>)
           : null;
-      const code = record?.industryCode;
-      const target =
-        typeof code === "string"
-          ? byCode.get(code as JobIndustryFile["code"])
-          : undefined;
+      const code =
+        typeof record?.industryCode === "string"
+          ? catalogueIndustryCode(record.industryCode)
+          : null;
+      const target = code
+        ? byCode.get(code as JobIndustryFile["code"])
+        : undefined;
       if (!target) throw new Error("JOB_CATALOGUE_INDUSTRY_CODE_INVALID");
       target.push(value);
     }
 
-    const temporaryPaths = this.fallbackFiles.map(
-      ({ filePath }) => `${filePath}.${ownerTokenHash.slice(0, 16)}.tmp`,
+    const changedFiles = this.fallbackFiles.flatMap(
+      ({ code, filePath }, index) => {
+        const text = `${JSON.stringify(byCode.get(code), null, 2)}\n`;
+        return text === originalTexts[index]
+          ? []
+          : [
+              {
+                filePath,
+                temporaryPath: `${filePath}.${ownerTokenHash.slice(0, 16)}.tmp`,
+                text,
+              },
+            ];
+      },
     );
     try {
       await Promise.all(
-        this.fallbackFiles.map(async ({ code }, index) => {
-          const handle = await open(temporaryPaths[index], "wx");
+        changedFiles.map(async ({ temporaryPath, text }) => {
+          const handle = await open(temporaryPath, "wx");
           try {
-            await handle.writeFile(
-              `${JSON.stringify(byCode.get(code), null, 2)}\n`,
-              "utf8",
-            );
+            await handle.writeFile(text, "utf8");
             await handle.sync();
           } finally {
             await handle.close();
@@ -306,13 +354,13 @@ export class JsonJobCatalogueRepository<T = unknown> {
         }),
       );
       await Promise.all(
-        this.fallbackFiles.map(({ filePath }, index) =>
-          rename(temporaryPaths[index], filePath),
+        changedFiles.map(({ filePath, temporaryPath }) =>
+          replaceFileWithRetry(temporaryPath, filePath),
         ),
       );
     } finally {
       await Promise.all(
-        temporaryPaths.map((temporaryPath) =>
+        changedFiles.map(({ temporaryPath }) =>
           rm(temporaryPath, { force: true }).catch(() => undefined),
         ),
       );
@@ -350,7 +398,7 @@ export class JsonJobCatalogueRepository<T = unknown> {
         claim,
         expectedCatalogueSha256,
       );
-      await this.writeSplitFiles(next, ownerTokenHash);
+      await this.writeSplitFiles(next, original.texts, ownerTokenHash);
       return next;
     } finally {
       await this.config.leaseCoordinator.release(claim).catch(() => undefined);

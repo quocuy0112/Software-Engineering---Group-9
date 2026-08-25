@@ -8,6 +8,7 @@ import {
   updateRecruiterJob,
   updateRecruiterCompanySettings,
 } from "@/backend/services/jobs/recruiter-job-posting-data";
+import { jobReviewSnapshotFromCatalog } from "@/backend/jobs/review/job-post-review-policy";
 import { createEmptyJobPosting } from "@/shared/contracts/recruiter-job-posting";
 
 const fsMocks = vi.hoisted(() => ({
@@ -246,6 +247,69 @@ describe("recruiter JSON job persistence", () => {
     expect(data.companyId).toBe("db-company-1");
     expect(data.companies).toHaveLength(1);
     expect(data.companyProfileComplete).toBe(true);
+  });
+
+  it("keeps an unassigned submitted job in pending approval", async () => {
+    prismaMocks.company.findMany.mockResolvedValue([
+      {
+        id: "db-company-1",
+        slug: "northstar-labs",
+        legalName: "Northstar Labs",
+        displayName: "Northstar Labs",
+        logoUrl: "https://example.com/logo.png",
+        websiteUrl: "https://northstar.example.com",
+        publicDescription: "A product company.",
+        publicLocation: "Ho Chi Minh City",
+        size: "51-200 employees",
+        industry: "Technology",
+        address: "Ho Chi Minh City",
+        entityType: null,
+        normalizedTaxIdentifier: "1234567890",
+        memberships: [{ userId: "recruiter-1", role: "OWNER" }],
+      },
+    ]);
+    const pendingJob = {
+      ...completeJob("pending-job"),
+      companyId: "db-company-1",
+    };
+    const pendingVersion = {
+      id: "pending-version-1",
+      sequence: 1,
+      state: "PENDING_REVIEW",
+      reasonCode: null,
+      publicExplanation: null,
+      submittedAt: new Date("2026-08-25T00:00:00Z"),
+      decidedAt: null,
+      snapshot: jobReviewSnapshotFromCatalog(pendingJob, "db-company-1"),
+    };
+    prismaMocks.jobPostReviewAggregate.findMany.mockResolvedValue([
+      {
+        jobId: pendingJob.id,
+        companyId: "db-company-1",
+        version: 1,
+        pendingVersion,
+        versions: [pendingVersion],
+        correctionRequests: [],
+      },
+    ]);
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return JSON.stringify([pendingJob]);
+      if (path.endsWith("companies.json")) return "[]";
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const data = await readRecruiterJobManagementData("recruiter-1");
+
+    expect(data.jobs).toHaveLength(1);
+    expect(data.jobs[0]).toMatchObject({
+      id: "pending-job",
+      status: "pending_approval",
+      review: {
+        reviewId: "pending-version-1",
+        state: "PENDING_REVIEW",
+        readOnly: true,
+      },
+    });
   });
 
   it("freshly aggregates jobs across every active company membership", async () => {
@@ -490,7 +554,13 @@ describe("recruiter JSON job persistence", () => {
       numberOfHires: 3,
       isUrgent: true,
       location: job.location,
-      description: job.description,
+      description: {
+        ...job.description,
+        generalInfo: {
+          ...job.description.generalInfo,
+          department: "Software Development",
+        },
+      },
     });
   });
   it("appends a posting without normalizing untouched legacy job statuses", async () => {

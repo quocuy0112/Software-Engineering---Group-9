@@ -4,6 +4,7 @@ import { config as loadEnvironment } from "dotenv";
 import { randomUUID } from "node:crypto";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { distributeUnassignedPendingReviews } from "../src/backend/jobs/review/job-post-review-assignment.ts";
 
 const webRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 loadEnvironment({ path: resolve(webRoot, ".env.local"), quiet: true });
@@ -113,6 +114,11 @@ try {
       skipDuplicates: true,
     });
 
+    const assignedPendingReviews = await distributeUnassignedPendingReviews(
+      transaction,
+      now,
+    );
+
     await transaction.auditEvent.create({
       data: {
         occurredAt: now,
@@ -126,6 +132,7 @@ try {
           source: "operator_terminal",
           previousState: existing?.state ?? null,
           changed: !existing || reactivating || existing.expiresAt !== null,
+          assignedPendingReviews,
         },
       },
     });
@@ -141,6 +148,7 @@ try {
       userId: user.id,
       state: grant.state,
       scopes: scopes.map((assignment) => assignment.scope),
+      assignedPendingReviews,
     };
   });
   console.log(JSON.stringify(result));

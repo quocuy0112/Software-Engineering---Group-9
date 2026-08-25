@@ -39,7 +39,10 @@ const emptyData: RecruiterJobManagementData = {
   companyId: null,
 };
 
-const JOB_POSTINGS_REFRESH_INTERVAL_MS = 5_000;
+// The API response is cached briefly and refreshes on focus/visibility and
+// after mutations. A longer background interval avoids repeatedly parsing the
+// large split catalogue while the recruiter is idle on this screen.
+const JOB_POSTINGS_REFRESH_INTERVAL_MS = 15_000;
 
 async function fetchRecruiterJobManagementData() {
   const response = await fetch("/api/recruiter/job-postings", {
@@ -497,7 +500,10 @@ function CompanyProfileRequiredState({
   };
   return (
     <section className="recruiter-company-required">
-      <span className="recruiter-company-required__illustration" aria-hidden="true">
+      <span
+        className="recruiter-company-required__illustration"
+        aria-hidden="true"
+      >
         <Icon name="briefcase" />
         <span className="recruiter-company-required__lock">
           <Icon name="lock" />
