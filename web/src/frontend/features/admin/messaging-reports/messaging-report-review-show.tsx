@@ -4,6 +4,7 @@ import { Alert, Box, Chip, Divider, Paper, Typography } from "@mui/material";
 import { Show, useRecordContext, useRefresh } from "react-admin";
 import type { AdminMessagingReportDetail } from "@/shared/contracts/admin/messaging-reports";
 import { MessagingReportActionPanel } from "./messaging-report-action-panel";
+import { adminReasonLabel } from "../shared/admin-reason-label";
 
 export function MessagingReportReviewContent({
   record,
@@ -20,7 +21,7 @@ export function MessagingReportReviewContent({
         </Typography>
         <Box sx={{ display: "flex", gap: 1, mt: 1, flexWrap: "wrap" }}>
           <Chip label={record.state} />
-          <Chip label={record.category} variant="outlined" />
+          <Chip label={adminReasonLabel(record.category)} variant="outlined" />
           <Chip label={`Version ${record.version}`} variant="outlined" />
         </Box>
       </Box>
@@ -36,7 +37,8 @@ export function MessagingReportReviewContent({
           Reported user: {record.targetDisplayName} ({record.targetAccountId})
         </Typography>
         <Typography>
-          Target: {record.targetType}; assigned administrator: {record.assignedAdministratorId ?? "unassigned"}
+          Target: {record.targetType}; assigned administrator:{" "}
+          {record.assignedAdministratorId ?? "unassigned"}
         </Typography>
       </Paper>
 
@@ -56,15 +58,20 @@ export function MessagingReportReviewContent({
         {record.evidence ? (
           <>
             <Typography variant="body2" color="text.secondary">
-              {record.evidence.senderDisplayName} ({record.evidence.senderAccountId}) · {new Date(record.evidence.sentAt).toLocaleString()}
+              {record.evidence.senderDisplayName} (
+              {record.evidence.senderAccountId}) ·{" "}
+              {new Date(record.evidence.sentAt).toLocaleString()}
             </Typography>
-            <Typography sx={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>
+            <Typography
+              sx={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
+            >
               {record.evidence.content}
             </Typography>
           </>
         ) : (
           <Alert severity="info">
-            No submitted evidence message is available. Conversation history is not accessible from this review.
+            No submitted evidence message is available. Conversation history is
+            not accessible from this review.
           </Alert>
         )}
       </Paper>
@@ -78,9 +85,12 @@ export function MessagingReportReviewContent({
         ) : (
           record.notes.map((note) => (
             <Box key={note.id}>
-              <Typography sx={{ whiteSpace: "pre-wrap" }}>{note.text}</Typography>
+              <Typography sx={{ whiteSpace: "pre-wrap" }}>
+                {note.text}
+              </Typography>
               <Typography variant="caption" color="text.secondary">
-                {note.authorAdministratorId} · {new Date(note.createdAt).toLocaleString()}
+                {note.authorAdministratorId} ·{" "}
+                {new Date(note.createdAt).toLocaleString()}
               </Typography>
             </Box>
           ))
@@ -101,7 +111,8 @@ export function MessagingReportReviewContent({
                 {event.action}: {event.priorState} to {event.resultingState}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {event.actorAdministratorId} · version {event.resultingVersion} · {new Date(event.occurredAt).toLocaleString()}
+                {event.actorAdministratorId} · version {event.resultingVersion}{" "}
+                · {new Date(event.occurredAt).toLocaleString()}
               </Typography>
               {event.enforcementCorrelationId ? (
                 <Typography variant="body2">

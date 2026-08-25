@@ -91,6 +91,10 @@ export const migrationNameMap = Object.freeze([
     "044_private_match_retry_deterministic_pointer",
     "051_private_match_retry_deterministic_pointer",
   ],
+  [
+    "20260824051404_thanhtestnef",
+    "065_prisma_schema_alignment",
+  ],
 ]);
 
 // These groups represent equivalent history shapes. The first two timestamp

@@ -118,6 +118,7 @@ export const authenticationAuditAction = z.enum([
   "admin.membership_removed",
   "admin.company_banned",
   "admin.company_unbanned",
+  "admin.verification_claimed",
   "admin.verification_changes_requested",
   "admin.verification_approved",
   "admin.verification_rejected",

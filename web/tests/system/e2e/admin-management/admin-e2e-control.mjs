@@ -662,10 +662,16 @@ async function membershipGuards(adminUserId, runId) {
 async function verificationConcurrent(adminUserId, requestId) {
   const { VerificationApprovalTransaction } =
     await import("../../../../src/backend/admin/verification/verification-approval-transaction.ts");
+  const { VerificationReviewService } =
+    await import("../../../../src/backend/admin/verification/verification-review-service.ts");
   const authority = await authorityFor(adminUserId);
+  await new VerificationReviewService().claim(authority, requestId, {
+    expectedVersion: 1,
+    idempotencyKey: randomUUID(),
+  });
   const transaction = new VerificationApprovalTransaction();
   const commands = [randomUUID(), randomUUID()].map((idempotencyKey) => ({
-    expectedVersion: 1,
+    expectedVersion: 2,
     idempotencyKey,
     role: "RECRUITER",
   }));

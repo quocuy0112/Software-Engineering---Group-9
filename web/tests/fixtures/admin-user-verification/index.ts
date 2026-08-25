@@ -21,11 +21,13 @@ export function verificationFixture(overrides: Record<string, unknown> = {}) {
     applicantId: "account-0001",
     companyName: "Synthetic Company",
     taxCode: "0123456789",
+    targetCompanyId: null,
     state: "PENDING_REVIEW" as const,
     applicantEligibility: "ACTIVE" as const,
     submittedAt: "2026-01-01T00:00:00.000Z",
     resubmissionCount: 0,
     assignedAdminRef: null,
+    assignmentStatus: "UNASSIGNED" as const,
     version: 1,
     ...overrides,
   };

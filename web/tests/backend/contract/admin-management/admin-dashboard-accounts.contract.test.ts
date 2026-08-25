@@ -48,6 +48,7 @@ describe("dashboard and account contracts", () => {
       byteSize: 74932,
       safetyState: "PASS" as const,
       accessibility: "AVAILABLE" as const,
+      unavailabilityReason: null,
     };
     expect(approvedVerificationEvidenceSchema.parse(evidence)).toEqual(
       evidence,
