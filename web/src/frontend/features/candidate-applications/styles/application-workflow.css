@@ -94,7 +94,7 @@
 }
 .application-ui-button--primary {
   border-color: var(--app-blue);
-  color: #fff;
+  color: var(--sh-color-on-brand);
   background: var(--app-blue);
   box-shadow: 0 1px 2px rgb(16 24 40 / 12%);
 }
@@ -159,7 +159,7 @@
   content: "";
 }
 .application-ui-stepper li.is-complete::after {
-  background: #12b76a;
+  background: var(--app-green);
 }
 .application-ui-stepper li > span {
   z-index: 1;
@@ -168,8 +168,8 @@
   height: 30px;
   place-items: center;
   border-radius: 50%;
-  color: #fff;
-  background: #eaecf0;
+  color: var(--sh-color-text-muted);
+  background: var(--sh-color-disabled-bg);
   font-size: 13px;
   font-weight: 700;
 }
@@ -177,10 +177,11 @@
   width: 16px;
 }
 .application-ui-stepper li.is-complete > span {
-  background: #12b76a;
+  color: var(--sh-color-on-success);
+  background: var(--app-green);
 }
 .application-ui-stepper li.is-complete strong {
-  color: #087443;
+  color: var(--app-green);
 }
 .application-ui-stepper li.is-active > span {
   background: var(--app-blue);
@@ -303,7 +304,7 @@
 .application-ui-file-list em {
   padding: 4px 9px;
   border-radius: 99px;
-  color: #087443;
+  color: var(--app-green);
   background: var(--app-green-50);
   font-size: 11px;
   font-style: normal;
@@ -472,7 +473,7 @@
   width: 16px;
   height: 16px;
   flex: 0 0 auto;
-  color: #12b76a;
+  color: var(--app-green);
 }
 .application-ui-icon-list svg {
   width: 16px;
@@ -542,12 +543,16 @@
   animation: application-ui-spin 1s linear infinite;
 }
 .application-ui-processing-hero.is-complete {
-  border-color: #abefc6;
+  border-color: color-mix(
+    in srgb,
+    var(--app-green) 36%,
+    var(--app-line)
+  );
   background: var(--app-green-50);
 }
 .application-ui-processing-hero.is-complete
   .application-ui-processing-hero__icon {
-  color: #087443;
+  color: var(--app-green);
 }
 .application-ui-processing-hero.is-complete
   .application-ui-processing-hero__icon
@@ -558,16 +563,20 @@
   animation: none;
 }
 .application-ui-processing-hero.is-complete > div > span {
-  color: #087443;
+  color: var(--app-green);
 }
 .application-ui-processing-hero.is-complete .application-ui-progress i {
-  background: #12b76a;
+  background: var(--app-green);
 }
 .application-ui-processing-hero.is-complete strong {
-  color: #05603a;
+  color: var(--app-green);
 }
 .application-ui-processing-hero.is-attention-required {
-  border-color: #fedf89;
+  border-color: color-mix(
+    in srgb,
+    var(--app-yellow) 36%,
+    var(--app-line)
+  );
   background: var(--app-yellow-50);
 }
 .application-ui-processing-hero.is-attention-required
@@ -575,12 +584,12 @@
   color: var(--app-yellow);
 }
 .application-ui-processing-hero.is-attention-required > div > span {
-  color: #b54708;
+  color: var(--app-yellow);
 }
 .application-ui-processing-hero.is-attention-required
   .application-ui-progress
   i {
-  background: #f79009;
+  background: var(--app-yellow);
 }
 .application-ui-processing-hero > div,
 .application-ui-status-hero > div {
@@ -657,15 +666,15 @@
   background: #f2f4f7;
 }
 .application-ui-intake-list li.is-complete > span {
-  color: #087443;
+  color: var(--app-green);
   background: var(--app-green-50);
 }
 .application-ui-intake-list li.is-active > span {
   color: var(--app-blue);
-  background: #e7edff;
+  background: var(--app-blue-50);
 }
 .application-ui-intake-list li.is-attention_required > span {
-  color: #b54708;
+  color: var(--app-yellow);
   background: var(--app-yellow-50);
 }
 .application-ui-intake-list svg {
@@ -694,7 +703,11 @@
   display: flex;
   align-items: flex-start;
   gap: 11px;
-  border-color: #fedf89;
+  border-color: color-mix(
+    in srgb,
+    var(--app-yellow) 36%,
+    var(--app-line)
+  );
   background: var(--app-yellow-50);
 }
 .application-ui-private-note > svg {
@@ -712,9 +725,10 @@
   gap: 9px;
   margin-top: 20px;
   padding: 12px 15px;
-  border: 1px solid #abefc6;
+  border: 1px solid
+    color-mix(in srgb, var(--app-green) 36%, var(--app-line));
   border-radius: 9px;
-  color: #05603a;
+  color: var(--app-green);
   background: var(--app-green-50);
   font-size: 13px;
   font-weight: 600;
@@ -773,7 +787,7 @@
   content: "";
 }
 .application-ui-stage-progress li.is-complete::after {
-  background: #12b76a;
+  background: var(--app-green);
 }
 .application-ui-stage-progress li > span {
   z-index: 1;
@@ -789,13 +803,13 @@
   font-weight: 700;
 }
 .application-ui-stage-progress li.is-complete > span {
-  border-color: #12b76a;
-  color: #fff;
-  background: #12b76a;
+  border-color: var(--app-green);
+  color: var(--sh-color-on-success);
+  background: var(--app-green);
 }
 .application-ui-stage-progress li.is-active > span {
   border-color: var(--app-blue);
-  color: #fff;
+  color: var(--sh-color-on-brand);
   background: var(--app-blue);
 }
 .application-ui-stage-progress li strong {
@@ -838,7 +852,7 @@
   height: 29px;
   place-items: center;
   border-radius: 50%;
-  color: #087443;
+  color: var(--app-green);
   background: var(--app-green-50);
 }
 .application-ui-timeline svg {
@@ -1731,22 +1745,22 @@
   content: "";
 }
 .candidate-application-steps li.is-complete {
-  color: #087443;
+  color: var(--app-green);
 }
 .candidate-application-steps li.is-complete::before {
-  color: #fff;
-  background: #12b76a;
+  color: var(--sh-color-on-success);
+  background: var(--app-green);
   content: "✓";
 }
 .candidate-application-steps li.is-complete::after {
-  background: #12b76a;
+  background: var(--app-green);
 }
 .candidate-application-steps li.is-active {
   color: var(--app-blue);
   font-weight: 700;
 }
 .candidate-application-steps li.is-active::before {
-  color: #fff;
+  color: var(--sh-color-on-brand);
   background: var(--app-blue);
 }
 .candidate-application-panel--quiet {
@@ -2904,10 +2918,11 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  color: #fff;
+  color: var(--sh-color-on-brand);
   background: var(--app-blue);
 }
 .application-ui--tracker .application-ui-timeline li > span.is-complete {
+  color: var(--sh-color-on-success);
   background: var(--app-green);
 }
 .application-ui--tracker .application-ui-timeline li strong {

@@ -192,7 +192,7 @@
 }
 
 .dialogActions button:first-child {
-  color: #fff;
+  color: var(--sh-color-on-error);
   background: var(--color-error, #b91c1c);
 }
 

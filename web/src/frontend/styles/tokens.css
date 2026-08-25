@@ -41,17 +41,22 @@
   --sh-color-border-subtle: #e2e8f0;
   --sh-color-border-strong: #475569;
   --sh-color-border-focus: #2563eb;
+  --sh-color-focus-ring: var(--sh-color-border-focus);
+  --sh-color-on-brand: var(--sh-color-text-inverse);
   --sh-color-focus-ring-bg: #dbeafe;
   /* Positive state language: active, verified, connected, and saved. */
   --sh-color-success: #15803d;
   --sh-color-success-bg: #f0fdf4;
+  --sh-color-on-success: #ffffff;
   /* Amber is both a warning/review tone and the semantic rating accent. */
   --sh-color-warning: #a16207;
   --sh-color-warning-bg: #fefce8;
+  --sh-color-on-warning: #ffffff;
   --sh-color-rating: var(--sh-color-warning);
   --sh-color-error: #b91c1c;
   --danger: var(--sh-color-error);
   --sh-color-error-bg: #fef2f2;
+  --sh-color-on-error: #ffffff;
   --sh-color-info: #1d4ed8;
   --sh-color-info-bg: #eff6ff;
   --sh-color-disabled-bg: #e2e8f0;
@@ -200,13 +205,16 @@
   /* Positive state language: active, verified, connected, and saved. */
   --sh-color-success: #4ade80;
   --sh-color-success-bg: #123a2a;
+  --sh-color-on-success: #07140d;
   /* Amber also carries rating emphasis; it is not a low-rating warning. */
   --sh-color-warning: #fbbf24;
   --sh-color-warning-bg: #3b2f12;
+  --sh-color-on-warning: #1c1400;
   --sh-color-rating: var(--sh-color-warning);
   --sh-color-error: #f87171;
   --danger: var(--sh-color-error);
   --sh-color-error-bg: #3a1720;
+  --sh-color-on-error: #24090d;
   --sh-color-info: #93c5fd;
   --sh-color-info-bg: #152e50;
   --sh-color-disabled-bg: #26354a;

@@ -575,18 +575,21 @@
 .pipeline-card__quick-action--move:hover,
 .pipeline-card__quick-action--waitlist:hover,
 .pipeline-card__quick-action--reject:hover {
-  color: var(--sh-color-text-inverse);
+  border-color: transparent;
 }
 
 .pipeline-card__quick-action--move:hover {
+  color: var(--sh-color-on-success);
   background: var(--pipeline-success);
 }
 
 .pipeline-card__quick-action--waitlist:hover {
+  color: var(--sh-color-on-warning);
   background: var(--pipeline-warning);
 }
 
 .pipeline-card__quick-action--reject:hover {
+  color: var(--sh-color-on-error);
   background: var(--pipeline-danger);
 }
 
@@ -901,28 +904,28 @@
    Existing pipeline-* aliases stay in the selectors for the current app
    mounts and DnD/accessibility tests.
    ------------------------------------------------------------------------- */
-:root {
-  --ink: #10142B;
-  --accent: #4453E8;
-  --accent-2: #7C6CF0;
-  --accent-soft: #EDEFFC;
-  --bg: #F1F3FA;
-  --surface: #FFFFFF;
-  --border: #E5E8F2;
-  --text: #10142B;
-  --muted: #6C7288;
-  --muted-2: #9AA0B4;
-  --success: #12946B;
-  --success-bg: #E7F7F1;
-  --warning: #C9820F;
-  --warning-bg: #FBF1E1;
-  --danger: #D9534F;
-  --danger-bg: #FBECEB;
+.recruiter-pipeline-page {
+  --ink: var(--sh-color-text-primary);
+  --accent: var(--sh-color-brand-primary);
+  --accent-2: var(--sh-color-brand-accent);
+  --accent-soft: var(--sh-color-brand-soft);
+  --bg: var(--sh-color-surface-page);
+  --surface: var(--sh-color-surface-card);
+  --border: var(--sh-color-border-subtle);
+  --text: var(--sh-color-text-primary);
+  --muted: var(--sh-color-text-secondary);
+  --muted-2: var(--sh-color-text-muted);
+  --success: var(--sh-color-success);
+  --success-bg: var(--sh-color-success-bg);
+  --warning: var(--sh-color-warning);
+  --warning-bg: var(--sh-color-warning-bg);
+  --danger: var(--sh-color-error);
+  --danger-bg: var(--sh-color-error-bg);
   --radius-lg: 18px;
   --radius-md: 12px;
   --radius-sm: 10px;
-  --shadow-card: 0 1px 2px rgba(16,20,43,0.06), 0 1px 1px rgba(16,20,43,0.04);
-  --shadow-card-hover: 0 8px 20px rgba(16,20,43,0.10);
+  --shadow-card: var(--sh-shadow-card);
+  --shadow-card-hover: var(--sh-shadow-card-hover);
 }
 
 .recruiter-pipeline-page {
@@ -1154,7 +1157,7 @@
 
 .pill.active {
   border-color: var(--ink);
-  color: #fff;
+  color: var(--sh-color-on-brand);
   background: var(--ink);
 }
 
@@ -1254,7 +1257,7 @@
   border: 1px dashed var(--border);
   border-radius: var(--radius-lg);
   color: var(--text);
-  background: rgba(255,255,255,0.5);
+  background: color-mix(in srgb, var(--surface) 50%, transparent);
   transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -1503,7 +1506,7 @@
   padding-right: 4px;
   margin-right: -4px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(229,232,242,0.72) transparent;
+  scrollbar-color: color-mix(in srgb, var(--border) 72%, transparent) transparent;
 }
 
 .card-stack::-webkit-scrollbar,
@@ -1515,12 +1518,12 @@
 .card-stack::-webkit-scrollbar-thumb,
 .pipeline-column__cards::-webkit-scrollbar-thumb {
   border-radius: 3px;
-  background: rgba(229,232,242,0.72);
+  background: color-mix(in srgb, var(--border) 72%, transparent);
 }
 
 .card-stack::-webkit-scrollbar-thumb:hover,
 .pipeline-column__cards::-webkit-scrollbar-thumb:hover {
-  background: rgba(154,160,180,0.55);
+  background: color-mix(in srgb, var(--muted-2) 55%, transparent);
 }
 
 .column-footer {
@@ -1595,7 +1598,7 @@
 
 .candidate-card:hover,
 .pipeline-card:hover {
-  border-color: #D6DAF3;
+  border-color: var(--sh-color-border-default);
   box-shadow: var(--shadow-card-hover);
   transform: translateY(-2px);
 }
@@ -1860,7 +1863,7 @@
 
 .assessment-btn:hover,
 .pipeline-card__assessment-action:hover {
-  color: #fff;
+  color: var(--sh-color-on-brand);
   background: var(--accent);
 }
 
@@ -1898,11 +1901,11 @@
 .quick-actions button.danger,
 .pipeline-card__quick-action--reject { color: var(--danger); background: var(--danger-bg); }
 .quick-actions button.move:hover,
-.pipeline-card__quick-action--move:hover { color: #fff; background: var(--success); }
+.pipeline-card__quick-action--move:hover { color: var(--sh-color-on-success); background: var(--success); }
 .quick-actions button.warn:hover,
-.pipeline-card__quick-action--waitlist:hover { color: #fff; background: var(--warning); }
+.pipeline-card__quick-action--waitlist:hover { color: var(--sh-color-on-warning); background: var(--warning); }
 .quick-actions button.danger:hover,
-.pipeline-card__quick-action--reject:hover { color: #fff; background: var(--danger); }
+.pipeline-card__quick-action--reject:hover { color: var(--sh-color-on-error); background: var(--danger); }
 
 .change-stage-link,
 .pipeline-card__change-stage {
@@ -2137,9 +2140,9 @@
 .bulk-actions-button.bulk-move { color: var(--success); background: var(--success-bg); }
 .bulk-actions-button.bulk-warn { color: var(--warning); background: var(--warning-bg); }
 .bulk-actions-button.bulk-danger { color: var(--danger); background: var(--danger-bg); }
-.bulk-actions-button.bulk-move:hover:not(:disabled) { color: #fff; background: var(--success); }
-.bulk-actions-button.bulk-warn:hover:not(:disabled) { color: #fff; background: var(--warning); }
-.bulk-actions-button.bulk-danger:hover:not(:disabled) { color: #fff; background: var(--danger); }
+.bulk-actions-button.bulk-move:hover:not(:disabled) { color: var(--sh-color-on-success); background: var(--success); }
+.bulk-actions-button.bulk-warn:hover:not(:disabled) { color: var(--sh-color-on-warning); background: var(--warning); }
+.bulk-actions-button.bulk-danger:hover:not(:disabled) { color: var(--sh-color-on-error); background: var(--danger); }
 
 .modal-select-all {
   display: flex;

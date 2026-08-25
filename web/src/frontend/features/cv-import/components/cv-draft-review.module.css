@@ -36,7 +36,7 @@
   inset-block: 0;
   inset-inline-start: 0;
   width: 3px;
-  background: #4453e8;
+  background: var(--sh-color-brand-primary);
   content: "";
 }
 
@@ -46,7 +46,7 @@
 }
 
 .header > p:first-child {
-  color: #4453e8;
+  color: var(--sh-color-brand-primary);
   font-size: 11px;
   font-weight: 700;
   line-height: 1.35;
@@ -101,7 +101,7 @@
 .completion {
   padding: 22px;
   border: 1px solid var(--sh-color-border-subtle);
-  border-block-start: 3px solid #4453e8;
+  border-block-start: 3px solid var(--sh-color-brand-primary);
   border-radius: 16px;
   background: var(--sh-color-surface-card);
 }
@@ -152,7 +152,7 @@
 }
 
 .steps strong {
-  color: #4453e8;
+  color: var(--sh-color-brand-primary);
   font-size: 12px;
   font-weight: 600;
 }
@@ -166,7 +166,7 @@
 .actionHint {
   margin: 0;
   padding: 12px 14px;
-  border-inline-start: 3px solid #4453e8;
+  border-inline-start: 3px solid var(--sh-color-brand-primary);
   border-radius: 0 10px 10px 0;
   background: var(--sh-color-info-bg);
 }
@@ -176,7 +176,7 @@
   height: 18px;
   flex: 0 0 auto;
   margin-top: 1px;
-  accent-color: #4453e8;
+  accent-color: var(--sh-color-brand-primary);
 }
 
 .actions {
@@ -201,18 +201,18 @@
 }
 
 .actions button:last-child {
-  border-color: #4453e8;
-  color: #fff;
-  background: #4453e8;
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-on-brand);
+  background: var(--sh-color-brand-primary);
 }
 .actions button:hover:not(:disabled) {
-  border-color: #4453e8;
-  color: #4453e8;
-  background: #edeffc;
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
 }
 .actions button:last-child:hover:not(:disabled) {
-  color: #fff;
-  background: #3544d7;
+  color: var(--sh-color-on-brand);
+  background: var(--sh-color-brand-primary-hover);
 }
 .actions button:disabled {
   color: var(--sh-color-disabled-text);

@@ -52,7 +52,11 @@
   padding: 10px 12px;
   border: 1px solid var(--sh-color-border-subtle);
   border-radius: 10px;
-  background: rgb(255 255 255 / 58%);
+  background: color-mix(
+    in srgb,
+    var(--sh-color-surface-card) 58%,
+    transparent
+  );
 }
 
 .counts dt {
