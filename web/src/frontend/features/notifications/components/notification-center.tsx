@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AppProviders } from "@/frontend/providers/app-providers";
 import {
@@ -37,6 +37,7 @@ function NotificationCenterContent({
   viewAllHref?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const centerRef = useRef<HTMLDivElement>(null);
   const panelId = useId();
   const router = useRouter();
   const copy = notificationCopy[locale];
@@ -53,6 +54,18 @@ function NotificationCenterContent({
     };
     window.addEventListener("keydown", close);
     return () => window.removeEventListener("keydown", close);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Node && !centerRef.current?.contains(target)) {
+        setOpen(false);
+      }
+    };
+    window.addEventListener("pointerdown", closeOnOutsidePointer);
+    return () => window.removeEventListener("pointerdown", closeOnOutsidePointer);
   }, [open]);
 
   async function openItem(item: NotificationItem) {
@@ -76,7 +89,7 @@ function NotificationCenterContent({
   }
 
   return (
-    <div className="notification-center">
+    <div ref={centerRef} className="notification-center">
       <button
         type="button"
         className="notification-bell"
