@@ -1,8 +1,8 @@
 .page {
-  --cv-card: #ffffff;
-  --cv-border: #e5e8f2;
-  --cv-ink-soft: #6c7288;
-  --cv-accent: #4453e8;
+  --cv-card: var(--sh-color-surface-card);
+  --cv-border: var(--sh-color-border-subtle);
+  --cv-ink-soft: var(--sh-color-text-secondary);
+  --cv-accent: var(--sh-color-brand-primary);
 
   width: 100%;
   min-width: 0;
