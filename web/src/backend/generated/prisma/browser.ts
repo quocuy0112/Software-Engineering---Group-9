@@ -53,6 +53,11 @@ export type CandidateIdentity = Prisma.CandidateIdentityModel
  */
 export type CandidateProfile = Prisma.CandidateProfileModel
 /**
+ * Model CandidateProfileVisibility
+ * 
+ */
+export type CandidateProfileVisibility = Prisma.CandidateProfileVisibilityModel
+/**
  * Model ProfileExperience
  * 
  */
@@ -415,6 +420,11 @@ export type ApplicationNotificationPreference = Prisma.ApplicationNotificationPr
  * 
  */
 export type JobApplication = Prisma.JobApplicationModel
+/**
+ * Model JobApplicationContactConsent
+ * 
+ */
+export type JobApplicationContactConsent = Prisma.JobApplicationContactConsentModel
 /**
  * Model JobApplicationAttemptCounter
  * 

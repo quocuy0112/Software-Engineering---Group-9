@@ -17,7 +17,7 @@
 
 **Purpose**: Establish the feature’s verification entry points and fixtures without changing production behavior.
 
-- [ ] T001 [P] Add the focused `test:profile-discovery` and `profile-discovery:migration:verify` scripts in `web/package.json`.
+- [X] T001 [P] Add the focused `test:profile-discovery` and `profile-discovery:migration:verify` scripts in `web/package.json`.
 - [ ] T002 [P] Add Candidate/Candidate/Recruiter application fixtures and safe account-ID helpers in `web/tests/helpers/profile-database-fixture.ts` and `web/tests/helpers/application-fixture.ts`.
 
 ---
@@ -28,15 +28,15 @@
 
 **CRITICAL**: No user-story route or UI may be shipped before this phase is complete.
 
-- [ ] T003 Add `CandidateProfileVisibility`, `JobApplicationContactConsent`, snapshot-review retention fields/relations, and indexes to `web/prisma/schema.prisma`.
-- [ ] T004 Create forward-only migration `web/prisma/migrations/066_candidate_profile_discovery/migration.sql` with default-hidden/backfill-safe behavior, one-to-one constraints, retention deadlines, and recovery notes.
+- [X] T003 Add `CandidateProfileVisibility`, `JobApplicationContactConsent`, snapshot-review retention fields/relations, and indexes to `web/prisma/schema.prisma`.
+- [X] T004 Create forward-only migration `web/prisma/migrations/066_candidate_profile_discovery/migration.sql` with default-hidden/backfill-safe behavior, one-to-one constraints, retention deadlines, and recovery notes.
 - [ ] T005 [P] Create `web/scripts/verify-candidate-profile-discovery-migration.mjs` and migration constraint tests in `web/tests/backend/integration/db/candidate-profile-discovery-constraints.test.ts`.
-- [ ] T006 Define strict visibility-section, profile-projection, lookup, and mutation contracts in `web/src/shared/contracts/account/profile.ts` and `web/src/shared/contracts/profile-discovery.ts`.
+- [X] T006 Define strict visibility-section, profile-projection, lookup, and mutation contracts in `web/src/shared/contracts/account/profile.ts` and `web/src/shared/contracts/profile-discovery.ts`.
 - [ ] T007 Define application contact-consent and recruiter applicant-profile response contracts in `web/src/shared/contracts/candidate-applications/index.ts` and `web/src/shared/contracts/applications/applicant-profile.ts`.
-- [ ] T008 Extend safe profile-discovery, consent, and recruiter-review actions/contexts/target types in `web/src/backend/audit/events.ts` and cover redaction constraints in `web/tests/backend/unit/security/profile-discovery-audit.test.ts`.
-- [ ] T009 Extend `web/src/backend/repositories/rate-limit/prisma-rate-limit-repository.ts` with atomic account/network admission, unsuccessful rolling-hour count, and durable `blockedUntil` enforcement; add policies in `web/src/backend/security/rate-limit/policies.ts`.
+- [X] T008 Extend safe profile-discovery, consent, and recruiter-review actions/contexts/target types in `web/src/backend/audit/events.ts` and cover redaction constraints in `web/tests/backend/unit/security/profile-discovery-audit.test.ts`.
+- [X] T009 Extend `web/src/backend/repositories/rate-limit/prisma-rate-limit-repository.ts` with atomic account/network admission, unsuccessful rolling-hour count, and durable `blockedUntil` enforcement; add policies in `web/src/backend/security/rate-limit/policies.ts`.
 - [ ] T010 [P] Add limiter boundary, concurrent-attempt, account/network isolation, and 15-minute-block tests in `web/tests/backend/unit/security/profile-discovery-rate-limit.test.ts`.
-- [ ] T011 Create common audience projection/redaction helpers in `web/src/backend/services/profile/profile-visibility-projection.ts` and unit tests in `web/tests/backend/unit/profile/profile-visibility-projection.test.ts`.
+- [X] T011 Create common audience projection/redaction helpers in `web/src/backend/services/profile/profile-visibility-projection.ts` and unit tests in `web/tests/backend/unit/profile/profile-visibility-projection.test.ts`.
 - [ ] T012 Extend `web/src/backend/applications/workers/application-retention-worker.ts` and `web/scripts/run-application-retention-worker.mjs` to deny expired application profile-snapshot review while preserving legal holds and minimum audit evidence.
 - [ ] T013 [P] Add snapshot-retention and legal-hold tests in `web/tests/backend/applications/profile-snapshot-retention.test.ts`.
 

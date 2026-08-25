@@ -9,7 +9,7 @@ export const profileAggregateInclude = {
     include: { skill: true },
   },
   socialLinks: { orderBy: { position: "asc" as const } },
-  candidate: { include: { user: true } },
+  candidate: { include: { user: true, profileVisibility: true } },
 } as const;
 
 export class PrismaProfileQueryRepository {
@@ -18,6 +18,19 @@ export class PrismaProfileQueryRepository {
       where: {
         candidateUserId: userId,
         candidate: { user: { state: "ACTIVE" } },
+      },
+      include: profileAggregateInclude,
+    });
+  }
+
+  async findDiscoverable(userId: string) {
+    return prisma.candidateProfile.findFirst({
+      where: {
+        candidateUserId: userId,
+        candidate: {
+          user: { state: "ACTIVE" },
+          profileVisibility: { discoverableByExactId: true },
+        },
       },
       include: profileAggregateInclude,
     });

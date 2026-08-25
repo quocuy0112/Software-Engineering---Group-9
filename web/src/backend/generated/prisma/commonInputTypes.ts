@@ -192,23 +192,6 @@ export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDateTimeNullableFilter<$PrismaModel>
 }
 
-export type EnumPreferenceLanguageFilter<$PrismaModel = never> = {
-  equals?: $Enums.PreferenceLanguage | Prisma.EnumPreferenceLanguageFieldRefInput<$PrismaModel>
-  in?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
-  notIn?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel> | $Enums.PreferenceLanguage
-}
-
-export type EnumPreferenceLanguageWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.PreferenceLanguage | Prisma.EnumPreferenceLanguageFieldRefInput<$PrismaModel>
-  in?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
-  notIn?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumPreferenceLanguageWithAggregatesFilter<$PrismaModel> | $Enums.PreferenceLanguage
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel>
-}
-
 export type JsonFilter<$PrismaModel = never> =
 | Prisma.PatchUndefined<
     Prisma.Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -258,6 +241,23 @@ export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedJsonFilter<$PrismaModel>
   _max?: Prisma.NestedJsonFilter<$PrismaModel>
+}
+
+export type EnumPreferenceLanguageFilter<$PrismaModel = never> = {
+  equals?: $Enums.PreferenceLanguage | Prisma.EnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  in?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel> | $Enums.PreferenceLanguage
+}
+
+export type EnumPreferenceLanguageWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PreferenceLanguage | Prisma.EnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  in?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPreferenceLanguageWithAggregatesFilter<$PrismaModel> | $Enums.PreferenceLanguage
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel>
 }
 
 export type EnumEmailChangeStatusFilter<$PrismaModel = never> = {
@@ -3088,23 +3088,6 @@ export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDateTimeNullableFilter<$PrismaModel>
 }
 
-export type NestedEnumPreferenceLanguageFilter<$PrismaModel = never> = {
-  equals?: $Enums.PreferenceLanguage | Prisma.EnumPreferenceLanguageFieldRefInput<$PrismaModel>
-  in?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
-  notIn?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel> | $Enums.PreferenceLanguage
-}
-
-export type NestedEnumPreferenceLanguageWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.PreferenceLanguage | Prisma.EnumPreferenceLanguageFieldRefInput<$PrismaModel>
-  in?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
-  notIn?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumPreferenceLanguageWithAggregatesFilter<$PrismaModel> | $Enums.PreferenceLanguage
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel>
-}
-
 export type NestedJsonFilter<$PrismaModel = never> =
 | Prisma.PatchUndefined<
     Prisma.Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -3127,6 +3110,23 @@ export type NestedJsonFilterBase<$PrismaModel = never> = {
   gt?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel>
   gte?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel>
   not?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel> | Prisma.JsonNullValueFilter
+}
+
+export type NestedEnumPreferenceLanguageFilter<$PrismaModel = never> = {
+  equals?: $Enums.PreferenceLanguage | Prisma.EnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  in?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel> | $Enums.PreferenceLanguage
+}
+
+export type NestedEnumPreferenceLanguageWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PreferenceLanguage | Prisma.EnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  in?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPreferenceLanguageWithAggregatesFilter<$PrismaModel> | $Enums.PreferenceLanguage
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel>
 }
 
 export type NestedEnumEmailChangeStatusFilter<$PrismaModel = never> = {

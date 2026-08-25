@@ -23,6 +23,14 @@ export async function runApplicationRetentionCycle(
       documentDeletionDueAt: new Date(now.getTime() + THIRTY_DAYS),
     },
   });
+  await prisma.jobApplication.updateMany({
+    where: {
+      profileSnapshotAccessDeniedAt: null,
+      profileSnapshotReviewDueAt: { lte: now },
+      legalHolds: { none: { releasedAt: null, OR: [{ endsAt: null }, { endsAt: { gt: now } }] } },
+    },
+    data: { profileSnapshotAccessDeniedAt: now },
+  });
   await prisma.applicationDocument.updateMany({
     where: {
       ordinaryAccessDeniedAt: null,
