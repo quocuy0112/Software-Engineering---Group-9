@@ -246,10 +246,7 @@ export const recruiterIndustryTaxonomy = [
     ],
   },
   {
-    // The JSON catalogue historically used r29 for this split file. New
-    // recruiter-authored records use the user-facing canonical code `other`;
-    // the catalogue adapter keeps r29 as a storage alias for compatibility.
-    code: "other",
+    code: "r29",
     label: "Other",
     subIndustries: null,
   },
@@ -259,14 +256,14 @@ export type RecruiterIndustryOption =
   (typeof recruiterIndustryTaxonomy)[number];
 export type StandardIndustryCode = Exclude<
   RecruiterIndustryOption["code"],
-  "other"
+  "r29"
 >;
 export type RecruiterIndustryCode = RecruiterIndustryOption["code"];
 export type RecruiterSubIndustry = readonly [string, string];
 
 export const standardRecruiterIndustries = recruiterIndustryTaxonomy.filter(
-  (industry): industry is Exclude<RecruiterIndustryOption, { code: "other" }> =>
-    industry.code !== "other",
+  (industry): industry is Exclude<RecruiterIndustryOption, { code: "r29" }> =>
+    industry.code !== "r29",
 );
 
 export const recruiterIndustryByCode = new Map(
@@ -277,7 +274,7 @@ export const recruiterIndustryByLabel = new Map(
   recruiterIndustryTaxonomy.map((industry) => [industry.label, industry]),
 );
 
-const legacyOtherCodes = new Set(["r29"]);
+const legacyOtherCodes = new Set(["other"]);
 
 function normalizedLabel(value: string) {
   return value.trim().toLowerCase();
@@ -291,14 +288,14 @@ export function recruiterIndustryOptionFor(input: {
   const code = (input.code ?? input.industryCode)?.trim().toLowerCase() ?? "";
   const byCode =
     recruiterIndustryByCode.get(code as RecruiterIndustryCode) ??
-    (legacyOtherCodes.has(code) ? recruiterIndustryByCode.get("other") : null);
+    (legacyOtherCodes.has(code) ? recruiterIndustryByCode.get("r29") : null);
   if (byCode) return byCode;
 
   const label = normalizedLabel(input.label ?? "");
   const byLabel = recruiterIndustryTaxonomy.find(
     (industry) => normalizedLabel(industry.label) === label,
   );
-  return byLabel ?? recruiterIndustryByCode.get("other")!;
+  return byLabel ?? recruiterIndustryByCode.get("r29")!;
 }
 
 export function isRecruiterIndustrySelectionValid(input: {
@@ -414,10 +411,12 @@ export function deriveRecruiterClassification(input: {
     industryCode: industry.code,
     subIndustry: rawSubIndustry,
     categoryFamily: industry.code,
-    // Keep user-entered labels out of canonical ids. This stable fallback
-    // preserves parent-industry filtering while the label can later be
-    // normalized or promoted into the curated taxonomy.
-    categoryIds: slug ? [`${industry.code}-other`] : [],
+    // Other has no curated children, so its typed label is the stable child
+    // identity. Custom labels under a curated industry retain the generic
+    // fallback until that label is promoted into the shared taxonomy.
+    categoryIds: slug
+      ? [industry.code === "r29" ? `r29-${slug}` : `${industry.code}-other`]
+      : [],
     department: rawSubIndustry || null,
     valid: industrySelectionValid && Boolean(rawSubIndustry && slug),
   };

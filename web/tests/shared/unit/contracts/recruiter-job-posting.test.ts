@@ -67,8 +67,9 @@ describe("recruiter job posting editor contract", () => {
         subIndustry: "Aerospace Operations",
       }),
     ).toMatchObject({
-      industryCode: "other",
-      categoryIds: ["other-other"],
+      industryCode: "r29",
+      categoryFamily: "r29",
+      categoryIds: ["r29-aerospace-operations"],
       valid: true,
     });
   });
@@ -81,7 +82,7 @@ describe("recruiter job posting editor contract", () => {
         { industryCode: "r03", subIndustry: "HR Technology" },
       ]),
     ).toEqual({
-      other: ["Aerospace Operations"],
+      r29: ["Aerospace Operations"],
       r03: ["HR Technology"],
     });
   });

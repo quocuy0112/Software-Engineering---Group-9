@@ -307,9 +307,9 @@ describe("recruiter job posting management", () => {
       ...initialData.jobs[0],
       id: "job-other",
       industry: "Other",
-      industryCode: "other",
-      categoryFamily: "other",
-      categoryIds: ["other-other"],
+      industryCode: "r29",
+      categoryFamily: "r29",
+      categoryIds: ["r29-aerospace-operations"],
       subIndustry: "Aerospace Operations",
     };
     render(
@@ -320,7 +320,7 @@ describe("recruiter job posting management", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
     fireEvent.change(screen.getByLabelText("Industry *"), {
-      target: { value: "other" },
+      target: { value: "r29" },
     });
 
     const subIndustry = screen.getByLabelText("Sub-industry *");
