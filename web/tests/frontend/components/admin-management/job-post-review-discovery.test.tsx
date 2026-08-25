@@ -27,6 +27,9 @@ describe("Administrator review discovery UI", () => {
       "Deleted archive",
       "WITHDRAWN",
       'state: "PENDING_REVIEW"',
+      "FilterButton",
+      "ExportButton",
+      "JobPostReviewListActions",
     ])
       expect(source).toContain(marker);
   });

@@ -1,5 +1,14 @@
 "use client";
-import { Datagrid, List, SelectInput, TextField, TextInput } from "react-admin";
+import {
+  Datagrid,
+  ExportButton,
+  FilterButton,
+  List,
+  SelectInput,
+  TextField,
+  TextInput,
+  TopToolbar,
+} from "react-admin";
 
 const filters = [
   <TextInput
@@ -60,9 +69,19 @@ const filters = [
   />,
 ];
 
+function JobPostReviewListActions() {
+  return (
+    <TopToolbar>
+      <FilterButton />
+      <ExportButton />
+    </TopToolbar>
+  );
+}
+
 export function JobPostReviewList() {
   return (
     <List
+      actions={<JobPostReviewListActions />}
       filters={filters}
       filterDefaultValues={{
         state: "PENDING_REVIEW",

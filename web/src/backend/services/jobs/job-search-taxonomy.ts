@@ -97,7 +97,7 @@ export function buildJobSearchTaxonomy(
         industry:
           snapshot?.industry || row.company.industry || "Other opportunities",
         industryCode:
-          snapshot?.industryCode || snapshot?.categoryFamily || "other",
+          snapshot?.industryCode || snapshot?.categoryFamily || "r29",
         subIndustry: snapshot?.subIndustry || "Open roles",
         title: snapshot?.title || row.title,
         categoryIds: snapshot?.categoryIds ?? [],
@@ -125,7 +125,7 @@ export function buildCatalogJobSearchTaxonomy(
       )
       .map((job) => ({
         industry: job.industry,
-        industryCode: job.industryCode || job.categoryFamily || "other",
+        industryCode: job.industryCode || job.categoryFamily || "r29",
         subIndustry: job.subIndustry,
         title: job.title,
         categoryIds: job.categoryIds,
@@ -152,13 +152,15 @@ function buildTaxonomy(entries: readonly TaxonomyEntry[]): JobSearchTaxonomy {
   };
 
   for (const entry of entries) {
-    const industry = industries.get(entry.industryCode) ?? {
-      code: entry.industryCode,
+    const industryCode =
+      entry.industryCode === "other" ? "r29" : entry.industryCode;
+    const industry = industries.get(industryCode) ?? {
+      code: industryCode,
       name: entry.industry,
       count: 0,
       subIndustries: new Map(),
     };
-    industries.set(entry.industryCode, industry);
+    industries.set(industryCode, industry);
     industry.count += 1;
 
     const subIndustry = industry.subIndustries.get(entry.subIndustry) ?? {
@@ -250,15 +252,15 @@ function buildTaxonomy(entries: readonly TaxonomyEntry[]): JobSearchTaxonomy {
  * Reconcile observed counts/titles with the canonical recruiter taxonomy.
  * Search may still expose counts from the catalogue, but labels, ordering,
  * standard sub-industries, and predefined ids come from one shared source.
- * The public search URL retains the historical r29 alias for Other while new
- * recruiter-authored snapshots use categoryFamily/industryCode `other`.
+ * `r29` is the canonical code for Other. Legacy snapshots using `other` are
+ * normalized before counts and sub-industries are reconciled.
  */
 function applyCanonicalTaxonomy(
   computed: JobSearchTaxonomy,
 ): JobSearchTaxonomy {
   const dynamicByCode = new Map(
     computed.industries.map((industry) => [
-      industry.code === "r29" ? "other" : industry.code,
+      industry.code === "other" ? "r29" : industry.code,
       industry,
     ]),
   );

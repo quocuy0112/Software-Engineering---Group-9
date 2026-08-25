@@ -24,10 +24,13 @@ import {
 } from "@/shared/contracts/recruiter-job-posting";
 import type { JobCatalogItem } from "@/shared/contracts/jobs/catalog";
 import { collectRecruiterSubIndustrySuggestions } from "@/shared/contracts/jobs/industry-taxonomy";
-import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
+import {
+  recruiterRoutes,
+  type RecruiterJobPostingTab,
+} from "@/shared/routing/recruiter-routes";
 
 const tabs: Array<{
-  value: "active" | "draft" | "pending_approval" | "closed";
+  value: RecruiterJobPostingTab;
   label: string;
 }> = [
   { value: "active", label: "Active" },
@@ -713,17 +716,22 @@ function withCompanyFromState(
 }
 export function RecruiterJobPostingManagement({
   initialData,
+  initialTab = "active",
   onNavigate,
+  onTabChange,
 }: {
   initialData?: RecruiterJobManagementData | null;
+  initialTab?: RecruiterJobPostingTab;
   onNavigate?: (href: string) => void;
+  onTabChange?: (tab: RecruiterJobPostingTab) => void;
 } = {}) {
   const [data, setData] = useState<RecruiterJobManagementData | null>(
     initialData ?? null,
   );
   const [loading, setLoading] = useState(!initialData);
-  const [activeTab, setActiveTab] =
-    useState<(typeof tabs)[number]["value"]>("active");
+  const [localActiveTab, setLocalActiveTab] =
+    useState<(typeof tabs)[number]["value"]>(initialTab);
+  const activeTab = onTabChange ? initialTab : localActiveTab;
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("all");
   const [view, setView] = useState<"dashboard" | "editor" | "applicants">(
@@ -739,6 +747,14 @@ export function RecruiterJobPostingManagement({
     useState<JobActionConfirmation | null>(null);
   const mutationEpoch = useRef(0);
   const csrfProof = useCsrfProof();
+
+  const selectTab = useCallback(
+    (tab: RecruiterJobPostingTab) => {
+      if (!onTabChange) setLocalActiveTab(tab);
+      onTabChange?.(tab);
+    },
+    [onTabChange],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -895,7 +911,7 @@ export function RecruiterJobPostingManagement({
     (job: RecruiterJob) => {
       storeSavedJob(job);
       setView("dashboard");
-      setActiveTab(
+      selectTab(
         job.status === "pending_approval"
           ? "pending_approval"
           : job.status === "closed"
@@ -905,7 +921,7 @@ export function RecruiterJobPostingManagement({
               : job.status,
       );
     },
-    [storeSavedJob],
+    [selectTab, storeSavedJob],
   );
   const closeJob = async (job: RecruiterJob) => {
     const response = await fetch(
@@ -1009,7 +1025,7 @@ export function RecruiterJobPostingManagement({
         };
       });
       setView("dashboard");
-      setActiveTab("draft");
+      selectTab("draft");
       return true;
     } catch {
       setActionError("Unable to withdraw this posting right now.");
@@ -1194,7 +1210,7 @@ export function RecruiterJobPostingManagement({
               aria-selected={activeTab === tab.value}
               aria-controls="recruiter-job-postings-panel"
               className={activeTab === tab.value ? "is-active" : ""}
-              onClick={() => setActiveTab(tab.value)}
+              onClick={() => selectTab(tab.value)}
             >
               {tab.label}
               <span>

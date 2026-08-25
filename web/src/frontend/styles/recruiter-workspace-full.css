@@ -9520,6 +9520,86 @@
   background: var(--sh-color-warning);
 }
 
+.recruiter-editor-auto-save {
+  display: inline-flex;
+  min-height: 28px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  padding: 0;
+  color: var(--sh-color-text-primary);
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: var(--sh-font-weight-regular);
+  white-space: nowrap;
+}
+
+.recruiter-editor-auto-save:hover {
+  color: var(--sh-color-brand-primary);
+}
+
+.recruiter-editor-auto-save:focus-visible {
+  outline: 3px solid
+    color-mix(in srgb, var(--sh-color-brand-primary) 25%, transparent);
+  outline-offset: 2px;
+}
+
+.recruiter-editor-auto-save__track {
+  position: relative;
+  width: 54px;
+  height: 26px;
+  flex: 0 0 auto;
+  border: 1px solid #64748b;
+  border-radius: var(--sh-radius-full);
+  color: #52525b;
+  background: var(--sh-color-surface-card);
+  transition:
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.recruiter-editor-auto-save__state {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: var(--sh-font-weight-regular);
+  line-height: 1;
+}
+
+.recruiter-editor-auto-save__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #52525b;
+  transition: transform 160ms ease;
+}
+
+.recruiter-editor-auto-save[aria-checked="true"]
+  .recruiter-editor-auto-save__track {
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-brand-primary);
+}
+
+.recruiter-editor-auto-save[aria-checked="true"]
+  .recruiter-editor-auto-save__state {
+  right: auto;
+  left: 7px;
+}
+
+.recruiter-editor-auto-save[aria-checked="true"]
+  .recruiter-editor-auto-save__thumb {
+  background: var(--sh-color-brand-primary);
+  transform: translateX(28px);
+}
+
 .recruiter-editor-progress {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 14px 20px;
@@ -10245,11 +10325,6 @@
 .recruiter-editor__actions .recruiter-primary-button:hover:not(:disabled) {
   background: #1e40af;
 }
-.recruiter-editor__actions .recruiter-outline-button[aria-pressed="true"] {
-  color: var(--sh-color-brand-primary);
-  border-color: var(--sh-color-brand-primary);
-  background: var(--sh-color-brand-soft);
-}
 @media (max-width: 1023px) {
   .recruiter-editor__grid {
     grid-template-columns: 1fr;
@@ -10265,6 +10340,9 @@
   }
   .recruiter-editor__heading-row {
     gap: 12px;
+  }
+  .recruiter-editor-auto-save {
+    align-self: flex-start;
   }
   .recruiter-editor__heading h1 {
     font-size: 26px;

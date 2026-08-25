@@ -37,7 +37,7 @@ export const JOB_INDUSTRY_SLUGS = {
 
 export type JobIndustryCode = keyof typeof JOB_INDUSTRY_SLUGS;
 
-/** New recruiter records use `other`; the split catalogue keeps r29 on disk. */
+/** `r29` is canonical; `other` remains readable for legacy local records. */
 export function catalogueIndustryCode(value: string): JobIndustryCode | null {
   const normalized = value.trim().toLowerCase();
   if (normalized === "other") return "r29";

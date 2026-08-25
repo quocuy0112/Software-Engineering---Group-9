@@ -144,9 +144,13 @@ describe("recruiter job posting management", () => {
     expect(screen.getByText("Live candidate preview")).toBeVisible();
     expect(screen.getByText("Required skills")).toBeVisible();
     expect(screen.getByRole("button", { name: "Save changes" })).toBeVisible();
-    expect(
-      screen.getByRole("button", { name: "Automatic save: Off" }),
-    ).toHaveAttribute("aria-pressed", "false");
+    expect(screen.queryByLabelText("Department")).toBeNull();
+    const autoSaveSwitch = screen.getByRole("switch", {
+      name: "Automatic save: Off",
+    });
+    expect(autoSaveSwitch).toHaveAttribute("aria-checked", "false");
+    expect(within(autoSaveSwitch).getByText("AutoSave")).toBeVisible();
+    expect(within(autoSaveSwitch).getByText("Off")).toBeVisible();
     expect(screen.queryByText("Drafts are saved manually")).toBeNull();
     expect(screen.queryByRole("button", { name: "Save draft" })).toBeNull();
   });
@@ -307,9 +311,9 @@ describe("recruiter job posting management", () => {
       ...initialData.jobs[0],
       id: "job-other",
       industry: "Other",
-      industryCode: "other",
-      categoryFamily: "other",
-      categoryIds: ["other-other"],
+      industryCode: "r29",
+      categoryFamily: "r29",
+      categoryIds: ["r29-aerospace-operations"],
       subIndustry: "Aerospace Operations",
     };
     render(
@@ -320,7 +324,7 @@ describe("recruiter job posting management", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
     fireEvent.change(screen.getByLabelText("Industry *"), {
-      target: { value: "other" },
+      target: { value: "r29" },
     });
 
     const subIndustry = screen.getByLabelText("Sub-industry *");
@@ -372,8 +376,13 @@ describe("recruiter job posting management", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
+    expect(screen.getByRole("button", { name: "Cancel" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Save draft" })).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Submit for approval" }),
+    ).toBeVisible();
     fireEvent.click(
-      screen.getByRole("button", { name: "Automatic save: Off" }),
+      screen.getByRole("switch", { name: "Automatic save: Off" }),
     );
     fireEvent.change(screen.getByLabelText(/Job title/), {
       target: { value: "Platform Engineer" },
@@ -391,8 +400,8 @@ describe("recruiter job posting management", () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(
-      screen.getByRole("button", { name: "Automatic save: On" }),
-    ).toHaveAttribute("aria-pressed", "true");
+      screen.getByRole("switch", { name: "Automatic save: On" }),
+    ).toHaveAttribute("aria-checked", "true");
     expect(
       screen.getByRole("heading", { name: "Platform Engineer", level: 1 }),
     ).toBeVisible();
@@ -404,12 +413,12 @@ describe("recruiter job posting management", () => {
     ).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
     expect(
-      screen.getByRole("button", { name: "Automatic save: On" }),
-    ).toHaveAttribute("aria-pressed", "true");
-    fireEvent.click(screen.getByRole("button", { name: "Automatic save: On" }));
+      screen.getByRole("switch", { name: "Automatic save: On" }),
+    ).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(screen.getByRole("switch", { name: "Automatic save: On" }));
     expect(
-      screen.getByRole("button", { name: "Automatic save: Off" }),
-    ).toHaveAttribute("aria-pressed", "false");
+      screen.getByRole("switch", { name: "Automatic save: Off" }),
+    ).toHaveAttribute("aria-checked", "false");
   });
 
   it("preserves spaces and commas while editing skills", async () => {

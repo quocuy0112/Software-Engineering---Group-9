@@ -1,3 +1,21 @@
+export const recruiterJobPostingTabs = [
+  "active",
+  "draft",
+  "pending_approval",
+  "closed",
+] as const;
+
+export type RecruiterJobPostingTab = (typeof recruiterJobPostingTabs)[number];
+
+export function parseRecruiterJobPostingTab(
+  value: string | string[] | undefined,
+): RecruiterJobPostingTab {
+  const candidate = Array.isArray(value) ? value[0] : value;
+  return recruiterJobPostingTabs.includes(candidate as RecruiterJobPostingTab)
+    ? (candidate as RecruiterJobPostingTab)
+    : "active";
+}
+
 export const recruiterRoutes = {
   analytics: "/recruiter/analytics",
   jobPostings: "/recruiter/job-postings",
@@ -13,4 +31,8 @@ export const recruiterRoutes = {
     `/recruiter/pipeline?jobId=${encodeURIComponent(jobId)}`,
   jobPostingEdit: (jobId: string) =>
     `/recruiter/job-postings/${encodeURIComponent(jobId)}/edit`,
+  jobPostingsForTab: (tab: RecruiterJobPostingTab) =>
+    tab === "active"
+      ? "/recruiter/job-postings"
+      : `/recruiter/job-postings?tab=${encodeURIComponent(tab)}`,
 } as const;
