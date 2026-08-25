@@ -1,35 +1,44 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { JobPostingEditor } from './job-posting-editor';
-import { RecruiterJobPostingManagement } from './job-posting-management';
+import { useRouter } from "next/navigation";
+import { JobPostingEditor } from "./job-posting-editor";
+import { RecruiterJobPostingManagement } from "./job-posting-management";
 import {
   createEmptyJobPosting,
   type RecruiterJob,
   type RecruiterJobManagementData,
-} from '@/shared/contracts/recruiter-job-posting';
-import { recruiterRoutes } from '@/shared/routing/recruiter-routes';
-import { collectRecruiterSubIndustrySuggestions } from '@/shared/contracts/jobs/industry-taxonomy';
+} from "@/shared/contracts/recruiter-job-posting";
+import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
+import type { RecruiterJobPostingTab } from "@/shared/routing/recruiter-routes";
+import { collectRecruiterSubIndustrySuggestions } from "@/shared/contracts/jobs/industry-taxonomy";
 
 type RecruiterRouteViewProps = {
-  view: 'list' | 'create' | 'edit';
+  view: "list" | "create" | "edit";
   initialData: RecruiterJobManagementData;
   jobId?: string;
+  initialTab?: RecruiterJobPostingTab;
 };
 
 export function RecruiterRouteView({
   view,
   initialData,
   jobId,
+  initialTab,
 }: RecruiterRouteViewProps) {
   const router = useRouter();
-  const companyName = initialData.companies[0]?.name ?? 'Your company';
+  const companyName = initialData.companies[0]?.name ?? "Your company";
 
-  if (view === 'list') {
+  if (view === "list") {
     return (
       <RecruiterJobPostingManagement
         initialData={initialData}
+        initialTab={initialTab}
         onNavigate={(href) => router.push(href)}
+        onTabChange={(tab) =>
+          router.replace(recruiterRoutes.jobPostingsForTab(tab), {
+            scroll: false,
+          })
+        }
       />
     );
   }
@@ -39,7 +48,7 @@ export function RecruiterRouteView({
   }
 
   const job =
-      view === 'edit'
+    view === "edit"
       ? initialData.jobs.find((item) => item.id === jobId)
       : ({
           ...createEmptyJobPosting(initialData.companyId),
@@ -51,12 +60,12 @@ export function RecruiterRouteView({
 
   if (!job) {
     return (
-      <section className='recruiter-empty-state recruiter-surface-card'>
+      <section className="recruiter-empty-state recruiter-surface-card">
         <h1>Job posting not found</h1>
         <p>This posting may have been removed or is no longer available.</p>
         <button
-          className='recruiter-primary-button'
-          type='button'
+          className="recruiter-primary-button"
+          type="button"
           onClick={() => router.replace(recruiterRoutes.jobPostings)}
         >
           Back to job postings
