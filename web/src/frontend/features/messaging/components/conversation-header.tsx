@@ -10,6 +10,7 @@ export function ConversationHeader({
   jobContextLabel,
   jobHref,
   presence,
+  onViewProfile = () => undefined,
   locale = "en",
 }: {
   name: string;
@@ -18,6 +19,7 @@ export function ConversationHeader({
   jobContextLabel?: string | null;
   jobHref?: string | null;
   presence: "ONLINE" | "OFFLINE";
+  onViewProfile?: () => void;
   locale?: WorkspaceLocale;
 }) {
   const copy = messagingCopy(locale);
@@ -30,7 +32,7 @@ export function ConversationHeader({
         size="large"
         presence={presence}
       />
-      <div>
+      <div className="messaging-participant-meta">
         <h2>{name}</h2>
         <p className="messaging-context-label">{contextLabel}</p>
         {jobContextLabel ? (
@@ -44,6 +46,7 @@ export function ConversationHeader({
             {jobHref ? <Link href={jobHref}>{copy.viewJob}</Link> : null}
           </div>
         ) : null}
+        <div className="messaging-participant-status">
         <p
           className="messaging-presence-label"
           data-presence={presence.toLocaleLowerCase()}
@@ -56,6 +59,14 @@ export function ConversationHeader({
           <span aria-hidden="true" />
           {presenceLabel}
         </p>
+        <button
+          type="button"
+          className="messaging-view-profile"
+          onClick={onViewProfile}
+        >
+          View profile
+        </button>
+        </div>
       </div>
     </div>
   );
