@@ -1143,5 +1143,5 @@ CV text and match output are candidate-private; optional AI use remains advisory
 | Version | Date | Editor | Exact change | Review |
 |---|---|---|---|---|
 | V1.1 | 2026-07-24 | Nguyễn Gia Quốc Uy | Initial Candidate Job Journey specifications. | Group 9 |
-| V1.2 | 2026-08-26 | Lưu Chí Hải | Added complete specifications for image-assisted search, withdrawal, offer response, and private CV match; recorded repository evidence and the unresolved F005 failure. | Pending Nguyễn Minh Khôi |
-| V1.3 | 2026-08-26 | Lưu Chí Hải | Audited prototype coverage for the PA5 use cases and recorded that matching UI screenshot evidence remains pending for UC-JOB-06 and UC-APP-05–07. | Pending Nguyễn Minh Khôi |
+| V1.2 | 2026-08-26 | Lưu Chí Hải | Added complete specifications for image-assisted search, withdrawal, offer response, and private CV match; recorded repository evidence and the unresolved F005 failure. | Nguyễn Minh Khôi |
+| V1.3 | 2026-08-26 | Lưu Chí Hải | Audited prototype coverage for the PA5 use cases and recorded that matching UI screenshot evidence remains pending for UC-JOB-06 and UC-APP-05–07. | Nguyễn Minh Khôi |
