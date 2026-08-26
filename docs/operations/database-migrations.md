@@ -20,10 +20,13 @@ After an unqualified reset, create a new local account before provisioning an ad
 
 ## Migration sequence normalization
 
-The checked-in history is normalized to 51 contiguous migrations, from
-`001_identity_foundation` through `051_private_match_retry_deterministic_pointer`.
-The obsolete no-op `031_smarthire` entry was removed. The two timestamp-generated
-index migrations were folded into `048_admin_timestamp_defaults_and_indexes`.
+The checked-in history is normalized to 74 contiguous migrations, from
+`001_identity_foundation` through `074_prisma_index_name_alignment`.
+The obsolete no-op `031_smarthire` entry was removed. The post-064 migrations
+from parallel feature branches were renumbered into one sequence; the duplicate
+schema-alignment timestamp migration was folded into `068_prisma_schema_alignment`,
+and the latest Prisma-generated index-name alignment is tracked as
+`074_prisma_index_name_alignment`.
 
 For a database that was initialized with the previous names, check and then
 apply the migration-history reconciliation before running `prisma migrate deploy`:
@@ -39,6 +42,9 @@ cd ..
 The reconciliation updates only `_prisma_migrations`; it does not replay schema
 SQL or modify application tables. Take a database backup and review the check
 output before using `--apply` in a shared environment.
+
+The root `npm run db:migrate` command performs the local reconciliation in apply
+mode automatically after PostgreSQL is healthy, then runs `prisma migrate dev`.
 
 ## Backup and restore
 

@@ -10,7 +10,7 @@ const service = readFileSync(
   "utf8",
 );
 const stateConstraintMigration = readFileSync(
-  "prisma/migrations/066_recruiter_job_withdrawal_state_constraint/migration.sql",
+  "prisma/migrations/070_recruiter_job_withdrawal_state_constraint/migration.sql",
   "utf8",
 );
 
@@ -33,7 +33,7 @@ describe("Recruiter withdraw-review contract", () => {
     expect(stateConstraintMigration).toContain(
       'DROP CONSTRAINT "JobPostReviewVersion_state_fields_check"',
     );
-    expect(stateConstraintMigration).toContain('"state" = \'WITHDRAWN\'');
+    expect(stateConstraintMigration).toContain("\"state\" = 'WITHDRAWN'");
     expect(stateConstraintMigration).toContain(
       '"decidedByAdminUserId" IS NULL',
     );

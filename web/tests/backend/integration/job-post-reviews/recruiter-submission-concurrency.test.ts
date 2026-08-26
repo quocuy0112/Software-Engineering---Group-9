@@ -10,7 +10,7 @@ const migration = readFileSync(
   "utf8",
 );
 const identicalResubmissionMigration = readFileSync(
-  "prisma/migrations/067_allow_identical_job_review_resubmission/migration.sql",
+  "prisma/migrations/071_allow_identical_job_review_resubmission/migration.sql",
   "utf8",
 );
 
