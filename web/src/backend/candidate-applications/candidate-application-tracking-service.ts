@@ -1,7 +1,10 @@
 import "server-only";
 
 import { prisma } from "@/backend/database/prisma";
-import { applicationStageSchema, type ApplicationStage } from "@/shared/contracts/jobs/applications";
+import {
+  applicationStageSchema,
+  type ApplicationStage,
+} from "@/shared/contracts/jobs/applications";
 import {
   applicationFileDescriptorSchema,
   applicationIntakeSchema,
@@ -67,7 +70,10 @@ function safeFilename(value: string | null | undefined, fallback: string) {
     ?.replace(/[\\/\r\n]/gu, "_")
     .replace(/[^\p{L}\p{N}._ -]/gu, "_")
     .trim();
-  if (!normalized || /^(?:application|candidate|imported)-cv-/iu.test(normalized)) {
+  if (
+    !normalized ||
+    /^(?:application|candidate|imported)-cv-/iu.test(normalized)
+  ) {
     return fallback;
   }
   return normalized.slice(0, 255);
@@ -86,9 +92,13 @@ function fileFromCv(row: CandidateApplicationTrackerRow) {
     ),
     mimeType,
     byteSize:
-      typeof snapshot.byteSize === "number" ? snapshot.byteSize : source.byteSize,
+      typeof snapshot.byteSize === "number"
+        ? snapshot.byteSize
+        : source.byteSize,
     version:
-      typeof snapshot.cvVersion === "number" ? snapshot.cvVersion : source.version,
+      typeof snapshot.cvVersion === "number"
+        ? snapshot.cvVersion
+        : source.version,
     parseStatus: "READY",
     confirmedAt: source.confirmedAt?.toISOString(),
   });
@@ -102,8 +112,11 @@ function fileFromCv(row: CandidateApplicationTrackerRow) {
   return descriptor.data;
 }
 
-function fileFromDocument(document: CandidateApplicationTrackerRow["applicationDocuments"][number]) {
-  const fallback = document.kind === "COVER_LETTER" ? "cover-letter.pdf" : "candidate-cv.pdf";
+function fileFromDocument(
+  document: CandidateApplicationTrackerRow["applicationDocuments"][number],
+) {
+  const fallback =
+    document.kind === "COVER_LETTER" ? "cover-letter.pdf" : "candidate-cv.pdf";
   const parsed = applicationFileDescriptorSchema.safeParse({
     versionId: document.id,
     displayName: safeFilename(document.originalFilenameEncrypted, fallback),
@@ -142,13 +155,14 @@ function intake(row: CandidateApplicationTrackerRow): ApplicationIntake {
             : state === "SENT_TO_RECRUITER"
               ? ("COMPLETE" as const)
               : ("ACTIVE" as const),
-      timestamp:
-        current.checkingStartedAt?.toISOString() ?? null,
+      timestamp: current.checkingStartedAt?.toISOString() ?? null,
     },
     {
       code: "SENT_TO_RECRUITER" as const,
       status:
-        state === "SENT_TO_RECRUITER" ? ("COMPLETE" as const) : ("PENDING" as const),
+        state === "SENT_TO_RECRUITER"
+          ? ("COMPLETE" as const)
+          : ("PENDING" as const),
       timestamp: current.sentAt?.toISOString() ?? null,
     },
   ];
@@ -167,8 +181,7 @@ function stageUpdate(
   const stage = applicationStageSchema.parse(event.toStage);
   if (stage === "APPLIED") return null;
   const publicStage = publicStageForCanonicalStage(stage);
-  const kind =
-    publicUpdateKindForCanonicalStage(stage);
+  const kind = publicUpdateKindForCanonicalStage(stage);
   const title = publicUpdateTitleForCanonicalStage(stage);
   return applicationPublicUpdateSchema.parse({
     id: event.id,
@@ -188,32 +201,44 @@ function publicUpdates(row: CandidateApplicationTrackerRow) {
   const updates = row.publicUpdates.flatMap((update) => {
     const title = update.title.trim() || publicUpdateTitle(update.kind);
     if (!title) return [];
+    const isWithdrawalUpdate =
+      update.kind === "WITHDRAWN" || update.publicOutcome === "WITHDRAWN";
     const sourceEvent = update.sourceEventReference
       ? stageEventsById.get(update.sourceEventReference)
       : undefined;
-    const canonicalStage = sourceEvent
-      ? applicationStageSchema.parse(sourceEvent.toStage)
-      : update.kind === "SUBMITTED"
-        ? "APPLIED"
-        : null;
-    const publicStage = canonicalStage
-      ? publicStageForCanonicalStage(canonicalStage)
-      : update.publicStage;
-    const publicOutcome = canonicalStage
-      ? publicOutcomeForCanonicalStage(canonicalStage)
-      : update.publicOutcome;
+    const canonicalStage = isWithdrawalUpdate
+      ? null
+      : sourceEvent
+        ? applicationStageSchema.parse(sourceEvent.toStage)
+        : update.kind === "SUBMITTED"
+          ? "APPLIED"
+          : null;
+    const publicStage = isWithdrawalUpdate
+      ? "OUTCOME"
+      : canonicalStage
+        ? publicStageForCanonicalStage(canonicalStage)
+        : update.publicStage;
+    const publicOutcome = isWithdrawalUpdate
+      ? "WITHDRAWN"
+      : canonicalStage
+        ? publicOutcomeForCanonicalStage(canonicalStage)
+        : update.publicOutcome;
     return [
       applicationPublicUpdateSchema.parse({
         id: update.id,
-        kind: canonicalStage
-          ? publicUpdateKindForCanonicalStage(canonicalStage)
-          : update.kind,
+        kind: isWithdrawalUpdate
+          ? "WITHDRAWN"
+          : canonicalStage
+            ? publicUpdateKindForCanonicalStage(canonicalStage)
+            : update.kind,
         publicStage,
         publicOutcome,
         canonicalStage,
-        title: canonicalStage
-          ? publicUpdateTitleForCanonicalStage(canonicalStage)
-          : title,
+        title: isWithdrawalUpdate
+          ? "Application withdrawn"
+          : canonicalStage
+            ? publicUpdateTitleForCanonicalStage(canonicalStage)
+            : title,
         occurredAt: update.effectiveAt.toISOString(),
       }),
     ];
@@ -226,23 +251,20 @@ function publicUpdates(row: CandidateApplicationTrackerRow) {
   );
   for (const event of row.stageEvents) {
     const update = stageUpdate(event);
-    if (
-      update &&
-      !known.has(update.id) &&
-      !knownEventReferences.has(event.id)
-    )
+    if (update && !known.has(update.id) && !knownEventReferences.has(event.id))
       updates.push(update);
   }
   if (row.withdrawalOutcome && row.withdrawnAt) {
     const id = `withdrawal:${row.id}`;
-    if (!known.has(id)) {
+    const hasWithdrawalUpdate = updates.some(
+      (update) => update.kind === "WITHDRAWN",
+    );
+    if (!hasWithdrawalUpdate) {
       updates.push(
         applicationPublicUpdateSchema.parse({
           id,
           kind: "WITHDRAWN",
-          publicStage: publicStageForCanonicalStage(
-            applicationStageSchema.parse(row.stage),
-          ),
+          publicStage: "OUTCOME",
           publicOutcome: "WITHDRAWN",
           title: "Application withdrawn",
           occurredAt: row.withdrawnAt.toISOString(),
@@ -250,9 +272,13 @@ function publicUpdates(row: CandidateApplicationTrackerRow) {
       );
     }
   }
-  return updates.sort((left, right) =>
-    left.occurredAt.localeCompare(right.occurredAt) || left.id.localeCompare(right.id),
-  ).slice(-500);
+  return updates
+    .sort(
+      (left, right) =>
+        left.occurredAt.localeCompare(right.occurredAt) ||
+        left.id.localeCompare(right.id),
+    )
+    .slice(-500);
 }
 
 function tracker(row: CandidateApplicationTrackerRow): ApplicationTracker {
@@ -263,8 +289,13 @@ function tracker(row: CandidateApplicationTrackerRow): ApplicationTracker {
     )
     .map(fileFromDocument)
     .filter((file): file is NonNullable<typeof file> => Boolean(file));
-  const cv = documents.find((file) => file.versionId === row.selectedCv.id) ?? fileFromCv(row);
-  const files = [cv, ...documents.filter((file) => file.versionId !== cv.versionId)];
+  const cv =
+    documents.find((file) => file.versionId === row.selectedCv.id) ??
+    fileFromCv(row);
+  const files = [
+    cv,
+    ...documents.filter((file) => file.versionId !== cv.versionId),
+  ];
   const preference = row.notificationPreference
     ? notificationPreferenceSchema.parse({
         emailEnabled: row.notificationPreference.emailEnabled,
@@ -273,7 +304,8 @@ function tracker(row: CandidateApplicationTrackerRow): ApplicationTracker {
         updatedAt: row.notificationPreference.updatedAt.toISOString(),
       })
     : notificationPreferenceSchema.parse({
-        emailEnabled: row.candidate.user.preferences?.applicationUpdatesEmail ?? true,
+        emailEnabled:
+          row.candidate.user.preferences?.applicationUpdatesEmail ?? true,
         inAppEnabled: true,
         version: 1,
         updatedAt: row.submittedAt.toISOString(),
@@ -282,9 +314,15 @@ function tracker(row: CandidateApplicationTrackerRow): ApplicationTracker {
     row.withdrawalOutcome === "CANDIDATE_WITHDRAWN"
       ? "WITHDRAWN"
       : publicOutcomeForCanonicalStage(canonicalStage);
+  const publicStage =
+    row.withdrawalOutcome === "CANDIDATE_WITHDRAWN"
+      ? "OUTCOME"
+      : publicStageForCanonicalStage(canonicalStage);
   const currentStageEvent = [...row.stageEvents]
     .reverse()
-    .find((event) => applicationStageSchema.parse(event.toStage) === canonicalStage);
+    .find(
+      (event) => applicationStageSchema.parse(event.toStage) === canonicalStage,
+    );
   return applicationTrackerSchema.parse({
     applicationId: row.id,
     job: {
@@ -292,17 +330,20 @@ function tracker(row: CandidateApplicationTrackerRow): ApplicationTracker {
       slug: row.jobPosting.slug,
       title: text(object(row.jobSnapshot).title) ?? row.jobPosting.title,
       companyName:
-        text(object(row.jobSnapshot).companyName) ?? row.jobPosting.company.displayName,
+        text(object(row.jobSnapshot).companyName) ??
+        row.jobPosting.company.displayName,
       companyLogoUrl: row.jobPosting.company.logoUrl,
-      location: text(object(row.jobSnapshot).location) ?? row.jobPosting.location,
+      location:
+        text(object(row.jobSnapshot).location) ?? row.jobPosting.location,
       employmentType: row.jobPosting.employmentType,
       experienceLevel: row.jobPosting.experienceLevel,
       workArrangement: row.jobPosting.workArrangement,
-      applicationDeadline: row.jobPosting.applicationDeadline?.toISOString() ?? null,
+      applicationDeadline:
+        row.jobPosting.applicationDeadline?.toISOString() ?? null,
       jobAvailable:
         row.jobPosting.status === "ACTIVE" && row.jobPosting.removedAt === null,
     },
-    publicStage: publicStageForCanonicalStage(canonicalStage),
+    publicStage,
     publicOutcome,
     canonicalStage,
     transitionFromStage: currentStageEvent?.fromStage
@@ -311,17 +352,23 @@ function tracker(row: CandidateApplicationTrackerRow): ApplicationTracker {
     stageVersion: row.stageVersion,
     submittedAt: row.submittedAt.toISOString(),
     lastUpdatedAt: new Date(
-      Math.max(row.lastStageChangedAt.getTime(), row.withdrawnAt?.getTime() ?? 0),
+      Math.max(
+        row.lastStageChangedAt.getTime(),
+        row.withdrawnAt?.getTime() ?? 0,
+      ),
     ).toISOString(),
     intake: intake(row),
     updates: publicUpdates(row),
     files: files.slice(0, 2),
     notificationPreference: preference,
-    canWithdraw: withdrawableStages.has(canonicalStage) && !row.withdrawalOutcome,
+    canWithdraw:
+      withdrawableStages.has(canonicalStage) && !row.withdrawalOutcome,
   });
 }
 
-function summary(row: CandidateApplicationTrackerRow): CandidateApplicationSummary {
+function summary(
+  row: CandidateApplicationTrackerRow,
+): CandidateApplicationSummary {
   const result = tracker(row);
   return candidateApplicationSummarySchema.parse({
     applicationId: result.applicationId,
@@ -368,7 +415,7 @@ export class CandidateApplicationTrackingService {
     const visible = hasNext ? rows.slice(0, limit) : rows;
     return candidateApplicationListResponseSchema.parse({
       applications: visible.map(summary),
-      nextCursor: hasNext ? visible.at(-1)?.id ?? null : null,
+      nextCursor: hasNext ? (visible.at(-1)?.id ?? null) : null,
     });
   }
 
@@ -382,72 +429,75 @@ export class CandidateApplicationTrackingService {
     },
     now = new Date(),
   ) {
-    return prisma.$transaction(async (tx) => {
-      const application = await tx.jobApplication.findFirst({
-        where: { id: applicationId, candidateUserId: actor.userId },
-        select: { id: true },
-      });
-      if (!application) {
-        throw new CandidateApplicationError(
-          404,
-          "APPLICATION_UNAVAILABLE",
-          "This application is unavailable.",
-        );
-      }
-      const current = await tx.applicationNotificationPreference.findUnique({
-        where: { applicationId },
-      });
-      if (current && current.version !== input.expectedVersion) {
-        throw new CandidateApplicationError(
-          409,
-          "APPLICATION_PREFERENCE_CONFLICT",
-          "These notification settings changed. Refresh and try again.",
-        );
-      }
-      if (!current && input.expectedVersion !== 1) {
-        throw new CandidateApplicationError(
-          409,
-          "APPLICATION_PREFERENCE_CONFLICT",
-          "These notification settings changed. Refresh and try again.",
-        );
-      }
-      const next = current
-        ? await tx.applicationNotificationPreference.updateMany({
-            where: { applicationId, version: input.expectedVersion },
-            data: {
-              emailEnabled: input.emailEnabled,
-              inAppEnabled: input.inAppEnabled,
-              version: { increment: 1 },
-              updatedAt: now,
-            },
-          })
-        : null;
-      if (current && next?.count !== 1) {
-        throw new CandidateApplicationError(
-          409,
-          "APPLICATION_PREFERENCE_CONFLICT",
-          "These notification settings changed. Refresh and try again.",
-        );
-      }
-      const saved = current
-        ? await tx.applicationNotificationPreference.findUniqueOrThrow({
-            where: { applicationId },
-          })
-        : await tx.applicationNotificationPreference.create({
-            data: {
-              applicationId,
-              emailEnabled: input.emailEnabled,
-              inAppEnabled: input.inAppEnabled,
-              version: 1,
-              updatedAt: now,
-            },
-          });
-      return notificationPreferenceSchema.parse({
-        emailEnabled: saved.emailEnabled,
-        inAppEnabled: saved.inAppEnabled,
-        version: saved.version,
-        updatedAt: saved.updatedAt.toISOString(),
-      });
-    }, { isolationLevel: "Serializable" });
+    return prisma.$transaction(
+      async (tx) => {
+        const application = await tx.jobApplication.findFirst({
+          where: { id: applicationId, candidateUserId: actor.userId },
+          select: { id: true },
+        });
+        if (!application) {
+          throw new CandidateApplicationError(
+            404,
+            "APPLICATION_UNAVAILABLE",
+            "This application is unavailable.",
+          );
+        }
+        const current = await tx.applicationNotificationPreference.findUnique({
+          where: { applicationId },
+        });
+        if (current && current.version !== input.expectedVersion) {
+          throw new CandidateApplicationError(
+            409,
+            "APPLICATION_PREFERENCE_CONFLICT",
+            "These notification settings changed. Refresh and try again.",
+          );
+        }
+        if (!current && input.expectedVersion !== 1) {
+          throw new CandidateApplicationError(
+            409,
+            "APPLICATION_PREFERENCE_CONFLICT",
+            "These notification settings changed. Refresh and try again.",
+          );
+        }
+        const next = current
+          ? await tx.applicationNotificationPreference.updateMany({
+              where: { applicationId, version: input.expectedVersion },
+              data: {
+                emailEnabled: input.emailEnabled,
+                inAppEnabled: input.inAppEnabled,
+                version: { increment: 1 },
+                updatedAt: now,
+              },
+            })
+          : null;
+        if (current && next?.count !== 1) {
+          throw new CandidateApplicationError(
+            409,
+            "APPLICATION_PREFERENCE_CONFLICT",
+            "These notification settings changed. Refresh and try again.",
+          );
+        }
+        const saved = current
+          ? await tx.applicationNotificationPreference.findUniqueOrThrow({
+              where: { applicationId },
+            })
+          : await tx.applicationNotificationPreference.create({
+              data: {
+                applicationId,
+                emailEnabled: input.emailEnabled,
+                inAppEnabled: input.inAppEnabled,
+                version: 1,
+                updatedAt: now,
+              },
+            });
+        return notificationPreferenceSchema.parse({
+          emailEnabled: saved.emailEnabled,
+          inAppEnabled: saved.inAppEnabled,
+          version: saved.version,
+          updatedAt: saved.updatedAt.toISOString(),
+        });
+      },
+      { isolationLevel: "Serializable" },
+    );
   }
 }
