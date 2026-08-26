@@ -30,6 +30,7 @@ One mutable, server-side, recoverable draft per Candidate. It is not an authorit
 | `operatingAddress` | String? | Required only when differs; normalized 5-500 |
 | `companyPhoneE164` | String? | Canonical `+84...`; syntax-only |
 | `websiteOrigin` | String? | Canonical HTTPS origin |
+| `requestedRole` | Enum | Candidate-selected membership role; defaults to `RECRUITER` and survives email verification redirects |
 | `relationship` | Enum? | Approved relationship enum |
 | `currentJobTitle` | String? | Normalized 2-120 |
 | `authorityExplanation` | String? | Normalized 20-500 when required |

@@ -41,6 +41,7 @@ const basePreparation = {
       currentJobTitle: "Owner",
       authorityExplanation: null,
       mismatchExplanation: null,
+      requestedRole: "RECRUITER",
     },
   },
 };

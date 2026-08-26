@@ -182,11 +182,15 @@ describe("verification decisions", () => {
       include: {
         targetCompany: { include: { memberships: true } },
         notifications: true,
+        decisions: true,
       },
     });
     expect(row.state).toBe("APPROVED");
+    expect(row.requestedRole).toBe("RECRUITER");
     expect(row.targetCompany?.memberships).toHaveLength(1);
     expect(row.targetCompany?.memberships[0]?.role).toBe("OWNER");
+    expect(row.decisions).toHaveLength(1);
+    expect(row.decisions[0]?.approvedRole).toBe("OWNER");
     expect(row.notifications).toHaveLength(1);
   });
 

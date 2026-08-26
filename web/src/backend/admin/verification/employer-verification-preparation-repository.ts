@@ -14,6 +14,7 @@ export type VerificationPreparationDraftChanges = {
   operatingAddress?: string | null;
   companyPhone?: string | null;
   website?: string | null;
+  requestedRole?: "OWNER" | "HR_MANAGER" | "RECRUITER" | "HIRING_MANAGER";
   relationship?: EmployerApplicantRelationshipValue | null;
   currentJobTitle?: string | null;
   authorityExplanation?: string | null;
@@ -44,6 +45,7 @@ export type VerificationPreparationRecord = {
   operatingAddress: string | null;
   companyPhoneE164: string | null;
   websiteOrigin: string | null;
+  requestedRole: "OWNER" | "HR_MANAGER" | "RECRUITER" | "HIRING_MANAGER";
   relationship: EmployerApplicantRelationshipValue | null;
   currentJobTitle: string | null;
   authorityExplanation: string | null;

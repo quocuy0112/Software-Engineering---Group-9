@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
+import { membershipRoleSchema } from "@/shared/contracts/admin/common";
 import {
   businessFactsDiffer,
   businessTaxIdentifierSchema,
@@ -25,6 +26,21 @@ type Item = {
   resubmissionCount: number;
   createdAt: string;
 };
+
+type RequestedRole = "OWNER" | "HR_MANAGER" | "RECRUITER" | "HIRING_MANAGER";
+
+function requestedRoleFromDraft(value: unknown): RequestedRole {
+  const parsed = membershipRoleSchema.safeParse(value);
+  return parsed.success ? parsed.data : "RECRUITER";
+}
+
+function requestedRoleLabel(
+  value: string,
+  roles: Record<RequestedRole, string>,
+) {
+  const parsed = membershipRoleSchema.safeParse(value);
+  return parsed.success ? roles[parsed.data] : value.toLowerCase();
+}
 
 type Preparation = EmployerVerificationPreparationResponse["data"];
 
@@ -94,6 +110,13 @@ export function employerVerificationCopy(locale: "vi" | "en") {
         step4: {
           title: "Bằng chứng thẩm quyền của bạn",
           hint: "Giải thích mối quan hệ của bạn và đồng ý xử lý tài liệu an toàn.",
+          requestedRole: "Vai trò yêu cầu",
+          roles: {
+            OWNER: "Chủ sở hữu",
+            HR_MANAGER: "Quản lý nhân sự",
+            RECRUITER: "Nhà tuyển dụng",
+            HIRING_MANAGER: "Quản lý tuyển dụng",
+          },
           relationship: "Mối quan hệ với công ty",
           selectRelationship: "Chọn mối quan hệ",
           relationships: {
@@ -228,6 +251,13 @@ export function employerVerificationCopy(locale: "vi" | "en") {
         step4: {
           title: "Your authority and evidence",
           hint: "Explain your relationship and consent to protected document processing.",
+          requestedRole: "Requested role",
+          roles: {
+            OWNER: "Owner",
+            HR_MANAGER: "HR Manager",
+            RECRUITER: "Recruiter",
+            HIRING_MANAGER: "Hiring manager",
+          },
           relationship: "Relationship to company",
           selectRelationship: "Select relationship",
           relationships: {
@@ -489,6 +519,8 @@ export function EmployerVerificationPage({
   );
   const [companyEmail, setCompanyEmail] = useState("");
   const [taxIdentifier, setTaxIdentifier] = useState("");
+  const [requestedRole, setRequestedRole] =
+    useState<RequestedRole>("RECRUITER");
   const [busy, setBusy] = useState<string>();
   const preparationRef = useRef<Preparation | null>(null);
   const draftSaveQueueRef = useRef<Promise<void>>(Promise.resolve());
@@ -509,6 +541,7 @@ export function EmployerVerificationPage({
     preparationRef.current = body.data;
     setPreparation(body.data);
     setDraft(body.data.draft);
+    setRequestedRole(requestedRoleFromDraft(body.data.draft.requestedRole));
     setTaxIdentifier(body.data.lookup?.taxIdentifier ?? "");
   }
 
@@ -524,6 +557,9 @@ export function EmployerVerificationPage({
         setItems(requests.data);
         setPreparation(current.data);
         setDraft(current.data.draft);
+        setRequestedRole(
+          requestedRoleFromDraft(current.data.draft.requestedRole),
+        );
         setTaxIdentifier(current.data.lookup?.taxIdentifier ?? "");
       })
       .catch(() => toast.error("Employer verification could not be loaded."));
@@ -581,6 +617,7 @@ export function EmployerVerificationPage({
       setPreparation(body.data);
       setDraft(body.data.draft);
       setCompanyEmail("");
+      setRequestedRole(requestedRoleFromDraft(body.data.draft.requestedRole));
       setTaxIdentifier(
         body.data.lookup?.taxIdentifier ?? normalizedTaxIdentifier.data,
       );
@@ -622,6 +659,7 @@ export function EmployerVerificationPage({
       setPreparation(body.data);
       setDraft(body.data.draft);
       setCompanyEmail("");
+      setRequestedRole(requestedRoleFromDraft(body.data.draft.requestedRole));
       setTaxIdentifier("");
       toast.success("Tax identifier cleared. Start the verification again.", {
         id: "business-lookup",
@@ -684,15 +722,17 @@ export function EmployerVerificationPage({
   }
 
   async function issueEmail() {
-    if (!preparation) return;
     setBusy("email");
     try {
+      await draftSaveQueueRef.current;
+      const latestPreparation = preparationRef.current;
+      if (!latestPreparation) return;
       await requestJson(
         "/api/employer-verifications/company-email/challenges",
         {
           method: "POST",
           body: JSON.stringify({
-            preparationVersion: preparation.version,
+            preparationVersion: latestPreparation.version,
             email: companyEmail,
           }),
         },
@@ -732,6 +772,7 @@ export function EmployerVerificationPage({
       payload.set("preparationVersion", String(latestPreparation.version));
       payload.set("lookupSnapshotId", latestPreparation.lookup.snapshotId);
       payload.set("taxIdentifier", latestPreparation.lookup.taxIdentifier);
+      payload.set("requestedRole", requestedRole);
       await requestJson("/api/employer-verifications", {
         method: "POST",
         headers: { "Idempotency-Key": crypto.randomUUID() },
@@ -742,6 +783,7 @@ export function EmployerVerificationPage({
       preparationRef.current = null;
       setPreparation(null);
       setDraft({});
+      setRequestedRole("RECRUITER");
       await Promise.all([loadRequests(), loadPreparation()]);
     } catch (error) {
       toast.error(submissionFailureMessage(error));
@@ -1004,7 +1046,6 @@ export function EmployerVerificationPage({
                 name="taxIdentifier"
                 value={preparation.lookup.taxIdentifier}
               />
-              <input type="hidden" name="requestedRole" value="RECRUITER" />
               <input
                 type="hidden"
                 name="policyVersion"
@@ -1207,6 +1248,30 @@ export function EmployerVerificationPage({
                 </div>
                 <p className={styles.sectionHint}>{copy.step4.hint}</p>
                 <div className={styles.form}>
+                  <label className={styles.field}>
+                    <span>{copy.step4.requestedRole}</span>
+                    <select
+                      name="requestedRole"
+                      required
+                      value={requestedRole}
+                      onChange={(event) => {
+                        const value = event.target.value as RequestedRole;
+                        setRequestedRole(value);
+                        void saveDraft("requestedRole", value);
+                      }}
+                    >
+                      <option value="OWNER">{copy.step4.roles.OWNER}</option>
+                      <option value="HR_MANAGER">
+                        {copy.step4.roles.HR_MANAGER}
+                      </option>
+                      <option value="RECRUITER">
+                        {copy.step4.roles.RECRUITER}
+                      </option>
+                      <option value="HIRING_MANAGER">
+                        {copy.step4.roles.HIRING_MANAGER}
+                      </option>
+                    </select>
+                  </label>
                   <label className={styles.field}>
                     <span>{copy.step4.relationship}</span>
                     <select
@@ -1428,7 +1493,9 @@ export function EmployerVerificationPage({
                     </div>
                     <div>
                       <dt>{copy.history.requestedRole}</dt>
-                      <dd>{item.requestedRole.toLowerCase()}</dd>
+                      <dd>
+                        {requestedRoleLabel(item.requestedRole, copy.step4.roles)}
+                      </dd>
                     </div>
                     <div>
                       <dt>{copy.history.resubmissions}</dt>

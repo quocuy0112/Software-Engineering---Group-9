@@ -1982,6 +1982,7 @@ model EmployerVerificationPreparation {
   operatingAddress           String?
   companyPhoneE164           String?
   websiteOrigin              String?
+  requestedRole              CompanyMembershipRole             @default(RECRUITER)
   relationship               EmployerApplicantRelationship?
   currentJobTitle            String?
   authorityExplanation       String?

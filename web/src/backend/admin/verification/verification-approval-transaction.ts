@@ -150,7 +150,6 @@ export class VerificationApprovalTransaction {
           data: {
             state: "APPROVED",
             targetCompanyId: companyId,
-            requestedRole: role,
             decidedAt: now,
           },
         });
