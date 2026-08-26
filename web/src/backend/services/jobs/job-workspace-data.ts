@@ -143,6 +143,7 @@ async function readCatalog(): Promise<JobCatalog> {
         approvedVersion: { select: { snapshot: true } },
         publicJobPosting: {
           select: {
+            id: true,
             status: true,
             publishedAt: true,
             updatedAt: true,
@@ -183,6 +184,13 @@ async function readCatalog(): Promise<JobCatalog> {
       if (!active || !snapshot.success || !projection?.publishedAt) return [];
       const projected = sourceJobSchema.safeParse({
         ...snapshot.data,
+        // SavedJob, applications, and candidate actions reference the public
+        // PostgreSQL posting. The review aggregate's jobId is only the
+        // recruiter catalogue key and is not a candidate-facing identifier.
+        id: projection.id,
+        // The JSON catalogue owns the company projection used by this
+        // workspace; the review snapshot stores the PostgreSQL company id.
+        companyId: job.companyId,
         status: "active",
         approvalComment: null,
         isVerified: true,
