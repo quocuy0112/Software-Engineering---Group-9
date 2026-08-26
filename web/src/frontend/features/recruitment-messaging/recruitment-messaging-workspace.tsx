@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { SendHorizontal, UserRound } from "lucide-react";
 
 type ThreadSummary = {
   id: string;
@@ -57,6 +58,8 @@ export function RecruitmentMessagingWorkspace({
     ownerOversight ? "all" : "mine",
   );
   const [query, setQuery] = useState("");
+  const [companyId, setCompanyId] = useState("all");
+  const [jobPostingId, setJobPostingId] = useState("all");
   const [selectedId, setSelectedId] = useState(
     initialThreadId ?? initialItems[0]?.id ?? null,
   );
@@ -69,16 +72,44 @@ export function RecruitmentMessagingWorkspace({
   >([]);
   const [assigneeId, setAssigneeId] = useState("");
   const initialListHydrated = useRef(false);
+  const chatHistoryRef = useRef<HTMLDivElement | null>(null);
+  const openedThreadRef = useRef<string | null>(null);
   const hasInitialItems = initialItems.length > 0;
 
+  const companies = useMemo(
+    () =>
+      Array.from(
+        new Map(
+          items.map((item) => [item.job.companyId, item.job.companyName]),
+        ).entries(),
+      ).map(([id, name]) => ({ id, name })),
+    [items],
+  );
+  const postings = useMemo(
+    () =>
+      Array.from(
+        new Map(
+          items
+            .filter(
+              (item) =>
+                companyId === "all" || item.job.companyId === companyId,
+            )
+            .map((item) => [item.job.id, item.job.title]),
+        ).entries(),
+      ).map(([id, title]) => ({ id, title })),
+    [companyId, items],
+  );
   const visible = useMemo(
     () =>
-      items.filter((item) =>
-        `${item.candidate.name} ${item.job.title} ${item.job.companyName}`
-          .toLocaleLowerCase()
-          .includes(query.trim().toLocaleLowerCase()),
+      items.filter(
+        (item) =>
+          (companyId === "all" || item.job.companyId === companyId) &&
+          (jobPostingId === "all" || item.job.id === jobPostingId) &&
+          `${item.candidate.name} ${item.job.title} ${item.job.companyName}`
+            .toLocaleLowerCase()
+            .includes(query.trim().toLocaleLowerCase()),
       ),
-    [items, query],
+    [companyId, items, jobPostingId, query],
   );
 
   useEffect(() => {
@@ -107,21 +138,61 @@ export function RecruitmentMessagingWorkspace({
   }, [assignment, hasInitialItems, ownerOversight]);
 
   useEffect(() => {
+    const refreshUnreadCounts = () =>
+      void responseJson<{ items: ThreadSummary[] }>(
+        ownerOversight
+          ? "/api/recruiter/messages/oversight"
+          : `/api/recruiter/messages?assignment=${assignment}`,
+      )
+        .then((payload) => setItems(payload.items))
+        .catch(() => undefined);
+    const timer = window.setInterval(refreshUnreadCounts, 10_000);
+    return () => window.clearInterval(timer);
+  }, [assignment, ownerOversight]);
+
+  useEffect(() => {
     if (!selectedId) return;
-    void responseJson<Detail>(
-      ownerOversight
-        ? `/api/recruiter/messages/oversight/threads/${encodeURIComponent(selectedId)}`
-        : `/api/recruitment-threads/${encodeURIComponent(selectedId)}`,
-    )
-      .then((payload) => {
-        setDetail(payload);
-        setError(null);
-      })
-      .catch(() => {
-        setDetail(null);
-        setError("This recruitment conversation is no longer available.");
-      });
+    let active = true;
+    const refreshThread = (showError: boolean) =>
+      responseJson<Detail>(
+        ownerOversight
+          ? `/api/recruiter/messages/oversight/threads/${encodeURIComponent(selectedId)}`
+          : `/api/recruitment-threads/${encodeURIComponent(selectedId)}`,
+      )
+        .then((payload) => {
+          if (!active) return;
+          setDetail(payload);
+          setError(null);
+        })
+        .catch(() => {
+          if (!active || !showError) return;
+          setDetail(null);
+          setError("This recruitment conversation is no longer available.");
+        });
+    void refreshThread(true);
+    const timer = window.setInterval(() => {
+      void refreshThread(false);
+    }, 3_000);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
   }, [ownerOversight, selectedId]);
+
+  useEffect(() => {
+    if (!detail || detail.thread.id !== selectedId) return;
+    const history = chatHistoryRef.current;
+    if (!history) return;
+    const openingThread = openedThreadRef.current !== detail.thread.id;
+    const closeToBottom =
+      history.scrollHeight - history.scrollTop - history.clientHeight < 48;
+    if (!openingThread && !closeToBottom) return;
+    const frame = window.requestAnimationFrame(() => {
+      history.scrollTop = history.scrollHeight;
+      openedThreadRef.current = detail.thread.id;
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [detail, selectedId]);
 
   const managerThreadId =
     detail?.access === "HR_MANAGER" ? detail.thread.id : null;
@@ -240,6 +311,37 @@ export function RecruitmentMessagingWorkspace({
               placeholder="Search messages"
             />
           </label>
+          <label>
+            <span>Company</span>
+            <select
+              value={companyId}
+              onChange={(event) => {
+                setCompanyId(event.target.value);
+                setJobPostingId("all");
+              }}
+            >
+              <option value="all">All companies</option>
+              {companies.map((company) => (
+                <option key={company.id} value={company.id}>
+                  {company.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>Job posting</span>
+            <select
+              value={jobPostingId}
+              onChange={(event) => setJobPostingId(event.target.value)}
+            >
+              <option value="all">All job postings</option>
+              {postings.map((posting) => (
+                <option key={posting.id} value={posting.id}>
+                  {posting.title}
+                </option>
+              ))}
+            </select>
+          </label>
           {!ownerOversight ? (
             <label>
               <span>Assignment</span>
@@ -268,13 +370,20 @@ export function RecruitmentMessagingWorkspace({
                 }}
               >
                 <strong>{item.candidate.name}</strong>
-                <span>
-                  {item.job.title} · {item.job.companyName}
+                <span className="recruitment-messaging__job-title">
+                  {item.job.title}
                 </span>
-                <small>
+                <span
+                  className="recruitment-messaging__list-stage"
+                  data-stage={item.applicationStage}
+                >
                   {item.applicationStage}
-                  {item.unreadCount ? ` · ${item.unreadCount} unread` : ""}
-                </small>
+                </span>
+                {item.unreadCount ? (
+                  <span className="recruitment-messaging__unread-count">
+                    {item.unreadCount} unread
+                  </span>
+                ) : null}
               </button>
             ))
           ) : (
@@ -291,14 +400,23 @@ export function RecruitmentMessagingWorkspace({
           ) : (
             <>
               <header className="recruitment-chat-header">
-                <p>{detail.thread.job.companyName}</p>
-                <h2>{detail.thread.candidate.name}</h2>
-                <span>
-                  {detail.thread.job.title} · {detail.thread.applicationStage} ·{" "}
-                  {detail.access === "OWNER"
-                    ? "Owner oversight (read-only)"
-                    : (detail.thread.assignee?.role ?? "Unassigned")}
-                </span>
+                <div>
+                  <h2>{detail.thread.candidate.name}</h2>
+                  <span>{detail.thread.job.title}</span>
+                </div>
+                <div className="recruitment-chat-header__meta">
+                  <span
+                    className="recruitment-chat-stage"
+                    data-stage={detail.thread.applicationStage}
+                  >
+                    {detail.thread.applicationStage}
+                  </span>
+                  <small>
+                    {detail.access === "OWNER"
+                      ? "Read-only oversight"
+                      : (detail.thread.assignee?.role ?? "Unassigned")}
+                  </small>
+                </div>
               </header>
               {detail.access === "HR_MANAGER" ? (
                 <form
@@ -323,31 +441,52 @@ export function RecruitmentMessagingWorkspace({
                   </button>
                 </form>
               ) : null}
-              <div className="recruitment-messaging__messages recruitment-chat-history">
+              <div
+                ref={chatHistoryRef}
+                className="recruitment-messaging__messages recruitment-chat-history"
+              >
                 {detail.messages.length ? (
-                  detail.messages.map((message) => (
-                    <article
+                  <>
+                    <p className="recruitment-chat-history__start">
+                      Conversation started
+                    </p>
+                    {detail.messages.map((message) => (
+                    <div
                       key={message.id}
+                      className="recruitment-chat-message"
                       data-direction={
                         message.senderUserId === detail.thread.candidate.id
                           ? "incoming"
                           : "outgoing"
                       }
-                    >
-                      <p>
-                        {message.senderUserId === detail.thread.candidate.id
+                      aria-label={`Message from ${
+                        message.senderUserId === detail.thread.candidate.id
                           ? detail.thread.candidate.name
                           : detail.access === "OWNER"
-                            ? (detail.thread.assignee?.name ??
-                              "Recruitment team")
-                            : "You"}
-                      </p>
-                      <div>{message.content}</div>
-                      <time dateTime={message.createdAt}>
-                        {new Date(message.createdAt).toLocaleString()}
-                      </time>
-                    </article>
-                  ))
+                            ? (detail.thread.assignee?.name ?? "Recruitment team")
+                            : "you"
+                      }`}
+                    >
+                      <span
+                        className="recruitment-chat-message__avatar"
+                        aria-hidden="true"
+                      >
+                        <UserRound />
+                      </span>
+                      <article
+                        data-time={new Date(message.createdAt).toLocaleString()}
+                      >
+                        <div>{message.content}</div>
+                        <time
+                          dateTime={message.createdAt}
+                          aria-hidden="true"
+                        >
+                          {new Date(message.createdAt).toLocaleString()}
+                        </time>
+                      </article>
+                    </div>
+                    ))}
+                  </>
                 ) : (
                   <p className="recruitment-messaging__empty">
                     No messages yet. Keep the conversation focused on this
@@ -377,22 +516,26 @@ export function RecruitmentMessagingWorkspace({
                       disabled={!detail.thread.canSend || busy}
                       placeholder={
                         detail.thread.canSend
-                          ? "Write a message about this application"
+                          ? "Write a message..."
                           : "This conversation is read-only"
                       }
                     />
+                    <span
+                      className="recruitment-chat-composer__count"
+                      aria-live="polite"
+                    >
+                      {content.length}/2,000
+                    </span>
                   </label>
                   <div className="recruitment-chat-composer__actions">
-                    <span>
-                      Enter / Ctrl+Enter to send. Shift+Enter for a new line.
-                    </span>
+                    <span>Enter to send · Shift + Enter for a new line</span>
                     <button
                       type="submit"
                       disabled={
                         !detail.thread.canSend || busy || !content.trim()
                       }
                     >
-                      {busy ? "Sending…" : "Send message"}
+                      {busy ? "Sending…" : "Send"} <SendHorizontal aria-hidden="true" />
                     </button>
                   </div>
                 </form>
@@ -405,6 +548,54 @@ export function RecruitmentMessagingWorkspace({
             </>
           )}
         </section>
+        <aside
+          className="recruitment-messaging__context"
+          aria-label="Candidate and application context"
+        >
+          {!detail || detail.thread.id !== selectedId ? (
+            <p className="recruitment-messaging__empty">
+              Select a conversation to view candidate and application details.
+            </p>
+          ) : (
+            <>
+              <header className="recruitment-messaging__context-header">
+                <span aria-hidden="true">
+                  {detail.thread.candidate.name.slice(0, 1).toUpperCase()}
+                </span>
+                <div>
+                  <p>Candidate</p>
+                  <h2>{detail.thread.candidate.name}</h2>
+                </div>
+              </header>
+              <dl className="recruitment-messaging__context-list">
+                <div>
+                  <dt>Application stage</dt>
+                  <dd>{detail.thread.applicationStage}</dd>
+                </div>
+                <div>
+                  <dt>Job posting</dt>
+                  <dd>{detail.thread.job.title}</dd>
+                </div>
+                <div>
+                  <dt>Company</dt>
+                  <dd>{detail.thread.job.companyName}</dd>
+                </div>
+                <div>
+                  <dt>Conversation owner</dt>
+                  <dd>
+                    {detail.thread.assignee?.name ?? "Unassigned"}
+                    {detail.thread.assignee
+                      ? ` · ${detail.thread.assignee.role}`
+                      : ""}
+                  </dd>
+                </div>
+              </dl>
+              <p className="recruitment-messaging__context-note">
+                This conversation is scoped to this candidate&apos;s application.
+              </p>
+            </>
+          )}
+        </aside>
       </section>
     </main>
   );
