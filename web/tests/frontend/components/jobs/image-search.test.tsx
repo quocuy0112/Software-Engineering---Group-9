@@ -502,18 +502,16 @@ describe("image-assisted job-search controls", () => {
         ".job-location-picker-selection",
       ),
     ).toHaveTextContent("Ho Chi Minh City, District 1");
-    expect(locationField).toHaveAttribute(
-      "aria-describedby",
-      "job-location-picker-tooltip",
-    );
-    expect(screen.getByRole("tooltip")).toHaveTextContent(
-      "Ho Chi Minh City, District 1",
-    );
+    expect(locationField).not.toHaveAttribute("aria-describedby");
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Clear location" }),
     ).toBeVisible();
     expect(screen.getByRole("button", { name: "Clear location" })).toHaveClass(
       "global-image-search-clear",
+    );
+    expect(screen.getByRole("button", { name: "Clear location" })).toHaveClass(
+      "job-location-picker-clear",
     );
     fireEvent.blur(locationField);
     expect(
@@ -521,24 +519,41 @@ describe("image-assisted job-search controls", () => {
     ).toBeVisible();
     expect(
       locationField.closest(".global-image-search-location")?.children,
-    ).toHaveLength(4);
+    ).toHaveLength(3);
+    expect(
+      locationField
+        .closest(".global-image-search-location")
+        ?.querySelector(".job-location-picker-actions"),
+    ).toContainElement(screen.getByRole("button", { name: "Clear location" }));
     expect(
       locationField
         .closest(".global-image-search-location")
         ?.querySelector("button.job-location-picker-chevron"),
-    ).toBeNull();
+    ).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open location picker" }),
+    );
+    expect(
+      screen.getByRole("dialog", { name: "Choose location" }),
+    ).toBeVisible();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Close location picker" }),
+    );
+    expect(
+      screen.queryByRole("dialog", { name: "Choose location" }),
+    ).not.toBeInTheDocument();
     fireEvent.focus(locationField);
     expect(locationField).toHaveValue("Ho Chi Minh City, District 1");
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
     fireEvent.pointerDown(document.body);
     expect(locationField).toHaveValue("Ho Chi Minh City, District 1");
-    expect(screen.getByRole("tooltip")).toBeInTheDocument();
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Clear location" }));
     expect(locationField).toHaveValue("");
     expect(onChange).toHaveBeenLastCalledWith({ q: "project manager" });
   });
 
-  it("shows a long province's comma-separated district list and exposes it in a tooltip", () => {
+  it("keeps a long province's comma-separated district list without a hover tooltip", () => {
     const longLocationTaxonomy: JobSearchTaxonomy = {
       ...taxonomy,
       locations: [
@@ -577,9 +592,7 @@ describe("image-assisted job-search controls", () => {
         ".job-location-picker-selection",
       ),
     ).toHaveTextContent("Bà Rịa - Vũng Tàu, Long Hải, Phước Hải");
-    expect(screen.getByRole("tooltip")).toHaveTextContent(
-      "Bà Rịa - Vũng Tàu, Long Hải, Phước Hải",
-    );
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
 
   it("shows only the province when all districts are selected", () => {
@@ -608,7 +621,7 @@ describe("image-assisted job-search controls", () => {
         ".job-location-picker-selection",
       ),
     ).toHaveTextContent("Ho Chi Minh City");
-    expect(screen.getByRole("tooltip")).toHaveTextContent("Ho Chi Minh City");
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
 
   it("opens and changes job categories only when clicked", () => {
@@ -697,7 +710,7 @@ describe("image-assisted job-search controls", () => {
       29,
     );
     const icons = document.querySelectorAll(".job-category-industry-icon");
-    expect(icons).toHaveLength(28);
+    expect(icons).toHaveLength(29);
     expect(
       [...icons].map((icon) => icon.getAttribute("data-industry-code")),
     ).toEqual(allIndustries.industries.map((industry) => industry.code));
@@ -750,11 +763,12 @@ describe("image-assisted job-search controls", () => {
 
   it("shows provenance and confidence while supporting edit, reverse, remove, and clear", () => {
     const onApply = vi.fn();
+    const onClear = vi.fn();
     render(
       <ImageSearchProposals
         intent={intent}
         onApply={onApply}
-        onClear={vi.fn()}
+        onClear={onClear}
       />,
     );
     expect(screen.getByText("High confidence")).toBeVisible();
@@ -790,6 +804,37 @@ describe("image-assisted job-search controls", () => {
     expect(
       screen.queryByLabelText("Edit workArrangement proposal"),
     ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Reverse selections" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Apply selected filters" }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(onClear).toHaveBeenCalledOnce();
+  });
+
+  it("keeps a single suggested filter compact by omitting reverse selection", () => {
+    const onApply = vi.fn();
+    const onClear = vi.fn();
+    render(
+      <ImageSearchProposals
+        intent={{ ...intent, proposals: [intent.proposals[1]] }}
+        onApply={onApply}
+        onClear={onClear}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Reverse selections" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Clear proposals" }),
+    ).toBeVisible();
+    expect(screen.getByRole("button", { name: "Close" })).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Apply selected filters" }),
+    ).toBeVisible();
   });
 
   it("keeps cancel, manual fallback, and initially-off external consent explicit", () => {

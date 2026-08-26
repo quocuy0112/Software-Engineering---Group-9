@@ -1527,6 +1527,21 @@
     0 8px 18px rgb(29 78 216 / 18%);
 }
 
+/*
+ * The hero search fields sit directly beside one another and the global
+ * focus treatment intentionally extends outside a control.  That treatment
+ * makes the ring spill into the neighbouring field (and into the CTA at
+ * narrower widths), so keep the accessible focus indicator inside each field
+ * instead.  Inset shadows do not change the control's dimensions or layout.
+ */
+.home-page .home-hero-search input:focus,
+.home-page .home-hero-search input:focus-visible {
+  border-color: var(--home-primary);
+  outline: none;
+  outline-offset: 0;
+  box-shadow: inset 0 0 0 2px var(--home-primary);
+}
+
 @media (max-width: 1180px) {
   .home-desktop-links,
   .home-header-actions > .home-guest-actions,

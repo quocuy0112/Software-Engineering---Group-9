@@ -32,6 +32,12 @@ export class GetProfileAggregateService {
         phone: row.phone,
         location: row.location,
       },
+      about: {
+        dateOfBirth: row.dateOfBirth ? dateOnly(row.dateOfBirth) : null,
+        preferredName: row.preferredName,
+        interests: row.interests,
+        bio: row.bio,
+      },
       skills: row.skills.map(({ skillId, displayName }) => ({
         id: skillId,
         label: displayName,

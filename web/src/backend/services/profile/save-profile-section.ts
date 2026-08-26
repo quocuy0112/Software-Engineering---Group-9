@@ -23,6 +23,7 @@ import {
   validateEducationEntry,
   validateExperienceEntry,
   validateProfilePhone,
+  assertIsoDate,
   validateUniqueSkills,
   validateUniqueSocialLinks,
 } from "./profile-validation";
@@ -102,6 +103,30 @@ export function normalizeProfileMutationText(input: unknown): {
           ),
           location: collect(
             normalizeText(parsed.basics.location, "basics.location", 160),
+          ),
+        },
+      },
+      warnings,
+    };
+  }
+  if (parsed.section === "about") {
+    return {
+      mutation: {
+        ...parsed,
+        about: {
+          dateOfBirth: parsed.about.dateOfBirth,
+          preferredName: collect(
+            normalizeText(
+              parsed.about.preferredName,
+              "about.preferredName",
+              120,
+            ),
+          ),
+          interests: collect(
+            normalizeText(parsed.about.interests, "about.interests", 500),
+          ),
+          bio: collect(
+            normalizeText(parsed.about.bio, "about.bio", 1_000, false, true),
           ),
         },
       },
@@ -221,6 +246,26 @@ function validateNormalizedMutation(
       if (value !== null) assertCodePointLength(field, value, maximum);
     }
     mutation.basics.phone = validateProfilePhone(mutation.basics.phone);
+  } else if (mutation.section === "about") {
+    if (mutation.about.dateOfBirth !== null) {
+      assertIsoDate("about.dateOfBirth", mutation.about.dateOfBirth);
+      if (mutation.about.dateOfBirth > today) {
+        throw new ProfileValidationError("about.dateOfBirth", "FUTURE");
+      }
+    }
+    if (mutation.about.preferredName !== null) {
+      assertCodePointLength(
+        "about.preferredName",
+        mutation.about.preferredName,
+        120,
+      );
+    }
+    if (mutation.about.interests !== null) {
+      assertCodePointLength("about.interests", mutation.about.interests, 500);
+    }
+    if (mutation.about.bio !== null) {
+      assertCodePointLength("about.bio", mutation.about.bio, 1_000);
+    }
   } else if (mutation.section === "skills") {
     assertProfileCollectionCaps({
       skills: mutation.skills,

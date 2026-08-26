@@ -1,0 +1,483 @@
+﻿===== Luu Chi Hai =====
+64c4fec4 | 06/06/2026 08:58 | Add PA1 Weekly Report
+2d9f6fed | 15/06/2026 20:27 | Add PA2 Weekly Report
+ef47cb77 | 16/06/2026 21:48 | Add Project Plan
+971ced02 | 17/06/2026 20:12 | Add Hai_Speckit
+2637d633 | 29/06/2026 19:57 | Write AI Usage Report, add author to sections that are missing, make SpecKit.pdf, project-plan folder
+b4887f3b | 29/06/2026 22:35 | Add PA2 2nd weekly report
+b9dffff8 | 23/07/2026 20:35 | complete Diagram 5 use case diagram, specifications, and UI prototypes
+05d3bc02 | 24/07/2026 17:02 | Fix diagram-05 display and convert it's files to pdf
+edf4d461 | 24/07/2026 20:54 | Add PA3 weekly report
+7d3e4bc7 | 25/07/2026 19:00 | Update Project Plan and  Weekly Report
+57ccbc15 | 25/07/2026 19:58 | Small fix weekly_report
+1b9efc09 | 25/07/2026 19:58 | Small fix weekly_report
+3ac6ae64 | 25/07/2026 20:01 | Small fix weekly_report
+d14f4e4f | 25/07/2026 20:14 | PA3 Weekl report pdf fixed
+37014a46 | 25/07/2026 20:42 | Add Changes.md for Project Plan
+537f6b84 | 25/07/2026 21:23 | Add Hai's PA3 AI usage report
+6fd0318d | 25/07/2026 22:29 | Small fix AI Report
+9fa2c291 | 25/07/2026 22:37 | Small fix AI Usage Report
+2ff12f71 | 25/07/2026 22:57 | Update Changes.md
+82072ad8 | 01/08/2026 22:47 | PA4 weekly_report
+fa025689 | 02/08/2026 16:29 | Small fix weekly_report
+1206f20b | 03/08/2026 20:38 | Update project plan
+37099865 | 03/08/2026 20:41 | Smol update weekly report
+0db09465 | 07/08/2026 15:01 | C4 Model diagram System Context, FE
+17b31011 | 07/08/2026 18:52 | Update Sys Context and FE diagrams
+d7aab9a2 | 08/08/2026 00:11 | Hai AI Usage PA4
+b9ad3008 | 08/08/2026 20:41 | docs: align C4 diagrams with current implementation
+f5182d9a | 12/08/2026 19:32 | fix(seed): support recruiter job posting statuses
+8233ed9b | 14/08/2026 17:25 | Add PA5 first scrum meeting document
+2ca89c6d | 14/08/2026 19:29 | Update Project Plan
+07d93773 | 16/08/2026 20:55 | docs(spec): define recruitment pipeline kanban board
+72b11a66 | 16/08/2026 21:31 | docs(spec): plan recruitment pipeline kanban board
+49310cb5 | 16/08/2026 21:51 | docs(spec): finalize recruitment pipeline kanban tasks
+f0a7506f | 17/08/2026 22:07 | feat: implement recruitment pipeline kanban board
+5b684c79 | 18/08/2026 09:19 | fix: improve recruitment pipeline dark mode
+015cb1ee | 18/08/2026 11:12 | feat: improve recruitment pipeline kanban UX
+502ff16c | 21/08/2026 21:14 | Complete PA5 test plan, execution results, bug reports, and summary
+25e9d5fa | 22/08/2026 21:26 | Add PA5 second weekly report
+364ec1b8 | 22/08/2026 22:23 | Update Project Plan
+68ec28b7 | 23/08/2026 10:03 | Update C4 System Context and Frontend Component diagrams for PA5 final architecture
+
+===== Ngo Quoc Tuan =====
+59d52322 | 05/06/2026 00:50 | topcv survey: Add file topcv.md, topcv.pdf
+d8255952 | 16/06/2026 22:15 | Introduction & Positioning Product: Add Problem Statement and Product Position Statement
+34112dfd | 16/06/2026 23:14 | docs: Add Spec Kit learning summary
+b409b749 | 25/06/2026 23:44 | Convert Spec Kit from markdown to pdf
+a07535bd | 27/06/2026 23:42 | docs: Add AI Usage  Report in PA2 by Tuan
+05d767a9 | 27/06/2026 23:52 | docs: Standardize student information section
+5404be0b | 28/06/2026 00:32 | docs: Add hybrid CV scoring flowchart and documentation
+485e9ff8 | 30/06/2026 22:28 | docs: Put all images into folder and restructure PA2 report by Task/Use Case and add table of contents
+853c6bc2 | 24/07/2026 16:52 | Complete Diagram 3 with use case diagram, specifications and UI prototypes
+14087aed | 25/07/2026 10:03 | Fixed toast error for verification complete
+e6fd7ed8 | 25/07/2026 10:10 | Retemplate .env.example
+0723f612 | 25/07/2026 10:16 | Add compose.yaml to gitignore
+cbd725d4 | 25/07/2026 10:37 | test
+639e02f2 | 25/07/2026 16:04 | Update authentication with smoothy notifications and temporary locked account
+f8e87014 | 25/07/2026 16:09 | Update authentication with smoothy notifications and temporary locked account
+3e4b6beb | 25/07/2026 16:30 | Fix merge conflict
+5adf86f4 | 25/07/2026 19:10 | AI Usage Report for PA3
+b6f884a8 | 30/07/2026 20:51 | Refactor: Separate Frontend and Backend structure
+5ab591c6 | 30/07/2026 21:28 | Refactor: Separate Frontend and Backend structure
+b9dd06f3 | 01/08/2026 21:22 | feat(job-board): implement job discovery and application workflows
+85291c68 | 02/08/2026 17:23 | Fix conflict
+88ec9918 | 02/08/2026 17:27 | Fix conflict
+36ec05ed | 02/08/2026 20:21 | feat(job-board): implement job discovery and application workflows
+02d2cf40 | 02/08/2026 20:24 | Fix conflict
+66599957 | 02/08/2026 21:23 | feat(job-board): implement job discovery and application workflows
+eb29cbfd | 02/08/2026 21:27 | Delete apps/web/prisma/migrations/20260730040100_smart_hire directory
+88ed2ab4 | 04/08/2026 18:42 | feat(job-board): implement job discovery and application workflows
+3d887805 | 06/08/2026 07:58 | Jobs board: Add search, filtered, quick review job, full review job, applied for jobs
+e73663bf | 06/08/2026 13:27 | Jobs board: Update the interface of Full detail job with more functiosn ex apply, save, report, show some related jobs.. And compatible with dark mode switching
+d65b3cb2 | 06/08/2026 20:25 | Jobs board: Update the interface of Full detail job with more functiosn ex apply, save, report, show some related jobs.. And compatible with dark mode switching
+c840e932 | 06/08/2026 21:59 | Jobs board: Update the interface of Full detail job with more functiosn ex apply, save, report, show some related jobs.. And compatible with dark mode switching
+d17a2173 | 07/08/2026 00:38 | Jobs board: Add 4 actiosn for each jobs card: apply job, save jobs, hide jobs, quick review jobs.
+20ea1ea2 | 07/08/2026 02:46 | Jobs board: Add 4 function ex saved jobs, applied jobs, suitable jobs, setting of suitable jobs
+fd08ad13 | 07/08/2026 14:10 | Jobs board: Add 4 function ex saved jobs, applied jobs, suitable jobs, setting of suitable jobs
+a5e7e537 | 07/08/2026 14:50 | Jobs board: Add 4 function ex saved jobs, applied jobs, suitable jobs, setting of suitable jobs
+8fa71d67 | 07/08/2026 15:30 | Rename migrations to ensure the correct order.
+e1732a0b | 07/08/2026 15:31 | Merge to main
+b791dab7 | 07/08/2026 20:01 | Fix scroll bar in full detail job
+793399e1 | 07/08/2026 20:19 | Fix negotiable in salaray
+feab0aa8 | 07/08/2026 20:43 | Update the interface of apply form and fix color synchronization issue
+c573a712 | 07/08/2026 21:33 | AI Usage Report for PA4
+5b034a92 | 07/08/2026 21:35 | feat(job-board): implement job discovery and application workflows
+ee4bfc3e | 08/08/2026 01:50 | Fix CV import status, update import cv with AI to apply form
+0f43a483 | 08/08/2026 14:03 | Change color of applied job
+a8acfbc9 | 08/08/2026 17:27 | Chagne user data to local data and update reset data
+466ab0f0 | 08/08/2026 18:34 | Fix timeout search by images
+66b972dc | 08/08/2026 20:58 | Fix import cv from local storage
+cd16044a | 09/08/2026 00:21 | Fix 404 error in import cv with ai
+d270db2b | 09/08/2026 00:23 | Delete local migration
+3c41b42d | 09/08/2026 12:41 | Add migration into reset database
+3f610acd | 09/08/2026 12:44 | Update test for ocr image
+33f76c91 | 11/08/2026 10:24 | Add how to run ocr container
+ddf8e705 | 11/08/2026 20:42 | docs(spec-kit): finalize recruiter workflow artifacts
+6d84e07e | 12/08/2026 12:16 | Fix button reset password didn't work
+7a146291 | 12/08/2026 18:23 | chore(clamav): allow local signature fallback up to 48 hours
+caf2b22f | 12/08/2026 18:23 | feat(recruiter): add recruiter workspace and job posting flow
+43824d9f | 13/08/2026 08:26 | Fix UI in Job Posting
+3e2e0f98 | 13/08/2026 08:30 | docs(spec-kit): add admin user management specification artifacts
+5a2b7af5 | 13/08/2026 13:24 | docs(spec-kit): finalize candidate filtering group 1 specification and implementation plan
+59c3ae1a | 13/08/2026 14:27 | Skip downloading the workers' images if they are already available.
+1745abba | 13/08/2026 14:29 | Fix recruiter verification in company settings
+8e2c013e | 13/08/2026 14:29 | Fix admin gateway
+6402cc85 | 13/08/2026 14:48 | Fix(recruiter): allow saving database-backed company profiles
+ddd3ef9f | 13/08/2026 14:53 | Fix conflict
+ff7e85b7 | 14/08/2026 09:42 | Add companies settings to data
+a47a1935 | 14/08/2026 12:11 | docs(spec-kit): define candidate hybrid ranking feature
+6587d774 | 14/08/2026 12:13 | Remove garbage file
+d1dfda2e | 14/08/2026 22:28 | Complete user management and recruiter verification
+79658181 | 14/08/2026 23:43 | Add kill PID automatically
+db042f0a | 14/08/2026 23:56 | Fix notification internal server
+fb5341d7 | 15/08/2026 00:37 | Fix notification language
+a6134d7c | 15/08/2026 09:32 |  Add pdf view or download in admin page
+d996419a | 15/08/2026 10:04 |  feat(candidate-ranking): implement candidate filtering and hybrid ranking (specs 012, 015)
+25e6e8fc | 15/08/2026 21:27 | Complete Candidate page
+10bc3f52 | 16/08/2026 11:32 | Redesign the Candidate page
+e235a7d5 | 16/08/2026 12:20 | Delete local migration
+10987c2f | 16/08/2026 16:39 | Improve the AI to calculate the scores of cv
+7fdf3d8c | 16/08/2026 20:13 | Redesign the UI of Ranking, fix overtime of parsing data of cv & cover letter, add url for Candidate & Job posting for each job card
+d4e05662 | 16/08/2026 20:28 | docs(spec-kit): finalize 020 candidate application tracking and private cv match
+acb1a876 | 17/08/2026 15:24 | docs(spec-kit): Complete private CV match and application tracking
+1f3297ff | 17/08/2026 15:24 | feat(candidate-match): complete private CV match flow, UI, storage recovery
+14eee0dc | 17/08/2026 15:45 | Delete local migration
+358c8205 | 17/08/2026 17:50 | docs(speckit): refine recruitment analytics specification and plan
+fb9ceb4c | 17/08/2026 18:28 | docs(speckit): refine recruitment analytics specification and plan
+08ce6c4c | 17/08/2026 21:54 | Add application workflow and redesign the apply form
+5aab13c0 | 18/08/2026 09:29 | Delete another specs 022
+80b39cb4 | 18/08/2026 09:31 | Redesign the UI of CV match check
+7ec89f84 | 18/08/2026 16:23 | feat(application): redesign UI, fix status update loading, and preview PDF/DOCX cover letters
+ac6b29dc | 18/08/2026 18:08 | fix(recruiter): fix CV and cover letter PDF previews
+d3807b15 | 18/08/2026 18:57 | Clean database for jobs
+2b42fcdb | 18/08/2026 19:01 | Rename all specskit to match the correct sequence numbers
+a3734c72 | 18/08/2026 19:45 | chore(migrations): normalize migration sequence
+f064ba67 | 18/08/2026 20:32 | fix(env): sync missing feature defaults in env:init
+7b3c2ac0 | 18/08/2026 21:12 | fix(auth): handle TOTP enrollment codes correctly
+b3b15542 | 18/08/2026 21:51 | fix(recruiter): persist catalogue updates
+00c5d37f | 18/08/2026 22:39 | fix(recruiter): improve job posting editor
+a66217b6 | 18/08/2026 23:05 | fix(recruiter): allow editing reviewed jobs
+a1c20cbf | 19/08/2026 00:07 | fix application submission and recruiter ranking
+a7158cb7 | 19/08/2026 15:24 | Clean database for jobs
+b3abb7da | 19/08/2026 15:25 | Add jobs data to .gitignore
+d6d9f565 | 19/08/2026 16:35 | Complete the logic of the kanban board
+765377ee | 19/08/2026 16:43 | chore: stop tracking local job data
+d72b5997 | 19/08/2026 16:52 | chore: ignore TypeScript build info
+adfbff40 | 19/08/2026 16:53 | Add TypeScript build info into .gitignore
+4222ba58 | 19/08/2026 17:05 | Restore jobs data and tsconfig
+7c478ebf | 19/08/2026 19:16 | fix recruiter application notification navigation
+5f39dcfc | 19/08/2026 19:22 | Redesign the UI of kanban board
+d14d9878 | 19/08/2026 19:30 | Clean database for jobs
+b5b4fdbe | 20/08/2026 16:15 | fix(recruitment-pipeline): restore card hierarchy and sorting
+4ad2abb2 | 20/08/2026 18:35 | feat(analytics): implement backend overview and export pipeline
+a096b65b | 20/08/2026 20:40 | fix: align recruitment export controls
+2eff588b | 20/08/2026 22:14 | Redesign the UI of kanban board
+5779d84e | 20/08/2026 22:20 | chore: ignore TypeScript build cache
+3edf5ece | 21/08/2026 12:38 | Clean database for job
+fcb7dd3f | 21/08/2026 16:12 | fix: unblock CV import worker validation
+f9e9c201 | 21/08/2026 16:38 | feat: enforce per-job application attempt limit
+f89cd544 | 21/08/2026 16:47 | feat: add read-only withdrawn pipeline column
+cb381e47 | 21/08/2026 16:51 | feat: show withdrawn applications in hiring overview
+74ba6174 | 21/08/2026 16:57 | feat: add withdrawn filter to candidate ranking
+fe61e4af | 21/08/2026 16:58 | fix: exclude withdrawn applications from scoring stats
+44ad29fb | 21/08/2026 16:58 | fix: ignore persisted applications in mock job state
+67d7bbd2 | 21/08/2026 17:03 | Update verification application migration
+0f72df2f | 22/08/2026 10:52 | fix: validate CV uploads and harden scoring
+34bf635f | 22/08/2026 12:47 | fix: stabilize parsed CV previews
+8f445ca3 | 22/08/2026 12:48 | fix: enforce required skills in CV matching
+68a2f110 | 23/08/2026 19:50 | fix: restore cv worker storage mount
+11838ccb | 23/08/2026 20:17 | feat(jobs): add sticky taxonomy search toolbar
+73e880e3 | 23/08/2026 20:56 | fix(jobs): recover catalogue cache after read failure
+b07182fb | 23/08/2026 22:12 | fix(jobs): persist search across workspace tabs
+70447ad9 | 24/08/2026 12:11 | fix(jobs): unify search location clear controls
+ac6aee17 | 24/08/2026 12:17 | feat(jobs): redesign filters and results toolbar
+5e1d1ecb | 24/08/2026 12:38 | fix(jobs): support entire industry search
+0603163a | 24/08/2026 19:18 | refactor(data): split job catalogue and relocate local data
+f437d717 | 24/08/2026 19:19 | fix(db): reset user-owned data without reseeding catalogue
+cb77c50f | 24/08/2026 19:20 | Add database into gitignore
+08717b97 | 24/08/2026 19:24 | refactor(data): split job catalogue and relocate local data
+aef7e30a | 24/08/2026 21:13 | perf: optimize recruiter workspace loading
+
+===== Nguyen Gia Quoc Uy =====
+bdc14f5d | 24/05/2026 16:53 | Initial commit
+0b7403d5 | 30/05/2026 01:17 | chore: setup folder structure for PA1
+4473b504 | 04/06/2026 10:02 | chore: setup separate directories for existing app surveys
+71258a22 | 06/06/2026 08:38 | chore: setup weekly reports directories for PA1-PA5
+db8d3b50 | 06/06/2026 23:53 | Create Team Proposal and Contract
+7984049d | 16/06/2026 09:35 | docs: create vision document preview folder
+579f6a0a | 16/06/2026 09:58 | docs: create spec kit traning folder
+6ed7b5be | 17/06/2026 16:49 | add: Speckit Summary
+22caaa19 | 18/06/2026 06:57 | Adding, Initialize Spec Kit
+a857b741 | 18/06/2026 07:02 | Modify: docs/spec-kit_training
+dd3c0da1 | 18/06/2026 09:13 | Rename Vision Document Preview File
+008674c2 | 26/06/2026 11:35 | docs: AI Usage Report in PA2 by Uy
+0650770d | 28/06/2026 21:58 | docs: Adding 5_Product_Features
+82c4f5fa | 29/06/2026 13:35 | Modify 5_Product_Features
+47b423fe | 29/06/2026 23:34 | Synchronize Vision Subpart
+d3bede6a | 01/07/2026 12:34 | Review Vision Document Preview
+ce296a36 | 05/07/2026 12:25 | Review Vision Document P2
+d34c0b5a | 10/07/2026 16:31 | Merging Final Vision Document
+1eaaf125 | 11/07/2026 22:29 | constituion.md created, vision document modified, project plan modified
+a90ee6a7 | 11/07/2026 23:17 | Modify VD
+0df4d330 | 11/07/2026 23:19 | Change the location of vision document
+a0112d9d | 19/07/2026 19:06 | Structure for PA3
+0e51fe25 | 25/07/2026 10:38 | Diagram 01 + 02
+21c6b50c | 25/07/2026 22:54 | Changing, Improving Use Case Model
+ac092764 | 27/07/2026 15:51 | Modify  .mailmap
+4ce2252d | 31/07/2026 07:37 | UI_Modify
+dc828b1e | 31/07/2026 11:30 | UI Fixing 31/07
+806a2bdb | 01/08/2026 19:21 | Fixing UI and Change Avatar Features
+7572ce7c | 01/08/2026 22:02 | Fixing UI 0108
+2a826fba | 02/08/2026 11:14 | Fixing UI by UY 02/08
+c2d36371 | 05/08/2026 15:26 | DarkMode for 0508
+257dce8c | 05/08/2026 20:45 | Create folder for PA4 Diagrams
+fb520002 | 06/08/2026 17:22 | PA4_Changes
+f7b37cd9 | 06/08/2026 17:39 | Modify Changes.md for PA4
+aed84b15 | 06/08/2026 20:52 | Fixing Dark Mode, Language Preferences
+9401407e | 07/08/2026 15:40 | Job Scroll
+8e45269b | 08/08/2026 16:31 | Fixing DB for Cannonical Stages Status, Sync Language for JOBs Section
+e9e4d74d | 08/08/2026 18:36 | Verify Diagrams for PA4
+55da2327 | 08/08/2026 20:08 | AI Usage Report by Uy
+585c5478 | 08/08/2026 22:54 | PA planning and Summary
+c76bbc30 | 09/08/2026 11:46 | Adding Migration
+90cbc9e7 | 10/08/2026 12:28 | Job Fixing
+e904578c | 11/08/2026 09:53 | UI Changing
+709b3c22 | 11/08/2026 12:03 | Job Page Modify
+4de6595b | 12/08/2026 14:11 | UI
+ed85ff4b | 12/08/2026 20:54 | 010-Home-Landing-Page Initialization
+874a28ef | 14/08/2026 07:08 | 010 Landing Page Improvement
+01c49896 | 14/08/2026 23:03 | Filter Modified, FAQ Adding
+55d7d79b | 15/08/2026 02:46 | UI_1508
+bf5fac60 | 15/08/2026 20:02 | UI Changing by Uy 1508
+2d426082 | 16/08/2026 22:47 | UI_Improvements by Uy 1608
+0b9e7273 | 16/08/2026 23:58 | Fixing
+edaa0937 | 18/08/2026 19:04 | UI Modify by Uy 1808
+7aa9704e | 18/08/2026 19:36 | fix(security): override vulnerable deepmerge-ts
+94bb452b | 19/08/2026 07:41 | Rewrite gitignore
+71935900 | 19/08/2026 17:02 | Redirecting Page
+e4296bf2 | 21/08/2026 15:18 | UI Improvement in Candidate and Recruiters
+a04ffaaf | 21/08/2026 15:27 | Fix Conflict tsbuildinfo
+aad42ad5 | 24/08/2026 12:30 | Home Page Improvement
+b4ba16ed | 25/08/2026 02:09 | UI for New Filter in Job Board
+
+===== Nguyen Minh Khoi =====
+088fe103 | 04/06/2026 16:54 | add vietnameworks survey: vietnamworks.md, vietnamworks.pdf
+cbfff8cc | 16/06/2026 11:20 | add 4. Product Overview
+b47c7d5d | 17/06/2026 15:37 | add Khoi_speckit
+6bb50c67 | 28/06/2026 09:53 |  add AI usage report by Khoi
+4b92e6d1 | 28/06/2026 14:06 |  vision doc: 6.non-functional requirements
+71b83962 | 30/06/2026 20:57 |  update Khoi_speckit_pdf
+8ef97a9d | 24/07/2026 15:01 | diagram 4: diagram, prototype, specification
+a98fcfae | 24/07/2026 15:11 |  add rendered diagram 04
+944824df | 25/07/2026 12:26 | Add AI report, fix prototype 04
+badf3e6c | 06/08/2026 15:10 |  version 1: BE component diagram, container diagram, deployment diagram
+ed281a69 | 07/08/2026 10:44 | add Khoi's AI_report
+a7816874 | 07/08/2026 19:16 | vesion 2: container, BE component, deployment diagram
+85695fd3 | 16/08/2026 17:09 | improve respond email to user
+0363bee0 | 17/08/2026 15:38 |  improve emails for applying recruiter
+40fc1484 | 17/08/2026 17:13 | update C4 diagrams for PA5
+
+===== Nguyen Quoc Thanh =====
+0cd8edf5 | 04/06/2026 10:37 | Added file survey  linkedin.md, linkedin.pdf
+abd018a9 | 06/06/2026 08:17 | Fixed format error: invalid direct for image, table
+3b62b2ff | 16/06/2026 10:59 | Add reviewer for linkedin.md
+5a38fd85 | 16/06/2026 11:26 | Have finished study Spec Kit (What is it? How to use it?)
+e563e31a | 17/06/2026 19:24 | Description stakeholder and users for Smart hire (Main workflow, details workflow and summary for candicate, recruiter, admin, base key stakeholder and user needs
+5979c0b1 | 25/06/2026 15:19 | Add writer, reviewer for speckit on type markdown
+8299c1a9 | 25/06/2026 15:32 | Convert speckit from markdown to pdf
+0a23bc88 | 29/06/2026 01:13 | Rename reviewer for 3_Stakeholder_Overview.md
+b6dc7ddd | 29/06/2026 01:28 | Add Recruiter Verification and Company Role Assignment Flow in Recruiter_Verification.md
+f8ee620a | 30/06/2026 01:50 | Add my task, and AI usage for my task during to finish project
+3d049560 | 17/07/2026 09:40 | add summary for app survey
+be27fa65 | 20/07/2026 11:42 | docs: selected PostgreSQL for this project (delete option SQL)
+8d351744 | 20/07/2026 13:46 | docs(constitution): stabilize architecture and session requirements
+9fad1b6f | 20/07/2026 18:03 | Align Better Auth session ownership, Route Handlers, cookie security, TOTP ownership, task dependencies, contracts, and compatibility spikes before implementation.
+c848d856 | 20/07/2026 19:23 | Align the feature artifacts with the apps/web workspace, Docker PostgreSQL, and portable team setup.
+b176582f | 20/07/2026 20:04 | chore(repo): scaffold local-first web workspace
+fae9e112 | 20/07/2026 21:33 | feat(auth): establish Prisma and Better Auth foundation
+ff81cb03 | 20/07/2026 23:22 | feat(auth): complete registration and email verification
+12f04a12 | 21/07/2026 00:09 | feat(email): implement asynchronous SMTP outbox worker
+417f61c9 | 21/07/2026 01:26 | feat(identity): implement login and opaque session management
+b958440c | 21/07/2026 10:28 | docs(identity): align TOTP QR implementation plan
+a9aa05a1 | 21/07/2026 11:01 | added claude code based on spec kit
+25f7c57f | 21/07/2026 14:02 | feat(identity): implement TOTP enrollment
+950152c4 | 21/07/2026 15:47 | feat(identity): implement TOTP login challenge
+d121e85e | 22/07/2026 14:13 | feat(identity): implement backup-code authentication and 2FA management
+6769cc65 | 22/07/2026 16:24 | feat(identity): implement password recovery and reset
+df2d85a2 | 22/07/2026 17:23 | feat(identity): enforce workflow security controls
+ac5364ee | 22/07/2026 21:11 | Add navigate login, logout, forgot password, add auth 2fa
+e214b32b | 23/07/2026 08:13 | feat(identity): complete identity security and validation
+8b34e4f6 | 23/07/2026 18:34 | home, dashboard, reset password, UI in profile
+4ff2e43c | 24/07/2026 02:13 | feat(identity): complete authentication recovery and profile integration
+e645f617 | 24/07/2026 17:20 | AI usage report PA3
+bb131442 | 25/07/2026 11:55 | AI usage report PA3
+28a8d152 | 25/07/2026 15:53 | Fix double toast notify and retrieve the email before send requirement
+c57cef97 | 25/07/2026 21:07 | Add readme.md for this project
+e3560348 | 25/07/2026 21:30 | Update detail project structure
+aa442288 | 25/07/2026 21:35 | Modify AI Usage report title
+4186b96c | 25/07/2026 21:46 | Add table of contents
+7c7c7917 | 25/07/2026 22:04 | Update Changes.md (add product overview change, Feature descriptions)
+410c3a36 | 25/07/2026 22:08 | Modify detailed feature list based on docs/project-plan/changes.md
+301fdd59 | 25/07/2026 22:29 | Update vision_document.md (Add author's name changed)
+8b281981 | 25/07/2026 22:53 | Update 4_Product_Overview.md (revise product overview based on PA2 feedback)
+224f4f9c | 25/07/2026 23:03 | Update (product overview - Applied revise product overview based on changes.md)
+37547abf | 27/07/2026 15:52 | update Better Auth/Prisma adapter to 1.6.25, fix find-my-way 9.7.0 valibot 1.4.2, brace-expansion 5.0.8, ESLint 10.8.0, Closed all API: /api/auth/**
+f9673743 | 30/07/2026 22:00 | Rename ./src to ./spec-kit and async files to match with new path
+6d2583b5 | 30/07/2026 23:52 | create ./web to manager frontend-backend project
+36c3381e | 31/07/2026 01:18 | fix logic turn on 2FA via authentication code
+dda5dece | 31/07/2026 02:25 | fix(ui): refine auth feedback and responsive workspace layout
+598354af | 31/07/2026 09:44 | Spec-kit initialization for Functional Group 002 (specify, clarify)
+456c93b6 | 31/07/2026 10:12 | add .gitignore for prisma\migrate
+9fe3da16 | 31/07/2026 11:42 | Initalization speckit for 002-(specify, clarify, plan, tasks, analyze)
+fb9535dc | 31/07/2026 12:10 | Fixed Critical, high, medium, ready for implement
+4ae89c9e | 31/07/2026 21:33 | feat(profile-account): complete Feature 002 candidate profile and account management
+6376c5f1 | 01/08/2026 00:10 | fix conflict from merger main with 002
+9b1e5698 | 01/08/2026 00:18 | Delete summary.md
+5f006383 | 01/08/2026 00:20 | Delete web/prisma/migrations/20260731191000_preserve_outbox_on_fk_cleanup directory
+0caa2278 | 01/08/2026 00:20 | Delete web/prisma/migrations/20260731025418_test_ready directory
+93f3e993 | 01/08/2026 08:56 | modify ts.config.tsbuildinfor
+d60e96d3 | 01/08/2026 13:11 | specify, clarify initialize
+3fe11a37 | 01/08/2026 14:15 | plan initialize
+e3c15ce8 | 01/08/2026 14:33 | tasks
+199b43a3 | 01/08/2026 17:15 | docs(constitution): clarify 5 MB limit and P95 SLA
+c3c19d52 | 01/08/2026 17:17 | docs(spec-kit): finalize feature 004 CV upload. Ready implementation plan
+5c0b9388 | 02/08/2026 13:42 | Final code is built by speckit-codex feature 004
+687f73e9 | 02/08/2026 15:09 | add module, and test
+b02db4d0 | 02/08/2026 16:52 | Add css for cv-imports
+463c80b2 | 02/08/2026 20:35 | UI for cv-imports, add flow via open AI parse
+3645c31d | 02/08/2026 21:08 | Revise README for clarity and feature updates
+d6c85918 | 04/08/2026 16:04 | Add jobs data clone
+f00632b0 | 04/08/2026 16:37 | Set new time out, maxWait, jobBatchSize to import 10.000 jobs succesful
+17d83610 | 06/08/2026 09:41 | Create folder AI_Usage_PA4
+b78ccb44 | 06/08/2026 13:44 | AI_usage report PA4 -- V001:feature 002
+b3af923d | 06/08/2026 15:35 | fix(): auto async fresh clam althought the database is exist, not exist
+affafeed | 06/08/2026 16:08 | Scaled up scope for AI feature can generate keyword/filter
+b717dccd | 06/08/2026 17:41 | build specify, clarify, plan, tasks, analyze -- ready for implement
+9454d15c | 06/08/2026 23:45 | Task 005 OCR parsing have done
+e5ad5c17 | 07/08/2026 11:58 | fix(): UI search bar, OCR image, AI analyze and then create keyword filter, auto apply to findjobs
+6b5b9177 | 07/08/2026 13:18 | Fix merge conflict main - 005 version 1.0
+726f5076 | 07/08/2026 16:17 | Delete tmp.md
+45272b6b | 07/08/2026 16:20 | fix fallback processing when OpenAI/network error
+6f57bbc5 | 09/08/2026 14:12 | fix global search position
+f85ac092 | 10/08/2026 14:53 | speckit specify, clarify, plan and verified
+a8db15ee | 10/08/2026 15:49 | tasks, anaalyze and fix high, critical problem from analyze, ready for run implement
+5696174e | 10/08/2026 19:09 | implement done by AI
+76801eec | 10/08/2026 19:39 | Change the name of migration for db and then async resource code
+807c366c | 10/08/2026 23:12 | Add access roles and modify UI text box
+0e798eaa | 11/08/2026 08:20 | Fix validate to config enviroment test
+26c9bcfa | 11/08/2026 11:20 | Improve OCR parsing, resize image to fix limitation when processing parse
+f3efca9e | 11/08/2026 13:50 | fix(admin): make security email delivery provider-truth
+b9adec79 | 11/08/2026 19:09 | test(admin): complete email E2E and reliability gates
+7249f8f6 | 12/08/2026 14:13 | The functional group Realtime Message have been done, update readme, add auto run docker with run dev
+1af00fde | 12/08/2026 14:26 | Fix duplicate CV_Storage...., Image_search...
+c4905c3f | 12/08/2026 15:08 | UI update for message
+939a700f | 12/08/2026 20:50 | fix clamAV is died after 1day, can't auto restart
+6480030c | 12/08/2026 23:52 | find user via name, email, id account, and add ID account to account details
+3bc35068 | 13/08/2026 01:27 | feat(admin): add SmartHire Support Center
+1ce8cd73 | 13/08/2026 01:47 | docs(spec): define professional connection proposals
+9d9012d2 | 13/08/2026 09:00 | feat(connections): add bilateral professional connections
+11673f26 | 13/08/2026 09:51 | Modify access to subdomain console.admin.localhost:3001
+70794013 | 13/08/2026 21:06 | add realtime chatting with admin support for role candidate, no need refresh the page
+d1970925 | 13/08/2026 21:24 | normalization migrate name
+912f1bc1 | 13/08/2026 22:03 | fix after merge
+81228868 | 13/08/2026 23:50 | add feature for admin resolve and review messaging report
+69d6b858 | 13/08/2026 23:54 | fix notified EsLint error
+c18f5a64 | 14/08/2026 00:51 | fix stabilize Next custom server runtime and build output locking
+128c67ba | 14/08/2026 01:16 | update UI employer-verification
+91e21e70 | 14/08/2026 01:26 | docs(spec-kit): specify business verification enrichment
+068efbbc | 14/08/2026 01:28 | docs(spec-kit): clarify verification enrichment policies
+096fe266 | 14/08/2026 01:37 | docs(spec-kit): plan business verification enrichment
+fd7320ab | 14/08/2026 01:39 | docs(spec-kit): task business verification enrichment
+85044189 | 14/08/2026 01:41 | docs(spec-kit): resolve verification analysis findings
+124071fb | 14/08/2026 07:33 | feat(verification): implement business verification enrichment
+e14f498a | 14/08/2026 08:10 | fix(verification): harden business verification workflow
+54c890d0 | 14/08/2026 08:54 | fix(verification): preserve company email confirmation flow
+0a87edec | 14/08/2026 09:11 | fix(verification): validate and serialize draft autosave
+898d97c5 | 14/08/2026 11:58 | feat(verification): enable VietQR and expand admin review
+dd89967d | 14/08/2026 12:28 | fix(verification): require confirmed tax registry record
+7dccff69 | 14/08/2026 12:58 | fix(admin): prevent native evidence preview crash
+aa97cd7f | 14/08/2026 14:21 | Modify logic candidate can upload again business license if admin request change
+e7aecd67 | 14/08/2026 14:32 | spec(016): define in-app notification center
+a5ee0ac2 | 14/08/2026 14:33 | spec(016): clarify notification channel policy
+13d313d0 | 14/08/2026 14:40 | spec(016): plan unified notification architecture
+1e02b346 | 14/08/2026 14:43 | spec(016): define notification implementation tasks
+d6c3dde8 | 14/08/2026 14:48 | spec(016): resolve notification analysis findings
+c23b1208 | 14/08/2026 14:59 | feat(notifications): add unified notification foundation
+a65d600c | 14/08/2026 15:07 | feat(notifications): add unified inbox interfaces
+3dc3c289 | 14/08/2026 15:29 | feat(notifications): integrate authoritative event producers
+3107a908 | 14/08/2026 16:47 | fix(notifications): harden retention and validation
+e3f348e0 | 14/08/2026 16:48 | fix(database): normalize notification migration history
+5d2e0039 | 14/08/2026 16:49 | docs(016): complete notification release gates
+867bb936 | 14/08/2026 18:19 | fix(notifications): prevent strict response validation failures
+68d2b7af | 14/08/2026 19:10 | Modify admin page, notification
+2f15ba99 | 15/08/2026 09:10 | fix session_expiry_consistency
+81c437f1 | 15/08/2026 09:33 | Fix warning pdfjs-dist can't be external
+6bfb164f | 15/08/2026 11:31 | add notification log when have some actives from user
+d75b35d2 | 15/08/2026 11:43 | MessageingReport fixture but not remove the notification corresponding
+b73e6acd | 15/08/2026 12:03 | spec: define administrator job-post review workflow
+78708577 | 15/08/2026 12:05 | spec: clarify administrator job-post review decisions
+a0c850f4 | 15/08/2026 12:15 | spec: plan administrator job-post review implementation
+2a440b2b | 15/08/2026 12:20 | spec: add administrator job-post review tasks
+a6919ebb | 15/08/2026 12:53 | spec: resolve pre-implementation analysis findings
+1cf616d8 | 15/08/2026 15:22 | feat: add job post review foundation
+95fa538d | 15/08/2026 15:39 | feat: add recruiter job review submission
+581853bf | 15/08/2026 16:33 | feat: add administrator job review discovery
+d38d3902 | 15/08/2026 16:54 | add administrator job post decisions
+a4233080 | 16/08/2026 01:07 | feat: finish recruiter outcome evidence
+68adec13 | 16/08/2026 11:02 | complete job post review workflow and improve review console
+6f3b71ba | 16/08/2026 11:26 | fix(db): make scoring migration index renames idempotent
+353d716c | 16/08/2026 11:39 | fix(recruiter): close merged review stylesheet block
+2b096f95 | 16/08/2026 11:54 | define administrator job post management specification
+fc49af23 | 16/08/2026 11:55 | record job post management decisions
+17112950 | 16/08/2026 11:59 | plan administrator job post management
+e6298f62 | 16/08/2026 12:01 | define administrator job post management tasks
+eb65370e | 16/08/2026 12:03 | align job post management design artifacts
+0d7b0744 | 16/08/2026 12:13 | build administrator job post management foundation
+16827526 | 16/08/2026 12:25 | complete job post operational commands
+67ac212f | 16/08/2026 12:29 | verify job post management foundation
+a1dfe937 | 16/08/2026 12:47 | complete job post management operations
+b9271a22 | 16/08/2026 12:53 | verify job post management release readiness
+3147ce08 | 16/08/2026 12:58 | harden job post management validation
+6ba95f3a | 16/08/2026 13:06 | align job post enforcement contracts
+0603c6f3 | 16/08/2026 13:08 | separate job post management persistence
+f24b5a05 | 16/08/2026 13:09 | track completed job post management tasks
+d50c5382 | 16/08/2026 13:14 | test job post management contracts
+8fb34871 | 16/08/2026 13:16 | test job post management discovery contract
+895a18e4 | 16/08/2026 13:21 | separate job post management read projections
+22833eb0 | 16/08/2026 13:24 | separate job post feature policy
+0c476187 | 16/08/2026 13:26 | notify recruiters about job correction requests
+aceed584 | 16/08/2026 13:27 | record completed job management implementations
+3a534e02 | 16/08/2026 13:46 | test job post management workflows
+ff7cad60 | 16/08/2026 13:51 | complete job post management verification
+670e4cfe | 16/08/2026 13:53 | commit tsbuildconfig
+8e1da929 | 16/08/2026 14:00 | docs: audit notification event-policy mapping
+1fed9db4 | 16/08/2026 14:01 | spec: notification deep-link resolution
+00690d09 | 16/08/2026 14:02 | plan: notification deep-link implementation
+c47b5a58 | 16/08/2026 14:02 | tasks: notification deep-link breakdown
+d4340f55 | 16/08/2026 14:03 | test(notifications): add destination resolver matrix
+05b1f5e9 | 16/08/2026 14:05 | feat(notifications): resolve href by context and audience
+f36f2638 | 16/08/2026 14:06 | feat(web): notification click flow with nonblocking mark-read
+b813d08d | 16/08/2026 14:08 | test(notifications): verify transient href policy
+67d74473 | 16/08/2026 20:41 | fix(admin): show account access roles in directory
+923912b8 | 16/08/2026 20:46 | feat(admin): show applicant counts and recruiter contact
+5213bc57 | 16/08/2026 20:47 | fix(admin): attribute recruiter activity to submitter
+6c96fb9d | 16/08/2026 20:57 | feat(admin): authorize job management for active administrators
+4f2d532a | 16/08/2026 21:34 | feat(notifications): resolve href by recipient role
+349f7664 | 16/08/2026 21:36 | fix(admin): navigate notifications from server href
+3e24afda | 16/08/2026 21:37 | docs(spec): correct deep-link task status
+56e4ee5d | 18/08/2026 07:52 | commit tsconfig
+9e1912bb | 18/08/2026 08:35 | fix npm audit
+c649968b | 18/08/2026 12:17 | backup
+d495c700 | 18/08/2026 14:02 | backup data
+53b667be | 18/08/2026 14:22 | Update UI for request recruiter verification
+e6bee96b | 18/08/2026 14:54 | Add the new feature for admin: management company overview
+4724439e | 18/08/2026 15:17 | update UI for detail company membership
+78ccc562 | 18/08/2026 15:22 | update UI for detail user account
+bb5e89e8 | 18/08/2026 15:33 | Does not hide job reviewed, verification recruiter reviewed
+1a042076 | 18/08/2026 15:38 | update UI for detail moderation report job
+8b73d791 | 18/08/2026 16:23 | Add tokenized name search, exact reference filters, normalized job-review   title indexing, migration reconciliation, and admin search documentation.
+c926e5b8 | 18/08/2026 19:44 | save data test
+85b3a0f6 | 18/08/2026 20:31 | Add Owner can see and edit Kanban
+433343b5 | 19/08/2026 21:02 | Company member invitations have done
+410ef1d6 | 19/08/2026 21:24 | Fix database can't load UI team
+1aed779c | 19/08/2026 21:26 | Delete summary.md
+6c8c4fed | 20/08/2026 12:20 | update UI for page company/team management
+bdfe232d | 20/08/2026 13:01 | inapp notification & email notification | company invite member
+c3038ab5 | 20/08/2026 14:08 | Update UI company invite member
+ab589d66 | 20/08/2026 14:10 | commit file tsconfig.tsbuildinfo
+63a5702c | 20/08/2026 14:35 | add safe deep links for all notification contexts
+34f59b7e | 20/08/2026 15:07 | route admin support alerts to case details
+a77aaa61 | 20/08/2026 22:22 | improve notification, admin, and messaging workflows
+2f37e416 | 20/08/2026 22:40 | store draft jobs, companies, tsconfig
+76ef5f2c | 21/08/2026 01:28 | implement application-scoped recruitment messaging
+e321792e | 21/08/2026 11:19 | add reversible company ban, notifications, and effective member access
+5ca6642b | 21/08/2026 13:50 | Normalize Prisma migration sequence
+08e61835 | 21/08/2026 13:50 | Add administrator data backup workflow
+6e7e241d | 21/08/2026 13:51 | Configure backup worker runtime
+21bc09b5 | 21/08/2026 13:51 | Document administrator data backup
+6e84da26 | 21/08/2026 13:57 | Add backup decryption command
+1d6cd152 | 21/08/2026 14:02 | Show backup step-up access state
+d0e38737 | 21/08/2026 14:08 | Paginate administrator exports
+24bcc1ac | 21/08/2026 14:16 | Improve backup settings administration
+

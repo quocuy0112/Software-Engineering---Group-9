@@ -888,6 +888,12 @@
   box-shadow: 0 0 0 3px #dee8ff;
 }
 
+.auth-card input::placeholder,
+.auth-card .sh-input::placeholder {
+  color: #93a4c1;
+  opacity: 1;
+}
+
 .auth-card button[type="submit"] {
   width: 100%;
   min-height: 48px;
@@ -964,6 +970,89 @@
   padding: 0;
   margin: -6px 0 0;
   list-style: none;
+}
+
+.password-field-label {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 7px;
+}
+
+.password-field-hint {
+  position: relative;
+  display: inline-flex;
+}
+
+.auth-form .password-field-hint-trigger {
+  display: inline-grid;
+  box-sizing: border-box;
+  width: 19px;
+  min-width: 19px;
+  height: 19px;
+  min-height: 19px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--sh-color-text-secondary);
+  background: transparent;
+  box-shadow: none;
+  cursor: help;
+  transition:
+    color 120ms ease,
+    background-color 120ms ease;
+}
+
+.auth-form .password-field-hint-trigger svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.auth-form .password-field-hint-trigger:hover,
+.auth-form .password-field-hint-trigger:focus-visible {
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-focus-ring-bg);
+  box-shadow: none;
+  transform: none;
+}
+
+.auth-form .password-field-hint-trigger:focus-visible {
+  outline: 2px solid var(--sh-color-brand-primary);
+  outline-offset: 2px;
+}
+
+.password-field-hint-tooltip {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 8px);
+  left: 50%;
+  width: max-content;
+  max-width: min(288px, calc(100vw - 48px));
+  padding: 9px 11px;
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: 9px;
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-sidebar-background);
+  box-shadow: var(--sh-shadow-floating);
+  font-family: var(--sh-font-family);
+  font-size: 11.5px;
+  font-style: normal;
+  font-weight: var(--sh-font-weight-medium);
+  line-height: 1.45;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -3px);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.password-field-hint:hover .password-field-hint-tooltip,
+.password-field-hint:focus-within .password-field-hint-tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 .password-requirement-checklist li {

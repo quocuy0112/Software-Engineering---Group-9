@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useAccountRecoveryCapability } from "@/frontend/features/authentication/client/use-account-recovery-capability";
 import { AuthStatus } from "./auth-status";
 import { PasswordField } from "./password-field";
+import { PasswordRequirementChecklist } from "./password-requirement-checklist";
 
 export function AccountRecoveryCompletion() {
   const capability = useAccountRecoveryCapability("completion");
@@ -93,6 +94,7 @@ export function AccountRecoveryCompletion() {
           onChange={(event) => setPassword(event.target.value)}
           required
         />
+        <PasswordRequirementChecklist value={password} />
         <PasswordField
           label="Confirm new password"
           id="account-recovery-confirm-password"

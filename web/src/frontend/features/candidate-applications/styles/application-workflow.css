@@ -5093,6 +5093,21 @@
   background: var(--sh-color-surface-subtle);
 }
 
+/* Locked profile values are rendered as semantic text boxes, not disabled
+ * inputs.  The light-stage refresh above gives them a slate ink value, so
+ * restore the dark token explicitly rather than letting that light value sit
+ * on a dark surface.  `-webkit-text-fill-color` also protects this contrast
+ * when a browser applies disabled-control text rendering. */
+:root[data-theme="dark"] .application-personal-information__locked-box,
+:root[data-theme="dark"] .application-personal-information__locked-box span {
+  color: var(--sh-color-text-primary);
+  -webkit-text-fill-color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] .application-personal-information__locked-box svg {
+  color: var(--sh-color-text-muted);
+}
+
 :root[data-theme="dark"] :is(
   .application-personal-information input:not([type="checkbox"]):not([type="radio"]),
   .application-files__textarea,
@@ -5109,6 +5124,30 @@
   box-shadow: var(--sh-shadow-card);
 }
 
+/* Make the three application stages scannable on a dark surface: completed
+ * and current states carry their semantic color, while the upcoming state
+ * remains visible without competing with the active step. */
+:root[data-theme="dark"] .application-stepper__step:not(:last-child)::after {
+  background: var(--sh-color-border-subtle);
+}
+
+:root[data-theme="dark"] .application-stepper__step--upcoming .application-stepper__node {
+  border: 1px solid var(--sh-color-border-subtle);
+  color: var(--sh-color-text-muted);
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] .application-stepper__step--current .application-stepper__node {
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-brand-primary);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--sh-color-brand-primary) 22%, transparent);
+}
+
+:root[data-theme="dark"] .application-stepper__step--complete .application-stepper__node {
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-success);
+}
+
 :root[data-theme="dark"] :is(
   .application-stepper__step:not(:last-child)::after,
   .application-stepper__node,
@@ -5118,11 +5157,24 @@
   background: var(--sh-color-surface-subtle);
 }
 
+/* Review headings need only their divider; a filled strip makes each summary
+ * card look like it contains a second nested panel in dark mode. */
+:root[data-theme="dark"] .application-review-submit__card-heading {
+  background: transparent;
+}
+
 :root[data-theme="dark"] :is(
   .application-stepper__eyebrow,
   .application-stepper__label strong
 ) {
   color: var(--sh-color-text-muted);
+}
+
+:root[data-theme="dark"] :is(
+  .application-stepper__step--current .application-stepper__eyebrow,
+  .application-stepper__step--complete .application-stepper__eyebrow
+) {
+  color: var(--sh-color-brand-primary);
 }
 
 :root[data-theme="dark"] :is(
@@ -5147,10 +5199,128 @@
 
 :root[data-theme="dark"] :is(
   .application-personal-information__tags span,
-  .application-files__tags span
+  .application-files__tags span,
+  .application-review-submit__tags span
 ) {
   color: var(--sh-color-text-secondary);
   background: var(--sh-color-surface-subtle);
+}
+
+/* Stage 2: all file-selection states and the parsing warning need dark
+ * surfaces.  The warning stays distinct, but never falls back to cream from
+ * the light stage. */
+:root[data-theme="dark"] .application-files__segmented button.is-active {
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-card);
+}
+
+:root[data-theme="dark"] .application-files__cv-list > button.is-selected {
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-info-bg);
+  box-shadow: inset 0 0 0 1px var(--sh-color-brand-primary);
+}
+
+:root[data-theme="dark"] :is(
+  .application-files__cv-list strong,
+  .application-files__file-copy strong,
+  .application-files__dropzone strong,
+  .application-files__job-card > strong,
+  .application-files__checklist li.is-complete,
+  .application-files__checklist li.is-current
+) {
+  color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] :is(
+  .application-files__cv-list small,
+  .application-files__file-copy small,
+  .application-files__dropzone small,
+  .application-files__job-card > p,
+  .application-files__job-card > small,
+  .application-files__checklist li,
+  .application-files__info-card li
+) {
+  color: var(--sh-color-text-secondary);
+}
+
+:root[data-theme="dark"] .application-files__callout {
+  border-color: var(--sh-color-warning);
+  background: var(--sh-color-warning-bg);
+}
+
+:root[data-theme="dark"] .application-files__callout strong {
+  color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] .application-files__callout p {
+  color: var(--sh-color-text-secondary);
+}
+
+/* Stage 3: prevent the review summary, file rows and explanatory blocks from
+ * inheriting the light slate/white values defined by the shared stage reset. */
+:root[data-theme="dark"] :is(
+  .application-review-submit__summary-grid dd,
+  .application-review-submit__file-copy strong,
+  .application-review-submit__textarea-label,
+  .application-review-submit__callout h2,
+  .application-review-submit__job-card > strong,
+  .application-review-submit__checklist li,
+  .application-review-submit__after-submit h2
+) {
+  color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] :is(
+  .application-review-submit__summary-grid dd.is-muted,
+  .application-review-submit__file-copy small,
+  .application-review-submit__cover-preview p,
+  .application-review-submit__empty-state,
+  .application-review-submit__callout p,
+  .application-review-submit__callout-note,
+  .application-review-submit__job-card > p,
+  .application-review-submit__job-card > small,
+  .application-review-submit__after-submit p,
+  .application-review-submit__after-submit small
+) {
+  color: var(--sh-color-text-secondary);
+}
+
+:root[data-theme="dark"] :is(
+  .application-review-submit__file-row,
+  .application-review-submit__cover-preview,
+  .application-review-submit__callout-note,
+  .application-review-submit__confirm
+) {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-subtle);
+}
+
+/* The summary, progress and disclosure cards carry a mix of title, value and
+ * supporting copy.  Keep every tier on the same dark semantic scale so no
+ * light-only slate/white rule can reduce contrast on the Apply flow. */
+:root[data-theme="dark"] :is(
+  .application-personal-information__job-card > strong,
+  .application-personal-information__checklist li.is-current,
+  .application-personal-information__callout,
+  .application-personal-information__info-card h2
+) {
+  color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] :is(
+  .application-personal-information__job-card > p,
+  .application-personal-information__job-card > small,
+  .application-personal-information__checklist li,
+  .application-personal-information__callout p,
+  .application-personal-information__info-card p
+) {
+  color: var(--sh-color-text-secondary);
+}
+
+:root[data-theme="dark"] .application-flow-header__save svg {
+  color: var(--sh-color-text-muted);
 }
 
 /* Legacy candidate-application states share the same screen as the newer

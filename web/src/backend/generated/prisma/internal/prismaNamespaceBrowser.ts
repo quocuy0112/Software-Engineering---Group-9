@@ -314,6 +314,10 @@ export const CandidateProfileScalarFieldEnum = {
   summary: 'summary',
   phone: 'phone',
   location: 'location',
+  dateOfBirth: 'dateOfBirth',
+  preferredName: 'preferredName',
+  interests: 'interests',
+  bio: 'bio',
   revision: 'revision',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

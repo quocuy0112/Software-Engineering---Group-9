@@ -41,6 +41,10 @@ export type CandidateProfileMinAggregateOutputType = {
   summary: string | null
   phone: string | null
   location: string | null
+  dateOfBirth: Date | null
+  preferredName: string | null
+  interests: string | null
+  bio: string | null
   revision: number | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -53,6 +57,10 @@ export type CandidateProfileMaxAggregateOutputType = {
   summary: string | null
   phone: string | null
   location: string | null
+  dateOfBirth: Date | null
+  preferredName: string | null
+  interests: string | null
+  bio: string | null
   revision: number | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -65,6 +73,10 @@ export type CandidateProfileCountAggregateOutputType = {
   summary: number
   phone: number
   location: number
+  dateOfBirth: number
+  preferredName: number
+  interests: number
+  bio: number
   revision: number
   createdAt: number
   updatedAt: number
@@ -87,6 +99,10 @@ export type CandidateProfileMinAggregateInputType = {
   summary?: true
   phone?: true
   location?: true
+  dateOfBirth?: true
+  preferredName?: true
+  interests?: true
+  bio?: true
   revision?: true
   createdAt?: true
   updatedAt?: true
@@ -99,6 +115,10 @@ export type CandidateProfileMaxAggregateInputType = {
   summary?: true
   phone?: true
   location?: true
+  dateOfBirth?: true
+  preferredName?: true
+  interests?: true
+  bio?: true
   revision?: true
   createdAt?: true
   updatedAt?: true
@@ -111,6 +131,10 @@ export type CandidateProfileCountAggregateInputType = {
   summary?: true
   phone?: true
   location?: true
+  dateOfBirth?: true
+  preferredName?: true
+  interests?: true
+  bio?: true
   revision?: true
   createdAt?: true
   updatedAt?: true
@@ -210,6 +234,10 @@ export type CandidateProfileGroupByOutputType = {
   summary: string | null
   phone: string | null
   location: string | null
+  dateOfBirth: Date | null
+  preferredName: string | null
+  interests: string | null
+  bio: string | null
   revision: number
   createdAt: Date
   updatedAt: Date
@@ -245,6 +273,10 @@ export type CandidateProfileWhereInput = {
   summary?: Prisma.StringNullableFilter<"CandidateProfile"> | string | null
   phone?: Prisma.StringNullableFilter<"CandidateProfile"> | string | null
   location?: Prisma.StringNullableFilter<"CandidateProfile"> | string | null
+  dateOfBirth?: Prisma.DateTimeNullableFilter<"CandidateProfile"> | Date | string | null
+  preferredName?: Prisma.StringNullableFilter<"CandidateProfile"> | string | null
+  interests?: Prisma.StringNullableFilter<"CandidateProfile"> | string | null
+  bio?: Prisma.StringNullableFilter<"CandidateProfile"> | string | null
   revision?: Prisma.IntFilter<"CandidateProfile"> | number
   createdAt?: Prisma.DateTimeFilter<"CandidateProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CandidateProfile"> | Date | string
@@ -265,6 +297,10 @@ export type CandidateProfileOrderByWithRelationInput = {
   summary?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
+  preferredName?: Prisma.SortOrderInput | Prisma.SortOrder
+  interests?: Prisma.SortOrderInput | Prisma.SortOrder
+  bio?: Prisma.SortOrderInput | Prisma.SortOrder
   revision?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -288,6 +324,10 @@ export type CandidateProfileWhereUniqueInput = Prisma.AtLeast<{
   summary?: Prisma.StringNullableFilter<"CandidateProfile"> | string | null
   phone?: Prisma.StringNullableFilter<"CandidateProfile"> | string | null
   location?: Prisma.StringNullableFilter<"CandidateProfile"> | string | null
+  dateOfBirth?: Prisma.DateTimeNullableFilter<"CandidateProfile"> | Date | string | null
+  preferredName?: Prisma.StringNullableFilter<"CandidateProfile"> | string | null
+  interests?: Prisma.StringNullableFilter<"CandidateProfile"> | string | null
+  bio?: Prisma.StringNullableFilter<"CandidateProfile"> | string | null
   revision?: Prisma.IntFilter<"CandidateProfile"> | number
   createdAt?: Prisma.DateTimeFilter<"CandidateProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CandidateProfile"> | Date | string
@@ -308,6 +348,10 @@ export type CandidateProfileOrderByWithAggregationInput = {
   summary?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
+  preferredName?: Prisma.SortOrderInput | Prisma.SortOrder
+  interests?: Prisma.SortOrderInput | Prisma.SortOrder
+  bio?: Prisma.SortOrderInput | Prisma.SortOrder
   revision?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -328,6 +372,10 @@ export type CandidateProfileScalarWhereWithAggregatesInput = {
   summary?: Prisma.StringNullableWithAggregatesFilter<"CandidateProfile"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"CandidateProfile"> | string | null
   location?: Prisma.StringNullableWithAggregatesFilter<"CandidateProfile"> | string | null
+  dateOfBirth?: Prisma.DateTimeNullableWithAggregatesFilter<"CandidateProfile"> | Date | string | null
+  preferredName?: Prisma.StringNullableWithAggregatesFilter<"CandidateProfile"> | string | null
+  interests?: Prisma.StringNullableWithAggregatesFilter<"CandidateProfile"> | string | null
+  bio?: Prisma.StringNullableWithAggregatesFilter<"CandidateProfile"> | string | null
   revision?: Prisma.IntWithAggregatesFilter<"CandidateProfile"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"CandidateProfile"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"CandidateProfile"> | Date | string
@@ -339,6 +387,10 @@ export type CandidateProfileCreateInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -359,6 +411,10 @@ export type CandidateProfileUncheckedCreateInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -377,6 +433,10 @@ export type CandidateProfileUpdateInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -397,6 +457,10 @@ export type CandidateProfileUncheckedUpdateInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -416,6 +480,10 @@ export type CandidateProfileCreateManyInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -427,6 +495,10 @@ export type CandidateProfileUpdateManyMutationInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -439,6 +511,10 @@ export type CandidateProfileUncheckedUpdateManyInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -456,6 +532,10 @@ export type CandidateProfileCountOrderByAggregateInput = {
   summary?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrder
+  preferredName?: Prisma.SortOrder
+  interests?: Prisma.SortOrder
+  bio?: Prisma.SortOrder
   revision?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -472,6 +552,10 @@ export type CandidateProfileMaxOrderByAggregateInput = {
   summary?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrder
+  preferredName?: Prisma.SortOrder
+  interests?: Prisma.SortOrder
+  bio?: Prisma.SortOrder
   revision?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -484,6 +568,10 @@ export type CandidateProfileMinOrderByAggregateInput = {
   summary?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrder
+  preferredName?: Prisma.SortOrder
+  interests?: Prisma.SortOrder
+  bio?: Prisma.SortOrder
   revision?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -634,6 +722,10 @@ export type CandidateProfileCreateWithoutCandidateInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -652,6 +744,10 @@ export type CandidateProfileUncheckedCreateWithoutCandidateInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -686,6 +782,10 @@ export type CandidateProfileUpdateWithoutCandidateInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -704,6 +804,10 @@ export type CandidateProfileUncheckedUpdateWithoutCandidateInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -722,6 +826,10 @@ export type CandidateProfileCreateWithoutExperiencesInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -741,6 +849,10 @@ export type CandidateProfileUncheckedCreateWithoutExperiencesInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -774,6 +886,10 @@ export type CandidateProfileUpdateWithoutExperiencesInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -793,6 +909,10 @@ export type CandidateProfileUncheckedUpdateWithoutExperiencesInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -810,6 +930,10 @@ export type CandidateProfileCreateWithoutEducationInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -829,6 +953,10 @@ export type CandidateProfileUncheckedCreateWithoutEducationInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -862,6 +990,10 @@ export type CandidateProfileUpdateWithoutEducationInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -881,6 +1013,10 @@ export type CandidateProfileUncheckedUpdateWithoutEducationInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -898,6 +1034,10 @@ export type CandidateProfileCreateWithoutSkillsInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -917,6 +1057,10 @@ export type CandidateProfileUncheckedCreateWithoutSkillsInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -950,6 +1094,10 @@ export type CandidateProfileUpdateWithoutSkillsInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -969,6 +1117,10 @@ export type CandidateProfileUncheckedUpdateWithoutSkillsInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -986,6 +1138,10 @@ export type CandidateProfileCreateWithoutSocialLinksInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1005,6 +1161,10 @@ export type CandidateProfileUncheckedCreateWithoutSocialLinksInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1038,6 +1198,10 @@ export type CandidateProfileUpdateWithoutSocialLinksInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1057,6 +1221,10 @@ export type CandidateProfileUncheckedUpdateWithoutSocialLinksInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1074,6 +1242,10 @@ export type CandidateProfileCreateWithoutCvUploadsInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1093,6 +1265,10 @@ export type CandidateProfileUncheckedCreateWithoutCvUploadsInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1126,6 +1302,10 @@ export type CandidateProfileUpdateWithoutCvUploadsInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1145,6 +1325,10 @@ export type CandidateProfileUncheckedUpdateWithoutCvUploadsInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1162,6 +1346,10 @@ export type CandidateProfileCreateWithoutCvDraftsInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1181,6 +1369,10 @@ export type CandidateProfileUncheckedCreateWithoutCvDraftsInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1214,6 +1406,10 @@ export type CandidateProfileUpdateWithoutCvDraftsInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1233,6 +1429,10 @@ export type CandidateProfileUncheckedUpdateWithoutCvDraftsInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1250,6 +1450,10 @@ export type CandidateProfileCreateWithoutCvConfirmationsInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1269,6 +1473,10 @@ export type CandidateProfileUncheckedCreateWithoutCvConfirmationsInput = {
   summary?: string | null
   phone?: string | null
   location?: string | null
+  dateOfBirth?: Date | string | null
+  preferredName?: string | null
+  interests?: string | null
+  bio?: string | null
   revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1302,6 +1510,10 @@ export type CandidateProfileUpdateWithoutCvConfirmationsInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1321,6 +1533,10 @@ export type CandidateProfileUncheckedUpdateWithoutCvConfirmationsInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1424,6 +1640,10 @@ export type CandidateProfileSelect<ExtArgs extends runtime.Types.Extensions.Inte
   summary?: boolean
   phone?: boolean
   location?: boolean
+  dateOfBirth?: boolean
+  preferredName?: boolean
+  interests?: boolean
+  bio?: boolean
   revision?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1445,6 +1665,10 @@ export type CandidateProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   summary?: boolean
   phone?: boolean
   location?: boolean
+  dateOfBirth?: boolean
+  preferredName?: boolean
+  interests?: boolean
+  bio?: boolean
   revision?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1458,6 +1682,10 @@ export type CandidateProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   summary?: boolean
   phone?: boolean
   location?: boolean
+  dateOfBirth?: boolean
+  preferredName?: boolean
+  interests?: boolean
+  bio?: boolean
   revision?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1471,12 +1699,16 @@ export type CandidateProfileSelectScalar = {
   summary?: boolean
   phone?: boolean
   location?: boolean
+  dateOfBirth?: boolean
+  preferredName?: boolean
+  interests?: boolean
+  bio?: boolean
   revision?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type CandidateProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "candidateUserId" | "headline" | "summary" | "phone" | "location" | "revision" | "createdAt" | "updatedAt", ExtArgs["result"]["candidateProfile"]>
+export type CandidateProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "candidateUserId" | "headline" | "summary" | "phone" | "location" | "dateOfBirth" | "preferredName" | "interests" | "bio" | "revision" | "createdAt" | "updatedAt", ExtArgs["result"]["candidateProfile"]>
 export type CandidateProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   candidate?: boolean | Prisma.CandidateIdentityDefaultArgs<ExtArgs>
   experiences?: boolean | Prisma.CandidateProfile$experiencesArgs<ExtArgs>
@@ -1514,6 +1746,10 @@ export type $CandidateProfilePayload<ExtArgs extends runtime.Types.Extensions.In
     summary: string | null
     phone: string | null
     location: string | null
+    dateOfBirth: Date | null
+    preferredName: string | null
+    interests: string | null
+    bio: string | null
     revision: number
     createdAt: Date
     updatedAt: Date
@@ -1954,6 +2190,10 @@ export interface CandidateProfileFieldRefs {
   readonly summary: Prisma.FieldRef<"CandidateProfile", 'String'>
   readonly phone: Prisma.FieldRef<"CandidateProfile", 'String'>
   readonly location: Prisma.FieldRef<"CandidateProfile", 'String'>
+  readonly dateOfBirth: Prisma.FieldRef<"CandidateProfile", 'DateTime'>
+  readonly preferredName: Prisma.FieldRef<"CandidateProfile", 'String'>
+  readonly interests: Prisma.FieldRef<"CandidateProfile", 'String'>
+  readonly bio: Prisma.FieldRef<"CandidateProfile", 'String'>
   readonly revision: Prisma.FieldRef<"CandidateProfile", 'Int'>
   readonly createdAt: Prisma.FieldRef<"CandidateProfile", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"CandidateProfile", 'DateTime'>

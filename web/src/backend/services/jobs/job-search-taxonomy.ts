@@ -18,6 +18,11 @@ type TaxonomyRow = Readonly<{
   }> | null;
 }>;
 
+type CandidateVisibleTaxonomyRow = TaxonomyRow &
+  Readonly<{
+    id: string;
+  }>;
+
 type MutableTitle = {
   name: string;
   categoryIds: Set<string>;
@@ -50,6 +55,7 @@ const emptyTaxonomy: JobSearchTaxonomy = { industries: [], locations: [] };
 const expectedIndustryCount = 29;
 
 const taxonomyCatalogJobSchema = z.object({
+  id: z.string().trim().min(1),
   industry: z.string().trim().min(1),
   industryCode: z.string().trim().min(1),
   categoryFamily: z.string().trim().min(1).optional(),
@@ -57,6 +63,7 @@ const taxonomyCatalogJobSchema = z.object({
   title: z.string().trim().min(1),
   categoryIds: z.array(z.string().trim().min(1)),
   status: z.string().trim().min(1),
+  applyDeadline: z.string().datetime().nullable(),
   location: z.object({
     city: z.string().trim().min(1),
     district: z.string().trim().nullable(),
@@ -116,12 +123,11 @@ export function buildJobSearchTaxonomy(
  */
 export function buildCatalogJobSearchTaxonomy(
   jobs: readonly TaxonomyCatalogJob[],
+  now = new Date(),
 ): JobSearchTaxonomy {
   return buildTaxonomy(
     jobs
-      .filter(({ status }) =>
-        ["open", "closing_soon", "active"].includes(status.toLowerCase()),
-      )
+      .filter((job) => isCatalogJobOpen(job, now))
       .map((job) => ({
         industry: job.industry,
         industryCode: job.industryCode || job.categoryFamily || "other",
@@ -131,6 +137,37 @@ export function buildCatalogJobSearchTaxonomy(
         location: job.location,
       })),
   );
+}
+
+function isCatalogJobOpen(job: TaxonomyCatalogJob, now: Date) {
+  if (!["open", "closing_soon", "active"].includes(job.status.toLowerCase())) {
+    return false;
+  }
+
+  return !job.applyDeadline || new Date(job.applyDeadline) > now;
+}
+
+function nextCatalogTaxonomyRefreshAt(
+  jobs: readonly TaxonomyCatalogJob[],
+  now: Date,
+) {
+  let nextRefreshAt = Number.POSITIVE_INFINITY;
+
+  for (const job of jobs) {
+    if (
+      !["open", "closing_soon", "active"].includes(job.status.toLowerCase())
+    ) {
+      continue;
+    }
+    if (!job.applyDeadline) continue;
+
+    const deadline = new Date(job.applyDeadline).getTime();
+    if (deadline > now.getTime() && deadline < nextRefreshAt) {
+      nextRefreshAt = deadline;
+    }
+  }
+
+  return nextRefreshAt;
 }
 
 function buildTaxonomy(entries: readonly TaxonomyEntry[]): JobSearchTaxonomy {
@@ -245,7 +282,17 @@ function buildTaxonomy(entries: readonly TaxonomyEntry[]): JobSearchTaxonomy {
   };
 }
 
-let catalogTaxonomyPromise: Promise<JobSearchTaxonomy> | null = null;
+type CachedCatalogTaxonomy = Readonly<{
+  taxonomy: JobSearchTaxonomy;
+  refreshAt: number;
+}>;
+
+let catalogTaxonomyCache: CachedCatalogTaxonomy | null = null;
+let catalogTaxonomyPromise: Promise<CachedCatalogTaxonomy> | null = null;
+let candidateTaxonomyCache: CachedCatalogTaxonomy | null = null;
+let candidateTaxonomyPromise: Promise<CachedCatalogTaxonomy> | null = null;
+
+const candidateTaxonomyMaxAgeMs = 60_000;
 
 function parseTaxonomyJson(text: string): unknown {
   try {
@@ -294,11 +341,127 @@ async function readTaxonomyCatalog(): Promise<unknown> {
   }
 }
 
+function locationFromDatabaseValue(location: string) {
+  const parts = location
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const city = parts.at(-1) || location;
+  const district = parts.length > 1 ? parts.slice(0, -1).join(", ") : null;
+  return { city, district };
+}
+
+function buildCandidateVisibleTaxonomy(
+  catalog: readonly TaxonomyCatalogJob[],
+  rows: readonly CandidateVisibleTaxonomyRow[],
+): JobSearchTaxonomy {
+  const catalogById = new Map(catalog.map((job) => [job.id, job]));
+  const industryCodes = new Map(
+    catalog.map((job) => [
+      job.industry,
+      job.industryCode || job.categoryFamily,
+    ]),
+  );
+
+  return buildTaxonomy(
+    rows.map((row) => {
+      const catalogJob = catalogById.get(row.id);
+      if (catalogJob) {
+        return {
+          industry: catalogJob.industry,
+          industryCode:
+            catalogJob.industryCode || catalogJob.categoryFamily || "other",
+          subIndustry: catalogJob.subIndustry,
+          title: catalogJob.title,
+          categoryIds: catalogJob.categoryIds,
+          location: catalogJob.location,
+        };
+      }
+
+      const snapshot = jobReviewSnapshotSchema.safeParse(
+        row.reviewAggregate?.approvedVersion?.snapshot,
+      ).data;
+      const industry =
+        snapshot?.industry || row.company.industry || "Other opportunities";
+      return {
+        industry,
+        industryCode:
+          snapshot?.industryCode ||
+          snapshot?.categoryFamily ||
+          industryCodes.get(industry) ||
+          "other",
+        subIndustry: snapshot?.subIndustry || "Open roles",
+        title: snapshot?.title || row.title,
+        categoryIds: snapshot?.categoryIds ?? [],
+        location: snapshot?.location || locationFromDatabaseValue(row.location),
+      };
+    }),
+  );
+}
+
+async function readCandidateVisibleTaxonomyRows(
+  now: Date,
+): Promise<readonly CandidateVisibleTaxonomyRow[]> {
+  const [{ prisma }, { candidateVisibleJobWhere }] = await Promise.all([
+    import("@/backend/database/prisma"),
+    import("@/backend/repositories/jobs/candidate-visible-job-policy"),
+  ]);
+
+  return prisma.jobPosting.findMany({
+    where: candidateVisibleJobWhere(now),
+    select: {
+      id: true,
+      title: true,
+      location: true,
+      company: { select: { industry: true } },
+      reviewAggregate: {
+        select: { approvedVersion: { select: { snapshot: true } } },
+      },
+    },
+  });
+}
+
+/**
+ * Uses the exact same public-visibility policy as JobDiscoveryService. This
+ * keeps the header total and every category/location count in sync with the
+ * jobs a candidate can actually discover.
+ */
+export async function listCandidateVisibleJobSearchTaxonomy(): Promise<JobSearchTaxonomy> {
+  if (candidateTaxonomyCache && candidateTaxonomyCache.refreshAt > Date.now()) {
+    return candidateTaxonomyCache.taxonomy;
+  }
+
+  const now = new Date();
+  candidateTaxonomyPromise ??= Promise.all([
+    readTaxonomyCatalog().then((catalog) =>
+      z.array(taxonomyCatalogJobSchema).parse(catalog),
+    ),
+    readCandidateVisibleTaxonomyRows(now),
+  ]).then(([catalog, rows]) => ({
+    taxonomy: buildCandidateVisibleTaxonomy(catalog, rows),
+    // A short cache avoids repeatedly parsing the complete catalog, while a
+    // newly approved, expired, or seeded job is reflected promptly.
+    refreshAt: now.getTime() + candidateTaxonomyMaxAgeMs,
+  }));
+
+  try {
+    candidateTaxonomyCache = await candidateTaxonomyPromise;
+    return candidateTaxonomyCache.taxonomy;
+  } finally {
+    candidateTaxonomyPromise = null;
+  }
+}
+
 export async function listJobSearchTaxonomy(): Promise<JobSearchTaxonomy> {
+  if (catalogTaxonomyCache && catalogTaxonomyCache.refreshAt > Date.now()) {
+    return catalogTaxonomyCache.taxonomy;
+  }
+
   catalogTaxonomyPromise ??= readTaxonomyCatalog().then((catalog) => {
     const jobs = z.array(taxonomyCatalogJobSchema).parse(catalog);
+    const now = new Date();
     const computedTaxonomy = jobs.length
-      ? buildCatalogJobSearchTaxonomy(jobs)
+      ? buildCatalogJobSearchTaxonomy(jobs, now)
       : emptyTaxonomy;
     // Keep the explicit catch-all category visible even when its split file
     // is currently empty. Jobs added later with industryCode r29 will reuse
@@ -315,7 +478,15 @@ export async function listJobSearchTaxonomy(): Promise<JobSearchTaxonomy> {
           ],
         };
     reportTaxonomyStage("catalog precompute", taxonomy);
-    return taxonomy;
+    return {
+      taxonomy,
+      refreshAt: nextCatalogTaxonomyRefreshAt(jobs, now),
+    };
   });
-  return catalogTaxonomyPromise;
+  try {
+    catalogTaxonomyCache = await catalogTaxonomyPromise;
+    return catalogTaxonomyCache.taxonomy;
+  } finally {
+    catalogTaxonomyPromise = null;
+  }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   Briefcase,
@@ -786,13 +786,17 @@ function JobCategoryMenu({
 function ClearFieldButton({
   label,
   onClear,
+  className,
 }: Readonly<{
   label: string;
   onClear(): void;
+  className?: string;
 }>) {
   return (
     <button
-      className="global-image-search-clear"
+      className={["global-image-search-clear", className]
+        .filter(Boolean)
+        .join(" ")}
       type="button"
       aria-label={label}
       onClick={onClear}
@@ -826,14 +830,24 @@ export function LocationPicker({
   const selectedGroup =
     groups.find((group) => group.city === draftCity) ?? groups[0];
   const displayValue = location ? [location, ...districts].join(", ") : "";
-  const selectedLocationTitle = displayValue || undefined;
-  const tooltipId = "job-location-picker-tooltip";
+  const countFormatter = useMemo(
+    () => new Intl.NumberFormat(vi ? "vi-VN" : "en-US"),
+    [vi],
+  );
   const placeholder = vi ? "Tỉnh/thành, quận..." : "Province/city, district...";
 
   const openPicker = () => {
     setDraftCity(location || groups[0]?.city || "");
     setDraftDistricts([...districts]);
     setOpen(true);
+  };
+
+  const togglePicker = () => {
+    if (open) {
+      setOpen(false);
+      return;
+    }
+    openPicker();
   };
 
   const beginEditing = () => {
@@ -875,7 +889,6 @@ export function LocationPicker({
             readOnly
             data-selected={Boolean(location) && !open}
             aria-label={vi ? "Địa điểm" : "Location"}
-            aria-describedby={selectedLocationTitle ? tooltipId : undefined}
             aria-haspopup="dialog"
             aria-expanded={open}
             aria-controls="job-location-picker-dialog"
@@ -890,28 +903,42 @@ export function LocationPicker({
             </span>
           ) : null}
         </div>
-        {location ? (
-          <ClearFieldButton
-            label={vi ? "Xóa địa điểm" : "Clear location"}
-            onClear={onClear}
-          />
-        ) : null}
-        <span className="job-location-picker-chevron" aria-hidden="true">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m7 10 5 5 5-5" />
-          </svg>
-        </span>
+        <div className="job-location-picker-actions">
+          {location ? (
+            <ClearFieldButton
+              className="job-location-picker-clear"
+              label={vi ? "Xóa địa điểm" : "Clear location"}
+              onClear={onClear}
+            />
+          ) : null}
+          {location ? (
+            <span
+              className="job-location-picker-action-divider"
+              aria-hidden="true"
+            />
+          ) : null}
+          <button
+            className="job-location-picker-chevron"
+            type="button"
+            aria-label={
+              open
+                ? vi
+                  ? "Đóng chọn địa điểm"
+                  : "Close location picker"
+                : vi
+                  ? "Mở chọn địa điểm"
+                  : "Open location picker"
+            }
+            aria-expanded={open}
+            aria-controls="job-location-picker-dialog"
+            onClick={togglePicker}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m7 10 5 5 5-5" />
+            </svg>
+          </button>
+        </div>
       </div>
-      {!open && selectedLocationTitle ? (
-        <span
-          id={tooltipId}
-          className="job-location-picker-tooltip"
-          role="tooltip"
-        >
-          {selectedLocationTitle}
-        </span>
-      ) : null}
-
       {open ? (
         <div
           id="job-location-picker-dialog"
@@ -967,8 +994,10 @@ export function LocationPicker({
                   <path d="M8 7V5.8A1.8 1.8 0 0 1 9.8 4h4.4A1.8 1.8 0 0 1 16 5.8V7M4 9.5h16v9.25A1.25 1.25 0 0 1 18.75 20H5.25A1.25 1.25 0 0 1 4 18.75V9.5Z" />
                   <path d="M4 13h16M10 13v1.5h4V13" />
                 </svg>
-                <span>
-                  <strong>{selectedGroup?.count ?? 0}</strong>{" "}
+                <strong className="job-location-province-count">
+                  {countFormatter.format(selectedGroup?.count ?? 0)}
+                </strong>
+                <span className="job-location-province-label">
                   {vi
                     ? "việc đang tuyển tại tỉnh này"
                     : "open jobs in this province"}

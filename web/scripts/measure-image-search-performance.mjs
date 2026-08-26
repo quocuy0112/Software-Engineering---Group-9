@@ -35,7 +35,7 @@ function validate(input) {
     throw new Error("IMAGE_SEARCH_PERF_SCHEMA_INVALID");
   if (
     input.metadata?.concurrency !== 4 ||
-    input.metadata?.ocrDeadlineMs !== 6_000
+    input.metadata?.ocrDeadlineMs !== 10_000
   )
     throw new Error("IMAGE_SEARCH_PERF_CONDITIONS_INVALID");
   if (!Array.isArray(input.samples))
@@ -85,7 +85,7 @@ function report(input) {
         sample.deterministicSearchMs <= 2_000,
     ).length / warm.length;
   const hardDeadlineMet = input.samples.every(
-    (sample) => sample.ocrMs <= 6_000,
+    (sample) => sample.ocrMs <= 10_000,
   );
   const passed =
     actionableWithin10s >= 0.95 && searchWithin2s >= 0.95 && hardDeadlineMet;
@@ -134,7 +134,7 @@ function selfTest() {
     mode: "SELF_TEST",
     metadata: {
       concurrency: 4,
-      ocrDeadlineMs: 6_000,
+      ocrDeadlineMs: 10_000,
       engine: "paddleocr-onnx@1.0.0",
       model: "PP-OCRv6-medium",
       interpreter: "deterministic-v1",

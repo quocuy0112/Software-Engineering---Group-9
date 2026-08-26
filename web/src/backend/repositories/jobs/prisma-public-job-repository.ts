@@ -8,6 +8,7 @@ import type {
 import {
   encodeJobCursor,
   normalizedDistrictLocation,
+  searchTextTokens,
 } from "@/backend/services/jobs/search-normalization";
 import { careerPathSearchTerms } from "@/shared/contracts/jobs/career-paths";
 import {
@@ -94,6 +95,80 @@ type RankedRow = {
   salaryMaximum: string | null;
 };
 
+// PostgreSQL's `lower` is case-insensitive but does not remove Vietnamese
+// diacritics.  Keep the search contract accent-insensitive without requiring
+// the optional `unaccent` extension (the project only provisions pg_trgm).
+const vietnameseAccentGroups = [
+  ["áàảãạăắằẳẵặâấầẩẫậ", "a"],
+  ["đ", "d"],
+  ["éèẻẽẹêếềểễệ", "e"],
+  ["íìỉĩị", "i"],
+  ["óòỏõọôốồổỗộơớờởỡợ", "o"],
+  ["úùủũụưứừửữự", "u"],
+  ["ýỳỷỹỵ", "y"],
+] as const;
+const vietnameseAccentSource = vietnameseAccentGroups
+  .map(([source]) => source)
+  .join("");
+const vietnameseAccentTarget = vietnameseAccentGroups
+  .map(([source, target]) => target.repeat(Array.from(source).length))
+  .join("");
+
+function normalizedCompanyColumn(column: "displayName" | "legalName") {
+  const identifier =
+    column === "displayName"
+      ? Prisma.raw('c."displayName"')
+      : Prisma.raw('c."legalName"');
+  return Prisma.sql`translate(lower(${identifier}), ${vietnameseAccentSource}, ${vietnameseAccentTarget})`;
+}
+
+function companyNameMatches(token: string) {
+  const pattern = `%${token}%`;
+  return Prisma.sql`EXISTS (
+    SELECT 1 FROM "Company" c
+    WHERE c."id" = j."companyId"
+      AND (
+        ${normalizedCompanyColumn("displayName")} LIKE ${pattern}
+        OR ${normalizedCompanyColumn("legalName")} LIKE ${pattern}
+      )
+  )`;
+}
+
+function skillNameMatches(token: string) {
+  return Prisma.sql`EXISTS (
+    SELECT 1
+    FROM "JobPostingSkill" js
+    JOIN "Skill" s ON s."id" = js."skillId"
+    WHERE js."jobPostingId" = j."id"
+      AND s."normalizedName" LIKE ${`%${token}%`}
+  )`;
+}
+
+function keywordMatches(
+  token: string,
+  searchBy: NormalizedJobSearch["searchBy"],
+) {
+  const title = Prisma.sql`j."normalizedTitle" LIKE ${`%${token}%`}`;
+  if (searchBy === "TITLE") return title;
+  const company = companyNameMatches(token);
+  if (searchBy === "COMPANY") return company;
+
+  // Home uses one free-text field labelled "role, skill, or company".  BOTH
+  // therefore intentionally covers all three searchable public signals.
+  return Prisma.sql`(${Prisma.join([title, company, skillNameMatches(token)], " OR ")})`;
+}
+
+function companySimilarity(query: string) {
+  return Prisma.sql`COALESCE((
+    SELECT GREATEST(
+      similarity(${normalizedCompanyColumn("displayName")}, ${query}),
+      similarity(${normalizedCompanyColumn("legalName")}, ${query})
+    )
+    FROM "Company" c
+    WHERE c."id" = j."companyId"
+  ), 0::real)`;
+}
+
 export type RankedJobSearchResult = Readonly<{
   orderedJobIds: string[];
   total?: number;
@@ -141,38 +216,16 @@ export interface PublicJobRepository {
 
 function publicClauses(input: NormalizedJobSearch, now: Date) {
   const clauses: Prisma.Sql[] = [candidateVisibleJobSql(now)];
-  for (const token of input.normalizedQuery.split(" ").filter(Boolean)) {
-    if (input.searchBy === "TITLE") {
-      clauses.push(Prisma.sql`j."normalizedTitle" LIKE ${`%${token}%`}`);
-    } else if (input.searchBy === "COMPANY") {
-      clauses.push(Prisma.sql`EXISTS (
-        SELECT 1 FROM "Company" c
-        WHERE c."id" = j."companyId"
-          AND (lower(c."displayName") LIKE ${`%${token}%`} OR lower(c."legalName") LIKE ${`%${token}%`})
-      )`);
-    } else {
-      clauses.push(
-        // Keep BOTH aligned with the Find Jobs selector: a keyword must be
-        // visible in either the job title or company name, not only in a
-        // hidden detail such as a requirement or description.
-        Prisma.sql`(
-          j."normalizedTitle" LIKE ${`%${token}%`}
-          OR EXISTS (
-            SELECT 1 FROM "Company" c
-            WHERE c."id" = j."companyId"
-              AND (
-                lower(c."displayName") LIKE ${`%${token}%`}
-                OR lower(c."legalName") LIKE ${`%${token}%`}
-              )
-          )
-        )`,
-      );
-    }
+  for (const token of searchTextTokens(input.normalizedQuery)) {
+    clauses.push(keywordMatches(token, input.searchBy));
   }
   if (input.normalizedLocation) {
-    clauses.push(
-      Prisma.sql`j."normalizedLocation" LIKE ${`%${input.normalizedLocation}%`}`,
+    const locationMatches = searchTextTokens(input.normalizedLocation).map(
+      (token) => Prisma.sql`j."normalizedLocation" LIKE ${`%${token}%`}`,
     );
+    if (locationMatches.length) {
+      clauses.push(Prisma.sql`(${Prisma.join(locationMatches, " AND ")})`);
+    }
   }
   const normalizedDistricts = input.normalizedDistricts ?? [];
   if (normalizedDistricts.length) {
@@ -338,7 +391,11 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
     const clauses = publicClauses(input, now);
     const query = input.normalizedQuery;
     const score = query
-      ? Prisma.sql`(similarity(j."normalizedTitle", ${query}) * 3 + similarity(j."searchDocumentNormalized", ${query}))`
+      ? Prisma.sql`(
+          similarity(j."normalizedTitle", ${query}) * 3
+          + similarity(j."searchDocumentNormalized", ${query})
+          ${input.searchBy === "TITLE" ? Prisma.empty : Prisma.sql`+ ${companySimilarity(query)} * 2`}
+        )`
       : Prisma.sql`0::double precision`;
     const cursor = cursorClause(input, score, now);
     const urgent = Prisma.sql`CASE WHEN j."applicationDeadline" IS NOT NULL AND j."applicationDeadline" > ${now} AND j."applicationDeadline" <= ${new Date(now.getTime() + 14 * 86_400_000)} THEN 1 ELSE 0 END`;

@@ -10,6 +10,7 @@ import {
 } from "@/shared/contracts/identity/password-recovery";
 import { AuthStatus } from "./auth-status";
 import { PasswordField } from "./password-field";
+import { PasswordRequirementChecklist } from "./password-requirement-checklist";
 import { useReplayableStatus } from "./use-status";
 
 export function ResetPasswordForm() {
@@ -99,6 +100,7 @@ export function ResetPasswordForm() {
           onChange={(event) => setPassword(event.target.value)}
           required
         />
+        <PasswordRequirementChecklist value={password} />
         <PasswordField
           label="Confirm new password"
           id="reset-confirm-password"
