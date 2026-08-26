@@ -168,7 +168,7 @@ describe("DocumentsTab", () => {
     let cvAttempts = 0;
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
-      if (url.includes("cover-letter")) {
+      if (url.includes("/documents/cover-letter/text")) {
         return new Response(
           JSON.stringify({ message: "The document is not available." }),
           { status: 404 },
@@ -204,5 +204,47 @@ describe("DocumentsTab", () => {
     expect(cvRequests).toHaveLength(2);
     expect(cvRequests[0]).not.toContain("cacheVersion=");
     expect(cvRequests[1]).toContain("cacheVersion=retry-1");
+  });
+
+  it("does not cache a missing cover letter before it is attached", async () => {
+    let coverLetterAvailable = false;
+    const fetchMock = vi.fn(async (input: string | URL) => {
+      const url = String(input);
+      if (url.includes("/documents/cover-letter/text")) {
+        return coverLetterAvailable
+          ? new Response(JSON.stringify(coverLetterPreview), { status: 200 })
+          : new Response(
+              JSON.stringify({ message: "The document is not available." }),
+              { status: 404 },
+            );
+      }
+      return new Response(JSON.stringify(cvPreview), { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const firstView = render(
+      <DocumentsTab
+        jobId="job-cover-letter-refresh"
+        applicationId="application-cover-letter-refresh"
+        automatic={automatic}
+      />,
+    );
+    expect(await screen.findByText("Cover letter not provided")).toBeInTheDocument();
+
+    coverLetterAvailable = true;
+    firstView.unmount();
+    render(
+      <DocumentsTab
+        jobId="job-cover-letter-refresh"
+        applicationId="application-cover-letter-refresh"
+        automatic={automatic}
+      />,
+    );
+
+    expect(await screen.findByText("Dear Hiring Manager,")).toBeInTheDocument();
+    const coverLetterRequests = fetchMock.mock.calls.filter(([input]) =>
+      String(input).includes("/documents/cover-letter/text"),
+    );
+    expect(coverLetterRequests).toHaveLength(2);
   });
 });

@@ -500,6 +500,13 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
         <ApplicationStageChangeDialog
           card={dialog.card}
           initialTarget={dialog.target}
+          fixedTarget={
+            dialog.intent === "drag" &&
+            dialog.target &&
+            !dialog.card.allowedDestinations.includes(dialog.target)
+              ? dialog.target
+              : undefined
+          }
           onCancel={() => {
             const id = dialog.card.applicationId;
             setDialog(null);

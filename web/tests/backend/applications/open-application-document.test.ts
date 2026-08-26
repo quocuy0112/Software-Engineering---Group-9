@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { OpenApplicationDocumentService } from "@/backend/applications/services/open-application-document";
+import { PrismaApplicationRepository } from "@/backend/repositories/applications/prisma-application-repository";
+import * as automaticStageRules from "@/backend/applications/services/automatic-viewed-stage-rules";
 import type { ApplicationRepositoryPort } from "@/backend/repositories/applications/application-repository";
 
 type TestDocument = {
@@ -127,5 +129,41 @@ describe("recruiter document review tracking", () => {
     expect(result.stream).toBeNull();
     expect(storage.assertReady).not.toHaveBeenCalled();
     expect(storage.open).not.toHaveBeenCalled();
+  });
+
+  it("still opens an authorized document when view automation fails", async () => {
+    class PrismaRepositoryDouble extends PrismaApplicationRepository {
+      override findDocument() {
+        return Promise.resolve(document("VIEWED"));
+      }
+    }
+
+    const automaticRule = vi
+      .spyOn(automaticStageRules, "applyAutomaticScoreStageRuleForApplication")
+      .mockRejectedValue(new Error("database temporarily unavailable"));
+    const service = new OpenApplicationDocumentService(
+      new PrismaRepositoryDouble({} as never),
+      {
+        authorizeApplication: vi.fn().mockResolvedValue({
+          authorized: true,
+          jobPostingId: "job-1",
+        }),
+      } as never,
+      undefined,
+      { transition: vi.fn() } as never,
+    );
+
+    await expect(
+      service.execute({
+        userId: "recruiter-1",
+        sessionId: "session-1",
+        jobId: "job-1",
+        applicationId: "application-1",
+        kind: "cv",
+        preview: true,
+      }),
+    ).resolves.toMatchObject({ document: { applicationId: "application-1" } });
+
+    expect(automaticRule).toHaveBeenCalledOnce();
   });
 });

@@ -55,7 +55,7 @@ The final Home UI supports all and only these controls:
 
 Home Smart Match is a candidate-facing job-fit recommendation over public jobs.
 It is not applicant screening, never ranks candidates for employers, and does
-not replace or alter the separate constitutional 60/40 applicant-screening
+not replace or alter the separate constitutional 40/60 applicant-screening
 formula.
 
 | Viewer/result state | Smart Match section | Job-card score |

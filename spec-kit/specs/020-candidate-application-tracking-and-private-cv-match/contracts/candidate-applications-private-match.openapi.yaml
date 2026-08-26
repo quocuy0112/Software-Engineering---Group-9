@@ -643,7 +643,7 @@ components:
       required: [score, weight, weightedContribution, evidenceCoverage, evidenceConfidence, matchedRequirements, gaps, requiredExperience, detectedExperience, evidence, parserProvenance, mayBeIncomplete]
       properties:
         score: { type: number, minimum: 0, maximum: 100 }
-        weight: { const: 0.6 }
+        weight: { const: 0.4 }
         weightedContribution: { type: number, minimum: 0, maximum: 60 }
         evidenceCoverage: { type: number, minimum: 0, maximum: 100 }
         evidenceConfidence: { type: number, minimum: 0, maximum: 100 }
@@ -667,7 +667,7 @@ components:
       required: [score, weight, weightedContribution, summary, strengths, mainGap, actions, evidenceConfidence, evidenceLevel, provider, model, promptVersion, policyVersion, durationMs, completedAt]
       properties:
         score: { type: number, minimum: 0, maximum: 100 }
-        weight: { const: 0.4 }
+        weight: { const: 0.6 }
         weightedContribution: { type: number, minimum: 0, maximum: 40 }
         summary: { type: string, minLength: 1, maxLength: 1000 }
         strengths:

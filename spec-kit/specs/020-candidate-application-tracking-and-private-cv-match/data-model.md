@@ -89,7 +89,7 @@ One-to-one per Application: `emailEnabled`, `inAppEnabled`, `version`, `updatedA
 | `candidateUserId` | Sole ordinary reader/commander |
 | `cvVersionId`, `cvVersion`, `cvDigest` | Fixed owned CV provenance |
 | `jobPostingId`, `jdVersion`, `jdDigest` | Job used for setup/navigation plus immutable provenance; no company access relation |
-| `scoringConfigVersion` | Fixed approved 60/40 configuration |
+| `scoringConfigVersion` | Fixed approved 40/60 configuration |
 | `currentAttemptId` | Nullable pointer changed only by safe publication |
 | `state` | `QUEUED`, `ANALYZING`, `LIMITED`, `READY`, `FAILED`, `INACCESSIBLE` |
 | `createdAt`, `expiresAt` | Expiry exactly 12 months after creation |
@@ -123,11 +123,11 @@ Only `READY` or `LIMITED` attempts may become current. A retry does not blank th
 
 ### PrivateAutomaticMatchResult
 
-Immutable private deterministic component: score 0-100, 60% weight, weighted contribution for display, required/preferred matches, required/detected experience, gaps with reason codes, evidence excerpts with type/location, evidence coverage, parser provenance, calculation time, and `mayBeIncomplete` warning.
+Immutable private deterministic component: score 0-100, 40% weight, weighted contribution for display, required/preferred matches, required/detected experience, gaps with reason codes, evidence excerpts with type/location, evidence coverage, parser provenance, calculation time, and `mayBeIncomplete` warning.
 
 ### PrivateAiEvaluationResult
 
-Immutable schema-validated private AI component: score 0-100, 40% weight, weighted contribution, summary, strengths/main gap, prioritized truthful actions, evidence confidence and level, model/provider/prompt/policy versions, duration, and completion timestamp. Sensitive/job-irrelevant attributes and raw provider response are not retained.
+Immutable schema-validated private AI component: score 0-100, 60% weight, weighted contribution, summary, strengths/main gap, prioritized truthful actions, evidence confidence and level, model/provider/prompt/policy versions, duration, and completion timestamp. Sensitive/job-irrelevant attributes and raw provider response are not retained.
 
 ### PrivateMatchEvidence
 
@@ -141,8 +141,8 @@ Immutable sanitized CV snapshot, JD snapshot, structured criteria, parser versio
 
 ### HybridScorePolicy
 
-- Automatic weight: `0.60`
-- AI weight: `0.40`
+- Automatic weight: `0.40`
+- AI weight: `0.60`
 - Calculate full precision, round final once to one decimal.
 - High Match: 80.0-100.0; Medium Match: 60.0-79.9; Low Match: below 60.0.
 - Hybrid/band absent when AI result is absent.

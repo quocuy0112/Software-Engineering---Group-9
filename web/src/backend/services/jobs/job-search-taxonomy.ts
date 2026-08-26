@@ -60,13 +60,15 @@ const taxonomyCatalogJobSchema = z.object({
   industry: z.string().trim().min(1),
   industryCode: z.string().trim().min(1),
   categoryFamily: z.string().trim().min(1).optional(),
-  subIndustry: z.string().trim().min(1),
-  title: z.string().trim().min(1),
+  // Incomplete drafts share the authoring catalogue but are filtered out
+  // before taxonomy entries are built.
+  subIndustry: z.string().trim(),
+  title: z.string().trim(),
   categoryIds: z.array(z.string().trim().min(1)),
   status: z.string().trim().min(1),
   applyDeadline: z.string().datetime().nullable(),
   location: z.object({
-    city: z.string().trim().min(1),
+    city: z.string().trim(),
     district: z.string().trim().nullable(),
   }),
 });

@@ -54,12 +54,18 @@ export function ApplicationStageChangeDialog({
   // The destination list is intentionally taken verbatim from the server
   // projection. The client does not recreate or narrow transition policy.
   const allowedDestinations = card.allowedDestinations;
-  const [target, setTarget] = useState<ApplicationStage | "">(
-    fixedTarget && allowedDestinations.includes(fixedTarget)
+  const fixedTargetAllowed =
+    fixedTarget !== undefined &&
+    (allowedDestinations.includes(fixedTarget) ||
+      (card.dragDestinations ?? []).includes(fixedTarget));
+  const initialDialogTarget =
+    fixedTargetAllowed && fixedTarget
       ? fixedTarget
       : initialTarget && allowedDestinations.includes(initialTarget)
         ? initialTarget
-        : "",
+        : "";
+  const [target, setTarget] = useState<ApplicationStage | "">(
+    initialDialogTarget,
   );
   const [reasonCode, setReasonCode] = useState("");
   const [internalNote, setInternalNote] = useState("");

@@ -1,6 +1,10 @@
 import "server-only";
 
-import { CandidateExportService, ExportRequestError } from "@/backend/exports/candidate-export-service";
+import {
+  CandidateExportService,
+  ExportRequestError,
+} from "@/backend/exports/candidate-export-service";
+import { exportDownloadResponse } from "@/backend/exports/export-download-response";
 import {
   accountErrorResponse,
   AccountRequestError,
@@ -20,21 +24,10 @@ export async function GET(request: Request, context: RouteContext) {
       jobPostingId: params.jobId,
       exportId: params.exportId,
     });
-    const safeFileName = result.fileName.replaceAll(String.fromCharCode(34), "");
-    const headers = new Headers(noStoreHeaders);
-    headers.set("content-type", result.mediaType);
-    headers.set(
-      "content-disposition",
-      "attachment; filename=" +
-        String.fromCharCode(34) +
-        safeFileName +
-        String.fromCharCode(34),
-    );
-    headers.set("cache-control", "private, no-store");
-    headers.set("content-length", String(result.body.byteLength));
-    return new Response(new Uint8Array(result.body), { status: 200, headers });
+    return exportDownloadResponse(result);
   } catch (error) {
-    if (error instanceof AccountRequestError) return accountErrorResponse(error);
+    if (error instanceof AccountRequestError)
+      return accountErrorResponse(error);
     if (error instanceof ExportRequestError) {
       return Response.json(
         {

@@ -8,7 +8,7 @@
 
 **Status**: Ready for implementation planning
 
-**Input**: Candidate-side application review, submission, processing, status tracking, and an independent private CV match check that reuses the approved 60% automatic matching and 40% AI evaluation method without exposing or influencing recruiter-side evaluation.
+**Input**: Candidate-side application review, submission, processing, status tracking, and an independent private CV match check that reuses the approved 40% automatic matching and 60% AI evaluation method without exposing or influencing recruiter-side evaluation.
 
 ## Clarifications
 
@@ -48,7 +48,7 @@ As a logged-in Candidate, I want to privately compare one of my CV versions with
 
 **Why this priority**: It provides explainable candidate value while preserving human recruitment authority and strict separation from the real application pipeline.
 
-**Independent Test**: Select an eligible job and successfully parsed owned CV, run the check with AI available, open the full report, verify the explicit 60/40 calculation and provenance, and prove that neither the recruiter nor an employer-side scoring query can discover the check or its result.
+**Independent Test**: Select an eligible job and successfully parsed owned CV, run the check with AI available, open the full report, verify the explicit 40/60 calculation and provenance, and prove that neither the recruiter nor an employer-side scoring query can discover the check or its result.
 
 **Acceptance Scenarios**:
 
@@ -56,8 +56,8 @@ As a logged-in Candidate, I want to privately compare one of my CV versions with
 2. **Given** a selected CV has not parsed successfully, **When** the Candidate tries Analyze my CV, **Then** analysis does not start, the Candidate receives a specific recovery path, and no zero or misleading score is produced.
 3. **Given** valid inputs and an available AI evaluation service, **When** the Candidate selects Analyze my CV, **Then** a private asynchronous analysis uses the exact approved method, excludes sensitive personal attributes, and does not submit an application or create, update, or influence any recruiter-side evaluation.
 4. **Given** analysis completes normally, **When** the ready view appears, **Then** it shows duration, preview hybrid score and match level, all four completed analysis steps, selected job, privacy commitments, exact CV and JD sources with parse status, report-content preview, guidance limitation, and a View full match report action.
-5. **Given** the Candidate opens the full report, **When** a hybrid result is available, **Then** the report shows the hybrid score and approved match level, strongest evidence and main gap, reproducibility statement, evidence confidence as a non-core signal, Automatic matching and AI evaluation scores with their 60/40 weights and weighted contributions, evidence coverage, evidence confidence, matched requirements, required-versus-detected experience, gaps, categorized CV evidence, prioritized truthful improvement guidance, and the explicit calculation with CV, JD, scoring-config, and relevant AI provenance versions.
-6. **Given** a normal result has Automatic matching score `A` and AI evaluation score `B`, **When** its calculation is displayed, **Then** it shows `Hybrid score = (A × 60%) + (B × 40%)`, the displayed contributions reconcile with the displayed hybrid score under one documented rounding rule, and the approved bands are labelled High Match for 80-100, Medium Match for 60-79, and Low Match below 60.
+5. **Given** the Candidate opens the full report, **When** a hybrid result is available, **Then** the report shows the hybrid score and approved match level, strongest evidence and main gap, reproducibility statement, evidence confidence as a non-core signal, Automatic matching and AI evaluation scores with their 40/60 weights and weighted contributions, evidence coverage, evidence confidence, matched requirements, required-versus-detected experience, gaps, categorized CV evidence, prioritized truthful improvement guidance, and the explicit calculation with CV, JD, scoring-config, and relevant AI provenance versions.
+6. **Given** a normal result has Automatic matching score `A` and AI evaluation score `B`, **When** its calculation is displayed, **Then** it shows `Hybrid score = (A × 40%) + (B × 60%)`, the displayed contributions reconcile with the displayed hybrid score under one documented rounding rule, and the approved bands are labelled High Match for 80-100, Medium Match for 60-79, and Low Match below 60.
 7. **Given** a private report is displayed, **When** the Candidate reviews its privacy notice, **Then** it states that only the Candidate can see it, it is not part of an application, it is not sent to recruiters, it does not affect recruiter ranking, sensitive attributes were excluded, and it can be deleted.
 8. **Given** the Candidate selects Apply now, **When** the application wizard starts, **Then** the chosen job and CV may be preselected when still valid, but the Candidate must review and explicitly submit through User Story 1 and a fresh independent employer-side evaluation may later use the application snapshots.
 
@@ -93,7 +93,7 @@ As a Candidate, I want the deterministic part of my private check and the applic
 **Acceptance Scenarios**:
 
 1. **Given** automatic matching completed and AI evaluation failed or timed out, **When** the report loads, **Then** its title includes `limited mode`, its subtitle says `AI temporarily unavailable`, its primary result is labelled `Deterministic match` and `not a final score`, and it shows an `AI evaluation unavailable` badge.
-2. **Given** limited mode, **When** metric cards are displayed, **Then** Automatic matching retains its score and 60% weight, AI evaluation displays `—` rather than zero with `AI contribution unavailable`, and no hybrid score or match band is fabricated.
+2. **Given** limited mode, **When** metric cards are displayed, **Then** Automatic matching retains its score and 40% weight, AI evaluation displays `—` rather than zero with `AI contribution unavailable`, and no hybrid score or match band is fabricated.
 3. **Given** limited mode, **When** the Candidate reads the report, **Then** matched requirements, gaps, experience comparison, and evidence found render fully from deterministic evidence, while the formula states `Hybrid score unavailable — Final score: not calculated` and `Deterministic evidence remains available`.
 4. **Given** limited mode, **When** the Candidate chooses Retry AI, **Then** the same versioned inputs are retried asynchronously without losing the deterministic result, submitting an application, or affecting recruiter-side scoring or ranking.
 5. **Given** a retried AI evaluation succeeds, **When** the Candidate returns to the check, **Then** the same check displays the latest completed hybrid report and retains immutable timestamps and outcomes for the earlier failed or limited attempts without creating duplicate candidate-facing reports.
@@ -181,7 +181,7 @@ As a Candidate, I want to enable or disable email and in-app application-status 
 - **FR-018**: Only an authenticated Candidate who owns the CV version and may view the job may create, view, retry, or delete the corresponding Private CV Match Check.
 - **FR-019**: Set up MUST show one selected job with extracted skills and experience requirements, one owned CV with file and parse status, comparison dimensions, expected report contents, the three analysis steps, limitations, and all privacy/fairness commitments before analysis.
 - **FR-020**: Private analysis MUST require a successfully parsed eligible CV and a fixed JD version; it MUST NOT silently switch either source after the Candidate starts the check.
-- **FR-021**: Normal private scoring MUST reuse the approved method exactly: `Hybrid score = 60% × Automatic matching score + 40% × AI evaluation score`; it MUST retain the approved weights and bands and MUST NOT redefine mandatory job criteria.
+- **FR-021**: Normal private scoring MUST reuse the approved method exactly: `Hybrid score = 40% × Automatic matching score + 60% × AI evaluation score`; it MUST retain the approved weights and bands and MUST NOT redefine mandatory job criteria.
 - **FR-022**: Private and recruiter-side scoring MUST be independent pipelines. Private check inputs, jobs, results, evidence, retry state, and deletion state MUST NOT create, update, seed, cache as an employer result, or influence an Application evaluation or recruiter ranking.
 - **FR-023**: Private-check records and access paths MUST be isolated from recruiter-queryable scoring records and recruiter/company authorization scopes even when both pipelines invoke the same approved scoring method or engine.
 - **FR-024**: The report-ready state MUST show analysis duration, preview score and level when available, four completed steps, job identity, privacy commitments, exact source versions and parse states, report-content preview, guidance limitation, and View full match report.
@@ -226,7 +226,7 @@ As a Candidate, I want to enable or disable email and in-app application-status 
 - **Public Application Update**: A candidate-safe projection of an approved pipeline or withdrawal event with public stage, copy, and timestamp; it excludes internal rationale, scores, rank, and notes.
 - **Private CV Match Check**: A candidate-only analysis request tying one Candidate, one CV Version, one JD Version, and one scoring configuration to private lifecycle, fallback, provenance, immutable analysis-attempt history, latest display state, 12-month expiry, and candidate-controlled deletion state. It is not an Application or recruiter evaluation.
 - **Private Match Result**: Candidate-only automatic matching evidence and, when available, AI evaluation, hybrid score, weighted contributions, match band, evidence coverage/confidence signals, gaps, and guidance. Its storage and query boundary is separate from employer evaluation data.
-- **Scoring Configuration Version**: The immutable approved method metadata including 60/40 weights, bands, deterministic rule version, thresholds, and relevant policies used to reproduce or cross-check a score.
+- **Scoring Configuration Version**: The immutable approved method metadata including 40/60 weights, bands, deterministic rule version, thresholds, and relevant policies used to reproduce or cross-check a score.
 - **Employer-Side Application Evaluation**: The recruiter-authorized scoring result associated with an actual Application. It may use the shared method but is created independently from application snapshots and is never populated from or exposed through a Private CV Match Check.
 - **Notification Preference**: Candidate-owned, Application-specific email and in-app choices for optional public status updates; each Application has independent settings.
 - **Audit Event**: Minimal accountability record for critical actions and failures; it is not a channel for CV contents, private report evidence, sensitive attributes, or recruiter-internal details.
@@ -239,7 +239,7 @@ As a Candidate, I want to enable or disable email and in-app application-status 
 - Technical post-submission intake progress and long-lived candidate-safe application tracking.
 - Public pipeline projection, recent public updates, submitted-file viewing, eligible withdrawal, and email/in-app preferences.
 - Candidate-only setup, normal report-ready state, full explainable report, deletion, and deterministic limited mode for Private CV Match Check.
-- Reuse of the approved 60% Automatic matching and 40% AI evaluation method without modifying it.
+- Reuse of the approved 40% Automatic matching and 60% AI evaluation method without modifying it.
 - Strict authorization, data separation, sensitive-attribute exclusion, provenance/versioning, auditability, accessibility, and fallback behavior required for these journeys.
 
 ### Must NOT Be Built at This Stage

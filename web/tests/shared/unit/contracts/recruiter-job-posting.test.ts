@@ -23,7 +23,38 @@ describe("recruiter job posting editor contract", () => {
         shortPitch: "Add a short pitch.",
         subIndustry: "Enter a sub-industry.",
         "description.overview": "Add a role overview.",
+        "description.responsibilities": "Add at least one responsibility.",
+        "description.requirements": "Add at least one requirement.",
         applyDeadline: "Choose an application deadline.",
+      }),
+    );
+  });
+
+  it("allows incomplete authoring fields in a draft", () => {
+    const job = createEmptyJobPosting("company-1");
+    job.title = "Platform Engineer";
+    job.shortPitch = "";
+    job.subIndustry = "";
+    job.location.city = "";
+    job.description.overview = "";
+    job.experience.label = "";
+    job.level = "";
+    job.employmentType = "";
+    job.workArrangement = "";
+    job.education = "";
+
+    expect(validateRecruiterJobForSave(job, "draft")).toEqual({});
+    expect(validateRecruiterJobForSave(job, "pending_approval")).toEqual(
+      expect.objectContaining({
+        shortPitch: "Add a short pitch.",
+        subIndustry: "Enter a sub-industry.",
+        "location.city": "Enter a city.",
+        "description.overview": "Add a role overview.",
+        "experience.label": "Enter an experience level.",
+        level: "Enter a job level.",
+        employmentType: "Choose an employment type.",
+        workArrangement: "Choose a work arrangement.",
+        education: "Enter an education requirement.",
       }),
     );
   });
@@ -35,6 +66,8 @@ describe("recruiter job posting editor contract", () => {
     job.subIndustry = "  HR Technology  ";
     job.skillTags = [" Figma ", "Figma", " Research "];
     job.description.overview = "  Own end-to-end product design.  ";
+    job.description.responsibilities = ["Shape product direction."];
+    job.description.requirements = ["Strong product design experience."];
     job.applyDeadline = "2099-12-31T23:59:59.000Z";
 
     const prepared = prepareRecruiterJobForSave(job);
@@ -94,7 +127,7 @@ describe("recruiter job posting editor contract", () => {
     job.description.overview = "Own end-to-end product design.";
     job.salary = { ...job.salary, min: 50_000_000, max: 20_000_000 };
 
-    expect(validateRecruiterJobForSave(job, "draft")).toEqual(
+    expect(validateRecruiterJobForSave(job, "pending_approval")).toEqual(
       expect.objectContaining({
         "salary.max":
           "Maximum salary must be greater than or equal to minimum salary.",

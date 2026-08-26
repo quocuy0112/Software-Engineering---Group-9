@@ -4,15 +4,18 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { prisma } from "@/backend/database/prisma";
 import { configuredJsonJobCatalogueRepository } from "@/backend/repositories/jobs/job-catalogue-repository-factory";
+import { catalogueIndustryCode } from "@/backend/repositories/jobs/job-industry-files";
 import { adoptActiveJobBaseline } from "@/backend/jobs/review/job-post-active-baseline-service";
 import {
   closeManagedJobPost,
+  reopenManagedJobPost,
   softDeleteManagedJobPost,
   withdrawManagedJobPostReview,
 } from "@/backend/jobs/review/job-post-review-service";
 import { applyRecruiterCapacityIncrease } from "@/backend/services/jobs/recruiter-capacity-service";
 import {
   companyCatalogSchema,
+  jobDraftCatalogSchema,
   recruiterCompanySettingsInputSchema,
   jobCatalogSchema,
   jobPostingStatusSchema,
@@ -128,7 +131,7 @@ const legacyStatusSchema = z.enum([
   "filled",
   "expired",
 ]);
-const sourceJobSchema = jobCatalogSchema
+const sourceJobSchema = jobDraftCatalogSchema
   .omit({ status: true })
   .extend({ status: z.string().min(1) })
   .passthrough();
@@ -193,11 +196,15 @@ const MANAGEMENT_DATA_CACHE_TTL_MS = 15_000;
 const RECRUITER_JOB_CACHE_TTL_MS = 60_000;
 const managementDataRead = new Map<
   string,
-  { value: Promise<RecruiterJobManagementData>; createdAt: number }
+  {
+    value: Promise<RecruiterJobManagementData>;
+    createdAt: number;
+    sourceVersion: string;
+  }
 >();
 const recruiterJobsRead = new Map<
   string,
-  { value: Promise<JobCatalogItem[]>; createdAt: number }
+  { value: Promise<JobCatalogItem[]>; createdAt: number; sourceVersion: string }
 >();
 
 function shouldCacheCatalogue() {
@@ -291,12 +298,17 @@ function normalizeJob(value: unknown): JobCatalogItem {
     delete candidateRecord.company;
     delete candidateRecord.review;
     delete candidateRecord.correctionRequest;
+    // PATCH carries this transient hint so split-catalogue writes can locate
+    // the previously persisted industry. It must never enter the strict job
+    // catalogue schema or be persisted as part of the job record.
+    delete candidateRecord.previousIndustryCode;
   }
 
   const source = sourceJobSchema.parse(candidate);
-  return jobCatalogSchema.parse({
+  const status = normalizedStatus(source.status);
+  return (status === "draft" ? jobDraftCatalogSchema : jobCatalogSchema).parse({
     ...source,
-    status: normalizedStatus(source.status),
+    status,
   });
 }
 
@@ -495,10 +507,14 @@ async function readRecruiterJobs(companyIds: ReadonlySet<string>) {
   if (companyIds.size === 0) return [];
 
   const cacheKey = [...companyIds].sort().join("\u0000");
+  const sourceVersion = shouldCacheCatalogue()
+    ? await jobsRepository.readSourceVersion()
+    : "";
   const cached = recruiterJobsRead.get(cacheKey);
   if (
     shouldCacheCatalogue() &&
     cached &&
+    cached.sourceVersion === sourceVersion &&
     Date.now() - cached.createdAt < RECRUITER_JOB_CACHE_TTL_MS
   ) {
     return cached.value;
@@ -516,7 +532,11 @@ async function readRecruiterJobs(companyIds: ReadonlySet<string>) {
     .then((rawJobs) => rawJobs.map(normalizeJob));
   if (!shouldCacheCatalogue()) return next;
 
-  recruiterJobsRead.set(cacheKey, { value: next, createdAt: Date.now() });
+  recruiterJobsRead.set(cacheKey, {
+    value: next,
+    createdAt: Date.now(),
+    sourceVersion,
+  });
   try {
     return await next;
   } catch (error) {
@@ -525,6 +545,43 @@ async function readRecruiterJobs(companyIds: ReadonlySet<string>) {
     }
     throw error;
   }
+}
+
+async function readRecruiterJobsForUpdate(
+  raw: unknown,
+  companyId: string,
+): Promise<JobCatalogItem[]> {
+  const record =
+    raw && typeof raw === "object" && !Array.isArray(raw)
+      ? (raw as Record<string, unknown>)
+      : null;
+  const requestedIndustryCode =
+    typeof record?.previousIndustryCode === "string"
+      ? record.previousIndustryCode
+      : typeof record?.industryCode === "string"
+        ? record.industryCode
+        : null;
+  const industryCode = requestedIndustryCode
+    ? catalogueIndustryCode(requestedIndustryCode)
+    : null;
+  const id = typeof record?.id === "string" ? record.id : null;
+  if (industryCode && id) {
+    const rawMatch = (
+      await jobsRepository.readIndustryPartition(industryCode)
+    ).find(
+      (job) =>
+        job &&
+        typeof job === "object" &&
+        !Array.isArray(job) &&
+        (job as { id?: unknown }).id === id &&
+        (job as { companyId?: unknown }).companyId === companyId,
+    );
+    if (rawMatch) return [normalizeJob(rawMatch)];
+  }
+
+  // A stale/malicious hint must never hide a valid authorized job. The
+  // fallback is slower, but only runs when the targeted partition misses.
+  return readRecruiterJobs(new Set([companyId]));
 }
 
 async function recruiterActionCompanies(userId: string) {
@@ -759,6 +816,7 @@ async function loadRecruiterJobManagementData(
           jobId: true,
           companyId: true,
           version: true,
+          closedAt: true,
           pendingVersion: {
             select: {
               id: true,
@@ -843,15 +901,17 @@ async function loadRecruiterJobManagementData(
           }
         : undefined,
       company,
-      status: aggregate.pendingVersion
-        ? ("pending_approval" as const)
-        : current?.state === "REJECTED"
-          ? ("rejected" as const)
-          : current?.state === "WITHDRAWN"
-            ? ("draft" as const)
-            : current?.state === "APPROVED"
-              ? ("active" as const)
-              : undefined,
+      status: aggregate.closedAt
+        ? ("closed" as const)
+        : aggregate.pendingVersion
+          ? ("pending_approval" as const)
+          : current?.state === "REJECTED"
+            ? ("rejected" as const)
+            : current?.state === "WITHDRAWN"
+              ? ("draft" as const)
+              : current?.state === "APPROVED"
+                ? ("active" as const)
+                : undefined,
       correction: correctionRequest
         ? {
             id: correctionRequest.id,
@@ -996,12 +1056,17 @@ export async function readRecruiterJobManagementData(
   if (!shouldCacheCatalogue()) return loadRecruiterJobManagementData(userId);
 
   const now = Date.now();
+  const sourceVersion = await jobsRepository.readSourceVersion();
   const cached = managementDataRead.get(userId);
-  if (cached && now - cached.createdAt < MANAGEMENT_DATA_CACHE_TTL_MS)
+  if (
+    cached &&
+    cached.sourceVersion === sourceVersion &&
+    now - cached.createdAt < MANAGEMENT_DATA_CACHE_TTL_MS
+  )
     return cached.value;
 
   const value = loadRecruiterJobManagementData(userId);
-  managementDataRead.set(userId, { value, createdAt: now });
+  managementDataRead.set(userId, { value, createdAt: now, sourceVersion });
   if (managementDataRead.size > 100) {
     const oldest = managementDataRead.keys().next().value;
     if (oldest) managementDataRead.delete(oldest);
@@ -1108,25 +1173,21 @@ function jobFromCommand(
   raw: unknown,
   companyId: string,
   createdByUserId: string,
-  status: JobPostingStatus,
+  status: Extract<JobPostingStatus, "draft">,
   now: string,
   id = buildJobId(),
 ): JobCatalogItem {
   const normalized = normalizeJob(raw);
-  if (
-    !isRecruiterIndustrySelectionValid(normalized) ||
-    !deriveRecruiterClassification(normalized).valid
-  ) {
+  if (!isRecruiterIndustrySelectionValid(normalized)) {
     throw new Error("Invalid recruiter job classification.");
   }
   const input = prepareRecruiterJobForSave(normalized);
   const title = input.title.trim();
-  if (!title) throw new Error("A job title is required.");
   const locationPart = input.location.city || "remote";
-  return jobCatalogSchema.parse({
+  return jobDraftCatalogSchema.parse({
     ...input,
     id,
-    slug: `${slugPart(title)}-${slugPart(locationPart)}-${id.slice(-8)}`,
+    slug: `${slugPart(title || "untitled-job")}-${slugPart(locationPart)}-${id.slice(-8)}`,
     companyId,
     createdByUserId,
     status,
@@ -1177,13 +1238,15 @@ function recruiterCanUpdateStatus(
 }
 export async function updateRecruiterJob(userId: string, raw: unknown) {
   return withWriteLock(async () => {
-    const { jobs, companies, rawJobs } = await readCatalog();
+    const { companies } = await readCompanyCatalog();
     const company = (await authorizedCompanies(companies, userId))[0] ?? null;
     if (!company) throw new Error("A recruiter-owned company is required.");
+    const jobs = await readRecruiterJobsForUpdate(raw, company.id);
     const normalized = normalizeJob(raw);
     if (
       !isRecruiterIndustrySelectionValid(normalized) ||
-      !deriveRecruiterClassification(normalized).valid
+      (normalized.status !== "draft" &&
+        !deriveRecruiterClassification(normalized).valid)
     ) {
       throw new Error("Invalid recruiter job classification.");
     }
@@ -1213,7 +1276,9 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
       );
     }
     const now = new Date().toISOString();
-    const updated = jobCatalogSchema.parse({
+    const updatedSchema =
+      input.status === "draft" ? jobDraftCatalogSchema : jobCatalogSchema;
+    const updated = updatedSchema.parse({
       ...input,
       id: current.id,
       slug: current.slug,
@@ -1227,7 +1292,33 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
         applicantCount: current.stats.applicantCount,
       },
     });
-    await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
+    const currentIndustryCode = catalogueIndustryCode(current.industryCode);
+    const updatedIndustryCode = catalogueIndustryCode(updated.industryCode);
+    if (!currentIndustryCode || !updatedIndustryCode) {
+      throw new Error("Invalid recruiter job classification.");
+    }
+    await jobsRepository.mutateIndustryPartitions(
+      [currentIndustryCode, updatedIndustryCode],
+      (partitions) => {
+        const previous = partitions.get(currentIndustryCode) ?? [];
+        if (currentIndustryCode === updatedIndustryCode) {
+          partitions.set(currentIndustryCode, replaceRawJob(previous, updated));
+          return;
+        }
+
+        const remaining = removeRawJob(previous, current.id);
+        if (remaining.length === previous.length)
+          throw new Error("Job posting not found.");
+        partitions.set(currentIndustryCode, remaining);
+        partitions.set(
+          updatedIndustryCode,
+          replaceOrAppendRawJob(
+            partitions.get(updatedIndustryCode) ?? [],
+            updated,
+          ),
+        );
+      },
+    );
     invalidateCatalogueCache();
     if (company.databaseBacked && company.databaseId) {
       await applyRecruiterCapacityIncrease({
@@ -1241,11 +1332,19 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
   });
 }
 
-export async function closeRecruiterJob(userId: string, jobId: string) {
+export async function closeRecruiterJob(
+  userId: string,
+  jobId: string,
+  requestedIndustryCode?: string,
+) {
   return withWriteLock(async () => {
-    const { jobs, companies, rawJobs } = await readCatalog();
+    const { companies } = await readCompanyCatalog();
     const company = (await authorizedCompanies(companies, userId))[0] ?? null;
     if (!company) throw new Error("A recruiter-owned company is required.");
+    const jobs = await readRecruiterJobsForUpdate(
+      { id: jobId, industryCode: requestedIndustryCode },
+      company.id,
+    );
     const current = jobs.find(
       (job) => job.id === jobId && job.companyId === company.id,
     );
@@ -1266,8 +1365,67 @@ export async function closeRecruiterJob(userId: string, jobId: string) {
       status: "closed",
       updatedAt: new Date().toISOString(),
     });
-    await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
+    const industryCode = catalogueIndustryCode(current.industryCode);
+    if (!industryCode) throw new Error("Invalid recruiter job classification.");
+    await jobsRepository.mutateIndustryPartition(industryCode, (rawJobs) =>
+      replaceRawJob(rawJobs, updated),
+    );
     invalidateCatalogueCache();
+    return { ...updated, company } satisfies RecruiterJob;
+  });
+}
+
+export async function reactivateRecruiterJob(
+  userId: string,
+  jobId: string,
+  requestedIndustryCode?: string,
+) {
+  return withWriteLock(async () => {
+    const { companies } = await readCompanyCatalog();
+    const company = (await authorizedCompanies(companies, userId))[0] ?? null;
+    if (!company) throw new Error("A recruiter-owned company is required.");
+    const jobs = await readRecruiterJobsForUpdate(
+      { id: jobId, industryCode: requestedIndustryCode },
+      company.id,
+    );
+    const current = jobs.find(
+      (job) => job.id === jobId && job.companyId === company.id,
+    );
+    if (!current) throw new Error("Job posting not found.");
+
+    const aggregate =
+      company.databaseBacked && company.databaseId
+        ? await prisma.jobPostReviewAggregate.findUnique({
+            where: { jobId: current.id },
+            select: { companyId: true, closedAt: true, softDeletedAt: true },
+          })
+        : null;
+    if (aggregate?.softDeletedAt) throw new Error("Job posting not found.");
+    if (current.status !== "closed" && !aggregate?.closedAt) {
+      throw new Error(
+        "This job posting cannot be reactivated in its current status.",
+      );
+    }
+
+    if (company.databaseBacked && company.databaseId && aggregate?.closedAt) {
+      await reopenManagedJobPost({
+        jobId: current.id,
+        companyId: company.databaseId,
+        actorUserId: userId,
+      });
+    }
+    const updated = jobCatalogSchema.parse({
+      ...current,
+      status: "active",
+      updatedAt: new Date().toISOString(),
+    });
+    const industryCode = catalogueIndustryCode(current.industryCode);
+    if (!industryCode) throw new Error("Invalid recruiter job classification.");
+    await jobsRepository.mutateIndustryPartition(industryCode, (rawJobs) =>
+      replaceRawJob(rawJobs, updated),
+    );
+    invalidateCatalogueCache();
+    await invalidateCandidateJobCatalogueCache();
     return { ...updated, company } satisfies RecruiterJob;
   });
 }

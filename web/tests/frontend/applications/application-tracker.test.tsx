@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ApplicationTracker } from "@/frontend/features/candidate-applications/components/application-tracker";
 import type { ApplicationTracker as ApplicationTrackerData } from "@/shared/contracts/candidate-applications";
@@ -102,10 +108,52 @@ function offeredTracker(): ApplicationTrackerData {
   };
 }
 
-function renderTracker(initialTracker = offeredTracker()) {
+function appliedTracker(): ApplicationTrackerData {
+  const base = offeredTracker();
+  return {
+    ...base,
+    publicStage: "APPLICATION_SUBMITTED",
+    publicOutcome: null,
+    canonicalStage: "APPLIED",
+    transitionFromStage: null,
+    stageVersion: 1,
+    updates: [base.updates[0]!],
+    canWithdraw: true,
+  };
+}
+
+function withdrawnTracker(): ApplicationTrackerData {
+  const base = appliedTracker();
+  const withdrawnAt = "2026-08-18T09:02:00.000Z";
+  return {
+    ...base,
+    publicStage: "OUTCOME",
+    publicOutcome: "WITHDRAWN",
+    canonicalStage: "APPLIED",
+    lastUpdatedAt: withdrawnAt,
+    updates: [
+      base.updates[0]!,
+      {
+        id: "withdrawal-1",
+        kind: "WITHDRAWN",
+        publicStage: "OUTCOME",
+        publicOutcome: "WITHDRAWN",
+        canonicalStage: null,
+        title: "Application withdrawn",
+        occurredAt: withdrawnAt,
+      },
+    ],
+    canWithdraw: false,
+  };
+}
+
+function renderTracker(
+  initialTracker = offeredTracker(),
+  refreshedTracker = offeredTracker(),
+) {
   const fetchMock = vi.fn().mockResolvedValue({
     ok: true,
-    json: async () => offeredTracker(),
+    json: async () => refreshedTracker,
   });
   vi.stubGlobal("fetch", fetchMock);
   vi.stubGlobal("crypto", {
@@ -227,5 +275,45 @@ describe("candidate application withdrawal confirmation", () => {
       }),
       "csrf",
     );
+  });
+
+  it("moves withdrawal into Outcome and shows one recent update", async () => {
+    mocks.mutate.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        applicationId: "application-1",
+        outcome: "WITHDRAWN",
+        withdrawnAt: "2026-08-18T09:02:00.000Z",
+        preservedStage: "APPLIED",
+        version: 1,
+      }),
+    });
+    renderTracker(appliedTracker(), withdrawnTracker());
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Withdraw application" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Confirm withdrawal" }));
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("heading", { name: "Application withdrawn" }),
+      ).toBeVisible(),
+    );
+
+    const outcomeStep = screen.getByText("Outcome").closest("li");
+    expect(outcomeStep).toHaveAttribute("data-step-state", "active");
+    expect(screen.getByText("Interview").closest("li")).toHaveAttribute(
+      "data-step-state",
+      "skipped",
+    );
+
+    const recentUpdates = screen
+      .getByRole("heading", { name: "Recent updates" })
+      .closest("section");
+    expect(recentUpdates).not.toBeNull();
+    expect(
+      within(recentUpdates!).getAllByText("Application withdrawn"),
+    ).toHaveLength(1);
   });
 });

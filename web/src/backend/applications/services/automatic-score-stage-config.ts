@@ -7,7 +7,7 @@ const DEFAULT_STRONG_SCORE_THRESHOLD = 80;
 const DEFAULT_VIEWED_TIMEOUT_MINUTES = 12 * 60;
 
 export const automaticScoreStageReasonCodes = Object.freeze({
-  lowScoreAutoReject: "score_below_60_auto_reject",
+  lowScoreAutoWaitlist: "score_below_60_auto_waitlist",
   reviewNeededTimeoutAutoReject: "review_needed_timeout_auto_reject",
   strongMatchTimeoutAutoShortlist: "strong_match_timeout_auto_shortlist",
 } as const);
@@ -109,12 +109,12 @@ export function automaticScoreBand(
   return { code: "LOW_MATCH", label: "Low match", iconLabel: "✕" };
 }
 
-export function lowScoreAutomaticRejectReasonCode(
+export function lowScoreAutomaticWaitlistReasonCode(
   config = getAutomaticScoreStageRuleConfig(),
 ) {
   return config.lowScoreThreshold === DEFAULT_LOW_SCORE_THRESHOLD
-    ? automaticScoreStageReasonCodes.lowScoreAutoReject
-    : `score_below_${config.lowScoreThreshold}_auto_reject`;
+    ? automaticScoreStageReasonCodes.lowScoreAutoWaitlist
+    : `score_below_${config.lowScoreThreshold}_auto_waitlist`;
 }
 
 export function automaticScoreConfigForPublishedResult(input: {

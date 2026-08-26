@@ -26,7 +26,7 @@ function claimedInitialAttempt(): ClaimedPrivateAttempt {
       jobPostingId: "job-1",
       jdVersion: 3,
       jdDigest: "b".repeat(64),
-      scoringConfigVersion: "HS-60/40-v1",
+      scoringConfigVersion: "HS-40/60-v1",
       cvSnapshot: {
         mimeType: "application/pdf",
         byteSize: 128,
@@ -48,8 +48,8 @@ function claimedInitialAttempt(): ClaimedPrivateAttempt {
 const automaticResult: AutomaticMatchingResult = {
   resultId: "automatic-1",
   score: 92,
-  weight: 0.6,
-  weightedContribution: 55.2,
+  weight: 0.4,
+  weightedContribution: 36.8,
   matchedRequirements: [
     { id: "java", label: "Java", kind: "REQUIRED", matched: true },
   ],
@@ -67,7 +67,7 @@ const automaticResult: AutomaticMatchingResult = {
   mayBeIncomplete: false,
   cvVersion: "cv-1-v1",
   jdVersion: "job-1-v3",
-  configVersion: "HS-60/40-v1",
+  configVersion: "HS-40/60-v1",
 };
 
 const validCvClassifier = {

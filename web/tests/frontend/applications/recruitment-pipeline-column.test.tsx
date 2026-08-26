@@ -47,7 +47,6 @@ const page: PipelineStagePage = {
 };
 
 const lockedStageCases: Array<[ApplicationStage, string]> = [
-  ["OFFERED", "Offered"],
   ["HIRED", "Hired"],
   ["OFFER_DECLINED", "Offer Declined"],
   ["WAITLISTED", "Waitlisted"],
@@ -133,13 +132,43 @@ describe("RecruitmentPipelineColumn footer", () => {
 });
 
 describe("RecruitmentPipelineColumn rejected stage", () => {
-  it("keeps Rejected available as a drop target and without a lock", () => {
+  it("keeps Rejected available as a drop target", () => {
     const { container } = render(
       <RecruitmentPipelineColumn
         jobId="job-1"
         summary={{ stage: "REJECTED", label: "Rejected", count: 1 }}
         page={{
           stage: "REJECTED",
+          items: [],
+          nextCursor: null,
+          observedAt: "2026-08-18T00:00:00.000Z",
+        }}
+        loading={false}
+        loadingMore={false}
+        error={null}
+        onLoadMore={vi.fn()}
+        onRetry={vi.fn()}
+      />,
+    );
+
+    expect(container.querySelector(".column")).not.toHaveClass("is-locked");
+    expect(
+      container.querySelector(".pipeline-column__header-tools .lock-icon"),
+    ).not.toBeInTheDocument();
+    expect(container.querySelector(".column")).not.toHaveAttribute(
+      "aria-disabled",
+    );
+  });
+});
+
+describe("RecruitmentPipelineColumn offered stage", () => {
+  it("keeps Offered available as a drop target", () => {
+    const { container } = render(
+      <RecruitmentPipelineColumn
+        jobId="job-1"
+        summary={{ stage: "OFFERED", label: "Offered", count: 0 }}
+        page={{
+          stage: "OFFERED",
           items: [],
           nextCursor: null,
           observedAt: "2026-08-18T00:00:00.000Z",

@@ -5,7 +5,6 @@ import { prisma } from "@/backend/database/prisma";
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
 import { createInAppNotification } from "@/backend/notifications/notification-service";
 import {
-  publicStageForCanonicalStage,
   withdrawalCommandSchema,
   withdrawalOutcomeSchema,
   type WithdrawalOutcome,
@@ -20,11 +19,7 @@ const withdrawableStages = new Set([
   "SHORTLISTED",
   "WAITLISTED",
 ] as const);
-type WithdrawableStage =
-  | "APPLIED"
-  | "VIEWED"
-  | "SHORTLISTED"
-  | "WAITLISTED";
+type WithdrawableStage = "APPLIED" | "VIEWED" | "SHORTLISTED" | "WAITLISTED";
 
 function isSerializationConflict(error: unknown) {
   return (
@@ -75,7 +70,11 @@ export class ApplicationWithdrawalService {
     now = new Date(),
   ) {
     const command = withdrawalCommandSchema.parse(rawCommand);
-    if (!idempotencyKey || idempotencyKey.length < 16 || idempotencyKey.length > 128) {
+    if (
+      !idempotencyKey ||
+      idempotencyKey.length < 16 ||
+      idempotencyKey.length > 128
+    ) {
       throw new CandidateApplicationError(
         400,
         "APPLICATION_IDEMPOTENCY_KEY_INVALID",
@@ -85,146 +84,146 @@ export class ApplicationWithdrawalService {
 
     try {
       return await prisma.$transaction(
-      async (tx) => {
-        const application = await tx.jobApplication.findFirst({
-          where: { id: applicationId, candidateUserId: actor.userId },
-          select: {
-            id: true,
-            stage: true,
-            stageVersion: true,
-            withdrawalOutcome: true,
-            withdrawnAt: true,
-            jobPosting: {
-              select: {
-                companyId: true,
-                title: true,
-                company: { select: { displayName: true } },
+        async (tx) => {
+          const application = await tx.jobApplication.findFirst({
+            where: { id: applicationId, candidateUserId: actor.userId },
+            select: {
+              id: true,
+              stage: true,
+              stageVersion: true,
+              withdrawalOutcome: true,
+              withdrawnAt: true,
+              jobPosting: {
+                select: {
+                  companyId: true,
+                  title: true,
+                  company: { select: { displayName: true } },
+                },
+              },
+              notificationPreference: {
+                select: { inAppEnabled: true },
               },
             },
-            notificationPreference: {
-              select: { inAppEnabled: true },
-            },
-          },
-        });
-        if (!application) {
-          throw new CandidateApplicationError(
-            404,
-            "APPLICATION_UNAVAILABLE",
-            "This application is unavailable.",
-          );
-        }
-
-        const deduplicationKey = `application:${application.id}:withdrawal:${idempotencyKey}`;
-        const replay = await tx.applicationPublicUpdate.findUnique({
-          where: { deduplicationKey },
-          select: { id: true },
-        });
-        if (replay) return outcome(application);
-        if (application.withdrawalOutcome) return outcome(application);
-
-        const stage = applicationStageSchema.parse(application.stage);
-        if (!withdrawableStages.has(stage as WithdrawableStage)) {
-          throw new CandidateApplicationError(
-            409,
-            "APPLICATION_WITHDRAWAL_BLOCKED",
-            "You can withdraw only before the interview stage.",
-          );
-        }
-        if (application.stageVersion !== command.expectedVersion) {
-          throw new CandidateApplicationError(
-            409,
-            "APPLICATION_STAGE_CONFLICT",
-            "This application changed. Refresh and try again.",
-          );
-        }
-
-        const updated = await tx.jobApplication.updateMany({
-          where: {
-            id: application.id,
-            candidateUserId: actor.userId,
-            stage,
-            stageVersion: command.expectedVersion,
-            withdrawalOutcome: null,
-          },
-          data: {
-            withdrawalOutcome: "CANDIDATE_WITHDRAWN",
-            withdrawnAt: now,
-            withdrawnByUserId: actor.userId,
-            withdrawalVersion: application.stageVersion,
-            activeProcessingStoppedAt: now,
-          },
-        });
-        if (updated.count !== 1) {
-          throw new CandidateApplicationError(
-            409,
-            "APPLICATION_STAGE_CONFLICT",
-            "This application changed. Refresh and try again.",
-          );
-        }
-
-        await tx.applicationPublicUpdate.create({
-          data: {
-            applicationId: application.id,
-            kind: "WITHDRAWN",
-            publicStage: publicStageForCanonicalStage(stage),
-            publicOutcome: "WITHDRAWN",
-            title: "Application withdrawn",
-            effectiveAt: now,
-            deduplicationKey,
-            sourceEventReference: null,
-          },
-        });
-        await tx.recruitmentNotificationWork.create({
-          data: {
-            applicationId: application.id,
-            audience: "COMPANY",
-            kind: "APPLICATION_STAGE_CHANGED",
-            targetReference: application.jobPosting.companyId,
-            payloadRef: {
-              v: 1,
-              event: "CANDIDATE_WITHDRAWN",
-              applicationId: application.id,
-              jobTitle: application.jobPosting.title,
-              companyName: application.jobPosting.company.displayName,
-            },
-            idempotencyKey: `application:${application.id}:withdrawal:recruiter`,
-          },
-        });
-        if (application.notificationPreference?.inAppEnabled ?? true) {
-          await createInAppNotification(tx, {
-            recipientUserId: actor.userId,
-            kind: "APPLICATION_STAGE_CHANGED",
-            deduplicationKey: `application:${application.id}:withdrawal:candidate`,
-            correlationId: randomUUID(),
-            occurredAt: now,
-            contextType: "APPLICATION",
-            contextId: application.id,
-            variables: { stage: "WITHDRAWN" },
           });
-        }
-        await new PrismaAuditRepository(tx).append({
-          occurredAt: now,
-          actorType: "user",
-          actorUserId: actor.userId,
-          actorSessionId: actor.sessionId,
-          action: "job.application.withdrawn",
-          targetType: "job_application",
-          targetId: application.id,
-          result: "SUCCESS",
-          correlationId: randomUUID(),
-          context: {
-            preservedStage: stage,
-            applicationVersion: application.stageVersion,
-            outcome: "CANDIDATE_WITHDRAWN",
-          },
-        });
-        return outcome({
-          ...application,
-          withdrawalOutcome: "CANDIDATE_WITHDRAWN" as const,
-          withdrawnAt: now,
-        });
-      },
-      { isolationLevel: "Serializable" },
+          if (!application) {
+            throw new CandidateApplicationError(
+              404,
+              "APPLICATION_UNAVAILABLE",
+              "This application is unavailable.",
+            );
+          }
+
+          const deduplicationKey = `application:${application.id}:withdrawal:${idempotencyKey}`;
+          const replay = await tx.applicationPublicUpdate.findUnique({
+            where: { deduplicationKey },
+            select: { id: true },
+          });
+          if (replay) return outcome(application);
+          if (application.withdrawalOutcome) return outcome(application);
+
+          const stage = applicationStageSchema.parse(application.stage);
+          if (!withdrawableStages.has(stage as WithdrawableStage)) {
+            throw new CandidateApplicationError(
+              409,
+              "APPLICATION_WITHDRAWAL_BLOCKED",
+              "You can withdraw only before the interview stage.",
+            );
+          }
+          if (application.stageVersion !== command.expectedVersion) {
+            throw new CandidateApplicationError(
+              409,
+              "APPLICATION_STAGE_CONFLICT",
+              "This application changed. Refresh and try again.",
+            );
+          }
+
+          const updated = await tx.jobApplication.updateMany({
+            where: {
+              id: application.id,
+              candidateUserId: actor.userId,
+              stage,
+              stageVersion: command.expectedVersion,
+              withdrawalOutcome: null,
+            },
+            data: {
+              withdrawalOutcome: "CANDIDATE_WITHDRAWN",
+              withdrawnAt: now,
+              withdrawnByUserId: actor.userId,
+              withdrawalVersion: application.stageVersion,
+              activeProcessingStoppedAt: now,
+            },
+          });
+          if (updated.count !== 1) {
+            throw new CandidateApplicationError(
+              409,
+              "APPLICATION_STAGE_CONFLICT",
+              "This application changed. Refresh and try again.",
+            );
+          }
+
+          await tx.applicationPublicUpdate.create({
+            data: {
+              applicationId: application.id,
+              kind: "WITHDRAWN",
+              publicStage: "OUTCOME",
+              publicOutcome: "WITHDRAWN",
+              title: "Application withdrawn",
+              effectiveAt: now,
+              deduplicationKey,
+              sourceEventReference: null,
+            },
+          });
+          await tx.recruitmentNotificationWork.create({
+            data: {
+              applicationId: application.id,
+              audience: "COMPANY",
+              kind: "APPLICATION_STAGE_CHANGED",
+              targetReference: application.jobPosting.companyId,
+              payloadRef: {
+                v: 1,
+                event: "CANDIDATE_WITHDRAWN",
+                applicationId: application.id,
+                jobTitle: application.jobPosting.title,
+                companyName: application.jobPosting.company.displayName,
+              },
+              idempotencyKey: `application:${application.id}:withdrawal:recruiter`,
+            },
+          });
+          if (application.notificationPreference?.inAppEnabled ?? true) {
+            await createInAppNotification(tx, {
+              recipientUserId: actor.userId,
+              kind: "APPLICATION_STAGE_CHANGED",
+              deduplicationKey: `application:${application.id}:withdrawal:candidate`,
+              correlationId: randomUUID(),
+              occurredAt: now,
+              contextType: "APPLICATION",
+              contextId: application.id,
+              variables: { stage: "WITHDRAWN" },
+            });
+          }
+          await new PrismaAuditRepository(tx).append({
+            occurredAt: now,
+            actorType: "user",
+            actorUserId: actor.userId,
+            actorSessionId: actor.sessionId,
+            action: "job.application.withdrawn",
+            targetType: "job_application",
+            targetId: application.id,
+            result: "SUCCESS",
+            correlationId: randomUUID(),
+            context: {
+              preservedStage: stage,
+              applicationVersion: application.stageVersion,
+              outcome: "CANDIDATE_WITHDRAWN",
+            },
+          });
+          return outcome({
+            ...application,
+            withdrawalOutcome: "CANDIDATE_WITHDRAWN" as const,
+            withdrawnAt: now,
+          });
+        },
+        { isolationLevel: "Serializable" },
       );
     } catch (error) {
       if (isSerializationConflict(error)) {

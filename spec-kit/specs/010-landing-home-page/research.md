@@ -72,7 +72,7 @@ cards.
 This result is a candidate-facing **job-fit recommendation** used to rank public
 jobs for the current candidate. It is not employer-facing applicant screening,
 does not rank applicants, and does not participate in hiring decisions. The
-constitutional 60/40 deterministic-plus-AI formula remains authoritative for the
+constitutional 40/60 deterministic-plus-AI formula remains authoritative for the
 separate applicant-screening capability and is not changed or invoked here.
 
 Refactor the existing internal `candidateProfileSignals` and ranking logic in

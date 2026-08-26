@@ -34,6 +34,10 @@ import { Badge } from "@/frontend/components/ui/badge";
 import { Modal } from "@/frontend/components/ui/modal";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import {
+  requestUnsavedChangesNavigation,
+  useUnsavedChangesGuard,
+} from "@/frontend/features/profile/client/unsaved-changes";
+import {
   formatVndInput,
   parseVndInput,
   prepareRecruiterJobForSave,
@@ -91,7 +95,7 @@ const recruiterDraftAutoSaveStoragePrefix =
   "smarthire.recruiter.job-draft-autosave";
 const recruiterDraftAutoSaveChangedEvent =
   "smarthire:recruiter-draft-autosave-changed";
-const recruiterDraftAutoSaveDelayMs = 1_500;
+const recruiterDraftAutoSaveDelayMs = 300;
 
 function useRecruiterDraftAutoSave(storageKey: string) {
   const subscribe = useCallback(
@@ -344,6 +348,7 @@ export function JobPostingEditor({
   companyName,
   autoSavePreferenceScope,
   subIndustrySuggestions = {},
+  awaitDraftSaveBeforeBack = false,
   onBack,
   onDraftAutoSaved,
   onSaved,
@@ -352,6 +357,8 @@ export function JobPostingEditor({
   companyName: string;
   autoSavePreferenceScope?: string;
   subIndustrySuggestions?: RecruiterSubIndustrySuggestions;
+  /** Routed editors refresh the list page after the draft response arrives. */
+  awaitDraftSaveBeforeBack?: boolean;
   onBack: () => void;
   onDraftAutoSaved?: (job: RecruiterJob) => void;
   onSaved: (job: RecruiterJob) => void;
@@ -364,6 +371,7 @@ export function JobPostingEditor({
   const catalogueUpdatedAt = useRef(
     initialJob.id === "new-job" ? null : initialJob.updatedAt,
   );
+  const savedIndustryCode = useRef(initialJob.industryCode);
   const csrfProof = useCsrfProof();
   const [saving, setSaving] = useState(false);
   const [pendingSubmission, setPendingSubmission] =
@@ -389,12 +397,13 @@ export function JobPostingEditor({
   const autoSaveEnabled = useRecruiterDraftAutoSave(autoSaveStorageKey);
   const locale = useWorkspaceLocale();
   const copy = recruiterJobPostingCopy(locale);
-  const readOnly = job.status === "pending_approval";
+  const readOnly = job.status === "pending_approval" || job.status === "closed";
   const canSubmitForApproval =
     job.id === "new-job" || job.status === "draft" || job.status === "rejected";
   const defaultSaveStatus: JobPostingStatus = canSubmitForApproval
     ? "draft"
     : job.status;
+  useUnsavedChangesGuard(hasUnsavedChanges && !readOnly);
   const salaryRangeInvalid =
     job.salary.max > 0 && job.salary.max < job.salary.min;
   const displayedErrors = salaryRangeInvalid
@@ -608,7 +617,11 @@ export function JobPostingEditor({
     async (
       prepared: RecruiterJob,
       targetStatus: JobPostingStatus,
-      options: { stayInEditor?: boolean; revision?: number } = {},
+      options: {
+        stayInEditor?: boolean;
+        revision?: number;
+        keepalive?: boolean;
+      } = {},
     ): Promise<boolean> => {
       setSaving(true);
       setError("");
@@ -626,6 +639,7 @@ export function JobPostingEditor({
           if (shouldPersistDraft) {
             const draftJob = toJobCatalogPayload(prepared);
             const draftMethod = prepared.id === "new-job" ? "POST" : "PATCH";
+            const previousIndustryCode = savedIndustryCode.current;
             const draftResponse = await fetch("/api/recruiter/job-postings", {
               method: draftMethod,
               headers: {
@@ -635,7 +649,11 @@ export function JobPostingEditor({
               body: JSON.stringify(
                 draftMethod === "POST"
                   ? { job: draftJob, status: "draft" }
-                  : { ...draftJob, status: "draft" },
+                  : {
+                      ...draftJob,
+                      status: "draft",
+                      previousIndustryCode,
+                    },
               ),
             });
             const draftPayload = (await draftResponse
@@ -667,6 +685,7 @@ export function JobPostingEditor({
           }
 
           catalogueUpdatedAt.current = savedDraft.updatedAt;
+          savedIndustryCode.current = savedDraft.industryCode;
           setJob(savedDraft);
           setHasUnsavedChanges(false);
           setHasSavedDraft(true);
@@ -729,16 +748,25 @@ export function JobPostingEditor({
         }
 
         const method = prepared.id === "new-job" ? "POST" : "PATCH";
+        // Keep the recruiter-only company projection out of the request. This
+        // also reduces exit-time keepalive payloads.
+        const draftJob = toJobCatalogPayload(prepared);
+        const previousIndustryCode = savedIndustryCode.current;
         const response = await fetch("/api/recruiter/job-postings", {
           method,
+          keepalive: options.keepalive,
           headers: {
             "Content-Type": "application/json",
             "x-csrf-token": csrfProof,
           },
           body: JSON.stringify(
             method === "POST"
-              ? { job: prepared, status: "draft" }
-              : { ...prepared, status: "draft" },
+              ? { job: draftJob, status: "draft" }
+              : {
+                  ...draftJob,
+                  status: "draft",
+                  previousIndustryCode,
+                },
           ),
         });
         const payload = (await response.json().catch(() => null)) as
@@ -764,6 +792,7 @@ export function JobPostingEditor({
           return false;
         }
         catalogueUpdatedAt.current = payload.updatedAt;
+        savedIndustryCode.current = payload.industryCode;
         setHasSavedDraft(true);
         if (options.stayInEditor) {
           const savedRevision = options.revision ?? editRevision.current;
@@ -841,12 +870,18 @@ export function JobPostingEditor({
           paths.some(
             (path) =>
               path.startsWith("experience.") ||
-              ["level", "education"].includes(path),
+              ["level", "education", "description.requirements"].includes(path),
           )
         )
           next[2] = true;
         if (paths.some((path) => path.startsWith("salary."))) next[3] = true;
-        if (paths.some((path) => path.startsWith("description.")))
+        if (
+          paths.some((path) =>
+            ["description.overview", "description.responsibilities"].includes(
+              path,
+            ),
+          )
+        )
           next[4] = true;
         if (
           paths.some((path) =>
@@ -887,6 +922,32 @@ export function JobPostingEditor({
     window.dispatchEvent(new Event(recruiterDraftAutoSaveChangedEvent));
   };
 
+  const leaveEditor = async () => {
+    if (autoSaveEnabled && hasUnsavedChanges && !saving && !readOnly) {
+      const prepared: RecruiterJob = {
+        ...job,
+        ...prepareRecruiterJobForSave(job),
+        company: job.company,
+      };
+      const draftErrors = validateRecruiterJobForSave(prepared, "draft");
+      if (Object.keys(draftErrors).length === 0) {
+        const saved = persist(prepared, "draft", {
+          stayInEditor: true,
+          revision: editRevision.current,
+          keepalive: true,
+        });
+        if (awaitDraftSaveBeforeBack) {
+          if (await saved) onBack();
+        } else {
+          void saved;
+          onBack();
+        }
+        return;
+      }
+    }
+    requestUnsavedChangesNavigation(onBack);
+  };
+
   useEffect(() => {
     if (
       !autoSaveEnabled ||
@@ -908,15 +969,35 @@ export function JobPostingEditor({
     }
 
     const revision = editRevision.current;
-    const timer = window.setTimeout(() => {
+    let started = false;
+    let timer = 0;
+    const saveDraft = (keepalive = false) => {
+      if (started) return;
+      started = true;
+      window.clearTimeout(timer);
       void persist(prepared, "draft", {
         stayInEditor: true,
         revision,
+        keepalive,
       }).then((saved) => {
         if (!saved) autoSaveBlockedRevision.current = revision;
       });
-    }, recruiterDraftAutoSaveDelayMs);
-    return () => window.clearTimeout(timer);
+    };
+    const saveWhenHidden = () => {
+      if (document.visibilityState === "hidden") saveDraft(true);
+    };
+    const saveOnPageHide = () => saveDraft(true);
+    timer = window.setTimeout(
+      () => saveDraft(true),
+      recruiterDraftAutoSaveDelayMs,
+    );
+    window.addEventListener("pagehide", saveOnPageHide);
+    document.addEventListener("visibilitychange", saveWhenHidden);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("pagehide", saveOnPageHide);
+      document.removeEventListener("visibilitychange", saveWhenHidden);
+    };
   }, [autoSaveEnabled, hasUnsavedChanges, job, persist, readOnly, saving]);
 
   const minDeadline = new Date().toISOString().slice(0, 10);
@@ -963,7 +1044,8 @@ export function JobPostingEditor({
         <button
           type="button"
           className="recruiter-back-button"
-          onClick={onBack}
+          disabled={awaitDraftSaveBeforeBack && saving}
+          onClick={() => void leaveEditor()}
         >
           <ArrowLeft aria-hidden="true" />
           {copy.back}
@@ -1062,7 +1144,8 @@ export function JobPostingEditor({
           noValidate
         >
           <p className="recruiter-required-note">
-            Fields marked * are required.
+            Fields marked * are required before submission. Drafts can be saved
+            at any time.
           </p>
 
           <EditorSection
@@ -1515,6 +1598,10 @@ export function JobPostingEditor({
                   "3+ years in a similar role\nStrong communication skills\nPortfolio of relevant work"
                 }
               />
+              <FieldError
+                field="description.requirements"
+                errors={displayedErrors}
+              />
             </label>
           </EditorSection>
 
@@ -1749,6 +1836,10 @@ export function JobPostingEditor({
                   "Own the roadmap for your domain\nCollaborate with product and engineering\nShare progress with stakeholders"
                 }
               />
+              <FieldError
+                field="description.responsibilities"
+                errors={displayedErrors}
+              />
             </label>
             <label>
               Reports to
@@ -1867,12 +1958,17 @@ export function JobPostingEditor({
             <button
               type="button"
               className="recruiter-outline-button"
-              onClick={onBack}
+              disabled={awaitDraftSaveBeforeBack && saving}
+              onClick={() => void leaveEditor()}
             >
               Cancel
             </button>
             {readOnly ? (
-              <Badge tone="warning">Editing locked during review</Badge>
+              <Badge tone={job.status === "closed" ? "neutral" : "warning"}>
+                {job.status === "closed"
+                  ? "Closed posting — view only"
+                  : "Editing locked during review"}
+              </Badge>
             ) : canSubmitForApproval ? (
               <>
                 <button

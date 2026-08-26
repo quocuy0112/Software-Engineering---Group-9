@@ -76,7 +76,7 @@ export type RequirementGap = Readonly<{
 export type AutomaticMatchingResult = Readonly<{
   resultId: string;
   score: number;
-  weight: 0.6;
+  weight: 0.4;
   weightedContribution: number;
   matchedRequirements: readonly RequirementMatch[];
   gaps: readonly RequirementGap[];
@@ -99,7 +99,7 @@ export type AutomaticMatchingResult = Readonly<{
 export type AiEvaluationResult = Readonly<{
   resultId: string;
   score: number;
-  weight: 0.4;
+  weight: 0.6;
   weightedContribution: number;
   summary: string;
   strengths: readonly Readonly<{ title: string; evidence: string }>[];

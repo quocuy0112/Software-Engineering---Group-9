@@ -25,7 +25,7 @@ describe("scoring work processor", () => {
     mocks.findOperation.mockResolvedValue({
       kind: "JOB_RESCORE",
       targetJobDescriptionVersionId: "JD-v3",
-      targetScoringConfigVersionId: "HS-60/40-v1",
+      targetScoringConfigVersionId: "HS-40/60-v1",
     });
 
     const { createScoringWorkProcessor } = await import(

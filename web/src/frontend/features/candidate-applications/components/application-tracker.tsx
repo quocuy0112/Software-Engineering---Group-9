@@ -188,6 +188,35 @@ function updateIcon(update: ApplicationTracker["updates"][number]) {
   return <Check aria-hidden="true" />;
 }
 
+function isAtLeastAsFresh(
+  current: ApplicationTracker,
+  next: ApplicationTracker,
+) {
+  // Withdrawal is a terminal candidate-owned outcome. A response that was
+  // already in flight before the withdrawal must not restore the old view.
+  if (
+    current.publicOutcome === "WITHDRAWN" &&
+    next.publicOutcome !== "WITHDRAWN"
+  ) {
+    return false;
+  }
+  if (
+    next.stageVersion < current.stageVersion ||
+    next.intake.progressPercent < current.intake.progressPercent
+  ) {
+    return false;
+  }
+  if (
+    next.stageVersion === current.stageVersion &&
+    next.intake.progressPercent === current.intake.progressPercent &&
+    new Date(next.lastUpdatedAt).getTime() <
+      new Date(current.lastUpdatedAt).getTime()
+  ) {
+    return false;
+  }
+  return true;
+}
+
 export function ApplicationTracker({
   initialTracker,
   csrfProof,
@@ -219,10 +248,7 @@ export function ApplicationTracker({
       if (!response.ok) return;
       const next = applicationTrackerSchema.parse(await response.json());
       setTracker((current) =>
-        next.stageVersion >= current.stageVersion &&
-        next.intake.progressPercent >= current.intake.progressPercent
-          ? next
-          : current,
+        isAtLeastAsFresh(current, next) ? next : current,
       );
     } catch {
       // Preserve the last safe projection during a transient poll failure.
@@ -421,23 +447,31 @@ export function ApplicationTracker({
     setError(null);
     setOfferDecision(decision);
   }
+  const isWithdrawn = tracker.publicOutcome === "WITHDRAWN";
   const isBranchOutcome =
+    isWithdrawn ||
     tracker.canonicalStage === "REJECTED" ||
     tracker.canonicalStage === "WAITLISTED";
-  const transitionOriginIndex = tracker.transitionFromStage
-    ? canonicalStepIndex[tracker.transitionFromStage]
-    : tracker.canonicalStage === "REJECTED"
+  const transitionOriginIndex = isWithdrawn
+    ? tracker.canonicalStage === "APPLIED"
       ? 0
-      : 1;
+      : 1
+    : tracker.transitionFromStage
+      ? canonicalStepIndex[tracker.transitionFromStage]
+      : tracker.canonicalStage === "REJECTED"
+        ? 0
+        : 1;
   const activeIndex =
-    tracker.canonicalStage === "OFFERED"
+    tracker.publicOutcome === "WITHDRAWN"
       ? 3
-      : canonicalStepIndex[tracker.canonicalStage];
+      : tracker.canonicalStage === "OFFERED"
+        ? 3
+        : canonicalStepIndex[tracker.canonicalStage];
   const outcomeDetail =
-    tracker.canonicalStage === "OFFERED"
-      ? "Awaiting response"
-      : tracker.publicOutcome === "WITHDRAWN"
-        ? "Withdrawn"
+    tracker.publicOutcome === "WITHDRAWN"
+      ? "Withdrawn"
+      : tracker.canonicalStage === "OFFERED"
+        ? "Awaiting response"
         : tracker.canonicalStage === "HIRED"
           ? "Hired"
           : tracker.canonicalStage === "OFFER_DECLINED"

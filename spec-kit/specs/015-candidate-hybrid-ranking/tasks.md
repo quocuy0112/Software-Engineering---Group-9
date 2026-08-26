@@ -63,9 +63,9 @@
 
 ## Phase 4: User Story 2 — AI assessment and hybrid score (Priority: P1)
 
-**Goal**: Publish explainable schema-valid AI and exact auditable 60/40 final results.
+**Goal**: Publish explainable schema-valid AI and exact auditable 40/60 final results.
 
-**Independent Test**: Automatic 92 and AI 88 publish 90.4 with complete provenance/explanation; timeout/malformed responses preserve fallback.
+**Independent Test**: Automatic 92 and AI 88 publish 89.6 with complete provenance/explanation; timeout/malformed responses preserve fallback.
 
 - [X] T030 [P] [US2] Add hybrid formula, one-rounding, lineage mismatch, and no-partial-final tests in `web/tests/backend/scoring/hybrid-score.test.ts`
 - [ ] T031 [P] [US2] Add AI explanation, confidence, compliance, question-link/fallback tests in `web/tests/backend/scoring/ai-assessment.test.ts`
@@ -255,7 +255,7 @@ then T036 + T039
 - It MUST NOT add another CV/cover-letter byte path; `documents-tab.tsx` composes Group 1 viewers and service authorization.
 - It MUST NOT show a hybrid final when AI is missing, use missing score as zero, silently omit processing rows from score filters, or rely on color alone.
 - It MUST NOT send internal rejection notes to candidates/providers/logs or add rejection notification/undo/reopen behavior.
-- It MUST NOT change the constitution-fixed 60/40 weights, score bands, canonical stages, or AI-as-advisory rule.
+- It MUST NOT change the constitution-fixed 40/60 weights, score bands, canonical stages, or AI-as-advisory rule.
 
 ## Format Validation
 

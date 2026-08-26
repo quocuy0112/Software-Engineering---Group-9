@@ -21,6 +21,11 @@ import {
   getAutomaticScoreStageRuleConfig,
   type AutomaticScoreStageRuleConfig,
 } from "@/backend/applications/services/automatic-score-stage-config";
+import {
+  AI_WEIGHT,
+  AUTOMATIC_WEIGHT,
+  FORMULA_VERSION,
+} from "@/backend/scoring/domain/hybrid-score-calculator";
 
 /* The generated Prisma include projection is intentionally narrowed at the
  * contract boundary below; the projection contains encrypted text fields. */
@@ -74,6 +79,13 @@ function humanAiFindingTitle(value: string): string {
       "Extraction flag": "Extraction flag",
     }[normalized] ?? normalized
   );
+}
+
+type HybridWeight = 0.4 | 0.6;
+
+function storedHybridWeight(value: unknown, fallback: HybridWeight): HybridWeight {
+  const weight = Number(value);
+  return weight === 0.4 || weight === 0.6 ? weight : fallback;
 }
 
 function aiQualityCategory(title: string, evidence: string): string {
@@ -258,6 +270,11 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
       mediumThreshold: row.mediumThreshold,
       highThreshold: row.highThreshold,
     });
+    const automaticWeight = storedHybridWeight(
+      row.automaticWeight,
+      AUTOMATIC_WEIGHT,
+    );
+    const aiWeight = storedHybridWeight(row.aiWeight, AI_WEIGHT);
     const ai = row.aiAssessment
       ? this.projectAi(row.aiAssessment, automatic, scoreConfig)
       : null;
@@ -266,10 +283,10 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
         ? null
         : ({
             value: Number(row.finalScore),
-            formulaText: `${Number(row.automaticScore)} × 0.6 + ${Number(row.aiScore)} × 0.4 = ${Number(row.finalScore)}`,
+            formulaText: `${Number(row.automaticScore)} × ${automaticWeight * 100}% + ${Number(row.aiScore)} × ${aiWeight * 100}% = ${Number(row.finalScore)}`,
             formulaVersion: row.formulaVersion,
-            automaticWeight: 0.6 as const,
-            aiWeight: 0.4 as const,
+            automaticWeight,
+            aiWeight,
             band:
               Number(row.finalScore) >= scoreConfig.strongScoreThreshold
                 ? { code: "HIGH_MATCH", label: "Strong match", iconLabel: "✓" }
@@ -288,7 +305,7 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
     const explicitFinalScore = finalScore
       ? ({
           ...finalScore,
-          formulaText: `${Number(row.automaticScore)} ${String.fromCharCode(215)} 0.6 + ${Number(row.aiScore)} ${String.fromCharCode(215)} 0.4 = ${Number(row.finalScore)}`,
+          formulaText: `${Number(row.automaticScore)} ${String.fromCharCode(215)} ${automaticWeight * 100}% + ${Number(row.aiScore)} ${String.fromCharCode(215)} ${aiWeight * 100}% = ${Number(row.finalScore)}`,
           band: {
             ...finalScore.band,
             iconLabel:
@@ -939,9 +956,9 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
           aiScore: input.ai?.score,
           finalScore: input.finalScore?.value,
           state: input.finalScore ? "SCORED" : "DETERMINISTIC_ONLY",
-          formulaVersion: input.finalScore?.formulaVersion ?? "HS-60/40-v1",
-          automaticWeight: 0.6,
-          aiWeight: 0.4,
+          formulaVersion: input.finalScore?.formulaVersion ?? FORMULA_VERSION,
+          automaticWeight: AUTOMATIC_WEIGHT,
+          aiWeight: AI_WEIGHT,
           highThreshold: scoreConfig.strongScoreThreshold,
           mediumThreshold: scoreConfig.lowScoreThreshold,
           roundingRule: "round-half-up-1-decimal",

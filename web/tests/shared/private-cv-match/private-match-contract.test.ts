@@ -11,7 +11,7 @@ const base = {
   expiresAt: "2027-08-16T00:00:00.000Z",
   provenance: {
     cvVersionId: "cv-1", cvVersion: 1, jdVersion: 3,
-    scoringConfigVersion: "HS-60/40-v1", aiProvider: null, aiModel: null,
+    scoringConfigVersion: "HS-40/60-v1", aiProvider: null, aiModel: null,
     promptVersion: null, inputPolicyVersion: null,
   },
   cv: {
@@ -61,11 +61,11 @@ describe("private match response contracts", () => {
         expiresAt: "2027-08-16T00:00:00.000Z",
         job: { jobId: "job-1", slug: "java-engineer", title: "Java Engineer", company: "Acme", location: "Remote" },
         cv: { versionId: "cv-1", displayName: "Resume", fileName: "resume.pdf", version: 1 },
-        hybridScore: 90.4,
+        hybridScore: 89.6,
         deterministicScore: 92,
       }],
     });
-    expect(response.items[0]?.hybridScore).toBe(90.4);
+    expect(response.items[0]?.hybridScore).toBe(89.6);
     expect(() => privateMatchListResponseSchema.parse({ items: [{ ...response.items[0], rank: 1 }] })).toThrow();
   });
 });

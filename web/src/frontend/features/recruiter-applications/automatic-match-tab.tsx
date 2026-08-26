@@ -146,7 +146,7 @@ export function AutomaticMatchTab({
         <ScoreCard
           title="Automatic match"
           value={`${automatic.score}/100`}
-          meta="Weight 60%"
+          meta="Weight 40%"
           tone="blue"
           progress={automatic.score}
         />
@@ -159,7 +159,7 @@ export function AutomaticMatchTab({
                 ? "Processing"
                 : "Unavailable"
           }
-          meta="Weight 40%"
+          meta="Weight 60%"
           tone="purple"
           progress={aiScore ?? 0}
         />

@@ -74,7 +74,7 @@
 
 ## Decision 10: One-time rounding and score parity fixtures
 
-**Decision**: Calculate `automatic × 0.60 + AI × 0.40`, round the final value once to one decimal, and derive bands from the same displayed value/config.
+**Decision**: Calculate `automatic × 0.40 + AI × 0.60`, round the final value once to one decimal, and derive bands from the same displayed value/config.
 
 **Rationale**: It matches Feature 015 and prevents contribution/label drift.
 

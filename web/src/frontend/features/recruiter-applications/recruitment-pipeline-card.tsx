@@ -27,13 +27,18 @@ const collapsibleStages = new Set<ApplicationStage>([
   "VIEWED",
   "SHORTLISTED",
   "INTERVIEWING",
+  "OFFERED",
+  "HIRED",
+  "OFFER_DECLINED",
+  "REJECTED",
+  "WAITLISTED",
 ]);
 
 const lockedStages = new Set<ApplicationStage>([
   "OFFERED",
-  "WAITLISTED",
   "HIRED",
   "OFFER_DECLINED",
+  "REJECTED",
 ]);
 
 const tierLabels = {
@@ -126,8 +131,7 @@ export function RecruitmentPipelineCard({
   const dragDestinations = terminal ? [] : (card.dragDestinations ?? []);
   const allowedDestinations = terminal ? [] : card.allowedDestinations;
   const canDrag = !dragOverlay && dragDestinations.length > 0 && !locked;
-  const collapsible =
-    !dragOverlay && !withdrawn && collapsibleStages.has(card.stage);
+  const collapsible = !dragOverlay && collapsibleStages.has(card.stage);
   const [expanded, setExpanded] = useState(!collapsible);
   const draggable = useDraggable({
     id: dragOverlay ? `${card.applicationId}-overlay` : card.applicationId,

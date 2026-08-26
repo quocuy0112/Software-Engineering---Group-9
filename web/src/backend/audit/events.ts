@@ -156,6 +156,7 @@ export const authenticationAuditAction = z.enum([
   "job_post_review.rejected",
   "job_post_review.approval_blocked",
   "job_post_review.closed",
+  "job_post_review.reopened",
   "job_post_review.withdrawn",
   "job_post_review.retention_purged",
   "job_post_management.hide",

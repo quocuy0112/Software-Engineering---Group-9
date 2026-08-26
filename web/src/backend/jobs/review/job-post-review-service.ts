@@ -651,6 +651,90 @@ export async function closeManagedJobPost(input: {
   });
 }
 
+export async function reopenManagedJobPost(input: {
+  jobId: string;
+  companyId: string;
+  actorUserId: string;
+  now?: Date;
+}) {
+  const now = input.now ?? new Date();
+  return prisma.$transaction(async (transaction) => {
+    const aggregate = await transaction.jobPostReviewAggregate.findUnique({
+      where: { jobId: input.jobId },
+    });
+    if (!aggregate) return false;
+    if (aggregate.companyId !== input.companyId)
+      throw new Error("JOB_POST_REVIEW_UNAVAILABLE");
+    if (!aggregate.closedAt) return true;
+
+    const correlationId = randomUUID();
+    const reopened = await transaction.jobPostReviewAggregate.update({
+      where: { id: aggregate.id, version: aggregate.version },
+      data: {
+        closedAt: null,
+        closedByUserId: null,
+        version: { increment: 1 },
+      },
+    });
+    if (aggregate.publicJobPostingId) {
+      const currentPublicJob = await transaction.jobPosting.findUniqueOrThrow({
+        where: { id: aggregate.publicJobPostingId },
+        select: { status: true },
+      });
+      const reopenedPublicJob = await transaction.jobPosting.update({
+        where: { id: aggregate.publicJobPostingId },
+        data: { status: "ACTIVE", closedAt: null, version: { increment: 1 } },
+      });
+      await appendJobPostingLifecycleFact(transaction, {
+        jobPostingId: reopenedPublicJob.id,
+        companyId: aggregate.companyId,
+        fromStatus: currentPublicJob.status,
+        toStatus: reopenedPublicJob.status,
+        effectiveAt: now,
+        postingVersion: reopenedPublicJob.version,
+        actorUserId: input.actorUserId,
+        correlationId,
+      });
+    }
+
+    const reviewVersionId =
+      aggregate.pendingVersionId ?? aggregate.approvedVersionId;
+    if (reviewVersionId) {
+      const review = await transaction.jobPostReviewVersion.findUniqueOrThrow({
+        where: { id: reviewVersionId },
+        select: { state: true, assignedAdminUserId: true },
+      });
+      await transaction.jobPostReviewHistory.create({
+        data: {
+          reviewVersionId,
+          action: "REOPENED",
+          actorUserId: input.actorUserId,
+          priorState: review.state,
+          resultingState: review.state,
+          priorAssigneeUserId: review.assignedAdminUserId,
+          resultingAssigneeUserId: review.assignedAdminUserId,
+          resultingAggregateVersion: reopened.version,
+          correlationId,
+          occurredAt: now,
+        },
+      });
+    }
+    await new PrismaAuditRepository(transaction).append({
+      occurredAt: now,
+      actorType: "user",
+      actorUserId: input.actorUserId,
+      actorSessionId: null,
+      action: "job_post_review.reopened",
+      targetType: "job_post_review",
+      targetId: reviewVersionId ?? aggregate.id,
+      result: "SUCCESS",
+      correlationId,
+      context: { resultingState: "ACTIVE", targetVersion: reopened.version },
+    });
+    return true;
+  });
+}
+
 /**
  * Ends a recruiter submission without treating it as an administrator
  * rejection. The immutable version and its audit trail remain available, but

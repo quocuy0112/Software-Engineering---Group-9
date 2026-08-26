@@ -23,7 +23,7 @@
   "scripts": {
     "env:init": "node scripts/setup-local.mjs",
     "env:check": "node scripts/check-environment.mjs",
-    "db:up": "docker compose up -d postgres",
+    "db:up": "docker compose up -d --wait postgres",
     "db:down": "docker compose stop postgres",
     "infra:up": "docker compose up -d --build postgres clamav ocr-engine cv-worker image-search-worker admin-worker",
     "infra:down": "docker compose down",
@@ -100,7 +100,7 @@
     "notifications:migration:verify": "npm run notifications:migration:verify --workspace @smarthire/web",
     "smoke:messaging:server": "npm run smoke:messaging:server --workspace @smarthire/web",
     "db:validate": "npm run db:validate --workspace @smarthire/web",
-    "db:migrate": "npm run db:migrate --workspace @smarthire/web",
+    "db:migrate": "npm run db:migrations:check --workspace @smarthire/web && npm run db:up && npm run db:migrations:reconcile-names --workspace @smarthire/web -- --apply && npm run db:migrate --workspace @smarthire/web",
     "db:studio": "npm run db:studio --workspace @smarthire/web"
   },
   "dependencies": {
