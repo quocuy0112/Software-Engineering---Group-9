@@ -679,5 +679,5 @@ The UI and audit trail must distinguish human priority from AI/deterministic res
 | Version | Date | Editor | Exact change | Review |
 |---|---|---|---|---|
 | V1.3 | 2026-08-06 | Group 9 | Revised UML relationships, flow wording, and prototype placement. | Group 9 |
-| V1.4 | 2026-08-26 | Lưu Chí Hải | Corrected company-role authorization, optional/advisory AI behavior, nine-stage conflict handling, and Owner scope; added score detail, AI retry, and manual-priority specifications. | Pending Nguyễn Minh Khôi |
-| V1.5 | 2026-08-26 | Lưu Chí Hải | Integrated UC-SCR-02, UC-SCR-04, and UC-SCR-05 into the normal specification sequence; linked valid score/retry prototypes and recorded missing manual-priority screenshot evidence. | Pending Nguyễn Minh Khôi |
+| V1.4 | 2026-08-26 | Lưu Chí Hải | Corrected company-role authorization, optional/advisory AI behavior, nine-stage conflict handling, and Owner scope; added score detail, AI retry, and manual-priority specifications. | Nguyễn Minh Khôi |
+| V1.5 | 2026-08-26 | Lưu Chí Hải | Integrated UC-SCR-02, UC-SCR-04, and UC-SCR-05 into the normal specification sequence; linked valid score/retry prototypes and recorded missing manual-priority screenshot evidence. | Nguyễn Minh Khôi |

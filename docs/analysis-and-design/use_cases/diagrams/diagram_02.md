@@ -116,5 +116,5 @@ flowchart LR
 | Version | Date | Editor | Exact change | Review |
 |---|---|---|---|---|
 | V1.3 | 2026-08-06 | Nguyễn Gia Quốc Uy | Revised UML relationships and report theme. | Group 9 |
-| V1.4 | 2026-08-26 | Lưu Chí Hải | Added evidence-backed image search, withdrawal, offer-response, and private-match use cases; recorded F005 failure status and domain boundaries. | Pending Nguyễn Minh Khôi |
-| V1.5 | 2026-08-26 | Lưu Chí Hải | Recorded that no matching existing prototype/UI screenshots cover UC-JOB-06 or UC-APP-05–07; specification evidence remains pending. | Pending Nguyễn Minh Khôi |
+| V1.4 | 2026-08-26 | Lưu Chí Hải | Added evidence-backed image search, withdrawal, offer-response, and private-match use cases; recorded F005 failure status and domain boundaries. | Nguyễn Minh Khôi |
+| V1.5 | 2026-08-26 | Lưu Chí Hải | Recorded that no matching existing prototype/UI screenshots cover UC-JOB-06 or UC-APP-05–07; specification evidence remains pending. | Nguyễn Minh Khôi |

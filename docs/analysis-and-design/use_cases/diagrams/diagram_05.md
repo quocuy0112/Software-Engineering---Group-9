@@ -113,5 +113,5 @@ flowchart LR
 | Version | Date | Editor | Exact change | Review |
 |---|---|---|---|---|
 | V1.3 | 2026-08-06 | Lưu Chí Hải | Revised prior supporting-services UML. | Nguyễn Gia Quốc Uy |
-| V1.4 | 2026-08-26 | Lưu Chí Hải | Replaced mixed scoring/analytics scope with evidence-backed connections, general messaging, recruitment messaging, reports, notifications, and deep-link authorization. | Pending Nguyễn Minh Khôi |
-| V1.5 | 2026-08-26 | Lưu Chí Hải | Linked valid UC-NOT-01–02 prototypes and recorded pending screenshot evidence for the remaining communication use cases in the split specification. | Pending Nguyễn Minh Khôi |
+| V1.4 | 2026-08-26 | Lưu Chí Hải | Replaced mixed scoring/analytics scope with evidence-backed connections, general messaging, recruitment messaging, reports, notifications, and deep-link authorization. | Nguyễn Minh Khôi |
+| V1.5 | 2026-08-26 | Lưu Chí Hải | Linked valid UC-NOT-01–02 prototypes and recorded pending screenshot evidence for the remaining communication use cases in the split specification. | Nguyễn Minh Khôi |

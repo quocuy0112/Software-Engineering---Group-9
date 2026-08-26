@@ -2,7 +2,7 @@
 
 _Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Quốc Thành | Edited by: Lưu Chí Hải_
 
-**Version:** 1.2 (2026-08-26) — PA5 implementation synchronization; review pending Nguyễn Minh Khôi
+**Version:** 1.2 (2026-08-26) — PA5 implementation synchronization; review Nguyễn Minh Khôi
 
 **Architecture scope:** Final implemented SmartHire product. At C4 Level 1, SmartHire is modeled as one software system; internal web, worker, database, storage, OCR, and malware-scanning containers are intentionally hidden.
 
@@ -97,4 +97,4 @@ _Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Q
 | Version | Date | Editor | Exact change | Review |
 |---|---|---|---|---|
 | 1.1 | 2026-08-06 | Lưu Chí Hải | Prior final system-context consolidation. | Nguyễn Gia Quốc Uy, Nguyễn Quốc Thành |
-| 1.2 | 2026-08-26 | Lưu Chí Hải | Reverified final actors and optional external adapters, excluded Feature 027, added deployment qualifications and repository evidence, and retained internal components outside Level 1. | Pending Nguyễn Minh Khôi |
+| 1.2 | 2026-08-26 | Lưu Chí Hải | Reverified final actors and optional external adapters, excluded Feature 027, added deployment qualifications and repository evidence, and retained internal components outside Level 1. | Nguyễn Minh Khôi |

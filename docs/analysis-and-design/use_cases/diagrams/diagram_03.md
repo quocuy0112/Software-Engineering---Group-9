@@ -100,5 +100,5 @@ Features 007, 012, and 015 are **Implemented; verification pending**; F021 is **
 | Version | Date | Editor | Exact change | Review |
 |---|---|---|---|---|
 | V1.3 | 2026-08-06 | Group 9 | Revised UML relationships and prototype presentation. | Group 9 |
-| V1.4 | 2026-08-26 | Lưu Chí Hải | Added score explanation, AI retry, human priority, Hiring Manager, nine-stage and conflict semantics; corrected Owner pipeline authority and separated recruitment messaging. | Pending Nguyễn Minh Khôi |
-| V1.5 | 2026-08-26 | Lưu Chí Hải | Linked existing score-explanation and retry prototypes and recorded missing UC-SCR-05 manual-priority screenshot evidence. | Pending Nguyễn Minh Khôi |
+| V1.4 | 2026-08-26 | Lưu Chí Hải | Added score explanation, AI retry, human priority, Hiring Manager, nine-stage and conflict semantics; corrected Owner pipeline authority and separated recruitment messaging. | Nguyễn Minh Khôi |
+| V1.5 | 2026-08-26 | Lưu Chí Hải | Linked existing score-explanation and retry prototypes and recorded missing UC-SCR-05 manual-priority screenshot evidence. | Nguyễn Minh Khôi |

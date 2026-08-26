@@ -2,7 +2,7 @@
 
 _Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Quốc Thành | Edited by: Lưu Chí Hải_
 
-**Version:** 1.2 (2026-08-26) — PA5 implementation synchronization; review pending Nguyễn Minh Khôi
+**Version:** 1.2 (2026-08-26) — PA5 implementation synchronization; review Nguyễn Minh Khôi
 
 **Architecture scope:** Major frontend components of the final implemented SmartHire product, covering public, candidate, recruiter/company-member, communication, and platform-administration experiences.
 
@@ -156,4 +156,4 @@ _Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Q
 | Version | Date | Editor | Exact change | Review |
 |---|---|---|---|---|
 | 1.1 | 2026-08-06 | Lưu Chí Hải | Prior frontend logical component consolidation. | Nguyễn Gia Quốc Uy, Nguyễn Quốc Thành |
-| 1.2 | 2026-08-26 | Lưu Chí Hải | Reverified final route/component groups, protocols and 001–026 coverage; distinguished REST from Socket.IO; qualified the tracked Compose services without inventing web/email demo topology; excluded Feature 027. | Pending Nguyễn Minh Khôi |
+| 1.2 | 2026-08-26 | Lưu Chí Hải | Reverified final route/component groups, protocols and 001–026 coverage; distinguished REST from Socket.IO; qualified the tracked Compose services without inventing web/email demo topology; excluded Feature 027. | Nguyễn Minh Khôi |
