@@ -1,0 +1,225 @@
+openapi: 3.0.3
+info:
+  title: Candidate Company and Team Applications
+  version: 1.0.0
+  description: Public company discovery and Owner-controlled HR Manager/Recruiter team applications.
+paths:
+  /companies:
+    get:
+      summary: List approved public companies
+      responses:
+        '200':
+          description: Company cards
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CompanyCard'
+  /companies/{companyId}:
+    get:
+      summary: Get public company details
+      parameters:
+        - $ref: '#/components/parameters/CompanyId'
+      responses:
+        '200':
+          description: Public company detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyDetail'
+        '404':
+          description: Company is unavailable without revealing private state
+  /companies/{companyId}/jobs:
+    get:
+      summary: Search active public jobs for one company
+      parameters:
+        - $ref: '#/components/parameters/CompanyId'
+        - in: query
+          name: q
+          schema: { type: string, maxLength: 200 }
+        - in: query
+          name: location
+          schema: { type: string, maxLength: 120 }
+      responses:
+        '200':
+          description: Company-scoped job results
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/JobCard'
+  /candidate/team-applications:
+    get:
+      summary: List the current Candidate's Team Applications
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200':
+          description: Candidate-safe team application statuses
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TeamApplicationStatus'
+    post:
+      summary: Submit a CV for an HR Manager or Recruiter team opportunity
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [companyId, role, cv]
+              properties:
+                companyId: { type: string }
+                role: { $ref: '#/components/schemas/TeamRole' }
+                cv: { type: string, format: binary }
+      responses:
+        '201': { description: Team application created }
+        '409': { description: Duplicate active application }
+        '422': { description: Invalid role, file, or closed opportunity }
+  /candidate/team-applications/{applicationId}:
+    get:
+      summary: Get one Candidate-owned Team Application status
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ApplicationId'
+      responses:
+        '200':
+          description: Candidate-safe application detail and status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamApplicationStatus'
+        '404': { description: Application unavailable to this Candidate }
+  /recruiter/company/team/applications:
+    get:
+      summary: List Team Applications for the current Owner company
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: Owner-authorized team applications }
+        '403': { description: Not authorized as company Owner }
+  /recruiter/company/team/applications/{applicationId}/accept:
+    post:
+      summary: Accept a team application and send invitation
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ApplicationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role: { $ref: '#/components/schemas/TeamRole' }
+      responses:
+        '200': { description: Invitation created or existing idempotent result }
+        '403': { description: Not authorized }
+        '409': { description: Application already decided or membership conflict }
+  /recruiter/company/team/applications/{applicationId}/reject:
+    post:
+      summary: Reject a team application and notify candidate
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ApplicationId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, maxLength: 2000 }
+      responses:
+        '200': { description: Rejected and notification enqueued }
+        '403': { description: Not authorized }
+        '409': { description: Application already decided }
+components:
+  parameters:
+    CompanyId:
+      in: path
+      name: companyId
+      required: true
+      schema: { type: string }
+    ApplicationId:
+      in: path
+      name: applicationId
+      required: true
+      schema: { type: string }
+  schemas:
+    TeamRole:
+      type: string
+      enum: [HR_MANAGER, RECRUITER]
+    TeamApplicationStatus:
+      type: object
+      required: [applicationId, companyId, appliedRole, status, submittedAt, ownerViewed]
+      properties:
+        applicationId: { type: string }
+        companyId: { type: string }
+        companyName: { type: string }
+        appliedRole: { $ref: '#/components/schemas/TeamRole' }
+        status:
+          type: string
+          enum: [SUBMITTED, VIEWED, REJECTED, INVITATION_SENT, WITHDRAWN, JOINED]
+        invitationStatus:
+          type: string
+          nullable: true
+          enum: [PENDING, REVOKED, ACCEPTED, DECLINED, EXPIRED]
+        submittedAt: { type: string, format: date-time }
+        ownerViewed: { type: boolean }
+        ownerFirstViewedAt: { type: string, format: date-time, nullable: true }
+        decidedAt: { type: string, format: date-time, nullable: true }
+    CompanyCard:
+      type: object
+      required: [companyId, name, description]
+      properties:
+        companyId: { type: string }
+        name: { type: string }
+        logoUrl: { type: string, nullable: true }
+        description: { type: string }
+    CompanyDetail:
+      allOf:
+        - $ref: '#/components/schemas/CompanyCard'
+        - type: object
+          required: [sizeRange, jobs, teamRoles]
+          properties:
+            foundedYear: { type: integer, nullable: true }
+            sizeRange: { type: string }
+            industry: { type: string, nullable: true }
+            location: { type: string, nullable: true }
+            teamRoles:
+              type: array
+              items: { $ref: '#/components/schemas/TeamRole' }
+            jobs:
+              type: array
+              items: { $ref: '#/components/schemas/JobCard' }
+    JobCard:
+      type: object
+      required: [jobPostingId, title, location]
+      properties:
+        jobPostingId: { type: string }
+        title: { type: string }
+        role: { type: string }
+        location: { type: string }
+        employmentType: { type: string }
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: session
