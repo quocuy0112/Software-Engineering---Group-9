@@ -2,7 +2,7 @@
 
 *Performed by: Lưu Chí Hải, Reviewed by: Nguyễn Gia Quốc Uy, Edited by: Lưu Chí Hải*
 
-*Planning status: reconciled through the Sprint 5 Weekly Report dated 12-08-2026 and its supporting Notion and task-assignment evidence. Sprint 5 remains in progress.*
+*Planning status: reconciled on 2026-08-26 with the final Feature 001–026 inventory, PA5 execution report, open defects, and document-synchronization work plan. Sprint 5 and the Final Build remain in progress.*
 
 ## 1. Introduction
 
@@ -44,7 +44,9 @@ At a high level, SmartHire covers the following product areas:
 9. Email and in-app notifications.
 10. Employer verification, company-membership management, job moderation, and user management.
 11. Backend audit records for security-sensitive and administrative actions.
-12. Recruitment analytics and authorized data export as P1 capabilities.
+12. Recruitment analytics and authorized data export as implemented capabilities pending consolidated final verification.
+13. Professional connections, general messaging, messaging-report review, and application-scoped recruitment messaging.
+14. Encrypted manual/scheduled administrator backup with history; no in-app restore UI.
 
 The current project release does not include:
 
@@ -57,7 +59,7 @@ The current project release does not include:
 - Employee onboarding.
 - A complete human-resource management suite.
 
-The Sprint 5 Weekly Report assigns Chat Messaging work, but Chat Messaging is not one of the 12 feature groups in the current Vision Document. It is therefore tracked in this plan as a pending scope clarification, not as an approved addition to the release baseline. It must not displace unfinished P0 work unless the Vision Document and related traceability records are formally updated.
+The final release baseline is Features 001–026. Feature 027 (Candidate Profile Discovery) is recorded separately as **Late Feature / Release Decision Pending** and is not counted in release totals or accepted into the Vision/use-case baseline without explicit project-lead evidence.
 
 ### 2.3. Delivery Form
 
@@ -103,7 +105,7 @@ The project depends on:
 - An external AI service.
 - A PDF or DOCX file-parsing service.
 
-The Vision Document is used as the product-scope baseline as instructed, but its metadata still identifies version 1.1 as a **Working Draft**, last updated 10-07-2026, with status **Draft for Team Review**. The later Weekly Reports record the Vision update task as completed but do not record a newer version number or formal approval. Final approval status therefore remains uncertain and should be confirmed rather than inferred.
+The Vision Document remains the product-scope baseline. Its functional/product sections are now a version 1.3 PA5 synchronization draft, while the NFR, scope, dependency, and AI/release qualification owned by Nguyễn Minh Khôi still require evidence-based correction and review. Final approval therefore remains pending and must not be inferred from the synchronization edits.
 
 ### 2.6. Deliverables
 
@@ -113,22 +115,22 @@ The project deliverables and their planning status based on the latest PA5 evide
 |---|---|---|---|
 | DEL-01 | A responsive SmartHire web application and its source code. | S3-05, S4-02A–B, S4-03, S4-08A–B, S5-01A–B, S5-02A–C, S5-03A–B, S5-04B, S5-05B, S5-06–S5-07 | In progress. The initial Sprint 5 landing-page, administrator, recruiter, access-control, scoring, and messaging work is completed. The supporting Notion evidence also marks the Recruiter job-posting flow, administrator approval of Recruiter job posts, Admin feature logic, and data backup completed; Recruiter feature logic, overall UI upgrades, minor features, integration, and stabilization remain in progress. |
 | DEL-02 | A revised and continuously maintained Project Plan that addresses previous feedback and remains consistent with the approved Notion task tracker and current assignment requirements. | S3-10, S4-15, S5-04A–B | In progress. The PA5 Weekly Report work is completed, while the Project Plan, System Context, and Frontend Component Diagram update remains active and depends on further implementation progress. |
-| DEL-03 | A revised Vision Document, with a high-level Product Overview and feature descriptions that include business rationale and primary beneficiaries. | S3-04 | The revision task is reported completed and the document is used as the scope baseline; its own metadata still labels it a Working Draft pending team review. |
+| DEL-03 | A revised Vision Document, with a high-level Product Overview and feature descriptions that include business rationale and primary beneficiaries. | S3-04 | Partially synchronized for PA5: Hải's functional/product sections and F001–F026 traceability are updated; Khôi-owned NFR, scope, dependency, and AI/release qualifications require correction and review before final integration. |
 | DEL-04 | One consolidated `Changes.md` file recording the material document and project changes introduced through PA4. | S3-04, S3-10, S3-12, S4-12 | Completed through PA4. |
 | DEL-05 | Spec Kit and specification-driven development artifacts (`constitution.md`, generated Markdown artifacts, specifications, clarifications, implementation plans, task breakdowns, analysis/checklists, source code). | S2-01, S2-10, S3-05, S3-07, S4-02A–B, S4-03, S5-01A, S5-02A, S5-03A, S5-04B | Partially completed. The report records specifications for Feature Groups 5, 7, 9, 10, 11, and 12 as completed. Feature Group 8 — Kanban was reassigned from Tuấn to Hải and remains assigned work. |
 | DEL-06 | Mermaid use-case models covering the functional requirements in the revised Vision Document. | S3-01, S3-06, S3-08, S3-09 | Completed during Sprint 3. |
 | DEL-07 | Use-case specifications (IDs, actors, descriptions, preconditions, basic/alternative flows, postconditions). | S3-01, S3-06, S3-08, S3-09 | Completed for the Sprint 3 use-case package; further feature specifications continue in Sprint 5. |
 | DEL-08 | Prototype evidence for the basic and alternative flows of the documented use cases. | S3-01, S3-06, S3-08, S3-09 | Completed during Sprint 3. |
 | DEL-09 | One full-stack Authentication, Authorization, and Access Control functional group implemented through Spec Kit during Sprint 3. | S3-05, S3-07 | Completed and reported as the deployed Sprint 3 functional group. |
-| DEL-10 | A final test package containing the Test Plan, reviewed and refined test cases, execution results, test summary, and linked bug reports. | S5-04A, S5-05A–B, S5-06–S5-07 | Preparation completed; execution remains. Hải and Khôi completed the Test Plan and test-case research, and Khôi completed his review of testing requirements for completed features. The available PA5 evidence does not record completion of the final Test Plan, test execution, test summary, or defect-reporting work. |
+| DEL-10 | A final test package containing the Test Plan, reviewed and refined test cases, execution results, test summary, and linked bug reports. | S5-04A, S5-05A–B, S5-06–S5-07 | Test execution recorded: 50/50 planned cases executed, 43 passed and 7 failed. All failures link to three open Medium defects (`BUG-AUTH-06`, `BUG-AUTH-08`, `BUG-IMG-02`). Fix/retest and final verification remain open; the test document itself is not changed by the synchronization assignment. |
 | DEL-11 | Weekly Reports, Scrum Meeting records, and Notion task-tracker screenshots. | S1-05, S2-05, S2-15, S3-11, S4-06, S5-04A, S5-12 | Completed through the 12-08 Sprint 5 report and its supporting evidence; continued final Sprint 5 reporting remains planned. |
 | DEL-12 | Individual AI Usage Reports recorded for the members assigned in each sprint. | S2-11A–E, S3-03A–E, S4-13A–E, S5-10 | Completed through PA4; final reporting remains planned. |
-| DEL-13 | User, technical, and project documentation updated to reflect the final implemented system. | S5-04B, S5-05B, S5-10 | In progress. The Project Plan, System Context, Frontend Component, Container, Backend, and Deployment diagram updates remain active; final synchronization remains planned. |
+| DEL-13 | User, technical, and project documentation updated to reflect the final implemented system. | S5-04B, S5-05B, S5-10; HAI-01–11; KHOI-01–10 | In progress. Hải-owned inventory, DGM-02/03/05, Vision functional sections, System Context, Frontend, Project Plan, and Technology Stack evidence review are active/completed-awaiting-review. Khôi-owned domain/architecture artifacts exist but require evidence corrections and cross-review before consolidation, Changes.md, and PDF consistency can finish. |
 | DEL-14 | Markdown and PDF versions of the required project documents. | S2-16A–C, S2-17, S3-02, S4-09–S4-12, S4-15, S5-04B, S5-10, S5-11 | Completed for earlier stages; final Markdown/PDF synchronization remains in progress or planned. |
 | DEL-15 | Git commit-history evidence and the final submission package. | S5-10, S5-11 | Planned. |
 | DEL-16 | Build 1: full-stack Authentication, Authorization, and Access Control increment. | S3-05, S3-07 | Completed by the Sprint 3 exit and confirmed in the Sprint 4 report. |
 | DEL-17 | PA4 system increment and architecture package, including two Spec Kit functional groups, system review and UI/UX improvements, C4 diagrams, technical documentation, change records, the updated Project Plan, AI Usage Reports, and demo evidence. | S4-01, S4-02A–B, S4-03–S4-06, S4-07A–B, S4-08A–B, S4-09–S4-15 | Completed by the start of Sprint 5. |
-| DEL-18 | Final Build and demonstration materials. | S5-01A–B, S5-02A–C, S5-03A–B, S5-04A–B, S5-05A–B, S5-06–S5-11 | In progress. Several Sprint 5 implementation tasks are completed, while Recruiter feature logic, overall UI upgrades and minor features, documentation, testing, stabilization, and demonstration work are not all recorded as completed. |
+| DEL-18 | Final Build and demonstration materials. | S5-01A–B, S5-02A–C, S5-03A–B, S5-04A–B, S5-05A–B, S5-06–S5-11 | In progress. Functional implementation evidence is broad, but three Medium bugs remain open and documentation review, demo rehearsal, stabilization ownership, Reflective Report, packaging, and PDF-source consistency are not all confirmed. |
 | DEL-19 | A Reflective Report covering team experience, Spec Kit experience, AI-tool usage, SDLC feedback, and individual member reflections. | S5-09 | Planned; the available PA5 evidence does not confirm an owner or completion. |
 
 Deliverable ownership, reviewers, dates, and acceptance criteria are managed in the sprint task lists rather than assigned globally in this section. Unconfirmed Sprint 5 fields are explicitly marked as pending rather than inferred.
@@ -170,7 +172,7 @@ The primary roles above remain the team baseline. The latest Sprint 5 allocation
 | R-05 | Email delivery failure | Medium | Medium | Nguyễn Quốc Thành | Separate recruitment transactions from email delivery, record failures, prevent duplicate delivery, and retry failed delivery at least three times with backoff. | Preserve in-app notifications and expose failed-delivery records for administrator troubleshooting. |
 | R-06 | Database migration or data loss | Low–Medium | Critical | Ngô Quốc Tuấn | Use ACID transactions, referential integrity, regular backups, documented migrations, a tested rollback procedure, RTO ≤ 60 minutes, and RPO ≤ 24 hours. | Stop deployment, roll back the migration, restore the latest verified backup, and investigate before retrying. |
 | R-07 | AI-service downtime or rate limits | Medium | High | Nguyễn Quốc Thành | Use asynchronous processing, visible scoring status, provider isolation, and rule-based fallback. | Temporarily disable semantic scoring while unrelated recruitment functions continue. |
-| R-08 | Scope creep or unstable P0 capabilities | High | High | Nguyễn Gia Quốc Uy | Prioritize P0 capabilities and review P1 or newly proposed work against the final approved scope before committing it to a sprint. Chat Messaging requires this review because it appears in the Sprint 5 report but not in the Vision feature baseline. | Record any P1 schedule deferral in the Project Plan, requirements traceability, and demonstration plan. Reject an unapproved addition or formalize a true scope/priority change, updating the Vision Document and `Changes.md` when the approved baseline changes. |
+| R-08 | Scope creep or unstable P0 capabilities | High | High | Nguyễn Gia Quốc Uy | Prioritize the approved F001–F026 baseline and keep Feature 027 classified as **Late Feature / Release Decision Pending** until the project lead records a release decision. | Exclude unapproved late work from final counts, FR/use-case baselines, and architecture claims; if approved, update the affected traceability and release documents through the normal change-control process. |
 | R-09 | Notion task-tracker inconsistency | Medium | High | Nguyễn Gia Quốc Uy | Review Notion, the Project Plan, and approved team decisions at the end of each sprint. | Resolve the discrepancy with the team, then update Notion, the Project Plan, and the Weekly Report using the same approved task information. |
 | R-10 | Integration or regression failure | Medium | High | Nguyễn Minh Khôi | Require review, automated checks, integration checkpoints, and regression tests. | Revert the breaking change and restore the latest stable build. |
 | R-11 | Project Plan or Weekly Report inconsistency | Medium | High | Lưu Chí Hải | Update the Project Plan and Weekly Report whenever approved task information changes and cross-check them against Notion before submission. | Resolve the discrepancy with the Project Manager and update all affected records consistently. |
@@ -309,7 +311,7 @@ Sprint 5 is in progress. The 12-08-2026 Weekly Report supersedes the 09-08 check
 | S5-04B | Update the Project Plan, System Context diagram, and Frontend Component diagram, and generate Spec Kit specifications for Feature Group 8 — Kanban. | Lưu Chí Hải | TBD | TBD | TBD | The Project Plan and assigned diagrams are updated and aligned with sufficiently progressed implementation, and the Feature Group 8 specification artifacts are complete and use the canonical pipeline stages. The Notion evidence gives 12-08-2026 to 23-08-2026 only for the documentation/diagram task, so the combined row dates remain `TBD`. |
 | S5-05A | Research the system Test Plan and test cases and review the testing requirements for completed features. | Nguyễn Minh Khôi | TBD | 12-08-2026 | 15-08-2026 | The research and review identify the required coverage and acceptance needs for completed features. |
 | S5-05B | Update the Container, Backend, and Deployment diagrams; support testing activities; and assist Thành in reviewing and fixing Admin notification emails with missing formatting or raw keywords instead of appropriate user-facing content. | Nguyễn Minh Khôi | TBD | TBD | TBD | The assigned diagrams align with the final architecture, testing support is provided as required, and affected Admin emails use complete formatting and appropriate user-facing content without exposing raw keywords. |
-| S5-06 | Complete the final Test Plan and reviewed functional test cases; execute the tests; record results; and prepare the Bug Report and test summary. | TBD | TBD | 10-08-2026 | 20-08-2026 | At least five use cases are covered by at least ten test cases each (at least 50 total); each execution records its date and result; failed cases link to reproducible bug reports; and the summary reports passed and failed totals by feature. Relevant coverage includes authorization, tenant isolation, personal-data protection, advisory AI, parsing, notification/email failure, timeout, retry, and external-service failure. |
+| S5-06 | Complete the final Test Plan and reviewed functional test cases; execute the tests; record results; and prepare the Bug Report and test summary. | Lưu Chí Hải and Nguyễn Minh Khôi executed assigned areas; single tracker owner unconfirmed | Nguyễn Gia Quốc Uy is named in test-document review records; final task review pending | 10-08-2026 | 20-08-2026 | Execution evidence exists for all 50 planned cases: 43 passed, 7 failed, with failures linked to three open Medium bugs. This row is not fully complete until review status and required retests are recorded. |
 | S5-07 | Assign and fix critical defects, rerun affected tests, integrate the remaining approved features, and stabilize the final build. | TBD | TBD | 17-08-2026 | 22-08-2026 | Release-blocking defects are resolved, affected tests are rerun, remaining known issues are documented, and every retained feature is integrated and demonstrable in a stable build. |
 | S5-08 | Prepare and rehearse the final product demonstration. | TBD | TBD | 18-08-2026 | 23-08-2026 | The approximately 15-minute demonstration presents the product, two or three complete workflows, the technology stack, C4 diagrams, and Spec Kit, with a speaking role for every member. |
 | S5-09 | Write the Reflective Report. | TBD | TBD | 17-08-2026 | 22-08-2026 | The report covers team and Spec Kit experience, AI-tool use, constructive SDLC feedback, and a three-to-five-sentence reflection from every member. |
@@ -324,7 +326,7 @@ Sprint 5 is in progress. The 12-08-2026 Weekly Report supersedes the 09-08 check
 | PA2 Documentation Baseline | 12-07-2026 | Project Plan, Vision Document, Spec Kit initialization, workflows, NFRs, Weekly Report, and AI Usage Reports. | Required documents and evidence are complete and consistent with Notion. | Completed; confirmed by the Sprint 3 report. |
 | Build 1 | 26-07-2026 | Revised Vision and Project Plan, use-case models, specifications, prototypes, and full-stack Authentication implementation. | PA3 deliverables are reviewed and Authentication is demonstrable. | Completed; confirmed by the Sprint 4 report. |
 | Build 2 | 09-08-2026 | Two functional groups implemented through Spec Kit, system setup and architecture review, frontend/backend work allocation, bug fixing and UI/UX improvements, five C4 diagrams, Technology Stack documentation, `Changes.md`, the updated Project Plan, AI Usage Reports, and a demonstration video. | The assigned functional-group work is demonstrable; the required diagrams, Project Plan, and supporting documents are complete and internally consistent; unresolved issues are documented; and the PA4 demo and submission evidence are ready. | Completed; the Sprint 5 report records the previous-stage work as complete. The reports do not identify the two functional groups by name. |
-| Final Build | 23-08-2026 | Completed initial PA5 role, access-control, scoring, landing-page, messaging, and specification work; Recruiter job posting and Admin approval of Recruiter job posts; Admin logic and data backup; remaining Recruiter logic, overall UI upgrades and minor features, Feature Group 8 — Kanban specifications, notification-email corrections, architecture/documentation updates, final Test Plan, reviewed test cases, execution results, linked bug reports, defect resolution, final product demonstration, Reflective Report, updated PA1–PA5 documents, AI Usage Reports, Git evidence, and the final submission package. | All P0 functional groups retained in the approved scope are implemented and stable; any delivered P1 work has not displaced P0 completion; all test cases have documented results; failed cases are linked to bug reports; release-blocking defects are resolved; the final demo includes every member; and all required submission materials are complete. | In progress. Supporting Notion evidence marks the Recruiter job-posting flow, Admin approval of Recruiter job posts, Admin feature logic, and data backup completed, while Recruiter logic, UI upgrades/minor features, and the Project Plan/diagram work remain in progress. The reports do not confirm completion of the remaining diagrams, Feature Group 8 specification, notification-email corrections, final testing, demonstration, Reflective Report, or submission package. |
+| Final Build | 23-08-2026 | Completed initial PA5 role, access-control, scoring, landing-page, messaging, and specification work; Recruiter job posting and Admin approval of Recruiter job posts; Admin logic and data backup; remaining Recruiter logic, overall UI upgrades and minor features, Feature Group 8 — Kanban specifications, notification-email corrections, architecture/documentation updates, final Test Plan, reviewed test cases, execution results, linked bug reports, defect resolution, final product demonstration, Reflective Report, updated PA1–PA5 documents, AI Usage Reports, Git evidence, and the final submission package. | All P0 functional groups retained in the approved scope are implemented and stable; any delivered P1 work has not displaced P0 completion; all test cases have documented results; failed cases are linked to bug reports; release-blocking defects are resolved; the final demo includes every member; and all required submission materials are complete. | In progress. PA5 execution records 50 cases executed, 43 passed, and 7 failed; `BUG-AUTH-06`, `BUG-AUTH-08`, and `BUG-IMG-02` remain open pending fix and retest. Documentation synchronization is only partially reviewed, and final demo rehearsal, Reflective Report, stabilization ownership, package audit, and Markdown/PDF parity are unconfirmed. The exit criteria are therefore not met. |
 
 ### 4.8. Definition of Done
 
@@ -338,6 +340,48 @@ A task is considered complete only when:
 6. Related documents and traceability references are updated.
 7. Required Markdown and PDF outputs render correctly.
 8. Material scope, schedule, requirement, priority, or technology changes are recorded in `Changes.md`.
+
+### 4.9. PA5 Final Synchronization and Exit Status (2026-08-26)
+
+*Performed by: Lưu Chí Hải | Reviewed by: Pending Nguyễn Minh Khôi | Edited by: Lưu Chí Hải*
+
+#### Feature 001–026 status summary
+
+| Final status | Count | Feature IDs |
+|---|---:|---|
+| Implemented and verified | 11 | 002, 003, 008, 011, 013, 014, 016, 017, 018, 021, 026 |
+| Implemented; verification pending | 12 | 001, 004, 006, 007, 009, 010, 012, 015, 020, 022, 023, 024 |
+| In progress | 3 | 005, 019, 025 |
+| Specified but deferred from final release | 0 | — |
+| Out of final scope | 0 within the 001–026 inventory | — |
+
+Feature 027 is not part of these counts. Its state is **Late Feature / Release Decision Pending**.
+
+#### Documentation synchronization responsibility
+
+| Work area | Owner | Evidence-based state | Reviewer/dependency |
+|---|---|---|---|
+| Inventory 001–013; DGM-02, DGM-03, DGM-05 and their specifications; Vision functional/product integration; System Context; Frontend; Project Plan | Lưu Chí Hải | In execution/completed awaiting review under HAI-01–HAI-08 | Nguyễn Minh Khôi review pending |
+| Inventory 014–026; Vision NFR/scope/dependencies; DGM-01/04/06/07 and specs; Container; Backend; Deployment | Nguyễn Minh Khôi | Files/changes exist, but work-plan status and evidence corrections remain pending | Lưu Chí Hải technical review findings must be resolved by Khôi |
+| Technology Stack edits | Nguyễn Gia Quốc Uy | True document owner; Hải performs evidence review/handoff only | No delegation to Hải found |
+| PA5 aggregate `Changes.md` | Lưu Chí Hải | Blocked until source edits and reviews are complete | Requires reviewed Hải work and corrected/reviewed Khôi work |
+
+#### Testing, finalization, and blockers
+
+| Item | Current evidence | Planning classification |
+|---|---|---|
+| PA5 test execution | 50 executed; 43 passed; 7 failed | Execution recorded; final verification pending |
+| Open defects | `BUG-AUTH-06`, `BUG-AUTH-08`, `BUG-IMG-02`, all Medium/Open | Blocks verification of F001/F005 workflows, not independent document editing |
+| Demo topology | Root Compose manifest exists, but repository evidence does not identify the final web/email/demo-host arrangement | Blocks final architecture/deployment verification only |
+| Demo rehearsal | Owner and completion unconfirmed | Blocks final-build exit only |
+| Reflective Report | Owner and completion unconfirmed | Blocks final-build exit only |
+| Stabilization | Owner/completion unconfirmed; open defects remain | Blocks final-build exit and affected feature verification |
+| Packaging | Owner and completion unconfirmed | Blocks final-build exit only |
+| PDF rendering | Final source-to-PDF method/consistency not yet verified | Blocks final document/package verification only |
+
+#### Final-build exit criteria
+
+The Final Build must remain **In progress** until: affected bug fixes receive genuine retest evidence or an approved deferred decision; Feature 027 has an explicit release decision; all PA5 source documents are evidence-reviewed; Mermaid/Markdown and required PDFs agree; demo rehearsal and Reflective Report are complete; stabilization and package owners/completion are recorded; and the final package audit passes.
 
 ## 5. Alignment with the Revised Vision
 
@@ -356,9 +400,9 @@ A task is considered complete only when:
 | Recruiter access is company-scoped while platform administrators hold a separate role. | S5-02A and S5-03A record the completed administrator and recruiter foundations under this boundary, while S5-03B completes Recruiter logic. The Weekly Report phrase “RBAC mechanism from Recruiter to Admin” is treated as role-boundary enforcement, not recruiter-to-administrator promotion. Recruiter/company access approval in S5-02A remains distinct from Admin approval of Recruiter job posts in S5-02B. |
 | Job matching is rule-based. | Semantic AI work is limited to CV scoring and explanations. |
 | AI scoring is advisory. | Constraints, risks, scoring tasks, and tests preserve recruiter override and prevent automated decisions. |
-| Analytics and export are P1. | Feature Group 12 specification work is completed in S5-03A, but implementation remains subordinate to stabilizing P0 capabilities and may be deferred consistently with the Vision. |
-| Notifications and in-app alerts are P0. | Feature Group 9 specification and initial UI-related work are completed in S5-01A. S5-05B adds review and correction of Admin notification emails; broader implementation, integration, and testing are not marked complete without supporting evidence. |
-| Chat Messaging is not in the Vision feature baseline. | S5-02A records the completed Weekly Report assignment but retains the scope clarification. It is not added to the approved release baseline without corresponding Vision and traceability updates. |
+| Analytics and export are P1. | F022 UI/API/schema/test evidence exists and the feature is classified `Implemented; verification pending`; it is no longer described as merely planned, while stabilization remains required. |
+| Notifications and in-app alerts are P0. | F016 is `Implemented and verified`; F019 deep-link authorization remains `In progress` and is tracked separately. |
+| General messaging and recruitment messaging are distinct. | F008 general messaging is `Implemented and verified`; F025 application-scoped recruitment messaging is `In progress` with separate data, authorization, and protocol boundaries. |
 | Personal data and CVs require protection. | Constraints and risk mitigations define the protection requirements, while S5-06 and S5-07 retain security-related test coverage, execution, defect reporting, correction, and regression verification. |
 | AI, email, parser, and database failures must be handled. | S5-06 includes relevant failure test cases, execution, and defect records; S5-07 fixes release-blocking failures and reruns the affected tests. |
 
@@ -400,3 +444,4 @@ A task is considered complete only when:
 | 14-08-2026 | Sprint 5 Planning | Replaced unsupported provisional owner assignments with the actual 09-08 work allocation, consolidated all S5-01–S5-12 work in the standard sprint task table, marked unconfirmed fields `TBD`, and retained the 23-08 final milestone. | Reconcile the plan with the latest Weekly Report, which states that detailed assignments after 15-08 were not yet finalized, while keeping the task format consistent across all sprints. |
 | 14-08-2026 | Scope and Authorization Alignment | Flagged Chat Messaging as pending scope confirmation; clarified the Sprint 5 RBAC boundary; aligned P1 deferral rules with the Vision; and recorded the Vision file's unresolved draft metadata. | Prevent unsupported scope, role, priority, or document-approval assumptions from silently changing the planning baseline. |
 | 22-08-2026 | PA5 Progress and Sprint 5 Planning | Reconciled the plan with the 12-08 Weekly Report and supporting evidence; recorded completed initial PA5 work and the newer Admin, Recruiter, UI, testing, diagram, data-backup, and notification-email assignments; transferred Feature Group 8 — Kanban from Tuấn to Hải; updated Deliverables, Sprint 5, Final Build, and Vision Alignment status; and removed obsolete uncertainty about post-15-08 assignments. | Bring the current Project Plan into line with the latest documented PA5 ownership, dates, task states, and remaining work without changing the plan structure or inferring unsupported completion. |
+| 26-08-2026 | PA5 final synchronization | Added the 001–026 status summary, actual 50/43/7 test result and three open bugs, Hải/Khôi documentation allocation, Feature 027 release-decision boundary, finalization blockers, and exit criteria; corrected messaging/analytics status without inventing owners. | Reflect current repository/test evidence and prevent Sprint 5 or Final Build from being marked complete prematurely. |

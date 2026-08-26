@@ -1,23 +1,16 @@
 # DGM-02 — Candidate Job Journey
 
-*Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*
-**Version:** V1.3 (06/08/2026) — UML relationships and report theme revised
+*Performed by: Lưu Chí Hải | Reviewed by: Pending Nguyễn Minh Khôi | Edited by: Lưu Chí Hải*
 
-## 1. Purpose
+**Version:** V1.5 (2026-08-26) — synchronized with Features 003, 005, and 020; PA5 screenshot evidence remains pending for UC-JOB-06 and UC-APP-05–07
 
-This use-case diagram describes how visitors, authenticated users, and candidates discover job opportunities and interact with job postings on the SmartHire Recruitment Platform.
+## 1. Purpose and scope
 
-Public users may browse, search, filter, view, and share job postings. After authentication, users may save jobs and report inappropriate postings. Candidates may additionally apply for jobs, track submitted applications, and view personalized job recommendations.
+This diagram covers public job discovery and the authenticated Candidate journey from search through application tracking. It includes image-assisted search, application withdrawal, offer response, and private pre-application CV matching only where corresponding UI, routes, services, persistence, and tests exist. Feature 005 remains **In progress** because the PA5 live OCR cases linked to `BUG-IMG-02` are still open.
 
-## 2. Scope
+Identity/profile/CV management is in DGM-01; recruiter review and pipeline control are in DGM-03; communication is in DGM-05.
 
-DGM-02 covers job discovery, job-posting details, saved jobs, job sharing and reporting, application submission, application tracking, and personalized job recommendations. Account registration, login, candidate-profile management, recruiter operations, and job-posting moderation are specified in other diagrams.
-
-## 3. Actor-Naming Convention
-
-Actors are named using singular, role-based nouns. Candidate generalizes Authenticated User and therefore inherits the parent actor's job-discovery capabilities. Navigation between screens is documented as Related Use Cases and Entry Points in the specifications; it is not modeled as `«include»` or `«extend»`.
-
-## 4. Use-Case Diagram
+## 2. Use-Case Diagram
 
 ```mermaid
 flowchart LR
@@ -27,99 +20,101 @@ flowchart LR
 
     subgraph SYSTEM["SmartHire Recruitment Platform"]
         direction TB
-        subgraph DISCOVERY["Job Discovery and Interaction"]
-            direction TB
+        subgraph DISCOVERY["Job Discovery"]
             JOB01(["UC-JOB-01<br/>Browse, Search, and Filter Jobs"])
             JOB02(["UC-JOB-02<br/>View Job Details"])
             JOB03(["UC-JOB-03<br/>Save or Remove Job"])
             JOB04(["UC-JOB-04<br/>Share Job"])
             JOB05(["UC-JOB-05<br/>Report Job Posting"])
+            JOB06(["UC-JOB-06<br/>Search Jobs from an Image"])
         end
         subgraph APPLICATION["Candidate Application Journey"]
-            direction TB
             APP01(["UC-APP-01<br/>Apply for a Job"])
             APP02(["UC-APP-02<br/>Track Job Applications"])
             APP03(["UC-APP-03<br/>View Saved Jobs"])
             APP04(["UC-APP-04<br/>View Recommended Jobs"])
+            APP05(["UC-APP-05<br/>Withdraw an Application"])
+            APP06(["UC-APP-06<br/>Respond to an Offer"])
+            APP07(["UC-APP-07<br/>Run a Private CV Match"])
         end
     end
 
-    SHARE_SERVICE["External Sharing Application"]
+    SHARE["External Sharing Application"]
 
     CANDIDATE -. "generalizes" .-> USER
-
     VISITOR --- JOB01
     VISITOR --- JOB02
     VISITOR --- JOB04
-
+    VISITOR --- JOB06
     USER --- JOB01
     USER --- JOB02
     USER --- JOB03
     USER --- JOB04
     USER --- JOB05
     USER --- APP03
-
     CANDIDATE --- APP01
     CANDIDATE --- APP02
     CANDIDATE --- APP04
+    CANDIDATE --- APP05
+    CANDIDATE --- APP06
+    CANDIDATE --- APP07
+    JOB04 --- SHARE
 
-    JOB04 --- SHARE_SERVICE
-
-    %% Selecting a result, applying, saving, sharing, and reporting are
-    %% independent goals. Their entry points are documented in the UC specs.
-
-    classDef primaryActor fill:#ffffff,stroke:#334155,stroke-width:1.5px,color:#0f172a;
-    classDef supportingActor fill:#f8fafc,stroke:#64748b,stroke-width:1.5px,color:#0f172a;
-    classDef discoveryCase fill:#eff6ff,stroke:#2563eb,stroke-width:1.5px,color:#172033;
-    classDef applicationCase fill:#f0fdf4,stroke:#16a34a,stroke-width:1.5px,color:#172033;
-
-    class VISITOR,USER,CANDIDATE primaryActor;
-    class SHARE_SERVICE supportingActor;
-    class JOB01,JOB02,JOB03,JOB04,JOB05 discoveryCase;
-    class APP01,APP02,APP03,APP04 applicationCase;
-
+    classDef actor fill:#ffffff,stroke:#334155,stroke-width:1.5px,color:#0f172a
+    classDef supporting fill:#f8fafc,stroke:#64748b,stroke-width:1.5px,color:#0f172a
+    classDef discovery fill:#eff6ff,stroke:#2563eb,stroke-width:1.5px,color:#172033
+    classDef application fill:#f0fdf4,stroke:#16a34a,stroke-width:1.5px,color:#172033
+    class VISITOR,USER,CANDIDATE actor
+    class SHARE supporting
+    class JOB01,JOB02,JOB03,JOB04,JOB05,JOB06 discovery
+    class APP01,APP02,APP03,APP04,APP05,APP06,APP07 application
     style SYSTEM fill:#ffffff,stroke:#334155,stroke-width:2px,color:#0f172a
-    style DISCOVERY fill:#f8fafc,stroke:#93c5fd,stroke-width:1px,color:#172033
-    style APPLICATION fill:#f8fafc,stroke:#86efac,stroke-width:1px,color:#172033
-    linkStyle default stroke:#64748b,stroke-width:1.5px,color:#334155
+    style DISCOVERY fill:#f8fafc,stroke:#93c5fd,color:#172033
+    style APPLICATION fill:#f8fafc,stroke:#86efac,color:#172033
 ```
 
-## 5. Actor Summary
+## 3. Actor and use-case summary
 
-| Actor ID | Actor Name | Actor Type | Description |
-|---|---|---|---|
-| ACT-01 | Visitor | Primary human actor | A person who does not currently have an authenticated session. A Visitor may discover, view, and share publicly available job postings. |
-| ACT-02 | Authenticated User | Primary human actor | A registered account holder with a valid session. An Authenticated User inherits public job-discovery capabilities and may save jobs, remove saved jobs, report postings, and view saved jobs. |
-| ACT-03 | Candidate | Specialized primary human actor | An Authenticated User who uses candidate-specific functions. A Candidate may apply for jobs, track submitted applications, and view personalized job recommendations. |
-| ACT-04 | External Sharing Application | Supporting external-system actor | An external email, messaging, social-network, or operating-system sharing application used to distribute a job-posting link. |
+| Actor | Meaning |
+|---|---|
+| Visitor | Unauthenticated person using public job discovery. |
+| Authenticated User | Account holder who may save/report jobs and view saved jobs. |
+| Candidate | Authenticated User using candidate-only application and private-match functions. |
+| External Sharing Application | Optional destination used to distribute a public job URL. |
 
-## 6. Actor Generalization
+| Use Case ID | Name | Feature | Implementation status |
+|---|---|---:|---|
+| UC-JOB-01 | Browse, Search, and Filter Jobs | F003 | Implemented and verified |
+| UC-JOB-02 | View Job Details | F003 | Implemented and verified |
+| UC-JOB-03 | Save or Remove Job | F003 | Implemented and verified |
+| UC-JOB-04 | Share Job | F003 | Implemented and verified |
+| UC-JOB-05 | Report Job Posting | F003 | Implemented and verified |
+| UC-JOB-06 | Search Jobs from an Image | F005 | In progress — live OCR failure remains open |
+| UC-APP-01 | Apply for a Job | F020 | Implemented; verification pending |
+| UC-APP-02 | Track Job Applications | F020 | Implemented; verification pending |
+| UC-APP-03 | View Saved Jobs | F003 | Implemented and verified |
+| UC-APP-04 | View Recommended Jobs | F003 | Implemented and verified |
+| UC-APP-05 | Withdraw an Application | F020 | Implemented; verification pending |
+| UC-APP-06 | Respond to an Offer | F020 | Implemented; verification pending |
+| UC-APP-07 | Run a Private CV Match | F020 | Implemented; verification pending |
 
-| Specialized Actor | Parent Actor | Meaning |
-|---|---|---|
-| Candidate | Authenticated User | A Candidate inherits all job-discovery and saved-job capabilities available to an Authenticated User and additionally receives application and recommendation capabilities. |
+## 4. Relationship decisions
 
-The Visitor actor is not the parent of Authenticated User. It represents the state in which a person interacts with publicly available functions without an authenticated session.
+- Selecting a result, saving, reporting, applying, withdrawing, responding to an offer, or running a private match are independent user goals, so navigation between them is not modeled as `«include»` or `«extend»`.
+- Candidate generalizes Authenticated User. Visitor is a session state, not the parent of Authenticated User.
+- Image interpretation may use deterministic fallback after OCR/AI failure; the diagram does not claim that the unresolved live OCR path is verified.
 
-## 7. Use-Case Summary
+## 5. Repository evidence
 
-| Use Case ID | Use Case | Primary Actor | Supporting Actor | Main Objective |
+- UI: `web/src/app/jobs/`, `web/src/app/jobs/applied/`, `web/src/app/(workspace)/cv-match-check/`, and the corresponding frontend feature directories.
+- APIs/services: `web/src/app/api/jobs/image-searches/`, `web/src/app/api/candidate/applications/`, `web/src/app/api/candidate/private-cv-matches/`, `web/src/backend/candidate-applications/`, `web/src/backend/private-cv-match/`, and `web/src/backend/services/image-search/`.
+- Data: `JobApplication`, `ApplicationStageEvent`, image-search, private-match, saved-job, and reporting records in `web/prisma/schema.prisma`.
+- Verification: candidate-application, private-match, image-search, and job-discovery tests under `web/tests/`; PA5 manual result in `docs/testing/PA5_Testing.md`.
+
+## 6. Revision history
+
+| Version | Date | Editor | Exact change | Review |
 |---|---|---|---|---|
-| UC-JOB-01 | Browse, Search, and Filter Jobs | Visitor / Authenticated User | — | Discover active job postings by browsing listings, entering search terms, and applying supported filters or sorting options. |
-| UC-JOB-02 | View Job Details | Visitor / Authenticated User | — | View the complete public information of a selected active job posting. |
-| UC-JOB-03 | Save or Remove Job | Authenticated User | — | Add a job posting to the user's saved-job collection or remove it from that collection. |
-| UC-JOB-04 | Share Job | Visitor / Authenticated User | External Sharing Application | Copy or distribute a public job-posting link through a supported sharing destination. |
-| UC-JOB-05 | Report Job Posting | Authenticated User | — | Submit a report when a job posting appears fraudulent, misleading, inappropriate, duplicated, or otherwise in violation of platform policy. |
-| UC-APP-01 | Apply for a Job | Candidate | — | Submit a candidate application to an active job posting using confirmed profile and application information. |
-| UC-APP-02 | Track Job Applications | Candidate | — | View submitted applications and their current recruitment stages or statuses. |
-| UC-APP-03 | View Saved Jobs | Authenticated User | — | View the authenticated user's saved-job collection and continue interacting with saved postings. |
-| UC-APP-04 | View Recommended Jobs | Candidate | — | View job postings recommended using the Candidate's confirmed profile and permitted platform data. |
-
-## 8. Related Use Cases and Entry Points
-
-The following are navigational or optional actions, not UML `«include»` or `«extend»` relationships:
-
-- UC-JOB-01 opens UC-JOB-02 when the actor selects a job result.
-- UC-JOB-02 may open UC-JOB-03, UC-JOB-04, UC-JOB-05, or UC-APP-01 through actions on the job-detail page.
-- UC-APP-03 may open UC-JOB-02 when the actor selects a saved job; UC-JOB-03 may be started from the saved-job list.
-- UC-APP-04 may open UC-JOB-02 when the Candidate selects a recommendation.
+| V1.3 | 2026-08-06 | Nguyễn Gia Quốc Uy | Revised UML relationships and report theme. | Group 9 |
+| V1.4 | 2026-08-26 | Lưu Chí Hải | Added evidence-backed image search, withdrawal, offer-response, and private-match use cases; recorded F005 failure status and domain boundaries. | Pending Nguyễn Minh Khôi |
+| V1.5 | 2026-08-26 | Lưu Chí Hải | Recorded that no matching existing prototype/UI screenshots cover UC-JOB-06 or UC-APP-05–07; specification evidence remains pending. | Pending Nguyễn Minh Khôi |
