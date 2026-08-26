@@ -1,20 +1,30 @@
 # DGM-01 — Identity, Access, and Profile
 
-*Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*
-**Version:** V1.3 (06/08/2026) — UML relationships and report theme revised
+*Performed by: Nguyễn Gia Quốc Uy | Reviewed by: Nguyễn Minh Khôi | Edited by: Nguyễn Minh Khôi*  
+**Version:** V1.4 (2026-08-26) — PA5 Final Document Synchronization Review
+
+### Revision History
+
+| Version | Date | Author/Editor | Summary | Status |
+|---|---|---|---|---|
+| 1.3 | 2026-08-06 | Nguyễn Gia Quốc Uy | UML relationships and report theme revised. | Baseline |
+| 1.4 | 2026-08-26 | Nguyễn Minh Khôi (Reviewer) | PA5 Document Synchronization review: Reconciled 16 use cases against Features 001, 002, 004, 005; noted Feature 001 verification pending status and Feature 027 as out-of-scope pending release decision. | Approved |
 
 ## 1. Purpose
+
+*Performed by: Nguyễn Gia Quốc Uy | Reviewed by: Nguyễn Minh Khôi | Edited by: Nguyễn Minh Khôi*
 
 This use-case diagram describes the identity, authentication, account-security, account-management, and candidate-profile functions of the SmartHire platform.
 
 A Visitor may register an account, verify an email address, log in, reset a forgotten password, complete a required two-factor challenge, or start the separately controlled full-account-recovery process after losing every authentication factor. After authentication, an Authenticated User may access protected account pages, manage two-factor authentication, review and revoke active sessions, and manage account information or preferences. A Candidate inherits the capabilities of an Authenticated User and may additionally manage a candidate profile and CV information.
 
-### 1.1. PA3 Implementation Status
+### 1.1. PA5 Implementation Status
 
-- `UC-AUTH-01` through `UC-AUTH-11` and the protected account workspace are implemented in the PA3 Spec Kit functional group.
-- `UC-ACC-01` is partially represented by the implemented Profile Overview page.
-- `UC-ACC-02` and `UC-PROF-01` through `UC-PROF-03` remain planned SmartHire capabilities outside the selected PA3 implementation group.
-- A normal forgotten-password reset preserves enabled TOTP and unused backup codes. Full account recovery is a different, lower-assurance workflow for loss of the password, TOTP access, and every backup code.
+- `UC-AUTH-01` through `UC-AUTH-11` (Feature 001) are implemented; verification pending formal retest of AUTH-06 and AUTH-08.
+- `UC-ACC-01`, `UC-ACC-02`, and `UC-PROF-01` (Feature 002) are implemented and verified.
+- `UC-PROF-02` and `UC-PROF-03` (Features 004 & 005) are implemented with asynchronous extraction, OCR engine integration, and draft review.
+- Feature 027 (Candidate Profile Discovery) remains outside the 26-feature baseline as pending release decision.
+- A normal forgotten-password reset preserves enabled TOTP and unused backup codes. Full account recovery is a separately controlled, lower-assurance workflow for loss of the password, TOTP access, and every backup code.
 
 ## 2. Actor-Naming Convention
 

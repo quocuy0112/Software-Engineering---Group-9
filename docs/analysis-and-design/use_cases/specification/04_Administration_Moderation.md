@@ -1,13 +1,22 @@
 # DGM-04 — Use-Case Specification: Company Administration and Moderation
 
-*Performed by: Nguyễn Minh Khôi | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Group 9*
-**Version:** V1.3 (06/08/2026) — Actor naming, relationship wording, and editorial pass revised
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*  
+**Version:** V1.4 (2026-08-26) — Reconciled company settings overview (UC-ORG-06), role boundaries, and PA5 baseline
+
+### Revision History
+
+| Version | Date | Author/Editor | Summary | Status |
+|---|---|---|---|---|
+| 1.3 | 2026-08-06 | Group 9 | Actor naming, relationship wording, and editorial pass revised. | Baseline |
+| 1.4 | 2026-08-26 | Nguyễn Minh Khôi | Added UC-ORG-06 (Manage Company Profile and Overview), clarified Owner/HR Manager/Recruiter boundaries, updated attribution and audit standards for PA5. | Approved |
 
 ![DGM-04 — Company Administration and Moderation](../diagrams/rendered_diagrams/diagram_04.png)
 
 The Mermaid source is maintained in [diagram_04.md](../diagrams/diagram_04.md). Candidate, Company Member, and Platform Administrator generalize Authenticated User. Recruiter, HR Manager, and Company Owner generalize Company Member.
 
 # UC-ORG-01 — Submit Company Verification Request
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 ## Use-Case Information
 
@@ -123,6 +132,8 @@ After Basic Flow step 9, the request may be opened in **UC-ORG-03 — Review Com
    ![UC-ORG-01 UI 05](../prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_05.png)
 
 # UC-ORG-02 — Request to Join Existing Company
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 ## Use-Case Information
 
@@ -254,6 +265,8 @@ After Basic Flow step 10, an eligible request may be opened in **UC-ORG-03 — R
 
 # UC-ORG-03 — Review Company or Membership Request
 
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
+
 ## Use-Case Information
 
 | Field | Value |
@@ -354,6 +367,8 @@ The request is `Rejected`; no company or membership record is created or altered
 
 # UC-ORG-04 — Manage Company Memberships and Roles
 
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
+
 ## Use-Case Information
 
 | Field | Value |
@@ -443,6 +458,8 @@ The company's membership list reflects the invitation, role change, or removal; 
 ---
 
 # UC-ORG-05 — Manage Membership Lifecycle
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 ## Use-Case Information
 
@@ -564,7 +581,84 @@ The membership or company reflects the new lifecycle state (`Left`, `Revoked`, o
 
 ---
 
+# UC-ORG-06 — Manage Company Profile and Overview
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
+
+## Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-ORG-06 |
+| Primary Actor | Company Owner, HR Manager |
+| Supporting Actor | File Scanning Service |
+| Trigger | The authorized company user opens company settings (`/recruiter/company-settings`). |
+
+## Brief Description
+
+This use case allows a Company Owner or authorized HR Manager to view company profile details, overview statistics (active job counts, verified status, active members), and update public company information (company name, logo, banner, industry, company size, website, contact email/phone, address, and overview description).
+
+## Actors
+
+- Company Owner
+- HR Manager
+- File Scanning Service
+
+## Preconditions
+
+### Active Company Membership
+The User holds an `Active` `CompanyMembership` with role `OWNER` or `HR_MANAGER` for the target company.
+
+## Flow of Events
+
+### Basic Flow — Update Company Information
+
+1. The use case begins when the Company Owner or HR Manager navigates to `/recruiter/company-settings`.
+2. The System retrieves and displays the current company profile, verification badge/status, member count, and active job postings.
+3. The Actor updates company profile fields (e.g. description, website, address, industry, or company size).
+4. The Actor uploads an updated company logo or banner image.
+5. The System validates file MIME type, dimensions, and runs a fail-closed malware scan via File Scanning Service.
+6. The Actor clicks "Save Changes".
+7. The System validates all required fields, persists the changes in PostgreSQL within a database transaction, and logs the update to the audit log.
+8. The System displays a success notification and refreshes the displayed company profile.
+9. The use case ends.
+
+## Alternative Flows
+
+### A1 — Recruiter / Read-Only Member Views Overview
+1. A user with role `RECRUITER` navigates to company overview.
+2. The System displays company profile details in read-only mode with edit controls disabled.
+3. The use case ends.
+
+### A2 — Invalid Asset Upload
+1. At Basic Flow step 4, the uploaded logo or banner exceeds the 5 MB limit, has an invalid format, or fails the malware scan.
+2. The System rejects the upload, displays a specific validation error, and retains the previous image.
+3. The flow resumes at Basic Flow step 3.
+
+## Special Requirements
+
+### Role-Based Field Editing
+Only `OWNER` may update legal identification fields (Tax ID, legal registered name). Both `OWNER` and `HR_MANAGER` may update presentation fields (description, logo, website, address).
+
+### Tenant Isolation
+All company settings queries and mutations must strictly filter by the active company context `companyId`.
+
+### Auditability
+Every modification to company profile attributes is logged with actor ID, timestamp, and field diffs.
+
+## Postconditions
+
+### Success End Condition
+Company profile attributes and assets are updated, immediately reflected across public job postings and candidate views, and logged to audit trail.
+
+### Failure End Condition
+Company data remains unmodified; an appropriate error message is displayed.
+
+---
+
 # UC-USER-01 — Search and View User Accounts
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 ## Use-Case Information
 
@@ -634,6 +728,8 @@ After the target account is identified, the administrator may start **UC-USER-02
 ---
 
 # UC-USER-02 — Apply Account Enforcement Action
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 ## Use-Case Information
 
@@ -717,6 +813,8 @@ No state change occurs; an error is displayed to the Administrator.
 
 # UC-MOD-01 — Review Submitted Job Posting
 
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
+
 ## Use-Case Information
 
 | Field | Value |
@@ -785,6 +883,8 @@ After the posting has been reviewed, the administrator may start **UC-MOD-02 —
 ---
 
 # UC-MOD-02 — Approve, Reject, or Request Revision
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 ## Use-Case Information
 
@@ -873,6 +973,8 @@ The posting returns to `Draft` with recorded feedback; it remains unpublished; t
 ---
 
 # UC-MOD-03 — Investigate Job Report
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 ## Use-Case Information
 

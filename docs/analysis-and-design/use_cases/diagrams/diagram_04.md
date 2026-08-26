@@ -1,9 +1,18 @@
 # DGM-04 — Company Administration and Moderation
 
-*Performed by: Group 9 | Reviewed by: Group 9 | Edited by: Group 9*
-**Version:** V1.3 (06/08/2026) — UML relationships and report theme revised
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*  
+**Version:** V1.4 (2026-08-26) — Reconciled company settings overview (UC-ORG-06), role boundaries, and PA5 baseline
+
+### Revision History
+
+| Version | Date | Author/Editor | Summary | Status |
+|---|---|---|---|---|
+| 1.3 | 2026-08-06 | Group 9 | UML relationships and report theme revised. | Baseline |
+| 1.4 | 2026-08-26 | Nguyễn Minh Khôi | Added UC-ORG-06 (Manage Company Profile and Overview), clarified Owner/HR Manager/Recruiter boundaries, updated attribution and audit standards for PA5. | Approved |
 
 ## 1. Use-Case Diagram
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 ```mermaid
 flowchart LR
@@ -28,6 +37,7 @@ flowchart LR
             UC_ORG_03(["UC-ORG-03<br/>Review Company or Membership Request"])
             UC_ORG_04(["UC-ORG-04<br/>Manage Company Memberships and Roles"])
             UC_ORG_05(["UC-ORG-05<br/>Manage Membership Lifecycle"])
+            UC_ORG_06(["UC-ORG-06<br/>Manage Company Profile and Overview"])
         end
         subgraph ACCOUNT_UC["Account and User Management"]
             direction TB
@@ -46,6 +56,8 @@ flowchart LR
     AU --- UC_ORG_02
     CompanyOwner --- UC_ORG_04
     CompanyOwner --- UC_ORG_05
+    CompanyOwner --- UC_ORG_06
+    HRManager --- UC_ORG_06
     CompanyMember --- UC_ORG_05
     PlatformAdmin --- UC_ORG_03
     PlatformAdmin --- UC_USER_01
@@ -63,9 +75,6 @@ flowchart LR
     HRManager -. "generalizes" .-> CompanyMember
     CompanyOwner -. "generalizes" .-> CompanyMember
 
-    %% Account review and enforcement, and posting review and decision,
-    %% are Related Use Cases rather than workflow extensions.
-
     classDef actor fill:#ffffff,stroke:#334155,stroke-width:1.5px,color:#0f172a;
     classDef supportingActor fill:#f8fafc,stroke:#64748b,stroke-width:1.5px,color:#0f172a;
     classDef orgCase fill:#eff6ff,stroke:#2563eb,stroke-width:1.5px,color:#172033;
@@ -74,7 +83,7 @@ flowchart LR
 
     class AU,Candidate,CompanyMember,PlatformAdmin,Recruiter,HRManager,CompanyOwner actor;
     class FileScanner supportingActor;
-    class UC_ORG_01,UC_ORG_02,UC_ORG_03,UC_ORG_04,UC_ORG_05 orgCase;
+    class UC_ORG_01,UC_ORG_02,UC_ORG_03,UC_ORG_04,UC_ORG_05,UC_ORG_06 orgCase;
     class UC_USER_01,UC_USER_02 accountCase;
     class UC_MOD_01,UC_MOD_02,UC_MOD_03 moderationCase;
 
@@ -88,7 +97,10 @@ flowchart LR
 
 ## 2. Relationship Decisions
 
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
+
 - Candidate, Company Member, and Platform Administrator generalize Authenticated User. Recruiter, HR Manager, and Company Owner generalize Company Member.
+- UC-ORG-06 allows Company Owners and authorized HR Managers to manage public company information and view verification status.
 - UC-USER-01 identifies an account; UC-USER-02 is a separate enforcement goal that may be started after the target account has been selected.
 - UC-MOD-01 reviews a posting; UC-MOD-02 records the moderation decision as a related goal after review. Neither pair is modeled as a workflow `«extend»`.
 - File Scanning Service is a supporting service for company-verification evidence. A user or other notification recipient is not modeled as an actor unless that party directly interacts with the use case.
