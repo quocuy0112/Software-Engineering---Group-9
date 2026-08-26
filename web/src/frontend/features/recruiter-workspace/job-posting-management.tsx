@@ -235,7 +235,7 @@ function StatusPill({ status }: { status: RecruiterJobStatus }) {
 }
 
 type JobActionConfirmation = {
-  kind: "delete" | "withdraw";
+  kind: "close" | "reactivate" | "delete" | "withdraw";
   job: RecruiterJob;
 };
 
@@ -253,34 +253,57 @@ function JobActionConfirmationDialog({
   onConfirm: () => void;
 }) {
   const { job, kind } = confirmation;
+  const closing = kind === "close";
+  const reactivating = kind === "reactivate";
   const activeDelete = kind === "delete" && job.status === "active";
-  const title =
-    kind === "withdraw"
-      ? "Withdraw submission?"
-      : activeDelete
-        ? "Delete active job?"
-        : "Delete draft?";
-  const confirmLabel =
-    kind === "withdraw"
-      ? "Withdraw to Drafts"
-      : activeDelete
-        ? "Delete active job"
-        : "Delete draft";
-  const description =
-    kind === "withdraw"
-      ? "The submission will leave the administrator review queue and return to Drafts. You can edit and submit it again later."
-      : activeDelete
-        ? "This job will be removed from the public job data and candidate search immediately. Existing applications and audit history will be preserved."
-        : "This draft will be permanently removed from the draft data. This action cannot be undone.";
+  const title = closing
+    ? "Close job early?"
+    : reactivating
+      ? "Reactivate job?"
+      : kind === "withdraw"
+        ? "Withdraw submission?"
+        : activeDelete
+          ? "Delete active job?"
+          : "Delete draft?";
+  const confirmLabel = closing
+    ? "Close job"
+    : reactivating
+      ? "Reactivate job"
+      : kind === "withdraw"
+        ? "Withdraw to Drafts"
+        : activeDelete
+          ? "Delete active job"
+          : "Delete draft";
+  const description = closing
+    ? "This posting will stop accepting new applications and move to Closed. Existing applications will remain available in your recruitment pipeline."
+    : reactivating
+      ? "This posting will start accepting new applications again and move back to Active."
+      : kind === "withdraw"
+        ? "The submission will leave the administrator review queue and return to Drafts. You can edit and submit it again later."
+        : activeDelete
+          ? "This job will be removed from the public job data and candidate search immediately. Existing applications and audit history will be preserved."
+          : "This draft will be permanently removed from the draft data. This action cannot be undone.";
 
   return (
     <Modal
       open
       title={title}
       description={description}
-      tone={kind === "delete" ? "destructive" : "standard"}
+      tone={closing || kind === "delete" ? "destructive" : "standard"}
       busy={busy}
-      icon={<Icon name={kind === "delete" ? "trash" : "undo"} />}
+      icon={
+        <Icon
+          name={
+            closing
+              ? "lock"
+              : reactivating
+                ? "undo"
+                : kind === "delete"
+                  ? "trash"
+                  : "undo"
+          }
+        />
+      }
       className="recruiter-job-confirm-modal"
       onClose={onCancel}
     >
@@ -305,7 +328,7 @@ function JobActionConfirmationDialog({
         <button
           type="button"
           className={
-            kind === "delete"
+            closing || kind === "delete"
               ? "recruiter-primary-button recruiter-primary-button--danger"
               : "recruiter-primary-button"
           }
@@ -324,6 +347,7 @@ function JobPostingCard({
   onEdit,
   onApplicants,
   onClose,
+  onReactivate,
   onExtend,
   onDelete,
   onWithdraw,
@@ -333,6 +357,7 @@ function JobPostingCard({
   onEdit: () => void;
   onApplicants: () => void;
   onClose: () => void;
+  onReactivate: () => void;
   onExtend: () => void;
   onDelete: () => void;
   onWithdraw: () => void;
@@ -415,7 +440,9 @@ function JobPostingCard({
             ) : null}
             {job.review.state === "APPROVED" ? (
               <p className="recruiter-review-approved-note" role="status">
-                This job post has been approved and is visible to candidates.
+                {job.status === "closed"
+                  ? "This approved job post is closed and no longer accepting applications."
+                  : "This job post has been approved and is visible to candidates."}
               </p>
             ) : null}
           </>
@@ -477,7 +504,9 @@ function JobPostingCard({
                 ? `Revise rejected job posting: ${title}`
                 : job.status === "pending_approval"
                   ? `View job posting under review: ${title}`
-                  : `Edit job posting: ${title}`
+                  : job.status === "closed"
+                    ? `View closed job posting: ${title}`
+                    : `Edit job posting: ${title}`
             }
           >
             <Icon name="edit" />
@@ -485,7 +514,9 @@ function JobPostingCard({
               ? "Revise posting"
               : job.status === "pending_approval"
                 ? "View posting"
-                : "Edit posting"}
+                : job.status === "closed"
+                  ? "View posting"
+                  : "Edit posting"}
           </button>
           {job.status === "active" ? (
             <>
@@ -528,6 +559,17 @@ function JobPostingCard({
             >
               <Icon name="undo" />
               Withdraw to draft
+            </button>
+          ) : null}
+          {job.status === "closed" ? (
+            <button
+              type="button"
+              className="recruiter-primary-button"
+              onClick={onReactivate}
+              disabled={actionPending}
+            >
+              <Icon name="undo" />
+              Reactivate job
             </button>
           ) : null}
         </div>
@@ -928,22 +970,76 @@ export function RecruiterJobPostingManagement({
     [selectTab, storeSavedJob],
   );
   const closeJob = async (job: RecruiterJob) => {
-    const response = await fetch(
-      "/api/recruiter/job-postings?jobId=" + encodeURIComponent(job.id),
-      {
-        method: "DELETE",
-        headers: { "x-csrf-token": csrfProof },
-      },
-    );
-    const payload = (await response.json().catch(() => null)) as
-      | (JobCatalogItem & { message?: string })
-      | null;
-    if (!response.ok || !payload) {
-      return;
+    setActionError("");
+    setActionPendingJobId(job.id);
+    mutationEpoch.current += 1;
+    try {
+      const response = await fetch(
+        "/api/recruiter/job-postings?jobId=" +
+          encodeURIComponent(job.id) +
+          "&industryCode=" +
+          encodeURIComponent(job.industryCode),
+        {
+          method: "DELETE",
+          headers: { "x-csrf-token": csrfProof },
+        },
+      );
+      const payload = (await response.json().catch(() => null)) as
+        | (JobCatalogItem & { message?: string })
+        | null;
+      if (!response.ok || !payload) {
+        setActionError(
+          payload?.message === "Try again in a moment."
+            ? "Unable to close this posting right now. Please try again."
+            : (payload?.message ?? "Unable to close this posting."),
+        );
+        return false;
+      }
+      receiveSavedJob(
+        withCompanyFromState(payload, current.companies, current.jobs),
+      );
+      return true;
+    } catch {
+      setActionError("Unable to close this posting right now.");
+      return false;
+    } finally {
+      setActionPendingJobId(null);
     }
-    receiveSavedJob(
-      withCompanyFromState(payload, current.companies, current.jobs),
-    );
+  };
+
+  const reactivateJob = async (job: RecruiterJob) => {
+    setActionError("");
+    setActionPendingJobId(job.id);
+    mutationEpoch.current += 1;
+    try {
+      const response = await fetch(
+        `/api/recruiter/job-postings/${encodeURIComponent(job.id)}/reactivate?industryCode=${encodeURIComponent(job.industryCode)}`,
+        {
+          method: "POST",
+          headers: { "x-csrf-token": csrfProof },
+        },
+      );
+      const payload = (await response.json().catch(() => null)) as
+        | (JobCatalogItem & { message?: string })
+        | null;
+      if (!response.ok || !payload) {
+        setActionError(
+          payload?.message === "Try again in a moment."
+            ? "Unable to reactivate this posting right now. Please try again."
+            : (payload?.message ?? "Unable to reactivate this posting."),
+        );
+        return false;
+      }
+      receiveSavedJob(
+        withCompanyFromState(payload, current.companies, current.jobs),
+      );
+      return true;
+    } catch {
+      setActionError("Unable to reactivate this posting right now.");
+      return false;
+    } finally {
+      setActionPendingJobId(null);
+    }
   };
 
   const deleteJob = async (job: RecruiterJob) => {
@@ -1284,7 +1380,14 @@ export function RecruiterJobPostingManagement({
                     setApplicantJob(job);
                     setView("applicants");
                   }}
-                  onClose={() => void closeJob(job)}
+                  onClose={() => {
+                    setActionError("");
+                    setConfirmation({ kind: "close", job });
+                  }}
+                  onReactivate={() => {
+                    setActionError("");
+                    setConfirmation({ kind: "reactivate", job });
+                  }}
                   onExtend={() => void extendJob(job)}
                   onDelete={() => {
                     setActionError("");
@@ -1318,9 +1421,13 @@ export function RecruiterJobPostingManagement({
           }}
           onConfirm={() => {
             const operation =
-              confirmation.kind === "delete"
-                ? deleteJob(confirmation.job)
-                : withdrawJob(confirmation.job);
+              confirmation.kind === "close"
+                ? closeJob(confirmation.job)
+                : confirmation.kind === "reactivate"
+                  ? reactivateJob(confirmation.job)
+                  : confirmation.kind === "delete"
+                    ? deleteJob(confirmation.job)
+                    : withdrawJob(confirmation.job);
             void operation.then((completed) => {
               if (completed) setConfirmation(null);
             });

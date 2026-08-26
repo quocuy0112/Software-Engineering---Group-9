@@ -8,6 +8,7 @@ import { catalogueIndustryCode } from "@/backend/repositories/jobs/job-industry-
 import { adoptActiveJobBaseline } from "@/backend/jobs/review/job-post-active-baseline-service";
 import {
   closeManagedJobPost,
+  reopenManagedJobPost,
   softDeleteManagedJobPost,
   withdrawManagedJobPostReview,
 } from "@/backend/jobs/review/job-post-review-service";
@@ -815,6 +816,7 @@ async function loadRecruiterJobManagementData(
           jobId: true,
           companyId: true,
           version: true,
+          closedAt: true,
           pendingVersion: {
             select: {
               id: true,
@@ -899,15 +901,17 @@ async function loadRecruiterJobManagementData(
           }
         : undefined,
       company,
-      status: aggregate.pendingVersion
-        ? ("pending_approval" as const)
-        : current?.state === "REJECTED"
-          ? ("rejected" as const)
-          : current?.state === "WITHDRAWN"
-            ? ("draft" as const)
-            : current?.state === "APPROVED"
-              ? ("active" as const)
-              : undefined,
+      status: aggregate.closedAt
+        ? ("closed" as const)
+        : aggregate.pendingVersion
+          ? ("pending_approval" as const)
+          : current?.state === "REJECTED"
+            ? ("rejected" as const)
+            : current?.state === "WITHDRAWN"
+              ? ("draft" as const)
+              : current?.state === "APPROVED"
+                ? ("active" as const)
+                : undefined,
       correction: correctionRequest
         ? {
             id: correctionRequest.id,
@@ -1328,11 +1332,19 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
   });
 }
 
-export async function closeRecruiterJob(userId: string, jobId: string) {
+export async function closeRecruiterJob(
+  userId: string,
+  jobId: string,
+  requestedIndustryCode?: string,
+) {
   return withWriteLock(async () => {
-    const { jobs, companies, rawJobs } = await readCatalog();
+    const { companies } = await readCompanyCatalog();
     const company = (await authorizedCompanies(companies, userId))[0] ?? null;
     if (!company) throw new Error("A recruiter-owned company is required.");
+    const jobs = await readRecruiterJobsForUpdate(
+      { id: jobId, industryCode: requestedIndustryCode },
+      company.id,
+    );
     const current = jobs.find(
       (job) => job.id === jobId && job.companyId === company.id,
     );
@@ -1353,8 +1365,67 @@ export async function closeRecruiterJob(userId: string, jobId: string) {
       status: "closed",
       updatedAt: new Date().toISOString(),
     });
-    await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
+    const industryCode = catalogueIndustryCode(current.industryCode);
+    if (!industryCode) throw new Error("Invalid recruiter job classification.");
+    await jobsRepository.mutateIndustryPartition(industryCode, (rawJobs) =>
+      replaceRawJob(rawJobs, updated),
+    );
     invalidateCatalogueCache();
+    return { ...updated, company } satisfies RecruiterJob;
+  });
+}
+
+export async function reactivateRecruiterJob(
+  userId: string,
+  jobId: string,
+  requestedIndustryCode?: string,
+) {
+  return withWriteLock(async () => {
+    const { companies } = await readCompanyCatalog();
+    const company = (await authorizedCompanies(companies, userId))[0] ?? null;
+    if (!company) throw new Error("A recruiter-owned company is required.");
+    const jobs = await readRecruiterJobsForUpdate(
+      { id: jobId, industryCode: requestedIndustryCode },
+      company.id,
+    );
+    const current = jobs.find(
+      (job) => job.id === jobId && job.companyId === company.id,
+    );
+    if (!current) throw new Error("Job posting not found.");
+
+    const aggregate =
+      company.databaseBacked && company.databaseId
+        ? await prisma.jobPostReviewAggregate.findUnique({
+            where: { jobId: current.id },
+            select: { companyId: true, closedAt: true, softDeletedAt: true },
+          })
+        : null;
+    if (aggregate?.softDeletedAt) throw new Error("Job posting not found.");
+    if (current.status !== "closed" && !aggregate?.closedAt) {
+      throw new Error(
+        "This job posting cannot be reactivated in its current status.",
+      );
+    }
+
+    if (company.databaseBacked && company.databaseId && aggregate?.closedAt) {
+      await reopenManagedJobPost({
+        jobId: current.id,
+        companyId: company.databaseId,
+        actorUserId: userId,
+      });
+    }
+    const updated = jobCatalogSchema.parse({
+      ...current,
+      status: "active",
+      updatedAt: new Date().toISOString(),
+    });
+    const industryCode = catalogueIndustryCode(current.industryCode);
+    if (!industryCode) throw new Error("Invalid recruiter job classification.");
+    await jobsRepository.mutateIndustryPartition(industryCode, (rawJobs) =>
+      replaceRawJob(rawJobs, updated),
+    );
+    invalidateCatalogueCache();
+    await invalidateCandidateJobCatalogueCache();
     return { ...updated, company } satisfies RecruiterJob;
   });
 }

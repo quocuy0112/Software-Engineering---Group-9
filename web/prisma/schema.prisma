@@ -339,6 +339,7 @@ enum JobPostReviewHistoryAction {
   LEGACY_BASELINE_IMPORTED
   CLOSED
   WITHDRAWN
+  REOPENED
 }
 
 enum JobPostVisibilityState {

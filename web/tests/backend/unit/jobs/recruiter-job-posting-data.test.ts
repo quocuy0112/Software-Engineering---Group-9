@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   authorizeLegacyRecruiterJobs,
+  closeRecruiterJob,
   createRecruiterJob,
+  reactivateRecruiterJob,
   readRecruiterCompanySettings,
   readRecruiterJobManagementData,
   resolveRecruiterJobIdForNavigation,
@@ -310,6 +312,66 @@ describe("recruiter JSON job persistence", () => {
         state: "PENDING_REVIEW",
         readOnly: true,
       },
+    });
+  });
+
+  it("projects a closed aggregate as closed even when its approved version is current", async () => {
+    prismaMocks.company.findMany.mockResolvedValue([
+      {
+        id: "db-company-1",
+        slug: "northstar-labs",
+        legalName: "Northstar Labs",
+        displayName: "Northstar Labs",
+        logoUrl: "https://example.com/logo.png",
+        websiteUrl: "https://northstar.example.com",
+        publicDescription: "A product company.",
+        publicLocation: "Ho Chi Minh City",
+        size: "51-200 employees",
+        industry: "Technology",
+        address: "Ho Chi Minh City",
+        entityType: null,
+        normalizedTaxIdentifier: "1234567890",
+        memberships: [{ userId: "recruiter-1", role: "OWNER" }],
+      },
+    ]);
+    const closedJob = {
+      ...completeJob("closed-job"),
+      companyId: "db-company-1",
+      status: "active" as const,
+    };
+    const approvedVersion = {
+      id: "approved-version-1",
+      sequence: 1,
+      state: "APPROVED",
+      reasonCode: null,
+      publicExplanation: null,
+      submittedAt: new Date("2026-08-25T00:00:00Z"),
+      decidedAt: new Date("2026-08-25T01:00:00Z"),
+      snapshot: jobReviewSnapshotFromCatalog(closedJob, "db-company-1"),
+    };
+    prismaMocks.jobPostReviewAggregate.findMany.mockResolvedValue([
+      {
+        jobId: closedJob.id,
+        companyId: "db-company-1",
+        version: 3,
+        closedAt: new Date("2026-08-25T02:00:00Z"),
+        pendingVersion: null,
+        versions: [approvedVersion],
+        correctionRequests: [],
+      },
+    ]);
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return JSON.stringify([closedJob]);
+      if (path.endsWith("companies.json")) return "[]";
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const data = await readRecruiterJobManagementData("recruiter-1");
+
+    expect(data.jobs[0]).toMatchObject({
+      id: "closed-job",
+      status: "closed",
+      review: { state: "APPROVED" },
     });
   });
 
@@ -732,5 +794,63 @@ describe("recruiter JSON job persistence", () => {
     expect(persisted[0]).not.toHaveProperty("review");
     expect(persisted[0]).not.toHaveProperty("correctionRequest");
     expect(persisted[0]).not.toHaveProperty("company");
+  });
+
+  it("closes an active recruiter job and persists only the lifecycle change", async () => {
+    const existing = {
+      ...completeJob("close-job"),
+      status: "active" as const,
+    };
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return JSON.stringify([existing]);
+      if (path.endsWith("companies.json")) return JSON.stringify([company]);
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const saved = await closeRecruiterJob("recruiter-1", existing.id, "r03");
+
+    expect(saved).toMatchObject({ id: existing.id, status: "closed" });
+    const jobWrite = fsMocks.writeFile.mock.calls.find(([path]) =>
+      String(path).endsWith("jobs.json"),
+    );
+    const persisted = JSON.parse(String(jobWrite?.[1])) as Array<
+      Record<string, unknown>
+    >;
+    expect(persisted).toHaveLength(1);
+    expect(persisted[0]).toMatchObject({
+      id: existing.id,
+      status: "closed",
+    });
+  });
+
+  it("reactivates a closed recruiter job and persists only the lifecycle change", async () => {
+    const existing = {
+      ...completeJob("reactivate-job"),
+      status: "closed" as const,
+    };
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return JSON.stringify([existing]);
+      if (path.endsWith("companies.json")) return JSON.stringify([company]);
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const saved = await reactivateRecruiterJob(
+      "recruiter-1",
+      existing.id,
+      "r03",
+    );
+
+    expect(saved).toMatchObject({ id: existing.id, status: "active" });
+    const jobWrite = fsMocks.writeFile.mock.calls.find(([path]) =>
+      String(path).endsWith("jobs.json"),
+    );
+    const persisted = JSON.parse(String(jobWrite?.[1])) as Array<
+      Record<string, unknown>
+    >;
+    expect(persisted).toHaveLength(1);
+    expect(persisted[0]).toMatchObject({
+      id: existing.id,
+      status: "active",
+    });
   });
 });

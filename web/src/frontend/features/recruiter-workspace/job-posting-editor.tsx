@@ -397,7 +397,7 @@ export function JobPostingEditor({
   const autoSaveEnabled = useRecruiterDraftAutoSave(autoSaveStorageKey);
   const locale = useWorkspaceLocale();
   const copy = recruiterJobPostingCopy(locale);
-  const readOnly = job.status === "pending_approval";
+  const readOnly = job.status === "pending_approval" || job.status === "closed";
   const canSubmitForApproval =
     job.id === "new-job" || job.status === "draft" || job.status === "rejected";
   const defaultSaveStatus: JobPostingStatus = canSubmitForApproval
@@ -1950,7 +1950,11 @@ export function JobPostingEditor({
               Cancel
             </button>
             {readOnly ? (
-              <Badge tone="warning">Editing locked during review</Badge>
+              <Badge tone={job.status === "closed" ? "neutral" : "warning"}>
+                {job.status === "closed"
+                  ? "Closed posting — view only"
+                  : "Editing locked during review"}
+              </Badge>
             ) : canSubmitForApproval ? (
               <>
                 <button
