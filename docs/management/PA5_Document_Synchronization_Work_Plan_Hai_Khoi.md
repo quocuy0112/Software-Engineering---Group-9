@@ -1,6 +1,6 @@
 # PA5 Final-Document Synchronization Audit and Work Plan — Hải and Khôi
 
-*Performed by: Repository audit | Reviewed by: Lưu Chí Hải and Nguyễn Minh Khôi | Edited by: Assigned document owner*
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Minh Khôi | Edited by: Lưu Chí Hải, Nguyễn Minh Khôi*
 
 **Audit date:** 2026-08-26  
 **Scope:** Documentation audit and work allocation only. No Vision, use-case, architecture, Project Plan, testing, or historical change document was modified by this audit.  
