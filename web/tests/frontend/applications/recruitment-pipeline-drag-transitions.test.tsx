@@ -10,6 +10,7 @@ import {
 import { RecruitmentPipelineBoard } from "@/frontend/features/recruiter-applications/recruitment-pipeline-board";
 
 const move = vi.fn().mockResolvedValue(undefined);
+const moveDrag = vi.fn().mockResolvedValue(undefined);
 
 const ordinaryCard: PipelineApplicationCard = {
   applicationId: "ordinary-application",
@@ -39,6 +40,24 @@ const rejectedCard: PipelineApplicationCard = {
   stage: "REJECTED",
   allowedDestinations: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING"],
   dragDestinations: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING"],
+};
+
+const waitlistedCard: PipelineApplicationCard = {
+  ...ordinaryCard,
+  applicationId: "waitlisted-application",
+  candidate: { displayName: "Waitlisted Candidate", avatarUrl: null },
+  stage: "WAITLISTED",
+  allowedDestinations: [],
+  dragDestinations: ["VIEWED", "SHORTLISTED", "INTERVIEWING", "REJECTED"],
+};
+
+const interviewingCard: PipelineApplicationCard = {
+  ...ordinaryCard,
+  applicationId: "interviewing-application",
+  candidate: { displayName: "Interviewing Candidate", avatarUrl: null },
+  stage: "INTERVIEWING",
+  allowedDestinations: ["OFFERED", "REJECTED", "WAITLISTED"],
+  dragDestinations: ["OFFERED", "REJECTED", "WAITLISTED"],
 };
 
 vi.mock("@dnd-kit/core", () => ({
@@ -83,6 +102,24 @@ vi.mock("@dnd-kit/core", () => ({
       </button>
       <button
         type="button"
+        data-testid="start-waitlisted-drag"
+        onClick={() =>
+          onDragStart({ active: { id: waitlistedCard.applicationId } })
+        }
+      >
+        Start waitlisted drag
+      </button>
+      <button
+        type="button"
+        data-testid="start-interviewing-drag"
+        onClick={() =>
+          onDragStart({ active: { id: interviewingCard.applicationId } })
+        }
+      >
+        Start interviewing drag
+      </button>
+      <button
+        type="button"
         data-testid="drop-viewed"
         onClick={() =>
           onDragEnd({ over: { data: { current: { stage: "VIEWED" } } } })
@@ -98,6 +135,33 @@ vi.mock("@dnd-kit/core", () => ({
         }
       >
         Drop in Rejected
+      </button>
+      <button
+        type="button"
+        data-testid="drop-shortlisted"
+        onClick={() =>
+          onDragEnd({ over: { data: { current: { stage: "SHORTLISTED" } } } })
+        }
+      >
+        Drop in Shortlisted
+      </button>
+      <button
+        type="button"
+        data-testid="drop-interviewing"
+        onClick={() =>
+          onDragEnd({ over: { data: { current: { stage: "INTERVIEWING" } } } })
+        }
+      >
+        Drop in Interviewing
+      </button>
+      <button
+        type="button"
+        data-testid="drop-offered"
+        onClick={() =>
+          onDragEnd({ over: { data: { current: { stage: "OFFERED" } } } })
+        }
+      >
+        Drop in Offered
       </button>
       {children}
     </>
@@ -161,10 +225,32 @@ vi.mock(
           loadingMore: false,
           error: null,
         },
+        INTERVIEWING: {
+          page: {
+            stage: "INTERVIEWING",
+            items: [interviewingCard],
+            nextCursor: null,
+            observedAt: "2026-08-18T00:00:00.000Z",
+          },
+          loading: false,
+          loadingMore: false,
+          error: null,
+        },
         REJECTED: {
           page: {
             stage: "REJECTED",
             items: [rejectedCard],
+            nextCursor: null,
+            observedAt: "2026-08-18T00:00:00.000Z",
+          },
+          loading: false,
+          loadingMore: false,
+          error: null,
+        },
+        WAITLISTED: {
+          page: {
+            stage: "WAITLISTED",
+            items: [waitlistedCard],
             nextCursor: null,
             observedAt: "2026-08-18T00:00:00.000Z",
           },
@@ -182,12 +268,16 @@ vi.mock(
       retry: vi.fn(),
       retryStageMove: vi.fn(),
       move,
+      moveDrag,
     }),
   }),
 );
 
 describe("RecruitmentPipelineBoard drag transitions", () => {
-  beforeEach(() => move.mockClear());
+  beforeEach(() => {
+    move.mockClear();
+    moveDrag.mockClear();
+  });
 
   it("persists an ordinary valid drop without confirmation", async () => {
     render(<RecruitmentPipelineBoard jobId="job-1" />);
@@ -196,7 +286,7 @@ describe("RecruitmentPipelineBoard drag transitions", () => {
     fireEvent.click(screen.getByTestId("drop-viewed"));
 
     await waitFor(() =>
-      expect(move).toHaveBeenCalledWith(ordinaryCard, "VIEWED", {}),
+      expect(moveDrag).toHaveBeenCalledWith(ordinaryCard, "VIEWED", {}),
     );
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
@@ -214,7 +304,7 @@ describe("RecruitmentPipelineBoard drag transitions", () => {
     const confirm = screen.getByRole("button", { name: "Confirm rejection" });
     expect(screen.getByLabelText("Destination stage")).toHaveValue("REJECTED");
     expect(confirm).toBeDisabled();
-    expect(move).not.toHaveBeenCalled();
+    expect(moveDrag).not.toHaveBeenCalled();
 
     fireEvent.change(screen.getByLabelText("Rejection reason"), {
       target: { value: "POSITION_FILLED" },
@@ -222,7 +312,7 @@ describe("RecruitmentPipelineBoard drag transitions", () => {
     fireEvent.click(confirm);
 
     await waitFor(() =>
-      expect(move).toHaveBeenCalledWith(guardedCard, "REJECTED", {
+      expect(moveDrag).toHaveBeenCalledWith(guardedCard, "REJECTED", {
         confirmed: true,
         reasonCode: "POSITION_FILLED",
         internalNote: undefined,
@@ -230,13 +320,63 @@ describe("RecruitmentPipelineBoard drag transitions", () => {
     );
   });
 
-  it("persists a valid drop from Rejected back into the active pipeline", async () => {
+  it("allows Interviewing -> Offered drag", async () => {
+    render(<RecruitmentPipelineBoard jobId="job-1" />);
+
+    fireEvent.click(screen.getByTestId("start-interviewing-drag"));
+    fireEvent.click(screen.getByTestId("drop-offered"));
+
+    await waitFor(() =>
+      expect(moveDrag).toHaveBeenCalledWith(interviewingCard, "OFFERED", {}),
+    );
+  });
+
+  it.each([
+    ["VIEWED", "drop-viewed"],
+    ["SHORTLISTED", "drop-shortlisted"],
+    ["INTERVIEWING", "drop-interviewing"],
+  ] as const)("allows Waitlisted -> %s drag", async (target, dropTestId) => {
+    render(<RecruitmentPipelineBoard jobId="job-1" />);
+    fireEvent.click(screen.getByTestId("start-waitlisted-drag"));
+    fireEvent.click(screen.getByTestId(dropTestId));
+
+    await waitFor(() =>
+      expect(moveDrag).toHaveBeenCalledWith(waitlistedCard, target, {}),
+    );
+  });
+
+  it("allows Waitlisted -> Rejected drag through the rejection dialog", async () => {
+    render(<RecruitmentPipelineBoard jobId="job-1" />);
+    fireEvent.click(screen.getByTestId("start-waitlisted-drag"));
+    fireEvent.click(screen.getByTestId("drop-rejected"));
+
+    fireEvent.change(screen.getByLabelText("Rejection reason"), {
+      target: { value: "POSITION_FILLED" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Confirm rejection" }));
+
+    await waitFor(() =>
+      expect(moveDrag).toHaveBeenCalledWith(waitlistedCard, "REJECTED", {
+        confirmed: true,
+        reasonCode: "POSITION_FILLED",
+        internalNote: undefined,
+      }),
+    );
+  });
+
+  it("blocks Waitlisted drops to every other stage", async () => {
+    render(<RecruitmentPipelineBoard jobId="job-1" />);
+    fireEvent.click(screen.getByTestId("start-waitlisted-drag"));
+    fireEvent.click(screen.getByTestId("drop-offered"));
+
+    expect(moveDrag).not.toHaveBeenCalled();
+  });
+
+  it("blocks Rejected cards from dragging to any stage", async () => {
     render(<RecruitmentPipelineBoard jobId="job-1" />);
     fireEvent.click(screen.getByTestId("start-rejected-drag"));
     fireEvent.click(screen.getByTestId("drop-viewed"));
 
-    await waitFor(() =>
-      expect(move).toHaveBeenCalledWith(rejectedCard, "VIEWED", {}),
-    );
+    expect(moveDrag).not.toHaveBeenCalled();
   });
 });

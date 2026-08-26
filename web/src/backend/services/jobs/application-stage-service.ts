@@ -856,9 +856,11 @@ export class ApplicationStageService {
         if (
           actorKind === "system_auto_score" &&
           !(
-            (fromStage === "APPLIED" && command.targetStage === "REJECTED") ||
+            (fromStage === "APPLIED" && command.targetStage === "WAITLISTED") ||
             (fromStage === "VIEWED" &&
-              ["SHORTLISTED", "REJECTED"].includes(command.targetStage))
+              ["SHORTLISTED", "REJECTED", "WAITLISTED"].includes(
+                command.targetStage,
+              ))
           )
         ) {
           throw new JobServiceError(409, {

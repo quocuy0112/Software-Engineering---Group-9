@@ -89,7 +89,7 @@ afterEach(() => {
 });
 
 describe("automatic score stage rules", () => {
-  it("rejects a sub-60 Applied application immediately with the low-score reason", async () => {
+  it("waitlists a sub-60 Applied application immediately with the low-score reason", async () => {
     const db = database([
       candidate({ id: "low", stage: "APPLIED", finalScore: 59.9 }),
     ]);
@@ -105,11 +105,33 @@ describe("automatic score stage rules", () => {
     expect(service.attemptStageTransition).toHaveBeenCalledWith(
       expect.objectContaining({
         candidateApplicationId: "low",
-        targetStage: "REJECTED",
+        targetStage: "WAITLISTED",
         actor: { kind: "system_auto_score" },
-        reasonCode: "score_below_60_auto_reject",
+        reasonCode: "score_below_60_auto_waitlist",
       }),
     );
+    expect(service.attemptStageTransition).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        candidateApplicationId: "low",
+        targetStage: "REJECTED",
+      }),
+    );
+  });
+
+  it("does not add the low-score Waitlist entry condition at exactly 60", async () => {
+    const db = database([
+      candidate({ id: "threshold", stage: "APPLIED", finalScore: 60 }),
+    ]);
+    const service = stageService();
+
+    await applyAutomaticScoreStageRuleForApplication({
+      candidateApplicationId: "threshold",
+      db: db as never,
+      stageService: service as never,
+      now,
+    });
+
+    expect(service.attemptStageTransition).not.toHaveBeenCalled();
   });
 
   it("does not reject a low AI score when the final score is high", async () => {
@@ -133,7 +155,7 @@ describe("automatic score stage rules", () => {
     expect(service.attemptStageTransition).not.toHaveBeenCalled();
   });
 
-  it("rejects a low final score even when the AI score is high", async () => {
+  it("waitlists a low final score even when the AI score is high", async () => {
     const db = database([
       candidate({
         id: "low-final",
@@ -154,13 +176,13 @@ describe("automatic score stage rules", () => {
     expect(service.attemptStageTransition).toHaveBeenCalledWith(
       expect.objectContaining({
         candidateApplicationId: "low-final",
-        targetStage: "REJECTED",
-        reasonCode: "score_below_60_auto_reject",
+        targetStage: "WAITLISTED",
+        reasonCode: "score_below_60_auto_waitlist",
       }),
     );
   });
 
-  it("rejects a low score immediately if scoring completes after the application was viewed", async () => {
+  it("waitlists a low score immediately if scoring completes after the application was viewed", async () => {
     const db = database([
       candidate({
         id: "low-viewed",
@@ -181,8 +203,8 @@ describe("automatic score stage rules", () => {
     expect(service.attemptStageTransition).toHaveBeenCalledWith(
       expect.objectContaining({
         candidateApplicationId: "low-viewed",
-        targetStage: "REJECTED",
-        reasonCode: "score_below_60_auto_reject",
+        targetStage: "WAITLISTED",
+        reasonCode: "score_below_60_auto_waitlist",
       }),
     );
   });

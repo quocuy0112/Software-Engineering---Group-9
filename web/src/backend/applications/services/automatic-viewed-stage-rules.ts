@@ -11,7 +11,7 @@ import {
   automaticScoreConfigForPublishedResult,
   automaticScoreStageReasonCodes,
   getAutomaticScoreStageRuleConfig,
-  lowScoreAutomaticRejectReasonCode,
+  lowScoreAutomaticWaitlistReasonCode,
   type AutomaticScoreStageRuleConfig,
 } from "./automatic-score-stage-config";
 
@@ -80,10 +80,10 @@ function automaticDecision(input: {
   const { finalScore, config, timeout, candidate } = input;
   if (finalScore < config.lowScoreThreshold) {
     return {
-      targetStage: "REJECTED" as const,
-      reasonCode: lowScoreAutomaticRejectReasonCode(config),
+      targetStage: "WAITLISTED" as const,
+      reasonCode: lowScoreAutomaticWaitlistReasonCode(config),
       candidateVisibleReason:
-        "Your application was not selected because its final score was below the configured threshold.",
+        "Your application has been waitlisted because its final score was below the configured threshold.",
     };
   }
 
@@ -103,14 +103,9 @@ function automaticDecision(input: {
   }
   return {
     targetStage: "REJECTED" as const,
-    reasonCode:
-      finalScore < config.lowScoreThreshold
-        ? lowScoreAutomaticRejectReasonCode(config)
-        : automaticScoreStageReasonCodes.reviewNeededTimeoutAutoReject,
+    reasonCode: automaticScoreStageReasonCodes.reviewNeededTimeoutAutoReject,
     candidateVisibleReason:
-      finalScore < config.lowScoreThreshold
-        ? "Your application was not selected because its final score was below the configured threshold."
-        : "Your application was not selected because no manual decision was recorded during the review window.",
+      "Your application was not selected because no manual decision was recorded during the review window.",
   };
 }
 

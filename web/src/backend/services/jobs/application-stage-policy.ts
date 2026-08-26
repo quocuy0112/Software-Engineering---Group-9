@@ -8,7 +8,11 @@ const activeStages = [
   "OFFERED",
 ] as const satisfies readonly ApplicationStage[];
 
-const terminalStages = new Set<ApplicationStage>(["HIRED", "OFFER_DECLINED"]);
+const terminalStages = new Set<ApplicationStage>([
+  "HIRED",
+  "OFFER_DECLINED",
+  "REJECTED",
+]);
 
 export function isTerminalApplicationStage(stage: ApplicationStage) {
   return terminalStages.has(stage);
@@ -36,15 +40,6 @@ export function canTransitionApplicationStage(
       to === "OFFER_DECLINED" ||
       to === "REJECTED" ||
       to === "WAITLISTED"
-    );
-  }
-
-  if (from === "REJECTED") {
-    return (
-      to === "APPLIED" ||
-      to === "VIEWED" ||
-      to === "SHORTLISTED" ||
-      to === "INTERVIEWING"
     );
   }
 
@@ -96,8 +91,8 @@ export const ordinaryApplicationTransitions = Object.freeze(
  * Recruiter pipeline controls intentionally expose a narrower policy than the
  * historical application-stage compatibility matrix above. The compatibility
  * matrix remains available to old read/command adapters, while the standalone
- * Pipeline surface only offers valid next decisions and never lets a recruiter
- * manufacture an offer outcome.
+ * Pipeline surface only offers valid next decisions while keeping offer
+ * outcomes available through the explicit Interviewing -> Offered decision.
  */
 export const recruiterPipelineButtonTransitions = Object.freeze({
   APPLIED: ["VIEWED", "REJECTED", "WAITLISTED"],
@@ -107,7 +102,7 @@ export const recruiterPipelineButtonTransitions = Object.freeze({
   OFFERED: [],
   HIRED: [],
   OFFER_DECLINED: [],
-  REJECTED: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING"],
+  REJECTED: [],
   WAITLISTED: [],
 } as const satisfies Record<ApplicationStage, readonly ApplicationStage[]>);
 
@@ -115,12 +110,12 @@ export const recruiterPipelineDragTransitions = Object.freeze({
   APPLIED: ["VIEWED", "REJECTED", "WAITLISTED"],
   VIEWED: ["SHORTLISTED", "REJECTED", "WAITLISTED"],
   SHORTLISTED: ["INTERVIEWING", "REJECTED", "WAITLISTED"],
-  INTERVIEWING: ["REJECTED", "WAITLISTED"],
+  INTERVIEWING: ["OFFERED", "REJECTED", "WAITLISTED"],
   OFFERED: [],
   HIRED: [],
   OFFER_DECLINED: [],
-  REJECTED: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING"],
-  WAITLISTED: [],
+  REJECTED: [],
+  WAITLISTED: ["VIEWED", "SHORTLISTED", "INTERVIEWING", "REJECTED"],
 } as const satisfies Record<ApplicationStage, readonly ApplicationStage[]>);
 
 export function canRecruiterPipelineTransition(

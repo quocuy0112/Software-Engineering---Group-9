@@ -102,7 +102,7 @@ describe("RecruitmentPipelineBoardService", () => {
     expect(result.items[0].allowedDestinations).not.toContain("HIRED");
   });
 
-  it("exposes Rejected as a two-way pipeline stage", async () => {
+  it("locks Rejected cards from all pipeline movement", async () => {
     const repository = {
       listPipelineStage: vi.fn().mockResolvedValue({
         items: [
@@ -134,17 +134,47 @@ describe("RecruitmentPipelineBoardService", () => {
       now: new Date("2026-01-01T00:00:00Z"),
     });
 
-    expect(result.items[0].allowedDestinations).toEqual([
-      "APPLIED",
-      "VIEWED",
-      "SHORTLISTED",
-      "INTERVIEWING",
-    ]);
+    expect(result.items[0].allowedDestinations).toEqual([]);
+    expect(result.items[0].dragDestinations).toEqual([]);
+  });
+
+  it("projects only the four permitted Waitlisted drag destinations", async () => {
+    const repository = {
+      listPipelineStage: vi.fn().mockResolvedValue({
+        items: [
+          {
+            applicationId: "app-waitlisted",
+            candidate: { displayName: "Ada", avatarUrl: null },
+            submittedAt: "2026-01-01T00:00:00.000Z",
+            stage: "WAITLISTED",
+            stageVersion: 2,
+            documents: { cvAvailable: true, coverLetterAvailable: false },
+            score: null,
+          },
+        ],
+        nextCursor: null,
+      }),
+    };
+    const service = new RecruitmentPipelineBoardService(
+      repository as never,
+      {
+        authorizeJob: vi.fn().mockResolvedValue(authorization("RECRUITER")),
+      } as never,
+    );
+
+    const result = await service.stagePage({
+      userId: "user-1",
+      jobId: "catalogue-1",
+      stage: "WAITLISTED",
+      limit: 25,
+      now: new Date("2026-01-01T00:00:00Z"),
+    });
+
     expect(result.items[0].dragDestinations).toEqual([
-      "APPLIED",
       "VIEWED",
       "SHORTLISTED",
       "INTERVIEWING",
+      "REJECTED",
     ]);
   });
 

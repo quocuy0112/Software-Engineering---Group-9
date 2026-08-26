@@ -49,7 +49,6 @@ type PipelineColumnProps = {
 };
 
 const lockedStages = new Set<ApplicationStage>([
-  "OFFERED",
   "WAITLISTED",
   "HIRED",
   "OFFER_DECLINED",
@@ -90,8 +89,7 @@ export function RecruitmentPipelineColumn({
   const withdrawn = summary.stage === "WITHDRAWN";
   const canonicalStage = withdrawn ? null : summary.stage;
   const locked =
-    withdrawn ||
-    (canonicalStage !== null && lockedStages.has(canonicalStage));
+    withdrawn || (canonicalStage !== null && lockedStages.has(canonicalStage));
   const droppable = useDroppable({
     id: summary.stage,
     data: { stage: summary.stage },
@@ -155,7 +153,10 @@ export function RecruitmentPipelineColumn({
               }
             />
           ) : null}
-          {canSort && canonicalStage && onToggleSortMenu && onSortDirectionChange ? (
+          {canSort &&
+          canonicalStage &&
+          onToggleSortMenu &&
+          onSortDirectionChange ? (
             <div className="column-sort pipeline-column__sort">
               <button
                 type="button"
