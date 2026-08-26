@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import { SendHorizontal, UserRound } from "lucide-react";
 
 type Detail = {
   thread: {
@@ -52,6 +53,12 @@ export function CandidateRecruitmentThread({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
   }, [load]);
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      void load();
+    }, 3_000);
+    return () => window.clearInterval(timer);
+  }, [load]);
   async function send(event: FormEvent) {
     event.preventDefault();
     if (!detail || !content.trim()) return;
@@ -87,17 +94,19 @@ export function CandidateRecruitmentThread({
         <div>
           <p>{detail?.thread.job.companyName ?? "Application communication"}</p>
           <h1>{detail?.thread.job.title ?? "Recruitment messages"}</h1>
+        </div>
+        <div className="recruitment-candidate-chat-status">
+          {detail ? (
+            <strong className="recruitment-chat-stage">
+              {detail.thread.applicationStage}
+            </strong>
+          ) : null}
           <span>
             {detail?.thread.assignee
               ? `Chatting with ${detail.thread.assignee.name} (${detail.thread.assignee.role})`
               : "Conversation for this application"}
           </span>
         </div>
-        {detail ? (
-          <strong className="recruitment-chat-stage">
-            {detail.thread.applicationStage}
-          </strong>
-        ) : null}
       </header>
       {state === "loading" ? (
         <p className="recruitment-messaging__empty">
@@ -119,26 +128,40 @@ export function CandidateRecruitmentThread({
         <section className="recruitment-messaging__thread recruitment-chat-thread">
           <div className="recruitment-messaging__messages recruitment-chat-history">
             {detail.messages.length ? (
-              <ol>
+              <>
+                <p className="recruitment-chat-history__start">
+                  Conversation started
+                </p>
                 {detail.messages.map((message) => {
                   const outgoing =
                     message.senderUserId !== detail.thread.assignee?.userId;
                   return (
-                    <li
+                    <div
                       key={message.id}
+                      className="recruitment-chat-message"
                       data-direction={outgoing ? "outgoing" : "incoming"}
+                      aria-label={`Message from ${
+                        outgoing ? "you" : (detail.thread.assignee?.name ?? "recruiter")
+                      }`}
                     >
-                      <article>
-                        <p>{outgoing ? "You" : detail.thread.assignee?.name}</p>
+                      <span
+                        className="recruitment-chat-message__avatar"
+                        aria-hidden="true"
+                      >
+                        <UserRound />
+                      </span>
+                      <article
+                        data-time={new Date(message.createdAt).toLocaleString()}
+                      >
                         <div>{message.content}</div>
-                        <time dateTime={message.createdAt}>
+                        <time dateTime={message.createdAt} aria-hidden="true">
                           {new Date(message.createdAt).toLocaleString()}
                         </time>
                       </article>
-                    </li>
+                    </div>
                   );
                 })}
-              </ol>
+              </>
             ) : (
               <p className="recruitment-messaging__empty">No messages yet.</p>
             )}
@@ -160,22 +183,29 @@ export function CandidateRecruitmentThread({
                   event.currentTarget.form?.requestSubmit();
                 }}
                 disabled={!detail.thread.canSend}
+                maxLength={2000}
                 placeholder={
                   detail.thread.canSend
-                    ? "Write a message about this application"
+                    ? "Write a message..."
                     : "This conversation is read-only"
                 }
               />
+              <span
+                className="recruitment-chat-composer__count"
+                aria-live="polite"
+              >
+                {content.length}/2,000
+              </span>
             </label>
             <div className="recruitment-chat-composer__actions">
               <span>
-                Enter / Ctrl+Enter to send. Shift+Enter for a new line.
+                Press Enter to send · Shift + Enter for a new line
               </span>
               <button
                 type="submit"
                 disabled={!detail.thread.canSend || !content.trim()}
               >
-                Send
+                Send <SendHorizontal aria-hidden="true" />
               </button>
             </div>
           </form>

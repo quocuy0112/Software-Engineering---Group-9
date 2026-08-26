@@ -417,63 +417,91 @@ export function CandidateScoreDrawer({
             ) : null}
           </div>
           <div className="ranking-drawer__scoreline-actions">
-            <button
-              type="button"
-              className="ai-ranking-button ai-ranking-button--secondary"
-              onClick={() => requestDocument("cv")}
+            <div
+              className="ranking-drawer__action-group"
+              role="group"
+              aria-label="Review candidate information"
             >
-              <FileText aria-hidden="true" /> View CV
-            </button>
-            <button
-              type="button"
-              className="ai-ranking-button ai-ranking-button--secondary"
-              onClick={() => requestDocument("cover-letter")}
+              <div className="ranking-drawer__action-buttons">
+                <button
+                  type="button"
+                  className="ai-ranking-button ai-ranking-button--secondary"
+                  onClick={() => requestDocument("cv")}
+                >
+                  <FileText aria-hidden="true" /> View CV
+                </button>
+                <button
+                  type="button"
+                  className="ai-ranking-button ai-ranking-button--secondary"
+                  onClick={() => requestDocument("cover-letter")}
+                >
+                  <Mail aria-hidden="true" /> View cover letter
+                </button>
+                <button
+                  type="button"
+                  className="ai-ranking-button ai-ranking-button--secondary"
+                  onClick={() => void openProfileReview()}
+                >
+                  <UserRoundCheck aria-hidden="true" /> View profile
+                </button>
+              </div>
+            </div>
+            <div
+              className="ranking-drawer__action-group"
+              role="group"
+              aria-label="Candidate recruitment actions"
             >
-              <Mail aria-hidden="true" /> View cover letter
-            </button>
-            <button type="button" className="ai-ranking-button ai-ranking-button--secondary" onClick={() => void openProfileReview()}>
-              <UserRoundCheck aria-hidden="true" /> View profile
-            </button>
-            {canShortlist ? (
-              <button
-                type="button"
-                className="ai-ranking-button ai-ranking-button--secondary"
-                onClick={() => void shortlist()}
-                disabled={shortlisting}
-              >
-                {shortlisting ? (
-                  <LoaderCircle aria-hidden="true" className="is-spinning" />
-                ) : (
-                  <ListChecks aria-hidden="true" />
-                )}{" "}
-                {shortlisting ? "Shortlisting…" : "Shortlist"}
-              </button>
-            ) : null}
-            {canOpenRecruitmentChat ? (
-              <button
-                type="button"
-                className="ai-ranking-button ai-ranking-button--primary"
-                onClick={() => void openRecruitmentChat()}
-                disabled={openingRecruitmentChat}
-              >
-                {openingRecruitmentChat ? (
-                  <LoaderCircle aria-hidden="true" className="is-spinning" />
-                ) : (
-                  <MessageSquare aria-hidden="true" />
-                )}{" "}
-                {openingRecruitmentChat ? "Opening chat…" : "Message candidate"}
-              </button>
-            ) : null}
-            {!readOnly ? (
-              <button
-                type="button"
-                className="ai-ranking-button ai-ranking-button--primary"
-                onClick={onMoveToInterview}
-                disabled={!canMoveToInterview}
-              >
-                <ArrowRight aria-hidden="true" /> Move to interview
-              </button>
-            ) : null}
+              <div className="ranking-drawer__action-buttons">
+                {canShortlist ? (
+                  <button
+                    type="button"
+                    className="ai-ranking-button ai-ranking-button--secondary"
+                    onClick={() => void shortlist()}
+                    disabled={shortlisting}
+                  >
+                    {shortlisting ? (
+                      <LoaderCircle
+                        aria-hidden="true"
+                        className="is-spinning"
+                      />
+                    ) : (
+                      <ListChecks aria-hidden="true" />
+                    )}{" "}
+                    {shortlisting ? "Shortlisting…" : "Shortlist"}
+                  </button>
+                ) : null}
+                {canOpenRecruitmentChat ? (
+                  <button
+                    type="button"
+                    className="ai-ranking-button ai-ranking-button--primary"
+                    onClick={() => void openRecruitmentChat()}
+                    disabled={openingRecruitmentChat}
+                  >
+                    {openingRecruitmentChat ? (
+                      <LoaderCircle
+                        aria-hidden="true"
+                        className="is-spinning"
+                      />
+                    ) : (
+                      <MessageSquare aria-hidden="true" />
+                    )}{" "}
+                    {openingRecruitmentChat
+                      ? "Opening chat…"
+                      : "Message candidate"}
+                  </button>
+                ) : null}
+                {!readOnly ? (
+                  <button
+                    type="button"
+                    className="ai-ranking-button ai-ranking-button--primary"
+                    onClick={onMoveToInterview}
+                    disabled={!canMoveToInterview}
+                  >
+                    <ArrowRight aria-hidden="true" /> Move to interview
+                  </button>
+                ) : null}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -644,15 +672,67 @@ export function CandidateScoreDrawer({
               openRequest={openDocumentRequest}
             />
           ) : (
-            <section aria-label="Candidate profile review">
-              <p><strong>Submitted profile</strong> is the application-time snapshot. <strong>Current profile</strong> reflects the candidate&apos;s current sharing choices.</p>
-              {profileReview?.submittedProfileAvailable ? (
-                <div><h3>Submitted profile</h3><p>{profileReview.submittedProfile?.headline ?? "No headline"}</p><p>{profileReview.submittedProfile?.summary ?? "No summary"}</p><p>{profileReview.submittedProfile?.skills.join(" · ")}</p></div>
-              ) : <p>Submitted profile is no longer available.</p>}
-              {profileReview?.liveProfile ? (
-                <div><h3>Current profile</h3><p>{profileReview.liveProfile.sections.headline ?? "No headline shared"}</p><p>{profileReview.liveProfile.sections.summary ?? "No summary shared"}</p><p>{profileReview.liveProfile.sections.skills?.join(" · ")}</p></div>
-              ) : <p>Current profile has no sections shared with recruiters.</p>}
-              <p>{profileReview?.contactShared ? "Candidate has shared contact details for this application." : "Contact details are not shared for this application."}</p>
+            <section
+              className="candidate-profile-review"
+              aria-label="Candidate profile review"
+            >
+              <header className="candidate-profile-review__intro">
+                <span aria-hidden="true">
+                  <UserRoundCheck />
+                </span>
+                <div>
+                  <h3>Current candidate profile</h3>
+                  <p>
+                    Profile details reflect the candidate&apos;s active sharing
+                    choices.
+                  </p>
+                </div>
+              </header>
+
+              <section className="candidate-profile-card candidate-profile-card--current">
+                <span className="candidate-profile-card__eyebrow">
+                  Current profile
+                </span>
+                {profileReview?.liveProfile ? (
+                  <>
+                    <h4>
+                      {profileReview.liveProfile.sections.headline ??
+                        "No headline shared"}
+                    </h4>
+                    <p>
+                      {profileReview.liveProfile.sections.summary ??
+                        "No summary shared"}
+                    </p>
+                    {profileReview.liveProfile.sections.skills?.length ? (
+                      <div
+                        className="candidate-profile-card__skills"
+                        aria-label="Shared skills"
+                      >
+                        {profileReview.liveProfile.sections.skills.map(
+                          (skill) => (
+                            <span key={skill}>{skill}</span>
+                          ),
+                        )}
+                      </div>
+                    ) : null}
+                  </>
+                ) : (
+                  <p className="candidate-profile-card__empty">
+                    Current profile has no sections shared with recruiters.
+                  </p>
+                )}
+              </section>
+
+              <p
+                className={`candidate-profile-review__contact ${
+                  profileReview?.contactShared ? "is-shared" : ""
+                }`}
+              >
+                <ShieldCheck aria-hidden="true" />
+                {profileReview?.contactShared
+                  ? "Candidate has shared contact details for this application."
+                  : "Contact details are not shared for this application."}
+              </p>
             </section>
           )}
         </div>
