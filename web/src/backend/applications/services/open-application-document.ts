@@ -34,15 +34,21 @@ export class OpenApplicationDocumentService {
     if (!input.sessionId || !document) {
       return;
     }
-    try {
-      if (this.repository instanceof PrismaApplicationRepository) {
+    if (this.repository instanceof PrismaApplicationRepository) {
+      try {
         const automatic = await applyAutomaticScoreStageRuleForApplication({
           candidateApplicationId: input.applicationId,
           stageService: this.stageService,
           now: input.now,
         });
         if (automatic?.stage === "REJECTED") return;
+      } catch {
+        // Stage automation is an acknowledgement side effect. A transient
+        // automation/database failure must not make an authorized document
+        // unavailable to the recruiter.
       }
+    }
+    try {
       if (document.stage !== "APPLIED" || document.stageVersion === undefined) {
         return;
       }
@@ -87,7 +93,8 @@ export class OpenApplicationDocumentService {
       ) {
         return;
       }
-      throw error;
+      // Loading the document is the primary operation. Keep it available if
+      // the best-effort VIEWED acknowledgement fails for another reason.
     }
   }
 
