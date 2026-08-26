@@ -1,6 +1,6 @@
 # PA5 Technology Stack Evidence Handoff to Nguyễn Gia Quốc Uy
 
-*Prepared by: Lưu Chí Hải | Technology Stack edit owner: Nguyễn Gia Quốc Uy | Review: Pending Nguyễn Gia Quốc Uy and Nguyễn Minh Khôi*
+*Prepared by: Lưu Chí Hải | Technology Stack edit owner: Nguyễn Gia Quốc Uy | Review: Nguyễn Gia Quốc Uy and Nguyễn Minh Khôi*
 
 **Date:** 2026-08-26  
 **Task:** HAI-09 — evidence review/handoff only  
