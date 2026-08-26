@@ -9650,10 +9650,6 @@
   margin-right: var(--sh-space-2);
 }
 
-.global-image-search-location .global-image-search-clear {
-  margin-left: var(--sh-space-2);
-}
-
 .job-location-picker {
   position: relative;
   z-index: 3;
@@ -9691,7 +9687,7 @@
   min-width: 0;
 }
 
-.global-image-search-bar .job-location-picker-input[data-selected="true"] {
+.job-location-picker-input[data-selected="true"] {
   color: transparent;
   caret-color: transparent;
 }
@@ -9713,47 +9709,6 @@
   white-space: nowrap;
 }
 
-.job-location-picker-tooltip {
-  position: absolute;
-  top: calc(100% + var(--sh-space-2));
-  left: 0;
-  z-index: 20;
-  width: max-content;
-  max-width: min(22rem, calc(100vw - 2rem));
-  padding: var(--sh-space-2) var(--sh-space-3);
-  border-radius: var(--sh-radius-sm);
-  color: var(--sh-color-text-inverse);
-  background: var(--sh-color-text-primary);
-  box-shadow: var(--sh-shadow-floating);
-  font-size: var(--sh-font-size-caption);
-  line-height: 1.35;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-2px);
-  visibility: hidden;
-  transition:
-    opacity 120ms ease,
-    transform 120ms ease,
-    visibility 120ms ease;
-}
-
-.job-location-picker-tooltip::before {
-  position: absolute;
-  top: -5px;
-  left: var(--sh-space-4);
-  width: 10px;
-  height: 10px;
-  background: inherit;
-  content: "";
-  transform: rotate(45deg);
-}
-
-.job-location-picker:is(:hover, :focus-within) .job-location-picker-tooltip {
-  opacity: 1;
-  transform: translateY(0);
-  visibility: visible;
-}
-
 .job-location-picker-input::placeholder {
   color: var(--sh-color-text-muted);
   opacity: 1;
@@ -9763,15 +9718,40 @@
   appearance: none;
 }
 
+.job-location-picker-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--sh-space-2);
+  margin-left: var(--sh-space-3);
+}
+
+.job-location-picker-clear.global-image-search-clear {
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  border-radius: var(--sh-radius-sm);
+  font-size: 1.125rem;
+}
+
+.job-location-picker-action-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--sh-color-border-subtle);
+}
+
 .job-location-picker-chevron {
   display: grid;
-  width: 16px;
-  height: 16px;
-  flex: 0 0 16px;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
   place-items: center;
   padding: 0;
+  border: 0;
+  border-radius: var(--sh-radius-sm);
   color: var(--sh-color-text-muted);
-  pointer-events: none;
+  background: transparent;
+  cursor: pointer;
   transition:
     color 160ms ease,
     transform 160ms ease;
@@ -9785,6 +9765,16 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.8;
+}
+
+.job-location-picker-chevron:focus-visible {
+  outline: 2px solid var(--sh-color-border-focus);
+  outline-offset: 2px;
+}
+
+.job-location-picker-chevron:hover {
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
 }
 
 .global-image-search-location:has(
@@ -9999,14 +9989,16 @@
 }
 
 .job-location-province-meta {
-  display: flex;
+  display: grid;
+  grid-template-columns: 15px auto minmax(0, 1fr);
   min-width: 0;
   align-items: center;
   gap: 7px;
   margin: 0;
   color: var(--sh-color-text-muted);
   font-size: 11px;
-  line-height: 1.4;
+  line-height: 1.35;
+  white-space: nowrap;
 }
 
 .job-location-province-meta svg {
@@ -10020,9 +10012,16 @@
   stroke-width: 1.7;
 }
 
-.job-location-province-meta strong {
+.job-location-province-count {
   color: var(--sh-color-brand-primary);
+  font-variant-numeric: tabular-nums;
   font-weight: var(--sh-font-weight-semibold);
+}
+
+.job-location-province-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .job-location-district-list {
@@ -12418,6 +12417,10 @@
   border: 0 !important;
   outline: 0 !important;
   box-shadow: none !important;
+}
+
+.job-filter-location-section .job-location-picker-actions {
+  margin-left: var(--sh-space-2);
 }
 
 .job-filter-location-section .job-location-picker-flyout {

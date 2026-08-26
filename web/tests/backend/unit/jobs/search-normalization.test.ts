@@ -4,6 +4,7 @@ import {
   encodeJobCursor,
   normalizedDistrictLocation,
   normalizeSearchText,
+  searchTextTokens,
 } from "@/backend/services/jobs/search-normalization";
 
 describe("Vietnamese job search normalization", () => {
@@ -26,6 +27,11 @@ describe("Vietnamese job search normalization", () => {
     expect(
       normalizedDistrictLocation("ba ria vung tau", "vung tau city center"),
     ).toBe("vung tau city center ba ria vung tau");
+  });
+
+  it("splits normalized free-text into stable search terms", () => {
+    expect(searchTextTokens("  minh   chi ho ")).toEqual(["minh", "chi", "ho"]);
+    expect(searchTextTokens("")).toEqual([]);
   });
 
   it("round-trips a versioned cursor", () => {

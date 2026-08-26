@@ -432,7 +432,9 @@ export function PrivateMatchSetup({
                 autoComplete="off"
               />
               <div
-                className="private-match-picker-results"
+                className={`private-match-picker-results ${
+                  matchingJobs.length > 6 ? "is-scrollable" : ""
+                }`}
                 aria-live="polite"
                 aria-label={setup.matchingJobs}
               >

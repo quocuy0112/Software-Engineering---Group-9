@@ -129,15 +129,16 @@ export const cvCopy = (locale: CvLocale) =>
           ready: "Sẵn sàng tải CV lên.",
           file: "Tệp CV",
           fileGuidance: "PDF, DOC hoặc DOCX, tối đa 5 MB (5.000.000 byte).",
-          chooseParser: "Chọn bộ phân tích cho lần nhập này",
+          chooseParser: "Bộ phân tích cho lần nhập này",
           parserGuidance:
-            "Mỗi CV có thể dùng một bộ phân tích khác nhau. Lựa chọn của bạn được lưu cùng lần nhập này.",
+            "CV sẽ được xử lý bằng OpenAI sau khi quét bảo mật, trích xuất văn bản và bạn cấp quyền.",
           deterministic: "SmartHire nội bộ",
           deterministicHint:
             "Chạy cục bộ mà không gửi văn bản đến nhà cung cấp AI.",
           external: "OpenAI bên ngoài",
           externalHint:
             "Phân tích có hỗ trợ AI sau khi quét, trích xuất và cấp quyền.",
+          required: "Bắt buộc",
           local: "Cục bộ",
           unavailable: "Không khả dụng",
           aiReady: "AI sẵn sàng",
@@ -228,6 +229,44 @@ export const cvCopy = (locale: CvLocale) =>
           guidance:
             "Bạn có thể tự khôi phục mà không cần chờ người khác. Nhập thủ công sẽ giữ lần nhập thất bại trong lịch sử và không tạo bản nháp rỗng.",
         },
+        consentRequiredRecovery: {
+          heading: "Không thể tiếp tục xử lý CV",
+          badge: "Cần đồng ý",
+          description:
+            "Tài liệu này chưa thể tiếp tục được xử lý. Theo Chính sách quyền riêng tư của SmartHire, việc phân tích bằng AI cần có sự đồng ý rõ ràng của bạn trước khi trích xuất dữ kiện nghề nghiệp.",
+          technicalDetails: "Chi tiết kỹ thuật",
+          safeCode: "Mã kết quả an toàn",
+          reason:
+            "OpenAI chưa được gọi và chưa có nội dung CV nào được gửi đến nhà cung cấp.",
+          chooseAction: "Chọn cách khôi phục",
+          fastest: "Nhanh nhất",
+          grantTitle: "Cấp quyền và tiếp tục",
+          grantDescription:
+            "Xác nhận cho phép phân tích AI để xử lý ngay tệp CV hiện tại.",
+          grantAction: "Cấp quyền và tiếp tục",
+          granting: "Đang cấp quyền…",
+          granted: "Đã cấp quyền. Yêu cầu xử lý CV đang tiếp tục.",
+          grantError:
+            "Không thể cấp quyền. Xử lý bên ngoài vẫn đang bị chặn.",
+          sessionExpired:
+            "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại trước khi cấp quyền.",
+          replacementTitle: "Tải CV thay thế",
+          replacementDescription:
+            "Chọn tệp PDF, DOC hoặc DOCX khác để bắt đầu một lần nhập mới.",
+          replacementAction: "Chọn tệp",
+          manualTitle: "Nhập hồ sơ thủ công",
+          manualDescription:
+            "Bỏ qua phân tích tự động và tự cập nhật kỹ năng, kinh nghiệm của bạn.",
+          manualAction: "Nhập thủ công",
+          guidance:
+            "Bạn có thể tự khôi phục mà không cần chờ người khác. Nhập thủ công vẫn giữ lần nhập thất bại trong lịch sử và không tạo bản nháp trống.",
+          delete: "Xóa lần nhập",
+          deleting: "Đang xóa lần nhập…",
+          deleteRequested: "Đã yêu cầu xóa lần nhập.",
+          deleteCancelled: "Đã hủy yêu cầu xóa lần nhập.",
+          deleteError:
+            "Không thể xóa lần nhập. Lần nhập vẫn được giữ trong lịch sử.",
+        },
         retention: {
           heading: "Lưu giữ và xóa dữ liệu",
           expiry: "Thời hạn lần nhập",
@@ -311,15 +350,16 @@ export const cvCopy = (locale: CvLocale) =>
           ready: "Ready to upload a CV.",
           file: "CV file",
           fileGuidance: "PDF, DOC, or DOCX, maximum 5 MB (5,000,000 bytes).",
-          chooseParser: "Choose a parser for this upload",
+          chooseParser: "Parser for this upload",
           parserGuidance:
-            "Each CV can use a different parser. Your choice is saved with this import.",
+            "Every CV is processed by OpenAI after security scanning, text extraction, and your consent.",
           deterministic: "SmartHire deterministic",
           deterministicHint:
             "Runs locally without sending text to an AI provider.",
           external: "External OpenAI",
           externalHint:
             "AI-assisted parsing after scanning, extraction, and consent.",
+          required: "Required",
           local: "Local",
           unavailable: "Unavailable",
           aiReady: "AI ready",
@@ -409,6 +449,44 @@ export const cvCopy = (locale: CvLocale) =>
           retryRemaining: "retries remaining.",
           guidance:
             "You can recover without waiting for another person. Manual entry keeps this failed import in your history and does not create an empty draft.",
+        },
+        consentRequiredRecovery: {
+          heading: "CV processing could not finish",
+          badge: "Consent required",
+          description:
+            "This document could not continue through CV processing. Under SmartHire's Privacy Policy, AI analysis needs your explicit consent before career data can be extracted.",
+          technicalDetails: "Technical details",
+          safeCode: "Safe result code",
+          reason:
+            "OpenAI has not been called and no CV content has been sent to the provider.",
+          chooseAction: "Choose a recovery action",
+          fastest: "Fastest",
+          grantTitle: "Grant consent and retry",
+          grantDescription:
+            "Approve AI analysis so the current CV can continue processing immediately.",
+          grantAction: "Grant and resume",
+          granting: "Granting consent…",
+          granted: "Consent granted. CV processing is continuing.",
+          grantError:
+            "Consent could not be granted. External processing remains blocked.",
+          sessionExpired:
+            "Your session expired. Sign in again before granting consent.",
+          replacementTitle: "Upload replacement CV",
+          replacementDescription:
+            "Select a different PDF, DOC, or DOCX file to start a fresh import.",
+          replacementAction: "Choose file",
+          manualTitle: "Enter profile manually",
+          manualDescription:
+            "Skip automated parsing and fill in your skills and history by hand.",
+          manualAction: "Manual entry",
+          guidance:
+            "You can recover without waiting for another person. Manual entry keeps this failed import in your history and does not create an empty draft.",
+          delete: "Delete import",
+          deleting: "Deleting import…",
+          deleteRequested: "Import deletion requested.",
+          deleteCancelled: "Import deletion cancelled.",
+          deleteError:
+            "The import could not be deleted. It remains available in your history.",
         },
         retention: {
           heading: "Retention and deletion",

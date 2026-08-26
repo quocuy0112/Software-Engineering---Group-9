@@ -729,7 +729,7 @@ export function FilterBar({
           >
             <option value="TITLE">Job title</option>
             <option value="COMPANY">Company</option>
-            <option value="BOTH">Title + company</option>
+            <option value="BOTH">Title, skills + company</option>
           </select>
         </div>
         <label className="job-keyword-field">

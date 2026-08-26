@@ -57,7 +57,7 @@ describe("CV upload and authoritative status UI", () => {
     expect(screen.getByRole("button", { name: /upload cv/i })).toBeEnabled();
   });
 
-  it("shows parser availability without making one parser globally exclusive", () => {
+  it("locks new uploads to the approved external parser", () => {
     render(
       <CvUploadForm
         csrfProof="csrf_fixture"
@@ -65,16 +65,12 @@ describe("CV upload and authoritative status UI", () => {
         parserAvailability={{ deterministic: true, external: true }}
       />,
     );
-    const deterministic = screen.getByRole("radio", {
-      name: /smarthire deterministic/i,
-    });
     const external = screen.getByRole("radio", { name: /external openai/i });
-    expect(deterministic).toBeEnabled();
     expect(external).toBeEnabled();
-    fireEvent.click(external);
     expect(external).toBeChecked();
-    fireEvent.click(deterministic);
-    expect(deterministic).toBeChecked();
+    expect(
+      screen.queryByRole("radio", { name: /smarthire deterministic/i }),
+    ).not.toBeInTheDocument();
   });
 
   it("validates exact type/5 MB, uploads by keyboard, and preserves text progress", async () => {

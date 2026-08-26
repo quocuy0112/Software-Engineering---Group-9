@@ -16,7 +16,7 @@ describe("Feature 005 performance harnesses", () => {
       mode: "SELF_TEST",
       releaseEvidenceEligible: false,
       passed: true,
-      environment: { concurrency: 4, ocrDeadlineMs: 6_000 },
+      environment: { concurrency: 4, ocrDeadlineMs: 10_000 },
       warm: { ocr: { samples: 100 } },
       gates: {
         actionableWithin10s: 1,

@@ -8588,6 +8588,9 @@
   --recruiter-amber-border: #fef3c7;
   --recruiter-blue-soft: #eef4ff;
   --recruiter-blue-border: #dbe6fe;
+  --recruiter-tab-count-bg: #f1f5f9;
+  --recruiter-tab-count-border: #e2e8f0;
+  --recruiter-tab-count-text: #475569;
   --recruiter-success-soft: #e9fbf5;
   --recruiter-success-border: #c9f1e2;
   --recruiter-purple-soft: #faf5ff;
@@ -8641,6 +8644,13 @@
     var(--recruiter-accent) 36%,
     var(--recruiter-border)
   );
+  --recruiter-tab-count-bg: color-mix(
+    in srgb,
+    var(--recruiter-card) 82%,
+    var(--recruiter-muted)
+  );
+  --recruiter-tab-count-border: var(--recruiter-border);
+  --recruiter-tab-count-text: var(--recruiter-muted);
   --recruiter-teal-soft: color-mix(
     in srgb,
     var(--recruiter-teal) 18%,
@@ -8888,9 +8898,25 @@
 }
 
 .recruiter-management .recruiter-tabs button span {
-  border: 1px solid transparent;
-  color: var(--sh-color-text-secondary);
-  background: var(--sh-color-surface-subtle);
+  display: inline-flex;
+  width: 26px;
+  min-width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 26px;
+  box-sizing: border-box;
+  padding: 0;
+  border: 1px solid
+    var(--recruiter-tab-count-border, transparent);
+  color: var(--recruiter-tab-count-text, var(--sh-color-text-secondary));
+  background: var(
+    --recruiter-tab-count-bg,
+    var(--sh-color-surface-subtle)
+  );
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
 }
 
 .recruiter-management .recruiter-tabs button.is-active span {

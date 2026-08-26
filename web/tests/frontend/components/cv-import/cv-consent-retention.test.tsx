@@ -338,6 +338,67 @@ describe("CV external consent and retention controls", () => {
     ).toBeVisible();
   });
 
+  it("uses the focused recovery workspace for a consent-required failure", async () => {
+    const next = externalResource({
+      status: "PARSE_QUEUED",
+      stage: "PARSE",
+      availableActions: ["REVOKE_CONSENT", "DELETE"],
+      consent: notice(true),
+    });
+    const loadStatus = vi.fn(async () => next);
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          uploadId: "upload_consent_status_1234",
+          grantedAt: "2026-08-02T00:00:01.000Z",
+          status: "PARSE_QUEUED",
+        }),
+        { status: 201, headers: { "content-type": "application/json" } },
+      ),
+    );
+    render(
+      <CvImportStatus
+        resource={externalResource({
+          status: "PARSE_FAILED",
+          stage: "PARSE",
+          failure: {
+            code: "CONSENT_REQUIRED",
+            message: "Candidate consent is required before parsing.",
+            retryable: false,
+            suggestedActions: ["MANUAL_PROFILE", "DELETE"],
+          },
+        })}
+        loadStatus={loadStatus}
+        csrfProof="csrf_consent_required"
+      />,
+    );
+
+    expect(
+      screen.getByTestId("cv-consent-required-recovery"),
+    ).toBeVisible();
+    expect(
+      screen.queryByTestId("cv-processing-consent"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /choose file/i }),
+    ).toHaveAttribute("href", "/profile/cv-imports");
+    expect(
+      screen.getByRole("link", { name: /manual entry/i }),
+    ).toHaveAttribute("href", "/profile");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /grant and resume/i }),
+    );
+    await waitFor(() => expect(loadStatus).toHaveBeenCalledOnce());
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/account/cv-imports/upload_consent_status_1234/consent",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ accepted: true, consentChallenge: challenge }),
+      }),
+    );
+  });
+
   it("replaces active status memory with the safe 202 tombstone immediately", async () => {
     localStorage.clear();
     sessionStorage.clear();

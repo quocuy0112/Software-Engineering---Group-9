@@ -2,7 +2,7 @@ type PasswordRequirementChecklistProps = {
   value: string;
 };
 
-/** Mirrors the public registration policy: 12–128 characters. */
+/** Mirrors PasswordPolicy without sending, storing, or exposing a password. */
 export function PasswordRequirementChecklist({
   value,
 }: PasswordRequirementChecklistProps) {
@@ -10,15 +10,20 @@ export function PasswordRequirementChecklist({
   const hasUppercase = /\p{Lu}/u.test(value);
   const hasDigit = /\p{N}/u.test(value);
   const hasSpecialCharacter = /[^\p{L}\p{N}\s]/u.test(value);
+  const hasNoControlCharacters = !Array.from(value).some((character) => {
+    const code = character.codePointAt(0) ?? 0;
+    return code <= 0x1f || code === 0x7f;
+  });
   const requirements = [
-    { label: "No more than 128 characters", met: length <= 128 },
     { label: "At least 12 characters", met: length >= 12 },
+    { label: "No more than 128 characters", met: length <= 128 },
     { label: "1 uppercase letter", met: hasUppercase },
     { label: "1 number", met: hasDigit },
     {
       label: "1 special character",
       met: hasSpecialCharacter,
     },
+    { label: "No control characters", met: hasNoControlCharacters },
   ];
 
   return (

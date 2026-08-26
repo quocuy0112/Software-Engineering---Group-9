@@ -70,6 +70,18 @@ export class PrismaProfileCommandRepository {
           where: { id: profile.id },
           data: mutation.basics,
         });
+      } else if (mutation.section === "about") {
+        await tx.candidateProfile.update({
+          where: { id: profile.id },
+          data: {
+            dateOfBirth: mutation.about.dateOfBirth
+              ? new Date(`${mutation.about.dateOfBirth}T00:00:00.000Z`)
+              : null,
+            preferredName: mutation.about.preferredName,
+            interests: mutation.about.interests,
+            bio: mutation.about.bio,
+          },
+        });
       } else if (mutation.section === "experience") {
         const existing = await tx.profileExperience.findMany({
           where: { profileId: profile.id },

@@ -1292,6 +1292,10 @@ model CandidateProfile {
   summary         String?
   phone           String?
   location        String?
+  dateOfBirth     DateTime? @db.Date
+  preferredName   String?
+  interests       String?
+  bio             String?
   revision        Int                     @default(0)
   createdAt       DateTime                @default(now())
   updatedAt       DateTime                @updatedAt

@@ -6,7 +6,6 @@ import {
   BriefcaseBusiness,
   FileSearch,
   ShieldCheck,
-  SlidersHorizontal,
   UserRound,
 } from "lucide-react";
 import { Badge } from "@/frontend/components/ui/badge";
@@ -124,13 +123,6 @@ export function DashboardView({
             </Badge>
           }
         />
-        <FeatureCard
-          href="/profile/preferences"
-          icon={<SlidersHorizontal />}
-          title={copy.preferencesTitle}
-          description={copy.preferencesCopy}
-          footer={<Badge tone="info">{copy.configured}</Badge>}
-        />
       </section>
 
       <Panel
@@ -195,9 +187,6 @@ function dashboardCopy(locale: "vi" | "en") {
         "Quản lý mật khẩu, xác thực hai lớp và các phiên đăng nhập.",
       protected: "Đã bật 2FA",
       recommended: "Nên bật 2FA",
-      preferencesTitle: "Tuỳ chọn cá nhân",
-      preferencesCopy: "Xem lại múi giờ và tuỳ chọn thông báo bảo mật.",
-      configured: "Đã sẵn sàng",
       nextKicker: "BƯỚC TIẾP THEO",
       nextTitle: "Làm hồ sơ của bạn nổi bật hơn",
       done: "Hoàn tất",
@@ -242,9 +231,6 @@ function dashboardCopy(locale: "vi" | "en") {
       "Control your password, two-factor authentication, and sessions.",
     protected: "2FA enabled",
     recommended: "2FA recommended",
-    preferencesTitle: "Personal preferences",
-    preferencesCopy: "Review your timezone and security notification settings.",
-    configured: "Available",
     nextKicker: "NEXT STEPS",
     nextTitle: "Make your profile stronger",
     done: "Complete",
