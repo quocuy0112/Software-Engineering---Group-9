@@ -6,6 +6,7 @@ import {
   type CompanyCatalogItem,
   type JobCatalogItem,
   type JobPostingStatus,
+  type RecruiterCompanyRole,
 } from "./jobs/catalog";
 import {
   deriveRecruiterClassification,
@@ -97,7 +98,15 @@ export type RecruiterCompanyView = Omit<
 > &
   Partial<
     Pick<CompanyCatalogItem, "memberUserIds" | "taxCode" | "verificationStatus">
-  >;
+  > & {
+    /** Persistent company id used by company-team APIs when the job catalogue id differs. */
+    databaseId?: string;
+    role?: RecruiterCompanyRole;
+    profileComplete?: boolean;
+    missingProfileFields?: Array<
+      "name" | "industry" | "size" | "address" | "logo"
+    >;
+  };
 export type RecruiterJob = JobCatalogItem & {
   company: RecruiterCompanyView;
   review?: RecruiterReviewProjection;

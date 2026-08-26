@@ -7,7 +7,9 @@ import {
 } from "@/backend/security/account-request-boundary";
 import { requireSession } from "@/backend/auth/session/require-session";
 import {
+  deleteRecruiterCompany,
   readRecruiterCompanySettings,
+  RecruiterCompanyDeletionError,
   updateRecruiterCompanySettings,
 } from "@/backend/services/jobs/recruiter-job-posting-data";
 import {
@@ -71,7 +73,9 @@ function normalizedInput(
 export async function GET(request: Request) {
   const current = await requireSession(request.headers);
   if (!current) return response("Authentication required.", 401);
-  const company = await readRecruiterCompanySettings(current.userId);
+  const companyId =
+    new URL(request.url).searchParams.get("companyId") ?? undefined;
+  const company = await readRecruiterCompanySettings(current.userId, companyId);
   if (!company) return response("Recruiter company not found.", 404);
   return NextResponse.json(company satisfies RecruiterCompanySettings, {
     headers: noStore,
@@ -81,12 +85,15 @@ export async function GET(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const current = await requireAccountRequest(request, { mutation: true });
+    const companyId =
+      new URL(request.url).searchParams.get("companyId") ?? undefined;
     const input = recruiterCompanySettingsInputSchema.parse(
       normalizeOptionalEmptyValues(await request.json()),
     );
     const company = await updateRecruiterCompanySettings(
       current.userId,
       normalizedInput(input),
+      companyId,
     );
     return NextResponse.json(company, { headers: noStore });
   } catch (error) {
@@ -114,5 +121,30 @@ export async function PATCH(request: Request) {
       });
     }
     return response("Unable to save company settings.", 400);
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const current = await requireAccountRequest(request, { mutation: true });
+    const companyId = new URL(request.url).searchParams.get("companyId") ?? "";
+    return NextResponse.json(
+      await deleteRecruiterCompany(current.userId, companyId),
+      { headers: noStore },
+    );
+  } catch (error) {
+    if (error instanceof AccountRequestError)
+      return accountErrorResponse(error);
+    if (error instanceof RecruiterCompanyDeletionError) {
+      if (error.code === "OWNER_REQUIRED")
+        return response("Only the company owner can delete this company.", 403);
+      return response("Recruiter company not found.", 404);
+    }
+    if (error instanceof Error && error.message === "CATALOGUE_WRITER_REQUIRED")
+      return response(
+        "Company data is temporarily locked for maintenance. Try again shortly.",
+        503,
+      );
+    return response("Unable to delete company.", 400);
   }
 }

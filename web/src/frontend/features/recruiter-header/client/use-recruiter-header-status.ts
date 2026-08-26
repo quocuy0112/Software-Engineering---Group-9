@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   parseRecruiterHeaderStatus,
+  RECRUITER_AUTHORITY_CHANGED_EVENT,
   type RecruiterHeaderStatus,
 } from "@/shared/contracts/recruiter-header-status";
 
@@ -60,16 +61,25 @@ export function useRecruiterHeaderStatus(
       if (document.visibilityState === "visible") void refresh();
     };
     const onFocus = () => void refresh();
+    const onAuthorityChanged = () => void refresh();
     const interval = window.setInterval(
       () => void refresh(),
       REFRESH_INTERVAL_MS,
     );
     document.addEventListener("visibilitychange", onVisible);
     window.addEventListener("focus", onFocus);
+    window.addEventListener(
+      RECRUITER_AUTHORITY_CHANGED_EVENT,
+      onAuthorityChanged,
+    );
     return () => {
       window.clearInterval(interval);
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("focus", onFocus);
+      window.removeEventListener(
+        RECRUITER_AUTHORITY_CHANGED_EVENT,
+        onAuthorityChanged,
+      );
       sequenceRef.current += 1;
       requestRef.current?.abort();
       requestRef.current = null;

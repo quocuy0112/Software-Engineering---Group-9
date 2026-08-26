@@ -12,10 +12,7 @@ export default async function RecruiterJobAnalyticsPage({
 }) {
   const context = await getWorkspaceContext();
   if (!context) {
-    redirect(
-      "/login?returnTo=" +
-        encodeURIComponent("/recruiter/analytics"),
-    );
+    redirect("/login?returnTo=" + encodeURIComponent("/recruiter/analytics"));
   }
 
   const data = await readRecruiterJobManagementData(context.userId);
@@ -32,6 +29,7 @@ export default async function RecruiterJobAnalyticsPage({
   return (
     <RecruiterAnalyticsOverview
       jobs={data.jobs}
+      companies={data.companies}
       initialJobId={job.id}
     />
   );

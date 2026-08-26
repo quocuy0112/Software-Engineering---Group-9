@@ -56,6 +56,7 @@ export const authenticationAuditAction = z.enum([
   "job_posting.capacity_changed",
   "job_posting.created",
   "job_posting.deleted",
+  "company.deleted",
   "analytics.export.requested",
   "analytics.export.succeeded",
   "analytics.export.failed",

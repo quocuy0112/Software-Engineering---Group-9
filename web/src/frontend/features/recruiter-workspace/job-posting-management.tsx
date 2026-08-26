@@ -28,6 +28,11 @@ import {
   recruiterRoutes,
   type RecruiterJobPostingTab,
 } from "@/shared/routing/recruiter-routes";
+import { RecruiterCompanyFilter } from "./recruiter-company-filter";
+import {
+  companyMatchesScope,
+  useRecruiterCompanyScope,
+} from "./recruiter-company-scope";
 
 const tabs: Array<{
   value: RecruiterJobPostingTab;
@@ -843,12 +848,39 @@ export function RecruiterJobPostingManagement({
   }, [initialData]);
 
   const current = data ?? emptyData;
-  const companyReady = Boolean(current.companyId && current.companies.length);
+  const { companyId, selectedCompanyId, setCompanyId } =
+    useRecruiterCompanyScope(current.companies);
+  const scopedJobs = useMemo(
+    () =>
+      current.jobs.filter((job) =>
+        companyMatchesScope(job.companyId, selectedCompanyId),
+      ),
+    [current.jobs, selectedCompanyId],
+  );
+  const selectedCompany =
+    (selectedCompanyId
+      ? current.companies.find((company) => company.id === selectedCompanyId)
+      : current.companies.find(
+          (company) => company.id === current.companyId,
+        )) ?? current.companies[0];
+  // In the aggregate view, use a complete company as the default create
+  // context so one unfinished profile does not hide another company's
+  // existing postings or block its create flow.
+  const targetCompany = selectedCompanyId
+    ? selectedCompany
+    : (current.companies.find((company) => company.profileComplete !== false) ??
+      selectedCompany);
+  const targetCompanyId = targetCompany?.id ?? current.companyId;
+  const companyReady = Boolean(targetCompanyId && current.companies.length);
+  const selectedCompanyProfileComplete =
+    targetCompany?.profileComplete ?? current.companyProfileComplete;
+  const selectedCompanyMissingFields =
+    targetCompany?.missingProfileFields ?? current.missingCompanyProfileFields;
   const departments = useMemo(
     () =>
       Array.from(
         new Set(
-          current.jobs
+          scopedJobs
             .map(
               (job) =>
                 job.description.generalInfo.department || job.categoryFamily,
@@ -856,24 +888,24 @@ export function RecruiterJobPostingManagement({
             .filter(Boolean),
         ),
       ).sort(),
-    [current.jobs],
+    [scopedJobs],
   );
   const counts = useMemo(
     () => ({
-      active: current.jobs.filter((job) => job.status === "active").length,
-      applicants: current.jobs.reduce(
+      active: scopedJobs.filter((job) => job.status === "active").length,
+      applicants: scopedJobs.reduce(
         (sum, job) => sum + job.stats.applicantCount,
         0,
       ),
-      pending: current.jobs.filter((job) => job.status === "pending_approval")
+      pending: scopedJobs.filter((job) => job.status === "pending_approval")
         .length,
-      closing: current.jobs.filter(isClosingSoon).length,
+      closing: scopedJobs.filter(isClosingSoon).length,
     }),
-    [current.jobs],
+    [scopedJobs],
   );
   const filteredJobs = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return current.jobs
+    return scopedJobs
       .filter((job) => statusForTab(job, activeTab))
       .filter(
         (job) =>
@@ -897,28 +929,30 @@ export function RecruiterJobPostingManagement({
             .includes(query),
       )
       .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
-  }, [activeTab, current.jobs, department, search]);
+  }, [activeTab, department, scopedJobs, search]);
   const subIndustrySuggestions = useMemo(
     () => collectRecruiterSubIndustrySuggestions(current.jobs),
     [current.jobs],
   );
 
   const openCreate = () => {
-    if (current.companyProfileComplete === false) {
+    if (selectedCompanyProfileComplete === false) {
       if (onNavigate) {
-        onNavigate("/recruiter/company-settings?required=profile");
+        onNavigate(
+          `/recruiter/company-settings?required=profile&companyId=${encodeURIComponent(targetCompanyId ?? "")}`,
+        );
       }
       return;
     }
-    if (!current.companyId) {
+    if (!targetCompanyId) {
       return;
     }
     if (onNavigate) {
-      onNavigate(recruiterRoutes.jobPostingCreate);
+      onNavigate(recruiterRoutes.jobPostingCreateForCompany(targetCompanyId));
       return;
     }
     setEditorJob(
-      withCompany(createEmptyJobPosting(current.companyId), current.companies),
+      withCompany(createEmptyJobPosting(targetCompanyId), current.companies),
     );
     setView("editor");
   };
@@ -1161,7 +1195,7 @@ export function RecruiterJobPostingManagement({
     return (
       <JobPostingEditor
         initialJob={editorJob}
-        companyName={current.companies[0]?.name ?? "Your company"}
+        companyName={targetCompany?.name ?? "Your company"}
         autoSavePreferenceScope={
           current.recruiterUserId ?? current.companyId ?? undefined
         }
@@ -1181,7 +1215,7 @@ export function RecruiterJobPostingManagement({
       />
     );
 
-  if (!loading && current.companyProfileComplete === false) {
+  if (!loading && selectedCompanyProfileComplete === false) {
     return (
       <div className="recruiter-management">
         <PageHeader
@@ -1200,9 +1234,19 @@ export function RecruiterJobPostingManagement({
             </button>
           }
         />
+        {current.companies.length > 1 ? (
+          <div className="recruiter-filter-panel recruiter-surface-card recruiter-profile-scope-filter recruiter-filter-panel--with-company">
+            <RecruiterCompanyFilter
+              companies={current.companies}
+              value={companyId}
+              onChange={setCompanyId}
+              id="recruiter-job-postings-company-required"
+            />
+          </div>
+        ) : null}
         <CompanyProfileRequiredState
           missingFields={
-            current.missingCompanyProfileFields ?? [
+            selectedCompanyMissingFields ?? [
               "name",
               "industry",
               "size",
@@ -1315,14 +1359,16 @@ export function RecruiterJobPostingManagement({
               {tab.label}
               <span>
                 {
-                  current.jobs.filter((job) => statusForTab(job, tab.value))
+                  scopedJobs.filter((job) => statusForTab(job, tab.value))
                     .length
                 }
               </span>
             </button>
           ))}
         </nav>
-        <div className="recruiter-filter-panel recruiter-surface-card">
+        <div
+          className={`recruiter-filter-panel recruiter-surface-card${current.companies.length > 1 ? "recruiter-filter-panel--with-company" : ""}`}
+        >
           <label htmlFor="recruiter-job-postings-search">
             <span>Search postings</span>
             <div className="recruiter-input-with-icon">
@@ -1355,6 +1401,12 @@ export function RecruiterJobPostingManagement({
               <Icon name="chevron-down" />
             </div>
           </label>
+          <RecruiterCompanyFilter
+            companies={current.companies}
+            value={companyId}
+            onChange={setCompanyId}
+            id="recruiter-job-postings-company"
+          />
         </div>
         <div
           id="recruiter-job-postings-panel"
@@ -1403,7 +1455,7 @@ export function RecruiterJobPostingManagement({
             </div>
           ) : (
             <EmptyState
-              hasAnyJobs={current.jobs.length > 0}
+              hasAnyJobs={scopedJobs.length > 0}
               tab={activeTab}
               onCreate={openCreate}
             />

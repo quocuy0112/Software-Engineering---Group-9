@@ -102,6 +102,7 @@ describe("recruiter job posting management", () => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
     window.localStorage.clear();
+    window.sessionStorage.clear();
   });
 
   it("uses the stable job id when opening candidates from a routed workspace", () => {
@@ -153,6 +154,55 @@ describe("recruiter job posting management", () => {
     expect(within(autoSaveSwitch).getByText("Off")).toBeVisible();
     expect(screen.queryByText("Drafts are saved manually")).toBeNull();
     expect(screen.queryByRole("button", { name: "Save draft" })).toBeNull();
+  });
+
+  it("scopes postings and the create route to the selected company", () => {
+    const secondCompany = {
+      ...initialData.companies[0],
+      id: "company-2",
+      slug: "northstar-analytics",
+      name: "Northstar Analytics",
+    };
+    const secondJob = {
+      ...initialData.jobs[0],
+      id: "job-2",
+      slug: "backend-engineer-job-2",
+      companyId: secondCompany.id,
+      title: "Backend Engineer",
+      company: secondCompany,
+    };
+    const onNavigate = vi.fn();
+
+    render(
+      <RecruiterJobPostingManagement
+        initialData={{
+          ...initialData,
+          companies: [initialData.companies[0], secondCompany],
+          jobs: [initialData.jobs[0], secondJob],
+        }}
+        onNavigate={onNavigate}
+      />,
+    );
+
+    const companyFilter = screen.getByLabelText("Company");
+    expect(companyFilter).toHaveValue("all");
+    expect(screen.getByText("Senior Product Designer")).toBeVisible();
+    expect(screen.getByText("Backend Engineer")).toBeVisible();
+
+    fireEvent.change(companyFilter, { target: { value: "company-2" } });
+
+    expect(screen.queryByText("Senior Product Designer")).toBeNull();
+    expect(screen.getByText("Backend Engineer")).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
+    expect(onNavigate).toHaveBeenCalledWith(
+      "/recruiter/job-postings/create?companyId=company-2",
+    );
+  });
+
+  it("hides the company filter when only one company is available", () => {
+    render(<RecruiterJobPostingManagement initialData={initialData} />);
+
+    expect(screen.queryByLabelText("Company")).not.toBeInTheDocument();
   });
 
   it("automatically reflects an administrator approval without a page refresh", async () => {
