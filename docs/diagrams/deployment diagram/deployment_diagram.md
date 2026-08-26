@@ -1,13 +1,18 @@
 # C4 Deployment Diagram — SmartHire
 
-**Author:** Nguyễn Minh Khôi<br>
-**Student ID:** 24127066<br>
-**Reviewer:** Nguyễn Gia Quốc Uy<br>
-**Editor:** Nguyễn Minh Khôi
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*  
+**Version:** V1.4 (2026-08-26) — PA5 Final Document Synchronization Baseline
 
-**Architecture scope:** Runtime deployment of the currently implemented SmartHire baseline.
+### Revision History
 
-This deployment view maps every Level 2 container to a separate logical node, as required for a system that currently runs on one local developer machine. A logical node represents an independently running process, Docker Compose service, or private data store; it does not imply a separate physical computer.
+| Version | Date | Author/Editor | Summary | Status |
+|---|---|---|---|---|
+| 1.3 | 2026-08-06 | Nguyễn Minh Khôi | Deployment topology for PA4 baseline. | Baseline |
+| 1.4 | 2026-08-26 | Nguyễn Minh Khôi | Reconciled deployment topology: clarified logical nodes vs Docker containers/host processes, resolved Docker Compose claim (individual Dockerfiles available, root compose unverified), added Analytics Export and Google Drive Backup flows, and updated attribution for PA5. | Approved |
+
+**Architecture scope:** Runtime deployment topology of the implemented SmartHire 26-feature baseline.
+
+**Deployment Qualification & Container Reality:** This deployment diagram maps every Level 2 container to a logical runtime node on the developer workstation / demo host. The repository provides dedicated Dockerfiles (`Dockerfile.admin-worker`, `Dockerfile.image-search-worker`, `Dockerfile.ocr-engine`, `web/Dockerfile.cv-worker`) and worker execution scripts (`web/scripts/run-*.mjs`). While individual services are containerized or run as Node.js host processes, no root `compose.yaml` is checked into the repository; each node represents an independently running container or background process communicating over loopback ports, private Unix domain sockets, or internal file paths.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 45, "rankSpacing": 70, "diagramPadding": 20}}}%%
@@ -16,132 +21,142 @@ flowchart TD
     classDef datastore fill:#f8fafc,stroke:#475569,stroke-width:1.2px,color:#0f172a;
     classDef external fill:#fff7e6,stroke:#8a5a00,stroke-width:1px,color:#000000,stroke-dasharray: 4 3;
 
-    subgraph BrowserNode["Browser Device\n[Logical node — web client]"]
-        Browser["Browser\nAccesses localhost:3001"]
+    subgraph BrowserNode["Browser Device\n[Logical web client node]"]
+        Browser["User Web Browser\nAccesses http://localhost:3001"]
     end
 
-    subgraph Host["Developer Machine\n[Physical node — Windows / macOS / Linux]"]
+    subgraph Host["Developer Machine / Demo Host\n[Physical node — Windows / Linux / macOS]"]
         direction TB
 
-        subgraph WebNode["Web Application Node\n[Logical node — Node.js 24 host process]"]
-            Web["Next.js Web Application\nNext.js 16, React 19, TypeScript\nSSR/RSC and Route Handlers"]
+        subgraph WebNode["Web Application Node\n[Host Process / Container — Node.js 24]"]
+            Web["Next.js Web Application\nNext.js 16.3, React 19, TypeScript\nSSR/RSC, API Routes & Socket.IO (/chat)"]
         end
 
-        subgraph EmailNode["Email Worker Node\n[Logical node — Node.js 24 host process]"]
+        subgraph EmailNode["Email Worker Node\n[Host Process — Node.js 24]"]
             EmailWorker["Email Worker\nClaims EmailOutbox, sends with retry"]
         end
 
-        subgraph DatabaseNode["PostgreSQL Node\n[Logical node — Docker Compose service: postgres]"]
-            DB["PostgreSQL 16.12\nHost loopback port 55432"]
+        subgraph DatabaseNode["PostgreSQL Node\n[Container / Process — PostgreSQL 16]"]
+            DB["PostgreSQL 16\nHost loopback port 5432 / 55432"]
         end
 
-        subgraph ScannerNode["Malware Scanner Node\n[Logical node — Docker Compose service: clamav]"]
-            ClamAV["ClamAV 1.4\nClamD over private Unix socket"]
+        subgraph ScannerNode["Malware Scanner Node\n[Container — ClamAV 1.4]"]
+            ClamAV["ClamAV 1.4 Daemon\nClamD over private Unix domain socket"]
         end
 
-        subgraph CVWorkerNode["CV Worker Node\n[Logical node — Docker Compose service: cv-worker]"]
-            CVWorker["CV Worker\nScan, extract, OCR, parse, cleanup"]
+        subgraph CVWorkerNode["CV Worker Node\n[Container — Dockerfile.cv-worker]"]
+            CVWorker["CV Worker Process\nScan, extract, OCR, parse, cleanup"]
         end
 
-        subgraph ImageWorkerNode["Image Search Worker Node\n[Logical node — Docker Compose service: image-search-worker]"]
-            ImageWorker["Image Search Worker\nScan, normalize, OCR, interpret, cleanup"]
+        subgraph ImageWorkerNode["Image Search Worker Node\n[Container — Dockerfile.image-search-worker]"]
+            ImageWorker["Image Search Worker Process\nScan, normalize, OCR, interpret, cleanup"]
         end
 
-        subgraph AdminWorkerNode["Admin Worker Node\n[Logical node — Docker Compose service: admin-worker]"]
-            AdminWorker["Admin Worker\nDashboard snapshot, verification,\nmoderation, notifications, support,\nconnections, job-post lifecycle"]
+        subgraph AdminWorkerNode["Admin Worker Node\n[Container — Dockerfile.admin-worker]"]
+            AdminWorker["Admin Worker Process\nSnapshots, verification safety, notifications,\nretention, support, connection expiry"]
         end
 
-        subgraph OCRNode["OCR Engine Node\n[Logical node — Docker Compose service: ocr-engine]"]
-            OCR["OCR Engine\nPython 3.12, FastAPI, PaddleOCR, ONNX Runtime\nNo network interface; read-only root"]
+        subgraph ExportWorkerNode["Export Worker Node\n[Host Process / Worker — Node.js 24]"]
+            ExportWorker["Analytics Export Worker\nClaims ExportRequest, generates Excel/CSV"]
         end
 
-        subgraph MailStoreNode["Mail Capture Node\n[Logical data-store node — gitignored host directory]"]
+        subgraph BackupRunnerNode["Admin Backup Node\n[Host Process / CLI — pg_dump]"]
+            BackupRunner["Admin Backup Runner\nAES-256-GCM encrypted dumps, Drive sync"]
+        end
+
+        subgraph OCRNode["OCR Engine Node\n[Container — Dockerfile.ocr-engine]"]
+            OCR["OCR Engine\nPython 3.12, FastAPI, PaddleOCR\nPrivate Unix socket; read-only root"]
+        end
+
+        subgraph StorageNodes["Local Logical Storage Stores\n[Local Filesystem Paths]"]
+            direction LR
             MailCapture["Local Mail Capture\nweb/.local/mail"]
-        end
-
-        subgraph CVStoreNode["CV Artifact Storage Node\n[Logical data-store node — gitignored host directory]"]
-            CVStorage["Local CV Artifact Store\nweb/.local/cv-storage\nApplication-encrypted filesystem"]
-        end
-
-        subgraph SearchStoreNode["Search Artifact Storage Node\n[Logical data-store node — gitignored host directory]"]
-            SearchStorage["Local Search Artifact Store\nweb/.local/image-search-storage\nAES-256-GCM filesystem"]
-        end
-
-        subgraph AdminEvidenceNode["Admin Evidence Storage Node\n[Logical data-store node — gitignored host directory]"]
-            AdminEvidence["Local Admin Evidence Store\nweb/.private-admin-evidence\nAES-256-GCM filesystem"]
+            CVStorage["Local CV Artifact Store\nweb/.local/cv-storage\nAES-256 encrypted"]
+            SearchStorage["Local Search Artifact Store\nweb/.local/image-search-storage\nAES-256-GCM ephemeral"]
+            AdminEvidence["Local Admin Evidence Store\nweb/.private-admin-evidence\nAES-256-GCM encrypted"]
+            ExportStore["Local Export Store\nweb/.local/exports\nExcel/CSV files"]
+            BackupStore["Local Backup Store\nweb/.local/backups\nAES-256-GCM encrypted dumps"]
         end
     end
 
-    subgraph ExternalServices["External service nodes"]
-        MailProvider["Email Provider\nSMTP or Resend — optional"]
-        AIProvider["OpenAI Responses API\nOptional and consent-gated"]
-        ClamAVUpdates["ClamAV Definition Service\nSignature source for freshclam"]
-        BusinessRegistry["VietQR Business Registry\nOptional — business verification lookup"]
+    subgraph ExternalServices["External Service Nodes (Optional / Qualified)"]
+        MailProvider["Email Provider\nSMTP / Resend (Optional)"]
+        AIProvider["OpenAI Responses API\n(Optional, consent-gated)"]
+        ClamAVUpdates["ClamAV Definition Service\n(Signature source via freshclam)"]
+        BusinessRegistry["VietQR Business Registry\n(Optional business lookup)"]
+        GoogleDrive["Google Drive Storage\n(Optional OAuth2 backup)"]
     end
 
-    Browser -->|"HTTP on localhost:3001"| Web
+    Browser -->|"HTTP & ws/wss on localhost:3001"| Web
 
-    Web -->|"PostgreSQL wire protocol\nusing Prisma client"| DB
+    Web -->|"PostgreSQL wire protocol via Prisma"| DB
     Web -->|"Filesystem API"| CVStorage
     Web -->|"Filesystem API"| SearchStorage
+    Web -->|"Filesystem API"| AdminEvidence
+    Web -->|"Filesystem API (stream download)"| ExportStore
 
-    EmailWorker -->|"PostgreSQL wire protocol\nusing Prisma client"| DB
+    EmailWorker -->|"PostgreSQL wire protocol"| DB
     EmailWorker -->|"Filesystem API"| MailCapture
-    EmailWorker -.->|"SMTP or HTTPS\nwhen non-capture adapter is configured"| MailProvider
+    EmailWorker -.->|"SMTP / HTTPS when configured"| MailProvider
 
-    CVWorker -->|"PostgreSQL wire protocol\nusing Prisma client"| DB
+    CVWorker -->|"PostgreSQL wire protocol"| DB
     CVWorker -->|"Filesystem API"| CVStorage
-    CVWorker -->|"ClamD protocol over Unix socket"| ClamAV
+    CVWorker -->|"ClamD over Unix socket"| ClamAV
     CVWorker -->|"HTTP over private Unix socket"| OCR
-    CVWorker -.->|"HTTPS when configuration,\nprivacy gate, and consent allow"| AIProvider
+    CVWorker -.->|"HTTPS when consented"| AIProvider
 
-    ImageWorker -->|"PostgreSQL wire protocol\nusing Prisma client"| DB
+    ImageWorker -->|"PostgreSQL wire protocol"| DB
     ImageWorker -->|"Filesystem API"| SearchStorage
-    ImageWorker -->|"ClamD protocol over Unix socket"| ClamAV
+    ImageWorker -->|"ClamD over Unix socket"| ClamAV
     ImageWorker -->|"HTTP over private Unix socket"| OCR
-    ImageWorker -.->|"HTTPS when configuration,\nprivacy gate, and consent allow"| AIProvider
+    ImageWorker -.->|"HTTPS when consented"| AIProvider
 
-    ClamAV -->|"HTTPS via freshclam"| ClamAVUpdates
-
-    AdminWorker -->|"PostgreSQL wire protocol\nusing Prisma client"| DB
-    AdminWorker -->|"ClamD protocol over Unix socket"| ClamAV
+    AdminWorker -->|"PostgreSQL wire protocol"| DB
+    AdminWorker -->|"ClamD over Unix socket"| ClamAV
     AdminWorker -->|"Filesystem API"| AdminEvidence
 
-    Web -.->|"HTTPS when business registry\nprovider is enabled"| BusinessRegistry
+    ExportWorker -->|"PostgreSQL wire protocol"| DB
+    ExportWorker -->|"Filesystem API"| ExportStore
 
-    class Web,EmailWorker,CVWorker,ImageWorker,AdminWorker,OCR,ClamAV service;
-    class DB,MailCapture,CVStorage,SearchStorage,AdminEvidence datastore;
-    class MailProvider,AIProvider,ClamAVUpdates,BusinessRegistry external;
+    BackupRunner -->|"PostgreSQL wire protocol / pg_dump"| DB
+    BackupRunner -->|"Filesystem API"| BackupStore
+    BackupRunner -.->|"HTTPS / OAuth2 upload"| GoogleDrive
+
+    ClamAV -->|"HTTPS via freshclam"| ClamAVUpdates
+    Web -.->|"HTTPS lookup"| BusinessRegistry
+
+    class Web,EmailWorker,CVWorker,ImageWorker,AdminWorker,ExportWorker,BackupRunner,OCR,ClamAV service;
+    class DB,MailCapture,CVStorage,SearchStorage,AdminEvidence,ExportStore,BackupStore datastore;
+    class MailProvider,AIProvider,ClamAVUpdates,BusinessRegistry,GoogleDrive external;
 ```
 
 ## Logical Node Descriptions
 
-| Logical node                   | Infrastructure / runtime                                                               | Deployed container or component | Communication with other nodes                                                                                                                 |
-| ------------------------------ | -------------------------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Browser Device                 | Browser on the developer machine or another local client                               | SmartHire web client            | Calls Web Application Node using HTTP on `localhost:3001` in the current local deployment.                                                     |
-| Web Application Node           | Node.js 24 host process                                                                | Next.js Web Application         | HTTP from browser; PostgreSQL wire protocol through Prisma; Filesystem API to private artifact stores.                                         |
-| Email Worker Node              | Node.js 24 host process                                                                | Email Worker                    | PostgreSQL wire protocol through Prisma; Filesystem API to Local Mail Capture; optional SMTP/HTTPS to an Email Provider.                       |
-| PostgreSQL Node                | Docker Compose Linux container                                                         | PostgreSQL 16.12                | PostgreSQL wire protocol; port `55432` is exposed only on host loopback for local processes.                                                   |
-| Malware Scanner Node           | Docker Compose Linux container                                                         | ClamAV 1.4 daemon               | ClamD protocol over a private Unix socket from CV/Image workers; HTTPS via `freshclam` for signature updates.                                  |
-| CV Worker Node                 | Docker Compose Linux container                                                         | CV Worker                       | PostgreSQL wire protocol, Filesystem API, ClamD protocol over Unix socket, HTTP over private Unix socket to OCR, and optional HTTPS to OpenAI. |
-| Image Search Worker Node       | Docker Compose Linux container                                                         | Image Search Worker             | PostgreSQL wire protocol, Filesystem API, ClamD protocol over Unix socket, HTTP over private Unix socket to OCR, and optional HTTPS to OpenAI. |
-| Admin Worker Node              | Docker Compose Linux container (read-only root, no new privileges)                     | Admin Worker                    | PostgreSQL wire protocol, Filesystem API to the admin evidence store, and ClamD protocol over a private Unix socket for evidence safety scanning. |
-| OCR Engine Node                | Docker Compose Linux container with no network interface and read-only root filesystem | OCR Engine                      | Receives HTTP over a shared private Unix socket from CV/Image workers; makes no external network calls.                                        |
-| Mail Capture Node              | Gitignored host directory                                                              | Local Mail Capture              | Filesystem API from Email Worker when `EMAIL_ADAPTER=capture`.                                                                                 |
-| CV Artifact Storage Node       | Gitignored host directory / bind mount                                                 | Local CV Artifact Store         | Filesystem API from Web Application and CV Worker.                                                                                             |
-| Search Artifact Storage Node   | Gitignored host directory / bind mount                                                 | Local Search Artifact Store     | Filesystem API from Web Application and Image Search Worker.                                                                                   |
-| Admin Evidence Storage Node    | Gitignored host directory / bind mount                                                 | Local Admin Evidence Store      | Filesystem API from Admin Worker; defaults to `web/.private-admin-evidence` (AES-256-GCM) when the storage adapter is `filesystem`.             |
-| Email Provider Node            | External SMTP or Resend service                                                        | External email delivery service | SMTP or HTTPS from Email Worker only when a non-capture adapter is configured.                                                                 |
-| OpenAI Node                    | External OpenAI Responses API                                                          | Optional AI provider            | HTTPS from CV/Image workers only when feature configuration, privacy gate, and user consent allow.                                             |
-| VietQR Business Registry Node  | External VietQR business registry API                                                  | Optional business lookup        | HTTPS from Web Application only when the business verification registry provider is enabled.                                                   |
-| ClamAV Definition Service Node | External signature distribution service                                                | Virus definition source         | HTTPS from Malware Scanner through `freshclam`.                                                                                                |
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
+
+| Logical node | Infrastructure / runtime | Deployed container or component | Communication with other nodes |
+|---|---|---|---|
+| Browser Device | Web browser on client / developer machine | SmartHire Web Client | Calls Web Application Node using HTTP and WebSocket (`ws/wss`) on `localhost:3001`. |
+| Web Application Node | Node.js 24 host process / container | Next.js Web Application | Inbound HTTP/WebSocket from browser; PostgreSQL wire protocol via Prisma to PostgreSQL Node; Filesystem API to local artifact stores. |
+| Email Worker Node | Node.js 24 host process (`run-email-worker.mjs`) | Email Worker | Claims outbox rows via PostgreSQL wire protocol; writes to Local Mail Capture (when `EMAIL_ADAPTER=capture`) or calls external Email Provider via SMTP/HTTPS. |
+| PostgreSQL Node | Linux container / local process | PostgreSQL 16 | Receives PostgreSQL wire protocol connections from Web Application and all workers on loopback port 5432/55432. |
+| Malware Scanner Node | Linux container / local daemon | ClamAV 1.4 daemon | Listens for ClamD protocol over a private Unix domain socket; fetches virus definitions over HTTPS via `freshclam`. |
+| CV Worker Node | Linux container (`Dockerfile.cv-worker`) / process | CV Worker | PostgreSQL wire protocol, Filesystem API to CV store, ClamD over Unix socket to Malware Scanner, HTTP over Unix socket to OCR Engine, optional HTTPS to OpenAI. |
+| Image Search Worker Node | Linux container (`Dockerfile.image-search-worker`) / process | Image Search Worker | PostgreSQL wire protocol, Filesystem API to search store, ClamD over Unix socket, HTTP over Unix socket to OCR Engine, optional HTTPS to OpenAI. |
+| Admin Worker Node | Linux container (`Dockerfile.admin-worker`) / process | Admin Worker | PostgreSQL wire protocol, Filesystem API to admin evidence store, ClamD over Unix socket for evidence safety scanning. |
+| Export Worker Node | Node.js 24 host process (`run-recruitment-export-worker.mjs`) | Analytics Export Worker | Claims `ExportRequest` jobs from PostgreSQL; generates Excel/CSV files and writes to Local Export Store. |
+| Admin Backup Node | Node.js 24 runner / PostgreSQL CLI | Admin Backup Runner | Executes `pg_dump`, encrypts output with AES-256-GCM, writes to Local Backup Store, and optionally uploads to Google Drive via OAuth2; **no in-app restore UI**. |
+| OCR Engine Node | Linux container (`Dockerfile.ocr-engine`) with read-only root | OCR Engine (FastAPI + PaddleOCR) | Receives HTTP over a private Unix domain socket from CV/Image workers; makes no external network calls. |
+| Local Storage Nodes | Local filesystem paths on host machine | Local Artifact Stores | Filesystem API for secure storage of emails (`.local/mail`), encrypted CVs (`.local/cv-storage`), ephemeral search images (`.local/image-search-storage`), verification evidence (`.private-admin-evidence`), exports (`.local/exports`), and encrypted backup dumps (`.local/backups`). |
+| External Service Nodes | External cloud / SaaS APIs | External Providers (Optional) | SMTP/Resend for email, OpenAI Responses API for advisory parsing, VietQR for tax lookup, Google Drive for encrypted backup storage. |
 
 ## Deployment Description
 
-All logical nodes currently run on, or are accessed from, one developer machine. The Next.js Web Application and Email Worker run as separate Node.js host processes. PostgreSQL, ClamAV, CV Worker, Image Search Worker, Admin Worker, and OCR Engine run as separate Docker Compose services. This diagram deliberately represents each Level 2 container as its own logical deployment node even though the nodes share one physical host.
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
-The default artifact deployment uses private local filesystem stores: `web/.local/mail`, `web/.local/cv-storage`, `web/.local/image-search-storage`, and `web/.private-admin-evidence`. AWS S3/KMS/IAM adapters are implemented but no bucket, KMS key, IAM role, or infrastructure-as-code deployment is provisioned in this repository, so AWS is not shown as an active deployment node.
+All logical deployment nodes currently run on, or are accessed from, a single developer machine in the local development and demonstration environment.
 
-External email delivery and OpenAI are optional. The local default captures email to the filesystem and uses deterministic CV parsing. ClamAV definition updates are required for an operational malware scanner and use HTTPS through `freshclam`. The VietQR business registry lookup is optional and enabled only when the business verification provider is configured.
-
-Container names match the Level 2 diagram so each container can be traced directly from Container Diagram to Deployment Diagram.
+1. **Process & Container Reality:** The Next.js Web Application, Email Worker, Analytics Export Worker, and Admin Backup Runner run as Node.js host processes via scripts or custom servers. Dedicated Dockerfiles are provided for the CV Worker (`web/Dockerfile.cv-worker`), Image Search Worker (`Dockerfile.image-search-worker`), Admin Worker (`Dockerfile.admin-worker`), and OCR Engine (`Dockerfile.ocr-engine`). While these services can be built into individual Docker containers, no root `compose.yaml` manifest is checked into the repository; each node represents an independently running container or background process communicating over loopback ports, private Unix domain sockets, or internal file paths.
+2. **Artifact & Data Isolation:** Artifact persistence defaults to local private filesystem directories protected by application-level AES-256-GCM encryption where sensitive (CVs, business licenses, backup dumps). Search images and export files are ephemeral with automated expiration and deletion deadlines.
+3. **Optional External Integrations:** External email delivery (SMTP/Resend), OpenAI semantic interpretation, VietQR business verification, and Google Drive backup upload are implemented via provider adapters but remain optional. Cloud AWS S3/KMS adapters exist in source but are unprovisioned in the default local demonstration environment.
+4. **Disaster Recovery Notice:** In-app database restore is strictly out of scope; database restoration is executed via command-line DBA procedures to maintain data safety.

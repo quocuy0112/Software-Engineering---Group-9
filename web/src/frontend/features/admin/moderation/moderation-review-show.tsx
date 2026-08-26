@@ -3,6 +3,7 @@
 import { Box, Chip, Divider, Paper, Stack, Typography } from "@mui/material";
 import { Show, useRecordContext, useRefresh } from "react-admin";
 import { ReportActionPanel } from "./report-action-panel";
+import { adminReasonLabel } from "../shared/admin-reason-label";
 
 type Report = {
   id: string;
@@ -21,7 +22,7 @@ type Report = {
   history: Array<{
     id: string;
     action: string;
-    priorState: string;
+    priorState: string | null;
     resultingState: string;
     occurredAt: string;
   }>;
@@ -41,6 +42,21 @@ type Report = {
     };
   }>;
 };
+
+function sentenceCase(value: string) {
+  return value
+    .replaceAll("_", " ")
+    .toLowerCase()
+    .replace(/\b\w/gu, (letter) => letter.toUpperCase());
+}
+
+function lifecycleStateColor(state: string) {
+  return state === "RESOLVED"
+    ? "success"
+    : state === "DISMISSED"
+      ? "default"
+      : "warning";
+}
 
 function Detail({ label, value }: { label: string; value: string }) {
   return (
@@ -141,7 +157,10 @@ function Review() {
               color={priorityColor}
               variant="outlined"
             />
-            <Chip label={record.category} variant="outlined" />
+            <Chip
+              label={adminReasonLabel(record.category)}
+              variant="outlined"
+            />
           </Stack>
           <Divider />
           <Box
@@ -279,16 +298,76 @@ function Review() {
                 No history recorded.
               </Typography>
             ) : (
-              <Stack spacing={1.25} divider={<Divider flexItem />}>
-                {record.history.map((item) => (
-                  <Box key={item.id}>
-                    <Typography variant="body2" fontWeight={600}>
-                      {item.action}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {item.priorState} → {item.resultingState} ·{" "}
-                      {new Date(item.occurredAt).toLocaleString()}
-                    </Typography>
+              <Stack spacing={0}>
+                {record.history.map((item, index) => (
+                  <Box
+                    key={item.id}
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "18px minmax(0, 1fr)",
+                      columnGap: 1.25,
+                      pb: index === record.history.length - 1 ? 0 : 2,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        position: "relative",
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 10,
+                          height: 10,
+                          mt: 0.75,
+                          borderRadius: "50%",
+                          bgcolor: `${lifecycleStateColor(item.resultingState)}.main`,
+                          boxShadow: 1,
+                          zIndex: 1,
+                        }}
+                      />
+                      {index < record.history.length - 1 && (
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            top: 15,
+                            bottom: -1,
+                            borderLeft: 2,
+                            borderColor: "divider",
+                          }}
+                        />
+                      )}
+                    </Box>
+                    <Stack spacing={0.6} sx={{ minWidth: 0 }}>
+                      <Typography variant="body2" fontWeight={700}>
+                        {sentenceCase(item.action)}
+                      </Typography>
+                      <Stack
+                        direction="row"
+                        spacing={0.5}
+                        alignItems="center"
+                        flexWrap="wrap"
+                        useFlexGap
+                      >
+                        <Chip
+                          label={sentenceCase(item.priorState ?? "CREATED")}
+                          size="small"
+                          variant="outlined"
+                        />
+                        <Typography variant="caption" color="text.secondary">
+                          to
+                        </Typography>
+                        <Chip
+                          label={sentenceCase(item.resultingState)}
+                          color={lifecycleStateColor(item.resultingState)}
+                          size="small"
+                        />
+                      </Stack>
+                      <Typography variant="caption" color="text.secondary">
+                        {new Date(item.occurredAt).toLocaleString()}
+                      </Typography>
+                    </Stack>
                   </Box>
                 ))}
               </Stack>

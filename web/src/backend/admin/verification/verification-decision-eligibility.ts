@@ -17,6 +17,7 @@ export type VerificationDecisionEligibility = {
     currentSubmissionVersion: number;
     version: number;
     state: "PENDING_REVIEW";
+    assignedAdminUserId: string;
     submissionIdempotencyKey: string | null;
     targetCompany: {
       id: string;
@@ -66,7 +67,7 @@ async function lockRow(
   );
 }
 
-async function requireCurrentAdministrator(
+export async function requireCurrentVerificationAdministrator(
   tx: Prisma.TransactionClient,
   authority: AdminAuthority,
   now: Date,
@@ -126,7 +127,7 @@ export async function loadVerificationDecisionEligibility(
   },
 ): Promise<VerificationDecisionEligibility> {
   const now = input.now ?? new Date();
-  await requireCurrentAdministrator(tx, input.authority, now);
+  await requireCurrentVerificationAdministrator(tx, input.authority, now);
 
   const lockedRequest = await lockRow(
     tx,
@@ -156,6 +157,8 @@ export async function loadVerificationDecisionEligibility(
   if (!row) fail("TARGET_UNAVAILABLE");
   if (row.version !== input.expectedVersion) fail("STALE_CONFLICT");
   if (row.state !== "PENDING_REVIEW") fail("INVALID_STATE");
+  if (row.assignedAdminUserId !== input.authority.userId)
+    fail(row.assignedAdminUserId ? "ASSIGNED_TO_OTHER" : "CLAIM_REQUIRED");
 
   const applicant = await tx.userAccount.findUnique({
     where: { id: row.applicantUserId },
@@ -248,6 +251,7 @@ export async function loadVerificationDecisionEligibility(
       currentSubmissionVersion: row.currentSubmissionVersion,
       version: row.version,
       state: "PENDING_REVIEW",
+      assignedAdminUserId: row.assignedAdminUserId,
       submissionIdempotencyKey: row.submissionIdempotencyKey,
       targetCompany: row.targetCompany,
       acceptedRegistrySnapshot: row.acceptedRegistrySnapshot,

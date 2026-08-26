@@ -1,78 +1,115 @@
 "use client";
+
 import {
   Datagrid,
   DateField,
+  FunctionField,
   List,
   Pagination,
   SelectInput,
-  TextField,
   TextInput,
 } from "react-admin";
 import { CurrentListSnapshotDifference } from "../dashboard/snapshot-difference-notice";
+import {
+  VerificationApplicantField,
+  VerificationAssignmentField,
+  VerificationCompanyField,
+  VerificationStateField,
+} from "./verification-list-fields";
+
+const filters = [
+  <TextInput
+    key="q"
+    source="q"
+    label="Request reference, tax code, or company"
+    alwaysOn
+  />,
+  <SelectInput
+    key="state"
+    source="state"
+    label="Review status"
+    choices={[
+      "PENDING_CHECKS",
+      "PENDING_REVIEW",
+      "CHANGES_REQUESTED",
+      "APPROVED",
+      "REJECTED",
+      "CANCELLED",
+      "EXPIRED",
+    ].map((id) => ({ id, name: id.replace(/_/gu, " ") }))}
+    emptyText="All statuses"
+  />,
+  <SelectInput
+    key="assignment"
+    source="assignment"
+    label="Assignment"
+    choices={[
+      { id: "UNASSIGNED", name: "Unassigned" },
+      { id: "MINE", name: "Claimed by me" },
+      { id: "ANY", name: "All assignments" },
+    ]}
+  />,
+  <SelectInput
+    key="applicantEligibility"
+    source="applicantEligibility"
+    label="Applicant account"
+    choices={[
+      { id: "ACTIVE_ONLY", name: "Active" },
+      { id: "SUSPENDED_ONLY", name: "Suspended" },
+      { id: "ANY", name: "All accounts" },
+    ]}
+  />,
+  <TextInput
+    key="submittedFrom"
+    source="submittedFrom"
+    label="Submitted from (YYYY-MM-DD)"
+  />,
+  <TextInput
+    key="submittedTo"
+    source="submittedTo"
+    label="Submitted to (YYYY-MM-DD)"
+  />,
+];
+
 export function VerificationRequestList() {
   return (
     <List
       perPage={25}
       pagination={<Pagination rowsPerPageOptions={[25, 50, 100]} />}
       sort={{ field: "createdAt", order: "ASC" }}
-      filters={[
-        <TextInput
-          key="q"
-          source="q"
-          label="Request reference, tax code, or name"
-          alwaysOn
-        />,
-        <SelectInput
-          key="state"
-          source="state"
-          choices={[
-            "PENDING_CHECKS",
-            "PENDING_REVIEW",
-            "CHANGES_REQUESTED",
-            "APPROVED",
-            "REJECTED",
-            "CANCELLED",
-            "EXPIRED",
-          ].map((id) => ({ id, name: id }))}
-          emptyText="All statuses"
-        />,
-        <TextInput key="company" source="company" />,
-        <TextInput
-          key="targetCompanyId"
-          source="targetCompanyId"
-          label="Target company reference"
-        />,
-        <TextInput key="taxCode" source="taxCode" />,
-        <SelectInput
-          key="applicantEligibility"
-          source="applicantEligibility"
-          choices={["ACTIVE_ONLY", "SUSPENDED_ONLY", "ANY"].map((id) => ({
-            id,
-            name: id,
-          }))}
-          emptyText="All applicant accounts"
-        />,
-        <SelectInput
-          key="assignment"
-          source="assignment"
-          choices={["UNASSIGNED", "MINE", "ANY"].map((id) => ({
-            id,
-            name: id,
-          }))}
-        />,
-      ]}
+      filters={filters}
     >
       <CurrentListSnapshotDifference />
-      <Datagrid bulkActionButtons={false} rowClick="show">
-        <TextField source="id" />
-        <TextField source="applicantId" label="Applicant" />
-        <TextField source="companyName" />
-        <TextField source="taxCode" />
-        <TextField source="state" />
-        <TextField source="applicantEligibility" label="Applicant account" />
-        <TextField source="resubmissionCount" />
-        <TextField source="assignedAdminRef" label="Assigned administrator" />
-        <DateField source="submittedAt" showTime />
+      <Datagrid
+        bulkActionButtons={false}
+        rowClick="show"
+        rowSx={(record) =>
+          record.state === "PENDING_REVIEW" &&
+          record.assignmentStatus === "UNASSIGNED"
+            ? {
+                backgroundColor: "warning.50",
+                "&:hover": { backgroundColor: "warning.100" },
+              }
+            : {}
+        }
+      >
+        <FunctionField
+          label="Company & request"
+          render={() => <VerificationCompanyField />}
+        />
+        <FunctionField
+          label="Applicant"
+          render={() => <VerificationApplicantField />}
+        />
+        <FunctionField
+          label="Review"
+          render={() => <VerificationStateField />}
+        />
+        <FunctionField
+          label="Assignment"
+          render={() => <VerificationAssignmentField />}
+        />
+        <DateField source="submittedAt" label="Submitted" showTime />
       </Datagrid>
     </List>
   );

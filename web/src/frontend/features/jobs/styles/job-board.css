@@ -6360,9 +6360,9 @@
 
 /* Clean two-column job board layout */
 .job-detail-board-page {
-  --job-detail-accent: #2563eb;
-  --job-detail-accent-hover: #1d4ed8;
-  --job-detail-accent-soft: #eff6ff;
+  --job-detail-accent: var(--sh-color-brand-primary);
+  --job-detail-accent-hover: var(--sh-color-brand-primary-hover);
+  --job-detail-accent-soft: var(--sh-color-brand-soft);
   max-width: 1440px;
   padding-inline: var(--sh-space-5);
   background: var(--sh-color-surface-page);
@@ -6615,7 +6615,11 @@
     var(--job-detail-accent) 20%,
     var(--sh-color-border-subtle)
   );
-  background: linear-gradient(135deg, var(--job-detail-accent-soft), #fff 68%);
+  background: linear-gradient(
+    135deg,
+    var(--job-detail-accent-soft),
+    var(--sh-color-surface-card) 68%
+  );
 }
 .job-detail-board-page .job-why-join-icon {
   color: var(--job-detail-accent);
@@ -7049,7 +7053,12 @@
   align-items: center;
   gap: 14px;
   padding: 10px;
-  border: 1px solid color-mix(in srgb, var(--sh-color-border-subtle) 72%, #fff);
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--sh-color-border-subtle) 72%,
+      var(--sh-color-surface-card)
+    );
   border-radius: 10px;
   background: var(--sh-color-surface-card);
 }
@@ -7833,7 +7842,7 @@
 .job-detail-sidebar--board .job-general-info-row,
 .job-detail-sidebar--board .job-sidebar-company-facts div {
   padding: 11px 0;
-  border-bottom: 1px solid #f0f3fc;
+  border-bottom: 1px solid var(--sh-profile-border);
 }
 
 .job-detail-sidebar--board .job-sidebar-company-facts div:last-child,
@@ -7854,7 +7863,7 @@
   gap: 10px;
   padding: 12px 0;
   border: 0;
-  border-bottom: 1px solid #f0f3fc;
+  border-bottom: 1px solid var(--sh-profile-border);
   border-radius: 0;
 }
 
@@ -7872,7 +7881,7 @@
   padding: 20px 22px;
   border: 0;
   border-radius: var(--sh-profile-radius-md);
-  color: #7a4a0e;
+  color: var(--sh-profile-amber);
   background: var(--sh-profile-amber-light);
   box-shadow: none;
 }
@@ -7882,7 +7891,7 @@
 }
 
 .job-detail-sidebar--board .job-report-widget h2 {
-  color: #7a4a0e;
+  color: var(--sh-profile-amber);
   font-size: 14.5px;
 }
 
@@ -11504,7 +11513,7 @@
   margin: var(--sh-space-6) auto 0;
   padding: 6px;
   overflow: hidden;
-  border: 1px solid #e5e8f2;
+  border: 1px solid var(--sh-color-border-subtle);
   border-radius: 18px;
   background: var(--sh-color-surface-card);
   box-shadow: 0 4px 16px rgb(15 23 42 / 5%);
@@ -11544,8 +11553,8 @@
 
 .job-pagination-control:disabled {
   border-color: transparent;
-  color: #9aa0b4;
-  background: #f1f3fa;
+  color: var(--sh-color-disabled-text);
+  background: var(--sh-color-disabled-bg);
   cursor: not-allowed;
 }
 
@@ -11613,8 +11622,8 @@
   padding: 0 12px;
   border: 0;
   border-radius: 9px;
-  color: #4a5672;
-  background: #f4f6fb;
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-subtle);
   font-family: var(--sh-profile-font-body);
   font-size: 14px;
   font-weight: 600;

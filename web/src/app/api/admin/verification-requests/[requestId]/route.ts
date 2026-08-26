@@ -7,9 +7,10 @@ export async function GET(
   context: { params: Promise<{ requestId: string }> },
 ) {
   try {
-    await new AdminRequestBoundary().require(request);
+    const authority = await new AdminRequestBoundary().require(request);
     const data = await new VerificationReviewService().reviewDetail(
       (await context.params).requestId,
+      authority.userId,
     );
     if (!data)
       return adminJson({ code: "TARGET_UNAVAILABLE" }, { status: 404 });

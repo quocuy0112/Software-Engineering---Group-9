@@ -406,7 +406,8 @@ export type SalaryPeriod = (typeof SalaryPeriod)[keyof typeof SalaryPeriod]
 export const JobPostReviewState = {
   PENDING_REVIEW: 'PENDING_REVIEW',
   APPROVED: 'APPROVED',
-  REJECTED: 'REJECTED'
+  REJECTED: 'REJECTED',
+  WITHDRAWN: 'WITHDRAWN'
 } as const
 
 export type JobPostReviewState = (typeof JobPostReviewState)[keyof typeof JobPostReviewState]
@@ -435,7 +436,8 @@ export const JobPostReviewHistoryAction = {
   REJECTED: 'REJECTED',
   RESUBMITTED: 'RESUBMITTED',
   LEGACY_BASELINE_IMPORTED: 'LEGACY_BASELINE_IMPORTED',
-  CLOSED: 'CLOSED'
+  CLOSED: 'CLOSED',
+  WITHDRAWN: 'WITHDRAWN'
 } as const
 
 export type JobPostReviewHistoryAction = (typeof JobPostReviewHistoryAction)[keyof typeof JobPostReviewHistoryAction]

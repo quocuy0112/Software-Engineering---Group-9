@@ -2,7 +2,12 @@ import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { open, readFile, rename, rm, stat } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import type { JobIndustryFile } from "./job-industry-files";
+import { setTimeout as delay } from "node:timers/promises";
+import {
+  catalogueIndustryCode,
+  industryCodeMatchesCatalogue,
+  type JobIndustryFile,
+} from "./job-industry-files";
 
 export type JobCatalogueLeaseClaim = {
   catalogueKey: string;
@@ -44,6 +49,33 @@ export type JsonJobCatalogueRepositoryConfig = {
 const sha256 = (value: string) =>
   createHash("sha256").update(value).digest("hex");
 
+const REPLACE_RETRY_DELAYS_MS = [25, 50, 100, 200, 400, 800] as const;
+const RETRYABLE_REPLACE_CODES = new Set(["EACCES", "EBUSY", "EPERM"]);
+
+/**
+ * Antivirus, indexing, and editor processes can briefly deny replacement of
+ * an existing file on Windows. Retrying only sharing/permission failures
+ * preserves atomic rename semantics without hiding path or data errors.
+ */
+export async function replaceFileWithRetry(
+  temporaryPath: string,
+  targetPath: string,
+  renameFile: typeof rename = rename,
+) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      await renameFile(temporaryPath, targetPath);
+      return;
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      const retryDelay = REPLACE_RETRY_DELAYS_MS[attempt];
+      if (!code || !RETRYABLE_REPLACE_CODES.has(code) || !retryDelay)
+        throw error;
+      await delay(retryDelay);
+    }
+  }
+}
+
 export class JsonJobCatalogueRepository<T = unknown> {
   private readonly filePath: string;
   private readonly fallbackFiles: readonly JobIndustryFile[];
@@ -77,9 +109,85 @@ export class JsonJobCatalogueRepository<T = unknown> {
     }
   }
 
+  /**
+   * Reads one split industry file when the default catalogue layout is in
+   * use. A configured monolithic jobs.json remains supported as a fallback.
+   */
+  async readIndustryPartition(industryCode: string): Promise<T[]> {
+    const code = catalogueIndustryCode(industryCode);
+    if (!code) throw new Error("JOB_CATALOGUE_INDUSTRY_CODE_INVALID");
+    if ((await this.sourceExists()) || this.fallbackFiles.length === 0) {
+      const values = await this.read();
+      return values.filter((entry) => {
+        if (!entry || typeof entry !== "object") return false;
+        return industryCodeMatchesCatalogue(
+          (entry as { industryCode?: unknown }).industryCode,
+          code,
+        );
+      });
+    }
+
+    const partition = this.fallbackFiles.find((file) => file.code === code);
+    if (!partition) throw new Error("JOB_CATALOGUE_INDUSTRY_CODE_INVALID");
+    return this.readIndustryDocument(partition);
+  }
+
+  /**
+   * Filters split files one at a time so a caller can locate a small tenant
+   * subset without retaining the complete parsed catalogue in memory.
+   */
+  async readMatching(predicate: (value: T) => boolean): Promise<T[]> {
+    if ((await this.sourceExists()) || this.fallbackFiles.length === 0) {
+      return (await this.read()).filter(predicate);
+    }
+
+    const matches: T[] = [];
+    for (const partition of this.fallbackFiles) {
+      const values = await this.readIndustryDocument(partition);
+      for (const value of values) {
+        if (predicate(value)) matches.push(value);
+      }
+    }
+    return matches;
+  }
+
   private async readFallbackFiles(): Promise<T[]> {
     const { values } = await this.readFallbackDocuments();
     return values.flat();
+  }
+
+  private async readIndustryDocument(partition: JobIndustryFile): Promise<T[]> {
+    let text: string;
+    try {
+      text = await readFile(partition.filePath, "utf8");
+    } catch (error) {
+      throw new Error("JOB_CATALOGUE_UNAVAILABLE", { cause: error });
+    }
+    return this.parseIndustryDocument(text, partition);
+  }
+
+  private parseIndustryDocument(text: string, partition: JobIndustryFile): T[] {
+    try {
+      const value: unknown = JSON.parse(text);
+      if (!Array.isArray(value)) throw new Error("not an array");
+      if (
+        value.some(
+          (entry) =>
+            entry &&
+            typeof entry === "object" &&
+            "industryCode" in entry &&
+            !industryCodeMatchesCatalogue(
+              (entry as { industryCode?: unknown }).industryCode,
+              partition.code,
+            ),
+        )
+      ) {
+        throw new Error("industry file contains a different industryCode");
+      }
+      return value as T[];
+    } catch {
+      throw new Error("JOB_CATALOGUE_MALFORMED");
+    }
   }
 
   private async readFallbackDocuments(): Promise<{
@@ -109,8 +217,10 @@ export class JsonJobCatalogueRepository<T = unknown> {
               entry &&
               typeof entry === "object" &&
               "industryCode" in entry &&
-              (entry as { industryCode?: unknown }).industryCode !==
+              !industryCodeMatchesCatalogue(
+                (entry as { industryCode?: unknown }).industryCode,
                 expectedCode,
+              ),
           )
         ) {
           throw new Error("industry file contains a different industryCode");
@@ -261,7 +371,7 @@ export class JsonJobCatalogueRepository<T = unknown> {
       const finalObserved = await readFile(this.filePath, "utf8");
       if (sha256(finalObserved) !== expectedCatalogueSha256)
         throw new Error("JOB_CATALOGUE_CHECKSUM_CONFLICT");
-      await rename(temporaryPath, this.filePath);
+      await replaceFileWithRetry(temporaryPath, this.filePath);
       return next;
     } finally {
       await rm(temporaryPath, { force: true }).catch(() => undefined);
@@ -269,7 +379,95 @@ export class JsonJobCatalogueRepository<T = unknown> {
     }
   }
 
-  private async writeSplitFiles(next: T[], ownerTokenHash: string) {
+  /**
+   * Mutates only the requested split industry document. This keeps recruiter
+   * actions independent from the total catalogue size while retaining the
+   * same fenced lease used by whole-catalogue mutations.
+   */
+  async mutateIndustryPartition(
+    industryCode: string,
+    mutation: (values: T[]) => T[] | Promise<T[]>,
+  ): Promise<T[]> {
+    const code = catalogueIndustryCode(industryCode);
+    if (!code) throw new Error("JOB_CATALOGUE_INDUSTRY_CODE_INVALID");
+    if ((await this.sourceExists()) || this.fallbackFiles.length === 0) {
+      return this.mutate(mutation);
+    }
+
+    await this.preflight();
+    const partition = this.fallbackFiles.find((file) => file.code === code);
+    if (!partition) throw new Error("JOB_CATALOGUE_INDUSTRY_CODE_INVALID");
+    const original = await readFile(partition.filePath, "utf8");
+    const originalValues = this.parseIndustryDocument(original, partition);
+    const expectedCatalogueSha256 = sha256(original);
+    const catalogueKey = sha256(
+      this.fallbackFiles
+        .map(({ filePath }) => filePath.toLowerCase())
+        .join("\u0000"),
+    );
+    const ownerTokenHash = sha256(
+      `${this.config.writerHostId}:${randomBytes(32).toString("hex")}`,
+    );
+    const claim = await this.config.leaseCoordinator.claim({
+      catalogueKey,
+      ownerTokenHash,
+      expectedCatalogueSha256,
+      leaseExpiresAt: new Date(Date.now() + this.config.leaseTtlMs),
+    });
+    const temporaryPath = `${partition.filePath}.${ownerTokenHash.slice(0, 16)}.tmp`;
+    try {
+      const next = await mutation(structuredClone(originalValues));
+      if (!Array.isArray(next))
+        throw new Error("JOB_CATALOGUE_MUTATION_INVALID");
+      if (
+        next.some(
+          (entry) =>
+            !entry ||
+            typeof entry !== "object" ||
+            !("industryCode" in entry) ||
+            !industryCodeMatchesCatalogue(
+              (entry as { industryCode?: unknown }).industryCode,
+              code,
+            ),
+        )
+      ) {
+        throw new Error("JOB_CATALOGUE_INDUSTRY_CODE_INVALID");
+      }
+      const observed = await readFile(partition.filePath, "utf8");
+      if (sha256(observed) !== expectedCatalogueSha256)
+        throw new Error("JOB_CATALOGUE_CHECKSUM_CONFLICT");
+      await this.config.leaseCoordinator.assertOwned(
+        claim,
+        expectedCatalogueSha256,
+      );
+
+      const handle = await open(temporaryPath, "wx");
+      try {
+        await handle.writeFile(`${JSON.stringify(next, null, 2)}\n`, "utf8");
+        await handle.sync();
+      } finally {
+        await handle.close();
+      }
+      await this.config.leaseCoordinator.assertOwned(
+        claim,
+        expectedCatalogueSha256,
+      );
+      const finalObserved = await readFile(partition.filePath, "utf8");
+      if (sha256(finalObserved) !== expectedCatalogueSha256)
+        throw new Error("JOB_CATALOGUE_CHECKSUM_CONFLICT");
+      await replaceFileWithRetry(temporaryPath, partition.filePath);
+      return next;
+    } finally {
+      await rm(temporaryPath, { force: true }).catch(() => undefined);
+      await this.config.leaseCoordinator.release(claim).catch(() => undefined);
+    }
+  }
+
+  private async writeSplitFiles(
+    next: T[],
+    originalTexts: readonly string[],
+    ownerTokenHash: string,
+  ) {
     const byCode = new Map(
       this.fallbackFiles.map(({ code }) => [code, [] as T[]]),
     );
@@ -278,27 +476,37 @@ export class JsonJobCatalogueRepository<T = unknown> {
         value && typeof value === "object"
           ? (value as Record<string, unknown>)
           : null;
-      const code = record?.industryCode;
-      const target =
-        typeof code === "string"
-          ? byCode.get(code as JobIndustryFile["code"])
-          : undefined;
+      const code =
+        typeof record?.industryCode === "string"
+          ? catalogueIndustryCode(record.industryCode)
+          : null;
+      const target = code
+        ? byCode.get(code as JobIndustryFile["code"])
+        : undefined;
       if (!target) throw new Error("JOB_CATALOGUE_INDUSTRY_CODE_INVALID");
       target.push(value);
     }
 
-    const temporaryPaths = this.fallbackFiles.map(
-      ({ filePath }) => `${filePath}.${ownerTokenHash.slice(0, 16)}.tmp`,
+    const changedFiles = this.fallbackFiles.flatMap(
+      ({ code, filePath }, index) => {
+        const text = `${JSON.stringify(byCode.get(code), null, 2)}\n`;
+        return text === originalTexts[index]
+          ? []
+          : [
+              {
+                filePath,
+                temporaryPath: `${filePath}.${ownerTokenHash.slice(0, 16)}.tmp`,
+                text,
+              },
+            ];
+      },
     );
     try {
       await Promise.all(
-        this.fallbackFiles.map(async ({ code }, index) => {
-          const handle = await open(temporaryPaths[index], "wx");
+        changedFiles.map(async ({ temporaryPath, text }) => {
+          const handle = await open(temporaryPath, "wx");
           try {
-            await handle.writeFile(
-              `${JSON.stringify(byCode.get(code), null, 2)}\n`,
-              "utf8",
-            );
+            await handle.writeFile(text, "utf8");
             await handle.sync();
           } finally {
             await handle.close();
@@ -306,13 +514,13 @@ export class JsonJobCatalogueRepository<T = unknown> {
         }),
       );
       await Promise.all(
-        this.fallbackFiles.map(({ filePath }, index) =>
-          rename(temporaryPaths[index], filePath),
+        changedFiles.map(({ filePath, temporaryPath }) =>
+          replaceFileWithRetry(temporaryPath, filePath),
         ),
       );
     } finally {
       await Promise.all(
-        temporaryPaths.map((temporaryPath) =>
+        changedFiles.map(({ temporaryPath }) =>
           rm(temporaryPath, { force: true }).catch(() => undefined),
         ),
       );
@@ -350,7 +558,7 @@ export class JsonJobCatalogueRepository<T = unknown> {
         claim,
         expectedCatalogueSha256,
       );
-      await this.writeSplitFiles(next, ownerTokenHash);
+      await this.writeSplitFiles(next, original.texts, ownerTokenHash);
       return next;
     } finally {
       await this.config.leaseCoordinator.release(claim).catch(() => undefined);

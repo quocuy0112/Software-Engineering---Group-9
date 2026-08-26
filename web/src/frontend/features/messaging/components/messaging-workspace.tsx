@@ -12,9 +12,9 @@ import { useMessageHistory } from "../client/use-message-history";
 import { useChatConnection } from "../client/use-chat-connection";
 import { useChatEvents } from "../client/use-chat-events";
 import { messagingCopy } from "../messaging-copy";
-import { ConversationList } from "./conversation-list";
 import { MessageThread } from "./message-thread";
 import { StartConversation } from "./start-conversation";
+import { ConversationDetails } from "./conversation-details";
 
 export function MessagingWorkspace({
   currentUserId,
@@ -33,6 +33,8 @@ export function MessagingWorkspace({
   const copy = messagingCopy(locale);
   const conversations = useConversations(initialConversations, locale);
   const [selectedId, setSelectedId] = useState(initialConversationId);
+  const [query, setQuery] = useState("");
+  const [showDetails, setShowDetails] = useState(false);
   const history = useMessageHistory(
     selectedId,
     csrfProof,
@@ -47,7 +49,10 @@ export function MessagingWorkspace({
     setPage,
     setPresence,
   } = history;
-  const { loadMore, refresh: refreshConversations } = conversations;
+  const {
+    refresh: refreshConversations,
+    setPresence: setConversationPresence,
+  } = conversations;
   const purge = useCallback(
     (conversationId?: string) => {
       if (!conversationId || conversationId === selectedId) setPage(null);
@@ -92,9 +97,11 @@ export function MessagingWorkspace({
     [purge, refreshConversations],
   );
   const onPresence = useCallback(
-    (event: { userId: string; presence: "ONLINE" | "OFFLINE" }) =>
-      setPresence(event.userId, event.presence),
-    [setPresence],
+    (event: { userId: string; presence: "ONLINE" | "OFFLINE" }) => {
+      setPresence(event.userId, event.presence);
+      setConversationPresence(event.userId, event.presence);
+    },
+    [setConversationPresence, setPresence],
   );
   const eventInput = useMemo(
     () => ({ onMessage, onRead, onAccessRevoked, onPresence }),
@@ -110,6 +117,28 @@ export function MessagingWorkspace({
         : connectionState === "RECONNECTING"
           ? copy.reconnecting
           : copy.offline;
+  const filteredConversations = useMemo(() => {
+    const normalized = query.trim().toLocaleLowerCase();
+    if (!normalized) return conversations.items;
+    return conversations.items.filter((item) =>
+      [
+        item.otherParticipant.name,
+        item.lastMessage?.content ?? "",
+      ].some((value) => value.toLocaleLowerCase().includes(normalized)),
+    );
+  }, [conversations.items, query]);
+  const selectConversation = useCallback(
+    (conversationId: string) => {
+      setShowDetails(false);
+      if (conversationId === selectedId) {
+        setPage(null);
+        void refreshHistory();
+        return;
+      }
+      setSelectedId(conversationId);
+    },
+    [refreshHistory, selectedId, setPage],
+  );
 
   return (
     <main
@@ -144,20 +173,14 @@ export function MessagingWorkspace({
           <StartConversation
             csrfProof={csrfProof}
             initialItems={initialEligibleParticipants}
+            query={query}
+            onQueryChange={setQuery}
             locale={locale}
             onOpened={(conversationId) => {
               setSelectedId(conversationId);
+              setShowDetails(false);
               void refreshConversations();
             }}
-          />
-          <ConversationList
-            currentUserId={currentUserId}
-            items={conversations.items}
-            selectedId={selectedId}
-            locale={locale}
-            onSelect={setSelectedId}
-            onLoadMore={() => void loadMore()}
-            hasMore={Boolean(conversations.nextCursor)}
           />
         </aside>
         <MessageThread
@@ -168,11 +191,21 @@ export function MessagingWorkspace({
           error={history.error}
           onLoadOlder={() => void loadOlder()}
           onBack={() => setSelectedId(null)}
+          onViewProfile={() => setShowDetails(true)}
           onBlockedChanged={() => {
             void refreshHistory();
             void refreshConversations();
           }}
           hasConversations={conversations.items.length > 0}
+        />
+        <ConversationDetails
+          page={history.page}
+          locale={locale}
+          showDetails={showDetails}
+          items={filteredConversations}
+          selectedId={selectedId}
+          onSelect={selectConversation}
+          onBack={() => setShowDetails(false)}
         />
       </div>
     </main>

@@ -162,4 +162,22 @@ describe("job search taxonomy", () => {
       expect.objectContaining({ code: "r03", count: 1 }),
     ]);
   });
+
+  it("merges legacy Other records into the canonical r29 industry", () => {
+    const other = {
+      industry: "Other",
+      subIndustry: "Aerospace Operations",
+      title: "Flight Operations Specialist",
+      categoryIds: ["r29-aerospace-operations"],
+      categoryFamily: "r29",
+    };
+    const taxonomy = buildJobSearchTaxonomy([
+      row(buildJobReviewSnapshot({ ...other, industryCode: "other" })),
+      row(buildJobReviewSnapshot({ ...other, industryCode: "r29" })),
+    ]);
+
+    expect(taxonomy.industries).toEqual([
+      expect.objectContaining({ code: "r29", name: "Other", count: 2 }),
+    ]);
+  });
 });

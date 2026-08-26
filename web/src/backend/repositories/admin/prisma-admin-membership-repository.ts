@@ -1,5 +1,6 @@
 import "server-only";
 import type {
+  CompanyModerationState,
   CompanyVerificationState,
   Prisma,
 } from "@/backend/generated/prisma/client";
@@ -22,6 +23,12 @@ export class PrismaAdminMembershipRepository {
       )
         ? (input.filter.verificationState as CompanyVerificationState)
         : undefined;
+    const moderationState: CompanyModerationState | undefined =
+      input.filter.moderationState === "ACTIVE" ||
+      input.filter.moderationState === "BANNED"
+        ? input.filter.moderationState
+        : undefined;
+    const needsAttention = input.filter.attention === "NEEDS_ATTENTION";
     const date = (value: unknown, endOfDay = false) => {
       if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/u.test(value))
         return undefined;
@@ -32,25 +39,70 @@ export class PrismaAdminMembershipRepository {
     };
     const createdFrom = date(input.filter.createdFrom);
     const createdTo = date(input.filter.createdTo, true);
+    const attentionReportCompanies = needsAttention
+      ? await prisma.moderationReport.findMany({
+          where: {
+            companyReference: { not: null },
+            state: "PENDING_REVIEW",
+          },
+          distinct: ["companyReference"],
+          select: { companyReference: true },
+        })
+      : [];
+    const attentionConditions: Prisma.CompanyWhereInput[] = [
+      { moderationState: "BANNED" },
+      { verificationState: { in: ["UNVERIFIED", "INACTIVE"] } },
+      { memberships: { none: { status: "ACTIVE", role: "OWNER" } } },
+      {
+        jobPostReviewAggregates: {
+          some: { pendingVersionId: { not: null }, softDeletedAt: null },
+        },
+      },
+      {
+        id: {
+          in: attentionReportCompanies.flatMap((report) =>
+            report.companyReference ? [report.companyReference] : [],
+          ),
+        },
+      },
+    ];
     const where: Prisma.CompanyWhereInput = {
-      ...(q
-        ? {
-            OR: [
-              { id: q },
-              { legalName: { contains: q, mode: "insensitive" } },
-              { displayName: { contains: q, mode: "insensitive" } },
-            ],
-          }
-        : {}),
-      ...(verificationState ? { verificationState } : {}),
-      ...(createdFrom || createdTo
-        ? {
-            createdAt: {
-              ...(createdFrom ? { gte: createdFrom } : {}),
-              ...(createdTo ? { lte: createdTo } : {}),
-            },
-          }
-        : {}),
+      AND: [
+        ...(q
+          ? [
+              {
+                OR: [
+                  { id: q },
+                  {
+                    legalName: {
+                      contains: q,
+                      mode: "insensitive" as const,
+                    },
+                  },
+                  {
+                    displayName: {
+                      contains: q,
+                      mode: "insensitive" as const,
+                    },
+                  },
+                ],
+              },
+            ]
+          : []),
+        ...(verificationState ? [{ verificationState }] : []),
+        ...(moderationState ? [{ moderationState }] : []),
+        ...(createdFrom || createdTo
+          ? [
+              {
+                createdAt: {
+                  ...(createdFrom ? { gte: createdFrom } : {}),
+                  ...(createdTo ? { lte: createdTo } : {}),
+                },
+              },
+            ]
+          : []),
+        ...(needsAttention ? [{ OR: attentionConditions }] : []),
+      ],
     };
     const [rows, total] = await Promise.all([
       prisma.company.findMany({
@@ -61,14 +113,80 @@ export class PrismaAdminMembershipRepository {
           displayName: true,
           verificationState: true,
           moderationState: true,
+          createdAt: true,
+          updatedAt: true,
         },
         skip: (input.page - 1) * input.perPage,
         take: input.perPage,
-        orderBy: [{ legalName: "asc" }, { id: "asc" }],
+        orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
       }),
       prisma.company.count({ where }),
     ]);
-    return { data: rows, total, ...calculationMetadata(now) };
+    const companyIds = rows.map((row) => row.id);
+    const [activeMemberships, activeOwners, pendingReviews, openReports] =
+      await Promise.all([
+        prisma.companyMembership.groupBy({
+          by: ["companyId"],
+          where: { companyId: { in: companyIds }, status: "ACTIVE" },
+          _count: { _all: true },
+        }),
+        prisma.companyMembership.groupBy({
+          by: ["companyId"],
+          where: {
+            companyId: { in: companyIds },
+            status: "ACTIVE",
+            role: "OWNER",
+          },
+          _count: { _all: true },
+        }),
+        prisma.jobPostReviewAggregate.groupBy({
+          by: ["companyId"],
+          where: {
+            companyId: { in: companyIds },
+            pendingVersionId: { not: null },
+            softDeletedAt: null,
+          },
+          _count: { _all: true },
+        }),
+        prisma.moderationReport.groupBy({
+          by: ["companyReference"],
+          where: {
+            companyReference: { in: companyIds },
+            state: "PENDING_REVIEW",
+          },
+          _count: { _all: true },
+        }),
+      ]);
+    const countByCompany = <
+      T extends { companyId: string; _count: { _all: number } },
+    >(
+      values: T[],
+    ) => new Map(values.map((value) => [value.companyId, value._count._all]));
+    const activeMembershipCount = countByCompany(activeMemberships);
+    const activeOwnerCount = countByCompany(activeOwners);
+    const pendingReviewCount = countByCompany(pendingReviews);
+    const openReportCount = new Map(
+      openReports.flatMap((report) =>
+        report.companyReference
+          ? [[report.companyReference, report._count._all] as const]
+          : [],
+      ),
+    );
+    return {
+      data: rows.map((row) => ({
+        ...row,
+        createdAt: row.createdAt.toISOString(),
+        updatedAt: row.updatedAt.toISOString(),
+        metrics: {
+          activeMembershipCount: activeMembershipCount.get(row.id) ?? 0,
+          activeOwnerCount: activeOwnerCount.get(row.id) ?? 0,
+          pendingJobReviewCount: pendingReviewCount.get(row.id) ?? 0,
+          openModerationReportCount: openReportCount.get(row.id) ?? 0,
+        },
+      })),
+      total,
+      ...calculationMetadata(now),
+    };
   }
   async companyDetail(companyId: string) {
     const company = await prisma.company.findUnique({

@@ -11,7 +11,10 @@ import {
   createVerificationInAppNotification,
 } from "@/backend/admin/notifications/verification-outbox";
 import { createVerificationDecisionNotification } from "@/backend/admin/notifications/verification-notification-event";
-import { loadVerificationDecisionEligibility } from "./verification-decision-eligibility";
+import {
+  loadVerificationDecisionEligibility,
+  requireCurrentVerificationAdministrator,
+} from "./verification-decision-eligibility";
 import {
   normalizeAdminPlainText,
   verificationRejectionCategorySchema,
@@ -30,8 +33,11 @@ export class VerificationReviewService {
   }) {
     return new PrismaVerificationRepository().listQueue(input);
   }
-  reviewDetail(requestId: string) {
-    return new PrismaVerificationRepository().reviewDetail(requestId);
+  reviewDetail(requestId: string, adminUserId: string) {
+    return new PrismaVerificationRepository().reviewDetail(
+      requestId,
+      adminUserId,
+    );
   }
   list(input: {
     page: number;
@@ -43,6 +49,79 @@ export class VerificationReviewService {
   }
   detail(requestId: string) {
     return new PrismaVerificationRepository().detail(requestId);
+  }
+  claim(
+    authority: AdminAuthority,
+    requestId: string,
+    command: { expectedVersion: number; idempotencyKey: string },
+  ) {
+    const now = new Date();
+    return new PrismaAdminCommandRepository().execute(
+      {
+        actorUserId: authority.userId,
+        actorSessionId: authority.sessionId,
+        grantId: authority.grantId,
+        commandKind: "verification.claim",
+        targetReference: requestId,
+        idempotencyKey: command.idempotencyKey,
+        normalizedBody: command,
+      },
+      async (tx, correlationId) => {
+        await requireCurrentVerificationAdministrator(tx, authority, now);
+        const row = await tx.recruiterVerificationRequest.findUnique({
+          where: { id: requestId },
+          select: {
+            id: true,
+            state: true,
+            version: true,
+            assignedAdminUserId: true,
+          },
+        });
+        if (!row) throw new Error("TARGET_UNAVAILABLE");
+        if (row.version !== command.expectedVersion)
+          throw new AdminCommandConflict("STALE_CONFLICT", row.version);
+        if (row.state !== "PENDING_REVIEW") throw new Error("INVALID_STATE");
+        if (row.assignedAdminUserId === authority.userId)
+          return {
+            requestId: row.id,
+            assignedAdminRef: authority.userId,
+            state: row.state,
+            version: row.version,
+          };
+        if (row.assignedAdminUserId) throw new Error("ASSIGNED_TO_OTHER");
+
+        const version = row.version + 1;
+        const claimed = await tx.recruiterVerificationRequest.updateMany({
+          where: {
+            id: row.id,
+            version: command.expectedVersion,
+            state: "PENDING_REVIEW",
+            assignedAdminUserId: null,
+          },
+          data: { assignedAdminUserId: authority.userId, version },
+        });
+        if (claimed.count !== 1)
+          throw new AdminCommandConflict("STALE_CONFLICT", version);
+        await new AuditWriter(tx).append({
+          occurredAt: now,
+          actorType: "user",
+          actorUserId: authority.userId,
+          actorSessionId: authority.sessionId,
+          action: "admin.verification_claimed",
+          targetType: "recruiter_verification",
+          targetId: row.id,
+          result: "SUCCESS",
+          correlationId,
+          context: { targetVersion: version },
+        });
+        return {
+          requestId: row.id,
+          assignedAdminRef: authority.userId,
+          state: row.state,
+          version,
+        };
+      },
+    );
   }
   private run(
     authority: AdminAuthority,

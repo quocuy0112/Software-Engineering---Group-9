@@ -39,7 +39,6 @@ export function ConversationList({
     <section className="messaging-recent">
       <div className="messaging-recent-heading">
         <div>
-          <p className="messaging-section-eyebrow">{copy.inbox}</p>
           <h2>{copy.recentConversations}</h2>
         </div>
         <span aria-label={`${items.length} ${copy.conversations}`}>

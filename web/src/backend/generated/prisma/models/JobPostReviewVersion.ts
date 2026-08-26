@@ -415,7 +415,6 @@ export type JobPostReviewVersionWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   decisionCorrelationId?: string
   reviewAggregateId_sequence?: Prisma.JobPostReviewVersionReviewAggregateIdSequenceCompoundUniqueInput
-  reviewAggregateId_snapshotSha256?: Prisma.JobPostReviewVersionReviewAggregateIdSnapshotSha256CompoundUniqueInput
   submittedByUserId_submissionIdempotencyKey?: Prisma.JobPostReviewVersionSubmittedByUserIdSubmissionIdempotencyKeyCompoundUniqueInput
   AND?: Prisma.JobPostReviewVersionWhereInput | Prisma.JobPostReviewVersionWhereInput[]
   OR?: Prisma.JobPostReviewVersionWhereInput[]
@@ -451,7 +450,7 @@ export type JobPostReviewVersionWhereUniqueInput = Prisma.AtLeast<{
   decidedByAdmin?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
   history?: Prisma.JobPostReviewHistoryListRelationFilter
   privateNotes?: Prisma.JobPostReviewPrivateNoteListRelationFilter
-}, "id" | "decisionCorrelationId" | "reviewAggregateId_sequence" | "reviewAggregateId_snapshotSha256" | "submittedByUserId_submissionIdempotencyKey">
+}, "id" | "decisionCorrelationId" | "reviewAggregateId_sequence" | "submittedByUserId_submissionIdempotencyKey">
 
 export type JobPostReviewVersionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -733,11 +732,6 @@ export type JobPostReviewVersionNullableScalarRelationFilter = {
 export type JobPostReviewVersionReviewAggregateIdSequenceCompoundUniqueInput = {
   reviewAggregateId: string
   sequence: number
-}
-
-export type JobPostReviewVersionReviewAggregateIdSnapshotSha256CompoundUniqueInput = {
-  reviewAggregateId: string
-  snapshotSha256: string
 }
 
 export type JobPostReviewVersionSubmittedByUserIdSubmissionIdempotencyKeyCompoundUniqueInput = {

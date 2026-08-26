@@ -7,7 +7,16 @@ const globalDatabase = globalThis as unknown as { prisma?: PrismaClient };
 
 function createPrismaClient() {
   const adapter = new PrismaPg(serverEnvironment.DATABASE_URL);
-  return new PrismaClient({ adapter });
+  return new PrismaClient({
+    adapter,
+    transactionOptions: {
+      // The admin and analytics workers can briefly occupy the pool. Give
+      // short recruiter mutations enough time to acquire a connection without
+      // changing their transactional behavior.
+      maxWait: 5_000,
+      timeout: 15_000,
+    },
+  });
 }
 
 export const prisma = globalDatabase.prisma ?? createPrismaClient();

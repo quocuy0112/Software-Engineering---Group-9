@@ -67,7 +67,10 @@ describe("verification decisions", () => {
         id: requestId,
         applicantUserId: applicantId,
         submittedCompanyName: `Verified Company ${suffix}`,
-        normalizedTaxIdentifier: suffix.replace(/\D/gu, "").padEnd(10, "0").slice(0, 10),
+        normalizedTaxIdentifier: suffix
+          .replace(/\D/gu, "")
+          .padEnd(10, "0")
+          .slice(0, 10),
         requestedRole: "RECRUITER",
         state: "PENDING_REVIEW",
         currentEvidenceId: evidenceId,
@@ -96,21 +99,33 @@ describe("verification decisions", () => {
   });
 
   afterEach(async () => {
-    await prisma.emailOutbox.deleteMany({ where: { verificationRequestId: requestId } });
-    await prisma.adminCommandReceipt.deleteMany({ where: { targetReference: requestId } });
+    await prisma.emailOutbox.deleteMany({
+      where: { verificationRequestId: requestId },
+    });
+    await prisma.adminCommandReceipt.deleteMany({
+      where: { targetReference: requestId },
+    });
     const request = await prisma.recruiterVerificationRequest.findUnique({
       where: { id: requestId },
       select: { targetCompanyId: true },
     });
-    await prisma.recruiterVerificationRequest.deleteMany({ where: { id: requestId } });
+    await prisma.recruiterVerificationRequest.deleteMany({
+      where: { id: requestId },
+    });
     if (request?.targetCompanyId) {
-      await prisma.companyMembership.deleteMany({ where: { companyId: request.targetCompanyId } });
-      await prisma.company.deleteMany({ where: { id: request.targetCompanyId } });
+      await prisma.companyMembership.deleteMany({
+        where: { companyId: request.targetCompanyId },
+      });
+      await prisma.company.deleteMany({
+        where: { id: request.targetCompanyId },
+      });
     }
     await prisma.candidateIdentity.delete({ where: { userId: applicantId } });
     await prisma.userAccount.delete({ where: { id: applicantId } });
     await prisma.administratorSessionPolicy.deleteMany({ where: { grantId } });
-    await prisma.platformAdministratorGrant.deleteMany({ where: { id: grantId } });
+    await prisma.platformAdministratorGrant.deleteMany({
+      where: { id: grantId },
+    });
     await prisma.session.deleteMany({ where: { id: adminSessionId } });
     await prisma.userAccount.delete({ where: { id: adminId } });
   });
@@ -134,19 +149,32 @@ describe("verification decisions", () => {
 
   it("allows exactly one concurrent new-company approval and creates one OWNER membership", async () => {
     const transaction = new VerificationApprovalTransaction();
-    const commands = [1, 2].map(() => ({
+    await new VerificationReviewService().claim(authority, requestId, {
       expectedVersion: 1,
+      idempotencyKey: crypto.randomUUID(),
+    });
+    const commands = [1, 2].map(() => ({
+      expectedVersion: 2,
       idempotencyKey: crypto.randomUUID(),
       role: "RECRUITER" as const,
     }));
     const results = await Promise.allSettled(
-      commands.map((command) => transaction.execute(authority, requestId, command)),
+      commands.map((command) =>
+        transaction.execute(authority, requestId, command),
+      ),
     );
-    expect(results.filter((item) => item.status === "fulfilled")).toHaveLength(1);
-    expect(results.filter((item) => item.status === "rejected")).toHaveLength(1);
+    expect(results.filter((item) => item.status === "fulfilled")).toHaveLength(
+      1,
+    );
+    expect(results.filter((item) => item.status === "rejected")).toHaveLength(
+      1,
+    );
     const row = await prisma.recruiterVerificationRequest.findUniqueOrThrow({
       where: { id: requestId },
-      include: { targetCompany: { include: { memberships: true } }, notifications: true },
+      include: {
+        targetCompany: { include: { memberships: true } },
+        notifications: true,
+      },
     });
     expect(row.state).toBe("APPROVED");
     expect(row.targetCompany?.memberships).toHaveLength(1);
@@ -155,13 +183,17 @@ describe("verification decisions", () => {
   });
 
   it("keeps a truncated company slug valid when the name ends at a separator", async () => {
+    await new VerificationReviewService().claim(authority, requestId, {
+      expectedVersion: 1,
+      idempotencyKey: crypto.randomUUID(),
+    });
     await prisma.recruiterVerificationRequest.update({
       where: { id: requestId },
       data: { submittedCompanyName: `${"A".repeat(47)} Company` },
     });
 
     await new VerificationApprovalTransaction().execute(authority, requestId, {
-      expectedVersion: 1,
+      expectedVersion: 2,
       idempotencyKey: crypto.randomUUID(),
       role: "RECRUITER",
     });
@@ -172,5 +204,34 @@ describe("verification decisions", () => {
     });
     expect(row.targetCompany?.slug).toMatch(/^[a-z0-9]+-[a-z0-9-]+$/u);
     expect(row.targetCompany?.slug).not.toContain("--");
+  });
+
+  it("requires a claim before a decision and assigns the case atomically", async () => {
+    await expect(
+      new VerificationApprovalTransaction().execute(authority, requestId, {
+        expectedVersion: 1,
+        idempotencyKey: crypto.randomUUID(),
+        role: "RECRUITER",
+      }),
+    ).rejects.toThrow("CLAIM_REQUIRED");
+
+    const claimed = await new VerificationReviewService().claim(
+      authority,
+      requestId,
+      { expectedVersion: 1, idempotencyKey: crypto.randomUUID() },
+    );
+    expect(claimed).toMatchObject({
+      requestId,
+      assignedAdminRef: adminId,
+      state: "PENDING_REVIEW",
+      version: 2,
+    });
+    await expect(
+      new VerificationApprovalTransaction().execute(authority, requestId, {
+        expectedVersion: 2,
+        idempotencyKey: crypto.randomUUID(),
+        role: "RECRUITER",
+      }),
+    ).resolves.toMatchObject({ state: "APPROVED" });
   });
 });

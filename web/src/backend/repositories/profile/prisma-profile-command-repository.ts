@@ -42,7 +42,30 @@ export class PrismaProfileCommandRepository {
       if (!profile) throw new Error("PROFILE_NOT_AVAILABLE");
       const conflictApplied = profile.revision !== mutation.baseRevision;
 
-      if (mutation.section === "basics") {
+      if (mutation.section === "visibility") {
+        const existing = await tx.candidateProfileVisibility.findUnique({
+          where: { candidateUserId: userId },
+          select: { version: true },
+        });
+        const candidateSections = [...new Set(mutation.visibility.candidateSections)];
+        const recruiterSections = [...new Set(mutation.visibility.recruiterSections)];
+        await tx.candidateProfileVisibility.upsert({
+          where: { candidateUserId: userId },
+          create: {
+            candidateUserId: userId,
+            discoverableByExactId: mutation.visibility.discoverableByExactId,
+            candidateSections,
+            recruiterSections,
+            version: 1,
+          },
+          update: {
+            discoverableByExactId: mutation.visibility.discoverableByExactId,
+            candidateSections,
+            recruiterSections,
+            version: { increment: existing ? 1 : 0 },
+          },
+        });
+      } else if (mutation.section === "basics") {
         await tx.candidateProfile.update({
           where: { id: profile.id },
           data: mutation.basics,

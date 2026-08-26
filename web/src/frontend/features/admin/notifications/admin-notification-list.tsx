@@ -136,7 +136,18 @@ export function AdminNotificationList() {
       pagination={<Pagination rowsPerPageOptions={[25, 50, 100]} />}
       sort={{ field: "lastOccurredAt", order: "DESC" }}
     >
-      <Datagrid bulkActionButtons={false} rowClick={false}>
+      <Datagrid
+        bulkActionButtons={false}
+        rowClick={false}
+        rowSx={(record: NotificationItem) =>
+          record.readAt
+            ? {}
+            : {
+                backgroundColor: "grey.100",
+                "&:hover": { backgroundColor: "grey.200" },
+              }
+        }
+      >
         <TextField source="severity" />
         <TextField source="category" />
         <TextField source="title" />

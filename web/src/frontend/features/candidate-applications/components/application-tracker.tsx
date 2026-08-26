@@ -356,6 +356,23 @@ export function ApplicationTracker({
     }
   }
 
+  async function setContactConsent(shared: boolean) {
+    setPending("contact-consent");
+    setError(null);
+    try {
+      const response = await mutateWithCurrentCsrf(
+        `/api/candidate/applications/${encodeURIComponent(applicationId)}/contact-consent`,
+        { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ shared, expectedVersion: tracker.contactConsent?.version }) },
+        csrfProof,
+      );
+      if (!response.ok) throw new Error("Contact sharing could not be updated. Refresh and try again.");
+      const next = await response.json() as { shared: boolean; version: number };
+      setTracker((current) => ({ ...current, contactConsent: next }));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Contact sharing could not be updated.");
+    } finally { setPending(null); }
+  }
+
   async function respondToOffer(decision: "ACCEPT" | "DECLINE") {
     if (tracker.canonicalStage !== "OFFERED" || pending) return;
     setPending(decision === "ACCEPT" ? "accept-offer" : "decline-offer");
@@ -853,6 +870,10 @@ export function ApplicationTracker({
               ) : (
                 <ToggleLeft aria-hidden="true" />
               )}
+            </button>
+            <button type="button" className="application-ui-toggle" disabled={pending !== null} aria-pressed={tracker.contactConsent?.shared ?? false} onClick={() => void setContactConsent(!(tracker.contactConsent?.shared ?? false))}>
+              <span className="application-ui-toggle__content"><Mail aria-hidden="true" /><span><strong>Share contact with recruiter</strong><small>{tracker.contactConsent?.shared ? "Enabled for this application" : "Private"}</small></span></span>
+              {tracker.contactConsent?.shared ? <ToggleRight aria-hidden="true" /> : <ToggleLeft aria-hidden="true" />}
             </button>
           </section>
 

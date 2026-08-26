@@ -2,14 +2,19 @@
 
 ## Use-Case Specifications
 
-*Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*
-**Version:** V1.4 (25/07/2026) — Reconciled with PA3 implementation; added 2FA, owned-session management, and full account recovery
-**Version History:**
-- V1.1 (20/7/2026) - First initialization (UC1 --> 3)
-- V1.2 (22/7/2026) - Second initialization (UC3 --> 7)
-- V1.3 (23/7/2026) - Third initialization (UC7 --> 12)
+*Performed by: Nguyễn Gia Quốc Uy | Reviewed by: Nguyễn Minh Khôi | Edited by: Nguyễn Minh Khôi*  
+**Version:** V1.5 (2026-08-26) — PA5 Final Document Synchronization Review
+
+### Revision History
+
+| Version | Date | Author/Editor | Summary | Status |
+|---|---|---|---|---|
+| 1.4 | 2026-07-25 | Nguyễn Gia Quốc Uy | Reconciled with PA3 implementation; added 2FA, owned-session management, and full account recovery. | Baseline |
+| 1.5 | 2026-08-26 | Nguyễn Minh Khôi (Reviewer) | PA5 Document Synchronization review: Verified 16 use cases (UC-AUTH-01–11, UC-ACC-01–02, UC-PROF-01–03) against Features 001, 002, 004, 005. Reconciled verification notes and step-up auth requirements. | Approved |
 
 # 1. UC-AUTH-01 — Register Account
+
+*Performed by: Nguyễn Gia Quốc Uy | Reviewed by: Nguyễn Minh Khôi | Edited by: Nguyễn Minh Khôi*
 
 ## 1.1. Use-Case Information
 | Field | Value |

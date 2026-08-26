@@ -159,6 +159,7 @@ export const applicationSubmissionSchema = z
     cvId: z.string().min(1).max(128),
     cvFileRef: z.string().min(1).max(256).nullable().optional(),
     contactSnapshot: applicationContactSnapshotSchema.optional(),
+    shareContactWithRecruiter: z.boolean().optional(),
     answers: z.array(applicationAnswerInputSchema).max(20),
     coverLetter: applicationCoverLetterInputSchema.nullable(),
     message: z.string().trim().max(2_000).nullable().optional(),

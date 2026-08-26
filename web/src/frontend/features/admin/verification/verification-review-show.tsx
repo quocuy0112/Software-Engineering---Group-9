@@ -9,7 +9,13 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { Show, useRecordContext, useRefresh } from "react-admin";
+import {
+  ListButton,
+  Show,
+  TopToolbar,
+  useRecordContext,
+  useRefresh,
+} from "react-admin";
 import { ProtectedEvidenceViewer } from "./protected-evidence-viewer";
 import { VerificationDecisionPanel } from "./verification-decision-panel";
 
@@ -21,6 +27,14 @@ type Evidence = {
   byteSize: number;
   safetyState: "PENDING" | "PASS" | "FAIL" | "ERROR";
   accessibility: "AVAILABLE" | "INACCESSIBLE" | "DELETED";
+  unavailabilityReason:
+    | "DELETED"
+    | "CONTENT_RESTRICTED"
+    | "SUPERSEDED"
+    | "NOT_CURRENT_SUBMISSION"
+    | "SAFETY_CHECK_INCOMPLETE"
+    | "TARGET_COMPANY_INACTIVE"
+    | null;
 };
 
 type VerificationReview = {
@@ -29,6 +43,7 @@ type VerificationReview = {
     applicantId: string;
     companyName: string;
     taxCode: string;
+    targetCompanyId: string | null;
     state: string;
     applicantEligibility: "ACTIVE" | "SUSPENDED";
     submittedAt: string;
@@ -37,6 +52,7 @@ type VerificationReview = {
     version: number;
   };
   company: {
+    id: string | null;
     name: string;
     taxCode: string;
     targetKind: string;
@@ -59,6 +75,11 @@ type VerificationReview = {
     createdAt: string;
   }>;
   applicantComment: string | null;
+  assignment: {
+    status: "UNASSIGNED" | "MINE" | "ASSIGNED_TO_OTHER";
+    assignedAdminRef: string | null;
+    canClaim: boolean;
+  };
   canDecide: boolean;
   blockReason: string | null;
   calculatedAt: string;
@@ -88,14 +109,51 @@ function StateChip({ value }: { value: string }) {
   return <Chip label={sentenceCase(value)} color={color} size="small" />;
 }
 
+function AssignmentChip({
+  status,
+}: {
+  status: "UNASSIGNED" | "MINE" | "ASSIGNED_TO_OTHER";
+}) {
+  const label =
+    status === "MINE"
+      ? "Claimed by you"
+      : status === "ASSIGNED_TO_OTHER"
+        ? "Claimed by another admin"
+        : "Unassigned";
+  return (
+    <Chip
+      label={label}
+      color={
+        status === "MINE"
+          ? "success"
+          : status === "UNASSIGNED"
+            ? "warning"
+            : "default"
+      }
+      size="small"
+      variant={status === "MINE" ? "filled" : "outlined"}
+    />
+  );
+}
+
 function Detail({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <Box>
       <Typography variant="caption" color="text.secondary">
         {label}
       </Typography>
-      <Typography sx={{ overflowWrap: "anywhere" }}>{value}</Typography>
+      <Typography component="div" sx={{ overflowWrap: "anywhere" }}>
+        {value}
+      </Typography>
     </Box>
+  );
+}
+
+function ReviewShowActions() {
+  return (
+    <TopToolbar>
+      <ListButton />
+    </TopToolbar>
   );
 }
 
@@ -136,6 +194,7 @@ function Review() {
               </Box>
               <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                 <StateChip value={current.state} />
+                <AssignmentChip status={record.assignment.status} />
                 <Chip
                   label={`Version ${current.version}`}
                   size="small"
@@ -151,7 +210,7 @@ function Review() {
               gridTemplateColumns: {
                 xs: "1fr",
                 sm: "repeat(2, 1fr)",
-                lg: "repeat(4, 1fr)",
+                lg: "repeat(5, minmax(0, 1fr))",
               },
               gap: 2,
             }}
@@ -159,12 +218,16 @@ function Review() {
             <Detail label="Applicant reference" value={current.applicantId} />
             <Detail label="Tax code" value={record.company.taxCode} />
             <Detail
+              label="Company ID"
+              value={record.company.id ?? "Assigned after approval"}
+            />
+            <Detail
               label="Request type"
               value={sentenceCase(record.company.targetKind)}
             />
             <Detail
               label="Assigned administrator"
-              value={current.assignedAdminRef ?? "Unassigned"}
+              value={<AssignmentChip status={record.assignment.status} />}
             />
           </Box>
         </Paper>
@@ -223,6 +286,7 @@ function Review() {
                 createdAt={current.submittedAt}
                 submissionVersion={evidence.version}
                 accessible={evidence.accessibility === "AVAILABLE"}
+                unavailabilityReason={evidence.unavailabilityReason}
               />
             ) : (
               <Alert severity="warning">
@@ -361,6 +425,7 @@ function Review() {
                 applicantEligibility={current.applicantEligibility}
                 canDecide={record.canDecide}
                 blockReason={record.blockReason}
+                assignment={record.assignment}
                 onDone={refresh}
               />
             </Paper>
@@ -373,7 +438,11 @@ function Review() {
 
 export function VerificationReviewShow() {
   return (
-    <Show>
+    <Show
+      title="Verification request"
+      actions={<ReviewShowActions />}
+      component="div"
+    >
       <Review />
     </Show>
   );

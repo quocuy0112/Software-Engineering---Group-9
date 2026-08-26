@@ -69,6 +69,26 @@ export const rateLimitPolicies = {
     limit: 10,
     windowSeconds: 60,
   },
+  profileDiscoveryAccount: {
+    scope: "profile-discovery-account",
+    limit: 10,
+    windowSeconds: 60,
+  },
+  profileDiscoveryNetwork: {
+    scope: "profile-discovery-network",
+    limit: 10,
+    windowSeconds: 60,
+  },
+  profileDiscoveryFailuresAccount: {
+    scope: "profile-discovery-failures-account",
+    limit: 30,
+    windowSeconds: 60 * 60,
+  },
+  profileDiscoveryFailuresNetwork: {
+    scope: "profile-discovery-failures-network",
+    limit: 30,
+    windowSeconds: 60 * 60,
+  },
 } as const;
 
 export function safeRetryMetadata(decision: RateLimitDecision) {

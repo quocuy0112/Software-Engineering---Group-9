@@ -49,4 +49,48 @@ export class PrismaRateLimitRepository {
       retryAfterSeconds: count <= input.limit ? 0 : retryAfterSeconds,
     };
   }
+
+  async blocked(input: { scope: string; subject: string; now?: Date }) {
+    const now = input.now ?? new Date();
+    const record = await prisma.rateLimitBucket.findUnique({
+      where: {
+        scope_subjectDigest_windowStart: {
+          scope: `${input.scope}:block`,
+          subjectDigest: this.subjectDigest(input.subject),
+          windowStart: new Date(0),
+        },
+      },
+      select: { blockedUntil: true },
+    });
+    const blockedUntil = record?.blockedUntil;
+    return blockedUntil && blockedUntil > now ? blockedUntil : null;
+  }
+
+  async block(input: {
+    scope: string;
+    subject: string;
+    seconds: number;
+    now?: Date;
+  }) {
+    const now = input.now ?? new Date();
+    const blockedUntil = new Date(now.getTime() + input.seconds * 1000);
+    await prisma.rateLimitBucket.upsert({
+      where: {
+        scope_subjectDigest_windowStart: {
+          scope: `${input.scope}:block`,
+          subjectDigest: this.subjectDigest(input.subject),
+          windowStart: new Date(0),
+        },
+      },
+      create: {
+        scope: `${input.scope}:block`,
+        subjectDigest: this.subjectDigest(input.subject),
+        windowStart: new Date(0),
+        count: 0,
+        blockedUntil,
+      },
+      update: { blockedUntil },
+    });
+    return blockedUntil;
+  }
 }

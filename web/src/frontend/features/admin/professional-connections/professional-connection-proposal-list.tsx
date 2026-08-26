@@ -284,6 +284,24 @@ export function ProfessionalConnectionProposalList() {
       title="Professional Connection Proposals"
       perPage={25}
       empty={false}
+      sx={{
+        "& .RaList-main": {
+          width: "100%",
+          maxWidth: 1320,
+          mx: "auto",
+        },
+        "& .RaList-content": {
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 2,
+          overflow: "hidden",
+          boxShadow: "none",
+        },
+        "& .RaDatagrid-headerCell": {
+          bgcolor: "grey.50",
+          fontWeight: 800,
+        },
+      }}
       pagination={<Pagination rowsPerPageOptions={[25, 50, 100]} />}
       filters={[
         <TextInput

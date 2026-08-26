@@ -66,5 +66,27 @@ export function useConversations(
     );
   }, []);
 
-  return { items, setItems, nextCursor, error, refresh, loadMore, clearUnread };
+  const setPresence = useCallback(
+    (userId: string, presence: "ONLINE" | "OFFLINE") => {
+      setItems((current) =>
+        current.map((conversation) =>
+          conversation.otherParticipant.id === userId
+            ? { ...conversation, presence }
+            : conversation,
+        ),
+      );
+    },
+    [],
+  );
+
+  return {
+    items,
+    setItems,
+    nextCursor,
+    error,
+    refresh,
+    loadMore,
+    clearUnread,
+    setPresence,
+  };
 }

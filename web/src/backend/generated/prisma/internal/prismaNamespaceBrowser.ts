@@ -58,6 +58,7 @@ export const ModelName = {
   TwoFactor: 'TwoFactor',
   CandidateIdentity: 'CandidateIdentity',
   CandidateProfile: 'CandidateProfile',
+  CandidateProfileVisibility: 'CandidateProfileVisibility',
   ProfileExperience: 'ProfileExperience',
   ProfileEducation: 'ProfileEducation',
   Skill: 'Skill',
@@ -130,6 +131,7 @@ export const ModelName = {
   ApplicationPublicUpdate: 'ApplicationPublicUpdate',
   ApplicationNotificationPreference: 'ApplicationNotificationPreference',
   JobApplication: 'JobApplication',
+  JobApplicationContactConsent: 'JobApplicationContactConsent',
   JobApplicationAttemptCounter: 'JobApplicationAttemptCounter',
   ApplicationDocument: 'ApplicationDocument',
   ApplicationCoverLetterText: 'ApplicationCoverLetterText',
@@ -324,6 +326,19 @@ export const CandidateProfileScalarFieldEnum = {
 } as const
 
 export type CandidateProfileScalarFieldEnum = (typeof CandidateProfileScalarFieldEnum)[keyof typeof CandidateProfileScalarFieldEnum]
+
+
+export const CandidateProfileVisibilityScalarFieldEnum = {
+  candidateUserId: 'candidateUserId',
+  discoverableByExactId: 'discoverableByExactId',
+  candidateSections: 'candidateSections',
+  recruiterSections: 'recruiterSections',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CandidateProfileVisibilityScalarFieldEnum = (typeof CandidateProfileVisibilityScalarFieldEnum)[keyof typeof CandidateProfileVisibilityScalarFieldEnum]
 
 
 export const ProfileExperienceScalarFieldEnum = {
@@ -1724,6 +1739,8 @@ export const JobApplicationScalarFieldEnum = {
   documentAccessDeniedAt: 'documentAccessDeniedAt',
   documentDeletionDueAt: 'documentDeletionDueAt',
   documentDeletedAt: 'documentDeletedAt',
+  profileSnapshotReviewDueAt: 'profileSnapshotReviewDueAt',
+  profileSnapshotAccessDeniedAt: 'profileSnapshotAccessDeniedAt',
   legacyDocumentState: 'legacyDocumentState',
   currentScoringResultId: 'currentScoringResultId',
   scoringGeneration: 'scoringGeneration',
@@ -1732,6 +1749,18 @@ export const JobApplicationScalarFieldEnum = {
 } as const
 
 export type JobApplicationScalarFieldEnum = (typeof JobApplicationScalarFieldEnum)[keyof typeof JobApplicationScalarFieldEnum]
+
+
+export const JobApplicationContactConsentScalarFieldEnum = {
+  applicationId: 'applicationId',
+  sharedAt: 'sharedAt',
+  withdrawnAt: 'withdrawnAt',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobApplicationContactConsentScalarFieldEnum = (typeof JobApplicationContactConsentScalarFieldEnum)[keyof typeof JobApplicationContactConsentScalarFieldEnum]
 
 
 export const JobApplicationAttemptCounterScalarFieldEnum = {

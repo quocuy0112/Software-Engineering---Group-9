@@ -4,6 +4,7 @@ import { config as loadEnvironment } from "dotenv";
 import { randomUUID } from "node:crypto";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { distributeUnassignedPendingReviews } from "../src/backend/jobs/review/job-post-review-assignment.ts";
 
 const webRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 loadEnvironment({ path: resolve(webRoot, ".env.local"), quiet: true });
@@ -73,6 +74,26 @@ try {
             },
           });
 
+    // Review state belongs to the recruiter submission, not to its assignee.
+    // Releasing the revoked administrator's assignments keeps every submitted
+    // version pending and lets another active administrator claim it without
+    // forcing the recruiter to create a new submission.
+    const releasedPendingReviewAssignments =
+      await transaction.jobPostReviewVersion.updateMany({
+        where: {
+          state: "PENDING_REVIEW",
+          assignedAdminUserId: user.id,
+        },
+        data: {
+          assignedAdminUserId: null,
+          assignedAt: null,
+        },
+      });
+    const reassignedPendingReviews = await distributeUnassignedPendingReviews(
+      transaction,
+      now,
+    );
+
     await transaction.auditEvent.create({
       data: {
         occurredAt: now,
@@ -87,11 +108,20 @@ try {
           previousState: existing.state,
           changed: existing.state !== "REVOKED",
           designatedSessionRevoked: Boolean(designatedSessionId),
+          releasedPendingReviewAssignments:
+            releasedPendingReviewAssignments.count,
+          reassignedPendingReviews,
         },
       },
     });
 
-    return { grantId: grant.id, userId: user.id, state: grant.state };
+    return {
+      grantId: grant.id,
+      userId: user.id,
+      state: grant.state,
+      releasedPendingReviewAssignments: releasedPendingReviewAssignments.count,
+      reassignedPendingReviews,
+    };
   });
   console.log(JSON.stringify(result));
 } finally {

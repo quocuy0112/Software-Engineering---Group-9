@@ -5,6 +5,7 @@ export const jobPostReviewStateSchema = z.enum([
   "PENDING_REVIEW",
   "APPROVED",
   "REJECTED",
+  "WITHDRAWN",
 ]);
 
 export const jobPostReviewReasonCodeSchema = z.enum([
@@ -47,6 +48,8 @@ export const jobPostReviewQueueItemSchema = z
     submittedAt: z.string().datetime(),
     ageSeconds: z.number().int().nonnegative(),
     version: z.number().int().positive(),
+    recordStatus: z.enum(["ACTIVE", "DELETED"]),
+    deletedAt: z.string().datetime().nullable(),
     integrityState: z.enum(["VALID", "BLOCKED"]).optional(),
   })
   .strict();
@@ -69,6 +72,7 @@ export const jobPostReviewListQuerySchema = z
     companyId: z.string().min(1).max(128).optional(),
     minimumAgeHours: z.number().int().min(0).max(8_760).optional(),
     sequence: z.number().int().positive().optional(),
+    recordStatus: z.enum(["ACTIVE", "DELETED", "ALL"]).optional(),
   })
   .strict();
 

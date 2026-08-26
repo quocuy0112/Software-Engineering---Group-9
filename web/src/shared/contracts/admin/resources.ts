@@ -214,6 +214,7 @@ export const moderationListItemSchema = z
   .object({
     id: adminReferenceSchema,
     reporterAccountId: adminReferenceSchema,
+    reporterDisplayName: z.string().min(1).max(200),
     targetType: z.enum(["JOB", "COMPANY", "MEMBERSHIP", "CANDIDATE"]),
     targetReference: adminReferenceSchema,
     category: reportCategorySchema,

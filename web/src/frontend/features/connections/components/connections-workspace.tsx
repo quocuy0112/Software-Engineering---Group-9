@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import {
-  ArrowRight,
   Bell,
   CircleHelp,
-  MessageSquareLock,
+  ArrowUpRight,
+  History,
+  Search,
   ShieldCheck,
+  UsersRound,
   UserRoundPlus,
 } from "lucide-react";
 import { Badge } from "@/frontend/components/ui/badge";
@@ -19,7 +21,16 @@ import type {
   ParticipantProposal,
   ProfessionalConnectionProjection,
 } from "@/shared/contracts/connections";
+import type { DiscoverableProfile } from "@/shared/contracts/profile-discovery";
 import { useConnectionInvalidation } from "../client/use-connection-invalidation";
+
+type RecentProfileSearch = {
+  userId: string;
+  displayName: string;
+};
+
+const RECENT_PROFILE_SEARCHES_KEY = "smarthire:recent-profile-searches";
+const MAX_RECENT_PROFILE_SEARCHES = 6;
 
 function formatConnectionDate(value: string, locale: string) {
   return new Intl.DateTimeFormat(locale, {
@@ -206,11 +217,13 @@ export function ConnectionsWorkspace({
   initialProposals,
   initialConnections,
   initialNotifications,
+  currentUserId = "",
 }: {
   csrfProof: string;
   initialProposals: ParticipantProposal[];
   initialConnections: ProfessionalConnectionProjection[];
   initialNotifications: ConnectionNotificationProjection[];
+  currentUserId?: string;
 }) {
   const locale = useWorkspaceLocale();
   const copy = connectionCopy(locale);
@@ -219,6 +232,56 @@ export function ConnectionsWorkspace({
   const [notifications, setNotifications] = useState(initialNotifications);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [lookupId, setLookupId] = useState("");
+  const [lookupResult, setLookupResult] = useState<DiscoverableProfile | null>(
+    null,
+  );
+  const [lookupMessage, setLookupMessage] = useState<string | null>(null);
+  const [lookupBusy, setLookupBusy] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<RecentProfileSearch[]>(
+    [],
+  );
+
+  useEffect(() => {
+    try {
+      const parsed: unknown = JSON.parse(
+        window.localStorage.getItem(RECENT_PROFILE_SEARCHES_KEY) ?? "[]",
+      );
+      if (!Array.isArray(parsed)) return;
+      setRecentSearches(
+        parsed
+          .filter(
+            (item): item is RecentProfileSearch =>
+              typeof item === "object" &&
+              item !== null &&
+              typeof item.userId === "string" &&
+              typeof item.displayName === "string",
+          )
+          .slice(0, MAX_RECENT_PROFILE_SEARCHES),
+      );
+    } catch {
+      // History is a local convenience; unavailable browser storage is safe to ignore.
+    }
+  }, []);
+
+  function rememberProfile(result: DiscoverableProfile) {
+    const entry = { userId: result.userId, displayName: result.displayName };
+    setRecentSearches((current) => {
+      const next = [
+        entry,
+        ...current.filter((item) => item.userId !== entry.userId),
+      ].slice(0, MAX_RECENT_PROFILE_SEARCHES);
+      try {
+        window.localStorage.setItem(
+          RECENT_PROFILE_SEARCHES_KEY,
+          JSON.stringify(next),
+        );
+      } catch {
+        // Do not let unavailable local storage block a lookup.
+      }
+      return next;
+    });
+  }
   const refresh = useCallback(async () => {
     const [proposalBody, connectionBody, notificationBody] = await Promise.all([
       connectionApi("/api/connections/proposals?limit=50", csrfProof),
@@ -235,6 +298,39 @@ export function ConnectionsWorkspace({
   const activeProposals = proposals.filter((item) =>
     ["PENDING_BOTH", "PARTIALLY_ACCEPTED"].includes(item.state),
   );
+  async function findProfile(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const target = lookupId.trim();
+    setLookupResult(null);
+    setLookupMessage(null);
+    if (!target) return;
+    if (target === currentUserId) {
+      setLookupMessage(
+        "This is your account ID. Manage your profile from Profile settings.",
+      );
+      return;
+    }
+    setLookupBusy(true);
+    try {
+      const response = await fetch(
+        `/api/people/lookup?userId=${encodeURIComponent(target)}`,
+        { cache: "no-store", credentials: "same-origin" },
+      );
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setLookupMessage(body.message ?? "Unable to complete this search.");
+        return;
+      }
+      const result = body.result ?? null;
+      setLookupResult(result);
+      if (result) rememberProfile(result);
+      else setLookupMessage("No visible profile found.");
+    } catch {
+      setLookupMessage("Unable to complete this search.");
+    } finally {
+      setLookupBusy(false);
+    }
+  }
   async function decide(
     proposal: ParticipantProposal,
     decision: "ACCEPTED" | "DECLINED",
@@ -261,39 +357,6 @@ export function ConnectionsWorkspace({
           reason.message !== "CONNECTION_REQUEST_FAILED"
           ? reason.message
           : copy.saveError,
-      );
-      await refresh().catch(() => undefined);
-    } finally {
-      setBusyId(null);
-    }
-  }
-  async function disconnect(connection: ProfessionalConnectionProjection) {
-    if (
-      !window.confirm(copy.endConfirm(connection.otherParticipant.displayName))
-    )
-      return;
-    setBusyId(connection.id);
-    setError(null);
-    try {
-      await connectionApi(
-        `/api/connections/${encodeURIComponent(connection.id)}/disconnect`,
-        csrfProof,
-        {
-          method: "POST",
-          headers: {
-            "if-match-version": String(connection.version),
-            "idempotency-key": crypto.randomUUID(),
-          },
-          body: JSON.stringify({ confirmation: true }),
-        },
-      );
-      await refresh();
-    } catch (reason) {
-      setError(
-        reason instanceof Error &&
-          reason.message !== "CONNECTION_REQUEST_FAILED"
-          ? reason.message
-          : copy.disconnectError,
       );
       await refresh().catch(() => undefined);
     } finally {
@@ -336,34 +399,105 @@ export function ConnectionsWorkspace({
             | "offline",
         }}
       />
+      <section
+        className="connections-profile-lookup"
+        aria-labelledby="profile-lookup-title"
+      >
+        <div className="connections-profile-lookup__heading">
+          <span className="connections-profile-lookup__icon">
+            <Search aria-hidden="true" />
+          </span>
+          <div>
+            <p className="connections-profile-lookup__eyebrow">
+              PROFILE DISCOVERY
+            </p>
+            <h2 id="profile-lookup-title">Find a professional by ID</h2>
+            <p>Only profiles that allow exact-ID discovery appear here.</p>
+          </div>
+        </div>
+        <form
+          onSubmit={findProfile}
+          className="connections-profile-lookup__form"
+        >
+          <label htmlFor="candidate-profile-id">Candidate ID</label>
+          <div>
+            <input
+              id="candidate-profile-id"
+              value={lookupId}
+              onChange={(event) => setLookupId(event.target.value)}
+              autoComplete="off"
+              maxLength={128}
+              required
+            />
+            <button type="submit" className="primary" disabled={lookupBusy}>
+              {lookupBusy ? "Searching…" : "Search"}
+            </button>
+          </div>
+        </form>
+        {lookupMessage ? <p role="status">{lookupMessage}</p> : null}
+        {lookupResult ? (
+          <article className="connections-profile-result">
+            <div className="connection-avatar" aria-hidden="true">
+              {lookupResult.displayName.slice(0, 1).toUpperCase()}
+            </div>
+            <div>
+              <h3>{lookupResult.displayName}</h3>
+              {lookupResult.sections.headline ? (
+                <p>{lookupResult.sections.headline}</p>
+              ) : null}
+              {lookupResult.sections.location ? (
+                <p>{lookupResult.sections.location}</p>
+              ) : null}
+              {lookupResult.sections.skills?.length ? (
+                <p>{lookupResult.sections.skills.join(" · ")}</p>
+              ) : null}
+            </div>
+            <Link
+              className="connections-profile-result__action"
+              href={`/people/${encodeURIComponent(lookupResult.userId)}`}
+              aria-label={`View ${lookupResult.displayName}'s profile`}
+            >
+              <span>View profile</span>
+              <ArrowUpRight aria-hidden="true" />
+            </Link>
+          </article>
+        ) : null}
+      </section>
       {error ? (
         <p className="connections-alert" role="alert">
           {error}
         </p>
       ) : null}
-      <section className="connections-flow" aria-label={copy.title}>
-        {copy.flow.map((step, index) => (
-          <div className="connections-flow__group" key={step.title}>
-            <article className="connections-flow__step">
-              <Badge
-                tone={index === 2 ? "teal" : "blue"}
-                className="connections-flow__icon"
-                data-step={index + 1}
-                aria-hidden="true"
-                icon={<ConsentFlowIcon step={index + 1} />}
-              />
-              <div>
-                <h2>{step.title}</h2>
-                <p>{step.description}</p>
-              </div>
-            </article>
-            {index < copy.flow.length - 1 ? (
-              <span className="connections-flow__arrow" aria-hidden="true">
-                <ArrowIcon />
-              </span>
-            ) : null}
+      <section className="connections-summary" aria-label="Connection overview">
+        <article>
+          <span>
+            <UsersRound aria-hidden="true" />
+          </span>
+          <div>
+            <strong>
+              {connections.filter((item) => item.state === "ACCEPTED").length}
+            </strong>
+            <small>Active connections</small>
           </div>
-        ))}
+        </article>
+        <article>
+          <span>
+            <UserRoundPlus aria-hidden="true" />
+          </span>
+          <div>
+            <strong>{activeProposals.length}</strong>
+            <small>Awaiting your response</small>
+          </div>
+        </article>
+        <article>
+          <span>
+            <ShieldCheck aria-hidden="true" />
+          </span>
+          <div>
+            <strong>Private by design</strong>
+            <small>Messaging opens only with consent</small>
+          </div>
+        </article>
       </section>
       <section className="connections-grid">
         <Panel
@@ -372,7 +506,7 @@ export function ConnectionsWorkspace({
           eyebrow={copy.consent}
           title={copy.proposals}
           rightSlot={
-            <span className="count-pill">
+            <span className="count-pill connections-count connections-count--pending">
               {activeProposals.length} {copy.pending}
             </span>
           }
@@ -452,64 +586,32 @@ export function ConnectionsWorkspace({
         <Panel
           as="article"
           className="connections-panel connections-panel--mini"
-          eyebrow={copy.messagingAccess}
-          title={copy.connections}
+          eyebrow="PROFILE DISCOVERY"
+          title="Recent profile searches"
           rightSlot={
-            <span className="count-pill">
-              {connections.filter((item) => item.state === "ACCEPTED").length}{" "}
-              {copy.active}
+            <span className="count-pill connections-count connections-count--saved">
+              {recentSearches.length} saved
             </span>
           }
         >
-          {connections.length === 0 ? (
+          {recentSearches.length === 0 ? (
             <CompactEmpty
-              title={copy.noConnections}
-              description={copy.noConnectionsCopy}
+              title="No recent searches"
+              description="Profiles you find by exact candidate ID will appear here for quick access on this browser."
             />
           ) : (
-            <div className="connection-card-list">
-              {connections.map((connection) => (
-                <section
-                  className="connection-card compact"
-                  key={connection.id}
+            <div className="recent-profile-searches">
+              {recentSearches.map((search) => (
+                <Link
+                  href={`/people/${encodeURIComponent(search.userId)}`}
+                  key={search.userId}
                 >
-                  <div className="connection-person">
-                    <div className="connection-avatar" aria-hidden="true">
-                      {connection.otherParticipant.displayName
-                        .slice(0, 1)
-                        .toUpperCase()}
-                    </div>
-                    <div>
-                      <h3>{connection.otherParticipant.displayName}</h3>
-                      <p>
-                        {connection.state === "ACCEPTED"
-                          ? copy.messagingEnabled
-                          : copy.connectionEnded}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="connection-actions">
-                    {connection.state === "ACCEPTED" ? (
-                      <>
-                        <Link className="primary link" href="/messages">
-                          {copy.openMessages}
-                        </Link>
-                        <button
-                          type="button"
-                          className="secondary"
-                          disabled={busyId === connection.id}
-                          onClick={() => void disconnect(connection)}
-                        >
-                          {copy.disconnect}
-                        </button>
-                      </>
-                    ) : (
-                      <Link className="secondary link" href="/messages">
-                        {copy.viewHistory}
-                      </Link>
-                    )}
-                  </div>
-                </section>
+                  <span className="connection-avatar" aria-hidden="true">
+                    {search.displayName.slice(0, 1).toUpperCase()}
+                  </span>
+                  <span>{search.displayName}</span>
+                  <History aria-hidden="true" />
+                </Link>
               ))}
             </div>
           )}
@@ -570,16 +672,6 @@ function CompactEmpty({
       </p>
     </div>
   );
-}
-
-function ConsentFlowIcon({ step }: { step: number }) {
-  const Icon =
-    step === 1 ? UserRoundPlus : step === 2 ? ShieldCheck : MessageSquareLock;
-  return <Icon aria-hidden="true" />;
-}
-
-function ArrowIcon() {
-  return <ArrowRight aria-hidden="true" />;
 }
 
 function EmptyStateIcon() {

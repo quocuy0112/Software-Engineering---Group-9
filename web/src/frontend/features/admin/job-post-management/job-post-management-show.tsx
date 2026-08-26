@@ -2,6 +2,7 @@
 import { Box, Chip, Divider, Paper, Stack, Typography } from "@mui/material";
 import { Show, useRecordContext, useRefresh } from "react-admin";
 import { JobPostManagementActionPanel } from "./job-post-management-action-panel";
+import { adminReasonLabel } from "../shared/admin-reason-label";
 
 type ManagementRecord = {
   id: string;
@@ -64,7 +65,8 @@ function Detail() {
         <Typography variant="h6">Recruiter contact</Typography>
         {record.recruiterContact ? (
           <Typography>
-            {record.recruiterContact.name} · {record.recruiterContact.maskedEmail}
+            {record.recruiterContact.name} ·{" "}
+            {record.recruiterContact.maskedEmail}
           </Typography>
         ) : (
           <Typography color="text.secondary">Unavailable</Typography>
@@ -93,7 +95,8 @@ function Detail() {
         </Typography>
         {record.reports?.map((report) => (
           <Typography key={report.id} sx={{ mt: 1 }}>
-            Report {report.id}: {report.category} / {report.priority} /{" "}
+            Report {report.id}: {adminReasonLabel(report.category)} /{" "}
+            {adminReasonLabel(report.priority)} /{" "}
             {new Date(report.createdAt).toLocaleString()}
           </Typography>
         ))}

@@ -1,6 +1,7 @@
 import "server-only";
 import {
   candidateProfileSchema,
+  profileVisibilitySchema,
   type CandidateProfileContract,
 } from "@/shared/contracts/account/profile";
 import { PrismaProfileQueryRepository } from "@/backend/repositories/profile/prisma-profile-query-repository";
@@ -64,6 +65,20 @@ export class GetProfileAggregateService {
         id: entry.id,
         url: entry.url,
       })),
+      visibility: row.candidate.profileVisibility
+        ? profileVisibilitySchema.parse({
+            discoverableByExactId:
+              row.candidate.profileVisibility.discoverableByExactId,
+            candidateSections: row.candidate.profileVisibility.candidateSections,
+            recruiterSections: row.candidate.profileVisibility.recruiterSections,
+            version: row.candidate.profileVisibility.version,
+          })
+        : {
+            discoverableByExactId: false,
+            candidateSections: [],
+            recruiterSections: [],
+            version: 0,
+          },
     };
     return candidateProfileSchema.parse(profile);
   }

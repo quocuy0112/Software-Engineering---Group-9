@@ -4694,7 +4694,7 @@
 
 .private-match-report-page .private-match-report-retry.is-prominent {
   border-color: var(--private-report-amber-600);
-  color: #fff;
+  color: var(--sh-color-on-warning);
   background: var(--private-report-amber-600);
 }
 

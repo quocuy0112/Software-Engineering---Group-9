@@ -7,6 +7,8 @@ import {
   AccordionSummary,
   Alert,
   Box,
+  Button,
+  CircularProgress,
   Chip,
   Divider,
   Link,
@@ -14,7 +16,14 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { Show, useRecordContext, useRefresh } from "react-admin";
+import {
+  ListButton,
+  Show,
+  TopToolbar,
+  useRecordContext,
+  useRefresh,
+  useShowContext,
+} from "react-admin";
 import type { JobReviewSnapshot } from "@/shared/contracts/recruiter-job-posting";
 import { useState } from "react";
 import { StepUpDialog } from "../auth/step-up-dialog";
@@ -22,7 +31,9 @@ import { JobPostReviewActionPanel } from "./job-post-review-action-panel";
 
 type ReviewDetailRecord = {
   id: string;
-  state: "PENDING_REVIEW" | "APPROVED" | "REJECTED";
+  state: "PENDING_REVIEW" | "APPROVED" | "REJECTED" | "WITHDRAWN";
+  recordStatus: "ACTIVE" | "DELETED";
+  deletedAt: string | null;
   assignment: string | null;
   sequence: number;
   version: number;
@@ -211,7 +222,17 @@ function BulletList({ items }: { items: string[] }) {
 
 function ReviewDetail() {
   const record = useRecordContext<ReviewDetailRecord>();
-  if (!record) return null;
+  if (!record?.snapshot) {
+    return (
+      <Box
+        role="status"
+        aria-live="polite"
+        sx={{ display: "flex", justifyContent: "center", p: 4 }}
+      >
+        <CircularProgress aria-label="Loading job post review" />
+      </Box>
+    );
+  }
 
   const snapshot = record.snapshot;
   const changedFields = changedSnapshotFields(record);
@@ -240,6 +261,9 @@ function ReviewDetail() {
             </Box>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
               <StatusChip value={sentenceCase(record.state)} />
+              {record.recordStatus === "DELETED" ? (
+                <StatusChip value="Deleted archive" />
+              ) : null}
               <StatusChip
                 value={`Integrity: ${record.integrityState ?? "VALID"}`}
                 ok={(record.integrityState ?? "VALID") === "VALID"}
@@ -254,6 +278,14 @@ function ReviewDetail() {
             are unavailable until integrity is restored.
           </Alert>
         )}
+
+        {record.recordStatus === "DELETED" ? (
+          <Alert severity="info">
+            This recruiter draft was deleted {dateTime(record.deletedAt)}. Its
+            review history is archived and retained according to the deleted
+            draft retention policy.
+          </Alert>
+        ) : null}
 
         <Box
           sx={{
@@ -526,7 +558,7 @@ function ReviewDetail() {
                     href={record.company.protectedVerificationHref}
                     underline="hover"
                   >
-                    View company verification requests
+                    Open protected verification viewer
                   </Link>
                 )}
               </Stack>
@@ -615,30 +647,61 @@ function ReviewDetail() {
   );
 }
 
-export function JobPostReviewShow() {
-  const [stepUpRequired, setStepUpRequired] = useState(false);
+function ReviewShowActions() {
+  return (
+    <TopToolbar>
+      <ListButton />
+    </TopToolbar>
+  );
+}
+
+function codeOf(error: unknown) {
+  const value = error as {
+    code?: unknown;
+    body?: { code?: unknown; error?: { code?: unknown } };
+  } | null;
+  if (typeof value?.code === "string") return value.code;
+  if (typeof value?.body?.code === "string") return value.body.code;
+  return typeof value?.body?.error?.code === "string"
+    ? value.body.error.code
+    : undefined;
+}
+
+function ReviewLoadError() {
+  const { error } = useShowContext();
   const refresh = useRefresh();
+  const [stepUpRequired, setStepUpRequired] = useState(
+    () => codeOf(error) === "STEP_UP_REQUIRED",
+  );
+
+  if (codeOf(error) !== "STEP_UP_REQUIRED") {
+    return (
+      <Alert severity="error">
+        This job-post review could not be loaded. Return to the list and try
+        again.
+      </Alert>
+    );
+  }
 
   return (
     <>
-      <Show
-        queryOptions={{
-          retry: false,
-          onError: (error) => {
-            const response = error as {
-              code?: string;
-              body?: { code?: string; error?: { code?: string } };
-            };
-            const code =
-              response.code ??
-              response.body?.code ??
-              response.body?.error?.code;
-            if (code === "STEP_UP_REQUIRED") setStepUpRequired(true);
-          },
-        }}
-      >
-        <ReviewDetail />
-      </Show>
+      <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 720, mx: "auto" }}>
+        <Alert
+          severity="info"
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => setStepUpRequired(true)}
+            >
+              Verify now
+            </Button>
+          }
+        >
+          A fresh authenticator code is required before this protected review
+          can be displayed. The code proves your access for 15 minutes.
+        </Alert>
+      </Box>
       <StepUpDialog
         open={stepUpRequired}
         id="job-post-review-detail"
@@ -649,5 +712,19 @@ export function JobPostReviewShow() {
         }}
       />
     </>
+  );
+}
+
+export function JobPostReviewShow() {
+  return (
+    <Show
+      title="Job post review"
+      actions={<ReviewShowActions />}
+      component="div"
+      error={<ReviewLoadError />}
+      queryOptions={{ retry: false }}
+    >
+      <ReviewDetail />
+    </Show>
   );
 }
