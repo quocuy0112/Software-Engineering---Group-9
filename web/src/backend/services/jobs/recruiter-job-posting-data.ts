@@ -33,6 +33,11 @@ import {
   isRecruiterIndustrySelectionValid,
 } from "@/shared/contracts/jobs/industry-taxonomy";
 import { splitCompanyIdentity } from "@/shared/contracts/employer-verification/business-verification";
+import {
+  isOwnerCompanyRole,
+  MAX_OWNED_COMPANIES_PER_USER,
+  OWNER_COMPANY_LIMIT_REACHED,
+} from "@/shared/contracts/company-ownership";
 import type {
   RecruiterJob,
   RecruiterJobManagementData,
@@ -1828,8 +1833,15 @@ export async function ensureRecruiterCompany(
 ) {
   return withWriteLock(async () => {
     const { companies, rawCompanies } = await readCatalog();
-    const existing = (await authorizedCompanies(companies, userId))[0] ?? null;
+    const authorized = await authorizedCompanies(companies, userId);
+    const existing = authorized[0] ?? null;
     if (existing) return existing;
+    const ownedCompanyCount = authorized.filter((company) =>
+      isOwnerCompanyRole(company.role),
+    ).length;
+    if (ownedCompanyCount >= MAX_OWNED_COMPANIES_PER_USER) {
+      throw new Error(OWNER_COMPANY_LIMIT_REACHED);
+    }
     const id = `comp-${randomUUID()}`;
     const identity = splitCompanyIdentity(input.name);
     const company = companyCatalogSchema.parse({

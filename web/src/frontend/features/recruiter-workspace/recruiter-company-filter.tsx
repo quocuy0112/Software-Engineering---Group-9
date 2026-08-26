@@ -19,6 +19,13 @@ export function RecruiterCompanyFilter({
 }) {
   if (companies.length < 2) return null;
 
+  const ownedCompanies = companies.filter(
+    (company) => company.role === "OWNER",
+  );
+  const memberCompanies = companies.filter(
+    (company) => company.role !== "OWNER",
+  );
+
   return (
     <label
       className={["recruiter-company-filter", className]
@@ -35,11 +42,24 @@ export function RecruiterCompanyFilter({
           onChange={(event) => onChange(event.target.value)}
         >
           <option value={ALL_RECRUITER_COMPANIES}>All companies</option>
-          {companies.map((company) => (
-            <option key={company.id} value={company.id}>
-              {company.name}
-            </option>
-          ))}
+          {ownedCompanies.length ? (
+            <optgroup label="Owned by you">
+              {ownedCompanies.map((company) => (
+                <option key={company.id} value={company.id}>
+                  {company.name}
+                </option>
+              ))}
+            </optgroup>
+          ) : null}
+          {memberCompanies.length ? (
+            <optgroup label="Member access">
+              {memberCompanies.map((company) => (
+                <option key={company.id} value={company.id}>
+                  {company.name}
+                </option>
+              ))}
+            </optgroup>
+          ) : null}
         </select>
         <ChevronDown aria-hidden="true" />
       </span>

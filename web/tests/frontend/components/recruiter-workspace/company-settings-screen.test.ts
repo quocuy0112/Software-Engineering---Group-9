@@ -153,6 +153,13 @@ describe("company posting gate validation", () => {
     expect(
       screen.getByRole("heading", { name: "Dava", level: 1 }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Owned by you" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("1/3 slots")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Member access" }),
+    ).toBeInTheDocument();
     expect(screen.getAllByText("Owner")).toHaveLength(2);
     expect(screen.getByRole("link", { name: "Manage team" })).toHaveAttribute(
       "href",
@@ -174,6 +181,61 @@ describe("company posting gate validation", () => {
     expect(
       screen.queryByRole("button", { name: "Delete company" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("shows the ownership quota separately from invited company access", () => {
+    vi.spyOn(console, "debug").mockImplementation(() => undefined);
+    const owner = {
+      id: "company-owner-1",
+      slug: "owner-one",
+      name: "Owner One",
+      entityType: "Limited liability company",
+      industry: "Technology",
+      size: "1-50 employees",
+      address: "Ho Chi Minh City",
+      logo: null,
+      website: null,
+      description: null,
+      ownerUserId: "recruiter-1",
+      memberUserIds: [],
+      taxCode: "1234567890",
+      verificationStatus: "approved" as const,
+      role: "OWNER" as const,
+      profileComplete: true,
+      missingProfileFields: [],
+    };
+    const companies = [
+      owner,
+      { ...owner, id: "company-owner-2", name: "Owner Two" },
+      { ...owner, id: "company-owner-3", name: "Owner Three" },
+      {
+        ...owner,
+        id: "company-member-1",
+        name: "Invited Company",
+        role: "RECRUITER" as const,
+      },
+    ];
+
+    render(
+      createElement(CompanySettingsScreen, {
+        initialCompany: owner,
+        initialCompanies: companies,
+      }),
+    );
+
+    expect(
+      screen.getByText(/Ownership limit reached \(3\/3\)/),
+    ).toBeInTheDocument();
+    expect(screen.getByText("3/3 slots")).toBeInTheDocument();
+    expect(screen.getByText("1 linked")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /You can still join companies as a Recruiter or HR Manager/,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Invited Company/ }),
+    ).toBeInTheDocument();
   });
 
   it("restores the shared company selection when settings is revisited", async () => {

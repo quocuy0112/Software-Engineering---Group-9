@@ -19,6 +19,10 @@ import {
 import { businessVerificationConfig } from "./business-verification-config";
 import { registryLookupConfirmsBusiness } from "@/shared/contracts/employer-verification/business-verification-responses";
 import { companyEmailSignals } from "./company-email-verification";
+import {
+  MAX_OWNED_COMPANIES_PER_USER,
+  OWNER_COMPANY_LIMIT_REACHED,
+} from "@/shared/contracts/company-ownership";
 function storage() {
   return process.env.ADMIN_EVIDENCE_STORAGE_ADAPTER === "s3"
     ? new S3PrivateBusinessEvidenceStorage()
@@ -195,6 +199,24 @@ export class ApplicantVerificationService {
         },
       });
       if (membership) throw new Error("DUPLICATE_AUTHORITY");
+    }
+    // A tax identifier that is not yet represented in the platform creates a
+    // new company during approval, so that path grants OWNER authority even
+    // when the request was submitted with the legacy recruiter label. Joining
+    // an existing company as a recruiter/HR manager does not consume this
+    // ownership quota.
+    const grantsOwnership = !existing || input.requestedRole === "OWNER";
+    if (grantsOwnership) {
+      const ownedCompanyCount = await prisma.companyMembership.count({
+        where: {
+          userId: session.userId,
+          role: "OWNER",
+          status: "ACTIVE",
+        },
+      });
+      if (ownedCompanyCount >= MAX_OWNED_COMPANIES_PER_USER) {
+        throw new Error(OWNER_COMPANY_LIMIT_REACHED);
+      }
     }
     const evidenceStorage = storage();
     const stored = await evidenceStorage.write(`${requestId}:1`, bytes);

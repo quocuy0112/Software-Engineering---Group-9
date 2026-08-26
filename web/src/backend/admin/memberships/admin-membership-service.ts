@@ -8,6 +8,7 @@ import { recordMembershipCommand } from "./admin-membership-command-transaction"
 import { PrismaAdminMembershipRepository } from "@/backend/repositories/admin/prisma-admin-membership-repository";
 import { enforceMessagingMembershipRevocation } from "@/backend/messaging/realtime/messaging-authority-enforcement";
 import { recordCompanyDetailViewed } from "../authorization/admin-access-audit";
+import { assertActiveOwnedCompanyCapacity } from "@/backend/company-members/company-ownership-limit";
 type Command = {
   expectedVersion: number;
   idempotencyKey: string;
@@ -104,6 +105,10 @@ export class AdminMembershipService {
           if (row.status === "REMOVED") throw new Error("INVALID_STATE");
           resultingState = "REMOVED";
           auditAction = "admin.membership_removed";
+        }
+        if (action === "restore" && resultingRole === "OWNER") {
+          await tx.$queryRaw`SELECT "id" FROM "user" WHERE "id" = ${row.userId} FOR UPDATE`;
+          await assertActiveOwnedCompanyCapacity(tx, row.userId, resultingRole);
         }
         const version = row.version + 1;
         const claimed = await tx.companyMembership.updateMany({

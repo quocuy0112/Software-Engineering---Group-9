@@ -14,6 +14,7 @@ import { adminDataProvider } from "../app/data-provider";
 import { StepUpDialog } from "../auth/step-up-dialog";
 import { createAdminOperationIdController } from "../shared/admin-operation-id";
 import { adminReasonLabel } from "../shared/admin-reason-label";
+import { MAX_OWNED_COMPANIES_PER_USER } from "@/shared/contracts/company-ownership";
 
 const categories = [
   "DOCUMENT_UNREADABLE",
@@ -87,7 +88,9 @@ export function VerificationDecisionPanel(props: {
         setError(
           errorValue.body?.code === "APPLICANT_SUSPENDED"
             ? "The applicant account is suspended. Refresh after the account state changes."
-            : "The decision did not commit. Refresh the current review state.",
+            : errorValue.body?.code === "OWNER_COMPANY_LIMIT_REACHED"
+              ? `The applicant already owns ${MAX_OWNED_COMPANIES_PER_USER} companies. The ownership limit must be resolved before approving this request.`
+              : "The decision did not commit. Refresh the current review state.",
         );
       }
     }

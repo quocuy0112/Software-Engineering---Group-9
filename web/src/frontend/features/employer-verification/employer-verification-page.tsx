@@ -438,6 +438,8 @@ function submissionFailureMessage(error: unknown) {
     RELATIONSHIP_REQUIRED:
       "An active company invitation or owner approval is required for this recruiter application.",
     DUPLICATE_AUTHORITY: "You already have active authority for this company.",
+    OWNER_COMPANY_LIMIT_REACHED:
+      "You already own 3 companies. You can still join an existing company as a Recruiter or HR Manager.",
     ACTIVE_REQUEST_EXISTS:
       "An active recruiter application already exists for this tax identifier.",
     STALE_CONFLICT:
