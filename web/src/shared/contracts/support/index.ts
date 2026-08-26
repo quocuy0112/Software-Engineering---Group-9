@@ -141,6 +141,7 @@ export const adminSupportCaseDetailSchema = adminSupportCaseSummarySchema
       z.object({
         id: supportReferenceSchema,
         authorAdminUserId: supportReferenceSchema,
+        authorAdminDisplayName: z.string().min(1).max(255),
         normalizedText: z.string(),
         createdAt: z.string().datetime(),
       }),

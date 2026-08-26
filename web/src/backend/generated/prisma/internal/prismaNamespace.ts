@@ -404,6 +404,7 @@ export const ModelName = {
   TwoFactor: 'TwoFactor',
   CandidateIdentity: 'CandidateIdentity',
   CandidateProfile: 'CandidateProfile',
+  CandidateProfileVisibility: 'CandidateProfileVisibility',
   ProfileExperience: 'ProfileExperience',
   ProfileEducation: 'ProfileEducation',
   Skill: 'Skill',
@@ -476,6 +477,7 @@ export const ModelName = {
   ApplicationPublicUpdate: 'ApplicationPublicUpdate',
   ApplicationNotificationPreference: 'ApplicationNotificationPreference',
   JobApplication: 'JobApplication',
+  JobApplicationContactConsent: 'JobApplicationContactConsent',
   JobApplicationAttemptCounter: 'JobApplicationAttemptCounter',
   ApplicationDocument: 'ApplicationDocument',
   ApplicationCoverLetterText: 'ApplicationCoverLetterText',
@@ -559,7 +561,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "companyInvitation" | "companyTeamActivity" | "companyMembership" | "platformAdministratorGrant" | "platformAdministratorGrantScopeAssignment" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostReviewAggregate" | "jobPostRevisionRequest" | "jobPostFeaturedPlacement" | "jobPostEnforcementAction" | "jobPostEnforcementTarget" | "moderationReportEnforcementLink" | "jobPostOperationalHistory" | "jobPostReviewVersion" | "jobPostReviewHistory" | "jobPostReviewPrivateNote" | "jobCatalogueWriteLease" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "privateCvMatchCheck" | "privateCvMatchAttempt" | "privateAutomaticMatchResult" | "privateAiEvaluationResult" | "privateMatchEvidence" | "privateCvMatchCommandReceipt" | "savedJob" | "jobReport" | "candidateApplicationDraft" | "applicationIntake" | "applicationPublicUpdate" | "applicationNotificationPreference" | "jobApplication" | "jobApplicationAttemptCounter" | "applicationDocument" | "applicationCoverLetterText" | "applicationArtifactPromotion" | "applicationDocumentLegalHold" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "recruitmentThread" | "recruitmentMessage" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence" | "automaticMatchResult" | "documentParseResult" | "skillEvidenceExtraction" | "cvEvidenceExcerpt" | "aiAssessment" | "aiAssessmentFinding" | "aiSuggestedInterviewQuestion" | "scoringOperation" | "scoringWorkItem" | "aiAssessmentAttempt" | "applicationScoringResult" | "manualApplicationPriority" | "rankingSnapshot" | "rankingSnapshotRow" | "jobPostingViewFact" | "jobPostingLifecycleFact" | "exportRequest" | "backupConfiguration" | "backupRun" | "activityLegalHold"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "candidateProfileVisibility" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "companyInvitation" | "companyTeamActivity" | "companyMembership" | "platformAdministratorGrant" | "platformAdministratorGrantScopeAssignment" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostReviewAggregate" | "jobPostRevisionRequest" | "jobPostFeaturedPlacement" | "jobPostEnforcementAction" | "jobPostEnforcementTarget" | "moderationReportEnforcementLink" | "jobPostOperationalHistory" | "jobPostReviewVersion" | "jobPostReviewHistory" | "jobPostReviewPrivateNote" | "jobCatalogueWriteLease" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "privateCvMatchCheck" | "privateCvMatchAttempt" | "privateAutomaticMatchResult" | "privateAiEvaluationResult" | "privateMatchEvidence" | "privateCvMatchCommandReceipt" | "savedJob" | "jobReport" | "candidateApplicationDraft" | "applicationIntake" | "applicationPublicUpdate" | "applicationNotificationPreference" | "jobApplication" | "jobApplicationContactConsent" | "jobApplicationAttemptCounter" | "applicationDocument" | "applicationCoverLetterText" | "applicationArtifactPromotion" | "applicationDocumentLegalHold" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "recruitmentThread" | "recruitmentMessage" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence" | "automaticMatchResult" | "documentParseResult" | "skillEvidenceExtraction" | "cvEvidenceExcerpt" | "aiAssessment" | "aiAssessmentFinding" | "aiSuggestedInterviewQuestion" | "scoringOperation" | "scoringWorkItem" | "aiAssessmentAttempt" | "applicationScoringResult" | "manualApplicationPriority" | "rankingSnapshot" | "rankingSnapshotRow" | "jobPostingViewFact" | "jobPostingLifecycleFact" | "exportRequest" | "backupConfiguration" | "backupRun" | "activityLegalHold"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1078,6 +1080,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CandidateProfileCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CandidateProfileCountAggregateOutputType> | number
+        }
+      }
+    }
+    CandidateProfileVisibility: {
+      payload: Prisma.$CandidateProfileVisibilityPayload<ExtArgs>
+      fields: Prisma.CandidateProfileVisibilityFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CandidateProfileVisibilityFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CandidateProfileVisibilityPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CandidateProfileVisibilityFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CandidateProfileVisibilityPayload>
+        }
+        findFirst: {
+          args: Prisma.CandidateProfileVisibilityFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CandidateProfileVisibilityPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CandidateProfileVisibilityFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CandidateProfileVisibilityPayload>
+        }
+        findMany: {
+          args: Prisma.CandidateProfileVisibilityFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CandidateProfileVisibilityPayload>[]
+        }
+        create: {
+          args: Prisma.CandidateProfileVisibilityCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CandidateProfileVisibilityPayload>
+        }
+        createMany: {
+          args: Prisma.CandidateProfileVisibilityCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CandidateProfileVisibilityCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CandidateProfileVisibilityPayload>[]
+        }
+        delete: {
+          args: Prisma.CandidateProfileVisibilityDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CandidateProfileVisibilityPayload>
+        }
+        update: {
+          args: Prisma.CandidateProfileVisibilityUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CandidateProfileVisibilityPayload>
+        }
+        deleteMany: {
+          args: Prisma.CandidateProfileVisibilityDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CandidateProfileVisibilityUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CandidateProfileVisibilityUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CandidateProfileVisibilityPayload>[]
+        }
+        upsert: {
+          args: Prisma.CandidateProfileVisibilityUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CandidateProfileVisibilityPayload>
+        }
+        aggregate: {
+          args: Prisma.CandidateProfileVisibilityAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCandidateProfileVisibility>
+        }
+        groupBy: {
+          args: Prisma.CandidateProfileVisibilityGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CandidateProfileVisibilityGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CandidateProfileVisibilityCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CandidateProfileVisibilityCountAggregateOutputType> | number
         }
       }
     }
@@ -6409,6 +6485,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    JobApplicationContactConsent: {
+      payload: Prisma.$JobApplicationContactConsentPayload<ExtArgs>
+      fields: Prisma.JobApplicationContactConsentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JobApplicationContactConsentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobApplicationContactConsentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JobApplicationContactConsentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobApplicationContactConsentPayload>
+        }
+        findFirst: {
+          args: Prisma.JobApplicationContactConsentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobApplicationContactConsentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JobApplicationContactConsentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobApplicationContactConsentPayload>
+        }
+        findMany: {
+          args: Prisma.JobApplicationContactConsentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobApplicationContactConsentPayload>[]
+        }
+        create: {
+          args: Prisma.JobApplicationContactConsentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobApplicationContactConsentPayload>
+        }
+        createMany: {
+          args: Prisma.JobApplicationContactConsentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JobApplicationContactConsentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobApplicationContactConsentPayload>[]
+        }
+        delete: {
+          args: Prisma.JobApplicationContactConsentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobApplicationContactConsentPayload>
+        }
+        update: {
+          args: Prisma.JobApplicationContactConsentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobApplicationContactConsentPayload>
+        }
+        deleteMany: {
+          args: Prisma.JobApplicationContactConsentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JobApplicationContactConsentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JobApplicationContactConsentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobApplicationContactConsentPayload>[]
+        }
+        upsert: {
+          args: Prisma.JobApplicationContactConsentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobApplicationContactConsentPayload>
+        }
+        aggregate: {
+          args: Prisma.JobApplicationContactConsentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJobApplicationContactConsent>
+        }
+        groupBy: {
+          args: Prisma.JobApplicationContactConsentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobApplicationContactConsentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JobApplicationContactConsentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobApplicationContactConsentCountAggregateOutputType> | number
+        }
+      }
+    }
     JobApplicationAttemptCounter: {
       payload: Prisma.$JobApplicationAttemptCounterPayload<ExtArgs>
       fields: Prisma.JobApplicationAttemptCounterFieldRefs
@@ -11578,12 +11728,29 @@ export const CandidateProfileScalarFieldEnum = {
   summary: 'summary',
   phone: 'phone',
   location: 'location',
+  dateOfBirth: 'dateOfBirth',
+  preferredName: 'preferredName',
+  interests: 'interests',
+  bio: 'bio',
   revision: 'revision',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type CandidateProfileScalarFieldEnum = (typeof CandidateProfileScalarFieldEnum)[keyof typeof CandidateProfileScalarFieldEnum]
+
+
+export const CandidateProfileVisibilityScalarFieldEnum = {
+  candidateUserId: 'candidateUserId',
+  discoverableByExactId: 'discoverableByExactId',
+  candidateSections: 'candidateSections',
+  recruiterSections: 'recruiterSections',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CandidateProfileVisibilityScalarFieldEnum = (typeof CandidateProfileVisibilityScalarFieldEnum)[keyof typeof CandidateProfileVisibilityScalarFieldEnum]
 
 
 export const ProfileExperienceScalarFieldEnum = {
@@ -12984,6 +13151,8 @@ export const JobApplicationScalarFieldEnum = {
   documentAccessDeniedAt: 'documentAccessDeniedAt',
   documentDeletionDueAt: 'documentDeletionDueAt',
   documentDeletedAt: 'documentDeletedAt',
+  profileSnapshotReviewDueAt: 'profileSnapshotReviewDueAt',
+  profileSnapshotAccessDeniedAt: 'profileSnapshotAccessDeniedAt',
   legacyDocumentState: 'legacyDocumentState',
   currentScoringResultId: 'currentScoringResultId',
   scoringGeneration: 'scoringGeneration',
@@ -12992,6 +13161,18 @@ export const JobApplicationScalarFieldEnum = {
 } as const
 
 export type JobApplicationScalarFieldEnum = (typeof JobApplicationScalarFieldEnum)[keyof typeof JobApplicationScalarFieldEnum]
+
+
+export const JobApplicationContactConsentScalarFieldEnum = {
+  applicationId: 'applicationId',
+  sharedAt: 'sharedAt',
+  withdrawnAt: 'withdrawnAt',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobApplicationContactConsentScalarFieldEnum = (typeof JobApplicationContactConsentScalarFieldEnum)[keyof typeof JobApplicationContactConsentScalarFieldEnum]
 
 
 export const JobApplicationAttemptCounterScalarFieldEnum = {
@@ -14470,20 +14651,6 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
- * Reference to a field of type 'PreferenceLanguage'
- */
-export type EnumPreferenceLanguageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PreferenceLanguage'>
-    
-
-
-/**
- * Reference to a field of type 'PreferenceLanguage[]'
- */
-export type ListEnumPreferenceLanguageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PreferenceLanguage[]'>
-    
-
-
-/**
  * Reference to a field of type 'Json'
  */
 export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -14494,6 +14661,20 @@ export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'J
  * Reference to a field of type 'QueryMode'
  */
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'PreferenceLanguage'
+ */
+export type EnumPreferenceLanguageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PreferenceLanguage'>
+    
+
+
+/**
+ * Reference to a field of type 'PreferenceLanguage[]'
+ */
+export type ListEnumPreferenceLanguageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PreferenceLanguage[]'>
     
 
 
@@ -16586,6 +16767,7 @@ export type GlobalOmitConfig = {
   twoFactor?: Prisma.TwoFactorOmit
   candidateIdentity?: Prisma.CandidateIdentityOmit
   candidateProfile?: Prisma.CandidateProfileOmit
+  candidateProfileVisibility?: Prisma.CandidateProfileVisibilityOmit
   profileExperience?: Prisma.ProfileExperienceOmit
   profileEducation?: Prisma.ProfileEducationOmit
   skill?: Prisma.SkillOmit
@@ -16658,6 +16840,7 @@ export type GlobalOmitConfig = {
   applicationPublicUpdate?: Prisma.ApplicationPublicUpdateOmit
   applicationNotificationPreference?: Prisma.ApplicationNotificationPreferenceOmit
   jobApplication?: Prisma.JobApplicationOmit
+  jobApplicationContactConsent?: Prisma.JobApplicationContactConsentOmit
   jobApplicationAttemptCounter?: Prisma.JobApplicationAttemptCounterOmit
   applicationDocument?: Prisma.ApplicationDocumentOmit
   applicationCoverLetterText?: Prisma.ApplicationCoverLetterTextOmit

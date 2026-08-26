@@ -465,6 +465,7 @@ export class PrismaApplicationRepository
         submittedAt: true,
         stage: true,
         contactSnapshot: true,
+        contactConsent: { select: { sharedAt: true, withdrawnAt: true } },
         coverLetter: true,
         candidate: {
           select: {
@@ -497,8 +498,14 @@ export class PrismaApplicationRepository
           applicationId: row.id,
           candidate: {
             displayName: row.candidate.user.name,
-            verifiedEmail: row.candidate.user.email,
-            sharedPhone: sharedPhone(row.contactSnapshot),
+            verifiedEmail:
+              row.contactConsent?.sharedAt && !row.contactConsent.withdrawnAt
+                ? row.candidate.user.email
+                : null,
+            sharedPhone:
+              row.contactConsent?.sharedAt && !row.contactConsent.withdrawnAt
+                ? sharedPhone(row.contactSnapshot)
+                : null,
             avatarUrl: safeAvatar(row.candidate.user.image),
           },
           submittedAt: row.submittedAt.toISOString(),

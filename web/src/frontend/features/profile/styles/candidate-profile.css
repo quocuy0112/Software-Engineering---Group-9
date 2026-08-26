@@ -286,6 +286,160 @@
   margin-top: 14px;
 }
 
+.candidate-profile-page .profile-about-card {
+  min-width: 0;
+}
+
+.candidate-profile-page .profile-about-eyebrow-mark {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  place-items: center;
+  color: var(--sh-profile-primary);
+  vertical-align: -5px;
+}
+
+.candidate-profile-page .profile-about-eyebrow-mark svg {
+  width: 15px;
+  height: 15px;
+}
+
+.candidate-profile-page .profile-about-description {
+  margin: 0 0 12px;
+  color: var(--sh-profile-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.candidate-profile-page .profile-about-privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--sh-profile-border);
+  border-radius: 10px;
+  color: var(--sh-profile-text-muted);
+  background: var(--sh-profile-surface-alt);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.candidate-profile-page .profile-about-privacy svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  color: var(--sh-profile-primary);
+}
+
+.candidate-profile-page .profile-about-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 18px;
+  margin: 0;
+}
+
+.candidate-profile-page .profile-about-details > div {
+  min-width: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--sh-profile-border);
+}
+
+.candidate-profile-page .profile-about-details__wide {
+  grid-column: 1 / -1;
+}
+
+.candidate-profile-page .profile-about-details dt {
+  margin: 0 0 4px;
+  color: var(--sh-profile-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.candidate-profile-page .profile-about-details dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--sh-profile-text);
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.candidate-profile-page .profile-about-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+
+.candidate-profile-page .profile-about-field {
+  min-width: 0;
+}
+
+.candidate-profile-page .profile-about-field--wide {
+  grid-column: 1 / -1;
+}
+
+.candidate-profile-page .profile-about-field > label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--sh-profile-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.candidate-profile-page .profile-about-field > label span {
+  color: var(--sh-profile-text-faint);
+  font-weight: 400;
+}
+
+.candidate-profile-page .profile-about-field > input,
+.candidate-profile-page .profile-about-field > textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 11px;
+  border: 1px solid var(--sh-profile-border);
+  border-radius: 10px;
+  color: var(--sh-profile-text);
+  background: var(--sh-profile-surface);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.candidate-profile-page .profile-about-field > input {
+  min-height: 38px;
+}
+
+.candidate-profile-page .profile-about-field > textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.candidate-profile-page .profile-about-field > input:hover,
+.candidate-profile-page .profile-about-field > textarea:hover {
+  border-color: var(--sh-profile-primary);
+}
+
+.candidate-profile-page .profile-about-field > input:focus-visible,
+.candidate-profile-page .profile-about-field > textarea:focus-visible {
+  border-color: var(--sh-profile-primary);
+}
+
+.candidate-profile-page .profile-about-field .profile-field-hint,
+.candidate-profile-page .profile-about-field .profile-field-error {
+  margin: 5px 0 0;
+  color: var(--sh-profile-text-faint);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.candidate-profile-page .profile-about-field .profile-field-error {
+  color: var(--sh-color-error);
+  font-weight: 600;
+}
+
 .candidate-profile-page .profile-account-id-value {
   display: flex;
   align-items: center;
@@ -338,6 +492,15 @@
   display: grid;
   gap: 16px;
 }
+
+.profile-visibility { padding: 24px 26px; border: 1px solid var(--sh-profile-border); border-radius: var(--sh-profile-radius-md); background: var(--sh-profile-surface); box-shadow: var(--sh-profile-shadow-card); }
+.profile-visibility .profile-compact-header p { max-width: 680px; margin: 6px 0 0; color: var(--sh-profile-text-muted); font-size: 13px; line-height: 1.55; }
+.profile-visibility__discovery { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; margin-top: 18px; padding: 14px; border: 1px solid var(--sh-profile-border); border-radius: var(--sh-profile-radius-sm); }
+.profile-visibility__discovery > span { display: grid; place-items: center; width: 36px; height: 36px; color: var(--sh-profile-primary); background: var(--sh-profile-primary-light); border-radius: 50%; }.profile-visibility__discovery strong,.profile-visibility__discovery p { display:block; margin:0; }.profile-visibility__discovery p { margin-top:3px; color:var(--sh-profile-text-muted); font-size:12px; }
+.profile-visibility__switch { display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; }.profile-visibility__switch input { position:absolute; opacity:0; }.profile-visibility__switch span { width:36px; height:20px; padding:2px; border-radius:999px; background:var(--sh-profile-border); transition:.2s; }.profile-visibility__switch span::after { content:""; display:block; width:16px; height:16px; border-radius:50%; background:#fff; transition:.2s; }.profile-visibility__switch input:checked + span { background:var(--sh-profile-primary); }.profile-visibility__switch input:checked + span::after { transform:translateX(16px); }
+.profile-visibility__audiences { display:grid; grid-template-columns:minmax(0,1fr); gap:14px; margin-top:16px; }.profile-visibility__audience { min-width:0; padding:14px; border:1px solid var(--sh-profile-border); border-radius:var(--sh-profile-radius-sm); }.profile-visibility__audience legend { font-weight:700; }.profile-visibility__audience > p { margin:4px 0 10px; color:var(--sh-profile-text-muted); font-size:12px; }.profile-visibility__audience > div { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }.profile-visibility__audience label { display:flex; gap:7px; align-items:flex-start; font-size:12px; cursor:pointer; }.profile-visibility__audience input { margin-top:3px; accent-color:var(--sh-profile-primary); }.profile-visibility__audience small { display:block; margin-top:1px; color:var(--sh-profile-text-muted); }
+.profile-visibility__footer { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-top:18px; }.profile-visibility__footer span { display:flex; gap:6px; align-items:center; color:var(--sh-profile-text-muted); font-size:12px; }.profile-visibility__footer button { min-height:38px; padding:0 14px; border:0; border-radius:var(--sh-profile-radius-sm); color:#fff; background:var(--sh-profile-primary); cursor:pointer; }.profile-visibility__footer button:disabled { opacity:.6; cursor:wait; }.profile-visibility__feedback { margin:10px 0 0; font-size:13px; }
+@media (max-width: 720px) { .profile-visibility { padding:18px; }.profile-visibility__audiences { grid-template-columns:1fr; }.profile-visibility__footer { align-items:flex-start; flex-direction:column; }.profile-visibility__audience > div { grid-template-columns:1fr; } }
 
 .candidate-profile-page__empty,
 .candidate-profile-page .candidate-section--editing {
@@ -1506,6 +1669,16 @@
     grid-template-columns: 1fr;
   }
 
+  .candidate-profile-page .profile-about-details,
+  .candidate-profile-page .profile-about-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .candidate-profile-page .profile-about-details__wide,
+  .candidate-profile-page .profile-about-field--wide {
+    grid-column: auto;
+  }
+
   .candidate-profile-page .professional-profile-fields > label {
     padding-top: 0;
   }
@@ -1550,5 +1723,81 @@
 
   .candidate-profile-page .candidate-avatar-modal .profile-avatar-preview-wrap {
     width: 96px;
+  }
+}
+
+/* About me is a first-class profile destination rather than a third card in
+ * the overview grid. Keep the editor aligned to the same content rail while
+ * giving its actions an explicit, accessible button treatment. */
+.profile-about-page > .profile-about-card {
+  width: 100%;
+  margin-top: 4px;
+  border: 1px solid var(--sh-profile-border);
+  border-radius: var(--sh-profile-radius-md);
+  background: var(--sh-profile-surface);
+  box-shadow: var(--sh-profile-shadow-card);
+}
+
+.profile-about-page .profile-about-card--editing .sh-panel__head {
+  align-items: flex-start;
+}
+
+.profile-about-page .profile-about-card--editing .sh-panel__body {
+  padding-top: 2px;
+}
+
+.candidate-profile-page .profile-section-primary-button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 16px;
+  border: 1px solid var(--sh-profile-primary);
+  border-radius: var(--sh-profile-radius-sm);
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-profile-primary);
+  font-family: var(--sh-font-family);
+  font-size: 13px;
+  font-weight: var(--sh-font-weight-semibold);
+  line-height: 1;
+  box-shadow: 0 4px 10px
+    color-mix(in srgb, var(--sh-profile-primary) 18%, transparent);
+  cursor: pointer;
+}
+
+.candidate-profile-page .profile-section-primary-button:hover:not(:disabled) {
+  border-color: var(--sh-profile-primary-dark);
+  background: var(--sh-profile-primary-dark);
+  box-shadow: 0 6px 14px
+    color-mix(in srgb, var(--sh-profile-primary) 24%, transparent);
+}
+
+.candidate-profile-page .profile-section-primary-button:focus-visible,
+.candidate-profile-page .profile-section-secondary-button:focus-visible,
+.candidate-profile-page .profile-section-edit-button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--sh-profile-primary) 28%, transparent);
+  outline-offset: 2px;
+}
+
+.candidate-profile-page .profile-section-primary-button:disabled {
+  border-color: var(--sh-profile-border);
+  color: var(--sh-profile-text-faint);
+  background: var(--sh-profile-gray-light);
+  box-shadow: none;
+  cursor: wait;
+}
+
+@media (max-width: 760px) {
+  .profile-about-page .profile-about-card--editing .sh-panel__head {
+    gap: 14px;
+  }
+
+  .profile-about-page .profile-about-card--editing .profile-section-action-group {
+    width: 100%;
+  }
+
+  .profile-about-page .profile-about-card--editing .profile-section-action-group > button {
+    flex: 1 1 140px;
   }
 }

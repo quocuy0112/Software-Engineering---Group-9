@@ -72,6 +72,23 @@ function evidenceAccessibility(item: {
   return "AVAILABLE" as const;
 }
 
+function evidenceUnavailabilityReason(input: {
+  contentInaccessibleAt: Date | null;
+  deletedAt: Date | null;
+  supersededAt: Date | null;
+  isCurrentSubmission: boolean;
+  safetyState: "PENDING" | "PASS" | "FAIL" | "ERROR";
+  targetCompanyIsActive: boolean;
+}) {
+  if (input.deletedAt) return "DELETED" as const;
+  if (input.contentInaccessibleAt) return "CONTENT_RESTRICTED" as const;
+  if (input.supersededAt) return "SUPERSEDED" as const;
+  if (!input.isCurrentSubmission) return "NOT_CURRENT_SUBMISSION" as const;
+  if (input.safetyState !== "PASS") return "SAFETY_CHECK_INCOMPLETE" as const;
+  if (!input.targetCompanyIsActive) return "TARGET_COMPANY_INACTIVE" as const;
+  return null;
+}
+
 function evidenceFileName(mediaType: string, version: number) {
   const extension =
     mediaType === "application/pdf"
@@ -345,11 +362,18 @@ export class PrismaAccountDirectoryRepository {
       const mediaType =
         evidence.detectedMediaType ?? evidence.declaredMediaType;
       const safetyState = evidenceSafetyState(evidence);
-      const qualified =
-        evidence.id === request.currentEvidenceId &&
-        evidence.submissionVersion === request.currentSubmissionVersion &&
-        safetyState === "PASS" &&
-        request.targetCompany?.verificationState === "ACTIVE";
+      const unavailabilityReason = evidenceUnavailabilityReason({
+        contentInaccessibleAt: evidence.contentInaccessibleAt,
+        deletedAt: evidence.deletedAt,
+        supersededAt: evidence.supersededAt,
+        isCurrentSubmission:
+          evidence.id === request.currentEvidenceId &&
+          evidence.submissionVersion === request.currentSubmissionVersion,
+        safetyState,
+        targetCompanyIsActive:
+          request.targetCompany?.verificationState === "ACTIVE",
+      });
+      const qualified = unavailabilityReason === null;
       return [
         {
           requestId: request.id,
@@ -372,6 +396,7 @@ export class PrismaAccountDirectoryRepository {
             supersededAt: evidence.supersededAt,
             qualified,
           }),
+          unavailabilityReason,
         },
       ];
     });

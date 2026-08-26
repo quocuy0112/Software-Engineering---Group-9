@@ -23,10 +23,13 @@ import {
   validateEducationEntry,
   validateExperienceEntry,
   validateProfilePhone,
+  assertIsoDate,
   validateUniqueSkills,
   validateUniqueSocialLinks,
 } from "./profile-validation";
 import { GetProfileAggregateService } from "./get-profile-aggregate";
+import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
+import { randomUUID } from "node:crypto";
 
 const normalizer = new PlainTextNormalizer();
 
@@ -107,6 +110,33 @@ export function normalizeProfileMutationText(input: unknown): {
       },
       warnings,
     };
+  }
+  if (parsed.section === "about") {
+    return {
+      mutation: {
+        ...parsed,
+        about: {
+          dateOfBirth: parsed.about.dateOfBirth,
+          preferredName: collect(
+            normalizeText(
+              parsed.about.preferredName,
+              "about.preferredName",
+              120,
+            ),
+          ),
+          interests: collect(
+            normalizeText(parsed.about.interests, "about.interests", 500),
+          ),
+          bio: collect(
+            normalizeText(parsed.about.bio, "about.bio", 1_000, false, true),
+          ),
+        },
+      },
+      warnings,
+    };
+  }
+  if (parsed.section === "visibility") {
+    return { mutation: parsed, warnings };
   }
   if (parsed.section === "skills") {
     return {
@@ -212,6 +242,9 @@ function validateNormalizedMutation(
   mutation: ProfileSectionMutation,
   today: string,
 ): ProfileSectionMutation {
+  if (mutation.section === "visibility") {
+    return mutation;
+  }
   if (mutation.section === "basics") {
     for (const [field, value, maximum] of [
       ["basics.headline", mutation.basics.headline, 200],
@@ -221,6 +254,26 @@ function validateNormalizedMutation(
       if (value !== null) assertCodePointLength(field, value, maximum);
     }
     mutation.basics.phone = validateProfilePhone(mutation.basics.phone);
+  } else if (mutation.section === "about") {
+    if (mutation.about.dateOfBirth !== null) {
+      assertIsoDate("about.dateOfBirth", mutation.about.dateOfBirth);
+      if (mutation.about.dateOfBirth > today) {
+        throw new ProfileValidationError("about.dateOfBirth", "FUTURE");
+      }
+    }
+    if (mutation.about.preferredName !== null) {
+      assertCodePointLength(
+        "about.preferredName",
+        mutation.about.preferredName,
+        120,
+      );
+    }
+    if (mutation.about.interests !== null) {
+      assertCodePointLength("about.interests", mutation.about.interests, 500);
+    }
+    if (mutation.about.bio !== null) {
+      assertCodePointLength("about.bio", mutation.about.bio, 1_000);
+    }
   } else if (mutation.section === "skills") {
     assertProfileCollectionCaps({
       skills: mutation.skills,
@@ -276,6 +329,7 @@ export class SaveProfileSectionService {
     private readonly commands = new PrismaProfileCommandRepository(),
     private readonly query = new GetProfileAggregateService(),
     private readonly clock: Clock = systemClock,
+    private readonly audit = new PrismaAuditRepository(),
   ) {}
 
   async execute(
@@ -286,6 +340,20 @@ export class SaveProfileSectionService {
     const today = this.clock.now().toISOString().slice(0, 10);
     const mutation = validateNormalizedMutation(normalized.mutation, today);
     const result = await this.commands.saveSection(userId, mutation);
+    if (mutation.section === "visibility") {
+      await this.audit.append({
+        occurredAt: this.clock.now(),
+        actorType: "user",
+        actorUserId: userId,
+        actorSessionId: null,
+        action: "profile.visibility_changed",
+        targetType: "candidate_profile",
+        targetId: userId,
+        result: "SUCCESS",
+        correlationId: randomUUID(),
+        context: { revision: result.revision, visibility: mutation.visibility.discoverableByExactId ? "EXACT_ID" : "HIDDEN" },
+      });
+    }
     const profile = await this.query.execute(userId);
     return profileMutationOutcomeSchema.parse({
       profile,

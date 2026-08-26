@@ -70,7 +70,8 @@ export function AdminNotificationButton() {
       {
         mutationMode: "optimistic",
         onSettled: () => void notifications.refetch(),
-        onError: () => notify("Unable to mark notification as read", { type: "error" }),
+        onError: () =>
+          notify("Unable to mark notification as read", { type: "error" }),
       },
     );
     navigate();
@@ -142,7 +143,15 @@ export function AdminNotificationButton() {
               key={notification.id}
               disabled={updateState.isPending}
               onClick={() => openNotification(notification)}
-              sx={{ whiteSpace: "normal" }}
+              sx={{
+                whiteSpace: "normal",
+                ...(notification.readAt
+                  ? {}
+                  : {
+                      backgroundColor: "grey.100",
+                      "&:hover": { backgroundColor: "grey.200" },
+                    }),
+              }}
             >
               <ListItemText
                 primary={notification.title}

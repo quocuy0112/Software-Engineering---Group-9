@@ -19,11 +19,15 @@ import { MessagingAvatar } from "./messaging-avatar";
 export function StartConversation({
   csrfProof,
   initialItems,
+  query: controlledQuery,
+  onQueryChange,
   onOpened,
   locale = "en",
 }: {
   csrfProof: string;
   initialItems: EligibleParticipant[];
+  query?: string;
+  onQueryChange?: (query: string) => void;
   onOpened: (conversationId: string) => void;
   locale?: WorkspaceLocale;
 }) {
@@ -49,12 +53,13 @@ export function StartConversation({
   const [selectedContexts, setSelectedContexts] = useState<
     Record<string, string>
   >({});
-  const [query, setQuery] = useState("");
+  const [uncontrolledQuery, setUncontrolledQuery] = useState("");
   const [items, setItems] = useState(initialItems);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [busyUserId, setBusyUserId] = useState<string | null>(null);
   const [openError, setOpenError] = useState<string | null>(null);
+  const query = controlledQuery ?? uncontrolledQuery;
   const hasQuery = Boolean(query.trim());
   const displayedItems = hasQuery ? items : initialItems;
 
@@ -141,7 +146,11 @@ export function StartConversation({
         <input
           type="search"
           value={query}
-          onChange={(event) => setQuery(event.currentTarget.value)}
+          onChange={(event) => {
+            const nextQuery = event.currentTarget.value;
+            setUncontrolledQuery(nextQuery);
+            onQueryChange?.(nextQuery);
+          }}
           placeholder={searchCopy.placeholder}
           aria-label={searchCopy.label}
         />

@@ -222,7 +222,7 @@ async function inspect(input) {
     expectedModelName: "PP-OCRv6-medium",
   });
   await ocr.assertReady(OCR_EXPECTED_MODEL_MANIFEST_SHA256);
-  const ocrDeadline = new Date(Date.now() + 6_000);
+  const ocrDeadline = new Date(Date.now() + 10_000);
   const recognition = await ocr.recognize({
     attemptId: `inspect-${randomUUID()}`,
     purpose: "JOB_IMAGE_SEARCH",

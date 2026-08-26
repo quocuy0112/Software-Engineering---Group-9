@@ -6,12 +6,46 @@ const isoDateSchema = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/u, "Use an ISO calendar date.");
 
+export const profileVisibilitySectionSchema = z.enum([
+  "avatar",
+  "headline",
+  "summary",
+  "location",
+  "skills",
+  "experience",
+  "education",
+  "links",
+]);
+
+export const profileVisibilitySchema = z
+  .object({
+    discoverableByExactId: z.boolean(),
+    candidateSections: z.array(profileVisibilitySectionSchema).max(8),
+    recruiterSections: z.array(profileVisibilitySectionSchema).max(8),
+    version: z.number().int().nonnegative(),
+  })
+  .strict();
+
 export const profileBasicsSchema = z
   .object({
     headline: nullableText(200),
     summary: nullableText(5_000),
     phone: nullableText(32),
     location: nullableText(160),
+  })
+  .strict();
+
+/**
+ * Personal context that belongs to the candidate account only.  It is kept
+ * separate from professional profile signals so it cannot accidentally flow
+ * into public profile or Smart Match projections.
+ */
+export const profileAboutSchema = z
+  .object({
+    dateOfBirth: isoDateSchema.nullable(),
+    preferredName: nullableText(120),
+    interests: nullableText(500),
+    bio: nullableText(1_000),
   })
   .strict();
 
@@ -58,10 +92,15 @@ export const candidateProfileSchema = z
     revision: z.number().int().nonnegative(),
     empty: z.boolean(),
     basics: profileBasicsSchema,
+    // Optional for backwards-compatible consumers and fixtures. Aggregate
+    // responses include the object; clients should treat a missing value as
+    // an empty private section.
+    about: profileAboutSchema.optional(),
     skills: z.array(profileSkillSchema).max(50),
     experience: z.array(profileExperienceSchema).max(50),
     education: z.array(profileEducationSchema).max(50),
     socialLinks: z.array(profileSocialLinkSchema).max(10),
+    visibility: profileVisibilitySchema.optional(),
   })
   .strict();
 
@@ -88,9 +127,23 @@ const socialLinkMutationSchema = profileSocialLinkSchema
 export const profileSectionMutationSchema = z.discriminatedUnion("section", [
   z
     .object({
+      section: z.literal("visibility"),
+      baseRevision: baseRevisionSchema,
+      visibility: profileVisibilitySchema.omit({ version: true }),
+    })
+    .strict(),
+  z
+    .object({
       section: z.literal("basics"),
       baseRevision: baseRevisionSchema,
       basics: profileBasicsSchema,
+    })
+    .strict(),
+  z
+    .object({
+      section: z.literal("about"),
+      baseRevision: baseRevisionSchema,
+      about: profileAboutSchema,
     })
     .strict(),
   z

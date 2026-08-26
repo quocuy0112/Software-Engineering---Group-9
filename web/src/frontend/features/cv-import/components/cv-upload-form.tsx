@@ -10,7 +10,6 @@ import {
 import { toast } from "sonner";
 
 import { Button } from "@/frontend/components/ui/button";
-import { SelectableCard } from "@/frontend/components/ui/cv-import-primitives";
 import type { CvParserClass } from "@/shared/contracts/cv-import/common";
 import { CV_SOURCE_MAX_BYTES } from "@/shared/contracts/cv-import/common";
 import { validateCvFile } from "@/shared/cv-file-validation";
@@ -39,12 +38,8 @@ export function CvUploadForm({
   const locale = useWorkspaceLocale();
   const copy = cvCopy(locale);
   const [file, setFile] = useState<File | null>(null);
-  const [parserClass, setParserClass] = useState<CvParserClass | null>(
-    parserAvailability.deterministic
-      ? "DETERMINISTIC_INTERNAL"
-      : parserAvailability.external
-        ? "EXTERNAL_OPENAI"
-        : null,
+  const [parserClass] = useState<CvParserClass | null>(
+    parserAvailability.external ? "EXTERNAL_OPENAI" : null,
   );
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState(copy.upload.ready);
@@ -127,19 +122,6 @@ export function CvUploadForm({
     );
   }
 
-  function selectParser(nextParser: CvParserClass) {
-    setParserClass(nextParser);
-    setMessage(
-      nextParser === "EXTERNAL_OPENAI"
-        ? locale === "vi"
-          ? "Đã chọn OpenAI. Bạn sẽ cấp quyền sau khi trích xuất văn bản an toàn."
-          : "OpenAI selected. You will grant consent after secure text extraction."
-        : locale === "vi"
-          ? "Đã chọn bộ phân tích SmartHire cho CV này."
-          : "SmartHire parser selected for this CV.",
-    );
-  }
-
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (!file)
@@ -154,6 +136,13 @@ export function CvUploadForm({
           ? "Hiện không có bộ phân tích CV khả dụng."
           : "No CV parser is currently available.",
       );
+    if (parserClass !== "EXTERNAL_OPENAI") {
+      return showError(
+        locale === "vi"
+          ? "Lần nhập CV mới chỉ hỗ trợ bộ phân tích OpenAI bên ngoài."
+          : "New CV imports only support the External OpenAI parser.",
+      );
+    }
 
     setBusy(true);
     setError(null);
@@ -219,44 +208,29 @@ export function CvUploadForm({
         <legend>{copy.upload.chooseParser}</legend>
         <p className={styles.parserGuidance}>{copy.upload.parserGuidance}</p>
         <div className={styles.parserOptions}>
-          <SelectableCard
-            avatarLabel="SH"
-            title={copy.upload.deterministic}
-            description={copy.upload.deterministicHint}
-            statusLabel={
-              parserAvailability.deterministic
-                ? copy.upload.local
-                : copy.upload.unavailable
-            }
-            selected={parserClass === "DETERMINISTIC_INTERNAL"}
-            inputProps={{
-              type: "radio",
-              name: "cv-upload-parser",
-              value: "DETERMINISTIC_INTERNAL",
-              checked: parserClass === "DETERMINISTIC_INTERNAL",
-              onChange: () => selectParser("DETERMINISTIC_INTERNAL"),
-              disabled: busy || !hydrated || !parserAvailability.deterministic,
-            }}
-          />
-          <SelectableCard
-            avatarLabel="AI"
-            title={copy.upload.external}
-            description={copy.upload.externalHint}
-            statusLabel={
-              parserAvailability.external
-                ? copy.upload.aiReady
-                : copy.upload.notConfigured
-            }
-            selected={parserClass === "EXTERNAL_OPENAI"}
-            inputProps={{
-              type: "radio",
-              name: "cv-upload-parser",
-              value: "EXTERNAL_OPENAI",
-              checked: parserClass === "EXTERNAL_OPENAI",
-              onChange: () => selectParser("EXTERNAL_OPENAI"),
-              disabled: busy || !hydrated || !parserAvailability.external,
-            }}
-          />
+          <div
+            className={styles.parserOption}
+            data-selected={parserClass === "EXTERNAL_OPENAI"}
+            data-disabled={!parserAvailability.external}
+            role="radio"
+            aria-checked={parserClass === "EXTERNAL_OPENAI"}
+            aria-disabled={!parserAvailability.external}
+            tabIndex={parserAvailability.external ? 0 : -1}
+            aria-label={copy.upload.external}
+          >
+            <span className={styles.parserMark} aria-hidden="true">
+              AI
+            </span>
+            <span className={styles.parserCopy}>
+              <strong>{copy.upload.external}</strong>
+              <small>{copy.upload.externalHint}</small>
+            </span>
+            <span className={styles.parserBadge}>
+              {parserAvailability.external
+                ? copy.upload.required
+                : copy.upload.notConfigured}
+            </span>
+          </div>
         </div>
       </fieldset>
       <div className={styles.actions}>

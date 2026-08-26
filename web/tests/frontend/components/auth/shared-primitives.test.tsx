@@ -45,6 +45,20 @@ describe("shared auth primitives", () => {
       screen.getByRole("button", { name: "Show password" }),
     ).toHaveAttribute("aria-pressed", "false");
   });
+  it("exposes password policy through a keyboard-operable information button", () => {
+    render(
+      <PasswordField
+        label="Password"
+        hint="Use 12–128 characters with an uppercase letter, number, and special character."
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Password requirements" }),
+    ).toBeVisible();
+    expect(screen.getByRole("tooltip")).toHaveTextContent(
+      "Use 12–128 characters",
+    );
+  });
   it("announces and focuses the error summary", () => {
     render(<FormFeedback errors={["Email is required"]} status="Waiting" />);
     const alerts = screen.getAllByRole("alert");

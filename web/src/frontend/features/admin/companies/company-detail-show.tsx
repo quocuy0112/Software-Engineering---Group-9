@@ -148,7 +148,7 @@ export function CompanyDetailContent() {
               gridTemplateColumns: {
                 xs: "1fr",
                 sm: "repeat(2, 1fr)",
-                lg: "repeat(4, 1fr)",
+                lg: "repeat(5, minmax(0, 1fr))",
               },
               gap: 2,
             }}

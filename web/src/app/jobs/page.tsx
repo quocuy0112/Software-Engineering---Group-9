@@ -7,7 +7,7 @@ import {
   type JobsLiveCopy,
 } from "@/frontend/features/jobs/components/live-job-search-experience";
 import { jobSearchBySchema } from "@/shared/contracts/jobs/discovery";
-import { listJobSearchTaxonomy } from "@/backend/services/jobs/job-search-taxonomy";
+import { listCandidateVisibleJobSearchTaxonomy } from "@/backend/services/jobs/job-search-taxonomy";
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -127,7 +127,10 @@ export default async function JobsPage({ searchParams }: PageProps) {
       .search(initialQuery, actor)
       .then((result) => ({ result, error: null }))
       .catch(() => ({ result: null, error: copy.tryAgain })),
-    listJobSearchTaxonomy().catch(() => ({ industries: [], locations: [] })),
+    listCandidateVisibleJobSearchTaxonomy().catch(() => ({
+      industries: [],
+      locations: [],
+    })),
   ]);
 
   return (

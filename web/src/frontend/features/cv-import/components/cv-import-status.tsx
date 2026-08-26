@@ -32,6 +32,7 @@ import {
   CvFailureRecovery,
   CvRecoveryActionError,
 } from "./cv-failure-recovery";
+import { CvConsentRequiredRecovery } from "./cv-consent-required-recovery";
 import { CvProcessingConsent } from "./cv-processing-consent";
 import { CvRetentionActions } from "./cv-retention-actions";
 import styles from "./cv-import-status.module.css";
@@ -439,6 +440,12 @@ export function CvImportStatus({
     typeof current.scanRetriesRemaining === "number" &&
     typeof current.parseRetriesRemaining === "number",
   );
+  const consentRequiredRecoveryNotice =
+    current.failure?.code === "CONSENT_REQUIRED" &&
+    current.consent &&
+    !current.consent.granted
+      ? current.consent
+      : null;
   return (
     <section className={styles.root} aria-labelledby="cv-status-heading">
       <h2 id="cv-status-heading">{copy.status.heading}</h2>
@@ -539,7 +546,22 @@ export function CvImportStatus({
           {pollError}
         </p>
       ) : null}
-      {hasFailureRecovery ? (
+      {consentRequiredRecoveryNotice ? (
+        <CvConsentRequiredRecovery
+          resource={{
+            uploadId: current.uploadId,
+            availableActions:
+              availableActions as CvImportResource["availableActions"],
+            failure: current.failure ?? null,
+          }}
+          notice={consentRequiredRecoveryNotice}
+          canGrant={Boolean(
+            csrfProof && availableActions.includes("GRANT_CONSENT"),
+          )}
+          onGrant={grantConsent}
+          onDelete={async () => (await deleteImport()) !== false}
+        />
+      ) : hasFailureRecovery ? (
         <CvFailureRecovery
           key={`${current.status}:${current.failure?.code}:${current.scanRetriesRemaining}:${current.parseRetriesRemaining}`}
           resource={{
@@ -570,7 +592,7 @@ export function CvImportStatus({
           ) : null}
         </div>
       )}
-      {current.consent ? (
+      {current.consent && !consentRequiredRecoveryNotice ? (
         <CvProcessingConsent
           notice={current.consent}
           canGrant={Boolean(

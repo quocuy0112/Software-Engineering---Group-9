@@ -16,5 +16,5 @@ export default async function ConnectionsPage() {
     repository.listConnections(context.userId, 50),
     repository.listNotifications(context.userId, 50),
   ]);
-  return <ConnectionsWorkspace csrfProof={context.csrfProof} initialProposals={proposals.items} initialConnections={connections.items} initialNotifications={notifications.items} />;
+  return <ConnectionsWorkspace csrfProof={context.csrfProof} currentUserId={context.userId} initialProposals={proposals.items} initialConnections={connections.items} initialNotifications={notifications.items} />;
 }

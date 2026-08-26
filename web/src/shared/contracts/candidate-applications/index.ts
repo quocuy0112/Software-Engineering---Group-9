@@ -192,6 +192,7 @@ export const applicationSubmitCommandSchema = z
     draftId: idSchema,
     expectedRevision: z.number().int().positive(),
     informationConfirmed: z.literal(true),
+    shareContactWithRecruiter: z.boolean().optional(),
   })
   .strict();
 
@@ -330,6 +331,7 @@ export const applicationTrackerSchema = z
     updates: z.array(applicationPublicUpdateSchema).max(500),
     files: z.array(publicFileSchema).min(1).max(2),
     notificationPreference: notificationPreferenceSchema,
+    contactConsent: z.object({ shared: z.boolean(), version: z.number().int().positive() }).strict().optional(),
     canWithdraw: z.boolean(),
   })
   .strict();

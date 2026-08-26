@@ -1,27 +1,34 @@
 # C4 Level 2 Container Diagram — SmartHire
 
-**Performed by:** Nguyễn Minh Khôi<br>
-**Student ID:** 24127066<br>
-**Reviewed by:** Nguyễn Gia Quốc Uy<br>
-**Edited by:** Nguyễn Minh Khôi
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*  
+**Version:** V1.4 (2026-08-26) — PA5 Final Document Synchronization Baseline
 
-**Architecture scope:** Implemented SmartHire baseline, including the admin lifecycle worker that supports verification, moderation, notifications, support, connections, and job-post management. The diagram includes every deployable runtime and logical data store currently required by the implemented features.
+### Revision History
+
+| Version | Date | Author/Editor | Summary | Status |
+|---|---|---|---|---|
+| 1.3 | 2026-08-06 | Nguyễn Minh Khôi | Updated containers and logical stores for PA4 baseline. | Baseline |
+| 1.4 | 2026-08-26 | Nguyễn Minh Khôi | Added Analytics Export Worker, Admin Backup Runner, Local Export/Backup stores, Socket.IO gateway, and Google Drive adapter. Reconciled container qualifications for PA5. | Approved |
+
+**Architecture scope:** Implemented SmartHire 26-feature baseline, including background workers for email, CV parsing, image search, admin lifecycle, analytics export, and encrypted database backup.
 
 ```mermaid
 flowchart TB
     Visitor["Visitor\n[Person]\nUnauthenticated"]
     Candidate["Candidate\n[Person]\nAuthenticated"]
     Recruiter["Recruiter / Company Member\n[Person]\nAuthenticated, membership-authorized"]
+    PlatformAdmin["Platform Administrator\n[Person]\nAuthenticated, recent 2FA"]
 
     Visitor -->|"HTTP(S) — browse/search jobs, view details,\nimage-assisted search, and register"| Web
-    Candidate -->|"HTTP(S) — authenticate, manage profile/CV,\nsearch, apply, and track applications"| Web
-    Recruiter -->|"HTTP(S) — update candidate application\nstages via implemented recruiter API"| Web
+    Candidate -->|"HTTP(S) & ws/wss — profile, CV upload,\napply, track, Kanban, and realtime chat"| Web
+    Recruiter -->|"HTTP(S) & ws/wss — job posts, candidate scoring,\npipeline Kanban, analytics, team, chat"| Web
+    PlatformAdmin -->|"HTTP(S) — verification, moderation, user audit,\nand privileged database backup"| Web
 
     subgraph SmartHire["SmartHire Platform"]
         direction TB
 
         subgraph AppLayer["Application layer"]
-            Web["Next.js Web Application\nContainer\nNext.js 16, React 19, TypeScript\nServer-side services & API routes\n(Next.js App Router)"]
+            Web["Next.js Web Application\nContainer\nNext.js 16.3, React 19, TypeScript\nServer-side services, Route Handlers,\nand Socket.IO Gateway (/chat)"]
         end
 
         subgraph WorkerLayer["Background workers"]
@@ -30,6 +37,8 @@ flowchart TB
             CVWorker["CV Worker\nContainer\nNode.js / TypeScript"]
             ImageWorker["Image Search Worker\nContainer\nNode.js / TypeScript"]
             AdminWorker["Admin Worker\nContainer\nNode.js / TypeScript"]
+            ExportWorker["Analytics Export Worker\nContainer\nNode.js / TypeScript (ExcelJS)"]
+            BackupWorker["Admin Backup Process\nContainer\nNode.js / TypeScript (pg_dump)"]
         end
 
         subgraph ProcessingLayer["Processing services"]
@@ -45,21 +54,25 @@ flowchart TB
             CVStorage[("Local CV Artifact Store\nLogical data store\nApplication-encrypted filesystem\n— default")]
             SearchStorage[("Local Search Artifact Store\nLogical data store\nAES-256-GCM filesystem\n— default")]
             AdminEvidence[("Local Admin Evidence Store\nLogical data store\nAES-256-GCM filesystem\n— default")]
+            ExportStorage[("Local Export Store\nLogical data store\nFilesystem (Excel/CSV)")]
+            BackupStorage[("Local Backup Store\nLogical data store\nAES-256-GCM encrypted dumps")]
         end
     end
 
     subgraph ExternalLayer["External services — optional unless noted"]
-        EmailProvider["Email Provider\nSMTP / Resend\nOptional — only when EMAIL_ADAPTER is not capture"]
+        EmailProvider["Email Provider\nSMTP / Resend\nOptional — when EMAIL_ADAPTER is not capture"]
         AIProvider["OpenAI Responses API\nOptional — requires feature configuration,\nprivacy gate, and consent"]
         AWSStorage["AWS S3, KMS, IAM\nOptional — adapter implemented,\ninfrastructure not provisioned"]
         ClamAVUpdates["ClamAV Definition Service\nSignature source required by freshclam"]
         BusinessRegistry["VietQR Business Registry\nOptional — business verification lookup"]
+        GoogleDrive["Google Drive Storage\nOptional — encrypted backup upload via OAuth2"]
     end
 
     Web -->|"PostgreSQL wire protocol via Prisma —\nread/write data, outbox, and durable work"| DB
     Web -->|"Filesystem API via storage adapter —\nwrite CV upload"| CVStorage
     Web -->|"Filesystem API via storage adapter —\nwrite search image"| SearchStorage
     Web -->|"Filesystem API via storage adapter —\nwrite/read verification evidence"| AdminEvidence
+    Web -->|"Filesystem API — stream generated export"| ExportStorage
     Web -.->|"AWS S3 API / HTTPS —\nwhen storage adapter is s3"| AWSStorage
     Web -.->|"HTTPS — business registry lookup\nwhen provider is enabled"| BusinessRegistry
 
@@ -86,120 +99,122 @@ flowchart TB
     AdminWorker -.->|"AWS S3 API / HTTPS —\nwhen adapter is s3"| AWSStorage
     AdminWorker -->|"ClamD protocol over private Unix socket —\nsafety-scan evidence"| ClamAV
 
+    ExportWorker -->|"PostgreSQL wire protocol via Prisma —\nclaim ExportRequest jobs"| DB
+    ExportWorker -->|"Filesystem API — write Excel/CSV files"| ExportStorage
+
+    BackupWorker -->|"PostgreSQL wire protocol / pg_dump —\nextract schema and data"| DB
+    BackupWorker -->|"Filesystem API — write AES-256-GCM encrypted dumps"| BackupStorage
+    BackupWorker -.->|"HTTPS / OAuth2 — upload encrypted dumps"| GoogleDrive
+
     ClamAV -->|"HTTPS — update signatures\nthrough freshclam"| ClamAVUpdates
 
     classDef container fill:#f8fafc,stroke:#475569,stroke-width:1.2px,color:#0f172a;
     classDef person fill:#eef2ff,stroke:#1d4ed8,stroke-width:1.2px,color:#1e3a8a;
     classDef external fill:#fff7e6,stroke:#8a5a00,stroke-width:1.2px,color:#0f172a,stroke-dasharray: 5 5;
-    class Web,EmailWorker,CVWorker,ImageWorker,AdminWorker,ClamAV,OCREngine,DB,MailCapture,CVStorage,SearchStorage,AdminEvidence container;
-    class Visitor,Candidate,Recruiter person;
-    class EmailProvider,AIProvider,AWSStorage,ClamAVUpdates,BusinessRegistry external;
+    class Web,EmailWorker,CVWorker,ImageWorker,AdminWorker,ExportWorker,BackupWorker,ClamAV,OCREngine,DB,MailCapture,CVStorage,SearchStorage,AdminEvidence,ExportStorage,BackupStorage container;
+    class Visitor,Candidate,Recruiter,PlatformAdmin person;
+    class EmailProvider,AIProvider,AWSStorage,ClamAVUpdates,BusinessRegistry,GoogleDrive external;
 ```
 
 ## Container descriptions
 
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
+
 ### 1. Next.js Web Application
 
-- Responsibilities: Serves both the React/Next.js frontend and the **server-side services & API routes** (Next.js App Router Route Handlers and backend services) in one deployable container; handles authentication, profile management, job-board operations, CV import admission, image-search admission, recruiter verification (business-registry lookup, evidence submission), and writes durable work (email outbox, CV-import, and image-search rows) into PostgreSQL.
-- Technology used: Next.js 16, React 19, TypeScript, Better Auth, Prisma, Tailwind CSS.
-- Data provided: User sessions, profile data, job listings, applications, audit records, CV import metadata, verification evidence and preparation state.
-- Which container calls it?: `Visitor` and `Candidate` use the implemented browser-facing workflows. Membership-authorized `Recruiter / Company Member` actors call the narrowly scoped recruiter application-stage API over HTTP(S); this does not imply a complete recruiter frontend.
-- Communication protocol: HTTP(S) for client traffic; PostgreSQL wire protocol using Prisma for database access; Filesystem API through the storage adapter by default; HTTPS to the VietQR business registry when the provider is enabled; AWS S3 API/HTTPS only when the adapter is switched to `s3` (not provisioned in this repository).
-
-The separate Frontend and Backend Level 3 diagrams are two logical component views of this single deployable Next.js container.
+- **Responsibilities:** Serves the React/Next.js frontend, App Router Route Handlers, modular backend services, and real-time Socket.IO gateway (`/chat`); handles authentication, profile management, job discovery/applications, CV intake, image search admission, recruiter operations (postings, hybrid candidate scoring, 9-stage Kanban pipeline, team management, company settings), candidate connection proposals, general and recruitment messaging, in-app notifications, and admin console functions.
+- **Technology used:** Next.js 16.3, React 19, TypeScript 5.9, Better Auth, Prisma 7.9, Socket.IO, Tailwind CSS 4, Radix UI.
+- **Data provided:** User sessions, profile data, job listings, applications, scoring assessments, messaging conversations, audit records, verification evidence, and export download links.
+- **Which container calls it?:** `Visitor`, `Candidate`, `Recruiter / Company Member`, and `Platform Administrator` over HTTP(S) and WebSocket (`ws/wss`).
+- **Communication protocol:** HTTP(S) and WebSocket for client traffic; PostgreSQL wire protocol using Prisma for database access; Filesystem API through storage adapters; HTTPS to external providers when enabled.
 
 ### 2. Email Worker
 
-- Responsibilities: Claims EmailOutbox rows written by the web app and sends transactional email (registration verification, password reset, security notifications) with retry.
-- Technology used: Node.js/TypeScript background process, Prisma, capture/SMTP/Resend adapters.
-- Data provided: Email outbox rows, delivery attempts, retry metadata, provider result state.
-- Which container calls it?: Consumes shared database state written by the Web Application.
-- Communication protocol: PostgreSQL wire protocol using Prisma for claiming outbox rows; Filesystem API to `Local Mail Capture` when `EMAIL_ADAPTER=capture` (the local default); SMTP/HTTPS to the external Email Provider only when a non-capture adapter is configured.
+- **Responsibilities:** Claims `EmailOutbox` records written by the web app and sends transactional email (verification, password recovery, invitations, notifications, and security alerts) with exponential retry.
+- **Technology used:** Node.js/TypeScript background worker, Prisma, React Email, capture/SMTP/Resend adapters.
+- **Data provided:** Email outbox status, delivery logs, retry attempts.
+- **Which container calls it?:** Consumes shared database outbox state.
+- **Communication protocol:** PostgreSQL wire protocol via Prisma; Filesystem API to `Local Mail Capture` when `EMAIL_ADAPTER=capture`; SMTP/HTTPS to external Email Provider when configured.
 
 ### 3. CV Worker
 
-- Responsibilities: Processes asynchronous CV ingestion — malware scanning coordination, hybrid extraction, OCR for eligible content, optional AI-assisted parsing, cleanup and reconciliation.
-- Technology used: Node.js/TypeScript worker, Prisma, ClamAV and OCR Engine adapters.
-- Data provided: CV binaries, parser artifacts, review status, extracted text, consent state, derived metadata.
-- Which container calls it?: Claims CV import jobs the Web Application writes into PostgreSQL.
-- Communication protocol: PostgreSQL wire protocol using Prisma for lease claim/update; Filesystem API through the storage adapter by default (AWS S3 API/HTTPS only if `s3` is configured); ClamD protocol over a private Unix socket to the Malware Scanner; HTTP over a private Unix socket to the OCR Engine; HTTPS to OpenAI only when configuration, privacy gate, and consent allow.
+- **Responsibilities:** Handles asynchronous CV ingestion — fail-closed malware scan coordination via ClamAV, text extraction, OCR invocation, optional AI-assisted parsing, and draft reconciliation.
+- **Technology used:** Node.js/TypeScript worker, Prisma, PDF.js, Mammoth, Sharp, ClamAV and OCR Engine adapters.
+- **Data provided:** Extracted CV text, parsed profile sections, parser status, and audit records.
+- **Which container calls it?:** Claims CV import jobs written by the Web Application into PostgreSQL.
+- **Communication protocol:** PostgreSQL wire protocol; Filesystem API; ClamD protocol over private Unix socket; HTTP over private Unix socket to OCR Engine; HTTPS to OpenAI when configured and consented.
 
 ### 4. Image Search Worker
 
-- Responsibilities: Processes image-assisted job search — scans and decodes uploaded images, normalizes to PNG, requests OCR, interprets OCR text into search-filter suggestions, and performs cleanup with a strict deletion deadline.
-- Technology used: Node.js/TypeScript worker, Prisma, ClamAV and OCR Engine adapters, OpenAI adapter for intent interpretation.
-- Data provided: Normalized image artifacts, OCR text, interpreted search criteria, deletion evidence.
-- Which container calls it?: Claims image-search work the Web Application writes into PostgreSQL.
-- Communication protocol: PostgreSQL wire protocol using Prisma for lease claim/update; Filesystem API through the storage adapter by default (AWS S3 API/HTTPS only if `s3` is configured); ClamD protocol over a private Unix socket to the Malware Scanner; HTTP over a private Unix socket to the OCR Engine; HTTPS to OpenAI only when configuration, privacy gate, and consent allow.
+- **Responsibilities:** Ingests images for job search — scans and decodes images, normalizes to PNG, requests OCR, interprets search intent into filter suggestions, and enforces strict deletion deadlines.
+- **Technology used:** Node.js/TypeScript worker, Prisma, Sharp, ClamAV and OCR Engine adapters, optional OpenAI adapter.
+- **Data provided:** Normalized image artifacts, OCR text, structured filter suggestions.
+- **Which container calls it?:** Claims image search work from PostgreSQL.
+- **Communication protocol:** PostgreSQL wire protocol; Filesystem API; ClamD protocol over Unix socket; HTTP over Unix socket to OCR Engine; HTTPS to OpenAI when configured.
 
 ### 5. Admin Worker
 
-- Responsibilities: Runs the admin lifecycle loops — dashboard snapshot calculation, verification evidence safety scanning and deadlines, verification/business-registry preparation cleanup, security and verification notification reconciliation, in-app notification retention, evidence/rationale retention, support lifecycle, professional-connection proposal lifecycle, and job-post auto-archival.
-- Technology used: Node.js/TypeScript worker, Prisma, ClamAV adapter, filesystem/S3 evidence storage adapters.
-- Data provided: Dashboard snapshots, verification evidence states, notification and retention evidence, lifecycle transitions.
-- Which container calls it?: Claims verification, notification, retention, and lifecycle work the Web Application and other flows write into PostgreSQL.
-- Communication protocol: PostgreSQL wire protocol using Prisma for claiming/updating work; Filesystem API to the Local Admin Evidence Store by default (AWS S3 API/HTTPS only if `s3` is configured); ClamD protocol over a private Unix socket to the Malware Scanner for evidence safety checks.
+- **Responsibilities:** Executes administrative lifecycle tasks — dashboard metric pre-computation, verification document safety scanning, notification retention cleanup, support ticket lifecycle, connection proposal expiry, and automated job posting archival.
+- **Technology used:** Node.js/TypeScript worker, Prisma, ClamAV adapter.
+- **Data provided:** Dashboard summaries, retention evidence, expired connection cleanup logs.
+- **Which container calls it?:** Claims administrative work loops from PostgreSQL.
+- **Communication protocol:** PostgreSQL wire protocol; Filesystem API; ClamD protocol over Unix socket.
 
-### 6. OCR Engine
+### 6. Analytics Export Worker
 
-- Responsibilities: Receives normalized images from CV Worker and Image Search Worker and returns recognized text, geometry, and confidence.
-- Technology used: Python 3.12, PaddleOCR, ONNX Runtime, FastAPI, exposed only over a private Unix socket.
-- Data provided: Recognition results (text, geometry, confidence) for CV pages and search images.
-- Which container calls it?: CV Worker and Image Search Worker.
-- Communication protocol: HTTP over a private Unix socket.
+- **Responsibilities:** Generates company-scoped recruitment data exports (candidate lists, application funnel histories, stage times) in Microsoft Excel (.xlsx) and CSV formats asynchronously.
+- **Technology used:** Node.js/TypeScript worker, Prisma, ExcelJS.
+- **Data provided:** Generated `.xlsx` and `.csv` files stored in `Local Export Store` with time-limited access tokens.
+- **Which container calls it?:** Claims `ExportRequest` jobs from PostgreSQL.
+- **Communication protocol:** PostgreSQL wire protocol via Prisma; Filesystem API to write export files.
 
-### 7. Malware Scanner
+### 7. Admin Backup Process
 
-- Responsibilities: Scans uploaded CV files, search images, and verification evidence for malware before they are accepted into the processing pipeline (fail-closed).
-- Technology used: ClamAV 1.4 running in a container with a local socket interface; signatures refreshed via `freshclam` against the ClamAV Definition Service.
-- Data provided: Scan requests and scan results.
-- Which container calls it?: CV Worker, Image Search Worker, and Admin Worker.
-- Communication protocol: ClamD protocol over a private Unix domain socket (local IPC); HTTPS to the external ClamAV Definition Service for signature updates.
+- **Responsibilities:** Executes manual and scheduled full database backups — triggers `pg_dump`, compresses output, encrypts stream using AES-256-GCM, stores dumps locally, and optionally uploads to Google Drive via OAuth2.
+- **Technology used:** Node.js/TypeScript runner, PostgreSQL `pg_dump` CLI, AES-256-GCM crypto, Google Drive OAuth2 API.
+- **Data provided:** Encrypted database backup artifacts, `BackupRun` logs, checksums, and durations.
+- **Which container calls it?:** Triggered by Platform Administrator (with recent 2FA) or automated schedule loop.
+- **Communication protocol:** PostgreSQL wire protocol / local process execution; Filesystem API; HTTPS to Google Drive API.
+- **Restore Qualification:** Out-of-band administrative disaster recovery only; no in-app restore UI.
 
-### 8. PostgreSQL
+### 8. OCR Engine
 
-- Responsibilities: System of record for users, authentication, profiles, jobs, applications, audit trails, email outbox, CV import and image-search work state, verification, notifications, support, connections, and job-post lifecycle state.
-- Technology used: PostgreSQL 16 with Prisma ORM.
-- Data provided: Persistent application data and durable-work/lease state used by the web app and all workers.
-- Which container calls it?: Web Application, Email Worker, CV Worker, Image Search Worker, Admin Worker.
-- Communication protocol: PostgreSQL wire protocol using Prisma as the client/ORM.
+- **Responsibilities:** Receives normalized images from CV Worker and Image Search Worker; returns recognized text, bounding boxes, and confidence scores.
+- **Technology used:** Python 3.12, PaddleOCR, ONNX Runtime, FastAPI exposed only over a private Unix socket with read-only root.
+- **Data provided:** Raw text and character geometry.
+- **Which container calls it?:** CV Worker and Image Search Worker.
+- **Communication protocol:** HTTP over a private Unix socket.
 
-### 9. Local Mail Capture
+### 9. Malware Scanner
 
-- Responsibilities: Local default backend for outbound email — writes messages to a gitignored local path instead of sending them, used whenever `EMAIL_ADAPTER=capture`.
-- Technology used: Filesystem.
-- Data provided: Captured transactional email content for local inspection.
-- Which container calls it?: Email Worker.
-- Communication protocol: Filesystem API.
+- **Responsibilities:** Scans uploaded CV files, search images, and business verification documents for malware before ingestion (fail-closed).
+- **Technology used:** ClamAV 1.4 daemon; signatures updated via `freshclam`.
+- **Data provided:** Malware scan status (`Clean`, `Infected`, `Error`).
+- **Which container calls it?:** CV Worker, Image Search Worker, and Admin Worker.
+- **Communication protocol:** ClamD protocol over private Unix socket; HTTPS to ClamAV Definition Service.
 
-### 10. Local CV Artifact Store
+### 10. PostgreSQL
 
-- Responsibilities: Default storage for uploaded CV files and processing artifacts when the storage adapter is `filesystem`.
-- Technology used: Application-encrypted filesystem.
-- Data provided: Uploaded documents, extracted segments, drafts, and retention-controlled content.
-- Which container calls it?: Web Application (writes uploads) and CV Worker (reads/writes/deletes artifacts).
-- Communication protocol: Filesystem storage adapter.
+- **Responsibilities:** Authoritative relational database for all users, memberships, jobs, applications, scoring models, messaging, outbox, backup runs, and audit logs.
+- **Technology used:** PostgreSQL 16 with Prisma ORM 7.9.
+- **Data provided:** Persistent entities, relational tables, and transactional state.
+- **Which container calls it?:** Web Application and all background workers.
+- **Communication protocol:** PostgreSQL wire protocol.
 
-### 11. Local Search Artifact Store
+### 11. Local Logical Data Stores
 
-- Responsibilities: Default storage for image-search artifacts (source image, normalized PNG, OCR text, candidate intent) when the storage adapter is `filesystem`.
-- Technology used: AES-256-GCM filesystem.
-- Data provided: Ephemeral search artifacts subject to a strict deletion deadline.
-- Which container calls it?: Web Application (writes uploads) and Image Search Worker (reads/writes/deletes artifacts).
-- Communication protocol: Filesystem storage adapter.
+- **Local Mail Capture:** Captures transactional emails to filesystem when `EMAIL_ADAPTER=capture`.
+- **Local CV Artifact Store:** AES-256 encrypted store for candidate CV uploads and parsed drafts.
+- **Local Search Artifact Store:** AES-256-GCM ephemeral store for job search images with auto-deletion deadlines.
+- **Local Admin Evidence Store:** Application-encrypted filesystem store for company verification business licenses.
+- **Local Export Store:** Ephemeral store for generated recruitment Excel/CSV exports with expiration deadlines.
+- **Local Backup Store:** Secure filesystem store for AES-256-GCM encrypted database dumps.
 
-### 12. Local Admin Evidence Store
+### 12. External Services (Optional / Qualified)
 
-- Responsibilities: Default storage for recruiter/company verification evidence (business license files) when the evidence storage adapter is `filesystem`.
-- Technology used: AES-256-GCM application-encrypted filesystem (keyed from `ADMIN_EVIDENCE_KEY_V1` or a derived secret).
-- Data provided: Encrypted business-license evidence files subject to a strict retention/delete deadline.
-- Which container calls it?: Web Application (writes/reads verification evidence) and Admin Worker (reads and deletes evidence during safety/retention cycles).
-- Communication protocol: Filesystem storage adapter.
-
-### 13. External Services — optional unless noted
-
-- **Email Provider (SMTP/Resend)** — optional; only called by Email Worker when `EMAIL_ADAPTER` is not `capture`. Protocol: SMTP/HTTPS.
-- **OpenAI Responses API** — optional; only called by CV Worker and Image Search Worker when the corresponding feature flag, privacy gate, and user consent all allow it. Protocol: HTTPS.
-- **AWS S3, KMS, IAM** — optional; storage/preflight adapters are implemented in code, but this repository does not provision any bucket, KMS key, or IAM role. Only used when the storage adapter is switched to `s3`. Protocol: AWS API/HTTPS.
-- **ClamAV Definition Service** — not optional for the Malware Scanner to function correctly; `freshclam` needs it to keep malware signatures current. Protocol: HTTPS.
-- **VietQR Business Registry** — optional; called by the Web Application over HTTPS only when the business-verification registry provider is enabled for company-lookup during recruiter verification. Protocol: HTTPS.
+- **Email Provider (SMTP / Resend):** Optional external transactional email provider when `EMAIL_ADAPTER!=capture`.
+- **OpenAI Responses API:** Optional AI provider for semantic scoring and image search interpretation; strictly advisory with deterministic fallback.
+- **AWS S3, KMS, IAM:** Optional cloud storage adapter; code implemented, infrastructure unprovisioned in default demo.
+- **ClamAV Definition Service:** Signature update source for `freshclam` over HTTPS.
+- **VietQR Business Registry:** Optional lookup provider for Vietnamese enterprise tax/business verification.
+- **Google Drive Storage Provider:** Optional cloud target for encrypted database backups via OAuth2.

@@ -43,11 +43,11 @@ export function loadImageSearchConfiguration(environment: Environment) {
   exact(environment, "OCR_POLICY_VERSION", "ocr-confidence-v1");
   exact(environment, "OCR_CV_UNIT_TIMEOUT_SECONDS", "20");
   exact(environment, "CV_HYBRID_DEADLINE_SECONDS", "180");
-  exact(environment, "OCR_SEARCH_TIMEOUT_SECONDS", "6");
+  exact(environment, "OCR_SEARCH_TIMEOUT_SECONDS", "10");
   exact(environment, "IMAGE_SEARCH_SOURCE_MAX_BYTES", "5000000");
   exact(environment, "IMAGE_SEARCH_MAX_DECODED_PIXELS", "20000000");
-  exact(environment, "IMAGE_SEARCH_VISITOR_LIMIT_PER_HOUR", "3");
-  exact(environment, "IMAGE_SEARCH_ACCOUNT_LIMIT_PER_HOUR", "10");
+  exact(environment, "IMAGE_SEARCH_VISITOR_LIMIT_PER_HOUR", "5");
+  exact(environment, "IMAGE_SEARCH_ACCOUNT_LIMIT_PER_HOUR", "15");
   exact(environment, "IMAGE_SEARCH_RETENTION_MINUTES", "15");
 
   const keys = [
@@ -112,7 +112,7 @@ export function loadImageSearchConfiguration(environment: Environment) {
       confidencePolicyVersion: environment.OCR_POLICY_VERSION!,
       cvUnitTimeoutMs: 20_000,
       cvHybridDeadlineMs: 180_000,
-      searchTimeoutMs: 6_000,
+      searchTimeoutMs: 10_000,
     },
     workerEnabled,
     cleanupEnabled: boolean(environment, "IMAGE_SEARCH_CLEANUP_ENABLED"),
@@ -137,8 +137,8 @@ export function loadImageSearchConfiguration(environment: Environment) {
     },
     sourceMaximumBytes: 5_000_000,
     maximumDecodedPixels: 20_000_000,
-    visitorLimitPerHour: 3,
-    accountLimitPerHour: 10,
+    visitorLimitPerHour: 5,
+    accountLimitPerHour: 15,
     retentionMs: 15 * 60_000,
   };
 }

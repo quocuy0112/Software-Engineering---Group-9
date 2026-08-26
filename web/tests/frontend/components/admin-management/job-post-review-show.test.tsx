@@ -32,5 +32,17 @@ describe("Administrator job-post review detail", () => {
     expect(source).toContain("STEP_UP_REQUIRED");
     expect(source).toContain("StepUpDialog");
     expect(source).toContain("refresh();");
+    expect(source).toContain("A fresh authenticator code is required");
+    expect(source).toContain("ListButton");
+  });
+
+  it("waits for the full review record before reading its submitted snapshot", () => {
+    const source = readFileSync(
+      "src/frontend/features/admin/job-post-reviews/job-post-review-show.tsx",
+      "utf8",
+    );
+
+    expect(source).toContain("if (!record?.snapshot)");
+    expect(source).toContain("Loading job post review");
   });
 });

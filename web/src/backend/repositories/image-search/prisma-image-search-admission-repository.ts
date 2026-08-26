@@ -126,7 +126,7 @@ export class PrismaImageSearchAdmissionRepository {
       const windowStart = new Date(input.now.getTime() - WINDOW_MS);
       let retryAt: Date | null = null;
       for (const subject of orderedSubjects) {
-        const limit = subject.kind === "ACCOUNT" ? 10 : 3;
+        const limit = subject.kind === "ACCOUNT" ? 15 : 5;
         const events = await transaction.imageSearchAdmissionEvent.findMany({
           where: {
             subjectKind: subject.kind,

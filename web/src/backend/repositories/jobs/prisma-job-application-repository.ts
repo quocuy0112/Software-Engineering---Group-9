@@ -647,6 +647,17 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
               contactSnapshot: input.command.contactSnapshot
                 ? (input.command.contactSnapshot as Prisma.InputJsonValue)
                 : undefined,
+              contactConsent: {
+                create: {
+                  sharedAt: input.command.shareContactWithRecruiter === true
+                    ? input.occurredAt
+                    : null,
+                  withdrawnAt: input.command.shareContactWithRecruiter === true
+                    ? null
+                    : input.occurredAt,
+                  version: 1,
+                },
+              },
               aiAnalysisConsent: input.command.aiAnalysisConsent ?? false,
               // Group 1 does not calculate or infer a score. Later scoring
               // groups own the versioned evaluation records.

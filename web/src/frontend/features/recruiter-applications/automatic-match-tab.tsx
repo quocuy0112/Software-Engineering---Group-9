@@ -15,6 +15,36 @@ import type {
   SkillEvidence,
 } from "@/shared/contracts/scoring";
 
+export function ScoringLineage({
+  automatic,
+}: {
+  automatic: AutomaticMatch | null | undefined;
+}) {
+  if (!automatic)
+    return (
+      <span className="automatic-formula-row__lineage">
+        Lineage is preserved
+      </span>
+    );
+
+  return (
+    <div className="automatic-formula-row__lineage" aria-label="Score inputs">
+      <span>
+        <b>JD</b>
+        <code>{automatic.jdVersion}</code>
+      </span>
+      <span>
+        <b>CV</b>
+        <code>{automatic.cvVersion}</code>
+      </span>
+      <span>
+        <b>Config</b>
+        <code>{automatic.configVersion}</code>
+      </span>
+    </div>
+  );
+}
+
 function SkillChips({
   title,
   items,
@@ -159,10 +189,7 @@ export function AutomaticMatchTab({
               ? `Deterministic ${automatic.score}/100 ready · AI retry in progress`
               : `Deterministic match: ${automatic.score}/100 · AI unavailable`}
         </strong>
-        <span>
-          JD {automatic.jdVersion} · CV {automatic.cvVersion} · Config{" "}
-          {automatic.configVersion}
-        </span>
+        <ScoringLineage automatic={automatic} />
       </div>
 
       {automatic.mayBeIncomplete ? (

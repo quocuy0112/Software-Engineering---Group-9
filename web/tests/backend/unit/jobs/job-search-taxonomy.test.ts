@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildCatalogJobSearchTaxonomy,
   buildJobSearchTaxonomy,
   listJobSearchTaxonomy,
 } from "@/backend/services/jobs/job-search-taxonomy";
@@ -110,6 +111,56 @@ describe("job search taxonomy", () => {
       count: 1,
       districts: [{ name: "Hai Chau", count: 1 }],
     });
+  });
+
+  it("counts only catalog jobs whose application deadline is still open", () => {
+    const taxonomy = buildCatalogJobSearchTaxonomy(
+      [
+        {
+          id: "open-job",
+          industry: "Information Technology (IT)",
+          industryCode: "r03",
+          subIndustry: "Software Development",
+          title: "Backend Developer",
+          categoryIds: ["r03-software-development"],
+          status: "active",
+          applyDeadline: "2026-08-26T00:00:00.000Z",
+          location: { city: "Hanoi", district: "Ba Dinh" },
+        },
+        {
+          id: "expired-job",
+          industry: "Information Technology (IT)",
+          industryCode: "r03",
+          subIndustry: "Software Development",
+          title: "Expired Developer",
+          categoryIds: ["r03-software-development"],
+          status: "active",
+          applyDeadline: "2026-08-24T00:00:00.000Z",
+          location: { city: "Hanoi", district: "Ba Dinh" },
+        },
+        {
+          id: "closed-job",
+          industry: "Information Technology (IT)",
+          industryCode: "r03",
+          subIndustry: "Software Development",
+          title: "Closed Developer",
+          categoryIds: ["r03-software-development"],
+          status: "closed",
+          applyDeadline: "2026-08-26T00:00:00.000Z",
+          location: { city: "Hanoi", district: "Ba Dinh" },
+        },
+      ],
+      new Date("2026-08-25T00:00:00.000Z"),
+    );
+
+    expect(taxonomy.locationGroups).toContainEqual({
+      city: "Hanoi",
+      count: 1,
+      districts: [{ name: "Ba Dinh", count: 1 }],
+    });
+    expect(taxonomy.industries).toEqual([
+      expect.objectContaining({ code: "r03", count: 1 }),
+    ]);
   });
 
   it("merges legacy Other records into the canonical r29 industry", () => {

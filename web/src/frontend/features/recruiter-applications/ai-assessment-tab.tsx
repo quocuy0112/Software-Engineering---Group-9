@@ -17,6 +17,7 @@ import type {
   ScoringState,
 } from "@/shared/contracts/scoring";
 import { ScoreBadgeFromLabel } from "./candidate-ranking-ui";
+import { ScoringLineage } from "./automatic-match-tab";
 
 export function AiAssessmentTab({
   state,
@@ -171,11 +172,7 @@ function RetryingAssessment({
           Deterministic {automatic?.score ?? "match"} ready · AI retry in
           progress
         </strong>
-        <span>
-          {automatic
-            ? `JD ${automatic.jdVersion} · CV ${automatic.cvVersion} · Config ${automatic.configVersion}`
-            : "Lineage is preserved"}
-        </span>
+        <ScoringLineage automatic={automatic} />
       </div>
     </div>
   );
@@ -219,10 +216,7 @@ function UnavailableAssessment({
         <strong>
           Deterministic match: {automatic.score}/100 · AI unavailable
         </strong>
-        <span>
-          JD {automatic.jdVersion} · CV {automatic.cvVersion} · Config{" "}
-          {automatic.configVersion}
-        </span>
+        <ScoringLineage automatic={automatic} />
       </div>
       {failures >= 3 ? (
         <div className="ranking-support-callout" role="status">

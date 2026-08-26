@@ -2,6 +2,7 @@
 
 import type { ImageSearchFallbackReason } from "../client/use-image-search";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { ImagePlus, Search } from "lucide-react";
 
 const fallbackContent: Record<
   ImageSearchFallbackReason,
@@ -43,6 +44,41 @@ export function ImageSearchRecovery({
   onManual(): void;
 }) {
   const vi = useWorkspaceLocale() === "vi";
+  const retryDate = retryAt ? new Date(retryAt) : null;
+  const retryLabel =
+    retryDate && !Number.isNaN(retryDate.getTime())
+      ? retryDate.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : null;
+  const retryBlocked =
+    retryDate !== null &&
+    !Number.isNaN(retryDate.getTime()) &&
+    retryDate.getTime() > Date.now();
+
+  const actions = (manualLabel: string) => (
+    <div className="image-search-recovery-actions">
+      <button
+        className="image-search-recovery-primary"
+        type="button"
+        disabled={retryBlocked}
+        onClick={onRetry}
+      >
+        <ImagePlus aria-hidden="true" />
+        {vi ? "Thử hình ảnh khác" : "Try another image"}
+      </button>
+      <button
+        className="image-search-recovery-secondary"
+        type="button"
+        onClick={() => onManual()}
+      >
+        <Search aria-hidden="true" />
+        {manualLabel}
+      </button>
+    </div>
+  );
+
   if (fallbackReason) {
     const content = vi
       ? {
@@ -75,24 +111,11 @@ export function ImageSearchRecovery({
       >
         <h3>{content.heading}</h3>
         <p>{content.description}</p>
-        <button type="button" onClick={onRetry}>
-          {vi ? "Thử hình ảnh khác" : "Try another image"}
-        </button>
-        <button type="button" onClick={() => onManual()}>
-          {vi ? "Tiếp tục tìm việc" : "Continue to Find jobs"}
-        </button>
+        {actions(vi ? "Tiếp tục tìm việc" : "Continue to Find jobs")}
       </div>
     );
   }
   if (!error) return null;
-  const retryDate = retryAt ? new Date(retryAt) : null;
-  const retryLabel =
-    retryDate && !Number.isNaN(retryDate.getTime())
-      ? retryDate.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      : null;
   return (
     <div
       role="alert"
@@ -105,8 +128,10 @@ export function ImageSearchRecovery({
       </h3>
       <p>{error}</p>
       {retryLabel ? (
-        <p>
-          {vi ? `Thử lại sau ${retryLabel}.` : `Try again after ${retryLabel}.`}
+        <p className="image-search-recovery-retry-detail">
+          {vi
+            ? `Thử lại sau ${retryLabel}.`
+            : `Try again after ${retryLabel}.`}
         </p>
       ) : null}
       <p>
@@ -114,12 +139,7 @@ export function ImageSearchRecovery({
           ? "Bạn vẫn có thể tìm kiếm bằng văn bản."
           : "Ordinary text search is still available."}
       </p>
-      <button type="button" onClick={onRetry}>
-        {vi ? "Thử hình ảnh khác" : "Try another image"}
-      </button>
-      <button type="button" onClick={() => onManual()}>
-        {vi ? "Tìm kiếm thủ công" : "Search manually"}
-      </button>
+      {actions(vi ? "Tìm kiếm thủ công" : "Search manually")}
     </div>
   );
 }

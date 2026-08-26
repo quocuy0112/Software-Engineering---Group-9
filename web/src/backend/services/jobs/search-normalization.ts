@@ -35,6 +35,18 @@ export function normalizeSearchText(value: string, maximum = 200): string {
 }
 
 /**
+ * Return the normalized terms used by the SQL search predicates.
+ *
+ * Keeping this split in one place makes free-text keyword and location
+ * matching consistent.  The caller is expected to normalize the value first;
+ * accepting repeated whitespace here keeps the helper safe for repository
+ * callers and makes the intended AND-per-term semantics explicit.
+ */
+export function searchTextTokens(value: string): string[] {
+  return value.trim().split(/\s+/u).filter(Boolean);
+}
+
+/**
  * Public job locations are projected as "district, city" before being
  * normalized. Compose the same canonical value for a district-level filter
  * so it can be matched exactly instead of as a broad text fragment.

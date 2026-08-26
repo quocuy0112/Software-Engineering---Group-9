@@ -8,13 +8,13 @@ import { WorkspaceShell } from "@/frontend/features/dashboard/components/workspa
 import { JobBoardHeader } from "@/frontend/features/jobs/components/job-board-header";
 import { JobInteractionProvider } from "@/frontend/features/jobs/components/job-interaction-provider";
 import { JobWorkspaceSearch } from "@/frontend/features/jobs/components/job-workspace-search";
-import { listJobSearchTaxonomy } from "@/backend/services/jobs/job-search-taxonomy";
+import { listCandidateVisibleJobSearchTaxonomy } from "@/backend/services/jobs/job-search-taxonomy";
 
 export default async function JobsLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const context = await getWorkspaceContext();
-  const taxonomy = await listJobSearchTaxonomy().catch(() => ({
+  const taxonomy = await listCandidateVisibleJobSearchTaxonomy().catch(() => ({
     industries: [],
     locations: [],
   }));

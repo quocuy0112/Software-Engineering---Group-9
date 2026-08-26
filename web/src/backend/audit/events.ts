@@ -118,6 +118,7 @@ export const authenticationAuditAction = z.enum([
   "admin.membership_removed",
   "admin.company_banned",
   "admin.company_unbanned",
+  "admin.verification_claimed",
   "admin.verification_changes_requested",
   "admin.verification_approved",
   "admin.verification_rejected",
@@ -168,6 +169,13 @@ export const authenticationAuditAction = z.enum([
   "job_post_management.feature",
   "job_post_management.unfeature",
   "job_post_management.enforce",
+  "profile.visibility_changed",
+  "profile.discovery_returned",
+  "profile.discovery_neutral",
+  "profile.discovery_blocked",
+  "application.contact_consent_granted",
+  "application.contact_consent_withdrawn",
+  "recruiter.application_profile_viewed",
 ]);
 
 const auditContextSchema = z
@@ -276,6 +284,9 @@ export const authenticationAuditEventSchema = z
       "connection_notification",
       "job_post_review",
       "export_request",
+      "candidate_profile",
+      "profile_discovery",
+      "application_contact_consent",
     ]),
     targetId: z.string().min(1).nullable().optional(),
     result: z.enum(["SUCCESS", "FAILURE", "DENIED"]),

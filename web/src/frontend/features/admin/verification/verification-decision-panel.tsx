@@ -1,10 +1,19 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Alert, Box, Button, MenuItem, TextField } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  MenuItem,
+  Stack,
+  TextField,
+} from "@mui/material";
 import { adminDataProvider } from "../app/data-provider";
 import { StepUpDialog } from "../auth/step-up-dialog";
 import { createAdminOperationIdController } from "../shared/admin-operation-id";
+import { adminReasonLabel } from "../shared/admin-reason-label";
 
 const categories = [
   "DOCUMENT_UNREADABLE",
@@ -23,6 +32,11 @@ export function VerificationDecisionPanel(props: {
   applicantEligibility?: "ACTIVE" | "SUSPENDED";
   canDecide?: boolean;
   blockReason?: string | null;
+  assignment: {
+    status: "UNASSIGNED" | "MINE" | "ASSIGNED_TO_OTHER";
+    assignedAdminRef: string | null;
+    canClaim: boolean;
+  };
   /** @deprecated accepted for compatibility with the previous panel contract */
   requestedRole?: string;
   /** @deprecated accepted for compatibility with the previous panel contract */
@@ -37,7 +51,9 @@ export function VerificationDecisionPanel(props: {
   const [comment, setComment] = useState("");
   const [protectedNote, setProtectedNote] = useState("");
   const [stepUp, setStepUp] = useState(false);
-  const [pendingAction, setPendingAction] = useState<"approve" | "reject">();
+  const [pendingAction, setPendingAction] = useState<
+    "claim" | "approve" | "reject"
+  >();
   const [error, setError] = useState("");
   const operation = useRef(createAdminOperationIdController());
 
@@ -67,11 +83,37 @@ export function VerificationDecisionPanel(props: {
         setPendingAction(action);
         setStepUp(true);
       } else {
-        if (errorValue.status) operation.current.complete();
+        operation.current.complete();
         setError(
           errorValue.body?.code === "APPLICANT_SUSPENDED"
             ? "The applicant account is suspended. Refresh after the account state changes."
             : "The decision did not commit. Refresh the current review state.",
+        );
+      }
+    }
+  }
+
+  async function claim() {
+    try {
+      await adminDataProvider.command(
+        `/api/admin/verification-requests/${encodeURIComponent(props.requestId)}/claim`,
+        {},
+        props.version,
+        operation.current.current(),
+      );
+      operation.current.complete();
+      props.onDone();
+    } catch (value) {
+      const errorValue = value as { body?: { code?: string } };
+      if (errorValue.body?.code === "STEP_UP_REQUIRED") {
+        setPendingAction("claim");
+        setStepUp(true);
+      } else {
+        operation.current.complete();
+        setError(
+          errorValue.body?.code === "ASSIGNED_TO_OTHER"
+            ? "Another administrator has already claimed this case. Refresh the review state."
+            : "The case was not claimed. Refresh the current review state.",
         );
       }
     }
@@ -92,12 +134,48 @@ export function VerificationDecisionPanel(props: {
   return (
     <Box sx={{ display: "grid", gap: 2 }}>
       {error && <Alert severity="warning">{error}</Alert>}
+      {props.assignment.status === "UNASSIGNED" && (
+        <Alert
+          severity="warning"
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              disabled={!props.assignment.canClaim}
+              onClick={() => {
+                operation.current.begin();
+                void claim();
+              }}
+            >
+              Claim case
+            </Button>
+          }
+        >
+          This case is unassigned. Claim it before approving or rejecting.
+        </Alert>
+      )}
+      {props.assignment.status === "MINE" && (
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Chip label="Claimed by you" color="success" size="small" />
+          <span>Only the assigned administrator can make a decision.</span>
+        </Stack>
+      )}
+      {props.assignment.status === "ASSIGNED_TO_OTHER" && (
+        <Alert severity="info">
+          This case is claimed by another administrator. Decisions are
+          read-only.
+        </Alert>
+      )}
       {blocked && (
         <Alert severity="warning">
           {props.blockReason === "APPLICANT_SUSPENDED" ||
           props.applicantEligibility === "SUSPENDED"
             ? "Applicant account is suspended; Approve and Reject are disabled."
-            : `Decision unavailable: ${props.blockReason ?? "current eligibility changed"}.`}
+            : props.blockReason === "CLAIM_REQUIRED"
+              ? "Claim this case before making a decision."
+              : props.blockReason === "ASSIGNED_TO_OTHER"
+                ? "This case is assigned to another administrator."
+                : `Decision unavailable: ${props.blockReason ?? "current eligibility changed"}.`}
         </Alert>
       )}
       <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
@@ -135,7 +213,7 @@ export function VerificationDecisionPanel(props: {
       >
         {categories.map((value) => (
           <MenuItem key={value} value={value}>
-            {value}
+            {adminReasonLabel(value)}
           </MenuItem>
         ))}
       </TextField>
@@ -167,7 +245,9 @@ export function VerificationDecisionPanel(props: {
         }}
         onVerified={() => {
           setStepUp(false);
-          if (pendingAction) void submit(pendingAction);
+          if (pendingAction === "claim") void claim();
+          if (pendingAction === "approve" || pendingAction === "reject")
+            void submit(pendingAction);
         }}
       />
     </Box>

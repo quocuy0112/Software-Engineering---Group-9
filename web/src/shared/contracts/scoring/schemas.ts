@@ -473,7 +473,7 @@ export const rankedApplicationRowSchema = z
     candidate: z
       .object({
         displayName: z.string().min(1),
-        verifiedEmail: z.string().email(),
+        verifiedEmail: z.string().email().nullable(),
         avatarUrl: z.string().url().nullable(),
       })
       .strict(),

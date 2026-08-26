@@ -21,7 +21,7 @@ export const submittedCandidateSchema = z
     candidate: z
       .object({
         displayName: z.string().min(1).max(200),
-        verifiedEmail: z.string().email().max(320),
+        verifiedEmail: z.string().email().max(320).nullable(),
         sharedPhone: z.string().max(32).nullable(),
         avatarUrl: z.string().url().nullable(),
       })

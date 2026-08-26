@@ -22,16 +22,10 @@ import {
 } from "../app/data-provider";
 import { StepUpDialog } from "../auth/step-up-dialog";
 import { createAdminOperationIdController } from "../shared/admin-operation-id";
-
-const categories = [
-  "SECURITY_COMPROMISE",
-  "POLICY_VIOLATION",
-  "USER_REQUEST",
-  "VERIFICATION_FAILURE",
-  "INCIDENT_RESOLVED",
-  "ACCESS_CLEANUP",
-  "OTHER",
-];
+import {
+  adminReasonLabel,
+  privilegedReasonCategories,
+} from "../shared/admin-reason-label";
 
 export function CompanyModerationPanel(props: {
   company: {
@@ -151,9 +145,9 @@ export function CompanyModerationPanel(props: {
                 value={category}
                 onChange={(event) => setCategory(event.target.value)}
               >
-                {categories.map((value) => (
+                {privilegedReasonCategories.map((value) => (
                   <MenuItem key={value} value={value}>
-                    {value}
+                    {adminReasonLabel(value)}
                   </MenuItem>
                 ))}
               </Select>

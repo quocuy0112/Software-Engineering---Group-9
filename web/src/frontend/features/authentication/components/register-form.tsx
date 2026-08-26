@@ -87,6 +87,9 @@ export function RegisterForm() {
           type="email"
           autoComplete="email"
           inputMode="email"
+          autoCapitalize="none"
+          spellCheck={false}
+          placeholder="example@email.com"
           {...register("email")}
         />
       </Field>

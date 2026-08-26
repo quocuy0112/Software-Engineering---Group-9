@@ -94,6 +94,7 @@ const trackerSelect = {
       updatedAt: true,
     },
   },
+  contactConsent: { select: { sharedAt: true, withdrawnAt: true, version: true } },
   candidate: {
     select: {
       user: {
