@@ -16,7 +16,7 @@ Extend the existing `JobApplication` recruitment authority with immutable, versi
 **Target Platform**: Existing SmartHire web deployment and bounded background-worker runtime  
 **Project Type**: Web application with server routes and background workers  
 **Performance Goals**: Ranked/filter page P95 ≤2 seconds for one 10,000-row job; AI semantic scoring P95 ≤20 seconds asynchronously; rescore command acceptance P95 ≤2 seconds  
-**Constraints**: Fixed 60/40 formula; immutable score publication; deterministic fallback; no score-driven stage mutation; provider independence; server-side tenant authorization; snapshot pagination; existing document viewer authority  
+**Constraints**: Fixed 40/60 formula; immutable score publication; deterministic fallback; no score-driven stage mutation; provider independence; server-side tenant authorization; snapshot pagination; existing document viewer authority
 **Scale/Scope**: 10,000 applications for one job, isolated candidate failures, bounded worker concurrency, no exact-count requirement except operation scope/count summaries
 
 ## Constitution Check
@@ -25,7 +25,7 @@ Extend the existing `JobApplication` recruitment authority with immutable, versi
 
 - **I — Human-Controlled Recruitment**: PASS. Scores are recommendations only. Only explicit authenticated recruiter commands can set priority or stage. Explanations, limitations, confidence, sensitive-attribute exclusion, and human-decision labels are first-class contract fields.
 - **II — Security, Privacy, Tenant Isolation**: PASS. Every route reuses role + current company/job authority; evidence and internal notes remain least-privilege; provider payloads are minimized and source-derived data follows application retention.
-- **III — Deterministic Core and Explainable AI**: PASS. Fixed 60/40 formula, approved bands, asynchronous AI, deterministic fallback, model/prompt/parser/config traceability, and provider boundary are explicit.
+- **III — Deterministic Core and Explainable AI**: PASS. Fixed 40/60 formula, approved bands, asynchronous AI, deterministic fallback, model/prompt/parser/config traceability, and provider boundary are explicit.
 - **IV — State, Audit, Data Integrity**: PASS. Immutable generations, compare-and-set stages/priorities, canonical `ApplicationStageEvent`, outbox idempotency, and queryable audit fields preserve database authority.
 - **V — Scope Discipline**: PASS. The work implements only Groups 2–4 declared by Feature 012 and does not introduce other pipeline transitions or document paths.
 - **VI — Measurable Quality and Accessibility**: PASS. P95 conditions, 10,000-row evidence, typed/text labels, keyboard confirmation behavior, and no color-only status are required.

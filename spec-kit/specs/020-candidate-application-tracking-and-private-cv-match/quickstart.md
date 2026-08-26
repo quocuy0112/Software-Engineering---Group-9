@@ -67,8 +67,8 @@ The focused command should cover contracts, policies, repository integration, wo
 
 1. Choose one parsed CV and visible job and start analysis.
 2. Use fixture scores Automatic 92 and AI 88.
-3. Verify one private check, fixed CV/JD/config provenance, completed steps, full evidence/gaps/guidance, and hybrid `90.4` from one-time rounding.
-4. Verify High Match, 60/40 contributions, evidence coverage/confidence as non-core signals, and sensitive-attribute exclusion.
+3. Verify one private check, fixed CV/JD/config provenance, completed steps, full evidence/gaps/guidance, and hybrid `89.6` from one-time rounding.
+4. Verify High Match, 40/60 contributions, evidence coverage/confidence as non-core signals, and sensitive-attribute exclusion.
 5. Search recruiter/company/admin APIs and repositories for the check ID and verify indistinguishable unavailable responses and no employer score mutation.
 
 ## Scenario 5: Limited mode and AI retry

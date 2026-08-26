@@ -1,11 +1,9 @@
 <!--
 Sync Impact Report
-- Version change: 2.1.0 -> 2.2.0
+- Version change: 2.2.0 -> 2.3.0
 - Modified principles:
-  - Principle VII - Maintainable and Provider-Independent Architecture: adds a
-    narrow exception that permits an approved long-lived realtime gateway to
-    attach to the same HTTP server as Next.js through a custom Node entrypoint.
-    Ordinary HTTP backend endpoints remain subject to Next.js routing.
+  - Principle III - Deterministic Core and Explainable AI: changes the approved
+    hybrid CV scoring weights to 40% deterministic matching and 60% AI.
 - Added sections: none
 - Removed sections: none
 - Templates:
@@ -102,7 +100,7 @@ unavailable, or uncertain.
 
 - Candidate scoring MUST use the approved hybrid formula:
 
-  `Final Score = 60% × Deterministic Matching Score + 40% × AI Score`
+  `Final Score = 40% × Deterministic Matching Score + 60% × AI Score`
 
 - Deterministic matching MUST evaluate structured job criteria, including
   required skills and relevant experience.
@@ -131,7 +129,7 @@ unavailable, or uncertain.
   additionally retain their weights and thresholds. Traceability MUST NOT require
   retaining an ephemeral raw search image or its OCR text beyond its approved
   retention deadline.
-- A specification or plan MUST NOT change the 60/40 weights, score bands, or
+- A specification or plan MUST NOT change the 40/60 weights, score bands, or
   human-override rule without first amending this constitution.
 
 **Rationale:** The deterministic component provides stability, testability, and
@@ -425,4 +423,4 @@ they do not conflict with this constitution.
 - Compliance MUST be checked when generating or updating a specification, plan,
   or task list.
 
-**Version**: 2.2.0 | **Ratified**: 2026-07-11 | **Last Amended**: 2026-08-11
+**Version**: 2.3.0 | **Ratified**: 2026-07-11 | **Last Amended**: 2026-08-26

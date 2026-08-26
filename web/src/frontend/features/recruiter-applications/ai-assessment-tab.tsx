@@ -378,7 +378,7 @@ function ReadyAssessment({
         <summary>How this score is calculated</summary>
         <p>
           {finalScore.formulaText} &middot; Automatic {automatic.score} &times;
-          0.6 + AI {ai.score} &times; 0.4
+          40% + AI {ai.score} &times; 60%
         </p>
       </details>
     </div>

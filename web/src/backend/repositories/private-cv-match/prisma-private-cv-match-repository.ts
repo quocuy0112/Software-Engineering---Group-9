@@ -7,6 +7,10 @@ import type {
   AiEvaluationResult,
   AutomaticMatchingResult,
 } from "@/backend/scoring-engine/scoring-contracts";
+import {
+  AI_WEIGHT,
+  AUTOMATIC_WEIGHT,
+} from "@/backend/scoring-engine/hybrid-score-policy";
 
 type PrivateDatabase = typeof prisma | Prisma.TransactionClient;
 
@@ -302,7 +306,7 @@ export class PrivateCvMatchRepository {
             id: input.result.resultId,
             attemptId: input.attemptId,
             score: input.result.score,
-            weight: 0.6,
+            weight: AUTOMATIC_WEIGHT,
             weightedContribution: input.result.weightedContribution,
             matchedRequirements: jsonValue(
               input.result.matchedRequirements.slice(0, 200),
@@ -410,7 +414,7 @@ export class PrivateCvMatchRepository {
           id: input.result.resultId,
           attemptId: input.attemptId,
           score: input.result.score,
-          weight: 0.4,
+          weight: AI_WEIGHT,
           weightedContribution: input.result.weightedContribution,
           summary: input.result.summary.slice(0, 1_000),
           strengths: jsonValue(

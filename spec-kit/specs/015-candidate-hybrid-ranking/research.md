@@ -18,7 +18,7 @@
 
 ## Decision 3: Fixed versioned formula
 
-**Decision**: Compute `automatic × 0.60 + AI × 0.40`, round once to one decimal, and record formula/config version, exact weights, thresholds, and component lineage.
+**Decision**: Compute `automatic × 0.40 + AI × 0.60`, round once to one decimal, and record formula/config version, exact weights, thresholds, and component lineage.
 
 **Rationale**: The constitution fixes the formula and score bands; storing inputs makes every result reproducible.
 

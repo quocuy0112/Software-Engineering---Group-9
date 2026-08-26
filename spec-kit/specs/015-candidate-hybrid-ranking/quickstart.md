@@ -21,7 +21,7 @@
 
 1. Configure the fake provider to return a schema-valid score 88/confidence 82 for automatic score 92.
 2. Wait for asynchronous publication and read detail.
-3. Verify final 90.4 and exact formula `92 × 0.6 + 88 × 0.4 = 90.4`.
+3. Verify final 89.6 and exact formula `92 × 0.4 + 88 × 0.6 = 89.6`.
 4. Verify provider/model/prompt/policy lineage, summary, three breakdown lines, strengths, points to verify, sensitive-attribute exclusion, and questions linked to verification points.
 5. Repeat with confidence 69 and insufficient question evidence.
 

@@ -7,11 +7,23 @@ import {
   type PrivateMatchResponse,
 } from "@/shared/contracts/private-cv-match";
 import type { PrivateCheckRecord } from "@/backend/repositories/private-cv-match/prisma-private-cv-match-repository";
+import {
+  AI_WEIGHT,
+  AUTOMATIC_WEIGHT,
+  PRIVATE_SCORING_CONFIG_VERSION,
+} from "@/backend/scoring-engine/hybrid-score-policy";
 import { jsonRecord } from "./private-match-types";
 
 function numberValue(value: unknown, fallback = 0): number {
   const number = typeof value === "number" ? value : Number(value);
   return Number.isFinite(number) ? number : fallback;
+}
+
+type HybridWeight = 0.4 | 0.6;
+
+function storedHybridWeight(value: unknown, fallback: HybridWeight): HybridWeight {
+  const weight = numberValue(value, fallback);
+  return weight === 0.4 || weight === 0.6 ? weight : fallback;
 }
 
 function boundedText(value: unknown, fallback: string, max: number): string {
@@ -203,7 +215,7 @@ function automaticComponent(
   });
   return {
     score: numberValue(result.score),
-    weight: 0.6 as const,
+    weight: storedHybridWeight(result.weight, AUTOMATIC_WEIGHT),
     weightedContribution: numberValue(result.weightedContribution),
     evidenceCoverage: numberValue(result.evidenceCoverage),
     evidenceConfidence: Math.min(
@@ -270,7 +282,7 @@ function aiComponent(
     .slice(0, 4);
   return {
     score: numberValue(result.score),
-    weight: 0.4 as const,
+    weight: storedHybridWeight(result.weight, AI_WEIGHT),
     weightedContribution: numberValue(result.weightedContribution),
     summary: boundedText(
       result.summary,
@@ -295,7 +307,7 @@ function aiComponent(
       "private-cv-match-prompt-v1",
       100,
     ),
-    policyVersion: boundedText(result.policyVersion, "HS-60/40-v1", 100),
+    policyVersion: boundedText(result.policyVersion, PRIVATE_SCORING_CONFIG_VERSION, 100),
     durationMs: Math.max(0, Math.round(result.durationMs)),
     completedAt: result.completedAt.toISOString(),
   };

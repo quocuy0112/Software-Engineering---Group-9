@@ -76,7 +76,7 @@ and guest/candidate/employer presentation states.
 | --- | --- | --- |
 | I. Human-controlled recruitment | Smart Match is labelled an estimate with strengths, gaps, and limitations; it makes no hiring decision. | Pass |
 | II. Security, privacy, tenant isolation | Server context emits only safe public/viewer projections; existing save, session, and recruiter boundaries stay authoritative. | Pass |
-| III. Deterministic core and explainability | Home reuses the existing deterministic candidate-facing job-recommendation match. It is not employer-facing applicant screening and therefore does not replace or modify the constitution-governed 60/40 screening formula. | Pass |
+| III. Deterministic core and explainability | Home reuses the existing deterministic candidate-facing job-recommendation match. It is not employer-facing applicant screening and therefore does not replace or modify the constitution-governed 40/60 screening formula. | Pass |
 | IV. State, audit, data integrity | Home owns no persistence; existing Saved Job and Better Auth/session services own state. Logout continues through the audited existing identity route and client failures reconcile visibly. | Pass |
 | V. Scope discipline/P0 completeness | Work is limited to Home composition/navigation; workflows and platforms outside Home are excluded. | Pass |
 | VI. Measurable quality/accessibility | P95, resilience, keyboard, focus, contrast, reduced motion, and responsive evidence are explicit release gates. | Pass |
@@ -163,7 +163,7 @@ This Home Smart Match is a **candidate-facing job-fit recommendation**: it ranks
 public jobs for the current candidate's own discovery experience. It is not an
 employer-facing applicant/candidate screening score, does not rank candidates
 for a recruiter, and does not participate in application decisions. The
-constitution's 60% deterministic plus 40% AI formula and score bands govern the
+constitution's 40% deterministic plus 60% AI formula and score bands govern the
 separate applicant-screening capability and are neither invoked nor changed by
 Feature 010. If screening output is ever added to Home, that would be a separate
 scope change and must use the constitutional screening contract.

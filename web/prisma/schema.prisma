@@ -2702,7 +2702,7 @@ model PrivateAutomaticMatchResult {
   id                    String                    @id @default(cuid())
   attemptId             String                    @unique
   score                 Decimal                   @db.Decimal(5, 2)
-  weight                Decimal                   @default(0.60) @db.Decimal(3, 2)
+  weight                Decimal                   @default(0.40) @db.Decimal(3, 2)
   weightedContribution  Decimal                   @db.Decimal(5, 2)
   matchedRequirements   Json
   gaps                  Json
@@ -2723,7 +2723,7 @@ model PrivateAiEvaluationResult {
   id                    String                    @id @default(cuid())
   attemptId             String                    @unique
   score                 Decimal                   @db.Decimal(5, 2)
-  weight                Decimal                   @default(0.40) @db.Decimal(3, 2)
+  weight                Decimal                   @default(0.60) @db.Decimal(3, 2)
   weightedContribution  Decimal                   @db.Decimal(5, 2)
   summary               String                    @db.Text
   strengths             Json

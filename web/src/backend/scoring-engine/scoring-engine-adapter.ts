@@ -7,6 +7,10 @@ import {
   type AiAssessmentProviderPort,
 } from "@/backend/scoring/providers/ai-assessment-provider-port";
 import { inspectCvForAiPreflight } from "@/backend/scoring/domain/cv-preflight";
+import {
+  AI_WEIGHT,
+  AUTOMATIC_WEIGHT,
+} from "@/backend/scoring/domain/hybrid-score-calculator";
 import { DocumentParsingService } from "@/backend/scoring/services/document-parsing-service";
 import type { AiEvaluationPort } from "./ai-evaluation-port";
 import type { AutomaticMatchingPort } from "./automatic-matching-port";
@@ -111,8 +115,8 @@ export class Feature012AutomaticMatchingAdapter implements AutomaticMatchingPort
     return {
       resultId: automatic.resultId,
       score: automatic.score,
-      weight: 0.6,
-      weightedContribution: roundContribution(automatic.score, 0.6),
+      weight: AUTOMATIC_WEIGHT,
+      weightedContribution: roundContribution(automatic.score, AUTOMATIC_WEIGHT),
       matchedRequirements,
       gaps,
       requiredExperience: automatic.minimumExperienceYears,
@@ -150,8 +154,8 @@ function mapAiResult(
   return {
     resultId: result.assessmentId,
     score: result.score,
-    weight: 0.4,
-    weightedContribution: roundContribution(result.score, 0.4),
+    weight: AI_WEIGHT,
+    weightedContribution: roundContribution(result.score, AI_WEIGHT),
     summary: result.overallSummary.slice(0, 1_000),
     strengths: result.strengths.map((item) => ({
       title: item.title.slice(0, 160),

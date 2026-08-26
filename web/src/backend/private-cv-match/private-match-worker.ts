@@ -26,6 +26,7 @@ import {
 } from "@/backend/scoring-engine/scoring-engine-adapter";
 import { validateExtractedCvText } from "@/backend/scoring/domain/cv-content-validation";
 import { resolveMatchingSkillRequirements } from "@/backend/scoring/domain/job-skill-requirement-policy";
+import { AUTOMATIC_WEIGHT } from "@/backend/scoring/domain/hybrid-score-calculator";
 import {
   ApprovedCvClassificationAdapter,
   decideCvClassification,
@@ -35,6 +36,7 @@ import type { AiEvaluationPort } from "@/backend/scoring-engine/ai-evaluation-po
 import type { AutomaticMatchingPort } from "@/backend/scoring-engine/automatic-matching-port";
 import { calculatePrivateHybridScore } from "@/backend/scoring-engine/hybrid-score-policy";
 import {
+  roundContribution,
   sanitizeCvText,
   type AiEvaluationResult,
   type AutomaticMatchingResult,
@@ -489,8 +491,11 @@ function automaticFromStoredResult(
   return {
     resultId: result.id,
     score: number(result.score),
-    weight: 0.6,
-    weightedContribution: number(result.weightedContribution),
+    weight: AUTOMATIC_WEIGHT,
+    weightedContribution: roundContribution(
+      number(result.score),
+      AUTOMATIC_WEIGHT,
+    ),
     matchedRequirements,
     gaps,
     requiredExperience:

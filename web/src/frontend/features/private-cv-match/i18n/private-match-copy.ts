@@ -99,7 +99,7 @@ const english = {
       `Job description version ${version}`,
     guidanceTitle: "This is guidance, not a hiring decision",
     guidanceDescription:
-      "This private preview uses the approved 60/40 method. A later employer result changes only when the submitted CV or job version changes.",
+      "This private preview uses the approved 40/60 method: 40% automatic matching and 60% AI evaluation. A later employer result changes only when the submitted CV or job version changes.",
     insideTitle: "Inside your report",
     requirementEvidence: "Requirement evidence",
     requirementEvidenceDescription: "See what matched and what is missing.",
@@ -125,7 +125,7 @@ const english = {
     deterministic: "DETERMINISTIC MATCH",
     privateScore: "PRIVATE SCORE",
     auditMethod: "Audit Method:",
-    hybridMethod: "60/40 Hybrid",
+    hybridMethod: "40/60 Hybrid",
     strongMatch: "Strong match",
     goodMatch: "Good match",
     lowMatch: "Low match",
@@ -137,7 +137,7 @@ const english = {
     reducedPreview: "Reduced-capability preview",
     limitedSummary:
       "Automatic matching completed successfully. The AI evaluation failed, so no hybrid final score is calculated.",
-    limitedGap: "Retry AI to produce the approved 60/40 hybrid score.",
+    limitedGap: "Retry AI to produce the approved 40/60 hybrid score.",
     deterministicNote:
       "Same CV + same job version + same method = the same underlying score.",
     privateToYou: "100% Private to you",
@@ -339,7 +339,7 @@ const english = {
       "Preferred skills and context",
     ],
     privacyDescription:
-      "This private result uses the approved 60/40 method. It is not sent to recruiters and does not affect your application.",
+      "This private result uses the approved 40/60 method. It is not sent to recruiters and does not affect your application.",
     privacyNote:
       "Sensitive personal attributes are excluded. Delete saved previews anytime from CV Match Check.",
     reportIncludes: "Your report will include",
@@ -478,7 +478,7 @@ const vietnamese = {
       `Mô tả công việc phiên bản ${version}`,
     guidanceTitle: "Đây là gợi ý, không phải quyết định tuyển dụng",
     guidanceDescription:
-      "Bản xem trước riêng tư này dùng phương pháp 60/40 đã được phê duyệt. Kết quả phía nhà tuyển dụng chỉ thay đổi khi CV đã nộp hoặc phiên bản công việc thay đổi.",
+      "Bản xem trước riêng tư này dùng phương pháp 40/60 đã được phê duyệt: 40% đối chiếu tự động và 60% đánh giá AI. Kết quả phía nhà tuyển dụng chỉ thay đổi khi CV đã nộp hoặc phiên bản công việc thay đổi.",
     insideTitle: "Bên trong báo cáo của bạn",
     requirementEvidence: "Bằng chứng theo yêu cầu",
     requirementEvidenceDescription:
@@ -506,7 +506,7 @@ const vietnamese = {
     deterministic: "ĐỐI CHIẾU THEO QUY TẮC",
     privateScore: "ĐIỂM RIÊNG TƯ",
     auditMethod: "Phương pháp đánh giá:",
-    hybridMethod: "Kết hợp 60/40",
+    hybridMethod: "Kết hợp 40/60",
     strongMatch: "Phù hợp cao",
     goodMatch: "Phù hợp tốt",
     lowMatch: "Phù hợp thấp",
@@ -518,7 +518,7 @@ const vietnamese = {
     reducedPreview: "Bản xem trước rút gọn",
     limitedSummary:
       "Đối chiếu tự động đã hoàn tất. Đánh giá AI không thành công nên chưa thể tính điểm tổng hợp cuối cùng.",
-    limitedGap: "Hãy thử lại AI để tạo điểm tổng hợp 60/40 đã được phê duyệt.",
+    limitedGap: "Hãy thử lại AI để tạo điểm tổng hợp 40/60 đã được phê duyệt.",
     deterministicNote:
       "Cùng CV + cùng phiên bản công việc + cùng phương pháp = cùng điểm nền tảng.",
     privateToYou: "100% riêng tư cho bạn",
@@ -748,7 +748,7 @@ const vietnameseSetup = {
     "Kỹ năng ưu tiên và ngữ cảnh",
   ],
   privacyDescription:
-    "Kết quả riêng tư này sử dụng phương pháp 60/40 đã được phê duyệt. Kết quả không gửi cho nhà tuyển dụng và không ảnh hưởng đến hồ sơ ứng tuyển của bạn.",
+    "Kết quả riêng tư này sử dụng phương pháp 40/60 đã được phê duyệt. Kết quả không gửi cho nhà tuyển dụng và không ảnh hưởng đến hồ sơ ứng tuyển của bạn.",
   privacyNote:
     "Các thuộc tính cá nhân nhạy cảm được loại trừ. Bạn có thể xóa bản xem trước đã lưu bất kỳ lúc nào từ Đối chiếu CV.",
   reportIncludes: "Báo cáo của bạn sẽ bao gồm",

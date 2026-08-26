@@ -1,5 +1,8 @@
 import {
+  AI_WEIGHT,
+  AUTOMATIC_WEIGHT,
   calculateHybridScore,
+  FORMULA_VERSION,
   scoreBand,
 } from "@/backend/scoring/domain/hybrid-score-calculator";
 import type { AutomaticMatch } from "@/shared/contracts/scoring";
@@ -9,9 +12,8 @@ import {
   type AutomaticMatchingResult,
 } from "./scoring-contracts";
 
-export const PRIVATE_SCORING_CONFIG_VERSION = "HS-60/40-v1" as const;
-export const AUTOMATIC_WEIGHT = 0.6 as const;
-export const AI_WEIGHT = 0.4 as const;
+export { AI_WEIGHT, AUTOMATIC_WEIGHT };
+export const PRIVATE_SCORING_CONFIG_VERSION = FORMULA_VERSION;
 
 export type PrivateHybridScore = Readonly<{
   value: number;
@@ -78,7 +80,7 @@ export function calculatePrivateHybridScore(
     value: final.value,
     band: final.band.code as PrivateHybridScore["band"],
     label: final.band.label,
-    formulaText: `${automatic.score} × 60% + ${ai.score} × 40% = ${final.value}`,
+    formulaText: final.formulaText,
     automaticContribution: roundContribution(automatic.score, AUTOMATIC_WEIGHT),
     aiContribution: roundContribution(ai.score, AI_WEIGHT),
   };

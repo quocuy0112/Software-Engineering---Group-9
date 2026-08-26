@@ -63,7 +63,7 @@ describe("private CV match repository boundary", () => {
       jobPostingId: "job-1",
       jdVersion: 3,
       jdDigest: "b".repeat(64),
-      scoringConfigVersion: "HS-60/40-v1",
+      scoringConfigVersion: "HS-40/60-v1",
       creationDedupeKey: "c".repeat(64),
       cvSnapshot: { versionId: "cv-1" },
       jdSnapshot: { jobId: "job-1" },
@@ -82,7 +82,7 @@ describe("private CV match repository boundary", () => {
         attemptNumber: 1,
         trigger: "INITIAL",
         state: "QUEUED",
-        scoringPolicyVersion: "HS-60/40-v1",
+        scoringPolicyVersion: "HS-40/60-v1",
       }),
     );
     expect(call.data).not.toHaveProperty("jobApplicationId");
@@ -120,7 +120,7 @@ describe("private CV match repository boundary", () => {
       candidateUserId: "candidate-a",
       checkId: "pmc-1",
       now,
-      scoringPolicyVersion: "HS-60/40-v1",
+      scoringPolicyVersion: "HS-40/60-v1",
     });
 
     expect(result).toBe(activeAttempt);
@@ -154,7 +154,7 @@ describe("private CV match repository boundary", () => {
       candidateUserId: "candidate-a",
       checkId: "pmc-1",
       now,
-      scoringPolicyVersion: "HS-60/40-v1",
+      scoringPolicyVersion: "HS-40/60-v1",
     });
 
     expect(database.privateCvMatchAttempt.create).toHaveBeenCalledWith({
@@ -204,7 +204,7 @@ describe("private CV match repository boundary", () => {
       candidateUserId: "candidate-a",
       checkId: "pmc-1",
       now,
-      scoringPolicyVersion: "HS-60/40-v1",
+      scoringPolicyVersion: "HS-40/60-v1",
     });
 
     expect(database.privateCvMatchAttempt.updateMany).toHaveBeenCalledWith({

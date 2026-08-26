@@ -217,6 +217,8 @@ export function PrivateMatchReport({
     ? report.automatic.evidenceConfidence
     : report.evidenceConfidence;
   const score = limited ? null : report.hybridScore;
+  const automaticWeight = report.automatic.weight * 100;
+  const aiWeight = (report.aiEvaluation?.weight ?? 0.6) * 100;
   const matchedCount = report.automatic.matchedRequirements.filter(
     (item) => item.matched,
   ).length;
@@ -487,7 +489,7 @@ export function PrivateMatchReport({
         aria-label="Score Components and Quality Signals"
         className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
       >
-        {/* Metric 1: Automatic Matching (60%) */}
+        {/* Metric 1: Automatic Matching (40%) */}
         <div className="pmr-metric shadow-subtle-card hover:shadow-card-hover flex flex-col justify-between space-y-3 rounded-2xl border border-slate-200/90 bg-white p-5 transition-all">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -499,7 +501,7 @@ export function PrivateMatchReport({
                 {copy.report.automaticMatching}
               </span>
               <span className="rounded-md border border-emerald-200/60 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
-                {copy.report.weight(60)}
+                {copy.report.weight(automaticWeight)}
               </span>
             </div>
             <div className="flex items-baseline gap-1">
@@ -538,7 +540,7 @@ export function PrivateMatchReport({
           </div>
         </div>
 
-        {/* Metric 2: AI Evaluation (40%) */}
+        {/* Metric 2: AI Evaluation (60%) */}
         <div
           className={`pmr-metric shadow-subtle-card hover:shadow-card-hover flex flex-col justify-between space-y-3 rounded-2xl border border-slate-200/90 bg-white p-5 transition-all ${limited ? "is-unavailable" : ""}`}
         >
@@ -552,7 +554,7 @@ export function PrivateMatchReport({
                 {copy.report.aiEvaluation}
               </span>
               <span className="rounded-md border border-emerald-200/60 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
-                {copy.report.weight(40)}
+                {copy.report.weight(aiWeight)}
               </span>
             </div>
             <div className="flex items-baseline gap-1">
@@ -935,7 +937,10 @@ export function PrivateMatchReport({
 
             {limited ? (
               <div className="space-y-1 rounded-xl border border-slate-100 bg-slate-50 p-3.5 font-mono text-xs text-slate-800">
-                <p>{number(report.automatic.score)} × 60% + AI × 40%</p>
+                <p>
+                  {number(report.automatic.score)} × {automaticWeight}% + AI ×{" "}
+                  {aiWeight}%
+                </p>
                 <strong className="text-brand-700 block text-sm">
                   {copy.report.finalNotCalculated}
                 </strong>
@@ -947,8 +952,8 @@ export function PrivateMatchReport({
               <>
                 <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-3.5 font-mono text-xs text-slate-800">
                   <span>
-                    {number(report.automatic.score)} × 60% +{" "}
-                    {number(report.aiEvaluation?.score ?? 0)} × 40%
+                    {number(report.automatic.score)} × {automaticWeight}% +{" "}
+                    {number(report.aiEvaluation?.score ?? 0)} × {aiWeight}%
                   </span>
                   <span className="text-brand-700 text-sm font-bold">
                     = {number(score ?? 0)} / 100

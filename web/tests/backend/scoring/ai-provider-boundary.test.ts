@@ -12,7 +12,7 @@ const input = {
   applicationId: "app-1",
   cvVersion: "CV-v1",
   jdVersion: "JD-v3",
-  configVersion: "HS-60/40-v1",
+  configVersion: "HS-40/60-v1",
   automaticScore: 92,
   evidence: [{ title: "React", excerpt: "Built React applications." }],
 };
