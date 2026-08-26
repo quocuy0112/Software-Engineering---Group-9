@@ -2,9 +2,11 @@
 
 ## Use-Case Specifications
 
-*Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*
-**Version:** V1.1 (24/07/2026) — First initialization
-**Version History:**
+*Performed by: Nguyễn Gia Quốc Uy and Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+**Version:** V1.2 (2026-08-26) — synchronized with Features 003, 005, and 020
+
+**Verification note:** Feature 005 is **In progress** because PA5 live cases IMG-02–IMG-06 remain failed under open `BUG-IMG-02`. Feature 003 is **Implemented and verified**. Feature 020 is **Implemented; verification pending**: PA5 APP cases passed, but the final inventory still requires consolidated feature verification beyond the existence of source/tests.
 
 # 1. UC-JOB-01 — Browse, Search, and Filter Jobs
 
@@ -909,3 +911,237 @@ The System redirects the Candidate to login and does not display personalized re
 
 ## 9.8. Related Use Cases and Entry Points
 - **Recommendation Selected:** Selecting a recommendation starts UC-JOB-02 — View Job Details.
+
+# 10. UC-JOB-06 — Search Jobs from an Image
+
+## 10.1. Use-Case Information
+
+| Field | Value |
+|---|---|
+| **Use-Case ID** | UC-JOB-06 |
+| **Primary Actor** | Visitor or Authenticated User |
+| **Supporting Actor** | Malware scanner; OCR worker; optional AI intent provider |
+| **Feature / Status** | F005 / In progress |
+| **Trigger** | The actor selects image-assisted search and supplies a supported image. |
+
+## 10.2. Brief Description
+
+The actor asks SmartHire to derive bounded job-search criteria from an image. The server validates, scans, stores privately, decodes, and performs OCR before applying deterministic or consent-gated AI interpretation. The image is never treated as biometric identity evidence.
+
+## 10.3. Preconditions
+
+1. The image-search admission check permits a new request.
+2. The file satisfies the configured size and media-type constraints.
+3. External interpretation is used only after the recorded consent/purpose gate succeeds.
+
+## 10.4. Basic Flow
+
+1. The actor opens the image-search control on the job-discovery page.
+2. The System reserves a private query and returns upload instructions.
+3. The actor uploads the image content.
+4. The System verifies request ownership, type, structure, size, malware status, and decodability.
+5. The worker extracts OCR evidence and derives a bounded search intent.
+6. The System displays proposed criteria rather than silently applying them.
+7. The actor confirms or edits the criteria.
+8. The System consumes the one-time result and runs UC-JOB-01 with the confirmed criteria.
+
+## 10.5. Alternative and Error Flows
+
+- **AF-01 — AI unavailable or not consented:** The System uses deterministic interpretation from approved OCR evidence when possible; it does not upload the image to the AI provider.
+- **AF-02 — Actor cancels:** The System cancels the query and schedules private artifacts for cleanup.
+- **EF-01 — Unsafe or invalid file:** The System rejects the content before interpretation and exposes only a safe error.
+- **EF-02 — OCR unavailable:** The System shows a recoverable failure/cancel state and does not claim that search criteria were extracted. This is the unresolved PA5 path recorded by `BUG-IMG-02`.
+- **EF-03 — Query expired or already consumed:** The System rejects reuse and requires a new query.
+- **EF-04 — Unauthorized query:** The System returns a neutral authorization/not-found response without exposing another user's image or result.
+
+## 10.6. Postconditions
+
+- **Success:** Confirmed, bounded criteria are passed to job search and the private query result is consumed.
+- **Failure:** No unsupported criteria are applied; retained artifacts follow cleanup policy.
+
+## 10.7. Special Requirements and Evidence
+
+- Uploaded images and OCR evidence remain private and purpose-scoped.
+- The UI must provide keyboard-accessible upload, progress, cancellation, failure, and retry states.
+- Evidence: `web/src/frontend/features/jobs/image-search/`, `web/src/app/api/jobs/image-searches/`, `web/src/backend/image-search/`, `web/src/backend/services/image-search/`, image-search schema records, and image-search tests under `web/tests/`.
+
+### Prototype/UI Screenshot Evidence
+
+### Real UI Evidence
+
+![UC-JOB-06 — image-assisted job search](../prototypes/DGM-02-Candidate-Job-Journey/UC_JOB_06_Image_Search.png)
+
+*Figure — Real SmartHire image-search dialog showing the job-poster upload control and required AI-processing consent before a search request. It does not prove an OCR result or retry outcome.*
+
+## 10.8. Related Use Cases and Entry Points
+
+Successful confirmation starts UC-JOB-01. Image search does not include or bypass application submission.
+
+# 11. UC-APP-05 — Withdraw an Application
+
+## 11.1. Use-Case Information
+
+| Field | Value |
+|---|---|
+| **Use-Case ID** | UC-APP-05 |
+| **Primary Actor** | Candidate |
+| **Feature / Status** | F020 / Implemented; verification pending |
+| **Trigger** | The Candidate selects **Withdraw application** from an owned application. |
+
+## 11.2. Brief Description
+
+The Candidate withdraws an eligible application. Withdrawal is recorded as a candidate outcome and public update; it does not rewrite the canonical nine-stage recruitment history.
+
+## 11.3. Preconditions
+
+1. The Candidate is authenticated and owns the application.
+2. The application is in a state where withdrawal is permitted.
+
+## 11.4. Basic Flow
+
+1. The Candidate opens application detail from UC-APP-02.
+2. The System verifies ownership and presents the withdrawal action.
+3. The Candidate confirms withdrawal.
+4. The System applies the command idempotently and records the withdrawal outcome/update.
+5. The System shows the updated read-only application state.
+
+## 11.5. Alternative and Error Flows
+
+- **AF-01 — Repeated command:** The System returns the authoritative already-withdrawn result without duplicating history.
+- **EF-01 — Ineligible state:** The System rejects the command and explains that the application can no longer be withdrawn.
+- **EF-02 — Ownership/session failure:** The System returns a neutral error and exposes no application data.
+- **EF-03 — Persistence conflict:** No false success is shown; the Candidate refreshes the authoritative state.
+
+## 11.6. Postconditions
+
+- **Success:** The application records `CANDIDATE_WITHDRAWN` and cannot continue as an active candidate workflow.
+- **Failure:** Application state is unchanged.
+
+## 11.7. Special Requirements and Evidence
+
+The action requires CSRF protection, ownership validation, idempotency, and auditable state. Evidence: `web/src/backend/candidate-applications/application-withdrawal-service.ts`, the candidate application route/UI, schema withdrawal outcome, workflow contract tests, and PA5 APP results.
+
+### Prototype/UI Screenshot Evidence
+
+### Real UI Evidence
+
+![UC-APP-05 — withdraw action](../prototypes/DGM-02-Candidate-Job-Journey/UC_APP_05_Withdraw.png)
+
+*Figure — Real owned application detail showing the **Withdraw application** action for the disposable PA5 candidate application. The screenshot records the available action, not a completed withdrawal.*
+
+# 12. UC-APP-06 — Respond to an Offer
+
+## 12.1. Use-Case Information
+
+| Field | Value |
+|---|---|
+| **Use-Case ID** | UC-APP-06 |
+| **Primary Actor** | Candidate |
+| **Feature / Status** | F020 / Implemented; verification pending |
+| **Trigger** | The Candidate accepts or declines an offer on an owned application. |
+
+## 12.2. Brief Description
+
+The Candidate records an offer response only when the application is in the offered state. Accepting and declining are explicit human decisions; no AI service responds on the Candidate's behalf.
+
+## 12.3. Preconditions
+
+1. The Candidate owns the application and has a valid session.
+2. The current authoritative recruitment stage is `OFFERED`.
+
+## 12.4. Basic Flow
+
+1. The Candidate opens the offer action from application detail.
+2. The System verifies ownership, current stage, and command validity.
+3. The Candidate chooses and confirms a response.
+4. The System records the response transactionally and creates the corresponding public/history state.
+5. The System shows the resulting application state.
+
+## 12.5. Alternative and Error Flows
+
+- **AF-01 — Decline:** The System records the candidate response and transitions to `OFFER_DECLINED` according to the domain policy.
+- **AF-02 — Repeated identical response:** The System returns the authoritative result without duplicating the transition.
+- **EF-01 — Application no longer offered:** The System rejects the stale command and asks the Candidate to refresh.
+- **EF-02 — Unauthorized application:** The System exposes no details and makes no change.
+- **EF-03 — Conflicting response:** The System rejects the second incompatible response.
+
+## 12.6. Postconditions
+
+The accepted or declined response is recorded once with an auditable stage/update event, or the application remains unchanged after failure.
+
+## 12.7. Special Requirements and Evidence
+
+The command must be ownership-scoped, CSRF-protected, idempotent, and concurrency-safe. Evidence: `web/src/backend/candidate-applications/candidate-offer-response-service.ts`, `/api/candidate/applications/[applicationId]/offer-response`, application UI/schema, workflow contracts, and PA5 APP results.
+
+### Prototype/UI Screenshot Evidence
+
+### Real UI Evidence
+
+![UC-APP-06 — offered application response](../prototypes/DGM-02-Candidate-Job-Journey/UC_APP_06_Offer_Response.png)
+
+*Figure — Real offered application detail showing the **Accept offer** and **Decline offer** controls while the outcome awaits the Candidate's response.*
+
+# 13. UC-APP-07 — Run a Private CV Match
+
+## 13.1. Use-Case Information
+
+| Field | Value |
+|---|---|
+| **Use-Case ID** | UC-APP-07 |
+| **Primary Actor** | Candidate |
+| **Supporting Actor** | Private-match worker; optional AI provider |
+| **Feature / Status** | F020 / Implemented; verification pending |
+| **Trigger** | The Candidate selects a private CV and job for a pre-application match check. |
+
+## 13.2. Brief Description
+
+The Candidate privately compares an owned reusable CV with an active job before applying. Deterministic scoring remains available when the optional AI assessment is unavailable; the result is private and does not create an application.
+
+## 13.3. Preconditions
+
+1. The Candidate owns a confirmed reusable CV.
+2. The selected job is visible and eligible for matching.
+3. The Candidate is authenticated and within request limits.
+
+## 13.4. Basic Flow
+
+1. The Candidate opens the private-match workspace or a job entry point.
+2. The System lists only the Candidate's eligible CVs and permitted jobs.
+3. The Candidate selects a CV/job pair and starts the check.
+4. The System validates ownership, snapshots permitted inputs, and queues the work.
+5. The worker computes deterministic evidence and, when allowed, an advisory AI assessment.
+6. The Candidate polls and views the private result, explanation, and provider status.
+7. The Candidate may continue to UC-APP-01 but must still submit an application explicitly.
+
+## 13.5. Alternative and Error Flows
+
+- **AF-01 — AI unavailable:** The result displays deterministic evidence and the AI-unavailable state without failing the whole match.
+- **AF-02 — Retry AI:** The Candidate requests the implemented AI retry for a failed eligible assessment.
+- **EF-01 — CV/job unavailable:** The System rejects the request without leaking private artifacts.
+- **EF-02 — Cross-account access:** The System returns a neutral error and records no result for the requester.
+- **EF-03 — Worker failure:** The System shows a safe retryable or terminal status; it does not fabricate a score.
+
+## 13.6. Postconditions
+
+- **Success:** A private result is available only to its owning Candidate and retained according to policy.
+- **Failure:** No application is created and no private CV content is exposed.
+
+## 13.7. Special Requirements and Evidence
+
+CV text and match output are candidate-private; optional AI use remains advisory and purpose-gated. Evidence: `web/src/app/(workspace)/cv-match-check/`, `web/src/app/api/candidate/private-cv-matches/`, `web/src/backend/private-cv-match/`, Prisma private-match records, and private-match security/unit/frontend tests.
+
+### Prototype/UI Screenshot Evidence
+
+### Real UI Evidence
+
+![UC-APP-07 — private CV match setup](../prototypes/DGM-02-Candidate-Job-Journey/UC_APP_07_Private_CV_Match.png)
+
+*Figure — Real private CV-match workspace showing the selected active job, confirmed reusable CV, privacy limitation, and **Analyze my CV** control. It does not claim that a match result has completed.*
+
+## 14. Revision History
+
+| Version | Date | Editor | Exact change | Review |
+|---|---|---|---|---|
+| V1.1 | 2026-07-24 | Nguyễn Gia Quốc Uy | Initial Candidate Job Journey specifications. | Group 9 |
+| V1.2 | 2026-08-26 | Lưu Chí Hải | Added complete specifications for image-assisted search, withdrawal, offer response, and private CV match; recorded repository evidence and the unresolved F005 failure. | Nguyễn Minh Khôi |
+| V1.3 | 2026-08-26 | Lưu Chí Hải | Audited prototype coverage for the PA5 use cases and recorded that matching UI screenshot evidence remains pending for UC-JOB-06 and UC-APP-05–07. | Nguyễn Minh Khôi |

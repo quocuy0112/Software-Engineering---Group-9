@@ -5,16 +5,18 @@
 | Group | 9 |
 | Document Owner | Nguyễn Gia Quốc Uy (Student ID: 24127261) |
 | Reviewers | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi |
-| Version | 1.2 (Final PA5 Release Baseline) |
+| Version | 1.4 (PA5 Synchronization Draft) |
 | Last Updated | 2026-08-26 |
-| Status | Final Release Baseline |
+| Status | Partial integration — Khôi-owned sections and cross-review pending |
 
 ### Revision History
 
 | Version | Date | Author/Editor | Summary | Status |
 |---|---|---|---|---|
 | 1.1 | 2026-07-10 | Nguyễn Gia Quốc Uy and Group 9 | Reconciled the project scope, multi-tenant authorization model, feature priorities, measurable quality targets, company-membership workflow, references, and document presentation. | Draft for Team Review |
-| 1.2 | 2026-08-26 | Nguyễn Minh Khôi (NFRs & Scope) & Lưu Chí Hải | PA5 Final Document Synchronization: Reconciled 26-feature baseline, NFRs (RBAC, CV privacy, AI advisory constraints, step-up 2FA), explicit out-of-scope boundaries (no DB restore UI, no group chat/attachments), and updated technology stack. | Final Release Baseline |
+| 1.2 | 2026-08-26 | Nguyễn Minh Khôi | Updated NFR, scope, dependency, and AI/release-qualification content. | Integrated in final synchronization |
+| 1.3 | 2026-08-26 | Lưu Chí Hải | Synchronized product overview, role taxonomy, Features 001–026 functional baseline, stable FR IDs, and FR-to-UC/code/test traceability without adding Feature 027 to release scope. | Integrated in final synchronization |
+| 1.4 | 2026-08-26 | Lưu Chí Hải | Replaced the obsolete 12-group Product Features presentation with seven final domains covering F001–F026, retained historical rationale/authorship, recorded domain statuses, and kept Feature 027 outside the baseline. | Integrated in final synchronization |
 
 ## Changes from PA1 Proposal & How this document was developed
 
@@ -25,7 +27,7 @@ PA1 proposal, based on deeper technical and product discussions within the team.
     - Generating a quality JD requires inputting nearly as much detail as writing it manually, providing negligible automation benefit.
 - **AI Resume Enhancement & Gap Analysis: Removed / merged.** 
     - Resume rewriting was dropped due to the risk of AI misrepresenting a candidate's actual qualifications.
-    - Gap-analysis value is instead delivered through the score explanation already required for the scoring engine (Section 5.3.7), rather than as a separate feature.
+    - Gap-analysis value is instead delivered through the score explanation already required for the scoring engine (Section 5.3.3), rather than as a separate feature.
 - **Application status model: Expanded and clarified.** 
     - PA1's original 5-state model (Applied → Screened → Interviewing → Offered → Hired/Rejected) has been refined into a 9-state canonical pipeline (Applied, Viewed, Shortlisted, Interviewing, Offered, Hired, Offer Declined, Rejected, Waitlisted) to accurately reflect the recruiter decision points identified during workflow design.
 - **Employer registration model: Redesigned.** 
@@ -160,7 +162,7 @@ Candidates have high interest because the system directly affects their job-sear
 
 ## 3.2. User Persona Summary
 
-The platform has three primary user groups: Candidates, Recruiters/HR Managers, and Administrators. Each group has different goals, technical abilities, permissions, and usage patterns.
+The platform has a base Candidate identity, company-scoped membership roles, and a separate platform-administration authority. Each group has different goals, permissions, and usage patterns; company membership never turns a user into a Platform Administrator.
 
 ### 3.2.1. Candidate
 
@@ -194,6 +196,22 @@ The platform has three primary user groups: Candidates, Recruiters/HR Managers, 
 | Technical ability | High; familiar with administrative dashboards and system management tools. |
 | Main activities | Verify recruiters, approve job posts, process & export reports, suspend accounts, monitor platform statistics, and review audit logs. |
 | Expected outcome | Maintain a safe recruitment environment with legitimate users and reliable job information. |
+
+### 3.2.4. Company-Scoped Roles and Platform Authority
+
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+| Role | Scope | Proven functional boundary |
+|---|---|---|
+| Candidate | Own account and candidate data | Profile/CV, job discovery, applications, connections, messaging, and notifications. A person retains this base capability when granted company membership. |
+| Company Member | One company/tenant per active membership | Parent concept for company-scoped authority; access requires current membership and resource-company agreement. |
+| Recruiter | Company scoped | Job/applicant work, scoring review, pipeline operations, and assigned recruitment messaging according to service policy. |
+| HR Manager | Company scoped | Recruiter operations plus recruitment-thread assignment and other HR-manager controls implemented by the relevant service. |
+| Hiring Manager | Company scoped | Applicant/scoring/pipeline access where the recruiter-application authorization policy includes this role; not treated as a recruitment-message assignee role unless the messaging service permits it. |
+| Company Owner | Company scoped | Company/team governance and current applicant/pipeline operations; read-only audited oversight applies specifically to recruitment threads, not to the Kanban pipeline. |
+| Platform Administrator | Platform scoped | Separate administrator grant/designated session for moderation, verification, account/platform management, analytics, report review, and backup. Company membership alone grants none of these privileges. |
+
+All company-resource access must revalidate active membership, company identity, resource ownership, and role-specific policy. Platform-administrator access uses the independent administrator authorization boundary and any required two-factor step-up.
 
 ## 3.3. User Environment
 
@@ -298,6 +316,8 @@ The platform competes with both job-search websites and Applicant Tracking Syste
 
 # 4. Product Overview
 
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
 **Author of this Part:** Nguyễn Minh Khôi<br>
 **Student ID:** 24127066 <br>
 **Modify based on feedback PA2:** Nguyễn Quốc Thành<br>
@@ -390,80 +410,97 @@ External-service interruptions may temporarily affect related features. However,
 
 # 5. Product Features
 
-**Author of this Part:** Nguyễn Gia Quốc Uy   
-**Student ID:** 24127261
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+**Historical authorship retained:** Original Product Features author — Nguyễn Gia Quốc Uy (Student ID 24127261); PA2 detailed-list modification — Nguyễn Quốc Thành (Student ID 24127542), reviewed by Nguyễn Gia Quốc Uy.
 
 ## 5.1. Feature Overview
-The table below summarizes the high-level feature groups of the SmartHire system. Each group may include multiple sub-features, which are described in the following section.
 
-**Priority scheme:**
+The final SmartHire functional baseline is Features 001–026. The domain groups below summarize that baseline without treating a specification or test file as proof of verification. Each group retains the business purpose of the earlier Vision while using the final Feature Inventory statuses.
 
-- **P0 (Must):** required for the current project release and the end-to-end recruitment workflow.
-- **P1 (Should):** important but implemented only after P0 capabilities are stable; it may be deferred without breaking the core workflow.
+Feature 027 is excluded from the baseline and remains **Late Feature / Release Decision Pending**.
 
 ## 5.2. Detailed Feature List
 
-**Modify based on feedback PA2:** Nguyễn Quốc Thành<br>
-**Student ID:** 24127542 <br>
-**Reviewer Name:** Nguyễn Gia Quốc Uy
-
-| No. | Group Feature                                      | Short Description                                                                                                                                              | Business Rationale                                                                                                                        | Primary Beneficiaries                                       | Priority    |
-| --: | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ----------- |
-|   1 | **Authentication, Authorization & Access Control** | Allows users to register and log in securely, supports email verification and password recovery, and enforces platform-level and company-scoped authorization. | Protects personal and recruitment data while preventing unauthorized access and cross-company data exposure.                              | All users                                                   | P0 (Must)   |
-|   2 | **Account Setup & Management**                     | Allows users to update non-critical account information, profile images, and preferences. Password changes remain part of P0 authentication security.          | Enables users to maintain accurate account information and communication preferences without requiring administrative support.            | Candidates and recruiters                                   | P1 (Should) |
-|   3 | **Candidate Profile Management**                   | Allows candidates to build a professional profile through a form or CV upload, with a CV parser that standardizes data for applications and scoring.           | Reduces repetitive data entry and provides structured candidate information for more consistent application and evaluation processes.     | Candidates and recruiters                                   | P0 (Must)   |
-|   4 | **Job Board & Advanced Search**                    | Allows candidates to search, filter, view, save, share, report, and apply to approved job postings.                                                            | Helps candidates discover more relevant opportunities and allows companies to receive applications from more suitable candidates.         | Candidates and hiring companies                             | P0 (Must)   |
-|   5 | **Job Posting Management**                         | Allows company-authorized recruiters to create, preview, edit, and manage the lifecycle of job postings.                                                       | Centralizes vacancy management and provides structured job information for searching, matching, and candidate screening.                  | Recruiters and hiring companies                             | P0 (Must)   |
-|   6 | **Application Tracking (Candidate Side)**          | Allows candidates to track saved jobs, submitted applications, scoring progress, and recommended jobs.                                                         | Improves application transparency and reduces uncertainty and manual follow-up for candidates.                                            | Candidates                                                  | P0 (Must)   |
-|   7 | **Candidate Screening & Hybrid Scoring System**    | Combines deterministic skills/experience matching with AI-assisted semantic analysis to score and rank applicants for a job posting.                           | Helps recruiters prioritize applications and apply more consistent initial screening criteria while retaining human decision-making.      | Recruiters and hiring managers                              | P0 (Must)   |
-|   8 | **Recruitment Pipeline Kanban Board**              | Provides a drag-and-drop interface for authorized company members to track and update application stages.                                                      | Replaces fragmented spreadsheet tracking and improves recruitment coordination, visibility, and collaboration.                            | Recruiters and hiring managers                              | P0 (Must)   |
-|   9 | **Automated Notifications & In-App Alerts**        | Sends email and in-app notifications when relevant application or moderation events occur.                                                                     | Reduces repetitive communication work and ensures users receive timely information about important events.                                | Candidates, recruiters, and administrators                  | P0 (Must)   |
-|  10 | **Job Posting Moderation & Quality Assurance**     | Allows administrators to approve or reject job postings and handle spam or violation reports.                                                                  | Reduces fraudulent, misleading, and low-quality job content and improves trust in the platform.                                           | Candidates, administrators, and legitimate hiring companies | P0 (Must)   |
-|  11 | **User Management & Employer Verification**        | Allows administrators to find user accounts, verify company documents, approve memberships, and handle violations.                                             | Prevents fake recruiter accounts, company impersonation, unauthorized company access, and recruitment fraud.                              | Candidates, administrators, and hiring companies            | P0 (Must)   |
-|  12 | **Recruitment Analytics & Data Export**            | Provides dashboards, recruitment statistics, and CSV/Excel exports for authorized users.                                                                       | Helps organizations evaluate recruitment performance, identify pipeline bottlenecks, and make decisions using structured historical data. | Recruiters, company owners, and administrators              | P1 (Should) |
+| No. | Final feature domain | Feature IDs | Business purpose and delivered boundary | Primary beneficiaries | Final release status |
+|---:|---|---|---|---|---|
+| 1 | **Identity, Account, Candidate Profile, CV and Purpose-Specific OCR** | F001, F002, F004, F005 | Secure registration/recovery/session controls, maintainable candidate information, private reusable CV processing, and bounded image/OCR assistance. | Candidates and all authenticated users | F002: Implemented and verified; F001/F004: Implemented; verification pending; F005: In progress |
+| 2 | **Candidate Job Discovery and Application Journey** | F003, F010, F020 | Public approved-job discovery, role-aware landing projections, applications, tracking, withdrawal, offer response, recommendations, and private pre-application matching. | Candidates and visitors | F003: Implemented and verified; F010/F020: Implemented; verification pending |
+| 3 | **Recruiter Job Operations, Screening and Kanban Pipeline** | F007, F012, F015, F021 | Company-scoped job posting, submitted-applicant review, transparent deterministic/optional-AI advisory scoring, human priority, and nine-stage pipeline control. | Recruiters, HR Managers, Hiring Managers, and Company Owners where authorized | F021: Implemented and verified; F007/F012/F015: Implemented; verification pending |
+| 4 | **Company Governance, Employer Verification and Platform Administration** | F006, F009, F014, F017, F018, F023, F024 | Company/team lifecycle, business verification, platform-admin grants, job-post review/enforcement, and company settings under tenant/platform boundaries. | Company members, Company Owners, and Platform Administrators | F014/F017/F018: Implemented and verified; F006/F009/F023/F024: Implemented; verification pending |
+| 5 | **Notifications, Professional Connections and Messaging Safety** | F008, F011, F013, F016, F019, F025 | Consent-based connections, eligible general messaging, application-scoped recruitment threads, reports, in-app/email notifications, and authorization-aware destinations. | Candidates, company users, and Platform Administrators | F008/F011/F013/F016: Implemented and verified; F019/F025: In progress |
+| 6 | **Recruitment Analytics and Export** | F022 | Company-scoped recruitment metrics/export plus current platform aggregate analytics, without cross-tenant access. | Recruiters, HR Managers, Company Owners, and Platform Administrators | Implemented; verification pending |
+| 7 | **Administrator Data Backup** | F026 | Recently reauthenticated Platform Administrators configure, run, and inspect encrypted manual/scheduled backups; no restore UI is claimed. | Platform Administrators | Implemented and verified; final demo provisioning remains an environment verification item |
 
 
 ## 5.3. Feature Descriptions
 
-### 5.3.1. Authentication, Authorization & Access Control
-This feature group covers registration, authentication, session security, and authorization. A standard user retains candidate capabilities and may also receive `OWNER`, `HR_MANAGER`, or `RECRUITER` permissions through an approved membership in one or more companies. Recruitment permissions are therefore scoped to a company rather than stored as a replacement for the user's candidate identity. Platform Administrators hold a separate platform-level role for verification, moderation, account management, and audited support operations. The backend validates both the user's platform role and active company membership before granting access to company data.
+### 5.3.1. Identity, Profile, CV and OCR
 
-### 5.3.2. Account Setup & Management
-This feature allows users to manage contact details, profile images, preferences, and other non-critical account information. Company information is managed separately and only by members with the required company-scoped permission. Password and session-security operations remain part of the P0 authentication feature group.
+SmartHire protects registration, recovery, sessions, account/profile maintenance, and private CV processing. Image/OCR assistance is purpose-scoped and must expose safe failure/fallback states; F005 remains **In progress** because its live OCR path has unresolved PA5 verification failures.
 
-### 5.3.3. Candidate Profile Management
-This feature allows candidates to create a structured professional profile through a form or by uploading a PDF or DOCX CV. The CV parser extracts profile data for candidate review and reuse in applications and provides normalized text to the matching and scoring service.
+### 5.3.2. Candidate Job Discovery and Application
 
-### 5.3.4. Job Board & Advanced Search
-This feature provides a public catalogue of approved job postings. Candidates can search and filter by criteria such as salary, experience, location, job type, and relevant tags, then view, save, share, report, or apply to a posting.
+Candidates discover only approved public jobs, save/report/apply, track their own applications, withdraw where eligible, respond to offers, and run private pre-application CV matches. Match output remains advisory and never creates an application without explicit submission.
 
-### 5.3.5. Job Posting Management
-This feature allows company-authorized recruiters to create, preview, edit, submit, publish, close, and extend job postings according to the approved lifecycle. Structured requirements such as skills, experience, salary range, location, and job type provide input to search, matching, and candidate screening.
+### 5.3.3. Recruiter Operations, Advisory Scoring and Kanban
 
-### 5.3.6. Application Tracking (Candidate Side)
-This feature provides candidates with a consolidated view of saved jobs, submitted applications, scoring progress, and rule-based job recommendations. The canonical recruitment stages are **Applied**, **Viewed**, **Shortlisted**, **Interviewing**, **Offered**, **Hired**, **Offer Declined**, **Rejected**, and **Waitlisted**. AI-processing progress is displayed separately through `scoring_status` and does not alter the recruitment stage.
+Authorized company roles manage job postings and applicants within company/job scope. Deterministic and optional AI scoring provides explanations and retry/fallback states, while human priority and all pipeline/hiring decisions remain visibly human-controlled. The Kanban records valid nine-stage transitions and stage history.
 
-### 5.3.7. Candidate Screening & Hybrid Scoring System
-This feature evaluates candidate applications for a specific job posting through a hybrid approach that combines rule-based skills and experience matching with AI-assisted semantic CV analysis. It produces a compatibility score and explanation to support recruiter review, while leaving all progression and hiring decisions under human control.
+### 5.3.4. Company Governance and Platform Administration
 
-### 5.3.8. Recruitment Pipeline Kanban Board
-This feature provides authorized company members with a visual representation of applications by recruitment stage. Dragging a candidate card to an allowed stage updates the application transactionally, records the actor and time, and triggers any configured notifications.
+Company membership, invitations, roles, settings, and employer-verification evidence remain tenant-scoped. Platform Administrators operate through a separate grant/designated-session boundary for verification, moderation, account operations, and job-post review/enforcement; company membership never grants platform authority.
 
-### 5.3.9. Automated Notifications & In-App Alerts
-This feature communicates application and moderation events without requiring users to poll the system manually. When an authorized recruiter changes an application stage, the system records the event and sends the configured email and in-app notification while preventing duplicate delivery.
+### 5.3.5. Notifications, Connections and Messaging
 
-### 5.3.10. Job Posting Moderation & Quality Assurance
-This feature allows Administrators to review job postings for legitimacy, completeness, spam, and policy violations. A new posting remains unavailable on the public job board until an Administrator approves it; rejection and revision requests include a recorded reason.
+Professional connections require explicit consent. General one-to-one messaging uses implemented eligibility and realtime delivery with REST recovery; application-scoped recruitment messaging is a separate REST/refetch workflow with Candidate/staff access and Company Owner read-only oversight where enforced. Notifications use recipient-scoped read state and current authorization when resolving destinations.
 
-### 5.3.11. User Management & Employer Verification
-This feature allows Administrators to search user accounts, perform audited support or enforcement actions, verify company documents, and review company-membership requests. A tax-ID match never grants access automatically: joining an existing company also requires a valid invitation or approval from an existing `OWNER` before final administrative verification.
+### 5.3.6. Recruitment Analytics and Export
 
-### 5.3.12. Recruitment Analytics & Data Export
-This P1 feature provides authorized recruiters with company-scoped metrics such as posting views, application counts, stage conversion, and successful hires. Administrators receive platform-level aggregate metrics. Authorized users may export permitted data to CSV or Excel without gaining access to records outside their tenant or platform role.
+Authorized company users receive company-scoped metrics and export workflows, while the current admin dashboard exposes permitted platform aggregates. F022 is **Implemented; verification pending**, so execution/performance outcomes are not claimed as verified.
 
-## 5.4. Key User Workflows
+### 5.3.7. Administrator Data Backup
 
-### 5.4.1. Hybrid CV Scoring System
+The implemented backup domain supports encrypted manual and scheduled runs plus run-history/failure visibility for a recently reauthenticated Platform Administrator. It does not provide a restore UI, and adapter existence does not prove final demo credentials or topology.
+
+## 5.4. Functional Requirements and Traceability
+
+The following stable IDs define the final functional baseline. A feature is not considered verified merely because its SpecKit artifacts or automated test source exist. Repository paths are representative entry points; detailed evidence and status rationale remain in the Feature Inventory.
+
+| FR ID | Requirement | Feature | Use Case(s) | UI and API/service evidence | Final status |
+|---|---|---:|---|---|---|
+| FR-IDN-01 | Register, verify email, authenticate, recover an account, manage sessions, and use 2FA/backup codes under safe redirect policy. | F001 | UC-AUTH-01–11 | `(auth)` and security pages; `/api/identity/*`; Better Auth/identity services; AUTH results | Implemented; verification pending |
+| FR-PROF-01 | Manage the account, candidate profile, preferences, avatar, and reusable professional information. | F002 | UC-ACC-01–02, UC-PROF-01 | `/profile/*`; `/api/account/*`; profile/account services; PROF results | Implemented and verified |
+| FR-JOB-01 | Browse only public approved jobs and search/filter/view/save/share/report/recommend permitted jobs. | F003 | UC-JOB-01–05, UC-APP-03–04 | `/jobs/*`; `/api/jobs*`, `/api/saved-jobs*`; job services; JOB results | Implemented and verified |
+| FR-CV-01 | Upload private PDF/DOCX CVs, scan/extract/parse them, review drafts, and confirm reusable versions. | F004 | UC-PROF-02–03 | profile CV-import UI; `/api/account/cv-imports*`; CV services/worker | Implemented; verification pending |
+| FR-OCR-01 | Perform purpose-specific OCR/image-assisted search with private storage, validation, consent, fallback, cancellation, and cleanup. | F005 | UC-PROF-03, UC-JOB-06 | job image-search/CV UI; image-search APIs/workers; IMG results | In progress |
+| FR-ADM-01 | Provide separately authorized platform administration and employer-verification workflows. | F006 | UC-ORG-03, UC-USER-01–02, UC-MOD-01–03 | `/admin-console`, employer-verification UI; `/api/admin/*`, `/api/employer-verifications*` | Implemented; verification pending |
+| FR-POST-01 | Allow authorized company members to create, submit, and manage company-scoped job postings. | F007 | UC-POST-01–04 | `/recruiter/job-postings/*`; recruiter job-post APIs/services | Implemented; verification pending |
+| FR-MSG-01 | Provide eligible one-to-one text messaging, read state, blocking, reporting entry points, realtime delivery, and REST recovery. | F008 | UC-MSG-01–03 | `/messages`; `/api/messaging/*`; Socket.IO messaging gateway | Implemented and verified |
+| FR-ADM-02 | Let Platform Administrators manage users and verified company authority through the separate admin boundary. | F009 | UC-USER-01–02, UC-ORG-01–03 | admin account/membership/verification resources and services | Implemented; verification pending |
+| FR-HOME-01 | Present the public/home experience using implemented job/company/account projections and role-aware entry points. | F010 | UC-JOB-01 | `/`, `/home`; home services/repositories and home tests | Implemented; verification pending |
+| FR-CON-01 | Require explicit professional-connection consent and support proposal decision, lifecycle, privacy, and disconnect. | F011 | UC-CON-01–02 | `/connections`, `/people/[userId]`; `/api/connections/*`; connection services | Implemented and verified |
+| FR-SCR-01 | Show company-scoped submitted applicants, filters, protected documents, and available scoring state to authorized roles. | F012 | UC-SCR-02–03 | `/recruiter/candidates/*`; recruiter applicant/document/scoring APIs | Implemented; verification pending |
+| FR-RPT-01 | Let participants report message evidence and Platform Administrators perform audited review with private notes. | F013 | UC-RPT-01–02 | messaging report actions/admin resource; report APIs/services | Implemented and verified |
+| FR-ORG-01 | Enrich business verification using bounded optional registry lookup, email proof, protected evidence, and admin decision. | F014 | UC-ORG-01–03 | employer-verification/business/admin views and services | Implemented and verified |
+| FR-SCR-02 | Produce transparent deterministic and optional AI advisory scoring, explanation, retry/fallback, ranking, and separate human priority. | F015 | UC-SCR-01–05, UC-APP-07 | recruiter scoring/private-match UI; scoring services/workers/routes | Implemented; verification pending |
+| FR-NOT-01 | Create privacy-bounded in-app/email notifications with idempotent outbox processing and recipient read-state management. | F016 | UC-NOT-01–02 | `/notifications`; notification/admin routes, services, and workers | Implemented and verified |
+| FR-MOD-01 | Let Platform Administrators review submitted job posts and return auditable approval/rejection/revision outcomes. | F017 | UC-MOD-01 | recruiter submission/admin review UI and review routes/services | Implemented and verified |
+| FR-MOD-02 | Let Platform Administrators enforce and manage job postings separately from initial review. | F018 | UC-MOD-02–03 | admin job-post resources and management/lifecycle services | Implemented and verified |
+| FR-NOT-02 | Resolve notification destinations using current recipient/context authorization and fall back neutrally when unavailable. | F019 | UC-NOT-03 | notification center/context-read routes and destination resolver | In progress |
+| FR-APP-01 | Let Candidates submit, track, withdraw, and respond to offers and run private CV matches without creating hidden applications. | F020 | UC-APP-01–02, UC-APP-05–07 | `/jobs/applied/*`, `/cv-match-check/*`; candidate application/private-match services | Implemented; verification pending |
+| FR-PIPE-01 | Let authorized company roles operate the nine-stage Kanban pipeline with valid transitions, conflicts, history, and human control. | F021 | UC-PIPE-01–03 | `/recruiter/pipeline`; pipeline routes/services and `ApplicationStageEvent` | Implemented and verified |
+| FR-ANL-01 | Provide company-scoped recruitment analytics/export and platform aggregate analytics through current authorized resources. | F022 | UC-ANL-01–03 | `/recruiter/analytics/*`, admin dashboard; analytics/export services | Implemented; verification pending |
+| FR-COMP-01 | Show and update company administration data according to the authorization actually enforced by the company-settings service. | F023 | UC-ORG-06 | `/recruiter/company-settings`; company route/services | Implemented; verification pending |
+| FR-TEAM-01 | Support invitation, accept/decline/revoke, role change, removal, history, and last-owner safeguards for company teams. | F024 | UC-ORG-04–05 | company team/invitation UI and routes/services | Implemented; verification pending |
+| FR-RMSG-01 | Provide application-scoped recruitment threads with Candidate/assignee access, HR assignment, company isolation, reports, and Owner read-only oversight. | F025 | UC-RMSG-01–04, UC-RPT-01 | candidate/recruiter message pages; recruitment-thread/message/oversight APIs/services | In progress |
+| FR-BKP-01 | Let a recently reauthenticated Platform Administrator configure, run, and inspect encrypted manual/scheduled backups without a restore UI. | F026 | UC-BKP-01–04 | admin-console backup resource; backup APIs/service/schedule loop | Implemented and verified |
+
+Feature 027 is not an FR in this table. It remains **Late Feature / Release Decision Pending** until an explicit project-lead release decision exists.
+
+## 5.5. Key User Workflows
+
+### 5.5.1. Hybrid CV Scoring System
 
 **Author:** Ngô Quốc Tuấn   
 **Student ID:** 24127581  
@@ -542,7 +579,7 @@ flowchart TD
 9. **Display Score**: The score and explanation are displayed to the recruiter and candidate
 
 
-### 5.4.2. Recruiter Verification & Company Role Assignment
+### 5.5.2. Recruiter Verification & Company Role Assignment
 
 This workflow governs how a standard user receives company-scoped recruitment permissions under the multi-tenant model described in Section 5.3.1. Approval creates a company membership; it does not replace the user's candidate identity. A tax-ID match is used only to identify an existing company and never grants membership automatically.
 
@@ -673,7 +710,7 @@ The system shall:
 - securely invalidate user sessions across all active devices upon logout or password reset.
 - enforce password reset through cryptographic email verification tokens.
 - store authentication tokens using HttpOnly, Secure, SameSite cookies, never in localStorage or sessionStorage, to mitigate client-side script injection (XSS).
-- enforce **Step-Up Authentication (Recent 2FA)**: Sensitive administrator actions (including triggering database backup, modifying global security settings, or privileged role assignments) require recent two-factor re-verification within 10 minutes.
+- enforce **Step-Up Authentication (Recent 2FA)**: Sensitive administrator actions (including triggering database backup, modifying global security settings, or privileged role assignments) require recent two-factor re-verification within 15 minutes.
 
 ### Authorization & Multi-Tenant Isolation
 
