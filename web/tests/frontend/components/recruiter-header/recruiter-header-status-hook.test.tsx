@@ -1,6 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useRecruiterHeaderStatus } from "@/frontend/features/recruiter-header/client/use-recruiter-header-status";
+import { RECRUITER_AUTHORITY_CHANGED_EVENT } from "@/shared/contracts/recruiter-header-status";
 
 const initialStatus = {
   state: "NEVER_APPLIED" as const,
@@ -40,6 +41,29 @@ describe("recruiter header status hook", () => {
     });
     expect(result.current.status).toBeNull();
     expect(result.current.unavailable).toBe(true);
+  });
+
+  it("refreshes immediately when recruiter authority changes", async () => {
+    const approvedStatus = {
+      state: "APPROVED" as const,
+      destinationKind: "RECRUITER_WORKSPACE" as const,
+      href: "/recruiter/job-postings" as const,
+      observedAt: "2026-08-11T00:00:00.000Z",
+    };
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify(initialStatus)),
+    );
+    const { result } = renderHook(() =>
+      useRecruiterHeaderStatus(approvedStatus),
+    );
+
+    await act(async () => {
+      window.dispatchEvent(new Event(RECRUITER_AUTHORITY_CHANGED_EVENT));
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(result.current.status).toEqual(initialStatus);
   });
 
   it("does not poll hidden tabs and polls visible tabs every thirty seconds", async () => {

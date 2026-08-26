@@ -1379,6 +1379,51 @@
   gap: 12px;
 }
 
+.recruiter-header-action-group {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.recruiter-header-action-group__primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.recruiter-header-action-group__toggle {
+  display: inline-grid;
+  width: 32px;
+  min-height: 40px;
+  place-items: center;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-md);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-surface);
+  font: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.recruiter-header-action-group__toggle:hover {
+  background: var(--sh-color-brand-soft);
+}
+
+.recruiter-header-action-group__toggle:focus-visible {
+  outline: 3px solid
+    color-mix(in srgb, var(--sh-color-brand-primary) 45%, transparent);
+  outline-offset: 2px;
+}
+
+.recruiter-header-action--create-company {
+  position: fixed;
+  z-index: 90;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-floating);
+}
+
 .recruiter-header-action {
   display: inline-flex;
   min-width: 40px;

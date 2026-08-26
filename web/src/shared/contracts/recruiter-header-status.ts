@@ -81,6 +81,10 @@ export type RecruiterHeaderError = z.infer<typeof recruiterHeaderErrorSchema>;
 export const EMPLOYER_VERIFICATION_HREF =
   "/dashboard/employer-verification" as const;
 
+/** Refreshes recruiter access UI after a company membership is removed. */
+export const RECRUITER_AUTHORITY_CHANGED_EVENT =
+  "smarthire:recruiter-authority-changed" as const;
+
 export function parseRecruiterHeaderStatus(value: unknown) {
   return recruiterHeaderStatusSchema.parse(value);
 }

@@ -1,18 +1,30 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { createElement } from "react";
 import {
   CompanySettingsScreen,
   getCompanyProfileValidation,
 } from "@/frontend/features/recruiter-workspace/company-settings-screen";
+import { RECRUITER_COMPANY_SCOPE_STORAGE_KEY } from "@/frontend/features/recruiter-workspace/recruiter-company-scope";
 
 vi.mock("@/frontend/features/authentication/client/csrf-proof-context", () => ({
   useCsrfProof: () => "csrf-test-proof",
 }));
 
 describe("company posting gate validation", () => {
+  beforeEach(() => {
+    window.sessionStorage.clear();
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
+    window.sessionStorage.clear();
   });
 
   it("recomputes completeness from filled form values instead of a stale server snapshot", () => {
@@ -96,6 +108,231 @@ describe("company posting gate validation", () => {
     expect(screen.getByText("Limited liability company")).toBeInTheDocument();
     expect(
       screen.queryByRole("textbox", { name: "Company name" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("switches the settings profile and team context between companies", async () => {
+    vi.spyOn(console, "debug").mockImplementation(() => undefined);
+    const firstCompany = {
+      id: "company-1",
+      slug: "dava",
+      name: "Dava",
+      entityType: "Limited liability company",
+      industry: "Game Development",
+      size: "1-50 employees",
+      address: "Ho Chi Minh, District 8",
+      logo: "https://example.com/dava-logo.png",
+      website: "https://example.com/Dava",
+      description: "A verified SmartHire employer.",
+      ownerUserId: "recruiter-1",
+      memberUserIds: [],
+      taxCode: "1234567890",
+      verificationStatus: "approved" as const,
+      role: "OWNER" as const,
+      profileComplete: true,
+      missingProfileFields: [],
+    };
+    const secondCompany = {
+      ...firstCompany,
+      id: "company-2",
+      slug: "northstar",
+      name: "Northstar Labs",
+      industry: "Information Technology",
+      address: "Hanoi",
+      role: "RECRUITER" as const,
+      memberUserIds: ["recruiter-1"],
+    };
+
+    render(
+      createElement(CompanySettingsScreen, {
+        initialCompany: firstCompany,
+        initialCompanies: [firstCompany, secondCompany],
+      }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Dava", level: 1 }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Owner")).toHaveLength(2);
+    expect(screen.getByRole("link", { name: "Manage team" })).toHaveAttribute(
+      "href",
+      "/recruiter/company-settings/team?companyId=company-1",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /Northstar Labs/ }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "Northstar Labs", level: 1 }),
+      ).toBeInTheDocument();
+    });
+    expect(screen.getByText("Authorized recruiter")).toBeInTheDocument();
+    expect(screen.getByText("Verification: Approved")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Manage team" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Delete company" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("restores the shared company selection when settings is revisited", async () => {
+    vi.spyOn(console, "debug").mockImplementation(() => undefined);
+    const firstCompany = {
+      id: "company-1",
+      slug: "dava",
+      name: "Dava",
+      entityType: "Limited liability company",
+      industry: "Game Development",
+      size: "1-50 employees",
+      address: "Ho Chi Minh, District 8",
+      logo: "https://example.com/dava-logo.png",
+      website: "https://example.com/Dava",
+      description: "A verified SmartHire employer.",
+      ownerUserId: "recruiter-1",
+      memberUserIds: [],
+      taxCode: "1234567890",
+      verificationStatus: "approved" as const,
+      role: "OWNER" as const,
+      profileComplete: true,
+      missingProfileFields: [],
+    };
+    const secondCompany = {
+      ...firstCompany,
+      id: "company-2",
+      slug: "northstar",
+      name: "Northstar Labs",
+      role: "RECRUITER" as const,
+    };
+    window.sessionStorage.setItem(
+      RECRUITER_COMPANY_SCOPE_STORAGE_KEY,
+      secondCompany.id,
+    );
+
+    render(
+      createElement(CompanySettingsScreen, {
+        initialCompany: firstCompany,
+        initialCompanies: [firstCompany, secondCompany],
+      }),
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "Northstar Labs", level: 1 }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("lets an owner delete the selected company and switches to the next one", async () => {
+    vi.spyOn(console, "debug").mockImplementation(() => undefined);
+    const firstCompany = {
+      id: "company-1",
+      slug: "dava",
+      name: "Dava",
+      entityType: "Limited liability company",
+      industry: "Game Development",
+      size: "1-50 employees",
+      address: "Ho Chi Minh, District 8",
+      logo: "https://example.com/dava-logo.png",
+      website: "https://example.com/Dava",
+      description: "A verified SmartHire employer.",
+      ownerUserId: "recruiter-1",
+      memberUserIds: [],
+      taxCode: "1234567890",
+      verificationStatus: "approved" as const,
+      role: "OWNER" as const,
+      profileComplete: true,
+      missingProfileFields: [],
+    };
+    const secondCompany = {
+      ...firstCompany,
+      id: "company-2",
+      slug: "northstar",
+      name: "Northstar Labs",
+      role: "RECRUITER" as const,
+    };
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ companyId: "company-1", deleted: true }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      createElement(CompanySettingsScreen, {
+        initialCompany: firstCompany,
+        initialCompanies: [firstCompany, secondCompany],
+      }),
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete company" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Delete Dava?" });
+    expect(dialog).toBeInTheDocument();
+    fireEvent.change(
+      within(dialog).getByRole("textbox", {
+        name: "Type company name to confirm",
+      }),
+      { target: { value: "Dava" } },
+    );
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Delete company" }),
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "Northstar Labs", level: 1 }),
+      ).toBeInTheDocument();
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/recruiter/company?companyId=company-1",
+      {
+        method: "DELETE",
+        headers: { "X-CSRF-Token": "csrf-test-proof" },
+      },
+    );
+    expect(
+      screen.queryByRole("button", { name: "Delete company" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("closes the delete confirmation when the backdrop is clicked", () => {
+    const firstCompany = {
+      id: "company-1",
+      slug: "dava",
+      name: "Dava",
+      entityType: "Limited liability company",
+      industry: "Game Development",
+      size: "1-50 employees",
+      address: "Ho Chi Minh, District 8",
+      logo: "https://example.com/dava-logo.png",
+      website: "https://example.com/Dava",
+      description: "A verified SmartHire employer.",
+      ownerUserId: "recruiter-1",
+      memberUserIds: [],
+      taxCode: "1234567890",
+      verificationStatus: "approved" as const,
+      role: "OWNER" as const,
+      profileComplete: true,
+      missingProfileFields: [],
+    };
+
+    render(
+      createElement(CompanySettingsScreen, {
+        initialCompany: firstCompany,
+        initialCompanies: [firstCompany],
+      }),
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete company" }));
+    const dialog = screen.getByRole("dialog", { name: "Delete Dava?" });
+    expect(dialog).toBeInTheDocument();
+
+    const backdrop = dialog.parentElement;
+    expect(backdrop).not.toBeNull();
+    fireEvent.mouseDown(backdrop!);
+
+    expect(
+      screen.queryByRole("dialog", { name: "Delete Dava?" }),
     ).not.toBeInTheDocument();
   });
 

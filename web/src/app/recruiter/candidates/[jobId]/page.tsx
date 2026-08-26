@@ -29,6 +29,7 @@ export default async function RecruiterCandidateRankingPage({
   return (
     <RecruiterCandidatesPage
       jobs={data.jobs}
+      companies={data.companies}
       selectedJobId={canonicalJobId}
       csrfProof={context.csrfProof}
     />

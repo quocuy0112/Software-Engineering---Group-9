@@ -25,6 +25,8 @@ export const recruiterRoutes = {
   analyticsForJob: (jobId: string) =>
     "/recruiter/analytics/" + encodeURIComponent(jobId),
   jobPostingCreate: "/recruiter/job-postings/create",
+  jobPostingCreateForCompany: (companyId: string) =>
+    `/recruiter/job-postings/create?companyId=${encodeURIComponent(companyId)}`,
   candidateRanking: (jobId: string) =>
     `/recruiter/candidates/${encodeURIComponent(jobId)}`,
   pipelineForJob: (jobId: string) =>

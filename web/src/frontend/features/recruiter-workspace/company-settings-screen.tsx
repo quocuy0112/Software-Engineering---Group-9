@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -10,17 +11,40 @@ import {
   type FormEvent,
 } from "react";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
+import { CompanyAvatar } from "@/frontend/features/jobs/components/company-avatar";
 import {
   companyLogoSchema,
   type RecruiterCompanySettings,
   type RecruiterCompanySettingsInput,
 } from "@/shared/contracts/jobs/catalog";
+import { RECRUITER_AUTHORITY_CHANGED_EVENT } from "@/shared/contracts/recruiter-header-status";
 import styles from "./company-settings-screen.module.css";
+import {
+  ALL_RECRUITER_COMPANIES,
+  useRecruiterCompanyScope,
+} from "./recruiter-company-scope";
 
-type Props = { initialCompany: RecruiterCompanySettings | null; canManageTeam?: boolean };
+type Props = {
+  initialCompany: RecruiterCompanySettings | null;
+  initialCompanies?: RecruiterCompanySettings[];
+  canManageTeam?: boolean;
+  initialCompanyId?: string;
+};
 type FormState = RecruiterCompanySettingsInput;
 type FieldName = "name" | "industry" | "size" | "address" | "logo";
 type FieldErrors = Partial<Record<FieldName | "website", string>>;
+
+function emptyForm(): FormState {
+  return {
+    name: "",
+    logo: null,
+    size: "",
+    industry: "",
+    address: "",
+    website: null,
+    description: null,
+  };
+}
 
 const MAX_LOGO_FILE_BYTES = 5 * 1024 * 1024;
 const ACCEPTED_LOGO_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -211,36 +235,98 @@ function fieldClass(hasError: boolean) {
   return hasError ? `${styles.field} ${styles.error}` : styles.field;
 }
 
-export function CompanySettingsScreen({ initialCompany, canManageTeam = false }: Props) {
+function companyRoleLabel(role?: RecruiterCompanySettings["role"]) {
+  switch (role) {
+    case "OWNER":
+      return "Owner";
+    case "HR_MANAGER":
+      return "Authorized recruiter · HR Manager";
+    case "RECRUITER":
+      return "Authorized recruiter";
+    case "HIRING_MANAGER":
+      return "Authorized recruiter · Hiring manager";
+    default:
+      return "Authorized recruiter/member";
+  }
+}
+
+export function CompanySettingsScreen({
+  initialCompany,
+  initialCompanies,
+  canManageTeam = false,
+  initialCompanyId,
+}: Props) {
   const csrfProof = useCsrfProof();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
+  const deleteConfirmationRef = useRef<HTMLInputElement>(null);
+  const [companies, setCompanies] = useState<RecruiterCompanySettings[]>(
+    initialCompanies?.length
+      ? initialCompanies
+      : initialCompany
+        ? [initialCompany]
+        : [],
+  );
   const [company, setCompany] = useState(initialCompany);
+  const { selectedCompanyId, setCompanyId } =
+    useRecruiterCompanyScope(companies);
+  const [explicitCompanyId, setExplicitCompanyId] = useState(
+    initialCompanyId ?? null,
+  );
   const [form, setForm] = useState<FormState>(
-    initialCompany
-      ? formFromCompany(initialCompany)
-      : {
-          name: "",
-          logo: null,
-          size: "",
-          industry: "",
-          address: "",
-          website: null,
-          description: null,
-        },
+    initialCompany ? formFromCompany(initialCompany) : emptyForm(),
   );
   const [busy, setBusy] = useState(false);
   const [logoBusy, setLogoBusy] = useState(false);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [isEditing, setIsEditing] = useState(!initialCompany?.profileComplete);
+
+  const activeCompanyId =
+    explicitCompanyId ??
+    selectedCompanyId ??
+    company?.id ??
+    companies[0]?.id ??
+    null;
+
+  useEffect(() => {
+    if (!activeCompanyId || activeCompanyId === company?.id) return;
+    const nextCompany = companies.find((item) => item.id === activeCompanyId);
+    if (!nextCompany) return;
+    // Synchronize the editable form with the company selected in the shared
+    // workspace scope. This is intentionally a state transition from the
+    // external company selector into this screen's local form state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCompany(nextCompany);
+    setForm(formFromCompany(nextCompany));
+    setIsEditing(!nextCompany.profileComplete);
+    setMessage("");
+    setError("");
+    setFieldErrors({});
+  }, [activeCompanyId, companies, company?.id]);
 
   useLayoutEffect(() => {
     if (isEditing && descriptionRef.current) {
       resizeDescription(descriptionRef.current);
     }
   }, [form.description, isEditing]);
+
+  useEffect(() => {
+    if (!deleteDialogOpen) return;
+    deleteConfirmationRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !deleteBusy) {
+        setDeleteDialogOpen(false);
+        setDeleteConfirmation("");
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [deleteBusy, deleteDialogOpen]);
 
   function updateField<K extends keyof FormState>(
     field: K,
@@ -290,7 +376,10 @@ export function CompanySettingsScreen({ initialCompany, canManageTeam = false }:
     }
     setBusy(true);
     try {
-      const response = await fetch("/api/recruiter/company", {
+      const companyQuery = company?.id
+        ? `?companyId=${encodeURIComponent(company.id)}`
+        : "";
+      const response = await fetch(`/api/recruiter/company${companyQuery}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -309,6 +398,13 @@ export function CompanySettingsScreen({ initialCompany, canManageTeam = false }:
       }
       const savedCompany = payload as RecruiterCompanySettings;
       setCompany(savedCompany);
+      setCompanies((current) =>
+        current.some((item) => item.id === savedCompany.id)
+          ? current.map((item) =>
+              item.id === savedCompany.id ? savedCompany : item,
+            )
+          : [...current, savedCompany],
+      );
       setForm(formFromCompany(savedCompany));
       setMessage("Company profile saved.");
       setIsEditing(false);
@@ -320,6 +416,65 @@ export function CompanySettingsScreen({ initialCompany, canManageTeam = false }:
       );
     } finally {
       setBusy(false);
+    }
+  }
+
+  function openDeleteDialog() {
+    if (!company || busy || deleteBusy) return;
+    setDeleteConfirmation("");
+    setDeleteDialogOpen(true);
+  }
+
+  function closeDeleteDialog() {
+    if (deleteBusy) return;
+    setDeleteDialogOpen(false);
+    setDeleteConfirmation("");
+  }
+
+  async function deleteCompany() {
+    const selectedCompany = company;
+    if (!selectedCompany || busy || deleteBusy) return;
+    if (deleteConfirmation.trim() !== selectedCompany.name.trim()) return;
+
+    setDeleteBusy(true);
+    setMessage("");
+    setError("");
+    setFieldErrors({});
+    try {
+      const companyQuery = `?companyId=${encodeURIComponent(selectedCompany.id)}`;
+      const response = await fetch(`/api/recruiter/company${companyQuery}`, {
+        method: "DELETE",
+        headers: { "X-CSRF-Token": csrfProof },
+      });
+      const payload = (await response.json().catch(() => ({}))) as {
+        deleted?: boolean;
+        message?: string;
+      };
+      if (!response.ok || !payload.deleted) {
+        throw new Error(payload.message ?? "Unable to delete company.");
+      }
+
+      window.dispatchEvent(new Event(RECRUITER_AUTHORITY_CHANGED_EVENT));
+
+      const remainingCompanies = companies.filter(
+        (candidate) => candidate.id !== selectedCompany.id,
+      );
+      const nextCompany = remainingCompanies[0] ?? null;
+      setCompanies(remainingCompanies);
+      setCompany(nextCompany);
+      setExplicitCompanyId(nextCompany?.id ?? null);
+      setCompanyId(nextCompany?.id ?? ALL_RECRUITER_COMPANIES);
+      setForm(nextCompany ? formFromCompany(nextCompany) : emptyForm());
+      setIsEditing(nextCompany ? !nextCompany.profileComplete : false);
+      setDeleteDialogOpen(false);
+      setDeleteConfirmation("");
+      setMessage(nextCompany ? "Company deleted." : "");
+    } catch (caught) {
+      setError(
+        caught instanceof Error ? caught.message : "Unable to delete company.",
+      );
+    } finally {
+      setDeleteBusy(false);
     }
   }
 
@@ -336,7 +491,7 @@ export function CompanySettingsScreen({ initialCompany, canManageTeam = false }:
           className={styles.btnSave}
           href="/dashboard/employer-verification"
         >
-          Start recruiter verification
+          Create a Company
         </Link>
       </section>
     );
@@ -346,9 +501,65 @@ export function CompanySettingsScreen({ initialCompany, canManageTeam = false }:
   const missingFields = profileValidation.missingFields;
   const profileComplete = missingFields.length === 0;
   const status = company.verificationStatus;
+  const managesSelectedTeam = company.role
+    ? company.role === "OWNER"
+    : canManageTeam;
+  const canDeleteCompany = company.role
+    ? company.role === "OWNER"
+    : canManageTeam;
 
   return (
     <section className={styles.wrap}>
+      <section
+        className={styles.companySwitcher}
+        aria-labelledby="company-switcher-title"
+      >
+        <div className={styles.companySwitcherHeader}>
+          <div>
+            <p className={styles.switcherLabel} id="company-switcher-title">
+              Your companies
+            </p>
+            <p className={styles.switcherHint}>
+              Switch the company profile and team context shown below.
+            </p>
+          </div>
+          <Link
+            className={styles.createCompanyLink}
+            href="/dashboard/employer-verification"
+          >
+            Create a Company
+          </Link>
+        </div>
+        <div className={styles.companySwitcherList} role="list">
+          {companies.map((candidate) => (
+            <div role="listitem" key={candidate.id}>
+              <button
+                className={`${styles.companySwitcherItem}${candidate.id === company.id ? ` ${styles.companySwitcherItemActive}` : ""}`}
+                type="button"
+                aria-pressed={candidate.id === company.id}
+                onClick={() => {
+                  setExplicitCompanyId(null);
+                  setCompanyId(candidate.id);
+                }}
+              >
+                <CompanyAvatar
+                  name={candidate.name}
+                  imageUrl={candidate.logo}
+                  size="sm"
+                />
+                <span className={styles.companySwitcherCopy}>
+                  <span className={styles.companySwitcherName}>
+                    {candidate.name}
+                  </span>
+                  <span className={styles.companySwitcherRole}>
+                    {companyRoleLabel(candidate.role)}
+                  </span>
+                </span>
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
       <div className={styles.phead}>
         <div>
           <p className={styles.eyebrow}>
@@ -715,8 +926,14 @@ export function CompanySettingsScreen({ initialCompany, canManageTeam = false }:
             </div>
 
             <div className={styles.readonlyActions}>
-              <p className={styles.formStatus} role="status" aria-live="polite">
-                {message || "Your saved details are currently read-only."}
+              <p
+                className={`${styles.formStatus}${error ? ` ${styles.isError}` : ""}`}
+                role={error ? "alert" : "status"}
+                aria-live="polite"
+              >
+                {error ||
+                  message ||
+                  "Your saved details are currently read-only."}
               </p>
               <button
                 className={styles.btnEdit}
@@ -754,9 +971,108 @@ export function CompanySettingsScreen({ initialCompany, canManageTeam = false }:
             <div className={styles.srl}>Members</div>
             <div className={styles.srv}>{company.memberUserIds.length}</div>
           </div>
-          {canManageTeam ? <Link className={styles.btnOutline} href="/recruiter/company-settings/team">Manage team</Link> : <p className={styles.sideNote}>Only the active company owner can manage team members.</p>}
+          {managesSelectedTeam ? (
+            <Link
+              className={styles.btnOutline}
+              href={`/recruiter/company-settings/team?companyId=${encodeURIComponent(company.databaseId ?? company.id)}`}
+            >
+              Manage team
+            </Link>
+          ) : (
+            <p className={styles.sideNote}>
+              Only the active company owner can manage team members.
+            </p>
+          )}
+          {canDeleteCompany ? (
+            <div className={styles.dangerZone}>
+              <p className={styles.dangerLabel}>Danger zone</p>
+              <p className={styles.dangerText}>
+                Permanently delete this company and all of its jobs,
+                applications, messages, and analytics. This cannot be undone.
+              </p>
+              <button
+                className={styles.btnDelete}
+                type="button"
+                disabled={busy || logoBusy || deleteBusy}
+                onClick={openDeleteDialog}
+              >
+                Delete company
+              </button>
+            </div>
+          ) : null}
         </aside>
       </div>
+      {deleteDialogOpen ? (
+        <div
+          className={styles.deleteDialogBackdrop}
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeDeleteDialog();
+          }}
+        >
+          <section
+            className={styles.deleteDialog}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-company-title"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className={styles.deleteDialogHeader}>
+              <div>
+                <p className={styles.dangerLabel}>Danger zone</p>
+                <h2 id="delete-company-title">Delete {company.name}?</h2>
+              </div>
+              <button
+                className={styles.deleteDialogClose}
+                type="button"
+                aria-label="Close delete dialog"
+                disabled={deleteBusy}
+                onClick={closeDeleteDialog}
+              >
+                ×
+              </button>
+            </div>
+            <p className={styles.deleteDialogText}>
+              This permanently removes the company and its recruiter data,
+              including job postings, applications, messages, and analytics.
+            </p>
+            <label className={styles.deleteConfirmationLabel}>
+              Type <strong>{company.name}</strong> to confirm
+              <input
+                ref={deleteConfirmationRef}
+                className={styles.deleteConfirmationInput}
+                type="text"
+                value={deleteConfirmation}
+                aria-label="Type company name to confirm"
+                autoComplete="off"
+                disabled={deleteBusy}
+                onChange={(event) => setDeleteConfirmation(event.target.value)}
+              />
+            </label>
+            <div className={styles.deleteDialogActions}>
+              <button
+                className={styles.btnCancelDelete}
+                type="button"
+                disabled={deleteBusy}
+                onClick={closeDeleteDialog}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.btnDeleteConfirm}
+                type="button"
+                disabled={
+                  deleteBusy ||
+                  deleteConfirmation.trim() !== company.name.trim()
+                }
+                onClick={() => void deleteCompany()}
+              >
+                {deleteBusy ? "Deleting..." : "Delete company"}
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </section>
   );
 }

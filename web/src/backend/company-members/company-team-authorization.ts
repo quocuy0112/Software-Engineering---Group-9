@@ -8,12 +8,26 @@ export class CompanyTeamAuthorizationError extends Error {
   }
 }
 
-export async function requireActiveCompanyOwner(userId: string) {
+export async function requireActiveCompanyOwner(
+  userId: string,
+  companyId?: string,
+) {
   const memberships = await prisma.companyMembership.findMany({
-    where: { userId, role: "OWNER", status: "ACTIVE", removedAt: null, company: { verificationState: "ACTIVE", verificationInactiveAt: null } },
+    where: {
+      userId,
+      ...(companyId ? { companyId } : {}),
+      role: "OWNER",
+      status: "ACTIVE",
+      removedAt: null,
+      company: {
+        verificationState: "ACTIVE",
+        verificationInactiveAt: null,
+      },
+    },
     select: { companyId: true, company: { select: { displayName: true } } },
     take: 2,
   });
-  if (memberships.length !== 1) throw new CompanyTeamAuthorizationError("TEAM_FORBIDDEN");
+  if (memberships.length !== 1)
+    throw new CompanyTeamAuthorizationError("TEAM_FORBIDDEN");
   return memberships[0];
 }

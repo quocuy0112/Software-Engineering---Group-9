@@ -15,10 +15,20 @@ import {
   SlidersHorizontal,
   Users,
 } from "lucide-react";
-import type { RecruiterJob } from "@/shared/contracts/recruiter-job-posting";
+import type {
+  RecruiterCompanyView,
+  RecruiterJob,
+} from "@/shared/contracts/recruiter-job-posting";
 import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
 import { RecruiterCandidateWorkspace } from "./recruiter-candidate-workspace";
 import { CampaignDistributionBar } from "./campaign-distribution-bar";
+import { RecruiterCompanyFilter } from "@/frontend/features/recruiter-workspace/recruiter-company-filter";
+import {
+  companyMatchesScope,
+  useRecruiterCompanyScope,
+} from "@/frontend/features/recruiter-workspace/recruiter-company-scope";
+
+const emptyCompanies: RecruiterCompanyView[] = [];
 import {
   useCampaignScoringStats,
   type CampaignScoringStats,
@@ -242,21 +252,28 @@ const CampaignCard = memo(function CampaignCard({
 
 export function RecruiterCandidatesPage({
   jobs,
+  companies,
   selectedJobId,
   csrfProof,
 }: {
   jobs: RecruiterJob[];
+  companies?: RecruiterCompanyView[];
   selectedJobId?: string;
   csrfProof?: string;
 }) {
+  const companyOptions = companies ?? emptyCompanies;
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"ALL" | "active" | "closed">("ALL");
   const [department, setDepartment] = useState("ALL");
   const [view, setView] = useState<"grid" | "list">("grid");
   const [campaignPageIndex, setCampaignPageIndex] = useState(0);
   const [campaignPageSize, setCampaignPageSize] = useState(12);
+  const { companyId, selectedCompanyId, setCompanyId } =
+    useRecruiterCompanyScope(companyOptions);
   const campaignData = useCampaignScoringStats(jobs);
-  const liveJobs = campaignData.jobs ?? jobs;
+  const liveJobs = (campaignData.jobs ?? jobs).filter((job) =>
+    companyMatchesScope(job.companyId, selectedCompanyId),
+  );
   const stats = campaignData.stats;
   const statsError = campaignData.error;
   const statsLoading = campaignData.loading;
@@ -309,11 +326,15 @@ export function RecruiterCandidatesPage({
     (currentCampaignPageIndex + 1) * campaignPageSize,
   );
   const hasCampaignFilters =
-    Boolean(search.trim()) || status !== "ALL" || department !== "ALL";
+    Boolean(search.trim()) ||
+    status !== "ALL" ||
+    department !== "ALL" ||
+    companyId !== "all";
   const clearCampaignFilters = () => {
     setSearch("");
     setStatus("ALL");
     setDepartment("ALL");
+    setCompanyId("all");
     setCampaignPageIndex(0);
   };
   const handleRefresh = useCallback(() => {
@@ -394,7 +415,10 @@ export function RecruiterCandidatesPage({
         </div>
       </div>
 
-      <div className="campaign-toolbar" role="search">
+      <div
+        className={`campaign-toolbar${companyOptions.length > 1 ? "campaign-toolbar--with-company" : ""}`}
+        role="search"
+      >
         <label className="campaign-search-field">
           <Search aria-hidden="true" />
           <span className="sr-only">Search campaigns</span>
@@ -444,6 +468,16 @@ export function RecruiterCandidatesPage({
             ))}
           </select>
         </label>
+        <RecruiterCompanyFilter
+          companies={companyOptions}
+          value={companyId}
+          onChange={(next) => {
+            setCompanyId(next);
+            setCampaignPageIndex(0);
+          }}
+          id="candidate-campaign-company"
+          className="campaign-filter-field"
+        />
         <div className="campaign-view-toggle" aria-label="Campaign view">
           <button
             type="button"

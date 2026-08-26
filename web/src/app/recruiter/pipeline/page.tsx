@@ -17,5 +17,11 @@ export default async function RecruiterPipelineRoute({
   if (!data.companyId) redirect("/recruiter/company-settings?required=profile");
 
   const query = searchParams ? await searchParams : {};
-  return <RecruiterPipelinePage jobs={data.jobs} initialJobId={query.jobId} />;
+  return (
+    <RecruiterPipelinePage
+      jobs={data.jobs}
+      companies={data.companies}
+      initialJobId={query.jobId}
+    />
+  );
 }

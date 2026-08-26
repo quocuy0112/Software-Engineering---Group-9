@@ -12,5 +12,11 @@ export default async function CandidatesPage() {
   const data = await readRecruiterJobManagementData(context.userId);
   if (!data.companyId) redirect("/recruiter/company-settings?required=profile");
 
-  return <RecruiterCandidatesPage jobs={data.jobs} csrfProof={context.csrfProof} />;
+  return (
+    <RecruiterCandidatesPage
+      jobs={data.jobs}
+      companies={data.companies}
+      csrfProof={context.csrfProof}
+    />
+  );
 }

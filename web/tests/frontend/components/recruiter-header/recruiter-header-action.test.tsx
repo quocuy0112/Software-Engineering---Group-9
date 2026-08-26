@@ -44,7 +44,7 @@ describe("recruiter header action", () => {
   });
 
   it.each([
-    ["NEVER_APPLIED", "Apply as Recruiter"],
+    ["NEVER_APPLIED", "Create a Company"],
     ["CHANGES_REQUESTED", "Update Application"],
     ["REJECTED", "Reapply as Recruiter"],
     ["APPROVED", "Recruiter Workspace"],
@@ -108,5 +108,102 @@ describe("recruiter header action", () => {
       "_blank",
       "noopener,noreferrer",
     );
+  });
+
+  it("expands and collapses Create a Company for approved recruiter actions", () => {
+    render(
+      <RecruiterHeaderAction
+        initialStatus={{
+          state: "APPROVED",
+          destinationKind: "RECRUITER_WORKSPACE",
+          href: "https://recruiter.example.test",
+          observedAt,
+        }}
+        onOpenWorkspace={() => {}}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Create a Company" }),
+    ).toBeNull();
+    const toggle = screen.getByRole("button", {
+      name: "Show Create a Company",
+    });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(toggle).toHaveTextContent("+");
+
+    fireEvent.click(toggle);
+    const companyAction = screen.getByRole("button", {
+      name: "Create a Company",
+    });
+    expect(companyAction).toBeVisible();
+    expect(companyAction.parentElement).toBe(document.body);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(toggle).toHaveAccessibleName("Hide Create a Company");
+    expect(toggle).toHaveTextContent("−");
+
+    fireEvent.click(toggle);
+    expect(
+      screen.queryByRole("button", { name: "Create a Company" }),
+    ).toBeNull();
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(toggle).toHaveAccessibleName("Show Create a Company");
+    expect(toggle).toHaveTextContent("+");
+  });
+
+  it("closes the floating company action on outside interaction or Escape", () => {
+    render(
+      <RecruiterHeaderAction
+        initialStatus={{
+          state: "APPROVED",
+          destinationKind: "RECRUITER_WORKSPACE",
+          href: "https://recruiter.example.test",
+          observedAt,
+        }}
+        onOpenWorkspace={() => {}}
+      />,
+    );
+
+    const toggle = screen.getByRole("button", {
+      name: "Show Create a Company",
+    });
+    fireEvent.click(toggle);
+    expect(
+      screen.getByRole("button", { name: "Create a Company" }),
+    ).toBeVisible();
+
+    fireEvent.mouseDown(document.body);
+    expect(
+      screen.queryByRole("button", { name: "Create a Company" }),
+    ).toBeNull();
+
+    fireEvent.click(toggle);
+    expect(
+      screen.getByRole("button", { name: "Create a Company" }),
+    ).toBeVisible();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(
+      screen.queryByRole("button", { name: "Create a Company" }),
+    ).toBeNull();
+  });
+
+  it("shows company creation for the 0-company state without an expansion toggle", () => {
+    render(
+      <RecruiterHeaderAction
+        initialStatus={{
+          state: "NEVER_APPLIED",
+          destinationKind: "EMPLOYER_VERIFICATION",
+          href: "/dashboard/employer-verification",
+          observedAt,
+        }}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Show Create a Company" }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: "Create a Company" }),
+    ).toBeVisible();
   });
 });

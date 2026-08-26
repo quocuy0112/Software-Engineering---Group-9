@@ -220,8 +220,18 @@ export type JobCatalogItem = z.infer<typeof jobCatalogSchema>;
 export type CompanyCatalogItem = z.infer<typeof companyCatalogSchema>;
 export type JobPostingStatus = z.infer<typeof jobPostingStatusSchema>;
 export type UserJobState = z.infer<typeof userJobStateSchema>;
+
+export type RecruiterCompanyRole =
+  | "OWNER"
+  | "HR_MANAGER"
+  | "RECRUITER"
+  | "HIRING_MANAGER"
+  | "MEMBER";
+
 export type RecruiterCompanySettings = {
   id: string;
+  /** Persistent company id used by company-team APIs when the job catalogue id differs. */
+  databaseId?: string;
   slug: string;
   name: string;
   entityType: string | null;
@@ -235,6 +245,7 @@ export type RecruiterCompanySettings = {
   memberUserIds: string[];
   taxCode: string;
   verificationStatus: "pending" | "approved" | "rejected";
+  role?: RecruiterCompanyRole;
   profileComplete: boolean;
   missingProfileFields: Array<
     "name" | "industry" | "size" | "address" | "logo"
