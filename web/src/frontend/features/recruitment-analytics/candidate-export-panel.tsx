@@ -132,14 +132,22 @@ export function CandidateExportPanel({
     setBusy(true);
     setMessage("");
     try {
-      const response = await fetch(
+      const exportUrl =
         "/api/recruiter/analytics/jobs/" +
-          encodeURIComponent(jobId) +
-          "/exports/" +
-          encodeURIComponent(status.id) +
-          "/download",
-        { cache: "no-store" },
-      );
+        encodeURIComponent(jobId) +
+        "/exports/" +
+        encodeURIComponent(status.id);
+      let response = await fetch(exportUrl + "/download", {
+        cache: "no-store",
+      });
+      // A long-running Next dev process can retain an older route manifest
+      // after a nested route is added. The query form uses the already-loaded
+      // status handler and keeps existing exports downloadable until restart.
+      if (!response.ok && response.status === 404) {
+        response = await fetch(exportUrl + "?download=1", {
+          cache: "no-store",
+        });
+      }
       if (!response.ok) {
         setMessage(
           await responseError(response, "The download is unavailable."),
