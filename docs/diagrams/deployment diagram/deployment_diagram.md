@@ -12,7 +12,7 @@
 
 **Architecture scope:** Runtime deployment topology of the implemented SmartHire 26-feature baseline.
 
-**Deployment Qualification & Container Reality:** This deployment diagram maps every Level 2 container to a logical runtime node on the developer workstation / demo host. The repository provides dedicated Dockerfiles (`Dockerfile.admin-worker`, `Dockerfile.image-search-worker`, `Dockerfile.ocr-engine`, `web/Dockerfile.cv-worker`) and worker execution scripts (`web/scripts/run-*.mjs`). While individual services are containerized or run as Node.js host processes, no root `compose.yaml` is checked into the repository; each node represents an independently running container or background process communicating over loopback ports, private Unix domain sockets, or internal file paths.
+**Deployment Qualification & Container Reality:** Tracked root `compose.yaml` defines six local services: PostgreSQL, ClamAV, CV Worker, OCR Engine, Image Search Worker, and Admin Worker. The repository also provides a web application and executable email/export/backup processes, but it does not prove their final demo launch topology; those are logical host processes rather than Compose services.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 45, "rankSpacing": 70, "diagramPadding": 20}}}%%
@@ -156,7 +156,7 @@ flowchart TD
 
 All logical deployment nodes currently run on, or are accessed from, a single developer machine in the local development and demonstration environment.
 
-1. **Process & Container Reality:** The Next.js Web Application, Email Worker, Analytics Export Worker, and Admin Backup Runner run as Node.js host processes via scripts or custom servers. Dedicated Dockerfiles are provided for the CV Worker (`web/Dockerfile.cv-worker`), Image Search Worker (`Dockerfile.image-search-worker`), Admin Worker (`Dockerfile.admin-worker`), and OCR Engine (`Dockerfile.ocr-engine`). While these services can be built into individual Docker containers, no root `compose.yaml` manifest is checked into the repository; each node represents an independently running container or background process communicating over loopback ports, private Unix domain sockets, or internal file paths.
+1. **Process & Container Reality:** Root `compose.yaml` provides PostgreSQL, ClamAV, CV Worker, OCR Engine, Image Search Worker, and Admin Worker. The Next.js web application, Email Worker, Analytics Export Worker, and Admin Backup Runner remain separately executable host/logical processes in repository evidence; their final demo process topology is not asserted.
 2. **Artifact & Data Isolation:** Artifact persistence defaults to local private filesystem directories protected by application-level AES-256-GCM encryption where sensitive (CVs, business licenses, backup dumps). Search images and export files are ephemeral with automated expiration and deletion deadlines.
 3. **Optional External Integrations:** External email delivery (SMTP/Resend), OpenAI semantic interpretation, VietQR business verification, and Google Drive backup upload are implemented via provider adapters but remain optional. Cloud AWS S3/KMS adapters exist in source but are unprovisioned in the default local demonstration environment.
 4. **Disaster Recovery Notice:** In-app database restore is strictly out of scope; database restoration is executed via command-line DBA procedures to maintain data safety.

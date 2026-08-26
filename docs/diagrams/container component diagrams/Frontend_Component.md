@@ -2,9 +2,13 @@
 
 _Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Quốc Thành | Edited by: Lưu Chí Hải_
 
+**Version:** 1.2 (2026-08-26) — PA5 implementation synchronization; review pending Nguyễn Minh Khôi
+
 **Architecture scope:** Major frontend components of the final implemented SmartHire product, covering public, candidate, recruiter/company-member, communication, and platform-administration experiences.
 
-**C4 modeling note:** The current structure, `web/next.config.ts`, `web/server.ts`, `compose.yaml`, and `tech_stack.md` continue to support one deployable `Next.js Web Application`. The frontend and backend diagrams are logical Level 3 views of that container, not separately deployed frontend and API services. `Server-side Services & API Routes` is shown only as the in-container backend interface used by the frontend; its internal decomposition remains in the Backend Component Diagram.
+**Release boundary:** The view covers final Features 001–026. Feature 027 remains **Late Feature / Release Decision Pending** and is intentionally not added to this final-release component baseline.
+
+**C4 modeling note:** The current structure, `web/next.config.ts`, `web/server.ts`, and the tracked root `compose.yaml` support one logical `Next.js Web Application` plus separately executable workers/infrastructure. The frontend and backend diagrams are logical Level 3 views of the web application, not separately deployed frontend and API services. `Server-side Services & API Routes` is shown only as the in-process backend interface used by the frontend; its internal decomposition remains in the Backend Component Diagram. The Compose manifest currently defines PostgreSQL, ClamAV, CV, OCR, image-search, and admin-worker services; it does not define a web or email-worker service, so this diagram does not infer their final demo process topology.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 24, "rankSpacing": 38}}}%%
@@ -137,3 +141,19 @@ _Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Q
 ## Frontend Technology Summary
 
 The implemented frontend uses **Next.js 16.3**, **React 19**, and **TypeScript 5.9** with App Router Server and Client Components. **Tailwind CSS 4** is imported by `web/src/app/globals.css` and works alongside project CSS modules/tokens. Interactive forms and contracts use **React Hook Form** and **Zod** where applicable; **TanStack Query** manages client caching, polling, mutations, and invalidation; **Socket.IO Client** provides realtime transport; **dnd-kit** powers the recruitment pipeline; and the administration console uses **React Admin 5** with **Material UI 7**.
+
+## Frontend Evidence and Revision History
+
+_Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Quốc Thành | Edited by: Lưu Chí Hải_
+
+| Component group | Final feature coverage | Repository evidence |
+|---|---|---|
+| Public/Candidate | F001–F005, F010, F020 | `web/src/app/(auth)/`, `web/src/app/jobs/`, `web/src/app/(workspace)/profile/`, `cv-match-check/`, candidate frontend features |
+| Recruiter/Company | F007, F012, F015, F021–F024 | `web/src/app/recruiter/`, recruiter application/pipeline/analytics/company frontend features |
+| Communication | F008, F011, F013, F016, F019, F025 | message/connection/notification/recruitment-message pages and frontend feature directories |
+| Platform Admin | F006, F009, F013–F014, F016–F018, F022, F026 | `web/src/app/(admin-console)/admin-console/page.tsx`, `web/src/frontend/features/admin/` |
+
+| Version | Date | Editor | Exact change | Review |
+|---|---|---|---|---|
+| 1.1 | 2026-08-06 | Lưu Chí Hải | Prior frontend logical component consolidation. | Nguyễn Gia Quốc Uy, Nguyễn Quốc Thành |
+| 1.2 | 2026-08-26 | Lưu Chí Hải | Reverified final route/component groups, protocols and 001–026 coverage; distinguished REST from Socket.IO; qualified the tracked Compose services without inventing web/email demo topology; excluded Feature 027. | Pending Nguyễn Minh Khôi |

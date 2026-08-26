@@ -2,7 +2,11 @@
 
 _Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Quốc Thành | Edited by: Lưu Chí Hải_
 
+**Version:** 1.2 (2026-08-26) — PA5 implementation synchronization; review pending Nguyễn Minh Khôi
+
 **Architecture scope:** Final implemented SmartHire product. At C4 Level 1, SmartHire is modeled as one software system; internal web, worker, database, storage, OCR, and malware-scanning containers are intentionally hidden.
+
+**Release boundary:** Feature 027 is **Late Feature / Release Decision Pending** and is not represented as a final-release capability. This context view describes repository-proven Features 001–026. It does not assert a final demo hosting topology.
 
 ```mermaid
 flowchart LR
@@ -73,3 +77,24 @@ A person can be both a Candidate and a Recruiter / Company Member; company membe
 - Business-registration facts and company evidence are restricted to the applicant and authorized administrators. Evidence must pass malware, type, structure, and safe-preview checks before review.
 - Better Auth-backed sessions use HttpOnly cookies. Browser mutations carry CSRF proof, recruiter endpoints re-check active company membership and resource ownership, and administrator endpoints enforce exact-origin, active grant, designated-session, two-factor, and recent step-up policies.
 - External AI, registry, email, storage, and backup integrations are server-side only. API keys, OAuth credentials, encryption keys, and storage credentials are not sent to the browser.
+
+### 3. Repository Evidence
+
+_Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Quốc Thành | Edited by: Lưu Chí Hải_
+
+| Context element | Repository evidence | Qualification |
+|---|---|---|
+| SmartHire users and authorization | `web/src/app/`, workspace/admin layouts, recruiter/admin authorization services, `web/prisma/schema.prisma` | Candidate identity, company membership, and platform-administrator grant are separate scopes. |
+| Email provider | email adapters/configuration and notification/outbox workers under `web/src/backend/` | Resend/SMTP are configured external adapters; capture is local and is not shown as an external system. |
+| S3/KMS | private artifact/export S3 adapters and environment validation | Adapter exists; repository does not provision an AWS account, bucket, KMS key, or final demo deployment. |
+| OpenAI | image-search, CV parsing, and scoring provider adapters | Optional/policy gated; deterministic behavior remains documented where implemented. |
+| VietQR registry | employer-verification registry provider and preparation service | Configurable/disableable adapter. |
+| Google Drive | `web/src/backend/backup/google-drive-backup.ts` and backup service/worker | Encrypted backup upload adapter exists; no restore UI is implemented. |
+| ClamAV definitions | upload safety scanner configuration, worker pipelines, and root `compose.yaml` | Scanner capability and a local Compose service exist; C4 Level 1 intentionally hides that internal deployment detail. |
+
+### 4. Revision History
+
+| Version | Date | Editor | Exact change | Review |
+|---|---|---|---|---|
+| 1.1 | 2026-08-06 | Lưu Chí Hải | Prior final system-context consolidation. | Nguyễn Gia Quốc Uy, Nguyễn Quốc Thành |
+| 1.2 | 2026-08-26 | Lưu Chí Hải | Reverified final actors and optional external adapters, excluded Feature 027, added deployment qualifications and repository evidence, and retained internal components outside Level 1. | Pending Nguyễn Minh Khôi |

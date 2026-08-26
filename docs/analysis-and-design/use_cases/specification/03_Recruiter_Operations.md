@@ -1,13 +1,14 @@
 # DGM-03 — Use-Case Specification: Recruiter Operations
 
-*Performed by: Ngô Quốc Tuấn | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Group 9*
-**Version:** V1.3 (06/08/2026) — UML relationships, flow wording, and prototype placement revised
+*Performed by: Ngô Quốc Tuấn and Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+**Version:** V1.5 (2026-08-26) — synchronized with Features 007, 012, 015, and 021
 
 ## 1. Scope and Diagram
 
 ![DGM-03 — Recruiter Operations](../diagrams/rendered_diagrams/diagram_03.png)
 
-The Mermaid source is maintained in [diagram_03.md](../diagrams/diagram_03.md). Recruiter, HR Manager, and Company Owner generalize Company Member. The posting, screening, and pipeline use cases are separate goals; navigation between them is recorded as Related Use Cases and Entry Points.
+The Mermaid source is maintained in [diagram_03.md](../diagrams/diagram_03.md). Recruiter, HR Manager, Company Owner, and Hiring Manager generalize Company Member. Posting, screening, human priority, and pipeline use cases are separate goals; application-scoped recruitment messaging is specified in DGM-05.
 
 ## 2. Actor and Traceability Summary
 
@@ -17,7 +18,8 @@ The Mermaid source is maintained in [diagram_03.md](../diagrams/diagram_03.md). 
 | Recruiter | Specialized human actor | Creates postings, reviews applicants, and updates recruitment stages. |
 | HR Manager | Specialized human actor | Performs recruiter operations with the permitted HR scope. |
 | Company Owner | Specialized human actor | Manages company-level posting visibility and views pipeline information. |
-| System / AI Service | Supporting system actor | Executes asynchronous candidate screening. |
+| Hiring Manager | Specialized human actor | Reviews authorized applicants and manages their company-scoped pipeline state. |
+| Scoring Worker / Optional AI Provider | Supporting system actor | Executes deterministic screening and optional advisory semantic assessment. |
 
 | Use Case ID | Use Case Name | Primary Actor(s) | Prototype Evidence |
 |---|---|---|---|
@@ -25,11 +27,14 @@ The Mermaid source is maintained in [diagram_03.md](../diagrams/diagram_03.md). 
 | UC-POST-02 | Preview and Submit Job Posting | Recruiter, HR Manager | Preview and duplicate-title warning |
 | UC-POST-03 | Manage Job-Posting Lifecycle | Recruiter, HR Manager, Company Owner | Actions menu and status-filter states |
 | UC-POST-04 | View Company Job Postings | Recruiter, HR Manager, Company Owner | Company posting list |
-| UC-SCR-01 | Execute Hybrid Candidate Screening | System / AI Service | Processing and failed-scoring states |
-| UC-SCR-03 | Review and Rank Applicants | Recruiter, HR Manager | Ranked candidates and decision states |
-| UC-PIPE-01 | View Recruitment Pipeline Kanban Board | Recruiter, HR Manager, Company Owner | Editable and owner read-only boards |
-| UC-PIPE-02 | Update Candidate Recruitment Stage | Recruiter, HR Manager | Drag state and success state |
-| UC-PIPE-03 | View Application Stage History | Recruiter, HR Manager, Company Owner | Stage-history timeline |
+| UC-SCR-01 | Execute Hybrid Candidate Screening | Scoring Worker / Optional AI Provider | Processing and failed-scoring states |
+| UC-SCR-02 | View Score and Explanation | Recruiter, HR Manager, Company Owner, Hiring Manager | Real recruiter scoring UI/source evidence |
+| UC-SCR-03 | Review and Rank Applicants | Recruiter, HR Manager, Company Owner, Hiring Manager | Ranked candidates and decision states |
+| UC-SCR-04 | Retry Failed AI Scoring | Recruiter, HR Manager, Company Owner, Hiring Manager | AI retry service/route evidence |
+| UC-SCR-05 | Set Manual Candidate Priority | Recruiter, HR Manager, Company Owner, Hiring Manager | Manual-priority service/route evidence |
+| UC-PIPE-01 | View Recruitment Pipeline Kanban Board | Recruiter, HR Manager, Company Owner, Hiring Manager | Kanban UI and tests |
+| UC-PIPE-02 | Update Candidate Recruitment Stage | Recruiter, HR Manager, Company Owner, Hiring Manager | Stage route/service and conflict tests |
+| UC-PIPE-03 | View Application Stage History | Recruiter, HR Manager, Company Owner, Hiring Manager | Stage-history UI/schema/tests |
 
 ## 3. Use-Case Specifications
 
@@ -252,13 +257,13 @@ The actor may start UC-POST-01, UC-POST-02, or UC-POST-03 from an appropriate ro
 | Field | Value |
 |---|---|
 | Use-Case ID | UC-SCR-01 |
-| Primary Actor | System / AI Service |
-| Supporting Actor | AI Service |
+| Primary Actor | Scoring Worker |
+| Supporting Actor | Optional AI Provider |
 | Trigger | A valid candidate application is submitted and normalized CV data is available. |
 
 #### Brief Description
 
-The System asynchronously calculates a deterministic and semantic screening result. The complete service specification and cross-domain evidence are maintained in DGM-05; this section records the recruiter-facing state.
+The System asynchronously calculates a deterministic screening result and, when policy/configuration permit, an advisory semantic assessment. Scoring does not update the recruitment stage.
 
 #### Preconditions
 
@@ -270,12 +275,13 @@ The System asynchronously calculates a deterministic and semantic screening resu
 1. The System detects the submitted application.
 2. The System changes screening status to `Processing`.
 3. The System calculates deterministic matches.
-4. The AI Service calculates semantic evaluation and returns an explanation.
-5. The System stores the blended score and changes status to `Completed`.
+4. When the optional AI gate permits, the System requests an evidence-bound semantic assessment and explanation.
+5. The System combines available results according to the scoring policy, stores provider/fallback state, and changes status to `Completed`.
 
 #### Alternative and Error Flows
 
-- **EF-01 — Screening Fails:** The System changes status to `Failed`, records a retryable error, and does not expose a partial score as final.
+- **AF-01 — AI unavailable, denied, or fails:** The System retains the deterministic assessment and records the AI provider state; it does not fabricate an AI result.
+- **EF-01 — Required deterministic screening fails:** The System changes status to `Failed`, records a safe retryable error, and does not expose a partial score as final.
 
 #### Postconditions
 
@@ -302,7 +308,7 @@ After a completed result is available, the recruiter may start UC-SCR-03. The sc
 | Field | Value |
 |---|---|
 | Use-Case ID | UC-SCR-03 |
-| Primary Actor | Recruiter or HR Manager |
+| Primary Actor | Recruiter, HR Manager, Company Owner, or Hiring Manager |
 | Supporting Actor | None |
 | Trigger | The actor opens the ranked-applicant view for a job posting. |
 
@@ -327,8 +333,8 @@ The actor reviews candidates whose screening results are already available and m
 #### Alternative and Error Flows
 
 - **AF-01 — Result Not Ready:** The System shows a `Processing` or `Failed` status and does not display an incomplete result as final.
-- **AF-02 — Manual Override:** The actor changes the ranking or advances a candidate, and the System records the actor and reason when required.
-- **AF-03 — Reject Candidate:** The actor records a rejection reason and the System updates the candidate's recruitment state.
+- **AF-02 — Human priority:** The actor starts UC-SCR-05; the original deterministic/AI score remains visible and unchanged.
+- **AF-03 — Recruitment decision:** The actor starts UC-PIPE-02 and supplies any reason required by the destination-stage policy.
 - **EF-01 — Results Cannot Be Loaded:** The System shows a retry message and retains the last authoritative ranking.
 
 #### Postconditions
@@ -360,7 +366,7 @@ UC-SCR-03 consumes a result produced by UC-SCR-01. A reviewed application may be
 | Field | Value |
 |---|---|
 | Use-Case ID | UC-PIPE-01 |
-| Primary Actor | Recruiter, HR Manager, or Company Owner |
+| Primary Actor | Recruiter, HR Manager, Company Owner, or Hiring Manager |
 | Supporting Actor | None |
 | Trigger | The actor opens the recruitment pipeline for a selected job or company. |
 
@@ -382,8 +388,8 @@ The actor views applications grouped by recruitment stage on a Kanban board.
 
 #### Alternative and Error Flows
 
-- **AF-01 — Company Owner View:** The System displays a read-only board and hides stage-changing controls.
-- **AF-02 — Filter by Job:** The actor selects a job and the System refreshes the board.
+- **AF-01 — Filter by Job:** The actor selects a job and the System refreshes the board.
+- **AF-02 — Large column:** The actor opens the implemented view-all/paginated surface without losing company scope.
 - **EF-01 — Pipeline Cannot Be Loaded:** The System reports the failure and does not present an incomplete board as current.
 
 #### Postconditions
@@ -396,9 +402,7 @@ The actor can see the current authorized pipeline state.
 
 *Figure 3.13 — UC-PIPE-01 basic flow; stage columns and candidate cards are visible.*
 
-![UC-PIPE-01 — owner read-only board](<../prototypes/DGM-03-Recruiter-Operations/Domain 3/UC_PIPE_01_Kanban_Board_Owner_View_Only.png>)
-
-*Figure 3.14 — UC-PIPE-01 AF-01; Company Owner sees the board without stage-changing controls.*
+*The historical owner-read-only prototype is not final implementation evidence. Current authorization tests allow active Owners to manage the pipeline; Owner read-only behavior applies to DGM-05 recruitment-message oversight only.*
 
 #### Related Use Cases and Entry Points
 
@@ -411,7 +415,7 @@ The actor may start UC-PIPE-02 from an editable card or UC-PIPE-03 from an appli
 | Field | Value |
 |---|---|
 | Use-Case ID | UC-PIPE-02 |
-| Primary Actor | Recruiter or HR Manager |
+| Primary Actor | Recruiter, HR Manager, Company Owner, or Hiring Manager |
 | Supporting Actor | None |
 | Trigger | The actor selects a candidate card and chooses a permitted destination stage. |
 
@@ -438,7 +442,8 @@ The actor changes an application's recruitment stage. The stage update and its h
 - **AF-01 — Move to Rejected:** The System requests a rejection reason before committing the transition.
 - **AF-02 — Stale Card:** The System detects a concurrent change, reloads the current application, and asks the actor to retry.
 - **AF-03 — Actor Cancels:** The System restores the card to its original stage and creates no history event.
-- **EF-01 — Transaction Fails:** The System rolls back both the stage update and its history event and displays a retry message.
+- **EF-01 — Invalid transition:** The System rejects a destination not permitted from the current stage and leaves the application unchanged.
+- **EF-02 — Transaction fails:** The System rolls back both the stage update and its history event and displays a retry message.
 
 #### Postconditions
 
@@ -465,7 +470,7 @@ UC-PIPE-02 may be started from UC-PIPE-01. The resulting history data is availab
 | Field | Value |
 |---|---|
 | Use-Case ID | UC-PIPE-03 |
-| Primary Actor | Recruiter, HR Manager, or Company Owner |
+| Primary Actor | Recruiter, HR Manager, Company Owner, or Hiring Manager |
 | Supporting Actor | None |
 | Trigger | The actor opens **Stage history** for an application. |
 
@@ -505,10 +510,174 @@ The actor has a read-only view of the authorized application-stage history. No s
 
 UC-PIPE-03 reads history events created by UC-PIPE-02. The actor may open it from UC-PIPE-01 or an application-detail view.
 
+### 3.10. UC-SCR-02 — View Score and Explanation
+
+#### Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-SCR-02 |
+| Primary Actor | Recruiter, HR Manager, Company Owner, or Hiring Manager |
+| Trigger | The actor opens scoring detail for an authorized submitted application. |
+
+#### Brief Description
+
+The actor reviews automatic-match evidence, the available advisory AI assessment, provider/fallback status, and a human-readable explanation. The display does not present the result as a hiring decision.
+
+#### Preconditions
+
+1. The actor has an active membership in the application's company and access to its job.
+2. A completed or partially available scoring result exists.
+
+#### Basic Flow
+
+1. The actor opens applicant scoring detail.
+2. The System rechecks company/job/application scope.
+3. The System loads the automatic score, evidence, AI state, combined result, and explanation permitted to the actor.
+4. The UI labels AI output as advisory and shows deterministic/fallback state separately.
+5. The actor returns to the ranked list or starts a human action.
+
+#### Alternative and Error Flows
+
+- **AF-01 — AI unavailable:** Deterministic evidence remains visible and the AI failure/unavailable state is explicit.
+- **AF-02 — Processing:** The UI shows processing and may poll; it does not display an incomplete value as final.
+- **EF-01 — Cross-company or inactive membership:** Access is denied without disclosing applicant data.
+- **EF-02 — Result missing:** The UI shows a safe unavailable/retry state.
+
+#### Postconditions
+
+No score, priority, or recruitment stage is changed.
+
+#### Special Requirements and Evidence
+
+Candidate CV data and internal explanations remain company-scoped; AI output cannot trigger a stage change. Evidence: `web/src/backend/scoring/services/scoring-detail-service.ts`, recruiter-candidate UI/routes, scoring repositories/schema, and scoring security/frontend tests.
+
+#### Prototype Evidence
+
+![Recruiter score and explanation view](../prototypes/DGM-05-Services-Analytics/UI_01_Ready_State.png)
+
+*Caption: Existing prototype showing a recruiter-visible hybrid score, strengths/watch-outs, and an advisory AI explanation for UC-SCR-02.*
+
+### 3.11. UC-SCR-04 — Retry Failed AI Scoring
+
+#### Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-SCR-04 |
+| Primary Actor | Recruiter, HR Manager, Company Owner, or Hiring Manager |
+| Trigger | An authorized actor selects retry for an eligible failed AI assessment. |
+
+#### Brief Description
+
+The actor requests another advisory AI assessment without discarding a valid deterministic result or moving the application.
+
+#### Preconditions
+
+1. The application belongs to an authorized company/job.
+2. The AI result is in an implemented retryable state and retry policy/rate limits permit the command.
+
+#### Basic Flow
+
+1. The actor selects **Retry AI assessment**.
+2. The System validates membership, resource scope, current result version, and retry eligibility.
+3. The System queues the retry idempotently and shows processing state.
+4. The worker calls the approved provider only when configuration/privacy gates allow.
+5. The System publishes the new provider result or safe failure state while preserving deterministic evidence.
+
+#### Alternative and Error Flows
+
+- **AF-01 — Provider still unavailable:** The deterministic result remains authoritative and the AI state remains failed/unavailable.
+- **EF-01 — Not retryable or rate-limited:** The command is rejected with a safe reason and no new work item.
+- **EF-02 — Stale/concurrent request:** The System returns the current authoritative scoring state.
+- **EF-03 — Unauthorized:** No applicant/scoring data is exposed.
+
+#### Postconditions
+
+A single eligible retry is queued/completed or scoring data remains unchanged. The recruitment stage is never changed.
+
+#### Special Requirements and Evidence
+
+Retry must be authorized, idempotent, rate-limited, auditable, and advisory. Evidence: `web/src/backend/scoring/services/ai-retry-service.ts`, scoring routes/workers/repositories, and scoring worker/provider tests.
+
+#### Prototype Evidence
+
+![Failed AI score with retry action](../prototypes/DGM-05-Services-Analytics/UI_01_Error_State.png)
+
+*Caption: Existing prototype showing an explicit scoring failure and the recruiter-controlled retry action for UC-SCR-04.*
+
+![AI scoring retry in progress](../prototypes/DGM-05-Services-Analytics/UI_01_Retry_Progress.png)
+
+*Caption: Existing prototype showing the non-final processing state after an AI scoring retry is requested.*
+
+### 3.12. UC-SCR-05 — Set Manual Candidate Priority
+
+#### Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-SCR-05 |
+| Primary Actor | Recruiter, HR Manager, Company Owner, or Hiring Manager |
+| Trigger | The actor sets or clears a manual priority for an authorized applicant. |
+
+#### Brief Description
+
+The actor applies a human ordering signal to an applicant. The signal is stored separately from deterministic and AI scores so the source of the prioritization remains transparent.
+
+#### Preconditions
+
+1. The actor can access the applicant's company/job.
+2. The selected priority value satisfies the service contract.
+
+#### Basic Flow
+
+1. The actor opens an applicant action and chooses a priority.
+2. The System validates membership, resource scope, input, and expected version.
+3. The System stores the priority and actor/time metadata.
+4. The ranked list refreshes and visibly distinguishes manual priority from computed score.
+
+#### Alternative and Error Flows
+
+- **AF-01 — Clear priority:** The System removes the manual ordering signal while retaining computed scores.
+- **EF-01 — Conflict:** The System rejects the stale update and reloads current data.
+- **EF-02 — Unauthorized:** No change occurs and applicant data is not disclosed.
+- **EF-03 — Invalid priority:** The System preserves current state and displays validation feedback.
+
+#### Postconditions
+
+The separate human priority is updated or left unchanged after failure; no automatic hiring/stage decision occurs.
+
+#### Special Requirements and Evidence
+
+The UI and audit trail must distinguish human priority from AI/deterministic results. Evidence: `web/src/backend/scoring/services/manual-priority-service.ts`, recruiter application routes/UI, scoring schema/repository, and ranking/security tests.
+
+#### Real UI Evidence
+
+![UC-SCR-05 — manually prioritized candidate](../prototypes/DGM-03-Recruiter-Operations/UC_SCR_05_Manual_Priority_State.png)
+
+*Figure — Real recruiter candidate detail showing **Manually prioritized** on the applicant row and the available **Edit priority** control.*
+
+![UC-SCR-05 — set manual priority](../prototypes/DGM-03-Recruiter-Operations/UC_SCR_05_Set_Priority_Modal.png)
+
+*Figure — Real **Set manual candidate priority** dialog showing the current high review priority, permitted priority choices, and the statement that the AI score remains unchanged.*
+
 ## 4. Relationship and Prototype Rules Applied
 
-- The actor hierarchy is represented as Recruiter / HR Manager / Company Owner → Company Member.
+- The actor hierarchy is represented as Recruiter / HR Manager / Company Owner / Hiring Manager → Company Member.
 - POST-01 → POST-02 → POST-03 is documented as a sequence of separate goals and entry points.
 - Screening is asynchronous: UC-SCR-03 requires a completed result and does not start scoring implicitly.
 - UC-PIPE-02 writes one stage event atomically; UC-PIPE-03 only reads that data.
-- Each use case contains its own prototype evidence with a flow/state caption. The coverage file remains an index, and the HTML prototype is supplementary demo material.
+- Existing prototype images are linked only where they show the specified flow/state; missing evidence is recorded explicitly rather than substituted with unrelated images.
+
+## 5. Implementation Evidence and Revision History
+
+- Authorization: `web/src/backend/applications/authorization/recruiter-application-authorization.ts` and `web/tests/security/applications/recruitment-pipeline-authorization.test.ts`.
+- Nine stages/history: `ApplicationStage` and `ApplicationStageEvent` in `web/prisma/schema.prisma`, pipeline services/routes, conflict/contract/security/frontend/E2E tests.
+- Scoring: `web/src/backend/scoring/`, recruiter candidate UI/routes, and scoring tests.
+- Feature status: F007, F012, and F015 are **Implemented; verification pending**; F021 is **Implemented and verified** in the final Feature Inventory.
+
+| Version | Date | Editor | Exact change | Review |
+|---|---|---|---|---|
+| V1.3 | 2026-08-06 | Group 9 | Revised UML relationships, flow wording, and prototype placement. | Group 9 |
+| V1.4 | 2026-08-26 | Lưu Chí Hải | Corrected company-role authorization, optional/advisory AI behavior, nine-stage conflict handling, and Owner scope; added score detail, AI retry, and manual-priority specifications. | Pending Nguyễn Minh Khôi |
+| V1.5 | 2026-08-26 | Lưu Chí Hải | Integrated UC-SCR-02, UC-SCR-04, and UC-SCR-05 into the normal specification sequence; linked valid score/retry prototypes and recorded missing manual-priority screenshot evidence. | Pending Nguyễn Minh Khôi |
