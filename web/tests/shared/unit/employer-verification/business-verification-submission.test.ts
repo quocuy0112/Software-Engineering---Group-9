@@ -19,6 +19,22 @@ const valid = {
 };
 
 describe("enriched verification submission", () => {
+  it("accepts the role selected by the applicant", () => {
+    for (const requestedRole of [
+      "OWNER",
+      "HR_MANAGER",
+      "RECRUITER",
+      "HIRING_MANAGER",
+    ]) {
+      expect(
+        enrichedVerificationSubmissionSchema.safeParse({
+          ...valid,
+          requestedRole,
+        }).success,
+      ).toBe(true);
+    }
+  });
+
   it("normalizes accepted multipart values before persistence", () => {
     const parsed = enrichedVerificationSubmissionSchema.parse({
       ...valid,

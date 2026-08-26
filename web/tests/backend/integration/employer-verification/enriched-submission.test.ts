@@ -56,7 +56,7 @@ const raw = {
   accuracyDeclaration: "true",
   documentProcessingConsent: "true",
   policyVersion: "business-verification-consent-v1",
-  requestedRole: "RECRUITER",
+  requestedRole: "OWNER",
 };
 
 describe("enriched employer verification submission transaction", () => {
@@ -199,6 +199,7 @@ describe("enriched employer verification submission transaction", () => {
         include: { businessFacts: true, evidence: true },
       },
     );
+    expect(request.requestedRole).toBe("OWNER");
     expect(request.businessFacts).toMatchObject({
       companyEmail: "hr@example.vn",
       companyPhoneE164: "+84901234567",

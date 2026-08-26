@@ -341,6 +341,7 @@ export class EmployerVerificationPreparationService {
           operatingAddress: preparation.operatingAddress,
           companyPhone: preparation.companyPhoneE164,
           website: preparation.websiteOrigin,
+          requestedRole: preparation.requestedRole,
           relationship: preparation.relationship,
           currentJobTitle: preparation.currentJobTitle,
           authorityExplanation: preparation.authorityExplanation,

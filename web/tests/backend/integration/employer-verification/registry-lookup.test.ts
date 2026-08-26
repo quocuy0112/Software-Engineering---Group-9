@@ -64,6 +64,20 @@ describe("business registry preparation persistence", () => {
       "Example Company",
     );
     expect(preparation?.applicantRegisteredAddress).toContain("Nguyen Hue");
+    expect(preparation?.requestedRole).toBe("RECRUITER");
+    expect(
+      await repository.updateDraft({
+        userId,
+        preparationId: preparation!.id,
+        version: preparation!.version,
+        changes: { requestedRole: "OWNER" },
+        now,
+        expiresAt: new Date(now.getTime() + 172_800_000),
+      }),
+    ).toBe(true);
+    expect(
+      (await repository.findCurrentPreparation(userId, now))?.requestedRole,
+    ).toBe("OWNER");
     expect(
       await repository.hasReusableLookup({
         userId,

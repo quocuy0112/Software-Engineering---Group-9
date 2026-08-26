@@ -79,7 +79,7 @@ export const verificationSubmissionSchema = z
   .object({
     companyName: normalizedText(1, 240),
     taxIdentifier: normalizedTaxIdentifierSchema,
-    requestedRole: z.literal("RECRUITER"),
+    requestedRole: membershipRoleSchema,
     targetCompanyId: z.string().min(1).optional(),
     prerequisiteId: z.string().min(1).optional(),
   })

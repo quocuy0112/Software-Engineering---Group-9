@@ -7,6 +7,7 @@ import {
 import { AuditWriter } from "@/backend/admin/audit/audit-writer";
 import { createVerificationDecisionNotification } from "@/backend/admin/notifications/verification-notification-event";
 import { splitCompanyIdentity } from "@/shared/contracts/employer-verification/business-verification";
+import { assertActiveOwnedCompanyCapacity } from "@/backend/company-members/company-ownership-limit";
 import { loadVerificationDecisionEligibility } from "./verification-decision-eligibility";
 
 export type ApprovalCommand = {
@@ -72,6 +73,11 @@ export class VerificationApprovalTransaction {
           if (!eligible.prerequisite) throw new Error("RELATIONSHIP_REQUIRED");
         } else {
           role = "OWNER";
+        }
+
+        await assertActiveOwnedCompanyCapacity(tx, row.applicantUserId, role);
+
+        if (!companyId) {
           const identity = splitCompanyIdentity(
             row.acceptedRegistrySnapshot?.registryLegalName ??
               row.submittedCompanyName,
@@ -144,7 +150,6 @@ export class VerificationApprovalTransaction {
           data: {
             state: "APPROVED",
             targetCompanyId: companyId,
-            requestedRole: role,
             decidedAt: now,
           },
         });

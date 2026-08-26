@@ -53,6 +53,7 @@ const preparation = {
       currentJobTitle: "Owner",
       authorityExplanation: null,
       mismatchExplanation: null,
+      requestedRole: "RECRUITER",
     },
   },
 };
@@ -98,6 +99,29 @@ describe("employer verification submission UI", () => {
     ).toBeEnabled();
   });
 
+  it("restores the requested role from the recoverable preparation draft", async () => {
+    const savedPreparation = {
+      data: {
+        ...preparation.data,
+        draft: { ...preparation.data.draft, requestedRole: "OWNER" },
+      },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) =>
+        Response.json(
+          String(input).endsWith("/preparation")
+            ? savedPreparation
+            : { data: [] },
+        ),
+      ),
+    );
+    render(<EmployerVerificationPage />);
+    expect(
+      await screen.findByRole("combobox", { name: "Requested role" }),
+    ).toHaveValue("OWNER");
+  });
+
   it("focuses the first invalid field before issuing a request", async () => {
     const fetcher = vi.fn(
       async (input: RequestInfo | URL) =>
@@ -131,14 +155,31 @@ describe("employer verification submission UI", () => {
     const latestPreparation = {
       data: {
         ...preparation.data,
+        version: 4,
+        draft: {
+          ...preparation.data.draft,
+          requestedRole: "OWNER",
+          applicantLegalName: "Updated Company",
+        },
+      },
+    };
+    const rolePreparation = {
+      data: {
+        ...preparation.data,
         version: 3,
-        draft: { ...preparation.data.draft, applicantLegalName: "Updated Company" },
+        draft: { ...preparation.data.draft, requestedRole: "OWNER" },
       },
     };
     const fetcher = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
-      if (url.endsWith("/preparation") && init?.method === "PATCH")
-        return pendingPatch;
+      if (url.endsWith("/preparation") && init?.method === "PATCH") {
+        const body = JSON.parse(String(init.body)) as {
+          changes?: Record<string, unknown>;
+        };
+        return body.changes?.requestedRole === "OWNER"
+          ? Promise.resolve(Response.json(rolePreparation))
+          : pendingPatch;
+      }
       if (url.endsWith("/employer-verifications") && init?.method === "POST") {
         submittedBody = init.body as FormData;
         return Promise.resolve(
@@ -158,6 +199,10 @@ describe("employer verification submission UI", () => {
     const legalName = await screen.findByRole("textbox", {
       name: "Legal company name",
     });
+    fireEvent.change(
+      await screen.findByRole("combobox", { name: "Requested role" }),
+      { target: { value: "OWNER" } },
+    );
     fireEvent.change(legalName, { target: { value: "Updated Company" } });
     fireEvent.blur(legalName);
     fireEvent.click(
@@ -168,10 +213,9 @@ describe("employer verification submission UI", () => {
       expect(
         fetcher.mock.calls.filter(
           ([url, request]) =>
-            String(url).endsWith("/preparation") &&
-            request?.method === "PATCH",
+            String(url).endsWith("/preparation") && request?.method === "PATCH",
         ),
-      ).toHaveLength(1),
+      ).toHaveLength(2),
     );
     expect(
       fetcher.mock.calls.some(
@@ -186,8 +230,9 @@ describe("employer verification submission UI", () => {
     });
     await waitFor(() => expect(submittedBody).not.toBeNull());
     const capturedBody = submittedBody as unknown as FormData;
-    expect(capturedBody.get("preparationVersion")).toBe("3");
+    expect(capturedBody.get("preparationVersion")).toBe("4");
     expect(capturedBody.get("preparationId")).toBe("prep-1");
+    expect(capturedBody.get("requestedRole")).toBe("OWNER");
     expect(toast.error).not.toHaveBeenCalled();
     validity.mockRestore();
   });

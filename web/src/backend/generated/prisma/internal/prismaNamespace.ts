@@ -12320,6 +12320,7 @@ export const EmployerVerificationPreparationScalarFieldEnum = {
   operatingAddress: 'operatingAddress',
   companyPhoneE164: 'companyPhoneE164',
   websiteOrigin: 'websiteOrigin',
+  requestedRole: 'requestedRole',
   relationship: 'relationship',
   currentJobTitle: 'currentJobTitle',
   authorityExplanation: 'authorityExplanation',

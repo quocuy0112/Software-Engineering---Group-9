@@ -10,6 +10,7 @@ const evidenceId = `verification-evidence-${suffix}`;
 const adminId = `verification-admin-${suffix}`;
 const adminSessionId = `verification-session-${suffix}`;
 const grantId = `verification-grant-${suffix}`;
+const quotaCompanyIds: string[] = [];
 const authority = {
   userId: adminId,
   sessionId: adminSessionId,
@@ -120,6 +121,13 @@ describe("verification decisions", () => {
         where: { id: request.targetCompanyId },
       });
     }
+    await prisma.companyMembership.deleteMany({
+      where: { companyId: { in: quotaCompanyIds } },
+    });
+    await prisma.company.deleteMany({
+      where: { id: { in: quotaCompanyIds } },
+    });
+    quotaCompanyIds.length = 0;
     await prisma.candidateIdentity.delete({ where: { userId: applicantId } });
     await prisma.userAccount.delete({ where: { id: applicantId } });
     await prisma.administratorSessionPolicy.deleteMany({ where: { grantId } });
@@ -174,12 +182,59 @@ describe("verification decisions", () => {
       include: {
         targetCompany: { include: { memberships: true } },
         notifications: true,
+        decisions: true,
       },
     });
     expect(row.state).toBe("APPROVED");
+    expect(row.requestedRole).toBe("RECRUITER");
     expect(row.targetCompany?.memberships).toHaveLength(1);
     expect(row.targetCompany?.memberships[0]?.role).toBe("OWNER");
+    expect(row.decisions).toHaveLength(1);
+    expect(row.decisions[0]?.approvedRole).toBe("OWNER");
     expect(row.notifications).toHaveLength(1);
+  });
+
+  it("blocks a new OWNER company after the applicant reaches the three-company limit", async () => {
+    for (const index of [1, 2, 3]) {
+      const company = await prisma.company.create({
+        data: {
+          slug: `quota-company-${suffix}-${index}`,
+          legalName: `Quota Company ${suffix} ${index}`,
+          displayName: `Quota Company ${suffix} ${index}`,
+          normalizedTaxIdentifier: `${1000000000 + index}`,
+          verificationState: "ACTIVE",
+          verifiedAt: new Date(),
+          memberships: {
+            create: {
+              userId: applicantId,
+              role: "OWNER",
+              status: "ACTIVE",
+            },
+          },
+        },
+      });
+      quotaCompanyIds.push(company.id);
+    }
+
+    await new VerificationReviewService().claim(authority, requestId, {
+      expectedVersion: 1,
+      idempotencyKey: crypto.randomUUID(),
+    });
+
+    await expect(
+      new VerificationApprovalTransaction().execute(authority, requestId, {
+        expectedVersion: 2,
+        idempotencyKey: crypto.randomUUID(),
+        role: "RECRUITER",
+      }),
+    ).rejects.toThrow("OWNER_COMPANY_LIMIT_REACHED");
+
+    const row = await prisma.recruiterVerificationRequest.findUniqueOrThrow({
+      where: { id: requestId },
+      select: { state: true, targetCompanyId: true },
+    });
+    expect(row.state).toBe("PENDING_REVIEW");
+    expect(row.targetCompanyId).toBeNull();
   });
 
   it("keeps a truncated company slug valid when the name ends at a separator", async () => {

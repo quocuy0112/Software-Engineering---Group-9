@@ -45,6 +45,7 @@ export type EmployerVerificationPreparationMinAggregateOutputType = {
   operatingAddress: string | null
   companyPhoneE164: string | null
   websiteOrigin: string | null
+  requestedRole: $Enums.CompanyMembershipRole | null
   relationship: $Enums.EmployerApplicantRelationship | null
   currentJobTitle: string | null
   authorityExplanation: string | null
@@ -68,6 +69,7 @@ export type EmployerVerificationPreparationMaxAggregateOutputType = {
   operatingAddress: string | null
   companyPhoneE164: string | null
   websiteOrigin: string | null
+  requestedRole: $Enums.CompanyMembershipRole | null
   relationship: $Enums.EmployerApplicantRelationship | null
   currentJobTitle: string | null
   authorityExplanation: string | null
@@ -91,6 +93,7 @@ export type EmployerVerificationPreparationCountAggregateOutputType = {
   operatingAddress: number
   companyPhoneE164: number
   websiteOrigin: number
+  requestedRole: number
   relationship: number
   currentJobTitle: number
   authorityExplanation: number
@@ -124,6 +127,7 @@ export type EmployerVerificationPreparationMinAggregateInputType = {
   operatingAddress?: true
   companyPhoneE164?: true
   websiteOrigin?: true
+  requestedRole?: true
   relationship?: true
   currentJobTitle?: true
   authorityExplanation?: true
@@ -147,6 +151,7 @@ export type EmployerVerificationPreparationMaxAggregateInputType = {
   operatingAddress?: true
   companyPhoneE164?: true
   websiteOrigin?: true
+  requestedRole?: true
   relationship?: true
   currentJobTitle?: true
   authorityExplanation?: true
@@ -170,6 +175,7 @@ export type EmployerVerificationPreparationCountAggregateInputType = {
   operatingAddress?: true
   companyPhoneE164?: true
   websiteOrigin?: true
+  requestedRole?: true
   relationship?: true
   currentJobTitle?: true
   authorityExplanation?: true
@@ -280,6 +286,7 @@ export type EmployerVerificationPreparationGroupByOutputType = {
   operatingAddress: string | null
   companyPhoneE164: string | null
   websiteOrigin: string | null
+  requestedRole: $Enums.CompanyMembershipRole
   relationship: $Enums.EmployerApplicantRelationship | null
   currentJobTitle: string | null
   authorityExplanation: string | null
@@ -326,6 +333,7 @@ export type EmployerVerificationPreparationWhereInput = {
   operatingAddress?: Prisma.StringNullableFilter<"EmployerVerificationPreparation"> | string | null
   companyPhoneE164?: Prisma.StringNullableFilter<"EmployerVerificationPreparation"> | string | null
   websiteOrigin?: Prisma.StringNullableFilter<"EmployerVerificationPreparation"> | string | null
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFilter<"EmployerVerificationPreparation"> | $Enums.CompanyMembershipRole
   relationship?: Prisma.EnumEmployerApplicantRelationshipNullableFilter<"EmployerVerificationPreparation"> | $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: Prisma.StringNullableFilter<"EmployerVerificationPreparation"> | string | null
   authorityExplanation?: Prisma.StringNullableFilter<"EmployerVerificationPreparation"> | string | null
@@ -351,6 +359,7 @@ export type EmployerVerificationPreparationOrderByWithRelationInput = {
   operatingAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   companyPhoneE164?: Prisma.SortOrderInput | Prisma.SortOrder
   websiteOrigin?: Prisma.SortOrderInput | Prisma.SortOrder
+  requestedRole?: Prisma.SortOrder
   relationship?: Prisma.SortOrderInput | Prisma.SortOrder
   currentJobTitle?: Prisma.SortOrderInput | Prisma.SortOrder
   authorityExplanation?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -379,6 +388,7 @@ export type EmployerVerificationPreparationWhereUniqueInput = Prisma.AtLeast<{
   operatingAddress?: Prisma.StringNullableFilter<"EmployerVerificationPreparation"> | string | null
   companyPhoneE164?: Prisma.StringNullableFilter<"EmployerVerificationPreparation"> | string | null
   websiteOrigin?: Prisma.StringNullableFilter<"EmployerVerificationPreparation"> | string | null
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFilter<"EmployerVerificationPreparation"> | $Enums.CompanyMembershipRole
   relationship?: Prisma.EnumEmployerApplicantRelationshipNullableFilter<"EmployerVerificationPreparation"> | $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: Prisma.StringNullableFilter<"EmployerVerificationPreparation"> | string | null
   authorityExplanation?: Prisma.StringNullableFilter<"EmployerVerificationPreparation"> | string | null
@@ -404,6 +414,7 @@ export type EmployerVerificationPreparationOrderByWithAggregationInput = {
   operatingAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   companyPhoneE164?: Prisma.SortOrderInput | Prisma.SortOrder
   websiteOrigin?: Prisma.SortOrderInput | Prisma.SortOrder
+  requestedRole?: Prisma.SortOrder
   relationship?: Prisma.SortOrderInput | Prisma.SortOrder
   currentJobTitle?: Prisma.SortOrderInput | Prisma.SortOrder
   authorityExplanation?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -435,6 +446,7 @@ export type EmployerVerificationPreparationScalarWhereWithAggregatesInput = {
   operatingAddress?: Prisma.StringNullableWithAggregatesFilter<"EmployerVerificationPreparation"> | string | null
   companyPhoneE164?: Prisma.StringNullableWithAggregatesFilter<"EmployerVerificationPreparation"> | string | null
   websiteOrigin?: Prisma.StringNullableWithAggregatesFilter<"EmployerVerificationPreparation"> | string | null
+  requestedRole?: Prisma.EnumCompanyMembershipRoleWithAggregatesFilter<"EmployerVerificationPreparation"> | $Enums.CompanyMembershipRole
   relationship?: Prisma.EnumEmployerApplicantRelationshipNullableWithAggregatesFilter<"EmployerVerificationPreparation"> | $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: Prisma.StringNullableWithAggregatesFilter<"EmployerVerificationPreparation"> | string | null
   authorityExplanation?: Prisma.StringNullableWithAggregatesFilter<"EmployerVerificationPreparation"> | string | null
@@ -456,6 +468,7 @@ export type EmployerVerificationPreparationCreateInput = {
   operatingAddress?: string | null
   companyPhoneE164?: string | null
   websiteOrigin?: string | null
+  requestedRole?: $Enums.CompanyMembershipRole
   relationship?: $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: string | null
   authorityExplanation?: string | null
@@ -481,6 +494,7 @@ export type EmployerVerificationPreparationUncheckedCreateInput = {
   operatingAddress?: string | null
   companyPhoneE164?: string | null
   websiteOrigin?: string | null
+  requestedRole?: $Enums.CompanyMembershipRole
   relationship?: $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: string | null
   authorityExplanation?: string | null
@@ -502,6 +516,7 @@ export type EmployerVerificationPreparationUpdateInput = {
   operatingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyPhoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteOrigin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
   relationship?: Prisma.NullableEnumEmployerApplicantRelationshipFieldUpdateOperationsInput | $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorityExplanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -527,6 +542,7 @@ export type EmployerVerificationPreparationUncheckedUpdateInput = {
   operatingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyPhoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteOrigin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
   relationship?: Prisma.NullableEnumEmployerApplicantRelationshipFieldUpdateOperationsInput | $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorityExplanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -550,6 +566,7 @@ export type EmployerVerificationPreparationCreateManyInput = {
   operatingAddress?: string | null
   companyPhoneE164?: string | null
   websiteOrigin?: string | null
+  requestedRole?: $Enums.CompanyMembershipRole
   relationship?: $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: string | null
   authorityExplanation?: string | null
@@ -571,6 +588,7 @@ export type EmployerVerificationPreparationUpdateManyMutationInput = {
   operatingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyPhoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteOrigin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
   relationship?: Prisma.NullableEnumEmployerApplicantRelationshipFieldUpdateOperationsInput | $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorityExplanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -594,6 +612,7 @@ export type EmployerVerificationPreparationUncheckedUpdateManyInput = {
   operatingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyPhoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteOrigin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
   relationship?: Prisma.NullableEnumEmployerApplicantRelationshipFieldUpdateOperationsInput | $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorityExplanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -622,6 +641,7 @@ export type EmployerVerificationPreparationCountOrderByAggregateInput = {
   operatingAddress?: Prisma.SortOrder
   companyPhoneE164?: Prisma.SortOrder
   websiteOrigin?: Prisma.SortOrder
+  requestedRole?: Prisma.SortOrder
   relationship?: Prisma.SortOrder
   currentJobTitle?: Prisma.SortOrder
   authorityExplanation?: Prisma.SortOrder
@@ -649,6 +669,7 @@ export type EmployerVerificationPreparationMaxOrderByAggregateInput = {
   operatingAddress?: Prisma.SortOrder
   companyPhoneE164?: Prisma.SortOrder
   websiteOrigin?: Prisma.SortOrder
+  requestedRole?: Prisma.SortOrder
   relationship?: Prisma.SortOrder
   currentJobTitle?: Prisma.SortOrder
   authorityExplanation?: Prisma.SortOrder
@@ -672,6 +693,7 @@ export type EmployerVerificationPreparationMinOrderByAggregateInput = {
   operatingAddress?: Prisma.SortOrder
   companyPhoneE164?: Prisma.SortOrder
   websiteOrigin?: Prisma.SortOrder
+  requestedRole?: Prisma.SortOrder
   relationship?: Prisma.SortOrder
   currentJobTitle?: Prisma.SortOrder
   authorityExplanation?: Prisma.SortOrder
@@ -765,6 +787,7 @@ export type EmployerVerificationPreparationCreateWithoutApplicantInput = {
   operatingAddress?: string | null
   companyPhoneE164?: string | null
   websiteOrigin?: string | null
+  requestedRole?: $Enums.CompanyMembershipRole
   relationship?: $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: string | null
   authorityExplanation?: string | null
@@ -788,6 +811,7 @@ export type EmployerVerificationPreparationUncheckedCreateWithoutApplicantInput 
   operatingAddress?: string | null
   companyPhoneE164?: string | null
   websiteOrigin?: string | null
+  requestedRole?: $Enums.CompanyMembershipRole
   relationship?: $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: string | null
   authorityExplanation?: string | null
@@ -825,6 +849,7 @@ export type EmployerVerificationPreparationUpdateWithoutApplicantInput = {
   operatingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyPhoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteOrigin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
   relationship?: Prisma.NullableEnumEmployerApplicantRelationshipFieldUpdateOperationsInput | $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorityExplanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -848,6 +873,7 @@ export type EmployerVerificationPreparationUncheckedUpdateWithoutApplicantInput 
   operatingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyPhoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteOrigin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
   relationship?: Prisma.NullableEnumEmployerApplicantRelationshipFieldUpdateOperationsInput | $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorityExplanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -869,6 +895,7 @@ export type EmployerVerificationPreparationCreateWithoutLookupSnapshotInput = {
   operatingAddress?: string | null
   companyPhoneE164?: string | null
   websiteOrigin?: string | null
+  requestedRole?: $Enums.CompanyMembershipRole
   relationship?: $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: string | null
   authorityExplanation?: string | null
@@ -892,6 +919,7 @@ export type EmployerVerificationPreparationUncheckedCreateWithoutLookupSnapshotI
   operatingAddress?: string | null
   companyPhoneE164?: string | null
   websiteOrigin?: string | null
+  requestedRole?: $Enums.CompanyMembershipRole
   relationship?: $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: string | null
   authorityExplanation?: string | null
@@ -929,6 +957,7 @@ export type EmployerVerificationPreparationUpdateWithoutLookupSnapshotInput = {
   operatingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyPhoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteOrigin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
   relationship?: Prisma.NullableEnumEmployerApplicantRelationshipFieldUpdateOperationsInput | $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorityExplanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -952,6 +981,7 @@ export type EmployerVerificationPreparationUncheckedUpdateWithoutLookupSnapshotI
   operatingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyPhoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteOrigin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
   relationship?: Prisma.NullableEnumEmployerApplicantRelationshipFieldUpdateOperationsInput | $Enums.EmployerApplicantRelationship | null
   currentJobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorityExplanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -977,6 +1007,7 @@ export type EmployerVerificationPreparationSelect<ExtArgs extends runtime.Types.
   operatingAddress?: boolean
   companyPhoneE164?: boolean
   websiteOrigin?: boolean
+  requestedRole?: boolean
   relationship?: boolean
   currentJobTitle?: boolean
   authorityExplanation?: boolean
@@ -1002,6 +1033,7 @@ export type EmployerVerificationPreparationSelectCreateManyAndReturn<ExtArgs ext
   operatingAddress?: boolean
   companyPhoneE164?: boolean
   websiteOrigin?: boolean
+  requestedRole?: boolean
   relationship?: boolean
   currentJobTitle?: boolean
   authorityExplanation?: boolean
@@ -1027,6 +1059,7 @@ export type EmployerVerificationPreparationSelectUpdateManyAndReturn<ExtArgs ext
   operatingAddress?: boolean
   companyPhoneE164?: boolean
   websiteOrigin?: boolean
+  requestedRole?: boolean
   relationship?: boolean
   currentJobTitle?: boolean
   authorityExplanation?: boolean
@@ -1052,6 +1085,7 @@ export type EmployerVerificationPreparationSelectScalar = {
   operatingAddress?: boolean
   companyPhoneE164?: boolean
   websiteOrigin?: boolean
+  requestedRole?: boolean
   relationship?: boolean
   currentJobTitle?: boolean
   authorityExplanation?: boolean
@@ -1064,7 +1098,7 @@ export type EmployerVerificationPreparationSelectScalar = {
   updatedAt?: boolean
 }
 
-export type EmployerVerificationPreparationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicantUserId" | "lookupSnapshotId" | "version" | "applicantLegalName" | "applicantRegisteredAddress" | "operatingAddressDiffers" | "operatingAddress" | "companyPhoneE164" | "websiteOrigin" | "relationship" | "currentJobTitle" | "authorityExplanation" | "mismatchExplanation" | "expiresAt" | "inaccessibleAt" | "deleteAfter" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["employerVerificationPreparation"]>
+export type EmployerVerificationPreparationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicantUserId" | "lookupSnapshotId" | "version" | "applicantLegalName" | "applicantRegisteredAddress" | "operatingAddressDiffers" | "operatingAddress" | "companyPhoneE164" | "websiteOrigin" | "requestedRole" | "relationship" | "currentJobTitle" | "authorityExplanation" | "mismatchExplanation" | "expiresAt" | "inaccessibleAt" | "deleteAfter" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["employerVerificationPreparation"]>
 export type EmployerVerificationPreparationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   applicant?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   lookupSnapshot?: boolean | Prisma.EmployerVerificationPreparation$lookupSnapshotArgs<ExtArgs>
@@ -1095,6 +1129,7 @@ export type $EmployerVerificationPreparationPayload<ExtArgs extends runtime.Type
     operatingAddress: string | null
     companyPhoneE164: string | null
     websiteOrigin: string | null
+    requestedRole: $Enums.CompanyMembershipRole
     relationship: $Enums.EmployerApplicantRelationship | null
     currentJobTitle: string | null
     authorityExplanation: string | null
@@ -1540,6 +1575,7 @@ export interface EmployerVerificationPreparationFieldRefs {
   readonly operatingAddress: Prisma.FieldRef<"EmployerVerificationPreparation", 'String'>
   readonly companyPhoneE164: Prisma.FieldRef<"EmployerVerificationPreparation", 'String'>
   readonly websiteOrigin: Prisma.FieldRef<"EmployerVerificationPreparation", 'String'>
+  readonly requestedRole: Prisma.FieldRef<"EmployerVerificationPreparation", 'CompanyMembershipRole'>
   readonly relationship: Prisma.FieldRef<"EmployerVerificationPreparation", 'EmployerApplicantRelationship'>
   readonly currentJobTitle: Prisma.FieldRef<"EmployerVerificationPreparation", 'String'>
   readonly authorityExplanation: Prisma.FieldRef<"EmployerVerificationPreparation", 'String'>

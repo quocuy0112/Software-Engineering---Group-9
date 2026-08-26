@@ -17,6 +17,7 @@ import {
   type RecruiterCompanySettings,
   type RecruiterCompanySettingsInput,
 } from "@/shared/contracts/jobs/catalog";
+import { MAX_OWNED_COMPANIES_PER_USER } from "@/shared/contracts/company-ownership";
 import { RECRUITER_AUTHORITY_CHANGED_EVENT } from "@/shared/contracts/recruiter-header-status";
 import styles from "./company-settings-screen.module.css";
 import {
@@ -248,6 +249,81 @@ function companyRoleLabel(role?: RecruiterCompanySettings["role"]) {
     default:
       return "Authorized recruiter/member";
   }
+}
+
+function CompanySwitcherGroup({
+  title,
+  description,
+  countLabel,
+  companies,
+  activeCompanyId,
+  emptyMessage,
+  onSelect,
+}: {
+  title: string;
+  description: string;
+  countLabel: string;
+  companies: RecruiterCompanySettings[];
+  activeCompanyId: string | null;
+  emptyMessage: string;
+  onSelect: (companyId: string) => void;
+}) {
+  const headingId = `company-switcher-${title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/gu, "-")}`;
+
+  return (
+    <section
+      className={styles.companySwitcherSection}
+      aria-labelledby={headingId}
+    >
+      <div className={styles.companySwitcherSectionHeader}>
+        <div>
+          <h2 className={styles.companySwitcherSectionTitle} id={headingId}>
+            {title}
+          </h2>
+          <p className={styles.companySwitcherSectionDescription}>
+            {description}
+          </p>
+        </div>
+        <span className={styles.companySwitcherSectionCount}>{countLabel}</span>
+      </div>
+      {companies.length ? (
+        <div
+          className={styles.companySwitcherList}
+          role="list"
+          aria-label={`${title} companies`}
+        >
+          {companies.map((candidate) => (
+            <div role="listitem" key={candidate.id}>
+              <button
+                className={`${styles.companySwitcherItem}${candidate.id === activeCompanyId ? ` ${styles.companySwitcherItemActive}` : ""}`}
+                type="button"
+                aria-pressed={candidate.id === activeCompanyId}
+                onClick={() => onSelect(candidate.id)}
+              >
+                <CompanyAvatar
+                  name={candidate.name}
+                  imageUrl={candidate.logo}
+                  size="sm"
+                />
+                <span className={styles.companySwitcherCopy}>
+                  <span className={styles.companySwitcherName}>
+                    {candidate.name}
+                  </span>
+                  <span className={styles.companySwitcherRole}>
+                    {companyRoleLabel(candidate.role)}
+                  </span>
+                </span>
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className={styles.companySwitcherEmpty}>{emptyMessage}</p>
+      )}
+    </section>
+  );
 }
 
 export function CompanySettingsScreen({
@@ -507,6 +583,14 @@ export function CompanySettingsScreen({
   const canDeleteCompany = company.role
     ? company.role === "OWNER"
     : canManageTeam;
+  const ownedCompanies = companies.filter(
+    (candidate) => candidate.role === "OWNER",
+  );
+  const memberCompanies = companies.filter(
+    (candidate) => candidate.role !== "OWNER",
+  );
+  const ownershipLimitReached =
+    ownedCompanies.length >= MAX_OWNED_COMPANIES_PER_USER;
 
   return (
     <section className={styles.wrap}>
@@ -527,38 +611,38 @@ export function CompanySettingsScreen({
             className={styles.createCompanyLink}
             href="/dashboard/employer-verification"
           >
-            Create a Company
+            Add or join a company
           </Link>
         </div>
-        <div className={styles.companySwitcherList} role="list">
-          {companies.map((candidate) => (
-            <div role="listitem" key={candidate.id}>
-              <button
-                className={`${styles.companySwitcherItem}${candidate.id === company.id ? ` ${styles.companySwitcherItemActive}` : ""}`}
-                type="button"
-                aria-pressed={candidate.id === company.id}
-                onClick={() => {
-                  setExplicitCompanyId(null);
-                  setCompanyId(candidate.id);
-                }}
-              >
-                <CompanyAvatar
-                  name={candidate.name}
-                  imageUrl={candidate.logo}
-                  size="sm"
-                />
-                <span className={styles.companySwitcherCopy}>
-                  <span className={styles.companySwitcherName}>
-                    {candidate.name}
-                  </span>
-                  <span className={styles.companySwitcherRole}>
-                    {companyRoleLabel(candidate.role)}
-                  </span>
-                </span>
-              </button>
-            </div>
-          ))}
-        </div>
+        <p className={styles.companySwitcherNote} role="status">
+          {ownershipLimitReached
+            ? `Ownership limit reached (${MAX_OWNED_COMPANIES_PER_USER}/${MAX_OWNED_COMPANIES_PER_USER}). You can still join companies as a Recruiter or HR Manager.`
+            : `You own ${ownedCompanies.length}/${MAX_OWNED_COMPANIES_PER_USER} companies. Joining a company as a Recruiter or HR Manager does not use an ownership slot.`}
+        </p>
+        <CompanySwitcherGroup
+          title="Owned by you"
+          description="You can manage the profile, team, and company settings."
+          countLabel={`${ownedCompanies.length}/${MAX_OWNED_COMPANIES_PER_USER} slots`}
+          companies={ownedCompanies}
+          activeCompanyId={company.id}
+          emptyMessage="You do not own a company yet."
+          onSelect={(companyId) => {
+            setExplicitCompanyId(null);
+            setCompanyId(companyId);
+          }}
+        />
+        <CompanySwitcherGroup
+          title="Member access"
+          description="Companies that invited you as a recruiter or manager."
+          countLabel={`${memberCompanies.length} linked`}
+          companies={memberCompanies}
+          activeCompanyId={company.id}
+          emptyMessage="No other company access yet."
+          onSelect={(companyId) => {
+            setExplicitCompanyId(null);
+            setCompanyId(companyId);
+          }}
+        />
       </section>
       <div className={styles.phead}>
         <div>

@@ -6,6 +6,7 @@ const suffix = crypto.randomUUID();
 const targetId = `membership-user-${suffix}`;
 const companyA = `company-a-${suffix}`;
 const companyB = `company-b-${suffix}`;
+const quotaCompanyIds: string[] = [];
 const authority = {
   userId: `admin-${suffix}`,
   sessionId: `session-${suffix}`,
@@ -82,6 +83,13 @@ describe("company-scoped membership lifecycle", () => {
       where: { targetReference: { in: [`ma-${suffix}`, `mb-${suffix}`] } },
     });
     await prisma.companyMembership.deleteMany({ where: { userId: targetId } });
+    await prisma.companyMembership.deleteMany({
+      where: { companyId: { in: quotaCompanyIds } },
+    });
+    await prisma.company.deleteMany({
+      where: { id: { in: quotaCompanyIds } },
+    });
+    quotaCompanyIds.length = 0;
     await prisma.company.deleteMany({
       where: { id: { in: [companyA, companyB] } },
     });
@@ -138,5 +146,53 @@ describe("company-scoped membership lifecycle", () => {
         command(row.version),
       ),
     ).rejects.toThrow("INVALID_STATE");
+  });
+
+  it("does not restore a suspended owner above the per-user ownership limit", async () => {
+    await prisma.companyMembership.update({
+      where: { id: `ma-${suffix}` },
+      data: {
+        role: "OWNER",
+        priorApprovedRole: "OWNER",
+        status: "SUSPENDED",
+        version: 2,
+      },
+    });
+    await prisma.companyMembership.update({
+      where: { id: `mb-${suffix}` },
+      data: { role: "OWNER", priorApprovedRole: "OWNER" },
+    });
+    for (const index of [1, 2]) {
+      const company = await prisma.company.create({
+        data: {
+          id: `quota-company-${suffix}-${index}`,
+          slug: `quota-company-${suffix}-${index}`,
+          legalName: `Quota Company ${suffix} ${index}`,
+          displayName: `Quota Company ${suffix} ${index}`,
+          verificationState: "ACTIVE",
+          memberships: {
+            create: {
+              userId: targetId,
+              role: "OWNER",
+              status: "ACTIVE",
+            },
+          },
+        },
+      });
+      quotaCompanyIds.push(company.id);
+    }
+
+    await expect(
+      new AdminMembershipService().restore(
+        authority,
+        `ma-${suffix}`,
+        command(2),
+      ),
+    ).rejects.toThrow("OWNER_COMPANY_LIMIT_REACHED");
+    expect(
+      await prisma.companyMembership.findUniqueOrThrow({
+        where: { id: `ma-${suffix}` },
+      }),
+    ).toMatchObject({ status: "SUSPENDED", version: 2 });
   });
 });

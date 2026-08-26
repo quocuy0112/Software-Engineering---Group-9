@@ -220,7 +220,7 @@ paths:
                 accuracyDeclaration: { type: boolean, const: true }
                 documentProcessingConsent: { type: boolean, const: true }
                 policyVersion: { type: string, minLength: 1, maxLength: 40 }
-                requestedRole: { type: string, const: RECRUITER }
+                requestedRole: { type: string, enum: [OWNER, HR_MANAGER, RECRUITER, HIRING_MANAGER] }
                 targetCompanyId: { type: string, minLength: 1 }
                 prerequisiteId: { type: string, minLength: 1 }
                 document:
@@ -310,6 +310,9 @@ components:
         website:
           type: [string, 'null']
           maxLength: 2048
+        requestedRole:
+          type: string
+          enum: [OWNER, HR_MANAGER, RECRUITER, HIRING_MANAGER]
         relationship:
           anyOf:
             - $ref: '#/components/schemas/ApplicantRelationship'

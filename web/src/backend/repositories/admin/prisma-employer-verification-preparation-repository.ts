@@ -106,6 +106,7 @@ export class PrismaEmployerVerificationPreparationRepository implements Employer
           applicantLegalName: input.result.facts?.legalName ?? null,
           applicantRegisteredAddress:
             input.result.facts?.registeredAddress ?? null,
+          requestedRole: "RECRUITER",
           mismatchExplanation: null,
           inaccessibleAt: null,
           deleteAfter: null,
@@ -187,6 +188,9 @@ export class PrismaEmployerVerificationPreparationRepository implements Employer
           : {}),
         ...(changes.website !== undefined
           ? { websiteOrigin: changes.website }
+          : {}),
+        ...(changes.requestedRole !== undefined
+          ? { requestedRole: changes.requestedRole }
           : {}),
         ...(changes.relationship !== undefined
           ? { relationship: changes.relationship }

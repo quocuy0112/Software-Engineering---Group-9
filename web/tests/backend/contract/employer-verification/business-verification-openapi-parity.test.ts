@@ -34,6 +34,25 @@ describe("Feature 014 OpenAPI and Zod parity", () => {
     expect(companyEmailChallengeSchema.safeParse({ preparationVersion: 1, email: "hr@example.vn" }).success).toBe(true);
     expect(companyEmailConfirmationSchema.safeParse({ token: "x".repeat(43) }).success).toBe(true);
     expect(preparationPatchSchema.safeParse({ preparationId: "prep", version: 1, changes: { unknown: true } }).success).toBe(false);
-    expect(enrichedVerificationSubmissionSchema.safeParse({ requestedRole: "OWNER" }).success).toBe(false);
+    expect(
+      preparationPatchSchema.safeParse({
+        preparationId: "prep",
+        version: 1,
+        changes: { requestedRole: "OWNER" },
+      }).success,
+    ).toBe(true);
+    expect(
+      enrichedVerificationSubmissionSchema.shape.requestedRole.safeParse(
+        "OWNER",
+      ).success,
+    ).toBe(true);
+    expect(
+      enrichedVerificationSubmissionSchema.shape.requestedRole.safeParse(
+        "NOT_A_ROLE",
+      ).success,
+    ).toBe(false);
+    expect(contract).toContain(
+      "enum: [OWNER, HR_MANAGER, RECRUITER, HIRING_MANAGER]",
+    );
   });
 });

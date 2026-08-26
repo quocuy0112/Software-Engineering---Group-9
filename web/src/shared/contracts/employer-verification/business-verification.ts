@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { membershipRoleSchema } from "@/shared/contracts/admin/common";
 
 const markup = /<[^>]*>/gu;
 
@@ -194,6 +195,7 @@ export const preparationPatchSchema = z
         operatingAddress: plainText(5, 500).nullable().optional(),
         companyPhone: companyPhoneSchema.nullable().optional(),
         website: companyWebsiteSchema.nullable().optional(),
+        requestedRole: membershipRoleSchema.optional(),
         relationship: employerApplicantRelationshipSchema.nullable().optional(),
         currentJobTitle: plainText(2, 120).nullable().optional(),
         authorityExplanation: plainText(20, 500).nullable().optional(),
@@ -222,7 +224,7 @@ export const enrichedVerificationSubmissionSchema = z
     accuracyDeclaration: z.literal("true"),
     documentProcessingConsent: z.literal("true"),
     policyVersion: z.string().min(1).max(40),
-    requestedRole: z.literal("RECRUITER"),
+    requestedRole: membershipRoleSchema,
     targetCompanyId: z.string().min(1).optional(),
     prerequisiteId: z.string().min(1).optional(),
   })
