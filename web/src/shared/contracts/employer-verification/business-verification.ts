@@ -28,6 +28,42 @@ export function normalizeBusinessPlainText(value: string): string {
     .trim();
 }
 
+const explicitEntityTypeSuffix =
+  /\s*\(\s*(?:loại\s+hình\s+doanh\s+nghiệp|loai\s+hinh\s+doanh\s+nghiep|business\s+entity\s+type)\s*:\s*([^()]+?)\s*\)\s*$/iu;
+
+export type CompanyIdentity = {
+  name: string;
+  entityType: string | null;
+};
+
+/**
+ * Keeps the registered name and legal entity type as separate values when a
+ * registry provider returns the type as an explicit parenthetical suffix.
+ * Common legal prefixes such as "CÔNG TY TNHH" are intentionally preserved:
+ * they can be part of a legitimate registered name.
+ */
+export function splitCompanyIdentity(
+  value: string,
+  entityType?: string | null,
+): CompanyIdentity {
+  const normalized = normalizeBusinessPlainText(value);
+  const explicit = explicitEntityTypeSuffix.exec(normalized);
+  const parsedName = explicit
+    ? normalizeBusinessPlainText(normalized.slice(0, explicit.index))
+    : normalized;
+  const parsedEntityType = explicit
+    ? normalizeBusinessPlainText(explicit[1])
+    : "";
+  const normalizedEntityType = entityType
+    ? normalizeBusinessPlainText(entityType)
+    : "";
+
+  return {
+    name: parsedName || normalized,
+    entityType: normalizedEntityType || parsedEntityType || null,
+  };
+}
+
 const plainText = (minimum: number, maximum: number) =>
   z
     .string()
@@ -213,6 +249,8 @@ export const enrichedVerificationSubmissionSchema = z
 
 export function businessFactsDiffer(left: string | null, right: string | null) {
   if (!left || !right) return false;
-  return normalizeBusinessPlainText(left).toLocaleLowerCase("vi") !==
-    normalizeBusinessPlainText(right).toLocaleLowerCase("vi");
+  return (
+    normalizeBusinessPlainText(left).toLocaleLowerCase("vi") !==
+    normalizeBusinessPlainText(right).toLocaleLowerCase("vi")
+  );
 }

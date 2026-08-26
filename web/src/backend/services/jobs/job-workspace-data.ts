@@ -1,7 +1,5 @@
 import "server-only";
 
-import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import { z } from "zod";
 import type { JobCard } from "@/shared/contracts/jobs/discovery";
 import type { JobPreferences } from "@/shared/contracts/jobs/preferences";
@@ -12,10 +10,17 @@ import type {
 import type { UserJobState } from "@/shared/contracts/jobs/catalog";
 import { normalizeSalaryAmount } from "@/shared/utils/jobs/job-display";
 import { PrismaApplicationTrackingRepository } from "@/backend/repositories/jobs/prisma-application-tracking-repository";
+import { configuredJsonJobCatalogueRepository } from "@/backend/repositories/jobs/job-catalogue-repository-factory";
 import { readUserJobState } from "./user-job-state-store";
 import { readMockAppliedJobIds } from "./recruiter-job-posting-data";
+import { prisma } from "@/backend/database/prisma";
+import { jobReviewSnapshotSchema } from "@/shared/contracts/recruiter-job-posting";
+import { MAX_APPLICATION_ATTEMPTS_MESSAGE } from "@/shared/contracts/jobs/actions";
 
-const dataPath = (name: string) => resolve(process.cwd(), "data", "jobs", name);
+const workspaceJobsRepository =
+  configuredJsonJobCatalogueRepository("jobs.json");
+const workspaceCompaniesRepository =
+  configuredJsonJobCatalogueRepository("companies.json");
 
 const sourceCompanySchema = z
   .object({
@@ -43,15 +48,17 @@ const sourceJobSchema = z
     id: z.string().min(1),
     slug: z.string().min(1),
     companyId: z.string().min(1),
-    title: z.string().min(1),
-    shortPitch: z.string().min(1),
+    // Draft catalogue rows may be incomplete. Only active rows are exposed
+    // below, while managed active jobs are projected from approved snapshots.
+    title: z.string(),
+    shortPitch: z.string(),
     industry: z.string().min(1),
-    subIndustry: z.string().min(1),
+    subIndustry: z.string(),
     categoryIds: z.array(z.string().min(1)),
     categoryFamily: z.string().min(1),
     skillTags: z.array(z.string().min(1)),
     location: z.object({
-      city: z.string().min(1),
+      city: z.string(),
       district: z.string().nullable(),
       isNationwideRemote: z.boolean(),
     }),
@@ -63,15 +70,15 @@ const sourceJobSchema = z
       isNegotiable: z.boolean(),
     }),
     education: z.string().optional(),
-    numberOfHires: z.number().int().positive().optional(),
+    numberOfHires: z.number().int().nonnegative().optional(),
     age: z.string().optional(),
     experience: z.object({
       minYears: z.number().int().nonnegative(),
-      label: z.string().min(1),
+      label: z.string(),
     }),
-    level: z.string().min(1),
-    employmentType: z.string().min(1),
-    workArrangement: z.string().min(1),
+    level: z.string(),
+    employmentType: z.string(),
+    workArrangement: z.string(),
     workOnSaturday: z.boolean(),
     status: z.enum([
       "draft",
@@ -107,17 +114,22 @@ type JobCatalog = {
 
 let catalogPromise: Promise<JobCatalog> | undefined;
 
+/** Clear the process-local JSON projection after an approved publication. */
+export function invalidateJobWorkspaceCatalogueCache() {
+  catalogPromise = undefined;
+}
+
 async function readCatalog(): Promise<JobCatalog> {
-  catalogPromise ??= Promise.all([
-    readFile(dataPath("jobs.json"), "utf8"),
-    readFile(dataPath("companies.json"), "utf8"),
-  ]).then(([jobsText, companiesText]) => {
-    const jobs = z
-      .array(sourceJobSchema)
-      .parse(JSON.parse(jobsText)) as SourceJob[];
+  if (catalogPromise) return catalogPromise;
+
+  const pendingCatalog = Promise.all([
+    workspaceJobsRepository.read(),
+    workspaceCompaniesRepository.read(),
+  ]).then(async ([jobValues, companyValues]) => {
+    const jobs = z.array(sourceJobSchema).parse(jobValues) as SourceJob[];
     const companies = z
       .array(sourceCompanySchema)
-      .parse(JSON.parse(companiesText)) as SourceCompany[];
+      .parse(companyValues) as SourceCompany[];
     const normalizedJobs = jobs.map((job) => ({
       ...job,
       status:
@@ -127,10 +139,80 @@ async function readCatalog(): Promise<JobCatalog> {
             ? "closed"
             : job.status,
     }));
+    const aggregates = await prisma.jobPostReviewAggregate.findMany({
+      where: { jobId: { in: normalizedJobs.map((job) => job.id) } },
+      include: {
+        approvedVersion: { select: { snapshot: true } },
+        publicJobPosting: {
+          select: {
+            id: true,
+            status: true,
+            publishedAt: true,
+            updatedAt: true,
+            applicationDeadline: true,
+            _count: { select: { applications: true } },
+          },
+        },
+        company: {
+          select: {
+            verificationState: true,
+            verifiedAt: true,
+            verificationInactiveAt: true,
+          },
+        },
+      },
+    });
+    const managedByJobId = new Map(
+      aggregates.map((aggregate) => [aggregate.jobId, aggregate]),
+    );
+    const observedAt = new Date();
+    const selectedJobs = normalizedJobs.flatMap((job) => {
+      const managed = managedByJobId.get(job.id);
+      if (!managed) return isCandidateWorkspaceRow(job) ? [job] : [];
+      const snapshot = jobReviewSnapshotSchema.safeParse(
+        managed.approvedVersion?.snapshot,
+      );
+      const projection = managed.publicJobPosting;
+      const active =
+        snapshot.success &&
+        projection?.status === "ACTIVE" &&
+        projection.publishedAt !== null &&
+        managed.closedAt === null &&
+        managed.company.verificationState === "ACTIVE" &&
+        managed.company.verifiedAt !== null &&
+        managed.company.verificationInactiveAt === null &&
+        (!projection.applicationDeadline ||
+          projection.applicationDeadline > observedAt);
+      if (!active || !snapshot.success || !projection?.publishedAt) return [];
+      const projected = sourceJobSchema.safeParse({
+        ...snapshot.data,
+        // SavedJob, applications, and candidate actions reference the public
+        // PostgreSQL posting. The review aggregate's jobId is only the
+        // recruiter catalogue key and is not a candidate-facing identifier.
+        id: projection.id,
+        // The JSON catalogue owns the company projection used by this
+        // workspace; the review snapshot stores the PostgreSQL company id.
+        companyId: job.companyId,
+        status: "active",
+        approvalComment: null,
+        isVerified: true,
+        postedAt: projection.publishedAt.toISOString(),
+        updatedAt: projection.updatedAt.toISOString(),
+        stats: {
+          viewCount: 0,
+          applicantCount: projection._count.applications,
+        },
+      });
+      return projected.success ? [projected.data] : [];
+    });
     return {
-      jobs: normalizedJobs,
+      jobs: selectedJobs,
       companies: new Map(companies.map((company) => [company.id, company])),
     };
+  });
+  catalogPromise = pendingCatalog;
+  void pendingCatalog.catch(() => {
+    if (catalogPromise === pendingCatalog) catalogPromise = undefined;
   });
   return catalogPromise;
 }
@@ -156,6 +238,11 @@ function isOpenForApplications(job: SourceJob, now: Date) {
     job.status === "active" &&
     (!job.applyDeadline || new Date(job.applyDeadline) > now)
   );
+}
+
+/** Recruiter-only lifecycle rows must never enter the candidate workspace. */
+function isCandidateWorkspaceRow(job: SourceJob) {
+  return job.status === "active" || job.status === "closed";
 }
 
 function experienceLevel(job: SourceJob): JobCard["experienceLevel"] {
@@ -196,8 +283,10 @@ export function projectWorkspaceJob(
   now = new Date(),
   matchScore?: number,
   appliedJobIds: ReadonlySet<string> = new Set(),
+  applicationLimitJobIds: ReadonlySet<string> = new Set(),
 ): JobCard {
   const applied = appliedJobIds.has(job.id);
+  const applicationLimitReached = applicationLimitJobIds.has(job.id);
   const card: JobCard = {
     id: job.id,
     slug: job.slug,
@@ -241,7 +330,12 @@ export function projectWorkspaceJob(
       applied,
       canSave: true,
       canReport: true,
-      canApply: isOpenForApplications(job, now) && !applied,
+      canApply:
+        isOpenForApplications(job, now) && !applied && !applicationLimitReached,
+      applicationLimitReached,
+      applicationLimitMessage: applicationLimitReached
+        ? MAX_APPLICATION_ATTEMPTS_MESSAGE
+        : undefined,
     },
   };
   if (matchScore === undefined) return card;
@@ -254,6 +348,7 @@ export type JobWorkspaceSnapshot = {
   companies: Map<string, SourceCompany>;
   savedJobs: JobCard[];
   appliedJobIds: string[];
+  applicationLimitJobIds: string[];
   positionOptions: JobPositionOption[];
   skillOptions: string[];
 };
@@ -286,19 +381,29 @@ export async function readJobWorkspaceSnapshot(
   candidateUserId: string,
   now = new Date(),
 ): Promise<JobWorkspaceSnapshot> {
-  const [catalog, state, prismaAppliedJobIds, mockAppliedJobIds] =
-    await Promise.all([
-      readCatalog(),
-      readUserJobState(candidateUserId),
-      new PrismaApplicationTrackingRepository().listAppliedJobIds(
-        candidateUserId,
-      ),
-      readMockAppliedJobIds(candidateUserId),
-    ]);
+  const [
+    catalog,
+    state,
+    prismaAppliedJobIds,
+    prismaApplicationLimitJobIds,
+    mockAppliedJobIds,
+  ] = await Promise.all([
+    readCatalog(),
+    readUserJobState(candidateUserId),
+    new PrismaApplicationTrackingRepository().listAppliedJobIds(
+      candidateUserId,
+    ),
+    new PrismaApplicationTrackingRepository().listApplicationLimitJobIds(
+      candidateUserId,
+    ),
+    readMockAppliedJobIds(candidateUserId),
+  ]);
   const appliedJobIds = [
     ...new Set([...prismaAppliedJobIds, ...mockAppliedJobIds]),
   ];
   const appliedIds = new Set(appliedJobIds);
+  const applicationLimitJobIds = [...new Set(prismaApplicationLimitJobIds)];
+  const applicationLimitIds = new Set(applicationLimitJobIds);
   const cardById = new Map(
     catalog.jobs.map((job) => [
       job.id,
@@ -309,6 +414,7 @@ export async function readJobWorkspaceSnapshot(
         now,
         undefined,
         appliedIds,
+        applicationLimitIds,
       ),
     ]),
   );
@@ -322,6 +428,7 @@ export async function readJobWorkspaceSnapshot(
       return job ? [job] : [];
     }),
     appliedJobIds,
+    applicationLimitJobIds,
     positionOptions,
     skillOptions,
   };
@@ -392,6 +499,7 @@ export function suggestedJobsForSnapshot(
 
   const hiddenIds = new Set(state.hiddenJobIds);
   const appliedIds = new Set(snapshot.appliedJobIds);
+  const applicationLimitIds = new Set(snapshot.applicationLimitJobIds);
   const positionConfigured = Boolean(
     preferences.professionalPositions.length ||
     preferences.customPositions.length,
@@ -475,6 +583,7 @@ export function suggestedJobsForSnapshot(
           now,
           matchScore,
           appliedIds,
+          applicationLimitIds,
         ),
         matchedCriteria,
       };

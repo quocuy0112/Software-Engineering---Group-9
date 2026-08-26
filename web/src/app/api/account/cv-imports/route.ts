@@ -38,6 +38,19 @@ export async function POST(request: Request): Promise<Response> {
       request,
       createCvImportRequestSchema,
       4 * 1024,
+      {
+        validationMessage: (issue) => {
+          if (issue.path[0] === "declaredMediaType")
+            return "Only PDF, DOC, or DOCX files are supported.";
+          if (issue.path[0] === "declaredBytes") {
+            if (issue.code === "too_big")
+              return "File size must not exceed 5MB.";
+            if (issue.code === "too_small")
+              return "The uploaded file is empty.";
+          }
+          return undefined;
+        },
+      },
     );
     const result = await new CreateCvImportService().execute({
       accountId: current.accountId,

@@ -14,6 +14,7 @@
     "@better-auth/core": "1.6.25",
     "@better-auth/utils": "0.4.2",
     "better-call": "1.3.7",
+    "deepmerge-ts": "8.0.1",
     "find-my-way": "9.7.0",
     "postcss": "8.5.26",
     "sharp": "0.35.3",
@@ -22,7 +23,7 @@
   "scripts": {
     "env:init": "node scripts/setup-local.mjs",
     "env:check": "node scripts/check-environment.mjs",
-    "db:up": "docker compose up -d postgres",
+    "db:up": "docker compose up -d --wait postgres",
     "db:down": "docker compose stop postgres",
     "infra:up": "docker compose up -d --build postgres clamav ocr-engine cv-worker image-search-worker admin-worker",
     "infra:down": "docker compose down",
@@ -34,7 +35,7 @@
     "db:seed:jobs": "npm run db:seed:jobs --workspace @smarthire/web --",
     "db:deploy": "npm run db:deploy --workspace @smarthire/web",
     "db:reset:empty": "node scripts/reset-local-database.mjs --empty",
-    "db:reset": "node scripts/reset-local-database.mjs",
+    "db:reset": "node scripts/db-reset-user.mjs",
     "db:reset:user": "node scripts/db-reset-user.mjs",
     "dev": "node scripts/run-local-development.mjs",
     "dev:web": "npm run dev:web --workspace @smarthire/web",
@@ -42,6 +43,11 @@
     "email:worker": "npm run email:worker --workspace @smarthire/web",
     "cv:worker": "npm run cv:worker --workspace @smarthire/web",
     "cv:worker:probe": "npm run cv:worker:probe --workspace @smarthire/web",
+    "candidate-match:worker": "npm run candidate-match:worker --workspace @smarthire/web",
+    "candidate-match:worker:probe": "npm run candidate-match:worker:probe --workspace @smarthire/web",
+    "applications:intake": "npm run applications:intake --workspace @smarthire/web",
+    "applications:intake:watch": "npm run applications:intake:watch --workspace @smarthire/web",
+    "candidate-match:migration:verify": "npm run candidate-match:migration:verify --workspace @smarthire/web",
     "cv:scanner:check": "npm run cv:scanner:check --workspace @smarthire/web",
     "ocr:up": "docker compose up -d --build ocr-engine",
     "ocr:check": "npm run ocr:check --workspace @smarthire/web",
@@ -82,6 +88,7 @@
     "test:messaging:e2e": "npm run test:messaging:e2e --workspace @smarthire/web",
     "test:cv-import": "npm run test:cv-import --workspace @smarthire/web",
     "test:cv-import:e2e": "npm run test:cv-import:e2e --workspace @smarthire/web",
+    "test:candidate-application-private-match": "npm run test:candidate-application-private-match --workspace @smarthire/web",
     "test:ocr-image-search": "npm run test:ocr-image-search --workspace @smarthire/web",
     "test:ocr-image-search:e2e": "npm run test:ocr-image-search:e2e --workspace @smarthire/web",
     "test:e2e": "npm run test:e2e --workspace @smarthire/web",
@@ -93,10 +100,15 @@
     "notifications:migration:verify": "npm run notifications:migration:verify --workspace @smarthire/web",
     "smoke:messaging:server": "npm run smoke:messaging:server --workspace @smarthire/web",
     "db:validate": "npm run db:validate --workspace @smarthire/web",
-    "db:migrate": "npm run db:migrate --workspace @smarthire/web",
+    "db:migrate": "npm run db:migrations:check --workspace @smarthire/web && npm run db:up && npm run db:migrations:reconcile-names --workspace @smarthire/web -- --apply && npm run db:migrate --workspace @smarthire/web",
     "db:studio": "npm run db:studio --workspace @smarthire/web"
   },
   "dependencies": {
     "motion": "^12.42.2"
+  },
+  "allowScripts": {
+    "@prisma/engines@7.9.0": true,
+    "esbuild@0.28.1": true,
+    "prisma@7.9.0": true
   }
 }

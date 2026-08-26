@@ -6,13 +6,18 @@ import {
   applicationStageSchema,
   candidateApplicationDetailSchema,
   candidateApplicationListResponseSchema,
+  candidateScoringFailureCodeSchema,
   type ApplicationStage,
   type ApplicationStageGroup,
   type CandidateApplicationDetail,
   type CandidateApplicationSummary,
 } from "@/shared/contracts/jobs/applications";
+import { MAX_APPLICATION_ATTEMPTS } from "@/shared/contracts/jobs/actions";
 
-type TrackingClient = Pick<typeof prisma, "jobApplication">;
+type TrackingClient = Pick<
+  typeof prisma,
+  "jobApplication" | "jobApplicationAttemptCounter"
+>;
 
 type ListInput = {
   candidateUserId: string;
@@ -33,6 +38,11 @@ const summarySelect = {
   aiAnalysisConsent: true,
   aiMatchScore: true,
   scoringStatus: true,
+  scoringWorkItems: {
+    orderBy: { updatedAt: "desc" },
+    take: 1,
+    select: { lastSafeFailureCode: true },
+  },
   jobPosting: {
     select: {
       slug: true,
@@ -63,6 +73,15 @@ function text(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+function isInternalFilename(value: string | null) {
+  return Boolean(
+    value &&
+    /^(?:imported-cv|application-cv|candidate-cv)-[A-Za-z0-9-]+\.[A-Za-z0-9]{1,8}$/iu.test(
+      value,
+    ),
+  );
+}
+
 function summary(row: SummaryRow): CandidateApplicationSummary {
   const snapshot = object(row.jobSnapshot);
   const stage = applicationStageSchema.parse(row.stage);
@@ -83,6 +102,7 @@ function summary(row: SummaryRow): CandidateApplicationSummary {
       lastStageChangedAt: true,
       jobAvailable: true,
       scoringStatus: true,
+      scoringFailureCode: true,
       aiMatchScore: true,
     })
     .parse({
@@ -105,6 +125,11 @@ function summary(row: SummaryRow): CandidateApplicationSummary {
       jobAvailable:
         row.jobPosting.status === "ACTIVE" && row.jobPosting.removedAt === null,
       scoringStatus: row.scoringStatus,
+      scoringFailureCode: candidateScoringFailureCodeSchema.safeParse(
+        row.scoringWorkItems?.[0]?.lastSafeFailureCode,
+      ).success
+        ? (row.scoringWorkItems?.[0]?.lastSafeFailureCode ?? null)
+        : null,
       aiMatchScore: row.aiMatchScore,
     });
 }
@@ -174,12 +199,20 @@ export class PrismaApplicationTrackingRepository {
     if (!row) return null;
 
     const cvSnapshot = object(row.cvSnapshot);
+    const snapshotFileName = text(cvSnapshot.fileName);
+    const selectedFileName = text(row.selectedCv.fileName);
     return candidateApplicationDetailSchema.parse({
       ...summary(row),
       coverLetter: row.coverLetter,
       cv: {
         displayName: text(cvSnapshot.displayName) ?? row.selectedCv.displayName,
-        fileName: text(cvSnapshot.fileName) ?? row.selectedCv.fileName,
+        fileName:
+          (snapshotFileName && !isInternalFilename(snapshotFileName)
+            ? snapshotFileName
+            : null) ??
+          (selectedFileName && !isInternalFilename(selectedFileName)
+            ? selectedFileName
+            : "candidate-cv.pdf"),
       },
       answers: row.answers.flatMap((answer) => {
         const question = text(object(answer.questionSnapshot).prompt);
@@ -205,7 +238,22 @@ export class PrismaApplicationTrackingRepository {
 
   async listAppliedJobIds(candidateUserId: string) {
     const rows = await this.db.jobApplication.findMany({
-      where: { candidateUserId },
+      where: {
+        candidateUserId,
+        withdrawalOutcome: null,
+        stage: { not: "REJECTED" },
+      },
+      select: { jobPostingId: true },
+    });
+    return rows.map((row) => row.jobPostingId);
+  }
+
+  async listApplicationLimitJobIds(candidateUserId: string) {
+    const rows = await this.db.jobApplicationAttemptCounter.findMany({
+      where: {
+        candidateUserId,
+        applicationCount: { gte: MAX_APPLICATION_ATTEMPTS },
+      },
       select: { jobPostingId: true },
     });
     return rows.map((row) => row.jobPostingId);

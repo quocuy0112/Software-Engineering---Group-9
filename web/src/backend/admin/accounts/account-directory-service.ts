@@ -42,6 +42,9 @@ function directoryItem(
     type: recruiter ? "RECRUITER" : "CANDIDATE",
     status: row.state,
     version: row.version,
+    hasCandidateIdentity: row.isCandidate,
+    activeMembershipCount: row.recruiterCompanyIds.length,
+    hasActiveAdministratorGrant: row.hasActiveAdministratorGrant,
     counts,
   });
 }

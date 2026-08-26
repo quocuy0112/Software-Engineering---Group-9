@@ -18,6 +18,31 @@ import { CompanyAvatar } from "./company-avatar";
 
 type GroupFilter = "ALL" | ApplicationStageGroup;
 
+function scoringFailureMessage(
+  code: CandidateApplicationSummary["scoringFailureCode"],
+) {
+  switch (code) {
+    case "SCORING_CV_TEXT_UNAVAILABLE":
+    case "CV_TEXT_UNAVAILABLE":
+    case "CV_TEXT_TOO_SHORT":
+    case "CV_TEXT_INVALID":
+      return "We couldn't read any content from this file. Please make sure it's a text-based CV, not a scanned image.";
+    case "CV_NOT_RECOGNIZED_AS_CV":
+      return "The uploaded file does not appear to be a valid CV. Please upload a file containing your resume information (work experience, education, skills, etc.).";
+    case "CV_CLASSIFICATION_TIMEOUT":
+      return "CV verification took too long. Please upload the file again.";
+    case "CV_CLASSIFICATION_UNAVAILABLE":
+    case "CV_CLASSIFICATION_MALFORMED":
+    case "CV_CLASSIFICATION_NOT_CONFIGURED":
+      return "We couldn't verify this CV right now. Please try uploading it again.";
+    case "SCORING_TIMEOUT":
+    case "SCORING_RETRY_LIMIT_REACHED":
+      return "CV scoring took too long to finish. Please upload your CV again.";
+    default:
+      return "CV analysis failed. Please upload your CV again.";
+  }
+}
+
 const groupFilters: Array<{ id: GroupFilter; label: string }> = [
   { id: "ALL", label: "All" },
   { id: "ACTIVE", label: "Active" },
@@ -145,8 +170,19 @@ export function ApplicationCard({
 
         <footer>
           <div>
-            {application.scoringStatus &&
-            application.scoringStatus !== "NOT_REQUESTED" ? (
+            {application.scoringStatus === "FAILED" ? (
+              <p className="application-scoring-error" role="alert">
+                {scoringFailureMessage(application.scoringFailureCode)}{" "}
+                {application.jobAvailable && application.jobSlug ? (
+                  <Link href={"/jobs/" + application.jobSlug + "/apply"}>
+                    Re-upload your CV to try again.
+                  </Link>
+                ) : (
+                  "Please contact support if you need help."
+                )}
+              </p>
+            ) : application.scoringStatus &&
+              application.scoringStatus !== "NOT_REQUESTED" ? (
               <span className="application-scoring-status">
                 CV analysis: {application.scoringStatus.toLowerCase()}
               </span>

@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { ZodType } from "zod";
+import type { ZodIssue, ZodType } from "zod";
 
 import { requireSession } from "@/backend/auth/session/require-session";
 import { prisma } from "@/backend/database/prisma";
@@ -87,13 +87,13 @@ function firstForbiddenPath(value: unknown, path = "request"): string | null {
   return null;
 }
 
-function validationError(path = "request"): CvRequestBoundaryError {
-  return new CvRequestBoundaryError(
-    400,
-    "VALIDATION_ERROR",
-    "Review the highlighted fields.",
-    [{ path, code: "INVALID", message: "Enter a valid value." }],
-  );
+function validationError(
+  path = "request",
+  message = "Review the highlighted fields.",
+): CvRequestBoundaryError {
+  return new CvRequestBoundaryError(400, "VALIDATION_ERROR", message, [
+    { path, code: "INVALID", message: "Enter a valid value." },
+  ]);
 }
 
 async function defaultOwns(input: {
@@ -232,6 +232,9 @@ export class CvAccountRequestBoundary {
     request: Request,
     schema: ZodType<T>,
     maximumBytes: number,
+    options: Readonly<{
+      validationMessage?: (issue: ZodIssue) => string | undefined;
+    }> = {},
   ): Promise<T> {
     if (!Number.isSafeInteger(maximumBytes) || maximumBytes < 1) {
       throw new Error("CV_JSON_BODY_LIMIT_INVALID");
@@ -285,6 +288,7 @@ export class CvAccountRequestBoundary {
       const issue = result.error.issues[0];
       throw validationError(
         issue?.path.length ? issue.path.join(".") : "request",
+        issue ? options.validationMessage?.(issue) : undefined,
       );
     }
     return result.data;

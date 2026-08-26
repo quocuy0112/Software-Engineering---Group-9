@@ -38,6 +38,7 @@ Browser
 
 Background processes
   |-- Email outbox worker
+  |-- Candidate private-match worker -> approved OpenAI boundary
   |-- CV worker ------> ClamAV Unix socket
   |                 `-> OCR Unix socket
   |-- Image-search worker -> OCR Unix socket / approved OpenAI boundary
@@ -130,6 +131,8 @@ Exact dependency versions are defined in the root `package-lock.json` and `web/p
 | --------------------- | ------------ | --------------------------------------------------- | --------------------------- |
 | Web application       | Host Node.js | Next.js HTTP plus Socket.IO                         | Supervised by `npm run dev` |
 | Email worker          | Host Node.js | Delivers transactional outbox records               | Supervised by `npm run dev` |
+| Candidate match worker | Host Node.js | Scores private CV match attempts and retries         | Supervised by `npm run dev` |
+| Application intake worker | Host Node.js | Verifies submitted files and advances intake state   | Supervised by `npm run dev` |
 | `postgres`            | Docker       | Authoritative PostgreSQL database                   | `unless-stopped`            |
 | `clamav`              | Docker       | Malware scanner and FreshClam updater               | `unless-stopped`            |
 | `ocr-engine`          | Docker       | Private Unix-socket OCR service                     | `unless-stopped`            |
@@ -194,6 +197,9 @@ PostgreSQL, `psql`, Python OCR dependencies, and ClamAV do not need to be instal
 | Command                             | Purpose                                                            |
 | ----------------------------------- | ------------------------------------------------------------------ |
 | `npm run email:worker`              | Run only the email outbox worker on the host                       |
+| `npm run candidate-match:worker`    | Drain queued private CV match attempts once                       |
+| `npm run applications:intake`       | Drain currently queued application intake checks                  |
+| `npm run applications:intake:watch` | Run the application intake worker continuously                     |
 | `npm run cv:worker:probe`           | Probe CV worker configuration/runtime boundaries                   |
 | `npm run cv:scanner:check`          | Check the configured scanner boundary                              |
 | `npm run ocr:up`                    | Build/start only the OCR engine                                    |
@@ -286,7 +292,6 @@ docker compose ps
 | Candidate application    | `http://localhost:3001`                   | Active                                                                          |
 | Messaging workspace      | `http://localhost:3001/messages`          | Active after authentication                                                     |
 | Platform Admin console   | `http://console.admin.localhost:3001`     | Active for authorized administrators                                            |
-| Recruiter console origin | `http://console.recruiter.localhost:3001` | Reserved boundary; full Recruiter Manager UI is not part of the current release |
 | Health endpoint          | `http://localhost:3001/api/health`        | Public operational health                                                       |
 
 The application validates exact hosts — do not use the admin console through the Candidate hostname.

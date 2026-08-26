@@ -14,7 +14,7 @@ type ReserveInput = Readonly<{
   accountId: string;
   profileId: string;
   uploadId: string;
-  documentKind: "PDF" | "DOCX";
+  documentKind: "PDF" | "DOC" | "DOCX";
   parserClass: "DETERMINISTIC_INTERNAL" | "EXTERNAL_OPENAI";
   declaredMediaType: string;
   declaredBytes: number;
@@ -49,6 +49,8 @@ function validateReservation(input: ReserveInput): number {
     input.expiresAt.getTime() !== input.now.getTime() + 30 * 86_400_000 ||
     (input.documentKind === "PDF" &&
       input.declaredMediaType !== "application/pdf") ||
+    (input.documentKind === "DOC" &&
+      input.declaredMediaType !== "application/msword") ||
     (input.documentKind === "DOCX" &&
       input.declaredMediaType !==
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
@@ -122,8 +124,11 @@ export class PrismaCvQuotaRepository {
         const quota = quotaRows[0];
         if (!quota) throw new CvImportServiceError("CV_PROCESSING_UNAVAILABLE");
 
-        const rolling = await transaction.$queryRaw<Array<{ count: bigint }>>`
-          SELECT COUNT(*)::bigint AS "count"
+        const rolling = await transaction.$queryRaw<
+          Array<{ count: bigint; oldest: Date | null }>
+        >`
+          SELECT COUNT(*)::bigint AS "count",
+                 MIN("createdAt") AS "oldest"
             FROM "CvUpload"
            WHERE "accountId" = ${input.accountId}
              AND "createdAt" > ${new Date(input.now.getTime() - 60 * 60_000)}
@@ -131,8 +136,18 @@ export class PrismaCvQuotaRepository {
         if (
           Number(rolling[0]?.count ?? 0) >= CV_UPLOAD_ATTEMPTS_PER_ROLLING_HOUR
         ) {
+          const oldest = rolling[0]?.oldest;
+          const retryAfterSeconds = oldest
+            ? Math.max(
+                1,
+                Math.ceil(
+                  (oldest.getTime() + 60 * 60_000 - input.now.getTime()) /
+                    1_000,
+                ),
+              )
+            : 60 * 60;
           throw new CvImportServiceError("UPLOAD_RATE_LIMITED", {
-            retryAfterSeconds: 60 * 60,
+            retryAfterSeconds,
           });
         }
         const retained = await transaction.$queryRaw<Array<{ count: bigint }>>`

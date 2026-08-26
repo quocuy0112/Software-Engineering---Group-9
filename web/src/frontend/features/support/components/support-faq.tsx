@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import type { WorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import {
   getSupportHelpCopy,
   type SupportFaqCategory,
@@ -20,8 +20,16 @@ const categoryOrder: readonly SupportFaqCategory[] = [
   "security",
 ];
 
-export function SupportFaq() {
-  const locale = useWorkspaceLocale();
+export function SupportFaq({
+  locale,
+  supportRequestHref = "/support",
+}: {
+  locale: WorkspaceLocale;
+  /**
+   * Public help can reuse this FAQ while keeping the case workspace private.
+   */
+  supportRequestHref?: string;
+}) {
   const copy = getSupportHelpCopy(locale);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<FilterCategory>("all");
@@ -237,7 +245,9 @@ export function SupportFaq() {
               <button type="button" onClick={clearFilters}>
                 {copy.faq.clearFilters}
               </button>
-              <Link href="/support">{copy.faq.createSupportRequest}</Link>
+              <Link href={supportRequestHref}>
+                {copy.faq.createSupportRequest}
+              </Link>
             </div>
           </div>
         )}
@@ -249,7 +259,7 @@ export function SupportFaq() {
       >
         <h2 id="support-faq-bridge">{copy.faq.noResultsTitle}</h2>
         <p>{copy.faq.noResultsCopy}</p>
-        <Link href="/support">
+        <Link href={supportRequestHref}>
           {copy.faq.createSupportRequest} <span aria-hidden="true">→</span>
         </Link>
       </section>

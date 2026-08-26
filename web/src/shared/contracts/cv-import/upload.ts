@@ -25,10 +25,12 @@ import { cvConsentNoticeSchema } from "./consent-retention";
 export { cvConsentNoticeSchema } from "./consent-retention";
 
 export const CV_PDF_MEDIA_TYPE = "application/pdf" as const;
+export const CV_DOC_MEDIA_TYPE = "application/msword" as const;
 export const CV_DOCX_MEDIA_TYPE =
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document" as const;
 export const CV_ACCEPTED_MEDIA_TYPES = [
   CV_PDF_MEDIA_TYPE,
+  CV_DOC_MEDIA_TYPE,
   CV_DOCX_MEDIA_TYPE,
 ] as const;
 

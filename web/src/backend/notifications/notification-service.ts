@@ -14,6 +14,7 @@ import type {
   NotificationItem,
 } from "@/shared/contracts/notifications";
 import { emitNotificationOperation } from "@/backend/notifications/notification-operations";
+import { resolveNotificationHref } from "@/backend/notifications/notification-destination-resolver";
 
 type NotificationDb = PrismaClient | Prisma.TransactionClient;
 
@@ -27,6 +28,7 @@ const toItem = (
     summary: string;
     variables?: unknown;
     href: string | null;
+    recipientRole: "CANDIDATE" | "RECRUITER" | "ADMIN";
     contextType: NotificationItem["contextType"];
     contextId: string | null;
     occurrenceCount: number;
@@ -47,7 +49,29 @@ const toItem = (
     severity: row.severity,
     title: localized?.title ?? row.title,
     summary: localized?.summary ?? row.summary,
-    href: row.href,
+    href: resolveNotificationHref({
+      notificationId: row.id,
+      kind: row.kind,
+      contextType: row.contextType,
+      contextId: row.contextId,
+      recipientRole: row.recipientRole,
+      occurrenceCount: row.occurrenceCount,
+      lastOccurredAt: row.lastOccurredAt,
+      jobId:
+        typeof row.variables === "object" &&
+        row.variables !== null &&
+        "jobId" in row.variables &&
+        typeof row.variables.jobId === "string"
+          ? row.variables.jobId
+          : null,
+      threadId:
+        typeof row.variables === "object" &&
+        row.variables !== null &&
+        "threadId" in row.variables &&
+        typeof row.variables.threadId === "string"
+          ? row.variables.threadId
+          : null,
+    }),
     contextType: row.contextType,
     contextId: row.contextId,
     occurrenceCount: row.occurrenceCount,

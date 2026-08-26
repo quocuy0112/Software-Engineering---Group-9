@@ -1,5 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
+import {
+  RefreshCw,
+  ShieldCheck,
+  ShieldOff,
+  Smartphone,
+  TriangleAlert,
+} from "lucide-react";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { PasswordField } from "@/frontend/features/authentication/components/password-field";
 import { useReplayableStatus } from "@/frontend/features/authentication/components/use-status";
@@ -86,6 +93,7 @@ export function TwoFactorManagement({
           intro: "Tạo mã mới sẽ vô hiệu hóa toàn bộ mã dự phòng cũ.",
           password: "Mật khẩu hiện tại",
           code: "Mã TOTP gồm sáu chữ số",
+          authenticator: "Ứng dụng xác thực",
           regenerate: "Tạo lại mã dự phòng",
           disable: "Tắt xác thực hai lớp",
           backupTitle: "Lưu mười mã dự phòng mới",
@@ -111,6 +119,7 @@ export function TwoFactorManagement({
           intro: "Regenerating codes invalidates every older backup code.",
           password: "Current password",
           code: "Six-digit TOTP code",
+          authenticator: "Authenticator app",
           regenerate: "Regenerate backup codes",
           disable: "Disable two-factor authentication",
           backupTitle: "Save your ten new backup codes",
@@ -234,14 +243,17 @@ export function TwoFactorManagement({
           className="security-panel-icon security-panel-icon--success"
           aria-hidden="true"
         >
-          ◎
+          <ShieldCheck size={20} />
         </span>
         <div>
           <p className="panel-kicker">{copy.kicker}</p>
           <h2 id="two-factor-management-title">{copy.title}</h2>
         </div>
       </div>
-      <p className="security-panel-copy">{copy.intro}</p>
+      <p className="security-panel-copy security-warning-callout">
+        <TriangleAlert aria-hidden="true" />
+        <span>{copy.intro}</span>
+      </p>
       <div className="security-management-fields">
         <PasswordField
           label={copy.password}
@@ -251,37 +263,46 @@ export function TwoFactorManagement({
           onChange={(e) => setPassword(e.target.value)}
         />
         <div className="field">
-          <label htmlFor="management-code">{copy.code}</label>
-          <input
-            id="management-code"
-            inputMode="numeric"
-            maxLength={6}
-            value={code}
-            onChange={(e) =>
-              setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-            }
-          />
+          <div className="security-field-label">
+            <label htmlFor="management-code">{copy.code}</label>
+            <span>{copy.authenticator}</span>
+          </div>
+          <div className="security-totp-input">
+            <input
+              id="management-code"
+              inputMode="numeric"
+              maxLength={6}
+              value={code}
+              onChange={(e) =>
+                setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+              }
+            />
+            <Smartphone aria-hidden="true" />
+          </div>
         </div>
       </div>
       <div className="security-actions">
         <button
+          className="security-primary-action"
           type="button"
           disabled={
             busy || isLocked || !proof || !password || code.length !== 6
           }
           onClick={() => setConfirmAction("regenerate")}
         >
-          {copy.regenerate}
+          <RefreshCw aria-hidden="true" />
+          <span>{copy.regenerate}</span>
         </button>
         <button
-          className="danger-action"
+          className="danger-action security-danger-action"
           type="button"
           disabled={
             busy || isLocked || !proof || !password || code.length !== 6
           }
           onClick={() => setConfirmAction("disable")}
         >
-          {copy.disable}
+          <ShieldOff aria-hidden="true" />
+          <span>{copy.disable}</span>
         </button>
       </div>
       {codes.length > 0 ? (

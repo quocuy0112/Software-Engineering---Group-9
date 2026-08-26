@@ -20,7 +20,7 @@ function localEnvironment(
     OCR_POLICY_VERSION: "ocr-confidence-v1",
     OCR_CV_UNIT_TIMEOUT_SECONDS: "20",
     CV_HYBRID_DEADLINE_SECONDS: "180",
-    OCR_SEARCH_TIMEOUT_SECONDS: "6",
+    OCR_SEARCH_TIMEOUT_SECONDS: "10",
     IMAGE_SEARCH_WORKER_ENABLED: "true",
     IMAGE_SEARCH_CLEANUP_ENABLED: "true",
     IMAGE_SEARCH_STORAGE_ADAPTER: "filesystem",
@@ -43,8 +43,8 @@ function localEnvironment(
     OPENAI_API_KEY: "shared-cv-and-image-search-test-key",
     IMAGE_SEARCH_SOURCE_MAX_BYTES: "5000000",
     IMAGE_SEARCH_MAX_DECODED_PIXELS: "20000000",
-    IMAGE_SEARCH_VISITOR_LIMIT_PER_HOUR: "3",
-    IMAGE_SEARCH_ACCOUNT_LIMIT_PER_HOUR: "10",
+    IMAGE_SEARCH_VISITOR_LIMIT_PER_HOUR: "5",
+    IMAGE_SEARCH_ACCOUNT_LIMIT_PER_HOUR: "15",
     IMAGE_SEARCH_RETENTION_MINUTES: "15",
     ...overrides,
   };
@@ -62,7 +62,7 @@ describe("Feature 005 configuration", () => {
       modelManifestSha256: modelSha,
       cvUnitTimeoutMs: 20_000,
       cvHybridDeadlineMs: 180_000,
-      searchTimeoutMs: 6_000,
+      searchTimeoutMs: 10_000,
     });
     expect(configuration.storage.adapter).toBe("filesystem");
     expect(configuration.interpreter.class).toBe("EXTERNAL_OPENAI");
@@ -74,7 +74,7 @@ describe("Feature 005 configuration", () => {
     ["OCR_MODEL_SHA256", "mutable"],
     ["OCR_CV_UNIT_TIMEOUT_SECONDS", "21"],
     ["CV_HYBRID_DEADLINE_SECONDS", "181"],
-    ["OCR_SEARCH_TIMEOUT_SECONDS", "7"],
+    ["OCR_SEARCH_TIMEOUT_SECONDS", "6"],
     ["IMAGE_SEARCH_RETENTION_MINUTES", "16"],
     ["IMAGE_SEARCH_STORAGE_LOCAL_ROOT", ".local/image-search-storage"],
   ])("fails closed for invalid fixed setting %s", (key, value) => {

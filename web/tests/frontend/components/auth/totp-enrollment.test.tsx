@@ -142,7 +142,8 @@ describe("TOTP enrollment UI", () => {
     const code = screen.getByLabelText("Six-digit code");
     expect(code).toHaveAttribute("autocomplete", "one-time-code");
     expect(code).toHaveAttribute("inputmode", "numeric");
-    fireEvent.change(code, { target: { value: "123456" } });
+    fireEvent.change(code, { target: { value: "123 456" } });
+    expect(code).toHaveValue("123456");
     fireEvent.click(screen.getByRole("button", { name: "Verify and enable" }));
 
     const heading = await screen.findByRole("heading", {

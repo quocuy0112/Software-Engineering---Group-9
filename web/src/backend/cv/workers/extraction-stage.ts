@@ -484,9 +484,11 @@ export class ExtractionStageProcessor {
             extractorName:
               work.upload.documentKind === "PDF"
                 ? "pdfjs"
-                : hybrid
-                  ? "mammoth+docx-relations"
-                  : "mammoth",
+                : work.upload.documentKind === "DOC"
+                  ? "legacy-doc"
+                  : hybrid
+                    ? "mammoth+docx-relations"
+                    : "mammoth",
             extractorVersion: hybrid ? "feature-005-v2" : "feature-004-v1",
             rulesVersion: hybrid ? "cv-ocr-eligibility-v1" : "cv-structure-v1",
             pageCount: extracted.pageCount,

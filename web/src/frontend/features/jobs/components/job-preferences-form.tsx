@@ -2,6 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Briefcase,
+  Check,
+  Plane,
+  ShieldCheck,
+  Sparkles,
+  UserRound,
+} from "lucide-react";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
@@ -75,6 +83,7 @@ export function JobPreferencesForm({
           bannerTitle: "Nhận các cơ hội phù hợp với bạn",
           bannerDescription:
             "Cho SmartHire biết công việc bạn mong muốn để nhận gợi ý phù hợp hơn.",
+          privacy: "Riêng tư cho bạn",
           required: "Thông tin bắt buộc",
           personal: "Thông tin cá nhân",
           gender: "Giới tính",
@@ -95,11 +104,16 @@ export function JobPreferencesForm({
           locations: "Tỉnh/Thành phố (trước 01/07/2025)",
           locationsPlaceholder: "Tìm tỉnh hoặc thành phố",
           relocation: "Tôi sẵn sàng chuyển nơi ở",
-          consent: "Đồng ý xử lý dữ liệu",
+          consent: "Đồng ý & quyền cho phép",
           aiConsent:
             "Tôi đồng ý để SmartHire sử dụng phân tích AI dựa trên CV và hoạt động tìm việc để gợi ý công việc.",
+          aiConsentDescription:
+            "Bật đối sánh CV rõ ràng, nhất quán và phù hợp hơn.",
           notificationConsent:
             "Tôi đồng ý để SmartHire gửi thông tin về việc làm và sự kiện nghề nghiệp.",
+          notificationConsentDescription:
+            "Nhận cơ hội được tuyển chọn qua thông báo và email tổng hợp.",
+          discard: "Huỷ thay đổi",
           updating: "Đang cập nhật…",
           update: "Cập nhật",
           experienceLabels: {
@@ -119,6 +133,7 @@ export function JobPreferencesForm({
           bannerTitle: "Get matched to relevant opportunities",
           bannerDescription:
             "Tell us what you want next so SmartHire can surface better matches.",
+          privacy: "Private to you",
           required: "Required information",
           personal: "Personal information",
           gender: "Gender",
@@ -139,11 +154,16 @@ export function JobPreferencesForm({
           locations: "Province/City (pre 7/1/2025)",
           locationsPlaceholder: "Search provinces or cities",
           relocation: "I'm open to relocating",
-          consent: "Consent",
+          consent: "Consent & Permissions",
           aiConsent:
             "I agree to let SmartHire recommend jobs based on my CV and job-search activity, using AI-based analysis.",
+          aiConsentDescription:
+            "Enables high-precision deterministic and qualitative CV matching.",
           notificationConsent:
             "I agree to let SmartHire send me information about jobs and career events.",
+          notificationConsentDescription:
+            "Receive curated opportunities via notification & email digest.",
+          discard: "Discard changes",
           updating: "Updating…",
           update: "Update",
           experienceLabels: {
@@ -209,231 +229,275 @@ export function JobPreferencesForm({
   }
 
   return (
-    <form
-      className="job-preferences-form"
-      onSubmit={(event) => void submit(event)}
-    >
+    <>
       <div className="job-preferences-banner">
-        <span aria-hidden="true">✦</span>
-        <div>
+        <span className="job-preferences-banner-icon" aria-hidden="true">
+          <Sparkles />
+        </span>
+        <div className="job-preferences-banner-copy">
           <strong>{copy.bannerTitle}</strong>
           <p>{copy.bannerDescription}</p>
         </div>
+        <span className="job-preferences-privacy">
+          <ShieldCheck aria-hidden="true" />
+          {copy.privacy}
+        </span>
       </div>
       <p className="job-preferences-required">
         <span>*</span> {copy.required}
       </p>
-      {error ? (
-        <div className="job-preferences-message is-error" role="alert">
-          {error}
-        </div>
-      ) : null}
-      {status ? (
-        <div className="job-preferences-message is-success" role="status">
-          {status}
-        </div>
-      ) : null}
-
-      <fieldset>
-        <legend>{copy.personal}</legend>
-        <div className="preference-field">
-          <span className="preference-label">{copy.gender}</span>
-          <div className="preference-radio-group">
-            {[
-              ["female", copy.female],
-              ["male", copy.male],
-              ["undisclosed", copy.undisclosed],
-            ].map(([value, label]) => (
-              <label key={value}>
-                <input
-                  type="radio"
-                  name="gender"
-                  value={value}
-                  checked={form.gender === value}
-                  onChange={() =>
-                    setForm((current) => ({
-                      ...current,
-                      gender: value as JobPreferences["gender"],
-                    }))
-                  }
-                />
-                {label}
-              </label>
-            ))}
+      <form
+        className="job-preferences-form"
+        onSubmit={(event) => void submit(event)}
+      >
+        {error ? (
+          <div className="job-preferences-message is-error" role="alert">
+            {error}
           </div>
-        </div>
-      </fieldset>
+        ) : null}
+        {status ? (
+          <div className="job-preferences-message is-success" role="status">
+            {status}
+          </div>
+        ) : null}
 
-      <fieldset>
-        <legend>{copy.jobNeeds}</legend>
-        <div className="preference-field">
-          <SearchableChipSelect
-            id="professional-positions"
-            label={copy.professionalPosition}
-            placeholder={copy.professionalPositionPlaceholder}
-            options={positionOptions(availablePositions)}
-            selectedValues={form.professionalPositions}
-            maximum={5}
-            required
-            onChange={(values) =>
-              setForm((current) => ({
-                ...current,
-                professionalPositions: values,
-              }))
-            }
-          />
-        </div>
+        <section className="job-preferences-card" aria-labelledby="personal-information-heading">
+          <h2 id="personal-information-heading" className="job-preferences-card-title">
+            <UserRound aria-hidden="true" />
+            {copy.personal}
+          </h2>
+          <div className="preference-field">
+            <span className="preference-label">{copy.gender}</span>
+            <div className="preference-radio-group">
+              {[
+                ["female", copy.female],
+                ["male", copy.male],
+                ["undisclosed", copy.undisclosed],
+              ].map(([value, label]) => (
+                <label key={value}>
+                  <input
+                    type="radio"
+                    name="gender"
+                    value={value}
+                    checked={form.gender === value}
+                    onChange={() =>
+                      setForm((current) => ({
+                        ...current,
+                        gender: value as JobPreferences["gender"],
+                      }))
+                    }
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+          </div>
+        </section>
 
-        <div className="preference-field">
-          <SearchableChipSelect
-            id="custom-positions"
-            label={copy.customPosition}
-            placeholder={copy.customPositionPlaceholder}
-            options={[]}
-            selectedValues={form.customPositions}
-            maximum={5}
-            allowCustom
-            helperText={copy.customPositionHelper}
-            onChange={(values) =>
-              setForm((current) => ({
-                ...current,
-                customPositions: values,
-              }))
-            }
-          />
-        </div>
-
-        <div className="preference-field">
-          <SearchableChipSelect
-            id="skills"
-            label={copy.skills}
-            placeholder={copy.skillsPlaceholder}
-            options={valueOptions(skillOptions)}
-            selectedValues={form.skills}
-            maximum={20}
-            required
-            onChange={(values) =>
-              setForm((current) => ({
-                ...current,
-                skills: values,
-              }))
-            }
-          />
-        </div>
-
-        <div className="preference-field">
-          <label className="preference-label" htmlFor="experience-level">
-            {copy.experience} <span>*</span>
-          </label>
-          <select
-            id="experience-level"
-            className="preference-select"
-            value={form.experienceLevel}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                experienceLevel: event.target
-                  .value as JobPreferences["experienceLevel"],
-              }))
-            }
-          >
-            {jobExperiencePreferenceOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {copy.experienceLabels[option.value]}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="preference-field">
-          <label className="preference-label" htmlFor="desired-salary">
-            {copy.desiredSalary} <span>*</span>
-          </label>
-          <div className="preference-input-suffix">
-            <input
-              id="desired-salary"
-              inputMode="numeric"
-              value={formatSalaryInput(form.desiredSalaryMin, locale)}
-              placeholder="15,000,000"
-              onChange={(event) =>
+        <section className="job-preferences-card job-preferences-card--needs" aria-labelledby="job-needs-heading">
+          <h2 id="job-needs-heading" className="job-preferences-card-title">
+            <Briefcase aria-hidden="true" />
+            {copy.jobNeeds}
+          </h2>
+          <div className="preference-field">
+            <SearchableChipSelect
+              id="professional-positions"
+              label={copy.professionalPosition}
+              placeholder={copy.professionalPositionPlaceholder}
+              options={positionOptions(availablePositions)}
+              selectedValues={form.professionalPositions}
+              maximum={5}
+              required
+              onChange={(values) =>
                 setForm((current) => ({
                   ...current,
-                  desiredSalaryMin: event.target.value.replace(/[^\d]/gu, ""),
+                  professionalPositions: values,
                 }))
               }
             />
-            <span>VND</span>
           </div>
+
+          <div className="preference-field">
+            <SearchableChipSelect
+              id="custom-positions"
+              label={copy.customPosition}
+              placeholder={copy.customPositionPlaceholder}
+              options={[]}
+              selectedValues={form.customPositions}
+              maximum={5}
+              allowCustom
+              helperText={copy.customPositionHelper}
+              onChange={(values) =>
+                setForm((current) => ({
+                  ...current,
+                  customPositions: values,
+                }))
+              }
+            />
+          </div>
+
+          <div className="preference-field">
+            <SearchableChipSelect
+              id="skills"
+              label={copy.skills}
+              placeholder={copy.skillsPlaceholder}
+              options={valueOptions(skillOptions)}
+              selectedValues={form.skills}
+              maximum={20}
+              required
+              onChange={(values) =>
+                setForm((current) => ({
+                  ...current,
+                  skills: values,
+                }))
+              }
+            />
+          </div>
+
+          <div className="preference-field">
+            <label className="preference-label" htmlFor="experience-level">
+              {copy.experience} <span>*</span>
+            </label>
+            <select
+              id="experience-level"
+              className="preference-select"
+              value={form.experienceLevel}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  experienceLevel: event.target
+                    .value as JobPreferences["experienceLevel"],
+                }))
+              }
+            >
+              {jobExperiencePreferenceOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {copy.experienceLabels[option.value]}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="preference-field">
+            <label className="preference-label" htmlFor="desired-salary">
+              {copy.desiredSalary} <span>*</span>
+            </label>
+            <div className="preference-input-suffix">
+              <input
+                id="desired-salary"
+                inputMode="numeric"
+                value={formatSalaryInput(form.desiredSalaryMin, locale)}
+                placeholder="15,000,000"
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    desiredSalaryMin: event.target.value.replace(/[^\d]/gu, ""),
+                  }))
+                }
+              />
+              <span>VND</span>
+            </div>
+          </div>
+
+          <div className="preference-field">
+            <SearchableChipSelect
+              id="work-locations"
+              label={copy.locations}
+              placeholder={copy.locationsPlaceholder}
+              options={valueOptions(VIETNAM_PROVINCES_63)}
+              selectedValues={form.workLocations}
+              maximum={63}
+              required
+              onChange={(values) =>
+                setForm((current) => ({
+                  ...current,
+                  workLocations: values,
+                }))
+              }
+            />
+          </div>
+          <label className="preference-relocation">
+            <input
+              type="checkbox"
+              checked={form.openToRelocation}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  openToRelocation: event.target.checked,
+                }))
+              }
+            />
+            <Plane aria-hidden="true" />
+            <span>{copy.relocation}</span>
+            <span className="preference-relocation-switch" aria-hidden="true" />
+          </label>
+        </section>
+
+        <section className="job-preferences-card job-preferences-card--consent" aria-labelledby="consent-heading">
+          <h2 id="consent-heading" className="job-preferences-card-title">
+            <ShieldCheck aria-hidden="true" />
+            {copy.consent}
+          </h2>
+          <label className="preference-checkbox preference-consent-row">
+            <input
+              type="checkbox"
+              required
+              checked={form.aiAnalysisConsent}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  aiAnalysisConsent: event.target.checked,
+                }))
+              }
+            />
+            <div>
+              <strong>
+                {copy.aiConsent} <em>*</em>
+              </strong>
+              <small>{copy.aiConsentDescription}</small>
+            </div>
+          </label>
+          <label className="preference-checkbox preference-consent-row">
+            <input
+              type="checkbox"
+              checked={form.jobUpdateNotificationConsent}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  jobUpdateNotificationConsent: event.target.checked,
+                }))
+              }
+            />
+            <div>
+              <strong>{copy.notificationConsent}</strong>
+              <small>{copy.notificationConsentDescription}</small>
+            </div>
+          </label>
+        </section>
+
+        <div className="job-preferences-actions">
+          <button
+            className="job-preferences-discard"
+            type="button"
+            disabled={pending}
+            onClick={() => {
+              setForm(toFormState(initialPreferences));
+              setError("");
+              setStatus("");
+            }}
+          >
+            {copy.discard}
+          </button>
+          <button
+            className="dashboard-hero-cta"
+            type="submit"
+            disabled={pending}
+          >
+            <Check aria-hidden="true" />
+            {pending ? copy.updating : copy.update}
+          </button>
         </div>
-
-        <div className="preference-field">
-          <SearchableChipSelect
-            id="work-locations"
-            label={copy.locations}
-            placeholder={copy.locationsPlaceholder}
-            options={valueOptions(VIETNAM_PROVINCES_63)}
-            selectedValues={form.workLocations}
-            maximum={63}
-            required
-            onChange={(values) =>
-              setForm((current) => ({
-                ...current,
-                workLocations: values,
-              }))
-            }
-          />
-        </div>
-        <label className="preference-checkbox">
-          <input
-            type="checkbox"
-            checked={form.openToRelocation}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                openToRelocation: event.target.checked,
-              }))
-            }
-          />
-          {copy.relocation}
-        </label>
-      </fieldset>
-
-      <fieldset>
-        <legend>{copy.consent}</legend>
-        <label className="preference-checkbox">
-          <input
-            type="checkbox"
-            required
-            checked={form.aiAnalysisConsent}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                aiAnalysisConsent: event.target.checked,
-              }))
-            }
-          />
-          {copy.aiConsent} <span>*</span>
-        </label>
-        <label className="preference-checkbox">
-          <input
-            type="checkbox"
-            checked={form.jobUpdateNotificationConsent}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                jobUpdateNotificationConsent: event.target.checked,
-              }))
-            }
-          />
-          {copy.notificationConsent}
-        </label>
-      </fieldset>
-
-      <div className="job-preferences-actions">
-        <button className="dashboard-hero-cta" type="submit" disabled={pending}>
-          {pending ? copy.updating : copy.update}
-        </button>
-      </div>
-    </form>
+      </form>
+    </>
   );
 }

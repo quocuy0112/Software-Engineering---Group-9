@@ -1,0 +1,5 @@
+-- RenameIndex
+ALTER INDEX "CandidateProfileVisibility_discoverableByExactId_candidateUserI" RENAME TO "CandidateProfileVisibility_discoverableByExactId_candidateU_idx";
+
+-- RenameIndex
+ALTER INDEX "JobApplication_profileSnapshotAccessDeniedAt_profileSnapshotRev" RENAME TO "JobApplication_profileSnapshotAccessDeniedAt_profileSnapsho_idx";

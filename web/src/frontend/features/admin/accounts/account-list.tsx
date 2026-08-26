@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Datagrid,
   DateField,
@@ -9,6 +10,8 @@ import {
   TextField,
   TextInput,
 } from "react-admin";
+import { AccountActivityField } from "./account-activity-field";
+import { AccessRolesField } from "./access-roles-field";
 
 const filters = [
   <TextInput
@@ -49,15 +52,6 @@ const filters = [
   />,
 ];
 
-function counts(record: Record<string, unknown>) {
-  const value = record.counts as Record<string, unknown> | undefined;
-  if (!value) return "Unavailable";
-  if (value.unavailable === true) return "Unavailable";
-  if (value.kind === "CANDIDATE")
-    return `CVs ${value.cvCount}; applications ${value.applicationCount}`;
-  return `Active ${value.active}; pending ${value.pendingReview}; rejected ${value.rejected}; draft ${value.draft}; closed ${value.closed}`;
-}
-
 export function AccountList() {
   return (
     <List
@@ -70,10 +64,13 @@ export function AccountList() {
         <TextField source="accountReference" label="Account reference" />
         <TextField source="displayName" />
         <TextField source="maskedEmail" />
-        <TextField source="type" label="Account type" />
+        <FunctionField label="Roles" render={() => <AccessRolesField />} />
         <TextField source="status" label="Status" />
         <DateField source="registeredAt" showTime />
-        <FunctionField label="Activity" render={counts} />
+        <FunctionField
+          label="Activity"
+          render={() => <AccountActivityField />}
+        />
       </Datagrid>
     </List>
   );

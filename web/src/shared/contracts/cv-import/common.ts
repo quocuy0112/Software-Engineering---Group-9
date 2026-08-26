@@ -6,7 +6,7 @@ export const CV_ACCOUNT_MAX_IMPORTS = 10;
 export const CV_ACCOUNT_MAX_STORED_BYTES = 50 * 1024 * 1024;
 export const CV_UPLOAD_ATTEMPTS_PER_ROLLING_HOUR = 5;
 
-export const CV_DOCUMENT_KINDS = ["PDF", "DOCX"] as const;
+export const CV_DOCUMENT_KINDS = ["PDF", "DOC", "DOCX"] as const;
 export const CV_PARSER_CLASSES = [
   "DETERMINISTIC_INTERNAL",
   "EXTERNAL_OPENAI",

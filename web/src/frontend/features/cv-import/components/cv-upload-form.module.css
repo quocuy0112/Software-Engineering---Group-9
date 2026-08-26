@@ -9,6 +9,7 @@
 .field {
   display: grid;
   min-width: 0;
+  grid-column: 1 / -1;
   align-content: start;
   gap: var(--sh-space-2);
   color: var(--sh-color-text-primary);
@@ -103,7 +104,7 @@
 
 .parserOptions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--sh-space-3);
 }
 
@@ -119,17 +120,12 @@
   border-radius: var(--sh-radius-md);
   background: var(--sh-color-surface-card);
   box-shadow: var(--sh-shadow-control);
-  cursor: pointer;
+  cursor: default;
   transition:
     border-color 180ms ease,
     background-color 180ms ease,
     box-shadow 180ms ease,
     transform 180ms ease;
-}
-
-.parserOption:hover:not([data-disabled="true"]) {
-  border-color: var(--sh-color-brand-accent);
-  transform: translateY(-1px);
 }
 
 .parserOption[data-selected="true"] {
@@ -148,6 +144,14 @@
   opacity: 0.72;
 }
 
+.parserOption[data-disabled="false"] {
+  border-color: var(--sh-color-brand-primary);
+  background: var(--sh-color-info-bg);
+  box-shadow:
+    0 0 0 2px var(--sh-color-brand-soft),
+    var(--sh-shadow-control);
+}
+
 .parserOption input {
   position: absolute;
   width: 1px;
@@ -159,11 +163,6 @@
   clip-path: inset(50%);
   border: 0;
   white-space: nowrap;
-}
-
-.parserOption:has(input:focus-visible) {
-  outline: 3px solid var(--sh-color-border-focus);
-  outline-offset: 2px;
 }
 
 .parserMark {

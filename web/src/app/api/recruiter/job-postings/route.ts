@@ -2,8 +2,13 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { requireSession } from "@/backend/auth/session/require-session";
 import {
+  jobErrorResponse,
+  requireJobActor,
+} from "@/backend/security/job-request-boundary";
+import {
   closeRecruiterJob,
   createRecruiterJob,
+  deleteRecruiterJob,
   readRecruiterJobManagementData,
   updateRecruiterJob,
 } from "@/backend/services/jobs/recruiter-job-posting-data";
@@ -49,6 +54,12 @@ function mutationErrorResponse(error: unknown, fallback: string) {
   if (message === "Company profile is incomplete.") {
     return errorResponse(message, 409);
   }
+  if (message === "Invalid recruiter job classification.") {
+    return errorResponse(message, 422, {
+      industry: "Choose an industry from the list.",
+      subIndustry: "Choose or enter a valid sub-industry.",
+    });
+  }
   if (message === "A recruiter-owned company is required.") {
     return errorResponse(message, 409);
   }
@@ -57,7 +68,10 @@ function mutationErrorResponse(error: unknown, fallback: string) {
   }
   if (
     message === "This job posting cannot be edited in its current status." ||
-    message === "This job posting cannot be closed in its current status."
+    message === "This job posting cannot be closed in its current status." ||
+    message === "This job posting cannot be deleted in its current status." ||
+    message === "Withdraw this job from review before deleting its draft." ||
+    message === "This job posting is locked while review is pending."
   ) {
     return errorResponse(message, 409);
   }
@@ -82,9 +96,9 @@ export async function POST(request: Request) {
   if (!current) return errorResponse("Authentication required.", 401);
   try {
     const body = (await request.json()) as { status?: unknown; job?: unknown };
-    if (body.status !== "draft" && body.status !== "pending_approval") {
-      return errorResponse("Choose draft or pending approval status.", 422, {
-        status: "Choose draft or pending approval status.",
+    if (body.status !== "draft") {
+      return errorResponse("Only draft content can be saved here.", 422, {
+        status: "Use the review submission action after saving the draft.",
       });
     }
     const job = await createRecruiterJob(current.userId, body.job, body.status);
@@ -98,7 +112,13 @@ export async function PATCH(request: Request) {
   const current = await actor(request);
   if (!current) return errorResponse("Authentication required.", 401);
   try {
-    const job = await updateRecruiterJob(current.userId, await request.json());
+    const body = (await request.json()) as Record<string, unknown>;
+    if (body.status !== "draft" && body.status !== "rejected")
+      return errorResponse("Only draft content can be saved here.", 422);
+    const job = await updateRecruiterJob(current.userId, {
+      ...body,
+      status: "draft",
+    });
     return NextResponse.json(job, { headers: noStore });
   } catch (error) {
     return mutationErrorResponse(error, "Unable to update job posting.");
@@ -106,12 +126,37 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const current = await actor(request);
-  if (!current) return errorResponse("Authentication required.", 401);
+  let current: Awaited<ReturnType<typeof requireJobActor>>;
+  try {
+    current = await requireJobActor(request, { mutation: true });
+  } catch (error) {
+    return jobErrorResponse(error);
+  }
   try {
     const jobId = new URL(request.url).searchParams.get("jobId");
     if (!jobId) return errorResponse("A job id is required.");
-    const job = await closeRecruiterJob(current.userId, jobId);
+    const action = new URL(request.url).searchParams.get("action");
+    if (action === "delete") {
+      const industryCode = new URL(request.url).searchParams.get(
+        "industryCode",
+      );
+      if (!industryCode || industryCode.length > 16) {
+        return errorResponse("A valid industry code is required.", 422);
+      }
+      const result = await deleteRecruiterJob(
+        current.userId,
+        current.sessionId,
+        jobId,
+        industryCode,
+      );
+      return NextResponse.json(result, { headers: noStore });
+    }
+    const industryCode = new URL(request.url).searchParams.get("industryCode");
+    const job = await closeRecruiterJob(
+      current.userId,
+      jobId,
+      industryCode && industryCode.length <= 16 ? industryCode : undefined,
+    );
     return NextResponse.json(job, { headers: noStore });
   } catch (error) {
     return mutationErrorResponse(error, "Unable to close job posting.");

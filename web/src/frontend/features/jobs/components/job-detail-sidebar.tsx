@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { CollapsibleCard } from "@/frontend/components/ui/collapsible-card";
+import { RatingRow } from "@/frontend/components/ui/rating-row";
+import { RelatedJobRow } from "@/frontend/components/ui/related-job-row";
 import type { JobCard, JobDetail } from "@/shared/contracts/jobs/discovery";
 import { formatSalary } from "@/shared/utils/jobs/job-display";
-
-import companyCatalog from "../../../../../data/jobs/companies.json";
+import companyCatalog from "../../../../../data/companies/companies.json";
 import { CompanyAvatar } from "./company-avatar";
 import { JobMetaIcon, type JobMetaIconName } from "./job-meta-icon";
 import { ReportJobDialog } from "./report-job-dialog";
@@ -108,6 +110,7 @@ function SidebarCompanyLogo({
     />
   );
 }
+
 export function CompanyLogo({
   company,
   large = false,
@@ -126,6 +129,7 @@ export function CompanyLogo({
     />
   );
 }
+
 function displayValue(value: string | null | undefined) {
   return value?.trim() ? value : "Not listed";
 }
@@ -159,100 +163,91 @@ export function CompanyCard({ job }: { job: JobDetail }) {
   const rating = company.rating;
 
   return (
-    <details
+    <CollapsibleCard
       id="company"
       className="job-sidebar-card job-company-card job-sidebar-card--redesign job-company-accordion"
-      aria-labelledby="company-card-heading"
-    >
-      <summary className="job-company-accordion-summary">
-        <span className="job-sidebar-company-heading">
+      defaultExpanded
+      titleId="company-card-heading"
+      triggerClassName="job-company-accordion-summary"
+      contentClassName="job-company-accordion-content"
+      title={
+        <span className="job-company-accordion-heading">
+          <span className="panel-kicker">The company</span>
+          <span
+            className="job-company-accordion-title"
+            role="heading"
+            aria-level={2}
+          >
+            Company info
+          </span>
+        </span>
+      }
+      persistentContent={
+        <div className="job-company-accordion-identity">
           <SidebarCompanyLogo company={company} large />
-          <span className="job-company-accordion-copy">
-            <span className="panel-kicker">The company</span>
-            <span
-              id="company-card-heading"
-              className="job-company-accordion-title"
-              role="heading"
-              aria-level={2}
-            >
-              Company info
-            </span>
-            <span className="job-company-accordion-name">
-              {company.displayName}
-            </span>
+          <div className="job-company-accordion-copy">
+            <p className="job-company-accordion-name">{company.displayName}</p>
             {job.isVerified ? (
               <span className="job-verified-inline">
                 <span aria-hidden="true">✓</span> Verified SmartHire employer
               </span>
             ) : null}
-          </span>
-        </span>
-        <span className="job-accordion-chevron" aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false">
-            <path d="m6 9 6 6 6-6" />
-          </svg>
-        </span>
-      </summary>
-
-      <div className="job-company-accordion-content">
-        {rating ? (
-          <span className="job-company-rating">
-            <span aria-hidden="true">★</span>
-            <span>{rating.score.toFixed(1)} / 5</span>
-            {rating.reviewCount !== undefined ? (
-              <small>· {rating.reviewCount} reviews</small>
-            ) : null}
-          </span>
-        ) : null}
-
-        <p className="job-sidebar-company-copy">
-          {displayValue(company.publicDescription)}
-        </p>
-
-        <dl className="job-sidebar-company-facts">
-          <div>
-            <dt>
-              <span className="job-sidebar-fact-icon" aria-hidden="true">
-                <JobMetaIcon name="company-size" />
-              </span>
-              Scale
-            </dt>
-            <dd>{displayValue(company.size)}</dd>
           </div>
-          <div>
-            <dt>
-              <span className="job-sidebar-fact-icon" aria-hidden="true">
-                <JobMetaIcon name="industry" />
-              </span>
-              Industry
-            </dt>
-            <dd>{displayValue(company.industry)}</dd>
-          </div>
-          <div>
-            <dt>
-              <span className="job-sidebar-fact-icon" aria-hidden="true">
-                <JobMetaIcon name="location" />
-              </span>
-              Address
-            </dt>
-            <dd>{displayValue(company.address ?? company.publicLocation)}</dd>
-          </div>
-        </dl>
+        </div>
+      }
+    >
+      {rating ? (
+        <RatingRow score={rating.score} reviewCount={rating.reviewCount} />
+      ) : null}
 
-        {company.websiteUrl ? (
-          <a
-            className="job-company-profile-button"
-            href={company.websiteUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Visit company website <span aria-hidden="true">→</span>
-          </a>
-        ) : null}
-      </div>
-    </details>
+      <p className="job-sidebar-company-copy">
+        {displayValue(company.publicDescription)}
+      </p>
+
+      <dl className="job-sidebar-company-facts">
+        <div>
+          <dt>
+            <span className="job-sidebar-fact-icon" aria-hidden="true">
+              <JobMetaIcon name="company-size" />
+            </span>
+            Scale
+          </dt>
+          <dd>{displayValue(company.size)}</dd>
+        </div>
+        <div>
+          <dt>
+            <span className="job-sidebar-fact-icon" aria-hidden="true">
+              <JobMetaIcon name="industry" />
+            </span>
+            Industry
+          </dt>
+          <dd>{displayValue(company.industry)}</dd>
+        </div>
+        <div>
+          <dt>
+            <span className="job-sidebar-fact-icon" aria-hidden="true">
+              <JobMetaIcon name="location" />
+            </span>
+            Address
+          </dt>
+          <dd>{displayValue(company.address ?? company.publicLocation)}</dd>
+        </div>
+      </dl>
+
+      {company.websiteUrl ? (
+        <a
+          className="sh-button sh-button--outline job-company-profile-button"
+          href={company.websiteUrl}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Visit company website <span aria-hidden="true">→</span>
+        </a>
+      ) : null}
+    </CollapsibleCard>
   );
 }
+
 function InfoRow({
   icon,
   label,
@@ -263,12 +258,7 @@ function InfoRow({
   value: string;
 }) {
   return (
-    <div
-      className={
-        "job-general-info-row" +
-        (label === "Experience" ? " job-general-info-row--legacy" : "")
-      }
-    >
+    <div className="job-general-info-row">
       <span className="job-general-info-icon" aria-hidden="true">
         <JobMetaIcon name={icon} />
       </span>
@@ -287,7 +277,7 @@ export function GeneralInfoCard({ job }: { job: JobDetail }) {
       <SidebarCardHeading
         eyebrow="At a glance"
         title="General information"
-        mark="▦"
+        mark="◆"
         headingId="general-information-heading"
       />
       <dl className="job-general-info-list">
@@ -295,15 +285,6 @@ export function GeneralInfoCard({ job }: { job: JobDetail }) {
           icon="level"
           label="Level"
           value={valueLabel[job.experienceLevel] ?? "Not listed"}
-        />
-        <InfoRow
-          icon="experience"
-          label="Experience"
-          value={
-            job.experienceMinYears !== undefined
-              ? `${job.experienceMinYears}+ years`
-              : "Not listed"
-          }
         />
         <InfoRow
           icon="education"
@@ -336,22 +317,17 @@ export function GeneralInfoCard({ job }: { job: JobDetail }) {
 
 function SimilarJobRow({ job }: { job: JobCard }) {
   const company = resolveSidebarCompany(job.company);
-
   return (
-    <Link className="job-sidebar-similar-job" href={"/jobs/" + job.slug}>
-      <SidebarCompanyLogo company={company} />
-      <span className="job-sidebar-similar-copy">
-        <strong>{job.title}</strong>
-        <small>{company.displayName}</small>
-        <small
-          className={
-            job.salary?.isNegotiable ? "job-salary--negotiable" : undefined
-          }
-        >
-          {formatSalary(job.salary)} · {job.location}
-        </small>
-      </span>
-    </Link>
+    <RelatedJobRow
+      compact
+      href={`/jobs/${job.slug}`}
+      avatarLabel={company.displayName.slice(0, 2).toUpperCase()}
+      avatar={<SidebarCompanyLogo company={company} />}
+      title={job.title}
+      company={company.displayName}
+      location={job.location}
+      salaryRange={formatSalary(job.salary)}
+    />
   );
 }
 
@@ -389,6 +365,7 @@ export function SimilarJobsCard({ job }: { job: JobDetail }) {
     </section>
   );
 }
+
 export function ReportJobWidget({ job }: { job: JobDetail }) {
   return (
     <section
@@ -411,6 +388,7 @@ export function ReportJobWidget({ job }: { job: JobDetail }) {
     </section>
   );
 }
+
 export function JobDetailSidebar({ job }: { job: JobDetail }) {
   return (
     <aside

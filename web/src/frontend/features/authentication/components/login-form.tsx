@@ -10,6 +10,7 @@ import {
 import { PasswordField } from "./password-field";
 import { FormFeedback } from "./form-feedback";
 import { useReplayableStatus } from "./use-status";
+import Link from "next/link";
 
 // Must stay in sync with `rateLimitPolicies.login` in policies.ts (5 minutes).
 const LOGIN_LOCKOUT_WINDOW_MS = 5 * 60 * 1000;
@@ -69,7 +70,9 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
   const { status, setStatus } = useReplayableStatus("");
   const [isLocked, setIsLocked] = useState(false);
   const [suspended, setSuspended] = useState(false);
-  const [suspendedSupportPath, setSuspendedSupportPath] = useState("/support/account-security");
+  const [suspendedSupportPath, setSuspendedSupportPath] = useState(
+    "/support/account-security",
+  );
   const [isNavigating, startNavigation] = useTransition();
   const {
     register,
@@ -108,7 +111,9 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
     if (!response.ok) {
       if (response.status === 423 && body?.code === "ACCOUNT_SUSPENDED") {
         setSuspended(true);
-        setSuspendedSupportPath(body.supportPath ?? "/support/account-security");
+        setSuspendedSupportPath(
+          body.supportPath ?? "/support/account-security",
+        );
         setStatus(body.message ?? "This account is suspended.");
         return;
       }
@@ -162,6 +167,10 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
           id="login-email"
           type="email"
           autoComplete="email"
+          inputMode="email"
+          autoCapitalize="none"
+          spellCheck={false}
+          placeholder="example@email.com"
           aria-invalid={Boolean(errors.email)}
           {...register("email")}
         />
@@ -170,18 +179,20 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
       <PasswordField
         label="Password"
         autoComplete="current-password"
+        hint="Use 12–128 characters, including an uppercase letter, a number, and a special character."
         error={errors.password?.message}
         {...register("password")}
       />
+      <Link className="auth-forgot-link" href="/forgot-password">
+        Forgot password?
+      </Link>
       <button type="submit" disabled={isSubmitting || isNavigating || isLocked}>
         {isSubmitting || isNavigating ? "Signing in…" : "Sign in"}
       </button>
       <FormFeedback status={status} />
       {suspended && (
         <p role="status">
-          <a href={suspendedSupportPath}>
-            Contact support or submit a dispute
-          </a>
+          <a href={suspendedSupportPath}>Contact support or submit a dispute</a>
         </p>
       )}
     </form>

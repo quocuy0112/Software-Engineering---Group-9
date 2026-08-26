@@ -12,6 +12,7 @@ import { readSearchArtifactEnvelope } from "@/backend/image-search/storage/prism
 import type { SearchStorageResource } from "@/backend/image-search/storage/factory";
 import type { SearchArtifactLocator } from "@/backend/image-search/storage/private-search-storage";
 import type { OcrEngine } from "@/backend/ocr/ocr-engine";
+import { OCR_PURPOSE_PROFILES } from "@/backend/ocr/policies";
 import {
   PrismaImageSearchWorkRepository,
   type ImageSearchWorkClaim,
@@ -29,7 +30,10 @@ export function searchOcrRequiresReview(input: {
   averageConfidence: number | null;
   partial: boolean;
 }) {
-  return input.partial || (input.averageConfidence ?? 0) < 0.6;
+  // A deadline can mark an otherwise readable poster as partial. Image search
+  // shows every generated criterion to the user for confirmation, so preserve
+  // high-confidence partial text for the interpreter rather than discarding it.
+  return (input.averageConfidence ?? 0) < 0.6;
 }
 
 function detectLanguage(text: string): SearchOcrText["language"] {
@@ -162,7 +166,10 @@ export class ImageSearchOcrStage {
       decode.normalizedArtifactId,
     );
     if (!envelope) throw new Error("STAGE_RESULT_DISCARDED");
-    const deadline = new Date((row.startedAt ?? now).getTime() + 6_000);
+    const deadline = new Date(
+      (row.startedAt ?? now).getTime() +
+        OCR_PURPOSE_PROFILES.JOB_IMAGE_SEARCH.unitDeadlineMs,
+    );
     let unattachedLocator: SearchArtifactLocator | null = null;
     try {
       await this.dependencies.ocr.assertReady(

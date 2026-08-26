@@ -26,16 +26,52 @@ describe("notification payload privacy", () => {
     ).toThrow();
   });
 
-  it("only creates encoded internal destinations", () => {
+  it("does not persist destinations supplied by an untrusted context", () => {
     const notification = buildNotification({
       ...base,
       kind: "MESSAGE_RECEIVED",
       contextType: "CONVERSATION",
       contextId: "../../external?next=https://evil.example",
     });
-    expect(notification.href).toBe(
-      "/messages?conversation=..%2F..%2Fexternal%3Fnext%3Dhttps%3A%2F%2Fevil.example",
-    );
-    expect(notification.href).not.toMatch(/^https?:/u);
+    expect(notification.href).toBeNull();
+  });
+
+  it("keeps actionable administrator alerts free of protected workflow content", () => {
+    for (const kind of [
+      "SUPPORT_CASE_RECEIVED",
+      "SUPPORT_REQUESTER_REPLIED",
+      "SUPPORT_CASE_REOPENED",
+      "MESSAGE_REPORT_RECEIVED_ADMIN",
+      "MODERATION_REPORT_RECEIVED_ADMIN",
+      "VERIFICATION_REVIEW_OVERDUE",
+      "DELIVERY_MANUAL_INTERVENTION_REQUIRED",
+    ] as const) {
+      const notification = buildNotification({
+        ...base,
+        kind: kind as never,
+        contextType: kind.startsWith("SUPPORT_")
+          ? "SUPPORT_CASE"
+          : kind.startsWith("MESSAGE_REPORT")
+            ? "MESSAGING_REPORT"
+            : kind.startsWith("MODERATION_REPORT")
+              ? "MODERATION_REPORT"
+              : kind.startsWith("VERIFICATION_")
+                ? "VERIFICATION_REQUEST"
+                : "ACCOUNT",
+        contextId: "opaque-resource-id",
+        variables: { audience: "ADMIN", state: "ACTION_REQUIRED" },
+      });
+      const serialized = JSON.stringify(notification);
+      for (const protectedValue of [
+        "support subject",
+        "message body",
+        "report evidence",
+        "user@example.test",
+        "private note",
+        "privileged rationale",
+      ]) {
+        expect(serialized).not.toContain(protectedValue);
+      }
+    }
   });
 });

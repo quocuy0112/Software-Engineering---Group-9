@@ -43,6 +43,37 @@ function visibleValue(proposal: SearchIntent["proposals"][number]) {
   return proposal.stringValues.join(", ");
 }
 
+function ProposalActionIcon({
+  name,
+}: {
+  name: "check" | "clear" | "close" | "reverse";
+}) {
+  if (name === "check") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20" focusable="false">
+        <path d="m4 10.25 3.6 3.6L16 5.75" />
+      </svg>
+    );
+  }
+
+  if (name === "reverse") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20" focusable="false">
+        <path d="M15.5 6.5A6.5 6.5 0 0 0 4.75 4.7L3 6.5" />
+        <path d="M3 3.5v3h3" />
+        <path d="M4.5 13.5a6.5 6.5 0 0 0 10.75 1.8L17 13.5" />
+        <path d="M17 16.5v-3h-3" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20" focusable="false">
+      <path d="m6 6 8 8M14 6l-8 8" />
+    </svg>
+  );
+}
+
 export function ImageSearchProposals({
   intent,
   onApply,
@@ -120,23 +151,45 @@ export function ImageSearchProposals({
       <ul className="image-search-proposals">
         {draft.proposals.map((proposal) => (
           <li key={proposal.id}>
-            <label>
-              <input
-                type="checkbox"
-                checked={proposal.selected}
-                onChange={(event) =>
+            <div className="image-search-proposal-field-heading">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={proposal.selected}
+                  onChange={(event) =>
+                    setDraft((current) => ({
+                      ...current,
+                      proposals: current.proposals.map((item) =>
+                        item.id === proposal.id
+                          ? { ...item, selected: event.target.checked }
+                          : item,
+                      ),
+                    }))
+                  }
+                />
+                {labels[proposal.field]}
+              </label>
+              <button
+                className="image-search-proposal-remove"
+                type="button"
+                aria-label={
+                  vi
+                    ? `Xóa ${labels[proposal.field]}`
+                    : `Remove ${proposal.field}`
+                }
+                onClick={() =>
                   setDraft((current) => ({
                     ...current,
-                    proposals: current.proposals.map((item) =>
-                      item.id === proposal.id
-                        ? { ...item, selected: event.target.checked }
-                        : item,
+                    proposals: current.proposals.filter(
+                      (item) => item.id !== proposal.id,
                     ),
                   }))
                 }
-              />
-              {labels[proposal.field]}
-            </label>
+              >
+                <ProposalActionIcon name="clear" />
+                {vi ? "Xóa" : "Remove"}
+              </button>
+            </div>
             <input
               aria-label={
                 vi
@@ -146,94 +199,137 @@ export function ImageSearchProposals({
               value={visibleValue(proposal)}
               onChange={(event) => update(proposal.id, event.target.value)}
             />
-            <span
-              className={`image-confidence image-confidence-${proposal.confidence >= 0.9 ? "high" : "review"}`}
-            >
-              {proposal.confidence >= 0.9
-                ? vi
-                  ? "Độ tin cậy cao"
-                  : "High confidence"
-                : vi
-                  ? "Nên xem lại"
-                  : "Review suggested"}
-            </span>
-            <small>
-              {vi ? "Nguồn" : "Source"}:{" "}
-              {proposal.evidence.map((item) => item.text).join(" · ")}
-            </small>
-            <button
-              type="button"
-              aria-label={
-                vi
-                  ? `Xóa ${labels[proposal.field]}`
-                  : `Remove ${proposal.field}`
-              }
-              onClick={() =>
-                setDraft((current) => ({
-                  ...current,
-                  proposals: current.proposals.filter(
-                    (item) => item.id !== proposal.id,
-                  ),
-                }))
-              }
-            >
-              {vi ? "Xóa" : "Remove"}
-            </button>
+            <div className="image-search-proposal-evidence">
+              <span
+                className={`image-confidence image-confidence-${proposal.confidence >= 0.9 ? "high" : "review"}`}
+              >
+                {proposal.confidence >= 0.9
+                  ? vi
+                    ? "Độ tin cậy cao"
+                    : "High confidence"
+                  : vi
+                    ? "Nên xem lại"
+                    : "Review suggested"}
+              </span>
+              <small
+                title={proposal.evidence.map((item) => item.text).join(" · ")}
+              >
+                {vi ? "Nguồn" : "Source"}:{" "}
+                {proposal.evidence.map((item) => item.text).join(" · ")}
+              </small>
+            </div>
           </li>
         ))}
       </ul>
       {error ? <p role="alert">{error}</p> : null}
-      <div className="image-search-actions">
-        <button
-          type="button"
-          onClick={() =>
-            setDraft((current) => ({
-              ...current,
-              proposals: current.proposals.map((proposal) => ({
-                ...proposal,
-                selected: !proposal.selected,
-              })),
-            }))
+      {draft.proposals.length ? (
+        <div
+          className="image-search-actions"
+          data-has-bulk-actions={draft.proposals.length > 1}
+          aria-label={
+            vi ? "Thao tác với bộ lọc gợi ý" : "Suggested filter actions"
           }
         >
-          {vi ? "Đảo lựa chọn" : "Reverse selections"}
-        </button>
-        <button
-          type="button"
-          onClick={() => setDraft({ ...draft, proposals: [] })}
-        >
-          {vi ? "Xóa tất cả gợi ý" : "Clear proposals"}
-        </button>
-        <button
-          className="image-search-apply-button"
-          type="button"
-          disabled={selectedCount === 0}
-          onClick={() => {
-            const parsed = searchIntentSchema.safeParse({
-              ...draft,
-              proposals: draft.proposals.map((proposal) => ({
-                ...proposal,
-                selected: false,
-              })),
-            });
-            if (!parsed.success) {
-              setError(
-                vi
-                  ? "Hãy kiểm tra các giá trị đã chỉnh sửa trước khi áp dụng."
-                  : "Review edited values before applying filters.",
-              );
-              return;
-            }
-            setError("");
-            onApply(draft);
-          }}
-        >
-          {vi ? "Áp dụng bộ lọc đã chọn" : "Apply selected filters"}
-        </button>
-        <button type="button" onClick={onClear}>
-          {vi ? "Đóng" : "Close"}
-        </button>
-      </div>
+          <div className="image-search-action-edit">
+            <p className="image-search-selection-summary" aria-live="polite">
+              <strong>{selectedCount}</strong>
+              <span>{vi ? "bộ lọc đã chọn" : "filters selected"}</span>
+            </p>
+            <div
+              className="image-search-action-utilities"
+              role="group"
+              aria-label={vi ? "Chỉnh sửa lựa chọn" : "Edit selections"}
+            >
+              {draft.proposals.length > 1 ? (
+                <button
+                  className="image-search-reverse-button"
+                  type="button"
+                  onClick={() =>
+                    setDraft((current) => ({
+                      ...current,
+                      proposals: current.proposals.map((proposal) => ({
+                        ...proposal,
+                        selected: !proposal.selected,
+                      })),
+                    }))
+                  }
+                >
+                  <ProposalActionIcon name="reverse" />
+                  {vi ? "Đảo lựa chọn" : "Reverse selections"}
+                </button>
+              ) : null}
+              <button
+                className="image-search-clear-button"
+                type="button"
+                onClick={() =>
+                  setDraft((current) => ({ ...current, proposals: [] }))
+                }
+              >
+                <ProposalActionIcon name="clear" />
+                {vi ? "Xóa tất cả gợi ý" : "Clear proposals"}
+              </button>
+            </div>
+          </div>
+          <div
+            className="image-search-action-commit"
+            role="group"
+            aria-label={vi ? "Hoàn tất bộ lọc" : "Finish suggested filters"}
+          >
+            <button
+              className="image-search-close-button"
+              type="button"
+              onClick={onClear}
+            >
+              <ProposalActionIcon name="close" />
+              {vi ? "Đóng" : "Close"}
+            </button>
+            <button
+              className="image-search-apply-button"
+              type="button"
+              aria-label={
+                vi ? "Áp dụng bộ lọc đã chọn" : "Apply selected filters"
+              }
+              disabled={selectedCount === 0}
+              onClick={() => {
+                const parsed = searchIntentSchema.safeParse({
+                  ...draft,
+                  proposals: draft.proposals.map((proposal) => ({
+                    ...proposal,
+                    selected: false,
+                  })),
+                });
+                if (!parsed.success) {
+                  setError(
+                    vi
+                      ? "Hãy kiểm tra các giá trị đã chỉnh sửa trước khi áp dụng."
+                      : "Review edited values before applying filters.",
+                  );
+                  return;
+                }
+                setError("");
+                onApply(draft);
+              }}
+            >
+              <ProposalActionIcon name="check" />
+              {vi ? "Áp dụng bộ lọc đã chọn" : "Apply selected filters"}
+              <span className="image-search-apply-count" aria-hidden="true">
+                {selectedCount}
+              </span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="image-search-empty-actions">
+          <button
+            className="image-search-close-button"
+            type="button"
+            onClick={onClear}
+          >
+            <ProposalActionIcon name="close" />
+            {vi ? "Đóng" : "Close"}
+          </button>
+        </div>
+      )}
     </section>
   );
 }

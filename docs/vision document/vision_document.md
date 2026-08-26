@@ -5,15 +5,16 @@
 | Group | 9 |
 | Document Owner | Nguyễn Gia Quốc Uy (Student ID: 24127261) |
 | Reviewers | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi |
-| Version | 1.1 (Working Draft) |
-| Last Updated | 2026-07-10 |
-| Status | Draft for Team Review |
+| Version | 1.2 (Final PA5 Release Baseline) |
+| Last Updated | 2026-08-26 |
+| Status | Final Release Baseline |
 
 ### Revision History
 
 | Version | Date | Author/Editor | Summary | Status |
 |---|---|---|---|---|
 | 1.1 | 2026-07-10 | Nguyễn Gia Quốc Uy and Group 9 | Reconciled the project scope, multi-tenant authorization model, feature priorities, measurable quality targets, company-membership workflow, references, and document presentation. | Draft for Team Review |
+| 1.2 | 2026-08-26 | Nguyễn Minh Khôi (NFRs & Scope) & Lưu Chí Hải | PA5 Final Document Synchronization: Reconciled 26-feature baseline, NFRs (RBAC, CV privacy, AI advisory constraints, step-up 2FA), explicit out-of-scope boundaries (no DB restore UI, no group chat/attachments), and updated technology stack. | Final Release Baseline |
 
 ## Changes from PA1 Proposal & How this document was developed
 
@@ -51,25 +52,24 @@ The document is intended for internal use across product, design, development, a
 
 ## 1.2. Scope and Out of Scope
 
-### In Scope for the Current Project Release
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
-- Candidate account, profile, and CV management.
-- Approved-job discovery, filtering, saving, and application submission.
-- Company-scoped recruiter access, job-post management, applicant review, and Kanban pipeline management.
-- Hybrid candidate scoring using deterministic matching plus AI-assisted semantic analysis and score explanations.
-- Candidate application tracking, email notifications, and in-app alerts.
-- Employer verification, company membership approval, job moderation, and essential platform administration.
-- Backend security logging and audit records required for troubleshooting, moderation, and accountability.
+### In Scope for the Current Project Release (Features 001–026 Baseline)
 
-Recruitment analytics and data export are **P1 (Should)** capabilities: they are planned for the current project but may be deferred until all P0 capabilities are stable.
+- **Identity, Access & Profile (Features 001–005):** Registration, email verification, session management, 2FA (TOTP/backup codes), password recovery, candidate profile, CV upload/parsing, purpose-specific OCR, and image-assisted job search.
+- **Home & Engagement (Features 010, 011):** Landing/home page with live projections, professional connection proposals between candidates with privacy controls.
+- **Recruiter Operations & ATS Pipeline (Features 007, 012, 015, 020–022):** Recruiter workspace, company-scoped job posting, candidate scoring/filtering with hybrid AI advisory evaluation, 9-stage visual Kanban pipeline, application tracking with private CV match, and recruitment analytics with Excel/CSV data export.
+- **Company Governance & Platform Administration (Features 006, 009, 014, 017, 018, 023, 024, 026):** Platform administrator console, user management, company verification enrichment, job-post moderation/enforcement, company settings overview, company team member lifecycle management, and privileged database backup.
+- **Messaging & Notifications (Features 008, 013, 016, 019, 025):** Realtime direct messaging (1:1 candidate-to-company / professional connections), message abuse reporting and admin review, in-app and email notifications with transactional outbox, notification deep linking, and application-scoped recruitment thread messaging with Owner read-only oversight.
 
-### Out of Scope for the Current Project Release
+### Out of Scope / Boundaries for the Final Release
 
-- AI-generated job descriptions.
-- AI resume rewriting or resume enhancement.
-- Fully automated candidate rejection or hiring decisions.
-- Semantic AI job recommendations; current Smart Matching uses rules based on tags, preferences, and location.
-- External calendar synchronization, payroll, onboarding, and full human-resource management.
+- **No In-App Database Restore UI:** Database backup generates encrypted dumps (AES-256-GCM) and uploads to Google Drive/local store; database restoration is strictly an out-of-band disaster-recovery operation performed by system administrators/DBAs via CLI and scripts to protect data integrity.
+- **No Group Chat or Arbitrary File Attachments in Messaging:** Messaging is strictly 1:1 text-based between authorized participants (candidate & recruiter/company or connected peers) with abuse reporting; group conversations and arbitrary media attachments are excluded.
+- **No Autonomous AI Hiring/Rejection Decisions:** AI semantic evaluation is strictly advisory; automated rejections or hiring actions are prohibited; deterministic rule-based fallback and human recruiter override are always enforced.
+- **No AI Job Description Generation or AI Resume Rewriting:** To prevent hallucinated requirements and qualification distortion.
+- **No External Calendar Synchronization, Payroll, or Full HRMS:** SmartHire focuses strictly on talent acquisition and applicant tracking.
+- **Late Feature 027 (Candidate Profile Discovery):** Recorded as Release Decision Pending; outside the 26-feature baseline.
 
 ## 1.3. References
 
@@ -477,7 +477,7 @@ The scoring system uses a hybrid algorithm that combines automatic skill/experie
 **Scoring formula:**
 
 ```
-Final Score = 60% × Auto Matching Score + 40% × AI Score
+Final Score = 40% × Auto Matching Score + 60% × AI Score
 ```
 
 **Score classification (out of 100):**
@@ -498,10 +498,10 @@ flowchart TD
     Parsed -->|Skill and Experience Matching| AutoScore[Auto Matching Score<br/>Skill/Experience vs JD]
     Parsed -->|LLM reads full context| AIScore[AI Score<br/>Deep Semantic Analysis vs JD]
 
-    AutoScore -->|Weight 60 percent| Combine{Weighted Score Aggregation}
-    AIScore -->|Weight 40 percent| Combine
+    AutoScore -->|Weight 40 percent| Combine{Weighted Score Aggregation}
+    AIScore -->|Weight 60 percent| Combine
 
-    Combine -->|Total Score = 60% Auto Match + 40% AI| FinalScore[Final Combined Score / 100]
+    Combine -->|Total Score = 40% Auto Match + 60% AI| FinalScore[Final Combined Score / 100]
 
     FinalScore --> Explanation[Explanation to Recruiter and Candidate]
     Explanation --> Classify{Score Classification}
@@ -535,7 +535,7 @@ flowchart TD
 2. **Parsed CV Text**: The CV Parser converts the original CV into normalized raw text.
 3. **Auto Matching Score**: An algorithm directly compares the skills/experience in the CV against the JD requirements.
 4. **AI Score**: An LLM reads the entire text, understands deep context (handling abbreviations and mixed languages), and compares it against the JD to score each criterion in detail.
-5. **Weighted Score Aggregation**: The two scores are combined using a weighted formula: 60% (Auto) / 40% (AI).
+5. **Weighted Score Aggregation**: The two scores are combined using a weighted formula: 40% (Auto) / 60% (AI).
 6. **Final Combined Score**: The final aggregated score on a scale of 100.
 7. **Score Explanation Generation**: The LLM generates a human-readable explanation describing why the candidate received that score, identifying strengths and gaps
 8. **Score Classification**: The score is classified and assigned a color theme (green/yellow/red) based on thresholds for visual display.
@@ -579,16 +579,19 @@ flowchart TD
 
 # 6. Non-Functional Requirements
 
-**Author of this Part:** Nguyễn Minh Khôi   
-**Student ID:** 24127066
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 ## 6.1. Overview
 
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
+
 The following non-functional requirements define the quality attributes, operational constraints, and engineering standards of the SmartHire Recruitment Platform. Unlike functional requirements, these requirements describe how well the system performs rather than what it does.
 
-These requirements apply across all major functional modules, including authentication, candidate profile management, AI-powered CV analysis, job posting management, recruitment pipelines, notifications, analytics, and administrative functions.
+These requirements apply across all major functional modules, including authentication, candidate profile management, AI-powered CV analysis, job posting management, recruitment pipelines, realtime messaging, notifications, analytics/export, and administrative functions.
 
 ## 6.2. Performance Requirements
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 The platform shall provide responsive interactions under the following acceptance-test baseline unless a test case states otherwise:
 
@@ -607,8 +610,8 @@ The platform shall provide responsive interactions under the following acceptanc
 | PERF-04 | Login and registration | P95 ≤ 3 seconds, excluding email-delivery time. |
 | PERF-05 | Candidate profile update | P95 ≤ 2 seconds. |
 | PERF-06 | Kanban drag-and-drop update | Visual feedback ≤ 500 ms and server persistence P95 ≤ 2 seconds. |
-| PERF-07 | In-app notification delivery | P95 ≤ 5 seconds after the triggering transaction is committed. |
-| PERF-08 | CSV/Excel export (P1) | Completed within 10 seconds for up to 10,000 records when the P1 export feature is delivered. |
+| PERF-07 | In-app notification & messaging delivery | P95 ≤ 2 seconds over WebSocket (Socket.IO) and ≤ 5 seconds for transactional outbox persistence. |
+| PERF-08 | CSV/Excel export | Completed within 10 seconds for up to 10,000 records using background export worker (ExcelJS). |
 | PERF-09 | AI semantic scoring | P95 ≤ 30 seconds for a supported CV of up to 5 MB; processing remains asynchronous and never blocks the user interface. |
 
 If an asynchronous AI request exceeds the target, the system shall keep the scoring status visible, allow other application activities to continue, and notify the user when processing completes or fails.
@@ -616,6 +619,8 @@ If an asynchronous AI request exceeds the target, the system shall keep the scor
 AI processing shall use a separate `scoring_status` (`Pending`, `Processing`, `Completed`, or `Failed`) rather than adding a temporary value to the canonical recruitment pipeline status.
 
 ## 6.3. Scalability Requirements
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 The architecture shall meet the following capacity baseline without a major redesign:
 
@@ -632,6 +637,8 @@ The AI integration shall be isolated behind a provider interface so that a suppo
 
 ## 6.4. Availability and Reliability
 
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
+
 The SmartHire platform shall provide reliable operation for both recruiters and candidates.
 
 ### Availability
@@ -646,63 +653,66 @@ The SmartHire platform shall provide reliable operation for both recruiters and 
 The system shall:
 
 - prevent data corruption during unexpected failures.
-- preserve uploaded CV files.
-- ensure recruitment pipeline states remain consistent.
+- preserve uploaded CV files and verification artifacts with cryptographic integrity checks.
+- ensure recruitment pipeline states remain consistent via ACID database transactions.
 - prevent duplicate applications by enforcing a unique candidate/job-application constraint and idempotent submission handling.
-- use transactional database operations for critical updates.
+- use transactional database operations for critical updates and transactional outbox for background emails and notifications.
 
 ## 6.5. Security Requirements
 
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
+
 Security is one of the highest priorities because the platform stores sensitive personal and business information.
 
-### Authentication
+### Authentication & Step-Up 2FA
 
 The system shall:
 
 - require authenticated login before accessing protected resources.
-- issue stateless JSON Web Tokens (JWT).
-- securely invalidate user sessions after logout.
-- enforce password reset through email verification.
-- store authentication tokens using HttpOnly, Secure, SameSite cookies, never in localStorage or sessionStorage, to prevent token theft via client-side script injection (XSS).
+- issue secure session identifiers and cookies managed via Better Auth.
+- securely invalidate user sessions across all active devices upon logout or password reset.
+- enforce password reset through cryptographic email verification tokens.
+- store authentication tokens using HttpOnly, Secure, SameSite cookies, never in localStorage or sessionStorage, to mitigate client-side script injection (XSS).
+- enforce **Step-Up Authentication (Recent 2FA)**: Sensitive administrator actions (including triggering database backup, modifying global security settings, or privileged role assignments) require recent two-factor re-verification within 10 minutes.
 
-### Authorization
+### Authorization & Multi-Tenant Isolation
 
-Authorization shall combine platform-level roles with company-scoped memberships:
+Authorization combines platform-level roles with company-scoped memberships:
 
 - Every standard user account retains access to its own candidate profile and candidate functions.
 - Recruitment permissions are granted through an active `CompanyMembership` for a specific company; granting membership does not replace the user's candidate identity.
-- A user may hold memberships in multiple companies, and every recruiter request shall include or resolve an active company context.
-- `OWNER`, `HR_MANAGER`, and `RECRUITER` membership roles shall receive only the permissions defined for that company role.
+- A user may hold memberships in multiple companies, and every recruiter request must include or resolve an active company context.
+- Membership roles (`OWNER`, `HR_MANAGER`, `RECRUITER`) receive only permissions defined for that company role:
+  - `OWNER`: Full company settings, member invite/role assignment/removal, ownership transfer, job postings, candidate evaluations, pipeline, and recruitment analytics.
+  - `HR_MANAGER`: Job posting creation/editing, candidate evaluations, pipeline stage transitions, analytics, and team view.
+  - `RECRUITER`: Job posting creation/editing, candidate evaluations, and pipeline stage transitions.
 - Company members may access job posts, applications, candidate documents, evaluations, and analytics only when those records belong to their active company context.
-- `OWNER` may manage company information and company memberships; `HR_MANAGER` and `RECRUITER` permissions shall be limited to their approved recruitment responsibilities.
-- Platform `ADMIN` users may perform verification, moderation, account-management, and audited support actions across companies without becoming company members.
-- The backend shall verify authentication, platform role, membership status, company scope, and resource ownership on every protected request; frontend route guards are not sufficient authorization controls.
+- Platform `ADMIN` users perform verification, moderation, account management, audit logs, and database backup across the platform without becoming company members.
+- Backend services and Route Handlers verify authentication, platform role, membership status, company scope, and resource ownership on every protected request; frontend route guards are never treated as sufficient security controls.
 
-Unauthenticated requests shall return HTTP `401`; authenticated requests that lack the required platform or company-scoped permission shall return HTTP `403` without exposing data from another tenant.
+Unauthenticated requests shall return HTTP `401`; authenticated requests lacking permission return HTTP `403` without exposing cross-tenant data.
 
 ### Password Security
 
 Passwords shall:
 
 - never be stored in plain text.
-- be hashed using secure industry-standard hashing algorithms.
-- satisfy minimum password complexity requirements.
+- be hashed using modern industry-standard algorithms (Argon2 / bcrypt).
+- satisfy minimum complexity: at least 8 characters, with upper/lower case letters and numbers.
 
-### Data Protection
+### Data Protection & Candidate CV Privacy
 
 The system shall:
 
-- encrypt sensitive communication using HTTPS.
-- protect against common web vulnerabilities including:
-  - SQL Injection
-  - Cross-Site Scripting (XSS)
-  - Cross-Site Request Forgery (CSRF)
-  - Broken Authentication
-- validate all user inputs before database processing.
-- sanitize uploaded file names.
-
+- encrypt sensitive communication in transit using HTTPS / TLS 1.3.
+- protect candidate CV files: access is granted strictly to authorized recruiters of companies where the candidate applied, served via authenticated private streams or signed time-limited tokens.
+- protect against common web vulnerabilities: SQL Injection (parameterized queries via Prisma), XSS (sanitized outputs and React auto-escaping), CSRF (SameSite cookies and custom headers), and Broken Object-Level Authorization (BOLA).
+- sanitize uploaded file names and validate MIME types against magic bytes.
+- perform fail-closed malware scanning with ClamAV on all uploads before storage or downstream processing.
 
 ## 6.6. File Storage Requirements
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 The system shall support secure document management.
 
@@ -710,55 +720,53 @@ Resume uploads shall satisfy the following constraints:
 
 | Item | Requirement |
 |------|-------------|
-| Supported formats | PDF, DOCX |
+| Supported formats | PDF (.pdf), Microsoft Word (.docx) |
 | Maximum file size | 5 MB |
-| Duplicate protection | Supported |
-| Malware scanning | Required before a file becomes available to other users or to downstream parsing services |
-| Secure storage | Required |
+| Duplicate protection | Cryptographic checksum (SHA-256) duplicate detection |
+| Malware scanning | Fail-closed scan via ClamAV before document ingestion or downstream worker processing |
+| Storage Encryption | Application-level AES-256-GCM encryption for stored private artifacts on filesystem |
+| Ephemeral Cleanup | Search images and ephemeral artifacts are automatically purged upon processing or expiration deadline |
 
-Deleted files shall no longer be publicly accessible.
+Deleted files shall no longer be accessible to any user.
 
 ## 6.7. AI Service Requirements
 
-The AI components shall function as decision-support tools rather than autonomous decision makers.
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
+
+The AI components shall function strictly as decision-support tools rather than autonomous decision makers.
 
 The platform shall:
 
-- generate AI recommendations without automatically rejecting candidates.
-- allow recruiters to override AI recommendations at any time.
-- display generated AI scores together with human-readable explanations.
-- continue operating when AI services are temporarily unavailable by falling back to rule-based matching where applicable.
-
+- generate AI recommendations without automatically rejecting or hiring candidates.
+- allow recruiters to override AI recommendations, scores, and stage proposals at any time.
+- display generated AI scores together with transparent, human-readable explanations and criterion breakdown.
+- continue operating seamlessly when AI services are disabled or temporarily unavailable by falling back to deterministic rule-based matching.
+- record explicit candidate consent prior to AI CV parsing or automated evaluation.
 
 ## 6.8. Usability Requirements
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 The platform shall meet the following usability acceptance targets:
 
 - at least 90% of representative participants shall complete the primary task for their role without facilitator assistance after no more than 30 minutes of onboarding;
-- the primary tasks are candidate application submission, recruiter applicant-stage update, and administrator verification decision;
+- primary tasks: candidate application submission, recruiter pipeline stage transition, and administrator verification decision;
 - usability testing shall include at least five representative participants for each primary user group before final acceptance; and
 - the System Usability Scale (SUS) target shall be at least 75.
 
 The interface shall:
 
 - follow consistent navigation patterns.
-- complete the primary role workflows with no unnecessary confirmation or repeated data-entry steps.
 - provide responsive layouts for desktop, tablet, and mobile devices.
-- clearly indicate loading, success, and error states.
-- display meaningful validation messages.
-- support drag-and-drop interactions for Kanban recruitment management.
-- provide searchable and filterable tables.
-- provide role-specific guidance sufficient to meet the 30-minute onboarding target.
+- clearly indicate loading, success, and error states with toast notifications and inline feedback.
+- support drag-and-drop interactions for Kanban recruitment management using accessible `@dnd-kit/core`.
+- provide searchable and filterable tables with pagination.
 
-The primary authentication, application, pipeline, and moderation workflows shall target WCAG 2.1 Level AA, including:
-
-- readable typography
-- sufficient color contrast
-- keyboard accessibility
-- descriptive labels
-- responsive layouts
+The primary authentication, application, pipeline, and moderation workflows target WCAG 2.1 Level AA (readable typography, color contrast ≥ 4.5:1, keyboard navigation, descriptive ARIA labels).
 
 ## 6.9. Compatibility Requirements
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 At release time, the platform shall operate correctly on the latest two stable major versions of:
 
@@ -773,128 +781,117 @@ The frontend shall support:
 - tablet viewports from 768 px wide; and
 - desktop viewports up to at least 1440 px wide.
 
-Supported resume formats include:
-
-- PDF (.pdf)
-- Microsoft Word (.docx)
-
-Supported export formats include:
-
-- CSV
-- Microsoft Excel (.xlsx)
+Supported resume formats: PDF (.pdf), Microsoft Word (.docx).  
+Supported export formats: CSV (.csv), Microsoft Excel (.xlsx).
 
 ## 6.10. Maintainability Requirements
 
-The software shall be designed for long-term maintenance.
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
-The implementation shall:
+The software is designed for long-term maintainability:
 
-- follow modular architecture.
-- separate frontend and backend services.
-- use layered backend architecture.
-- maintain reusable UI components.
-- follow TypeScript coding standards.
-- use Git for version control.
-- support continuous feature expansion.
-- pass TypeScript compilation, linting, and automated tests in continuous integration before merge.
+- modular layered architecture separating UI, server actions/route handlers, business services, repository layer, and background workers.
+- reusable UI components using Tailwind CSS and Radix UI primitives (Shadcn UI).
+- strict TypeScript compilation with zero implicit `any`.
+- Git version control with feature-branch workflow.
+- pass TypeScript compilation, ESLint, and automated test suites in continuous integration prior to merge.
 - maintain at least 70% automated line coverage for security-sensitive and recruitment-domain service modules.
 
-Business logic, database access, and presentation logic shall remain loosely coupled.
+## 6.11. Database and Backup Requirements
 
-## 6.11. Database Requirements
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
 The database shall:
 
-- maintain ACID transactional consistency.
-- enforce referential integrity.
-- automatically generate unique identifiers.
-- prevent duplicate critical records.
-- support indexing for high-frequency search operations.
-- maintain audit information for important administrative actions.
+- maintain ACID transactional consistency via PostgreSQL and Prisma ORM.
+- enforce referential integrity with foreign-key constraints and cascading rules.
+- automatically generate unique identifiers (UUIDs / CUIDs).
+- prevent duplicate critical records using unique constraints.
+- support B-tree and full-text indexing for high-frequency search and filter operations.
+- maintain structured audit logs for administrative, moderation, and authentication actions.
 
-Regular backup procedures shall be supported.
+### Backup Policy & Procedures
+
+- Automated scheduled backups (daily/weekly) and manual on-demand backups triggered by Platform Administrators with recent 2FA.
+- Full database dumps generated via `pg_dump`, compressed, and encrypted with AES-256-GCM before storage.
+- Storage: Local backup directory and optional encrypted upload to Google Drive via OAuth2.
+- Backup run history, status, duration, file size, and error diagnostics recorded in `BackupRun` model.
+- **Database Restore Boundary:** To guarantee data safety and prevent accidental destructive overwrites, database restore is strictly an out-of-band administrative operation executed by authorized DBAs via CLI/scripts; no in-app restore UI is provided.
 
 ## 6.12. Notification Requirements
 
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
+
 The notification subsystem shall:
 
-- automatically trigger notifications based on recruitment events.
-- enqueue interview invitations and status notifications within 5 seconds after the triggering transaction is committed.
+- automatically trigger in-app alerts and transactional emails based on recruitment and security events.
+- enqueue interview invitations and status notifications within 5 seconds after transaction commit.
 - notify candidates when application status changes.
-- support configurable email templates.
-- prevent duplicate notification delivery.
+- support transactional email templates rendered via React Email / Nodemailer.
+- prevent duplicate notification delivery using idempotent event keys.
 
-Temporary email-service failures shall not interrupt other platform operations. Failed deliveries shall be retried at least three times with backoff and recorded for administrative troubleshooting.
+Temporary email provider outages shall not block core platform transactions; failed email deliveries are enqueued in `EmailOutbox` and retried with exponential backoff.
 
 ## 6.13. Logging and Monitoring
 
-The requirements below describe mandatory P0 backend audit logging for security, accountability, and debugging. An admin-facing activity-log interface is a separate P1 presentation capability and may be deferred without removing the underlying audit records.
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
-The platform shall maintain system logs for:
+The platform maintains system logs for:
 
-- user authentication
-- administrator actions
-- recruiter moderation actions
-- job posting approvals
-- account suspension
-- AI processing failures
-- export activities
-- critical system errors
-
-Logs shall support troubleshooting and security auditing.
+- user authentication and session revocation
+- administrator verification, moderation, and enforcement actions
+- job posting approvals, revisions, and status changes
+- account suspension and role assignments
+- AI processing errors and worker task failures
+- export requests and database backup executions
+- critical application errors and security violations
 
 ## 6.14. Legal and Compliance Requirements
 
-The platform shall comply with applicable legal and ethical standards. The production compliance baseline shall be reviewed before deployment because legal obligations may change during the project lifecycle.
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
 
-These include:
+The platform complies with applicable Vietnamese legal and ethical standards:
 
 - Law No. 91/2025/QH15 on Personal Data Protection, effective from 2026-01-01;
-- Decree No. 13/2023/ND-CP on Personal Data Protection where its supporting requirements remain applicable;
+- Decree No. 13/2023/ND-CP on Personal Data Protection;
 - purpose limitation and data minimization for candidate, company, and recruitment data;
-- explicit and recorded user consent where consent is the applicable processing basis;
-- secure handling, retention, deletion, and access control for personal information and uploaded CVs;
-- mechanisms for users to request access, correction, or deletion of their personal data, subject to applicable retention obligations; and
-- recruiter and company verification with access to business documents restricted to authorized Administrators.
-
-AI-generated recommendations shall remain advisory only and shall not replace human recruitment decisions.
+- explicit user consent recorded for CV storage and AI advisory analysis;
+- user rights to access, rectify, or delete personal data;
+- recruiter and company verification with business license access restricted to authorized Platform Administrators;
+- AI recommendations remain strictly advisory with mandatory human recruiter oversight.
 
 ## 6.15. Environmental and Platform Constraints
 
-The system is designed as a modern web application using the following technology stack.
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
+
+The system is implemented using the following technology stack:
 
 | Layer | Technology |
-|---------|------------|
-| Frontend | Next.js |
-| Language | TypeScript |
-| Styling | Tailwind CSS |
-| UI Components | Shadcn UI |
+|---|---|
+| Frontend Framework | Next.js 16.3 (App Router), React 19, TypeScript 5.9 |
+| Styling & UI Components | Tailwind CSS 4, Radix UI (Shadcn UI), React Admin |
 | State Management | Zustand |
-| Drag & Drop | hello-pangea/dnd |
-| Backend | Next.js API Routes |
-| Database | PostgreSQL / MySQL |
-| Authentication | JWT |
-| AI Integration | OpenAI API or Another AI Model |
-| Version Control | GitHub |
-
-The platform requires:
-
-- Internet connectivity
-- Modern web browser
-- JavaScript enabled
-- Email service for verification and notifications
+| Drag & Drop | @dnd-kit/core, @dnd-kit/sortable |
+| Realtime Communication | Socket.IO (custom server in `web/server.ts`) |
+| Backend & API Layer | Next.js Route Handlers, TypeScript modular domain services |
+| Database & ORM | PostgreSQL 16 with Prisma ORM 7.9 |
+| Authentication | Better Auth with secure HttpOnly cookies, TOTP 2FA, session management |
+| OCR Engine | Python 3.12, FastAPI, PaddleOCR, ONNX Runtime (private Unix socket) |
+| Malware Scanner | ClamAV 1.4 daemon (private ClamD Unix socket) |
+| Export Processing | ExcelJS, CSV generation in background export worker |
+| Backup Storage | AES-256-GCM encryption, optional Google Drive OAuth2 adapter |
+| External Adapters | Resend/SMTP email adapter (local capture default), optional OpenAI API, optional VietQR registry |
+| Version Control | Git / GitHub |
 
 ## 6.16. Documentation Requirements
 
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Lưu Chí Hải | Edited by: Nguyễn Minh Khôi*
+
 The project shall provide the following documentation:
 
-- User Manual
-- Recruiter User Guide
-- Administrator Guide
-- Installation Guide
-- Deployment Guide
-- API Documentation
-- Database Schema Documentation
-- System Architecture Documentation
-
-Developer documentation shall be maintained alongside the source code.
+- Vision Document (Business positioning, actors, 26-feature baseline, NFRs, traceability)
+- Use-Case Model and Use-Case Specifications (Mermaid diagrams DGM-01–DGM-07, full specifications, UI prototypes)
+- System Architecture and Diagrams (C4 Level 1 Context, Level 2 Container, Level 3 Frontend/Backend, Deployment Diagram, Technology Stack)
+- Project Plan (Sprint 5 execution, task assignments, test results, risks, exit criteria)
+- PA5 Changes Log (`docs/changes/changes_for_pa5/Changes.md`)
+- Test Plan, Test Cases, Bug Reports, and Testing Summary Report

@@ -7,6 +7,7 @@ import {
   useEffect,
   useSyncExternalStore,
 } from "react";
+import { usePathname } from "next/navigation";
 
 export type Theme = "light" | "dark";
 
@@ -16,6 +17,35 @@ type ThemeContextValue = {
 };
 
 const THEME_STORAGE_KEY = "smarthire-theme";
+
+/**
+ * Marketing and authentication routes deliberately have one, stable visual
+ * identity.  The workspace preference is kept in storage, but it must not
+ * leak into these public screens when a signed-in user follows a login or
+ * recovery link in the same browser session.
+ */
+export function isAlwaysLightRoute(pathname: string | null): boolean {
+  if (!pathname) return false;
+
+  return (
+    pathname === "/" ||
+    pathname === "/home" ||
+    [
+      "/login",
+      "/register",
+      "/forgot-password",
+      "/reset-password",
+      "/two-factor",
+      "/check-email",
+      "/verify-email",
+      "/verify-company-email",
+      "/verify-email-change",
+      "/account-recovery",
+      "/business",
+      "/legal",
+    ].some((route) => pathname === route || pathname.startsWith(`${route}/`))
+  );
+}
 
 const defaultThemeContext: ThemeContextValue = {
   theme: "light",
@@ -75,20 +105,23 @@ function updateTheme(theme: Theme) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const theme = useSyncExternalStore(
     subscribeToTheme,
     getClientTheme,
     getServerTheme,
   );
 
+  const appliedTheme: Theme = isAlwaysLightRoute(pathname) ? "light" : theme;
+
   useEffect(() => {
-    applyTheme(theme);
+    applyTheme(appliedTheme);
     try {
       window.localStorage.setItem(THEME_STORAGE_KEY, theme);
     } catch {
       // Theme switching still works for the current session without storage.
     }
-  }, [theme]);
+  }, [appliedTheme, theme]);
 
   const toggleTheme = useCallback(() => {
     updateTheme(theme === "dark" ? "light" : "dark");

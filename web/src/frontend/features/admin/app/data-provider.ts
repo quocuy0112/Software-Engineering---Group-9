@@ -1,6 +1,11 @@
 "use client";
 import type { DataProvider, Identifier } from "react-admin";
 import { currentAdminCsrfToken } from "./auth-provider";
+import {
+  adminGrowthReportSchema,
+  type AdminOverviewQuery,
+  type AdminGrowthReport,
+} from "@/shared/contracts/analytics/admin";
 
 const endpoints: Record<string, string> = {
   accounts: "/api/admin/accounts",
@@ -13,6 +18,8 @@ const endpoints: Record<string, string> = {
   "professional-connection-proposals":
     "/api/admin/professional-connection-proposals",
   notifications: "/api/admin/notifications",
+  "job-post-reviews": "/api/admin/job-post-reviews",
+  "job-postings": "/api/admin/job-postings",
 };
 
 export function adminApiErrorDetails(body: unknown) {
@@ -20,6 +27,7 @@ export function adminApiErrorDetails(body: unknown) {
     return { code: "INTERNAL_FAILURE", message: "INTERNAL_FAILURE" };
   const envelope = body as {
     code?: unknown;
+    message?: unknown;
     error?: { code?: unknown; message?: unknown };
   };
   const code =
@@ -29,7 +37,11 @@ export function adminApiErrorDetails(body: unknown) {
         ? envelope.error.code
         : "INTERNAL_FAILURE";
   const message =
-    typeof envelope.error?.message === "string" ? envelope.error.message : code;
+    typeof envelope.message === "string"
+      ? envelope.message
+      : typeof envelope.error?.message === "string"
+        ? envelope.error.message
+        : code;
   return { code, message };
 }
 
@@ -80,7 +92,10 @@ function reactAdminRecord(resource: string, value: unknown) {
   const nested = record[nestedKey];
   if (!nested || typeof nested !== "object") return value;
   const nestedRecord = nested as Record<string, unknown>;
-  if (typeof nestedRecord.id !== "string" && typeof nestedRecord.id !== "number")
+  if (
+    typeof nestedRecord.id !== "string" &&
+    typeof nestedRecord.id !== "number"
+  )
     return value;
   return { ...record, id: nestedRecord.id };
 }
@@ -88,6 +103,8 @@ function reactAdminRecord(resource: string, value: unknown) {
 const unsupported = async (): Promise<never> => {
   throw new Error("GENERIC_PRIVILEGED_CRUD_DISABLED");
 };
+
+const ADMIN_LIST_PAGE_SIZE = 100;
 
 export type AdminDataProvider = DataProvider & {
   command(
@@ -97,6 +114,7 @@ export type AdminDataProvider = DataProvider & {
     idempotencyKey: string,
   ): Promise<unknown>;
   dashboard(): Promise<unknown>;
+  analyticsOverview(query: AdminOverviewQuery): Promise<AdminGrowthReport>;
   markAllNotificationsRead(): Promise<unknown>;
 };
 
@@ -113,48 +131,84 @@ type ListParams = {
 const closedProvider = {
   async getList(resource: string, params: ListParams) {
     const page = params.pagination?.page ?? 1;
-    const pageSize = params.pagination?.perPage ?? 25;
+    const requestedPageSize = params.pagination?.perPage ?? 25;
     const filter = params.filter ?? {};
-    const query = new URLSearchParams({
-      page: String(page),
-      pageSize: String(pageSize),
-    });
-    if (resource === "accounts") {
-      for (const key of [
-        "q",
-        "type",
-        "status",
-        "registeredFrom",
-        "registeredTo",
-      ]) {
-        const value = filter[key];
-        if (typeof value === "string" && value.trim())
-          query.set(key, value.trim());
+    const fetchPage = async (nextPage: number, pageSize: number) => {
+      const query = new URLSearchParams({
+        page: String(nextPage),
+        pageSize: String(pageSize),
+      });
+      if (resource === "accounts") {
+        for (const key of [
+          "q",
+          "type",
+          "status",
+          "registeredFrom",
+          "registeredTo",
+        ]) {
+          const value = filter[key];
+          if (typeof value === "string" && value.trim())
+            query.set(key, value.trim());
+        }
+      } else if (resource === "verification-requests") {
+        for (const key of [
+          "q",
+          "state",
+          "applicantEligibility",
+          "company",
+          "targetCompanyId",
+          "taxCode",
+          "submittedFrom",
+          "submittedTo",
+          "applicantId",
+          "assignment",
+        ]) {
+          const value = filter[key];
+          if (typeof value === "string" && value.trim())
+            query.set(key, value.trim());
+        }
+      } else {
+        query.set("perPage", String(pageSize));
+        query.set("sort", params.sort?.field ?? "createdAt");
+        query.set("order", params.sort?.order ?? "DESC");
+        query.set("filter", JSON.stringify(filter));
       }
-    } else if (resource === "verification-requests") {
-      for (const key of [
-        "state",
-        "applicantEligibility",
-        "company",
-        "taxCode",
-        "submittedFrom",
-        "submittedTo",
-        "applicantId",
-        "assignment",
-      ]) {
-        const value = filter[key];
-        if (typeof value === "string" && value.trim())
-          query.set(key, value.trim());
-      }
-    } else {
-      query.set("perPage", String(pageSize));
-      query.set("sort", params.sort?.field ?? "createdAt");
-      query.set("order", params.sort?.order ?? "DESC");
-      query.set("filter", JSON.stringify(filter));
+      return api(`${endpoint(resource)}?${query}`, {
+        signal: params.signal,
+      }) as Promise<{
+        data: unknown[];
+        total: number;
+        meta?: Record<string, unknown>;
+        calculatedAt?: string;
+        stateDefinitionVersion?: string;
+      }>;
+    };
+    const initialBackendPage =
+      Math.floor(((page - 1) * requestedPageSize) / ADMIN_LIST_PAGE_SIZE) + 1;
+    const result = await fetchPage(
+      requestedPageSize > ADMIN_LIST_PAGE_SIZE ? initialBackendPage : page,
+      Math.min(requestedPageSize, ADMIN_LIST_PAGE_SIZE),
+    );
+    if (requestedPageSize > ADMIN_LIST_PAGE_SIZE && result.data.length > 0) {
+      const remainingPageCount = Math.min(
+        Math.ceil(
+          (requestedPageSize - result.data.length) / ADMIN_LIST_PAGE_SIZE,
+        ),
+        Math.max(
+          0,
+          Math.ceil(result.total / ADMIN_LIST_PAGE_SIZE) - initialBackendPage,
+        ),
+      );
+      const additional = await Promise.all(
+        Array.from({ length: remainingPageCount }, (_, index) =>
+          fetchPage(initialBackendPage + index + 1, ADMIN_LIST_PAGE_SIZE),
+        ),
+      );
+      result.data = [
+        ...result.data,
+        ...additional.flatMap((next) => next.data),
+      ];
     }
-    const result = await api(`${endpoint(resource)}?${query}`, {
-      signal: params.signal,
-    });
     return {
       data: result.data,
       total: result.total,
@@ -233,6 +287,57 @@ const closedProvider = {
     });
   },
   dashboard: () => api("/api/admin/dashboard"),
+  analyticsOverview: async (query: AdminOverviewQuery) => {
+    const request = async (nextQuery: AdminOverviewQuery) => {
+      const params = new URLSearchParams({
+        from: nextQuery.from,
+        to: nextQuery.to,
+        timeZone: nextQuery.timeZone,
+        grouping: nextQuery.grouping,
+      });
+      return adminGrowthReportSchema.parse(
+        await api("/api/admin/analytics/overview?" + params.toString()),
+      );
+    };
+    try {
+      return await request(query);
+    } catch (error) {
+      const body =
+        error && typeof error === "object" && "body" in error
+          ? (error as { body?: unknown }).body
+          : null;
+      const details =
+        body && typeof body === "object" && "details" in body
+          ? (body as { details?: unknown }).details
+          : null;
+      const availableFrom =
+        details &&
+        typeof details === "object" &&
+        "analyticsAvailableFrom" in details &&
+        typeof (details as { analyticsAvailableFrom?: unknown })
+          .analyticsAvailableFrom === "string"
+          ? (details as { analyticsAvailableFrom: string })
+              .analyticsAvailableFrom
+          : null;
+      const availableMs = availableFrom ? Date.parse(availableFrom) : NaN;
+      const errorCode =
+        error && typeof error === "object" && "code" in error
+          ? (error as { code?: unknown }).code
+          : null;
+      if (
+        errorCode === "ANALYTICS_RANGE_UNAVAILABLE" &&
+        Number.isFinite(availableMs) &&
+        Date.parse(query.from) < availableMs &&
+        availableMs < Date.parse(query.to)
+      ) {
+        return request({
+          ...query,
+          from: new Date(availableMs).toISOString(),
+        });
+      }
+      throw error;
+    }
+  },
   markAllNotificationsRead: () =>
     api("/api/admin/notifications/read-all", {
       method: "POST",
@@ -264,4 +369,11 @@ export function membershipCommandPath(
   action: "suspend" | "restore" | "remove",
 ) {
   return `${endpoint("company-memberships")}/${encodeURIComponent(String(membershipId))}/${action}`;
+}
+
+export function companyModerationCommandPath(
+  companyId: Identifier,
+  action: "ban" | "unban",
+) {
+  return `${endpoint("companies")}/${encodeURIComponent(String(companyId))}/${action}`;
 }

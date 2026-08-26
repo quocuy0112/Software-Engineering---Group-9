@@ -1,5 +1,6 @@
 import { extractDocx } from "./docx";
 import { createDocxOcrManifest } from "./docx-ocr-manifest";
+import { extractLegacyDocText } from "./legacy-doc";
 import { extractPdf } from "./pdf";
 import { createPdfOcrManifest } from "./pdf-ocr-manifest";
 import { PrivateRasterWorkspace } from "./private-raster-workspace";
@@ -21,7 +22,9 @@ async function main(): Promise<void> {
       throw Object.assign(new Error(), { code: "OUTPUT_LIMIT" });
     workspace = await PrivateRasterWorkspace.create();
     let value;
-    if (raw.kind === "PDF") {
+    if (raw.kind === "DOC") {
+      value = extractLegacyDocText(source);
+    } else if (raw.kind === "PDF") {
       const manifest = await createPdfOcrManifest({ source, workspace });
       const hybrid = manifest.eligibleImageCount > 0;
       if (hybrid) {

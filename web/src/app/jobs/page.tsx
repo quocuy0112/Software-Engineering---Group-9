@@ -6,21 +6,33 @@ import {
   LiveJobSearchExperience,
   type JobsLiveCopy,
 } from "@/frontend/features/jobs/components/live-job-search-experience";
+import { jobSearchBySchema } from "@/shared/contracts/jobs/discovery";
+import { listCandidateVisibleJobSearchTaxonomy } from "@/backend/services/jobs/job-search-taxonomy";
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-function query(input: Record<string, string | string[] | undefined>) {
+export function jobsPageQuery(
+  input: Record<string, string | string[] | undefined>,
+) {
   const array = (name: string) => {
     const value = input[name];
     return value === undefined ? [] : Array.isArray(value) ? value : [value];
   };
   return {
     q: Array.isArray(input.q) ? input.q[0] : input.q,
+    searchBy:
+      jobSearchBySchema.safeParse(
+        Array.isArray(input.searchBy) ? input.searchBy[0] : input.searchBy,
+      ).data ?? "BOTH",
     location: Array.isArray(input.location)
       ? input.location[0]
       : input.location,
+    district: array("district").filter(Boolean),
+    categoryFamily: array("categoryFamily").filter(Boolean),
+    categoryId: array("categoryId").filter(Boolean),
+    categoryTitle: array("categoryTitle").filter(Boolean),
     employmentType: array("employmentType").filter(Boolean),
     experienceLevel: array("experienceLevel").filter(Boolean),
     workArrangement: array("workArrangement").filter(Boolean),
@@ -51,7 +63,8 @@ function query(input: Record<string, string | string[] | undefined>) {
 }
 
 const vietnameseCopy: JobsLiveCopy = {
-  kicker: "Cơ hội từ Smart Hire",
+  locale: "vi",
+  kicker: "Không gian ứng viên",
   title: "Việc làm",
   intro:
     "Khám phá các cơ hội đã được xác minh và tìm công việc phù hợp với bước tiến tiếp theo của bạn.",
@@ -70,13 +83,15 @@ const vietnameseCopy: JobsLiveCopy = {
   nextPage: "Trang sau",
   lastPage: "Trang cuối",
   page: "Trang",
+  perPage: "Mỗi trang:",
   empty: "Không tìm thấy việc làm phù hợp",
   emptyCopy: "Hãy nới lỏng một hoặc nhiều tiêu chí để xem thêm cơ hội.",
   clear: "Xoá bộ lọc",
 };
 
 const englishCopy: JobsLiveCopy = {
-  kicker: "Smart Hire opportunities",
+  locale: "en",
+  kicker: "Candidate workspace",
   title: "Jobs",
   intro:
     "Discover verified opportunities and find work that fits your next career move.",
@@ -95,6 +110,7 @@ const englishCopy: JobsLiveCopy = {
   nextPage: "Next page",
   lastPage: "Last page",
   page: "Page",
+  perPage: "Per page:",
   empty: "No jobs match these criteria",
   emptyCopy: "Try widening one or more criteria to see more opportunities.",
   clear: "Clear filters",
@@ -105,22 +121,26 @@ export default async function JobsPage({ searchParams }: PageProps) {
   const workspace = await getWorkspaceContext();
   const copy = workspace?.initialLocale === "vi" ? vietnameseCopy : englishCopy;
   const actor = await optionalJobActor(await headers());
-  let result = null;
-  let error: string | null = null;
-
-  try {
-    result = await new JobDiscoveryService().search(query(raw), actor);
-  } catch {
-    error = copy.tryAgain;
-  }
+  const initialQuery = jobsPageQuery(raw);
+  const [search, taxonomy] = await Promise.all([
+    new JobDiscoveryService()
+      .search(initialQuery, actor)
+      .then((result) => ({ result, error: null }))
+      .catch(() => ({ result: null, error: copy.tryAgain })),
+    listCandidateVisibleJobSearchTaxonomy().catch(() => ({
+      industries: [],
+      locations: [],
+    })),
+  ]);
 
   return (
     <div className="jobs-page">
       <LiveJobSearchExperience
-        initialCriteria={raw}
-        initialResult={result}
-        initialError={error}
+        initialCriteria={initialQuery}
+        initialResult={search.result}
+        initialError={search.error}
         copy={copy}
+        taxonomy={taxonomy}
       />
     </div>
   );

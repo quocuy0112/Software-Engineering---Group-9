@@ -7,6 +7,7 @@ import { createMetadataCryptor } from "@/backend/cv/encryption/metadata-cryptor"
 import { prisma } from "@/backend/database/prisma";
 import { serverEnvironment } from "@/backend/env/runtime";
 import { PrismaCvQuotaRepository } from "@/backend/repositories/cv-import/prisma-cv-quota-repository";
+import { logCvUploadRejection } from "@/backend/cv/upload-observability";
 import { CvImportServiceError } from "./cv-http-errors";
 import { canonicalJson } from "@/shared/contracts/cv-import/common";
 import {
@@ -65,9 +66,10 @@ function normalizeFilename(value: string): string {
 function documentKind(
   filename: string,
   mediaType: CreateCvImportRequest["declaredMediaType"],
-): "PDF" | "DOCX" {
+): "PDF" | "DOC" | "DOCX" {
   const extension = filename.toLocaleLowerCase("en-US").split(".").at(-1);
   if (extension === "pdf" && mediaType === "application/pdf") return "PDF";
+  if (extension === "doc" && mediaType === "application/msword") return "DOC";
   if (
     extension === "docx" &&
     mediaType ===
@@ -137,7 +139,22 @@ export class CreateCvImportService {
     const profileId = await this.dependencies.findProfileId(input.accountId);
     if (!profileId) throw new CvImportServiceError("FORBIDDEN");
     const filename = normalizeFilename(request.displayFilename);
-    const kind = documentKind(filename, request.declaredMediaType);
+    let kind: "PDF" | "DOC" | "DOCX";
+    try {
+      kind = documentKind(filename, request.declaredMediaType);
+    } catch (error) {
+      if (
+        error instanceof CvImportServiceError &&
+        error.code === "UNSUPPORTED_MEDIA_TYPE"
+      ) {
+        logCvUploadRejection({
+          reason: "UNSUPPORTED_MEDIA_TYPE",
+          byteSize: request.declaredBytes,
+          declaredMimeType: request.declaredMediaType,
+        });
+      }
+      throw error;
+    }
     const uploadId = this.dependencies.newId();
     const now = this.dependencies.now();
     const expiresAt = new Date(now.getTime() + 30 * 86_400_000);

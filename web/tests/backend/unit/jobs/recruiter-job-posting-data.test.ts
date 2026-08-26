@@ -1,15 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  authorizeLegacyRecruiterJobs,
+  closeRecruiterJob,
   createRecruiterJob,
+  reactivateRecruiterJob,
   readRecruiterCompanySettings,
   readRecruiterJobManagementData,
+  resolveRecruiterJobIdForNavigation,
+  updateRecruiterJob,
   updateRecruiterCompanySettings,
 } from "@/backend/services/jobs/recruiter-job-posting-data";
+import { jobReviewSnapshotFromCatalog } from "@/backend/jobs/review/job-post-review-policy";
 import { createEmptyJobPosting } from "@/shared/contracts/recruiter-job-posting";
 
 const fsMocks = vi.hoisted(() => ({
   readFile: vi.fn(),
   writeFile: vi.fn(),
+  temporaryWrites: new Map<string, string>(),
 }));
 
 const prismaMocks = vi.hoisted(() => ({
@@ -17,16 +24,48 @@ const prismaMocks = vi.hoisted(() => ({
     findMany: vi.fn(),
     update: vi.fn(),
   },
+  jobPostReviewAggregate: {
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+  },
+  jobPosting: {
+    findUnique: vi.fn(),
+  },
 }));
 
-vi.mock("node:fs/promises", () => ({
-  default: {
+vi.mock("node:fs/promises", () => {
+  const stat = vi.fn(async (path: string) => ({
+    isFile: () => path.endsWith(".json"),
+    isDirectory: () => !path.endsWith(".json"),
+  }));
+  const open = vi.fn(async (path: string) => ({
+    writeFile: async (value: string) => {
+      fsMocks.temporaryWrites.set(path, value);
+    },
+    sync: async () => undefined,
+    close: async () => undefined,
+  }));
+  const rename = vi.fn(async (source: string, target: string) => {
+    await fsMocks.writeFile(
+      target,
+      fsMocks.temporaryWrites.get(source),
+      "utf8",
+    );
+  });
+  const rm = vi.fn(async () => undefined);
+  const mocked = {
     readFile: fsMocks.readFile,
     writeFile: fsMocks.writeFile,
-  },
-  readFile: fsMocks.readFile,
-  writeFile: fsMocks.writeFile,
-}));
+    stat,
+    open,
+    rename,
+    rm,
+  };
+  return {
+    default: mocked,
+    ...mocked,
+  };
+});
 
 vi.mock("@/backend/database/prisma", () => ({
   prisma: prismaMocks,
@@ -68,10 +107,45 @@ describe("recruiter JSON job persistence", () => {
     fsMocks.readFile.mockReset();
     fsMocks.writeFile.mockReset();
     fsMocks.writeFile.mockResolvedValue(undefined);
+    fsMocks.temporaryWrites.clear();
     prismaMocks.company.findMany.mockReset();
     prismaMocks.company.findMany.mockResolvedValue([]);
     prismaMocks.company.update.mockReset();
     prismaMocks.company.update.mockResolvedValue({});
+    prismaMocks.jobPostReviewAggregate.findMany.mockReset();
+    prismaMocks.jobPostReviewAggregate.findMany.mockResolvedValue([]);
+    prismaMocks.jobPostReviewAggregate.findUnique.mockReset();
+    prismaMocks.jobPostReviewAggregate.findUnique.mockResolvedValue(null);
+    prismaMocks.jobPosting.findUnique.mockReset();
+    prismaMocks.jobPosting.findUnique.mockResolvedValue(null);
+  });
+
+  it("maps an old public posting notification to an authorized catalogue job", async () => {
+    prismaMocks.jobPosting.findUnique.mockResolvedValue({
+      reviewAggregate: { jobId: "catalog-job-1" },
+    });
+
+    await expect(
+      resolveRecruiterJobIdForNavigation("public-job-1", [
+        { id: "catalog-job-1" },
+      ]),
+    ).resolves.toBe("catalog-job-1");
+    expect(prismaMocks.jobPosting.findUnique).toHaveBeenCalledWith({
+      where: { id: "public-job-1" },
+      select: { reviewAggregate: { select: { jobId: true } } },
+    });
+  });
+
+  it("does not resolve a public posting outside the authorized job projection", async () => {
+    prismaMocks.jobPosting.findUnique.mockResolvedValue({
+      reviewAggregate: { jobId: "other-company-job" },
+    });
+
+    await expect(
+      resolveRecruiterJobIdForNavigation("public-job-1", [
+        { id: "catalog-job-1" },
+      ]),
+    ).resolves.toBeNull();
   });
 
   it("exposes an admin-approved database company to recruiter settings", async () => {
@@ -88,6 +162,7 @@ describe("recruiter JSON job persistence", () => {
         size: null,
         industry: null,
         address: null,
+        entityType: null,
         normalizedTaxIdentifier: "1234567890",
         memberships: [{ userId: "recruiter-1", role: "OWNER" }],
       },
@@ -109,6 +184,41 @@ describe("recruiter JSON job persistence", () => {
     });
   });
 
+  it("keeps a registry entity type out of the company display name", async () => {
+    prismaMocks.company.findMany.mockResolvedValue([
+      {
+        id: "db-company-2",
+        slug: "vnpt",
+        legalName:
+          "TẬP ĐOÀN BƯU CHÍNH VIỄN THÔNG VIỆT NAM (LOẠI HÌNH DOANH NGHIỆP: CÔNG TY TNHH)",
+        displayName:
+          "TẬP ĐOÀN BƯU CHÍNH VIỄN THÔNG VIỆT NAM (LOẠI HÌNH DOANH NGHIỆP: CÔNG TY TNHH)",
+        logoUrl: null,
+        websiteUrl: null,
+        publicDescription: null,
+        publicLocation: null,
+        size: null,
+        industry: null,
+        address: null,
+        entityType: null,
+        normalizedTaxIdentifier: "0100684378",
+        memberships: [{ userId: "recruiter-1", role: "OWNER" }],
+      },
+    ]);
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return "[]";
+      if (path.endsWith("companies.json")) return "[]";
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    await expect(
+      readRecruiterCompanySettings("recruiter-1"),
+    ).resolves.toMatchObject({
+      name: "TẬP ĐOÀN BƯU CHÍNH VIỄN THÔNG VIỆT NAM",
+      entityType: "CÔNG TY TNHH",
+    });
+  });
+
   it("allows an approved database member to open job posting management", async () => {
     prismaMocks.company.findMany.mockResolvedValue([
       {
@@ -123,6 +233,7 @@ describe("recruiter JSON job persistence", () => {
         size: "51-200 employees",
         industry: "Technology",
         address: "Ho Chi Minh City",
+        entityType: null,
         normalizedTaxIdentifier: "1234567890",
         memberships: [{ userId: "recruiter-1", role: "OWNER" }],
       },
@@ -135,9 +246,331 @@ describe("recruiter JSON job persistence", () => {
 
     const data = await readRecruiterJobManagementData("recruiter-1");
 
+    expect(data.recruiterUserId).toBe("recruiter-1");
     expect(data.companyId).toBe("db-company-1");
     expect(data.companies).toHaveLength(1);
     expect(data.companyProfileComplete).toBe(true);
+  });
+
+  it("keeps an unassigned submitted job in pending approval", async () => {
+    prismaMocks.company.findMany.mockResolvedValue([
+      {
+        id: "db-company-1",
+        slug: "northstar-labs",
+        legalName: "Northstar Labs",
+        displayName: "Northstar Labs",
+        logoUrl: "https://example.com/logo.png",
+        websiteUrl: "https://northstar.example.com",
+        publicDescription: "A product company.",
+        publicLocation: "Ho Chi Minh City",
+        size: "51-200 employees",
+        industry: "Technology",
+        address: "Ho Chi Minh City",
+        entityType: null,
+        normalizedTaxIdentifier: "1234567890",
+        memberships: [{ userId: "recruiter-1", role: "OWNER" }],
+      },
+    ]);
+    const pendingJob = {
+      ...completeJob("pending-job"),
+      companyId: "db-company-1",
+    };
+    const pendingVersion = {
+      id: "pending-version-1",
+      sequence: 1,
+      state: "PENDING_REVIEW",
+      reasonCode: null,
+      publicExplanation: null,
+      submittedAt: new Date("2026-08-25T00:00:00Z"),
+      decidedAt: null,
+      snapshot: jobReviewSnapshotFromCatalog(pendingJob, "db-company-1"),
+    };
+    prismaMocks.jobPostReviewAggregate.findMany.mockResolvedValue([
+      {
+        jobId: pendingJob.id,
+        companyId: "db-company-1",
+        version: 1,
+        pendingVersion,
+        versions: [pendingVersion],
+        correctionRequests: [],
+      },
+    ]);
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return JSON.stringify([pendingJob]);
+      if (path.endsWith("companies.json")) return "[]";
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const data = await readRecruiterJobManagementData("recruiter-1");
+
+    expect(data.jobs).toHaveLength(1);
+    expect(data.jobs[0]).toMatchObject({
+      id: "pending-job",
+      status: "pending_approval",
+      review: {
+        reviewId: "pending-version-1",
+        state: "PENDING_REVIEW",
+        readOnly: true,
+      },
+    });
+  });
+
+  it("projects a closed aggregate as closed even when its approved version is current", async () => {
+    prismaMocks.company.findMany.mockResolvedValue([
+      {
+        id: "db-company-1",
+        slug: "northstar-labs",
+        legalName: "Northstar Labs",
+        displayName: "Northstar Labs",
+        logoUrl: "https://example.com/logo.png",
+        websiteUrl: "https://northstar.example.com",
+        publicDescription: "A product company.",
+        publicLocation: "Ho Chi Minh City",
+        size: "51-200 employees",
+        industry: "Technology",
+        address: "Ho Chi Minh City",
+        entityType: null,
+        normalizedTaxIdentifier: "1234567890",
+        memberships: [{ userId: "recruiter-1", role: "OWNER" }],
+      },
+    ]);
+    const closedJob = {
+      ...completeJob("closed-job"),
+      companyId: "db-company-1",
+      status: "active" as const,
+    };
+    const approvedVersion = {
+      id: "approved-version-1",
+      sequence: 1,
+      state: "APPROVED",
+      reasonCode: null,
+      publicExplanation: null,
+      submittedAt: new Date("2026-08-25T00:00:00Z"),
+      decidedAt: new Date("2026-08-25T01:00:00Z"),
+      snapshot: jobReviewSnapshotFromCatalog(closedJob, "db-company-1"),
+    };
+    prismaMocks.jobPostReviewAggregate.findMany.mockResolvedValue([
+      {
+        jobId: closedJob.id,
+        companyId: "db-company-1",
+        version: 3,
+        closedAt: new Date("2026-08-25T02:00:00Z"),
+        pendingVersion: null,
+        versions: [approvedVersion],
+        correctionRequests: [],
+      },
+    ]);
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return JSON.stringify([closedJob]);
+      if (path.endsWith("companies.json")) return "[]";
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const data = await readRecruiterJobManagementData("recruiter-1");
+
+    expect(data.jobs[0]).toMatchObject({
+      id: "closed-job",
+      status: "closed",
+      review: { state: "APPROVED" },
+    });
+  });
+
+  it("keeps the current JSON draft timestamp after a review is withdrawn", async () => {
+    prismaMocks.company.findMany.mockResolvedValue([
+      {
+        id: "db-company-1",
+        slug: "northstar-labs",
+        legalName: "Northstar Labs",
+        displayName: "Northstar Labs",
+        logoUrl: "https://example.com/logo.png",
+        websiteUrl: "https://northstar.example.com",
+        publicDescription: "A product company.",
+        publicLocation: "Ho Chi Minh City",
+        size: "51-200 employees",
+        industry: "Technology",
+        address: "Ho Chi Minh City",
+        entityType: null,
+        normalizedTaxIdentifier: "1234567890",
+        memberships: [{ userId: "recruiter-1", role: "OWNER" }],
+      },
+    ]);
+    const submittedJob = {
+      ...completeJob("withdrawn-job"),
+      companyId: "db-company-1",
+      title: "Submitted title",
+      updatedAt: "2026-08-25T00:00:00.000Z",
+    };
+    const workingDraft = {
+      ...submittedJob,
+      title: "Current draft title",
+      status: "draft" as const,
+      updatedAt: "2026-08-25T02:00:00.000Z",
+    };
+    const withdrawnVersion = {
+      id: "withdrawn-version-1",
+      sequence: 1,
+      state: "WITHDRAWN",
+      reasonCode: null,
+      publicExplanation: null,
+      submittedAt: new Date("2026-08-25T00:00:00.000Z"),
+      decidedAt: new Date("2026-08-25T01:00:00.000Z"),
+      snapshot: jobReviewSnapshotFromCatalog(submittedJob, "db-company-1"),
+    };
+    prismaMocks.jobPostReviewAggregate.findMany.mockResolvedValue([
+      {
+        jobId: workingDraft.id,
+        companyId: "db-company-1",
+        version: 2,
+        pendingVersion: null,
+        versions: [withdrawnVersion],
+        correctionRequests: [],
+      },
+    ]);
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return JSON.stringify([workingDraft]);
+      if (path.endsWith("companies.json")) return "[]";
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const data = await readRecruiterJobManagementData("recruiter-1");
+
+    expect(data.jobs[0]).toMatchObject({
+      id: "withdrawn-job",
+      title: "Current draft title",
+      status: "draft",
+      updatedAt: "2026-08-25T02:00:00.000Z",
+      review: { state: "WITHDRAWN", readOnly: false },
+    });
+  });
+
+  it("freshly aggregates jobs across every active company membership", async () => {
+    prismaMocks.company.findMany.mockResolvedValue([
+      {
+        id: "db-company-1",
+        slug: "northstar-labs",
+        legalName: "Northstar Labs",
+        displayName: "Northstar Labs",
+        logoUrl: null,
+        websiteUrl: null,
+        publicDescription: null,
+        publicLocation: "Ho Chi Minh City",
+        size: "51-200 employees",
+        industry: "Technology",
+        address: "Ho Chi Minh City",
+        entityType: null,
+        normalizedTaxIdentifier: "1234567890",
+        memberships: [{ userId: "recruiter-1", role: "OWNER" }],
+      },
+      {
+        id: "db-company-2",
+        slug: "second-company",
+        legalName: "Second Company",
+        displayName: "Second Company",
+        logoUrl: null,
+        websiteUrl: null,
+        publicDescription: null,
+        publicLocation: "Hanoi",
+        size: "51-200 employees",
+        industry: "Technology",
+        address: "Hanoi",
+        entityType: null,
+        normalizedTaxIdentifier: "9876543210",
+        memberships: [{ userId: "recruiter-1", role: "RECRUITER" }],
+      },
+    ]);
+    const firstJob = {
+      ...completeJob("job-company-1"),
+      companyId: "db-company-1",
+    };
+    const secondJob = {
+      ...completeJob("job-company-2"),
+      companyId: "db-company-2",
+    };
+    let jobsText = JSON.stringify([firstJob, secondJob]);
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return jobsText;
+      if (path.endsWith("companies.json")) return "[]";
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const firstRead = await readRecruiterJobManagementData("recruiter-1");
+    expect(firstRead.jobs.map((job) => job.id)).toEqual([
+      "job-company-1",
+      "job-company-2",
+    ]);
+
+    const newJob = {
+      ...completeJob("job-company-2-new"),
+      companyId: "db-company-2",
+      stats: { viewCount: 3, applicantCount: 17 },
+    };
+    jobsText = JSON.stringify([firstJob, secondJob, newJob]);
+    const refreshedRead = await readRecruiterJobManagementData("recruiter-1");
+
+    expect(refreshedRead.jobs.map((job) => job.id)).toEqual([
+      "job-company-1",
+      "job-company-2",
+      "job-company-2-new",
+    ]);
+    expect(
+      refreshedRead.jobs.find((job) => job.id === "job-company-2-new"),
+    ).toMatchObject({
+      companyId: "db-company-2",
+      stats: { applicantCount: 17 },
+    });
+  });
+
+  it("uses active database membership when legacy catalog membership is stale", async () => {
+    prismaMocks.company.findMany.mockResolvedValue([
+      {
+        id: "db-company-1",
+        slug: "northstar-labs",
+        legalName: "Northstar Labs",
+        displayName: "Northstar Labs",
+        logoUrl: null,
+        websiteUrl: null,
+        publicDescription: null,
+        publicLocation: "Ho Chi Minh City",
+        size: "51-200 employees",
+        industry: "Technology",
+        address: "Ho Chi Minh City",
+        entityType: null,
+        normalizedTaxIdentifier: "1234567890",
+        memberships: [{ userId: "recruiter-1", role: "RECRUITER" }],
+      },
+    ]);
+    const catalogCompany = {
+      ...company,
+      ownerUserId: null,
+      memberUserIds: [],
+      verificationStatus: "pending",
+    };
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) {
+        return JSON.stringify([
+          { ...completeJob("legacy-job"), companyId: company.id },
+        ]);
+      }
+      if (path.endsWith("companies.json")) {
+        return JSON.stringify([catalogCompany]);
+      }
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    await expect(
+      authorizeLegacyRecruiterJobs("recruiter-1", ["legacy-job"]),
+    ).resolves.toEqual(
+      new Map([
+        [
+          "legacy-job",
+          {
+            jobId: "legacy-job",
+            companyId: company.id,
+            jobTitle: "Product Designer",
+          },
+        ],
+      ]),
+    );
   });
 
   it("saves a complete profile for a database-backed company", async () => {
@@ -154,6 +587,7 @@ describe("recruiter JSON job persistence", () => {
         size: "1-50 employees",
         industry: "Game Development",
         address: "Ho Chi Minh, District 8",
+        entityType: null,
         normalizedTaxIdentifier: "2000000000",
         memberships: [{ userId: "recruiter-1", role: "OWNER" }],
       },
@@ -251,8 +685,40 @@ describe("recruiter JSON job persistence", () => {
       numberOfHires: 3,
       isUrgent: true,
       location: job.location,
-      description: job.description,
+      description: {
+        ...job.description,
+        generalInfo: {
+          ...job.description.generalInfo,
+          department: "Software Development",
+        },
+      },
     });
+  });
+
+  it("persists an incomplete recruiter draft with a stable fallback slug", async () => {
+    const draft = createEmptyJobPosting("company-1");
+    draft.subIndustry = "";
+    draft.shortPitch = "";
+    draft.location.city = "";
+    draft.description.overview = "";
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return "[]";
+      if (path.endsWith("companies.json")) return JSON.stringify([company]);
+      if (path.endsWith("applications.json")) return "[]";
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const saved = await createRecruiterJob("recruiter-1", draft, "draft");
+
+    expect(saved).toMatchObject({
+      title: "",
+      shortPitch: "",
+      subIndustry: "",
+      location: { city: "" },
+      description: { overview: "" },
+      status: "draft",
+    });
+    expect(saved.slug).toMatch(/^untitled-job-remote-/u);
   });
   it("appends a posting without normalizing untouched legacy job statuses", async () => {
     const existing = { ...completeJob("legacy-job"), status: "open" };
@@ -278,5 +744,113 @@ describe("recruiter JSON job persistence", () => {
       status: "open",
     });
     expect(persisted.at(-1)?.status).toBe("draft");
+  });
+
+  it("updates an approved recruiter projection without persisting review metadata", async () => {
+    const existing = {
+      ...completeJob("approved-job"),
+      status: "active" as const,
+      applyDeadline: "2099-12-31T23:59:59.000Z",
+    };
+    const recruiterProjection = {
+      ...existing,
+      company,
+      review: {
+        reviewId: "review-1",
+        jobId: existing.id,
+        sequence: 1,
+        state: "APPROVED" as const,
+        readOnly: false,
+        reasonCode: null,
+        publicExplanation: null,
+        submittedAt: "2026-08-18T00:00:00.000Z",
+        decidedAt: "2026-08-18T01:00:00.000Z",
+        version: 1,
+      },
+      correctionRequest: {
+        id: "correction-1",
+        publicExplanation: "Keep the approved version live.",
+        hideImmediately: false,
+        createdAt: "2026-08-18T02:00:00.000Z",
+      },
+      previousIndustryCode: existing.industryCode,
+      title: "Updated Product Designer",
+    };
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return JSON.stringify([existing]);
+      if (path.endsWith("companies.json")) return JSON.stringify([company]);
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const saved = await updateRecruiterJob("recruiter-1", recruiterProjection);
+
+    expect(saved.title).toBe("Updated Product Designer");
+    const jobWrite = fsMocks.writeFile.mock.calls.find(([path]) =>
+      String(path).endsWith("jobs.json"),
+    );
+    const persisted = JSON.parse(String(jobWrite?.[1])) as Array<
+      Record<string, unknown>
+    >;
+    expect(persisted[0]).not.toHaveProperty("review");
+    expect(persisted[0]).not.toHaveProperty("correctionRequest");
+    expect(persisted[0]).not.toHaveProperty("company");
+  });
+
+  it("closes an active recruiter job and persists only the lifecycle change", async () => {
+    const existing = {
+      ...completeJob("close-job"),
+      status: "active" as const,
+    };
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return JSON.stringify([existing]);
+      if (path.endsWith("companies.json")) return JSON.stringify([company]);
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const saved = await closeRecruiterJob("recruiter-1", existing.id, "r03");
+
+    expect(saved).toMatchObject({ id: existing.id, status: "closed" });
+    const jobWrite = fsMocks.writeFile.mock.calls.find(([path]) =>
+      String(path).endsWith("jobs.json"),
+    );
+    const persisted = JSON.parse(String(jobWrite?.[1])) as Array<
+      Record<string, unknown>
+    >;
+    expect(persisted).toHaveLength(1);
+    expect(persisted[0]).toMatchObject({
+      id: existing.id,
+      status: "closed",
+    });
+  });
+
+  it("reactivates a closed recruiter job and persists only the lifecycle change", async () => {
+    const existing = {
+      ...completeJob("reactivate-job"),
+      status: "closed" as const,
+    };
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return JSON.stringify([existing]);
+      if (path.endsWith("companies.json")) return JSON.stringify([company]);
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const saved = await reactivateRecruiterJob(
+      "recruiter-1",
+      existing.id,
+      "r03",
+    );
+
+    expect(saved).toMatchObject({ id: existing.id, status: "active" });
+    const jobWrite = fsMocks.writeFile.mock.calls.find(([path]) =>
+      String(path).endsWith("jobs.json"),
+    );
+    const persisted = JSON.parse(String(jobWrite?.[1])) as Array<
+      Record<string, unknown>
+    >;
+    expect(persisted).toHaveLength(1);
+    expect(persisted[0]).toMatchObject({
+      id: existing.id,
+      status: "active",
+    });
   });
 });

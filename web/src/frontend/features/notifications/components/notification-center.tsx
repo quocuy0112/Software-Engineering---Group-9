@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AppProviders } from "@/frontend/providers/app-providers";
 import {
@@ -13,6 +13,7 @@ import {
 } from "../client/use-notifications";
 import { notificationCopy, notificationTime } from "../notification-copy";
 import type { NotificationItem } from "@/shared/contracts/notifications";
+import { requestUnsavedChangesNavigation } from "@/frontend/features/profile/client/unsaved-changes";
 
 export function NotificationCenter(
   props: NotificationMutationAuth & {
@@ -36,6 +37,7 @@ function NotificationCenterContent({
   viewAllHref?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const centerRef = useRef<HTMLDivElement>(null);
   const panelId = useId();
   const router = useRouter();
   const copy = notificationCopy[locale];
@@ -54,19 +56,40 @@ function NotificationCenterContent({
     return () => window.removeEventListener("keydown", close);
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Node && !centerRef.current?.contains(target)) {
+        setOpen(false);
+      }
+    };
+    window.addEventListener("pointerdown", closeOnOutsidePointer);
+    return () => window.removeEventListener("pointerdown", closeOnOutsidePointer);
+  }, [open]);
+
   async function openItem(item: NotificationItem) {
-    try {
-      if (!item.readAt)
-        await markRead.mutateAsync({ notificationId: item.id });
-      setOpen(false);
-      if (item.href) router.push(item.href);
-    } catch {
-      toast.error(copy.error);
-    }
+    if (!item.readAt)
+      void markRead
+        .mutateAsync({ notificationId: item.id })
+        .catch(() => toast.error(copy.error));
+    const href = item.href;
+    if (!href) return;
+    const current = `${window.location.pathname}${window.location.search}`;
+    if (current === href) return;
+    setOpen(false);
+    requestUnsavedChangesNavigation(() => router.push(href));
+  }
+
+  function markItemRead(item: NotificationItem) {
+    if (item.readAt) return;
+    void markRead
+      .mutateAsync({ notificationId: item.id })
+      .catch(() => toast.error(copy.error));
   }
 
   return (
-    <div className="notification-center">
+    <div ref={centerRef} className="notification-center">
       <button
         type="button"
         className="notification-bell"
@@ -119,24 +142,65 @@ function NotificationCenterContent({
           ) : (
             <ul className="notification-list">
               {items.map((item) => (
-                <li key={item.id}>
-                  <button
-                    type="button"
+                <li
+                  key={item.id}
+                  className="notification-item-wrapper"
+                  data-read={Boolean(item.readAt)}
+                  data-severity={item.severity}
+                >
+                  <div
                     className="notification-item"
                     data-read={Boolean(item.readAt)}
                     data-severity={item.severity}
                     onClick={() => void openItem(item)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        void openItem(item);
+                      }
+                    }}
                   >
-                    <span className="notification-item__meta">
-                      <span>{copy.severities[item.severity]}</span>
-                      <span>{item.readAt ? copy.read : copy.unread}</span>
+                    {!item.readAt ? (
+                      <span
+                        className="notification-item__accent"
+                        aria-hidden="true"
+                      />
+                    ) : null}
+                    <div className="notification-item__meta">
+                      <span className="notification-item__severity">
+                        {copy.severities[item.severity]}
+                      </span>
+                      <span className="notification-item__status">
+                        {item.readAt ? copy.read : copy.unread}
+                      </span>
+                    </div>
+                    <strong className="notification-item__title">
+                      {item.title}
+                    </strong>
+                    <span className="notification-item__summary">
+                      {item.summary}
                     </span>
-                    <strong>{item.title}</strong>
-                    <span>{item.summary}</span>
-                    <time dateTime={item.lastOccurredAt}>
-                      {notificationTime(item.lastOccurredAt, locale)}
-                    </time>
-                  </button>
+                    <div className="notification-item__footer">
+                      <time dateTime={item.lastOccurredAt}>
+                        {notificationTime(item.lastOccurredAt, locale)}
+                      </time>
+                      {!item.readAt ? (
+                        <button
+                          type="button"
+                          className="notification-item__mark-read"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            markItemRead(item);
+                          }}
+                          aria-label={`Mark ${item.title} as read`}
+                        >
+                          {copy.markAsRead}
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>

@@ -29,6 +29,7 @@ function listItem(row: {
   state: "PENDING_REVIEW" | "RESOLVED" | "DISMISSED";
   assignedAdminUserId: string | null;
   evidenceMessageId: string | null;
+  recruitmentEvidenceMessageId: string | null;
   createdAt: Date;
   version: number;
   reporter: { name: string };
@@ -44,7 +45,7 @@ function listItem(row: {
     category: row.category,
     state: row.state,
     assignedAdministratorId: row.assignedAdminUserId,
-    evidenceAvailable: Boolean(row.evidenceMessageId),
+    evidenceAvailable: Boolean(row.evidenceMessageId || row.recruitmentEvidenceMessageId),
     createdAt: row.createdAt.toISOString(),
     version: row.version,
   };
@@ -58,7 +59,43 @@ export class PrismaAdminMessagingReportRepository {
       typeof input.filter.age === "number"
         ? Number(input.filter.age)
         : Number.NaN;
+    const q = typeof input.filter.q === "string" ? input.filter.q.trim() : "";
+    const tokens = q.split(/\s+/u).filter(Boolean).slice(0, 8);
     const where: Prisma.MessagingReportWhereInput = {
+      ...(q
+        ? {
+            OR: [
+              { id: q },
+              { reporterUserId: q },
+              { targetUserId: q },
+              { assignedAdminUserId: q },
+              ...(tokens.length
+                ? [
+                    {
+                      AND: tokens.map((token) => ({
+                        reporter: {
+                          name: {
+                            contains: token,
+                            mode: "insensitive" as const,
+                          },
+                        },
+                      })),
+                    },
+                    {
+                      AND: tokens.map((token) => ({
+                        target: {
+                          name: {
+                            contains: token,
+                            mode: "insensitive" as const,
+                          },
+                        },
+                      })),
+                    },
+                  ]
+                : []),
+            ],
+          }
+        : {}),
       ...(typeof input.filter.targetType === "string"
         ? { targetType: input.filter.targetType as never }
         : {}),
@@ -104,6 +141,7 @@ export class PrismaAdminMessagingReportRepository {
           state: true,
           assignedAdminUserId: true,
           evidenceMessageId: true,
+          recruitmentEvidenceMessageId: true,
           createdAt: true,
           version: true,
           reporter: { select: { name: true } },
@@ -126,6 +164,7 @@ export class PrismaAdminMessagingReportRepository {
         reporterUserId: true,
         targetUserId: true,
         conversationId: true,
+        recruitmentThreadId: true,
         targetType: true,
         category: true,
         normalizedDetail: true,
@@ -134,6 +173,7 @@ export class PrismaAdminMessagingReportRepository {
         handledByAdminUserId: true,
         enforcementCorrelationId: true,
         evidenceMessageId: true,
+        recruitmentEvidenceMessageId: true,
         version: true,
         handledAt: true,
         createdAt: true,
@@ -145,6 +185,16 @@ export class PrismaAdminMessagingReportRepository {
             id: true,
             conversationId: true,
             senderId: true,
+            content: true,
+            createdAt: true,
+            sender: { select: { name: true } },
+          },
+        },
+        recruitmentEvidenceMessage: {
+          select: {
+            id: true,
+            threadId: true,
+            senderUserId: true,
             content: true,
             createdAt: true,
             sender: { select: { name: true } },
@@ -175,7 +225,7 @@ export class PrismaAdminMessagingReportRepository {
       },
     });
     if (!row) return null;
-    const evidence =
+    const conversationEvidence =
       row.evidenceMessage?.conversationId === row.conversationId
         ? {
             id: row.evidenceMessage.id,
@@ -185,6 +235,17 @@ export class PrismaAdminMessagingReportRepository {
             sentAt: row.evidenceMessage.createdAt.toISOString(),
           }
         : null;
+    const recruitmentEvidence =
+      row.recruitmentEvidenceMessage?.threadId === row.recruitmentThreadId
+        ? {
+            id: row.recruitmentEvidenceMessage.id,
+            senderAccountId: row.recruitmentEvidenceMessage.senderUserId,
+            senderDisplayName: row.recruitmentEvidenceMessage.sender.name,
+            content: row.recruitmentEvidenceMessage.content,
+            sentAt: row.recruitmentEvidenceMessage.createdAt.toISOString(),
+          }
+        : null;
+    const evidence = conversationEvidence ?? recruitmentEvidence;
     return adminMessagingReportDetailSchema.parse({
       ...listItem(row),
       evidenceAvailable: Boolean(evidence),

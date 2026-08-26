@@ -15,9 +15,7 @@ export const companyLogoSchema = z
       .string()
       .min(32)
       .max(1_100_000)
-      .regex(
-        /^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/u,
-      ),
+      .regex(/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/u),
   ])
   .nullable();
 
@@ -46,6 +44,9 @@ export const jobCatalogSchema = z
     id: z.string().min(1).max(128),
     slug: z.string().min(1).max(220),
     companyId: z.string().min(1).max(128),
+    // Null/omitted for the immutable shared catalogue. User-created jobs
+    // carry the account id so a user reset can remove only owned records.
+    createdByUserId: z.string().min(1).max(128).nullable().optional(),
     industry: z.string().min(1).max(160),
     industryCode: z.string().max(80),
     subIndustry: z.string().min(1).max(160),
@@ -126,11 +127,47 @@ export const jobCatalogSchema = z
   })
   .strict();
 
+/**
+ * Drafts retain the complete catalogue shape so they can move through the
+ * existing repositories, but authoring fields may be empty until submission.
+ * Primitive bounds remain enforced while completeness and cross-field checks
+ * are deferred to submission.
+ */
+export const jobDraftCatalogSchema = jobCatalogSchema.extend({
+  title: z.string().max(200),
+  shortPitch: z.string().max(500),
+  subIndustry: z.string().max(160),
+  salary: z
+    .object({
+      min: z.number().nonnegative(),
+      max: z.number().nonnegative(),
+      currency: z.string().regex(/^[A-Z]{3}$/u),
+      period: z.enum(["hour", "month", "year"]),
+      isNegotiable: z.boolean(),
+    })
+    .strict(),
+  location: jobCatalogSchema.shape.location.extend({
+    city: z.string().max(160),
+  }),
+  description: jobCatalogSchema.shape.description.extend({
+    overview: z.string().max(20_000),
+  }),
+  experience: jobCatalogSchema.shape.experience.extend({
+    label: z.string().max(80),
+  }),
+  level: z.string().max(80),
+  employmentType: z.string().max(80),
+  workArrangement: z.string().max(80),
+  education: z.string().max(200),
+  numberOfHires: z.number().int().nonnegative(),
+});
+
 export const companyCatalogSchema = z
   .object({
     id: z.string().min(1).max(128),
     slug: z.string().min(1).max(200),
     name: z.string().min(1).max(160),
+    entityType: z.string().trim().max(120).nullable().optional(),
     logo: companyLogoSchema,
     size: z.string().min(1).max(80),
     industry: z.string().min(1).max(160),
@@ -187,6 +224,7 @@ export type RecruiterCompanySettings = {
   id: string;
   slug: string;
   name: string;
+  entityType: string | null;
   logo: string | null;
   size: string;
   industry: string;
@@ -198,7 +236,9 @@ export type RecruiterCompanySettings = {
   taxCode: string;
   verificationStatus: "pending" | "approved" | "rejected";
   profileComplete: boolean;
-  missingProfileFields: Array<"name" | "industry" | "size" | "address" | "logo">;
+  missingProfileFields: Array<
+    "name" | "industry" | "size" | "address" | "logo"
+  >;
 };
 
 export type RecruiterCompanySettingsInput = z.infer<

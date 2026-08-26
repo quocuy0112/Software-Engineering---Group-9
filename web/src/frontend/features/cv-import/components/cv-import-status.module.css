@@ -1,24 +1,21 @@
 .root {
   display: grid;
   min-width: 0;
-  gap: var(--sh-space-5);
-  padding: var(--sh-card-padding);
-  border: 1px solid var(--sh-color-border-subtle);
-  border-radius: var(--sh-radius-lg);
-  background: var(--sh-color-surface-card);
-  box-shadow: var(--sh-shadow-card);
+  gap: var(--sh-space-3);
 }
 
 .root > h2 {
   margin: 0;
-  font-size: var(--sh-font-size-h2);
-  line-height: var(--sh-line-height-h2);
-  letter-spacing: -0.02em;
+  padding-top: 0;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: 0;
 }
 
 .state {
   margin: 0;
-  padding: var(--sh-space-3) var(--sh-space-4);
+  padding: 14px var(--sh-space-4);
   border: 1px solid var(--sh-color-focus-ring-bg);
   border-inline-start: 4px solid var(--sh-color-brand-primary);
   border-radius: var(--sh-radius-sm);
@@ -35,7 +32,7 @@
 .technicalDetails {
   width: fit-content;
   max-width: 100%;
-  padding: var(--sh-space-2) var(--sh-space-3);
+  padding: 7px var(--sh-space-3);
   border: 1px solid var(--sh-color-border-subtle);
   border-radius: var(--sh-radius-sm);
   color: var(--sh-color-text-secondary);
@@ -78,7 +75,7 @@
   grid-template-columns: 48px minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--sh-space-4);
-  padding: var(--sh-space-4);
+  padding: 18px var(--sh-space-4);
   border: 1px solid var(--ai-accent);
   border-radius: var(--sh-radius-md);
   color: var(--sh-color-text-primary);
@@ -204,25 +201,36 @@
 }
 
 .timeline {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
-  gap: var(--sh-space-2);
+  position: relative;
+  display: flex;
+  align-items: flex-start;
   margin: 0;
-  padding: 0;
+  padding: var(--sh-space-3) 0 var(--sh-space-1);
   list-style: none;
+}
+
+.timeline::before {
+  position: absolute;
+  z-index: 0;
+  top: calc(var(--sh-space-3) + 19px);
+  right: 7.15%;
+  left: 7.15%;
+  height: 2px;
+  background: var(--sh-color-border-subtle);
+  content: "";
 }
 
 .timeline li {
   position: relative;
-  display: grid;
+  z-index: 1;
+  display: flex;
+  flex: 1 1 0;
   min-width: 0;
-  justify-items: center;
+  flex-direction: column;
+  align-items: center;
   gap: var(--sh-space-2);
-  padding: var(--sh-space-3) var(--sh-space-2);
-  border: 1px solid var(--sh-color-border-subtle);
-  border-radius: var(--sh-radius-sm);
+  padding: 0 var(--sh-space-1);
   color: var(--sh-color-text-muted);
-  background: var(--sh-color-surface-subtle);
   font-size: var(--sh-font-size-caption);
   line-height: var(--sh-line-height-caption);
   text-align: center;
@@ -236,8 +244,8 @@
 
 .timelineMarker {
   display: grid;
-  width: 28px;
-  height: 28px;
+  width: 38px;
+  height: 38px;
   place-items: center;
   border: 1px solid var(--sh-color-border-default);
   border-radius: var(--sh-radius-full);
@@ -250,12 +258,8 @@
 }
 
 .timeline [data-state="current"] {
-  border-color: var(--sh-color-brand-primary);
   color: var(--sh-color-brand-primary);
-  background: var(--sh-color-info-bg);
   font-weight: var(--sh-font-weight-bold);
-  text-decoration: none;
-  box-shadow: inset 0 -3px 0 var(--sh-color-brand-primary);
 }
 
 .timeline [data-state="current"] .timelineMarker {
@@ -265,23 +269,18 @@
 }
 
 .timeline [data-state="complete"] {
-  border-color: color-mix(in srgb, var(--sh-color-success) 38%, transparent);
   color: var(--sh-color-success);
-  background: var(--sh-color-success-bg);
 }
 
 .timeline [data-state="complete"] .timelineMarker {
   border-color: var(--sh-color-success);
-  color: var(--sh-color-text-inverse);
-  background: var(--sh-color-success);
+  color: var(--sh-color-success);
+  background: var(--sh-color-surface-card);
 }
 
 .timeline [data-state="error"] {
-  border-color: var(--sh-color-error);
   color: var(--sh-color-error);
-  background: var(--sh-color-error-bg);
   font-weight: var(--sh-font-weight-bold);
-  box-shadow: inset 0 -3px 0 var(--sh-color-error);
 }
 
 .timeline [data-state="error"] .timelineMarker {
@@ -380,13 +379,23 @@
 
 @media (max-width: 42rem) {
   .timeline {
-    grid-template-columns: 1fr;
+    display: grid;
+    gap: var(--sh-space-3);
+    padding: 0;
+  }
+
+  .timeline::before {
+    display: none;
   }
 
   .timeline li {
-    grid-template-columns: 28px minmax(0, 1fr);
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
     align-items: center;
     justify-items: start;
+    flex: initial;
+    gap: var(--sh-space-3);
+    padding: 0;
     text-align: left;
   }
 
@@ -406,11 +415,6 @@
 }
 
 @media (max-width: 32rem) {
-  .root {
-    padding: var(--sh-space-4);
-    border-radius: var(--sh-radius-md);
-  }
-
   .actions {
     align-items: stretch;
     flex-direction: column;

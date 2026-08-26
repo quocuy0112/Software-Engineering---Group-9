@@ -49,7 +49,7 @@ block every user story.
 **CRITICAL**: No user story implementation begins until this phase passes.
 
 - [X] T005 Add the minimal Feature 007-owned `ProfessionalConnection` canonical pair plus `ACCEPTED` state, `MessagingConversationContextType`, `MessagingReportTargetType`, `MessagingConversation`, `MessagingConversationParticipant`, `MessagingMessage`, `UserMessagingBlock`, `MessagingReport`, and required existing-model relations/constraints to `web/prisma/schema.prisma`
-- [X] T006 Create safe forward/recovery SQL, uniqueness/check constraints, foreign keys, and indexes for Feature 008 in `web/prisma/migrations/022_realtime_messaging/migration.sql`
+- [X] T006 Create safe forward/recovery SQL, uniqueness/check constraints, foreign keys, and indexes for Feature 008 in `web/prisma/migrations/023_realtime_messaging/migration.sql`
 - [X] T007 Regenerate the Prisma client after T005-T006 and verify migration sequencing in `web/src/backend/generated/prisma/` and `web/tests/backend/integration/messaging/messaging-migration.test.ts`
 - [X] T008 [P] Define strict Zod schemas and safe projections for eligible participants, conversations, messages, cursors, read boundaries, blocks, reports, and errors in `web/src/shared/contracts/messaging/common.ts`, `web/src/shared/contracts/messaging/conversations.ts`, and `web/src/shared/contracts/messaging/messages.ts`
 - [X] T009 [P] Define typed `/chat` client/server event maps and acknowledgement unions matching `contracts/socket-events.md` in `web/src/shared/contracts/messaging/socket-events.ts`
@@ -88,7 +88,7 @@ projections, neutral denials, and current membership enforcement.
 - [X] T022 [US1] Implement `GET /api/messaging/eligible-participants` in `web/src/app/api/messaging/eligible-participants/route.ts`
 - [X] T023 [US1] Implement `POST /api/messaging/conversations` and initial `GET` shell contract in `web/src/app/api/messaging/conversations/route.ts`
 - [X] T024 [P] [US1] Create authenticated `/messages` page bootstrap and safe server context in `web/src/app/(workspace)/messages/page.tsx` and `web/src/backend/messaging/services/get-messaging-page-context.ts`
-- [X] T025 [US1] Build eligible-person search/context picker and new-conversation dialog in `web/src/frontend/features/messaging/components/start-conversation.tsx` and `web/src/frontend/features/messaging/client/messaging-api.ts`
+- [X] T025 [US1] Build eligible-person search/context picker and new-conversation dialog in `web/src/frontend/features/messaging/components/start-conversation.tsx` and `web/src/frontend/features/messaging/client/messaging-api.ts`; search calls only the server-filtered eligible-participants endpoint.
 - [X] T026 [US1] Add localized Messages navigation/icon and entry-point wiring in `web/src/frontend/features/dashboard/components/workspace-navigation.tsx` and `web/src/frontend/features/dashboard/client/workspace-locale.tsx`
 - [X] T027 [US1] Add an authorized public professional profile route and `Message` button that selects an eligible context, calls `POST /api/messaging/conversations`, and redirects to the returned thread, including canonical pair/context duplicate recovery when the conversation already exists, in `web/src/app/(workspace)/people/[userId]/page.tsx`, `web/src/frontend/features/profile/components/public-professional-profile.tsx`, `web/src/frontend/features/profile/components/profile-message-action.tsx`, and `web/tests/frontend/components/messaging/profile-message-action.test.tsx`
 

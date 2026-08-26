@@ -12,6 +12,26 @@ import { createCvWorkerStorage } from "./cv-worker-resources";
 
 export const CV_RECONCILIATION_ORPHAN_GRACE_MS = 60 * 60_000;
 
+const storageLocatorPattern = /^[A-Za-z0-9_-]{16,128}$/u;
+
+function draftCoverLetterStorageKey(value: unknown): string | null {
+  if (
+    !value ||
+    typeof value !== "object" ||
+    Array.isArray(value) ||
+    (value as { kind?: unknown }).kind !== "FILE"
+  ) {
+    return null;
+  }
+  const file = (value as { file?: unknown }).file;
+  if (!file || typeof file !== "object" || Array.isArray(file)) return null;
+  const storageKey = (file as { storageKey?: unknown }).storageKey;
+  return typeof storageKey === "string" &&
+    storageLocatorPattern.test(storageKey)
+    ? storageKey
+    : null;
+}
+
 export type CvReconciliationResult = Readonly<{
   referencesChecked: number;
   missingScheduled: number;
@@ -144,13 +164,51 @@ export class CvStorageReconciliation {
       ...(input.cursor ? { cursor: input.cursor } : {}),
     });
     const locators = inventory.items.map((item) => String(item.locator));
-    const tracked = locators.length
-      ? await prisma.cvStoredArtifact.findMany({
-          where: { storageLocator: { in: locators } },
-          select: { storageLocator: true },
-        })
-      : [];
-    const trackedLocators = new Set(tracked.map((item) => item.storageLocator));
+    // The local CV storage adapter is also used by CandidateCv materialized
+    // copies, application-document promotion, and active application drafts.
+    // Reconciliation must treat all five namespaces as owned objects;
+    // otherwise a valid draft cover letter is classified as an untracked
+    // artifact and deleted after the orphan grace period.
+    const [
+      trackedCvArtifacts,
+      trackedCandidateCvs,
+      trackedApplicationDocuments,
+      trackedPromotions,
+      trackedDrafts,
+    ] = locators.length
+      ? await Promise.all([
+          prisma.cvStoredArtifact.findMany({
+            where: { storageLocator: { in: locators } },
+            select: { storageLocator: true },
+          }),
+          prisma.candidateCv.findMany({
+            where: { storageKey: { in: locators } },
+            select: { storageKey: true },
+          }),
+          prisma.applicationDocument.findMany({
+            where: { storageKeyEncrypted: { in: locators }, deletedAt: null },
+            select: { storageKeyEncrypted: true },
+          }),
+          prisma.applicationArtifactPromotion.findMany({
+            where: { storageKeyEncrypted: { in: locators }, deletedAt: null },
+            select: { storageKeyEncrypted: true },
+          }),
+          prisma.candidateApplicationDraft.findMany({
+            where: { expiresAt: { gt: now } },
+            select: { coverLetterDraft: true },
+          }),
+        ])
+      : [[], [], [], [], []];
+    const trackedLocators = new Set([
+      ...trackedCvArtifacts.map((item) => item.storageLocator),
+      ...trackedCandidateCvs.map((item) => item.storageKey),
+      ...trackedApplicationDocuments.map((item) => item.storageKeyEncrypted),
+      ...trackedPromotions.map((item) => item.storageKeyEncrypted),
+      ...trackedDrafts.flatMap(({ coverLetterDraft }) => {
+        const storageKey = draftCoverLetterStorageKey(coverLetterDraft);
+        return storageKey ? [storageKey] : [];
+      }),
+    ]);
     let orphansDeleted = 0;
     for (const item of inventory.items) {
       if (
@@ -161,21 +219,30 @@ export class CvStorageReconciliation {
       ) {
         continue;
       }
-      const outcome = await this.storage.delete(String(item.locator));
-      if (!outcome.deleted) continue;
-      orphansDeleted += 1;
-      await prisma.auditEvent.create({
-        data: {
-          occurredAt: now,
-          actorType: "system",
-          action: "cv_import.reconciled",
-          targetType: "cv_import",
-          targetId: null,
-          result: "SUCCESS",
-          correlationId: `cv_reconcile_${randomUUID()}`.slice(0, 128),
-          context: { state: "GRACE_AGED_ORPHAN_DELETED", count: 1 },
-        },
-      });
+      try {
+        const outcome = await this.storage.delete(String(item.locator));
+        if (!outcome.deleted) continue;
+        orphansDeleted += 1;
+        await prisma.auditEvent.create({
+          data: {
+            occurredAt: now,
+            actorType: "system",
+            action: "cv_import.reconciled",
+            targetType: "cv_import",
+            targetId: null,
+            result: "SUCCESS",
+            correlationId: `cv_reconcile_${randomUUID()}`.slice(0, 128),
+            context: { state: "GRACE_AGED_ORPHAN_DELETED", count: 1 },
+          },
+        });
+      } catch (error) {
+        if (!(error instanceof CvStorageError)) throw error;
+        // A stale inventory entry must not stop the worker from processing CVs.
+        // Keep the locator out of logs/audit context because it is sensitive.
+        console.warn(
+          `[cv-worker] orphan cleanup skipped: ${error.code}`,
+        );
+      }
     }
     return Object.freeze({
       referencesChecked: references.length,

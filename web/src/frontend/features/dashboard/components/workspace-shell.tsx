@@ -16,7 +16,6 @@ import { CsrfProofProvider } from "@/frontend/features/authentication/client/csr
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
 import { ThemeToggle } from "@/frontend/components/ui/theme-toggle";
-import { GlobalImageSearch } from "@/frontend/features/jobs/image-search/components/global-image-search";
 import {
   ACCOUNT_NAME_UPDATED_EVENT,
   type AccountNameUpdatedDetail,
@@ -32,6 +31,7 @@ import { closeMessagingConnectionOnLogout } from "@/frontend/features/messaging/
 import { RecruiterHeaderAction } from "@/frontend/features/recruiter-header/components/recruiter-header-action";
 import type { RecruiterHeaderStatus } from "@/shared/contracts/recruiter-header-status";
 import type { RecruiterJobManagementData } from "@/shared/contracts/recruiter-job-posting";
+import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
 import {
   WORKSPACE_MODE_COOKIE,
   type WorkspaceMode,
@@ -41,6 +41,11 @@ import {
   RecruiterWorkspaceNavigation,
 } from "@/frontend/features/recruiter-workspace/job-posting-management";
 import { NotificationCenter } from "@/frontend/features/notifications/components/notification-center";
+import { UnsavedChangesNavigationDialog } from "@/frontend/features/profile/client/unsaved-changes";
+import {
+  getAccountInitials,
+  getCandidateGreetingName,
+} from "./workspace-greeting";
 const SIDEBAR_MINIMUM_WIDTH = 220;
 const SIDEBAR_WIDTH_STEP = 16;
 const SIDEBAR_MAXIMUM_FALLBACK_WIDTH = 360;
@@ -121,6 +126,8 @@ function WorkspaceShellContent({
   const [status, setStatus] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const workspaceMode = initialWorkspaceMode;
+  const candidateJobBoard =
+    workspaceMode === "candidate" && contentMode === "job-board";
   const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_MINIMUM_WIDTH);
   const [sidebarMaximumWidth, setSidebarMaximumWidth] = useState(
     SIDEBAR_MAXIMUM_FALLBACK_WIDTH,
@@ -195,6 +202,8 @@ function WorkspaceShellContent({
   )
     ? workspaceProfile.image
     : null;
+  const greetingName = getCandidateGreetingName(workspaceProfile.name);
+  const accountInitials = getAccountInitials(workspaceProfile.name);
   const copy = getWorkspaceCopy(locale, workspaceProfile.name);
   function getWorkspaceCopy(currentLocale: WorkspaceLocale, name: string) {
     return currentLocale === "vi"
@@ -236,7 +245,7 @@ function WorkspaceShellContent({
         };
   }
 
-  const accountTitle = `${workspaceProfile.name} — ${workspaceProfile.email || copy.manageProfile}`;
+  const accountTitle = workspaceProfile.name;
 
   function persistWorkspaceMode(mode: WorkspaceMode) {
     if (mode === "recruiter") openRecruiterWorkspace();
@@ -249,7 +258,7 @@ function WorkspaceShellContent({
 
   function openRecruiterWorkspace() {
     document.cookie = `${WORKSPACE_MODE_COOKIE}=recruiter; Path=/; Max-Age=31536000; SameSite=Lax`;
-    startNavigation(() => router.push("/recruiter"));
+    startNavigation(() => router.push(recruiterRoutes.jobPostings));
   }
 
   function openCandidateWorkspace() {
@@ -330,6 +339,7 @@ function WorkspaceShellContent({
 
   return (
     <main className="workspace-page" lang={locale}>
+      <UnsavedChangesNavigationDialog />
       <div
         className="workspace-layout"
         data-sidebar-collapsed={sidebarCollapsed}
@@ -405,25 +415,41 @@ function WorkspaceShellContent({
         </aside>
         <div
           className="workspace-main"
+          data-workspace-mode={workspaceMode}
           data-content-mode={
             workspaceMode === "recruiter" ? "default" : contentMode
           }
         >
-          <header className="workspace-header">
-            <div>
+          <header
+            className="workspace-header"
+            data-job-search={candidateJobBoard ? "true" : undefined}
+          >
+            <div className="workspace-header-identity">
               <p className="workspace-topbar-kicker">
                 {workspaceMode === "recruiter"
                   ? copy.recruiterWorkspace
                   : copy.workspace}
               </p>
               <p className="workspace-topbar-title">
-                {workspaceMode === "recruiter"
-                  ? copy.recruiterGreeting
-                  : copy.greeting}
+                {workspaceMode === "recruiter" ? (
+                  copy.recruiterGreeting
+                ) : (
+                  <>
+                    {copy.greeting}{" "}
+                    {greetingName ? (
+                      <span className="workspace-topbar-name">
+                        {greetingName}
+                      </span>
+                    ) : null}
+                  </>
+                )}
               </p>
             </div>
-            {workspaceMode === "candidate" && contentMode === "job-board" ? (
-              <GlobalImageSearch csrfProof={csrfProof} />
+            {candidateJobBoard ? (
+              <div
+                id="workspace-job-search-slot"
+                className="workspace-header-job-search-slot"
+              />
             ) : null}
             <div className="workspace-header-actions">
               <NotificationCenter csrfProof={csrfProof} locale={locale} />
@@ -444,16 +470,21 @@ function WorkspaceShellContent({
                       unoptimized
                     />
                   ) : (
-                    <svg viewBox="0 0 24 24">
-                      <circle cx="12" cy="8" r="3.2" />
-                      <path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8" />
-                    </svg>
+                    <span className="workspace-account-initials">
+                      {accountInitials}
+                    </span>
                   )}
                 </span>
-                <span>
-                  <strong>{workspaceProfile.name}</strong>
-                  <small>{workspaceProfile.email || copy.manageProfile}</small>
+                <span className="workspace-account-copy">
+                  <strong>{greetingName || workspaceProfile.name}</strong>
                 </span>
+                <svg
+                  className="workspace-account-chevron"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path d="m7 10 5 5 5-5" />
+                </svg>
               </Link>
               {workspaceMode === "recruiter" ? (
                 <button

@@ -1,10 +1,25 @@
 .root {
   display: grid;
   min-width: 0;
-  gap: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--color-border, #94a3b8);
-  border-radius: 0.75rem;
+  gap: 14px;
+}
+
+.card {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-lg);
+  background: var(--sh-color-surface-card);
+  box-shadow: none;
+}
+
+.root h2 {
+  margin: 0;
+  color: var(--sh-color-text-primary);
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.35;
 }
 
 .deadlines {
@@ -13,14 +28,15 @@
   gap: 0.65rem;
 }
 
-.deadlines div {
+.cleanup {
   display: grid;
   grid-template-columns: minmax(9rem, 0.35fr) minmax(0, 1fr);
   gap: 0.75rem;
 }
 
 .deadlines dt {
-  font-weight: 750;
+  color: var(--sh-color-text-secondary);
+  font-weight: var(--sh-font-weight-semibold);
 }
 
 .deadlines dd {
@@ -29,11 +45,63 @@
   overflow-wrap: anywhere;
 }
 
-.status {
-  min-height: 1.5rem;
+.expiryBlock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sh-space-3);
+  padding: 16px 18px;
+  border-radius: var(--sh-radius-md);
+  background: var(--sh-color-warning-bg);
+}
+
+.expiryBlock dt {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--sh-space-3);
+}
+
+.expiryIcon {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-warning);
+  background: var(--sh-color-surface-card);
+}
+
+.expiryBlock dd {
+  display: flex;
+  align-items: center;
+  gap: var(--sh-space-3);
   margin: 0;
-  padding-inline-start: 0.75rem;
-  border-inline-start: 0.3rem solid var(--color-warning, #a16207);
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-body);
+  font-weight: var(--sh-font-weight-bold);
+}
+
+.daysLeft {
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  border-radius: var(--sh-radius-full);
+  color: var(--sh-color-warning);
+  background: var(--sh-color-surface-card);
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-bold);
+  white-space: nowrap;
+}
+
+.status {
+  min-height: auto;
+  margin: 0;
+  padding: 0;
+  color: var(--sh-color-text-secondary);
+  background: transparent;
+  font-size: 12.5px;
+  line-height: 1.55;
 }
 
 .actions,
@@ -43,11 +111,49 @@
   gap: 0.75rem;
 }
 
+.actions {
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding-top: 16px;
+  border-top: 1px solid var(--sh-color-border-subtle);
+}
+
 .actions button,
 .actions a,
 .dialogActions button {
   min-height: 2.75rem;
   padding: 0.65rem 0.85rem;
+}
+
+.actions > button {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  color: var(--sh-color-error);
+  background: transparent;
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-semibold);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.actions > a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--sh-color-brand-primary);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-brand-primary);
+  font-size: var(--sh-font-size-button);
+  font-weight: var(--sh-font-weight-semibold);
+  text-decoration: none;
+  box-shadow: var(--sh-shadow-control);
+}
+
+.actions > a:hover {
+  background: var(--sh-color-brand-primary-hover);
 }
 
 .actions :is(button, a):focus-visible,
@@ -86,14 +192,25 @@
 }
 
 .dialogActions button:first-child {
-  color: #fff;
+  color: var(--sh-color-on-error);
   background: var(--color-error, #b91c1c);
 }
 
 @media (max-width: 32rem) {
-  .deadlines div {
+  .card {
+    padding: var(--sh-space-4);
+  }
+  .cleanup {
     grid-template-columns: 1fr;
     gap: 0.2rem;
+  }
+
+  .expiryBlock {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .expiryBlock dd {
+    margin-left: 48px;
   }
 
   .actions,

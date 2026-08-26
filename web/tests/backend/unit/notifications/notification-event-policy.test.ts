@@ -35,7 +35,7 @@ describe("in-app notification event policy", () => {
     }
   });
 
-  it("uses Vietnamese with English fallback and safe internal destinations", () => {
+  it("uses Vietnamese with English fallback and defers destinations", () => {
     const vi = buildNotification(
       {
         ...base,
@@ -58,7 +58,7 @@ describe("in-app notification event policy", () => {
     );
     expect(vi.summary).toContain("tin nhắn chưa đọc");
     expect(en.summary).toContain("unread messages");
-    expect(en.href).toBe("/messages?conversation=conversation%201");
+    expect(en.href).toBeNull();
     expect(en.groupable).toBe(true);
   });
 
@@ -74,6 +74,34 @@ describe("in-app notification event policy", () => {
     expect(notification.title).toBe("Verification received");
     expect(notification.summary).toBe(
       "A new business verification request was submitted and is awaiting review.",
+    );
+  });
+
+  it("assigns actionable administrator alerts safe severity and generic copy", () => {
+    const expected = {
+      SUPPORT_CASE_RECEIVED: "MEDIUM",
+      SUPPORT_REQUESTER_REPLIED: "HIGH",
+      SUPPORT_CASE_REOPENED: "HIGH",
+      MESSAGE_REPORT_RECEIVED_ADMIN: "HIGH",
+      MODERATION_REPORT_RECEIVED_ADMIN: "HIGH",
+      VERIFICATION_REVIEW_OVERDUE: "HIGH",
+      DELIVERY_MANUAL_INTERVENTION_REQUIRED: "CRITICAL",
+    } as const;
+    for (const [kind, severity] of Object.entries(expected)) {
+      const notification = buildNotification(
+        {
+          ...base,
+          kind: kind as never,
+          variables: { audience: "ADMIN", state: "ACTION_REQUIRED" },
+        },
+        "EN",
+      );
+      expect(notification.severity).toBe(severity);
+      expect(notification.title).not.toContain("ACTION_REQUIRED");
+      expect(notification.summary).not.toContain("user@example.test");
+    }
+    expect(notificationKinds).toEqual(
+      expect.arrayContaining(Object.keys(expected)),
     );
   });
 

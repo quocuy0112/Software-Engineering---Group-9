@@ -12,6 +12,11 @@ export const notificationKinds = [
   "MEMBERSHIP_SUSPENDED",
   "MEMBERSHIP_RESTORED",
   "MEMBERSHIP_REMOVED",
+  "COMPANY_BANNED",
+  "COMPANY_UNBANNED",
+  "COMPANY_INVITATION_RECEIVED",
+  "COMPANY_INVITATION_ACCEPTED",
+  "COMPANY_INVITATION_DECLINED",
   "APPLICATION_SUBMITTED",
   "APPLICATION_RECEIVED",
   "APPLICATION_STAGE_CHANGED",
@@ -24,6 +29,9 @@ export const notificationKinds = [
   "VERIFICATION_EXPIRED",
   "SUPPORT_WAITING_FOR_USER",
   "SUPPORT_RESOLVED",
+  "SUPPORT_CASE_RECEIVED",
+  "SUPPORT_REQUESTER_REPLIED",
+  "SUPPORT_CASE_REOPENED",
   "CONNECTION_PROPOSAL_CREATED",
   "CONNECTION_PROPOSAL_UPDATED",
   "CONNECTION_PROPOSAL_INACTIVE",
@@ -33,9 +41,17 @@ export const notificationKinds = [
   "MESSAGE_REPORT_RECEIVED",
   "MESSAGE_REPORT_RESOLVED",
   "MESSAGE_REPORT_DISMISSED",
+  "MESSAGE_REPORT_RECEIVED_ADMIN",
   "MODERATION_REPORT_RECEIVED",
   "MODERATION_REPORT_RESOLVED",
   "MODERATION_REPORT_DISMISSED",
+  "MODERATION_REPORT_RECEIVED_ADMIN",
+  "VERIFICATION_REVIEW_OVERDUE",
+  "DELIVERY_MANUAL_INTERVENTION_REQUIRED",
+  "JOB_POST_REVIEW_REQUESTED_ADMIN",
+  "JOB_POST_APPROVED",
+  "JOB_POST_REJECTED",
+  "JOB_POST_CHANGES_REQUESTED",
 ] as const;
 
 export const notificationKindSchema = z.enum(notificationKinds);
@@ -64,6 +80,18 @@ export const notificationSeverities = [
 export const notificationSeveritySchema = z.enum(notificationSeverities);
 export type NotificationSeverity = z.infer<typeof notificationSeveritySchema>;
 
+export const notificationRecipientRoles = [
+  "CANDIDATE",
+  "RECRUITER",
+  "ADMIN",
+] as const;
+export const notificationRecipientRoleSchema = z.enum(
+  notificationRecipientRoles,
+);
+export type NotificationRecipientRole = z.infer<
+  typeof notificationRecipientRoleSchema
+>;
+
 export const notificationContextTypes = [
   "ACCOUNT",
   "MEMBERSHIP",
@@ -75,6 +103,8 @@ export const notificationContextTypes = [
   "CONVERSATION",
   "MESSAGING_REPORT",
   "MODERATION_REPORT",
+  "JOB_POST_REVIEW",
+  "COMPANY_INVITATION",
 ] as const;
 export const notificationContextTypeSchema = z.enum(notificationContextTypes);
 export type NotificationContextType = z.infer<

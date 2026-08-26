@@ -53,6 +53,11 @@ export type CandidateIdentity = Prisma.CandidateIdentityModel
  */
 export type CandidateProfile = Prisma.CandidateProfileModel
 /**
+ * Model CandidateProfileVisibility
+ * 
+ */
+export type CandidateProfileVisibility = Prisma.CandidateProfileVisibilityModel
+/**
  * Model ProfileExperience
  * 
  */
@@ -148,6 +153,16 @@ export type AuditEvent = Prisma.AuditEventModel
  */
 export type Company = Prisma.CompanyModel
 /**
+ * Model CompanyInvitation
+ * 
+ */
+export type CompanyInvitation = Prisma.CompanyInvitationModel
+/**
+ * Model CompanyTeamActivity
+ * 
+ */
+export type CompanyTeamActivity = Prisma.CompanyTeamActivityModel
+/**
  * Model CompanyMembership
  * 
  */
@@ -157,6 +172,11 @@ export type CompanyMembership = Prisma.CompanyMembershipModel
  * 
  */
 export type PlatformAdministratorGrant = Prisma.PlatformAdministratorGrantModel
+/**
+ * Model PlatformAdministratorGrantScopeAssignment
+ * 
+ */
+export type PlatformAdministratorGrantScopeAssignment = Prisma.PlatformAdministratorGrantScopeAssignmentModel
 /**
  * Model AdministratorSessionPolicy
  * 
@@ -263,6 +283,61 @@ export type ModerationPrivateNote = Prisma.ModerationPrivateNoteModel
  */
 export type JobPosting = Prisma.JobPostingModel
 /**
+ * Model JobPostReviewAggregate
+ * 
+ */
+export type JobPostReviewAggregate = Prisma.JobPostReviewAggregateModel
+/**
+ * Model JobPostRevisionRequest
+ * 
+ */
+export type JobPostRevisionRequest = Prisma.JobPostRevisionRequestModel
+/**
+ * Model JobPostFeaturedPlacement
+ * 
+ */
+export type JobPostFeaturedPlacement = Prisma.JobPostFeaturedPlacementModel
+/**
+ * Model JobPostEnforcementAction
+ * 
+ */
+export type JobPostEnforcementAction = Prisma.JobPostEnforcementActionModel
+/**
+ * Model JobPostEnforcementTarget
+ * 
+ */
+export type JobPostEnforcementTarget = Prisma.JobPostEnforcementTargetModel
+/**
+ * Model ModerationReportEnforcementLink
+ * 
+ */
+export type ModerationReportEnforcementLink = Prisma.ModerationReportEnforcementLinkModel
+/**
+ * Model JobPostOperationalHistory
+ * 
+ */
+export type JobPostOperationalHistory = Prisma.JobPostOperationalHistoryModel
+/**
+ * Model JobPostReviewVersion
+ * 
+ */
+export type JobPostReviewVersion = Prisma.JobPostReviewVersionModel
+/**
+ * Model JobPostReviewHistory
+ * 
+ */
+export type JobPostReviewHistory = Prisma.JobPostReviewHistoryModel
+/**
+ * Model JobPostReviewPrivateNote
+ * 
+ */
+export type JobPostReviewPrivateNote = Prisma.JobPostReviewPrivateNoteModel
+/**
+ * Model JobCatalogueWriteLease
+ * 
+ */
+export type JobCatalogueWriteLease = Prisma.JobCatalogueWriteLeaseModel
+/**
  * Model JobPostingSkill
  * 
  */
@@ -278,6 +353,39 @@ export type ApplicationQuestion = Prisma.ApplicationQuestionModel
  */
 export type CandidateCv = Prisma.CandidateCvModel
 /**
+ * Model PrivateCvMatchCheck
+ * Candidate-private CV match data deliberately has no relations to the
+ * application, company, recruiter, job, or CV tables. The identifiers are
+ * immutable provenance values, not authorization paths. Candidate ownership
+ * is enforced by the private repository on every read and mutation.
+ */
+export type PrivateCvMatchCheck = Prisma.PrivateCvMatchCheckModel
+/**
+ * Model PrivateCvMatchAttempt
+ * 
+ */
+export type PrivateCvMatchAttempt = Prisma.PrivateCvMatchAttemptModel
+/**
+ * Model PrivateAutomaticMatchResult
+ * 
+ */
+export type PrivateAutomaticMatchResult = Prisma.PrivateAutomaticMatchResultModel
+/**
+ * Model PrivateAiEvaluationResult
+ * 
+ */
+export type PrivateAiEvaluationResult = Prisma.PrivateAiEvaluationResultModel
+/**
+ * Model PrivateMatchEvidence
+ * 
+ */
+export type PrivateMatchEvidence = Prisma.PrivateMatchEvidenceModel
+/**
+ * Model PrivateCvMatchCommandReceipt
+ * 
+ */
+export type PrivateCvMatchCommandReceipt = Prisma.PrivateCvMatchCommandReceiptModel
+/**
  * Model SavedJob
  * 
  */
@@ -288,10 +396,60 @@ export type SavedJob = Prisma.SavedJobModel
  */
 export type JobReport = Prisma.JobReportModel
 /**
+ * Model CandidateApplicationDraft
+ * 
+ */
+export type CandidateApplicationDraft = Prisma.CandidateApplicationDraftModel
+/**
+ * Model ApplicationIntake
+ * 
+ */
+export type ApplicationIntake = Prisma.ApplicationIntakeModel
+/**
+ * Model ApplicationPublicUpdate
+ * 
+ */
+export type ApplicationPublicUpdate = Prisma.ApplicationPublicUpdateModel
+/**
+ * Model ApplicationNotificationPreference
+ * 
+ */
+export type ApplicationNotificationPreference = Prisma.ApplicationNotificationPreferenceModel
+/**
  * Model JobApplication
  * 
  */
 export type JobApplication = Prisma.JobApplicationModel
+/**
+ * Model JobApplicationContactConsent
+ * 
+ */
+export type JobApplicationContactConsent = Prisma.JobApplicationContactConsentModel
+/**
+ * Model JobApplicationAttemptCounter
+ * 
+ */
+export type JobApplicationAttemptCounter = Prisma.JobApplicationAttemptCounterModel
+/**
+ * Model ApplicationDocument
+ * 
+ */
+export type ApplicationDocument = Prisma.ApplicationDocumentModel
+/**
+ * Model ApplicationCoverLetterText
+ * 
+ */
+export type ApplicationCoverLetterText = Prisma.ApplicationCoverLetterTextModel
+/**
+ * Model ApplicationArtifactPromotion
+ * 
+ */
+export type ApplicationArtifactPromotion = Prisma.ApplicationArtifactPromotionModel
+/**
+ * Model ApplicationDocumentLegalHold
+ * 
+ */
+export type ApplicationDocumentLegalHold = Prisma.ApplicationDocumentLegalHoldModel
 /**
  * Model ProfessionalConnection
  * 
@@ -347,6 +505,19 @@ export type SupportInternalNote = Prisma.SupportInternalNoteModel
  * 
  */
 export type SupportConversationHistory = Prisma.SupportConversationHistoryModel
+/**
+ * Model RecruitmentThread
+ * Recruitment messaging is deliberately separate from a social messaging
+ * conversation. It has one durable business context (an application), a
+ * single accountable assignee, and company-owner oversight without making the
+ * owner a message participant.
+ */
+export type RecruitmentThread = Prisma.RecruitmentThreadModel
+/**
+ * Model RecruitmentMessage
+ * 
+ */
+export type RecruitmentMessage = Prisma.RecruitmentMessageModel
 /**
  * Model MessagingConversation
  * 
@@ -499,3 +670,103 @@ export type ImageSearchAdmissionEvent = Prisma.ImageSearchAdmissionEventModel
  * refresh their respective component.
  */
 export type ImageSearchOperationalEvidence = Prisma.ImageSearchOperationalEvidenceModel
+/**
+ * Model AutomaticMatchResult
+ * 
+ */
+export type AutomaticMatchResult = Prisma.AutomaticMatchResultModel
+/**
+ * Model DocumentParseResult
+ * 
+ */
+export type DocumentParseResult = Prisma.DocumentParseResultModel
+/**
+ * Model SkillEvidenceExtraction
+ * 
+ */
+export type SkillEvidenceExtraction = Prisma.SkillEvidenceExtractionModel
+/**
+ * Model CvEvidenceExcerpt
+ * 
+ */
+export type CvEvidenceExcerpt = Prisma.CvEvidenceExcerptModel
+/**
+ * Model AiAssessment
+ * 
+ */
+export type AiAssessment = Prisma.AiAssessmentModel
+/**
+ * Model AiAssessmentFinding
+ * 
+ */
+export type AiAssessmentFinding = Prisma.AiAssessmentFindingModel
+/**
+ * Model AiSuggestedInterviewQuestion
+ * 
+ */
+export type AiSuggestedInterviewQuestion = Prisma.AiSuggestedInterviewQuestionModel
+/**
+ * Model ScoringOperation
+ * 
+ */
+export type ScoringOperation = Prisma.ScoringOperationModel
+/**
+ * Model ScoringWorkItem
+ * 
+ */
+export type ScoringWorkItem = Prisma.ScoringWorkItemModel
+/**
+ * Model AiAssessmentAttempt
+ * 
+ */
+export type AiAssessmentAttempt = Prisma.AiAssessmentAttemptModel
+/**
+ * Model ApplicationScoringResult
+ * 
+ */
+export type ApplicationScoringResult = Prisma.ApplicationScoringResultModel
+/**
+ * Model ManualApplicationPriority
+ * 
+ */
+export type ManualApplicationPriority = Prisma.ManualApplicationPriorityModel
+/**
+ * Model RankingSnapshot
+ * 
+ */
+export type RankingSnapshot = Prisma.RankingSnapshotModel
+/**
+ * Model RankingSnapshotRow
+ * 
+ */
+export type RankingSnapshotRow = Prisma.RankingSnapshotRowModel
+/**
+ * Model JobPostingViewFact
+ * 
+ */
+export type JobPostingViewFact = Prisma.JobPostingViewFactModel
+/**
+ * Model JobPostingLifecycleFact
+ * 
+ */
+export type JobPostingLifecycleFact = Prisma.JobPostingLifecycleFactModel
+/**
+ * Model ExportRequest
+ * 
+ */
+export type ExportRequest = Prisma.ExportRequestModel
+/**
+ * Model BackupConfiguration
+ * 
+ */
+export type BackupConfiguration = Prisma.BackupConfigurationModel
+/**
+ * Model BackupRun
+ * 
+ */
+export type BackupRun = Prisma.BackupRunModel
+/**
+ * Model ActivityLegalHold
+ * 
+ */
+export type ActivityLegalHold = Prisma.ActivityLegalHoldModel

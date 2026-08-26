@@ -18,6 +18,7 @@ export function MessageThread({
   error,
   onLoadOlder,
   onBack,
+  onViewProfile = () => undefined,
   csrfProof,
   onBlockedChanged,
   hasConversations = true,
@@ -28,6 +29,7 @@ export function MessageThread({
   error: string | null;
   onLoadOlder: () => void;
   onBack: () => void;
+  onViewProfile?: () => void;
   csrfProof: string;
   onBlockedChanged: (blocked: boolean) => void;
   hasConversations?: boolean;
@@ -116,6 +118,7 @@ export function MessageThread({
         <ConversationHeader
           name={page.conversation.otherParticipant.name}
           image={page.conversation.otherParticipant.image}
+          onViewProfile={onViewProfile}
           contextLabel={
             jobContextLabel
               ? copy.jobConversation
@@ -180,6 +183,12 @@ export function MessageThread({
                 data-direction={outgoing ? "outgoing" : "incoming"}
               >
                 <div className="messaging-message-bubble">
+                  <span className="messaging-message-avatar" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <circle cx="12" cy="8" r="3.25" />
+                      <path d="M5.5 20c.65-3.4 3.15-5.25 6.5-5.25S17.85 16.6 18.5 20" />
+                    </svg>
+                  </span>
                   <p>{message.content}</p>
                   <span className="messaging-message-meta">
                     <time dateTime={message.createdAt}>

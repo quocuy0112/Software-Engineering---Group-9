@@ -32,7 +32,7 @@ Immutable published scoring aggregate.
 | `finalScore` | Nullable decimal 0–100; exists iff AI score exists and lineage matches |
 | `state` | `DETERMINISTIC_ONLY` or `SCORED`; persisted state is never `PENDING` |
 | `formulaVersion` | Required approved formula identifier |
-| `automaticWeight`, `aiWeight` | Exactly 0.60 and 0.40 for this feature |
+| `automaticWeight`, `aiWeight` | Exactly 0.40 and 0.60 for this feature |
 | `highThreshold`, `mediumThreshold` | Exactly 80 and 60 for this formula version |
 | `roundingRule` | One-decimal, round-half-up after weighted sum |
 | `jobDescriptionVersionId`, `cvSnapshotVersionId` | Required exact input lineage |

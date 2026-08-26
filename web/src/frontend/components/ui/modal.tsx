@@ -8,6 +8,9 @@ export function Modal({
   description,
   tone = "standard",
   busy = false,
+  icon,
+  id,
+  className,
   onClose,
   children,
 }: {
@@ -16,6 +19,9 @@ export function Modal({
   description?: string;
   tone?: "standard" | "destructive";
   busy?: boolean;
+  icon?: ReactNode;
+  id?: string;
+  className?: string;
   onClose: () => void;
   children: ReactNode;
 }) {
@@ -93,7 +99,8 @@ export function Modal({
     >
       <section
         ref={dialogRef}
-        className="sh-modal"
+        id={id}
+        className={className ? "sh-modal " + className : "sh-modal"}
         data-tone={tone}
         role="dialog"
         aria-modal="true"
@@ -104,7 +111,7 @@ export function Modal({
       >
         <div className="sh-modal-heading">
           <span className="sh-modal-icon" aria-hidden="true">
-            {tone === "destructive" ? "!" : "i"}
+            {icon ?? (tone === "destructive" ? "!" : "i")}
           </span>
           <div>
             <h2 id={titleId}>{title}</h2>

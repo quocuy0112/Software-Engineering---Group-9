@@ -1,0 +1,1057 @@
+.recruitment-messaging {
+  display: grid;
+  gap: 1.25rem;
+  min-height: 100%;
+  padding: clamp(1rem, 2.5vw, 2rem);
+  color: #12233f;
+}
+.recruitment-messaging__header {
+  border-left: 4px solid #3158d8;
+  padding-left: 1rem;
+}
+.recruitment-messaging__header p,
+.recruitment-messaging__thread header p {
+  margin: 0;
+  color: #3158d8;
+  font-family: var(--sh-font-family);
+  font-size: 11.5px;
+  font-weight: var(--sh-font-weight-bold);
+  letter-spacing: 0.1em;
+  line-height: var(--sh-line-height-caption);
+  text-transform: uppercase;
+}
+.recruitment-messaging__header h1,
+.recruitment-messaging__thread h2 {
+  margin: 0.2rem 0;
+  letter-spacing: -0.035em;
+}
+.recruitment-messaging__header h1 {
+  color: var(--sh-color-text-primary);
+  font-family: var(--sh-font-family);
+  font-size: 24px;
+  font-weight: var(--sh-font-weight-bold);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+.recruitment-messaging__header span,
+.recruitment-messaging__thread header span,
+.recruitment-messaging__list small,
+.recruitment-messaging__list button span {
+  display: block;
+  color: #61708f;
+}
+.recruitment-messaging__header span {
+  font-family: var(--sh-font-family);
+  font-size: 13px;
+  font-weight: var(--sh-font-weight-regular);
+  line-height: 1.5;
+}
+.recruitment-messaging__grid {
+  display: grid;
+  /* Mirrors the /messages inbox: a stable 290–340px sidebar and a
+   * fluid conversation. The compact context rail yields first. */
+  grid-template-columns: minmax(290px, 340px) minmax(0, 1fr) minmax(220px, 270px);
+  gap: 1.5rem;
+  width: 100%;
+  height: clamp(620px, calc(100dvh - 220px), 780px);
+  min-height: 620px;
+  align-items: stretch;
+}
+.recruitment-messaging__list {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+  min-height: 0;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 1rem;
+  border: 1px solid #e1e8f5;
+  border-radius: 1.1rem;
+  background: linear-gradient(180deg, #f8faff 0%, #fff 28%);
+}
+.recruitment-messaging__list label,
+.recruitment-messaging__thread form label {
+  display: grid;
+  gap: 0.38rem;
+  color: #354968;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+.recruitment-messaging input,
+.recruitment-messaging select,
+.recruitment-messaging textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #bdcbe3;
+  border-radius: 0.6rem;
+  outline: none;
+  font: inherit;
+  padding: 0.65rem 0.7rem;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+.recruitment-messaging input:focus,
+.recruitment-messaging select:focus,
+.recruitment-messaging textarea:focus {
+  border-color: #3158d8;
+  box-shadow: 0 0 0 3px #dfe8ff;
+}
+.recruitment-messaging__list button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.28rem;
+  min-width: 0;
+  border: 1px solid #e0e8f5;
+  border-radius: 0.75rem;
+  background: #fff;
+  cursor: pointer;
+  padding: 0.8rem;
+  text-align: left;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+.recruitment-messaging__list button:hover {
+  border-color: #9eb5ec;
+  box-shadow: 0 6px 14px rgba(39, 78, 156, 0.08);
+  transform: translateY(-1px);
+}
+.recruitment-messaging__list button:focus-visible {
+  outline: 3px solid #9db6fb;
+  outline-offset: 2px;
+}
+.recruitment-messaging__list button.is-selected {
+  border-color: #3158d8;
+  background: #f1f5ff;
+  box-shadow:
+    inset 3px 0 #3158d8,
+    0 5px 14px rgba(39, 78, 156, 0.1);
+}
+.recruitment-messaging__list button strong,
+.recruitment-messaging__list button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.recruitment-messaging__list button strong {
+  grid-column: 1;
+  grid-row: 1;
+}
+.recruitment-messaging__list button .recruitment-messaging__job-title {
+  grid-column: 1;
+  grid-row: 2;
+  font-size: 0.85rem;
+}
+.recruitment-messaging__list-stage,
+.recruitment-chat-stage {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.22rem 0.45rem;
+  color: #3158d8;
+  background: #eef3ff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.recruitment-messaging__list-stage {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+  justify-self: end;
+}
+.recruitment-messaging__unread-count {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: center;
+  justify-self: end;
+  color: #3158d8;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+.recruitment-messaging__list [data-stage="OFFERED"],
+.recruitment-chat-stage[data-stage="OFFERED"] {
+  color: #087443;
+  background: #e4f7ed;
+}
+.recruitment-messaging__list [data-stage="VIEWED"],
+.recruitment-chat-stage[data-stage="VIEWED"] {
+  color: #3158d8;
+  background: #eef3ff;
+}
+.recruitment-messaging__list [data-stage="SHORTLISTED"],
+.recruitment-chat-stage[data-stage="SHORTLISTED"],
+.recruitment-messaging__list [data-stage="INTERVIEWING"],
+.recruitment-chat-stage[data-stage="INTERVIEWING"] {
+  color: #7650bd;
+  background: #f0eaff;
+}
+.recruitment-messaging__list [data-stage="REJECTED"],
+.recruitment-chat-stage[data-stage="REJECTED"] {
+  color: #b42318;
+  background: #fef0ef;
+}
+.recruitment-messaging__thread {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  box-sizing: border-box;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid #dbe4f3;
+  border-radius: 1.1rem;
+  background: #fff;
+  box-shadow: 0 18px 45px rgba(34, 63, 124, 0.09);
+}
+.recruitment-messaging__context {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 1.25rem;
+  border: 1px solid #e1e8f5;
+  border-radius: 1.1rem;
+  background: linear-gradient(180deg, #f8faff 0%, #fff 30%);
+}
+.recruitment-messaging__context-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e1e8f5;
+}
+.recruitment-messaging__context-header > span {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 12px;
+  color: #3158d8;
+  background: #e4edff;
+  font-size: 1rem;
+  font-weight: 800;
+}
+.recruitment-messaging__context-header p,
+.recruitment-messaging__context-header h2 {
+  margin: 0;
+}
+.recruitment-messaging__context-header p {
+  color: #61708f;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.recruitment-messaging__context-header h2 {
+  margin-top: 0.16rem;
+  overflow: hidden;
+  color: #12233f;
+  font-size: 1rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.recruitment-messaging__context-list {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+}
+.recruitment-messaging__context-list > div {
+  display: grid;
+  gap: 0.28rem;
+}
+.recruitment-messaging__context-list dt {
+  color: #71809a;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.recruitment-messaging__context-list dd {
+  margin: 0;
+  color: #253957;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.recruitment-messaging__context-note {
+  margin: 0;
+  border-radius: 0.7rem;
+  padding: 0.75rem;
+  color: #61708f;
+  background: #f1f5ff;
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+.recruitment-messaging__thread > header {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e3e9f4;
+}
+.recruitment-messaging__thread h2 {
+  font-size: 1.35rem;
+}
+.recruitment-messaging__assignment {
+  display: flex;
+  align-items: end;
+  gap: 0.75rem;
+  border: 1px solid #cfdbf2;
+  border-radius: 0.75rem;
+  background: #f4f7fd;
+  padding: 0.75rem;
+}
+.recruitment-messaging__assignment label {
+  flex: 1;
+}
+.recruitment-messaging__assignment button {
+  border: 1px solid #3158d8;
+  border-radius: 0.55rem;
+  background: #fff;
+  color: #2446b8;
+  font-weight: 800;
+  padding: 0.65rem 0.85rem;
+}
+.recruitment-messaging__messages {
+  display: grid;
+  align-content: start;
+  gap: 0.8rem;
+  overflow: auto;
+  padding: 0.15rem 0.2rem 0.3rem;
+}
+.recruitment-messaging__messages article {
+  width: fit-content;
+  max-width: min(42rem, 72%);
+  border: 1px solid #e1e8f4;
+  border-radius: 0.85rem 0.85rem 0.85rem 0.2rem;
+  background: #f5f7fc;
+  box-shadow: 0 2px 6px rgba(31, 55, 105, 0.04);
+  padding: 0.8rem 0.9rem;
+}
+.recruitment-messaging__messages article p,
+.recruitment-messaging__messages article time {
+  margin: 0 0 0.35rem;
+  color: #64728c;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+.recruitment-messaging__messages article time {
+  display: block;
+  height: 0;
+  overflow: hidden;
+  margin-top: 0;
+  margin-bottom: 0;
+  opacity: 0;
+  font-weight: 500;
+  transition: opacity 0.16s ease;
+}
+.recruitment-messaging__messages article:hover time,
+.recruitment-messaging__messages article:focus-within time {
+  height: auto;
+  margin-top: 0.45rem;
+  opacity: 0.78;
+}
+.recruitment-chat-message article {
+  position: relative;
+}
+.recruitment-chat-message article time {
+  display: none;
+}
+.recruitment-chat-message article::after {
+  position: absolute;
+  z-index: 2;
+  bottom: -1.75rem;
+  left: 0;
+  padding: 0.3rem 0.48rem;
+  border-radius: 0.4rem;
+  color: #ffffff;
+  background: #253957;
+  box-shadow: 0 3px 8px rgba(31, 55, 105, 0.18);
+  content: attr(data-time);
+  font-size: 0.62rem;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-3px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  white-space: nowrap;
+}
+.recruitment-chat-message[data-direction="outgoing"] article::after {
+  right: 0;
+  left: auto;
+}
+.recruitment-chat-message:hover article::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+.recruitment-messaging__messages article > header {
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+  margin-bottom: 0.38rem;
+}
+.recruitment-messaging__messages article > header p {
+  margin: 0;
+}
+.recruitment-chat-message__avatar {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  color: #3158d8;
+  background: #e4edff;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+.recruitment-messaging__thread form {
+  display: grid;
+  gap: 0.55rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid #e3e9f4;
+}
+.recruitment-messaging textarea {
+  min-height: 5.25rem;
+  resize: vertical;
+}
+.recruitment-messaging button[type="submit"] {
+  justify-self: end;
+  border: 0;
+  border-radius: 0.55rem;
+  background: linear-gradient(135deg, #3158d8, #2448ba);
+  box-shadow: 0 7px 14px rgba(38, 73, 181, 0.22);
+  color: #fff;
+  font-weight: 800;
+  padding: 0.68rem 1.05rem;
+}
+.recruitment-messaging button[type="submit"]:hover:not(:disabled) {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+.recruitment-messaging button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.recruitment-messaging__error {
+  margin: 0;
+  border: 1px solid #f0a1a1;
+  border-radius: 0.7rem;
+  background: #fff2f2;
+  color: #9c1c1c;
+  padding: 0.8rem 1rem;
+}
+.recruitment-messaging__empty {
+  margin: 0;
+  color: #66758f;
+  padding: 1rem;
+  text-align: center;
+}
+@media (max-width: 1240px) {
+  .recruitment-messaging__grid {
+    grid-template-columns: minmax(270px, 310px) minmax(0, 1fr);
+  }
+  .recruitment-messaging__list {
+    grid-row: span 2;
+  }
+  .recruitment-messaging__context {
+    grid-column: 2;
+    border-top: 1px solid #e1e8f5;
+    border-left: 0;
+  }
+}
+@media (max-width: 800px) {
+  .recruitment-messaging__grid {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
+  }
+  .recruitment-messaging__list {
+    max-height: 21rem;
+    grid-row: auto;
+    border-right: 0;
+    border-bottom: 1px solid #dfe7f4;
+  }
+  .recruitment-messaging__thread {
+    min-height: 32rem;
+  }
+  .recruitment-messaging__context {
+    grid-column: auto;
+  }
+}
+@media (max-width: 520px) {
+  .recruitment-messaging {
+    padding: 1rem 0.75rem;
+  }
+  .recruitment-messaging__assignment {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .recruitment-messaging__assignment button,
+  .recruitment-messaging button[type="submit"] {
+    width: 100%;
+  }
+}
+
+/* Candidate conversations stay visually focused on the application context. */
+.recruitment-messaging--candidate {
+  width: min(100%, 58rem);
+  margin: 0 auto;
+  padding-top: clamp(1.5rem, 4vw, 3rem);
+}
+
+.recruitment-messaging--candidate .application-detail-back {
+  width: fit-content;
+  color: #3158d8;
+  font-size: 0.875rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.recruitment-messaging--candidate .application-detail-back:hover {
+  text-decoration: underline;
+}
+
+.recruitment-messaging--candidate .recruitment-messaging__thread {
+  height: clamp(36rem, calc(100dvh - 15rem), 46rem);
+  min-height: 36rem;
+  overflow: hidden;
+  border: 1px solid #dbe4f3;
+  border-radius: 1.1rem;
+  box-shadow: 0 18px 45px rgba(34, 63, 124, 0.09);
+}
+
+.recruitment-messaging--candidate .recruitment-messaging__thread > header {
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #f2f6ff, #fbfcff);
+  padding: 1rem;
+}
+
+/* The recruiter inbox retains a stable list pane while the selected thread is open. */
+.recruitment-messaging--recruiter .recruitment-messaging__list {
+  scrollbar-color: #b8c8ed transparent;
+  scrollbar-width: thin;
+}
+
+.recruitment-messaging--recruiter .recruitment-messaging__thread > header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #fff;
+}
+
+.recruitment-messaging--recruiter .recruitment-messaging__thread > .recruitment-chat-header {
+  padding: 0 0 0.9rem;
+  border: 0;
+  border-bottom: 1px solid #d9e3f4;
+  border-radius: 0;
+  background: transparent;
+}
+
+.recruitment-messaging--recruiter .recruitment-messaging__messages {
+  min-height: 16rem;
+}
+
+/* One shared conversation surface for the candidate and recruiter views. */
+.recruitment-chat-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid #d9e3f4;
+  border-radius: 0.9rem;
+  background: linear-gradient(135deg, #f5f8ff, #ffffff 68%);
+}
+.recruitment-chat-header > div:first-child {
+  min-width: 0;
+}
+.recruitment-messaging--candidate .recruitment-chat-header {
+  align-items: center;
+}
+.recruitment-candidate-chat-status {
+  display: grid;
+  justify-items: end;
+  gap: 0.38rem;
+  min-width: 0;
+}
+.recruitment-candidate-chat-status .recruitment-chat-stage {
+  align-self: center;
+}
+.recruitment-candidate-chat-status > span {
+  max-width: 20rem;
+  color: #61708f;
+  font-size: 0.76rem;
+  line-height: 1.3;
+  text-align: right;
+}
+
+.recruitment-messaging__thread > .recruitment-chat-header {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #d9e3f4;
+}
+
+.recruitment-chat-header p {
+  margin: 0;
+  color: #3158d8;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.recruitment-chat-header h1,
+.recruitment-chat-header h2 {
+  margin: 0.22rem 0;
+  color: #12233f;
+  font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+}
+
+.recruitment-chat-header span {
+  display: block;
+  color: #61708f;
+  font-size: 0.8rem;
+}
+
+.recruitment-chat-stage {
+  flex: 0 0 auto;
+  border: 1px solid #cbd8fa;
+  border-radius: 999px;
+  background: #eaf0ff;
+  color: #2448ba;
+  padding: 0.38rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.recruitment-chat-history {
+  flex: 1 1 auto;
+  min-height: 0;
+  align-content: start;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding: 1.625rem clamp(1.25rem, 4vw, 3.25rem) 3.375rem;
+  scrollbar-color: #b8c8ed transparent;
+  scrollbar-width: thin;
+}
+.recruitment-chat-history__start {
+  justify-self: center;
+  margin: 0 0 1.4rem;
+  border-radius: 999px;
+  padding: 0.48rem 1rem;
+  color: #61708f;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(31, 55, 105, 0.08);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.recruitment-chat-message {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+.recruitment-chat-message[data-direction="outgoing"] {
+  justify-self: stretch;
+}
+.recruitment-chat-message article {
+  width: fit-content;
+  max-width: min(68%, 650px);
+  margin: 0;
+  padding: 0.625rem 0.8125rem;
+  flex: 0 1 auto;
+  border-radius: 5px 12px 12px 12px;
+  box-shadow: none;
+}
+.recruitment-chat-message[data-direction="outgoing"] article {
+  margin-left: auto;
+  border-color: #3158d8;
+  border-radius: 12px 5px 12px 12px;
+  background: #3158d8;
+  color: #ffffff;
+}
+.recruitment-chat-message[data-direction="outgoing"] article time {
+  color: #dce6ff;
+}
+.recruitment-chat-message__avatar {
+  position: absolute;
+  right: auto;
+  left: -38px;
+  bottom: 0;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid #dce4f0;
+  border-radius: 50%;
+  color: #61708f;
+  background: #ffffff;
+}
+.recruitment-chat-message__avatar svg {
+  width: 15px;
+  height: 15px;
+}
+.recruitment-chat-message[data-direction="outgoing"] .recruitment-chat-message__avatar {
+  right: -38px;
+  left: auto;
+  border-color: #b9ceff;
+  color: #2457d9;
+  background: #e4edff;
+}
+
+.recruitment-chat-history ol {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recruitment-chat-history li,
+.recruitment-chat-history > article {
+  width: 100%;
+}
+
+.recruitment-chat-history li {
+  display: flex;
+}
+
+.recruitment-chat-history > article {
+  display: block;
+  width: auto;
+}
+
+.recruitment-chat-history li[data-direction="outgoing"],
+.recruitment-chat-history > article[data-direction="outgoing"] {
+  justify-content: flex-end;
+}
+
+.recruitment-chat-history > article[data-direction="outgoing"] {
+  justify-self: end;
+}
+.recruitment-chat-history > article[data-direction="outgoing"] > header {
+  justify-content: flex-end;
+}
+
+.recruitment-chat-history li[data-direction="incoming"],
+.recruitment-chat-history > article[data-direction="incoming"] {
+  justify-content: flex-start;
+}
+
+.recruitment-chat-history > article[data-direction="incoming"] {
+  justify-self: start;
+}
+
+.recruitment-messaging--candidate .recruitment-chat-history > ol > li > article,
+.recruitment-chat-history > article {
+  max-width: min(42rem, 82%);
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+}
+
+.recruitment-chat-history li[data-direction="incoming"] article,
+.recruitment-chat-history > article[data-direction="incoming"] {
+  border-color: #dce4f0;
+  border-left: 1px solid #dce4f0;
+  border-radius: 0.9rem 0.9rem 0.9rem 0.2rem;
+  background: #f4f7fb;
+  color: #1b2e4b;
+}
+
+.recruitment-chat-history li[data-direction="outgoing"] article,
+.recruitment-chat-history > article[data-direction="outgoing"] {
+  border-color: #3158d8;
+  border-left: 1px solid #3158d8;
+  border-radius: 0.9rem 0.9rem 0.2rem 0.9rem;
+  background: linear-gradient(135deg, #3158d8, #2448ba);
+  color: #ffffff;
+}
+
+.recruitment-chat-history li[data-direction="outgoing"] article p,
+.recruitment-chat-history li[data-direction="outgoing"] article time,
+.recruitment-chat-history > article[data-direction="outgoing"] p,
+.recruitment-chat-history > article[data-direction="outgoing"] time {
+  color: #dce6ff;
+}
+
+.recruitment-chat-history article > div {
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+.recruitment-chat-composer {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 52px auto;
+  align-items: start;
+  gap: 8px 12px !important;
+  padding: 12px 20px 16px !important;
+  min-height: 0 !important;
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 100%;
+  box-sizing: border-box;
+  border: 0 !important;
+  border-top: 1px solid #dbe4f3 !important;
+  border-radius: 0;
+  background: transparent;
+}
+
+.recruitment-chat-composer label {
+  display: block !important;
+  position: relative;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.recruitment-chat-composer textarea {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  border-radius: 10px;
+  background: var(--sh-color-surface-tinted);
+  padding: 12px 68px 12px 16px;
+  line-height: 1.45;
+  resize: none;
+}
+
+.recruitment-chat-composer__count {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  color: #61708f;
+  font-size: 0.75rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.recruitment-chat-composer__actions {
+  display: contents;
+}
+
+.recruitment-chat-composer__actions > span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+  color: #71809a;
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+.recruitment-chat-composer__actions button[type="submit"] {
+  display: inline-flex;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  min-width: 104px;
+  height: 52px;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0;
+  justify-self: auto;
+  white-space: nowrap;
+  align-self: start;
+}
+
+/* The messaging workspace predates the shared semantic tokens. Keep its
+ * light presentation intact, while mapping all conversation surfaces to the
+ * active theme in dark mode. */
+:root[data-theme="dark"] .recruitment-messaging {
+  color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__header h1,
+:root[data-theme="dark"] .recruitment-messaging__thread h2,
+:root[data-theme="dark"] .recruitment-chat-header h1,
+:root[data-theme="dark"] .recruitment-chat-header h2 {
+  color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__header span,
+:root[data-theme="dark"] .recruitment-messaging__thread header span,
+:root[data-theme="dark"] .recruitment-messaging__list small,
+:root[data-theme="dark"] .recruitment-messaging__list button span,
+:root[data-theme="dark"] .recruitment-chat-header span,
+:root[data-theme="dark"] .recruitment-messaging__empty {
+  color: var(--sh-color-text-secondary);
+}
+
+:root[data-theme="dark"] .recruitment-chat-header__meta small {
+  color: var(--sh-color-text-secondary);
+}
+
+/* Shared recruiter page-header rhythm. */
+.recruitment-messaging--recruiter .recruitment-messaging__header {
+  position: relative;
+  margin: 0 0 24px;
+  padding-left: 0;
+  border-left: 0;
+}
+
+.recruitment-messaging--recruiter .recruitment-messaging__header > p {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+  color: var(--sh-color-brand-primary);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+.recruitment-messaging--recruiter .recruitment-messaging__header > p::before {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+}
+
+.recruitment-messaging--recruiter .recruitment-messaging__header h1 {
+  margin: 0 0 5px;
+  color: var(--sh-color-text-primary);
+  font-family: var(--sh-font-family-label);
+  font-size: 22px;
+  font-weight: var(--sh-font-weight-bold);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.recruitment-messaging--recruiter .recruitment-messaging__header > span {
+  color: var(--sh-color-text-secondary);
+  font-family: var(--sh-font-family-label);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+:root[data-theme="dark"] .recruitment-messaging--candidate .recruitment-messaging__thread {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-card);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__list {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__thread,
+:root[data-theme="dark"] .recruitment-messaging--recruiter .recruitment-messaging__thread > header {
+  background: var(--sh-color-surface-card);
+}
+.recruitment-chat-header__meta {
+  display: grid;
+  justify-items: end;
+  gap: 0.38rem;
+  flex: 0 0 auto;
+}
+.recruitment-chat-header__meta small {
+  color: #61708f;
+  font-size: 0.66rem;
+  font-weight: 700;
+  border-radius: 10px;
+  box-shadow: none;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.recruitment-chat-composer__actions button[type="submit"] svg {
+  width: 20px;
+  height: 20px;
+}
+
+:root[data-theme="dark"] .recruitment-messaging__context {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__context-header {
+  border-color: var(--sh-color-border-subtle);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__context-header > span {
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__context-header h2,
+:root[data-theme="dark"] .recruitment-messaging__context-list dd {
+  color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__context-header p,
+:root[data-theme="dark"] .recruitment-messaging__context-list dt,
+:root[data-theme="dark"] .recruitment-messaging__context-note {
+  color: var(--sh-color-text-secondary);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__context-note {
+  background: var(--sh-color-surface-card);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__list label,
+:root[data-theme="dark"] .recruitment-messaging__thread form label {
+  color: var(--sh-color-text-secondary);
+}
+
+:root[data-theme="dark"] .recruitment-messaging input,
+:root[data-theme="dark"] .recruitment-messaging select,
+:root[data-theme="dark"] .recruitment-messaging textarea {
+  border-color: var(--sh-color-border-default);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__list button {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+}
+
+:root[data-theme="dark"] .recruitment-messaging__list button.is-selected {
+  border-color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+}
+
+@media (max-width: 520px) {
+  .recruitment-chat-header,
+  .recruitment-chat-composer__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .recruitment-chat-stage {
+    align-self: flex-start;
+  }
+
+  .recruitment-chat-header__meta {
+    justify-items: start;
+  }
+
+  .recruitment-chat-composer__actions button[type="submit"] {
+    width: 100%;
+  }
+
+  .recruitment-messaging--candidate .recruitment-chat-history article,
+  .recruitment-chat-history > article {
+    max-width: 92%;
+  }
+}

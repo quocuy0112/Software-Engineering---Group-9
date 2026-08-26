@@ -15,7 +15,7 @@ describe("messaging retention and deletion policy", () => {
   });
 
   it("enforces a database-level 90-day evidence hold and has no message expiry column", () => {
-    const migration = readFileSync("prisma/migrations/022_realtime_messaging/migration.sql", "utf8");
+    const migration = readFileSync("prisma/migrations/023_realtime_messaging/migration.sql", "utf8");
     expect(migration).toContain("INTERVAL '90 days'");
     const messageTable = migration.slice(
       migration.indexOf('CREATE TABLE "MessagingMessage"'),

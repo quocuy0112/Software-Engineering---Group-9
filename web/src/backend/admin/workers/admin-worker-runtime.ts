@@ -12,7 +12,10 @@ export type AdminWorkerLoop = {
     | "in-app-notification-retention"
     | "retention"
     | "support"
-    | "connections";
+    | "connections"
+    | "job-post-lifecycle"
+    | "job-review-retention"
+    | "backup";
   intervalMs: number;
   run(now: Date): Promise<unknown>;
 };

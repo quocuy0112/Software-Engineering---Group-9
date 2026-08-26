@@ -31,7 +31,7 @@ describe("CV browser data boundary", () => {
       <CvUploadForm csrfProof="csrf_browser_boundary" onUpload={onUpload} />,
     );
     const file = new File(
-      [`${canaries.cvText}\n${canaries.token}`],
+      [`%PDF-${canaries.cvText}\n${canaries.token}`],
       canaries.filename,
       { type: "application/pdf" },
     );
@@ -39,6 +39,11 @@ describe("CV browser data boundary", () => {
       target: { files: [file] },
     });
     fireEvent.click(screen.getByRole("radio", { name: /external openai/i }));
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent(
+        /privacy-person@example\.invalid\.pdf is ready/i,
+      ),
+    );
     fireEvent.click(screen.getByRole("button", { name: /upload cv/i }));
     await waitFor(() => expect(onUpload).toHaveBeenCalledOnce());
     expect(onUpload).toHaveBeenCalledWith(

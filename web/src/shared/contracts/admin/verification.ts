@@ -96,11 +96,13 @@ export const verificationListFilterSchema = z
 
 export const verificationQueueFilterSchema = z
   .object({
-    state: verificationStateSchema.default("PENDING_REVIEW"),
+    state: verificationStateSchema.optional(),
     applicantEligibility: z
       .enum(["ACTIVE_ONLY", "SUSPENDED_ONLY", "ANY"])
-      .default("ACTIVE_ONLY"),
+      .default("ANY"),
+    q: z.string().trim().min(1).max(160).optional(),
     company: z.string().trim().max(160).optional(),
+    targetCompanyId: z.string().trim().min(1).max(128).optional(),
     taxCode: z
       .string()
       .trim()
@@ -145,11 +147,13 @@ export const verificationQueueItemSchema = z
     applicantId: z.string().min(1),
     companyName: z.string().max(240),
     taxCode: z.string().regex(/^\d{10}$/u),
+    targetCompanyId: z.string().min(1).nullable(),
     state: verificationStateSchema,
     applicantEligibility: z.enum(["ACTIVE", "SUSPENDED"]),
     submittedAt: adminTimestampSchema,
     resubmissionCount: z.number().int().nonnegative(),
     assignedAdminRef: z.string().min(1).nullable(),
+    assignmentStatus: z.enum(["UNASSIGNED", "MINE", "ASSIGNED_TO_OTHER"]),
     version: z.number().int().positive(),
   })
   .strict();
@@ -184,6 +188,16 @@ export const evidenceMetadataSchema = z
     byteSize: z.number().int().positive(),
     safetyState: z.enum(["PENDING", "PASS", "FAIL", "ERROR"]),
     accessibility: z.enum(["AVAILABLE", "INACCESSIBLE", "DELETED"]),
+    unavailabilityReason: z
+      .enum([
+        "DELETED",
+        "CONTENT_RESTRICTED",
+        "SUPERSEDED",
+        "NOT_CURRENT_SUBMISSION",
+        "SAFETY_CHECK_INCOMPLETE",
+        "TARGET_COMPANY_INACTIVE",
+      ])
+      .nullable(),
   })
   .strict();
 
@@ -191,6 +205,7 @@ export const verificationReviewDetailSchema = z
   .object({
     request: verificationQueueItemSchema,
     company: z.object({
+      id: z.string().min(1).nullable(),
       name: z.string(),
       taxCode: z.string().regex(/^\d{10}$/u),
       targetKind: z.enum(["NEW_COMPANY", "EXISTING_COMPANY"]),
@@ -208,6 +223,13 @@ export const verificationReviewDetailSchema = z
       }),
     ),
     applicantComment: z.string().nullable(),
+    assignment: z
+      .object({
+        status: z.enum(["UNASSIGNED", "MINE", "ASSIGNED_TO_OTHER"]),
+        assignedAdminRef: z.string().min(1).nullable(),
+        canClaim: z.boolean(),
+      })
+      .strict(),
     canDecide: z.boolean(),
     blockReason: z.string().nullable(),
     calculatedAt: adminTimestampSchema,

@@ -25,7 +25,7 @@ export type ExtractedSegment = Readonly<{
 }>;
 
 export type ExtractionChildRequest = Readonly<{
-  kind: "PDF" | "DOCX";
+  kind: "PDF" | "DOC" | "DOCX";
   source: Uint8Array;
   limits: typeof CV_EXTRACTION_LIMITS;
 }>;
@@ -84,7 +84,7 @@ export class IsolatedDocumentExtractor {
   ) {}
 
   async extract(input: {
-    kind: "PDF" | "DOCX";
+    kind: "PDF" | "DOC" | "DOCX";
     scanStatus:
       | "QUEUED"
       | "PROCESSING"

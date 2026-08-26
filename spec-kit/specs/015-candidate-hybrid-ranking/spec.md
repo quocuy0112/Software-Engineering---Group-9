@@ -11,7 +11,7 @@
 
 ### Session 2026-08-14
 
-- Q: Is the hybrid formula configurable for this feature? → A: No. The constitution fixes `60% deterministic + 40% AI`; configuration is versioned for audit and future migration, but changing weights requires a constitution amendment.
+- Q: Is the hybrid formula configurable for this feature? → A: No. The constitution fixes `40% deterministic + 60% AI`; configuration is versioned for audit and future migration, but changing weights requires a constitution amendment.
 - Q: What does each scoring-state term mean? → A: `Not calculated` means no applicable computation has ever completed or is running; `Pending` means a final/AI computation is running; `Unavailable` means the last AI attempt failed and may be retried while deterministic output remains valid; `Processing` is the list-row presentation for an application with no published scoring result while initial scoring runs. These labels are never aliases.
 - Q: Is a partial hybrid score allowed when AI fails? → A: No. Automatic match remains visible, AI is `Unavailable`, and final score is `Not calculated`; AI is never substituted with zero and no partial number is called final.
 - Q: What happens to old scores during rescore? → A: The last published score remains current and fully readable until an application’s replacement aggregate commits atomically. A separate rescore status indicates work in progress.
@@ -46,7 +46,7 @@ As a Recruiter, I want a deterministic CV-to-JD score with skill, experience, an
 
 ### User Story 2 — Review an explainable AI assessment and hybrid score (Priority: P1)
 
-As a Recruiter, I want a bounded AI assessment and explicit 60/40 calculation so that I can understand the recommendation without treating it as a decision.
+As a Recruiter, I want a bounded AI assessment and explicit 40/60 calculation so that I can understand the recommendation without treating it as a decision.
 
 **Why this priority**: It supplies the semantic component and auditable final ranking required by the ranking screens.
 
@@ -54,7 +54,7 @@ As a Recruiter, I want a bounded AI assessment and explicit 60/40 calculation so
 
 **Acceptance scenarios**:
 
-1. **Given** automatic score 92 and AI score 88, **when** both publish, **then** final score is 90.4 and the response states `92 × 0.6 + 88 × 0.4 = 90.4` with all input/config versions.
+1. **Given** automatic score 92 and AI score 88, **when** both publish, **then** final score is 89.6 and the response states `92 × 0.4 + 88 × 0.6 = 89.6` with all input/config versions.
 2. **Given** confidence is below 70%, **when** assessment is read, **then** it carries an explicit low-confidence label and human-review caution without modifying the score.
 3. **Given** too little evidence exists for questions, **when** the assessment is read, **then** it contains the explicit question fallback instead of an empty list.
 
@@ -154,7 +154,7 @@ As a Recruiter, I want to explicitly reject an eligible application with an allo
 ### Out of scope
 
 - Automated pipeline transitions, hiring recommendations that execute decisions, bulk rejection/advancement, or score-threshold actions.
-- Changing 60/40 weights, approved score bands, canonical stage enum, or Group 1 submission/document authority.
+- Changing 40/60 weights, approved score bands, canonical stage enum, or Group 1 submission/document authority.
 - Reopening `REJECTED`, undo rejection, interview scheduling, candidate rejection notification, editable scoring, recruiter-authored AI text, or general pipeline/Kanban ownership.
 - A second CV/JD access path, a second Application aggregate, or persistent raw provider payloads.
 
@@ -169,7 +169,7 @@ As a Recruiter, I want to explicitly reject an eligible application with an allo
 - **FR-007**: Successful AI assessment MUST include score 0–100, confidence 0–100, provider/model/prompt/policy versions, labelled AI summary, evidence-based strengths, points to verify, concise breakdown, and the statement `Sensitive personal attributes are excluded from scoring.`
 - **FR-008**: Confidence below 70 MUST return `LOW_CONFIDENCE` and human-review guidance; confidence MUST NOT alter score weights or stage.
 - **FR-009**: Suggested questions MUST trace to points-to-verify or return `INSUFFICIENT_DATA` with a non-empty fallback message.
-- **FR-010**: Hybrid score MUST equal deterministic × 0.6 + AI × 0.4, rounded to one decimal using the recorded formula version, weights, thresholds, CV/JD/config versions, and computed time.
+- **FR-010**: Hybrid score MUST equal deterministic × 0.4 + AI × 0.6, rounded to one decimal using the recorded formula version, weights, thresholds, CV/JD/config versions, and computed time.
 - **FR-011**: A hybrid final score MUST exist only when both component scores succeeded for the same input/config lineage.
 - **FR-012**: APIs MUST represent `Not calculated`, `Pending`, `Unavailable`, and `Processing` as mutually exclusive typed variants with explicit labels; no variant may rely on a color token.
 - **FR-013**: Score bands MUST be `HIGH_MATCH` 80–100, `MEDIUM_MATCH` 60–79.9, and `LOW_MATCH` below 60 with text and icon semantics in every projection.
@@ -221,7 +221,7 @@ As a Recruiter, I want to explicitly reject an eligible application with an allo
 - [ ] Malformed, timed-out, or failed AI cannot block or erase deterministic output.
 - [ ] Confidence below 70 has a non-color textual warning and no automated consequence.
 - [ ] Suggested questions derive from verification points or show an explicit insufficient-data fallback.
-- [ ] Every final score exposes the exact 60/40 calculation, weights, thresholds, CV/JD/config/model/prompt provenance, and computed time.
+- [ ] Every final score exposes the exact 40/60 calculation, weights, thresholds, CV/JD/config/model/prompt provenance, and computed time.
 - [ ] No hybrid number is returned until compatible deterministic and AI components both succeed.
 - [ ] `Not calculated`, `Pending`, `Unavailable`, and `Processing` are distinct typed states and labels.
 - [ ] No state, tier, success, warning, or failure relies on color alone.

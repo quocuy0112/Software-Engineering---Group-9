@@ -25,6 +25,8 @@
   --sh-color-brand-primary: #1d4ed8;
   --sh-color-brand-primary-hover: #1e40af;
   --sh-color-brand-primary-pressed: #1e3a8a;
+  /* Auth-only: full-screen brand panel; never use for in-app cards or sections. */
+  --primary-deep: #0b1b4d;
   --sh-color-brand-accent: #3b82f6;
   --sh-color-brand-soft: #dbeafe;
   --sh-color-surface-page: #f6f8fc;
@@ -39,13 +41,22 @@
   --sh-color-border-subtle: #e2e8f0;
   --sh-color-border-strong: #475569;
   --sh-color-border-focus: #2563eb;
+  --sh-color-focus-ring: var(--sh-color-border-focus);
+  --sh-color-on-brand: var(--sh-color-text-inverse);
   --sh-color-focus-ring-bg: #dbeafe;
+  /* Positive state language: active, verified, connected, and saved. */
   --sh-color-success: #15803d;
   --sh-color-success-bg: #f0fdf4;
+  --sh-color-on-success: #ffffff;
+  /* Amber is both a warning/review tone and the semantic rating accent. */
   --sh-color-warning: #a16207;
   --sh-color-warning-bg: #fefce8;
+  --sh-color-on-warning: #ffffff;
+  --sh-color-rating: var(--sh-color-warning);
   --sh-color-error: #b91c1c;
+  --danger: var(--sh-color-error);
   --sh-color-error-bg: #fef2f2;
+  --sh-color-on-error: #ffffff;
   --sh-color-info: #1d4ed8;
   --sh-color-info-bg: #eff6ff;
   --sh-color-disabled-bg: #e2e8f0;
@@ -89,6 +100,8 @@
     BlinkMacSystemFont, "Segoe UI", sans-serif;
   --sh-font-family-label:
     "Manrope Variable", "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --sh-font-family-display:
+    "Space Grotesk", "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
   --sh-font-size-display: 32px;
   --sh-font-size-h1: 28px;
   --sh-font-size-h2: 24px;
@@ -122,6 +135,51 @@
     0 2px 4px rgb(15 23 42 / 6%), 0 16px 36px rgb(15 23 42 / 10%);
   --sh-shadow-floating:
     0 4px 10px rgb(15 23 42 / 8%), 0 24px 64px rgb(15 23 42 / 16%);
+
+  /* Shared light workspace language used by Profile and Connections. */
+  --sh-profile-bg: #f4f7ff;
+  --sh-profile-surface: #ffffff;
+  --sh-profile-surface-alt: #ecf2ff;
+  --sh-profile-primary: #2954e5;
+  --sh-profile-primary-dark: #122b8c;
+  --sh-profile-primary-light: #dee8ff;
+  --sh-profile-purple: #6d5bd0;
+  --sh-profile-purple-light: #e8e4fa;
+  --sh-profile-purple-dark: #3e2fa0;
+  --sh-profile-teal: #0ea57e;
+  --sh-profile-teal-light: #dcf6ee;
+  --sh-profile-teal-dark: #0a7f62;
+  --sh-profile-amber: #c97a17;
+  --sh-profile-amber-light: #fbebd4;
+  --sh-profile-gray-light: #eef1f9;
+  --sh-profile-text: #101b39;
+  --sh-profile-text-muted: #5c6a8c;
+  --sh-profile-text-faint: #96a1c2;
+  --sh-profile-border: #dce5f8;
+  --sh-profile-radius-sm: 10px;
+  --sh-profile-radius-md: 16px;
+  --sh-profile-radius-lg: 24px;
+  --sh-profile-shadow-card:
+    0 1px 2px rgb(16 27 57 / 4%), 0 8px 24px rgb(16 27 57 / 6%);
+  --sh-profile-font-body:
+    "Be Vietnam Pro", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --sh-profile-font-label:
+    "Space Grotesk", "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --sh-social-linkedin: #0a66c2;
+  --sh-social-github: #181717;
+  --sh-social-facebook: #1877f2;
+  --sh-social-instagram-start: #833ab4;
+  --sh-social-instagram-mid: #e1306c;
+  --sh-social-instagram-end: #fcb045;
+
+  /* Candidate CV library uses these generic workspace aliases. Defining them
+     here prevents fallback light values from bypassing the active theme. */
+  --workspace-border: var(--sh-color-border-subtle);
+  --workspace-surface: var(--sh-color-surface-card);
+  --workspace-ink: var(--sh-color-text-primary);
+  --workspace-muted: var(--sh-color-text-muted);
+  --workspace-soft: var(--sh-color-surface-subtle);
+  --workspace-primary: var(--sh-color-brand-primary);
 }
 
 :root[data-theme="dark"] {
@@ -144,12 +202,19 @@
   --sh-color-border-strong: #a9b9ce;
   --sh-color-border-focus: #7db3ff;
   --sh-color-focus-ring-bg: #1e3a5f;
+  /* Positive state language: active, verified, connected, and saved. */
   --sh-color-success: #4ade80;
   --sh-color-success-bg: #123a2a;
+  --sh-color-on-success: #07140d;
+  /* Amber also carries rating emphasis; it is not a low-rating warning. */
   --sh-color-warning: #fbbf24;
   --sh-color-warning-bg: #3b2f12;
+  --sh-color-on-warning: #1c1400;
+  --sh-color-rating: var(--sh-color-warning);
   --sh-color-error: #f87171;
+  --danger: var(--sh-color-error);
   --sh-color-error-bg: #3a1720;
+  --sh-color-on-error: #24090d;
   --sh-color-info: #93c5fd;
   --sh-color-info-bg: #152e50;
   --sh-color-disabled-bg: #26354a;
@@ -165,4 +230,22 @@
     0 2px 4px rgb(0 0 0 / 28%), 0 16px 36px rgb(0 0 0 / 28%);
   --sh-shadow-floating:
     0 4px 10px rgb(0 0 0 / 28%), 0 24px 64px rgb(0 0 0 / 42%);
+
+  --sh-profile-bg: var(--sh-color-surface-page);
+  --sh-profile-surface: var(--sh-color-surface-card);
+  --sh-profile-surface-alt: var(--sh-color-surface-subtle);
+  --sh-profile-primary: var(--sh-color-brand-primary);
+  --sh-profile-primary-dark: var(--sh-color-brand-primary-pressed);
+  --sh-profile-primary-light: var(--sh-color-brand-soft);
+  --sh-profile-teal: var(--sh-color-success);
+  --sh-profile-teal-light: var(--sh-color-success-bg);
+  --sh-profile-teal-dark: var(--sh-color-success);
+  --sh-profile-amber: var(--sh-color-warning);
+  --sh-profile-amber-light: var(--sh-color-warning-bg);
+  --sh-profile-gray-light: var(--sh-color-surface-subtle);
+  --sh-profile-text: var(--sh-color-text-primary);
+  --sh-profile-text-muted: var(--sh-color-text-muted);
+  --sh-profile-text-faint: var(--sh-color-disabled-text);
+  --sh-profile-border: var(--sh-color-border-subtle);
+  --sh-profile-shadow-card: var(--sh-shadow-card);
 }

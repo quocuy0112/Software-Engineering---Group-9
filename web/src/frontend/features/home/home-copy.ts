@@ -42,6 +42,9 @@ export type HomeCopy = {
     dashboard: string;
     applications: string;
     savedJobs: string;
+    notificationLabel: string;
+    notificationPromptTitle: string;
+    notificationPromptDescription: string;
   };
   hero: {
     eyebrow: string;
@@ -97,6 +100,7 @@ export type HomeCopy = {
     personal: string;
     illustrative: string;
     personalScore: string;
+    cvScore: string;
     sampleScore: string;
     matchingSkills: string;
     improvementAreas: string;
@@ -116,13 +120,17 @@ export type HomeCopy = {
     illustrativeJobTitle: string;
     compositionTitle: string;
     skillsContribution: string;
+    roleAndSkillsContribution: string;
+    preferencesContribution: string;
     experienceContribution: string;
     educationContribution: string;
+    unmatchedContribution: string;
     insufficientData: string;
     scoreSuffix: string;
     scoreLabel: string;
     illustrativeCaption: string;
     estimateDetailsLabel: string;
+    cvMatchLimitation: string;
   };
   careerPaths: {
     eyebrow: string;
@@ -157,6 +165,8 @@ export type HomeCopy = {
     title: string;
     matchEstimate: string;
     bestMatch: string;
+    topSuggestion: string;
+    lowMatchNotice: string;
     featured: string;
     postedRecently: string;
     negotiableSalary: string;
@@ -164,6 +174,11 @@ export type HomeCopy = {
     hourlySalaryUnit: string;
     yearlySalaryUnit: string;
     profileMatch: string;
+    profileMatchEstimate: string;
+    cvMatchScore: string;
+    cvMatchPrivate: string;
+    cvMatchContext: string;
+    reviewCvMatch: string;
     matchSignals: string;
     viewJobDetails: string;
     loginForMatch: string;
@@ -173,6 +188,12 @@ export type HomeCopy = {
     completeProfileAction: string;
     completeProfileNote: string;
     lockedMatchLabel: string;
+    noPersonalMatches: string;
+    noPersonalMatchesDescription: string;
+    matchUnavailable: string;
+    matchUnavailableDescription: string;
+    matchUnavailableLabel: string;
+    browseOpportunities: string;
     save: string;
     saved: string;
     saving: string;
@@ -198,6 +219,26 @@ export type HomeCopy = {
     employerEyebrow: string;
     employerTitle: string;
   };
+  aiCvPolicy: {
+    backToHome: string;
+    effective: string;
+    policyVersion: string;
+    eyebrow: string;
+    title: string;
+    description: string;
+    principles: readonly (CuratedCard & {
+      key: "optional" | "human" | "integrity";
+    })[];
+    sections: readonly {
+      title: string;
+      paragraphs: readonly string[];
+    }[];
+    importantNoticeLabel: string;
+    importantNotice: string;
+    dataHighlights: readonly string[];
+    supportAction: string;
+    copyright: string;
+  };
   footer: {
     description: string;
     label: string;
@@ -206,6 +247,10 @@ export type HomeCopy = {
     informationLabel: string;
     jobs: string;
     companies: string;
+    support: string;
+    privacy: string;
+    terms: string;
+    cookies: string;
     aiCvPolicy: string;
     establishedYear: number;
     copyright: string;
@@ -242,6 +287,10 @@ export const homeCopy = {
       dashboard: "My Dashboard",
       applications: "My Applications",
       savedJobs: "Saved Jobs",
+      notificationLabel: "Notifications",
+      notificationPromptTitle: "Stay informed",
+      notificationPromptDescription:
+        "Sign in or create an account to receive system notifications.",
     },
     hero: {
       eyebrow: "SMART HIRE — AI-POWERED HIRING",
@@ -388,6 +437,7 @@ export const homeCopy = {
       personal: "Personal job-fit recommendation",
       illustrative: "Illustrative Smart Match example",
       personalScore: "Personal match estimate",
+      cvScore: "CV Match Check score: {score}%",
       sampleScore: "Illustrative match estimate",
       matchingSkills: "Matching skills",
       improvementAreas: "Improvement areas",
@@ -411,14 +461,19 @@ export const homeCopy = {
       illustrativeJobTitle: "Frontend Developer",
       compositionTitle: "Fit-score composition",
       skillsContribution: "Skills",
+      roleAndSkillsContribution: "Role & skills",
+      preferencesContribution: "Location & pay",
       experienceContribution: "Experience",
       educationContribution: "Education",
+      unmatchedContribution: "Requirements not yet matched",
       insufficientData: "Insufficient data",
       scoreSuffix: "fit",
       scoreLabel: "Fit estimate: {score}%",
       illustrativeCaption:
         "An illustration of how AI can compare a candidate profile with job signals — no real data is used.",
       estimateDetailsLabel: "About this fit estimate",
+      cvMatchLimitation:
+        "This is the latest completed CV Match Check for this role, based on the CV and job description used when you ran the check.",
     },
     careerPaths: {
       eyebrow: "DIRECTIONS",
@@ -484,6 +539,9 @@ export const homeCopy = {
       title: "Trending Opportunities",
       matchEstimate: "match estimate",
       bestMatch: "BEST MATCH FOR YOU",
+      topSuggestion: "TOP SUGGESTION",
+      lowMatchNotice:
+        "This is a low-confidence estimate from your current profile, not a strong match.",
       featured: "FEATURED",
       postedRecently: "Recently posted",
       negotiableSalary: "Negotiable",
@@ -491,6 +549,12 @@ export const homeCopy = {
       hourlySalaryUnit: "m / hour",
       yearlySalaryUnit: "m / year",
       profileMatch: "Fit with your profile",
+      profileMatchEstimate: "Profile fit estimate",
+      cvMatchScore: "CV Match Check score",
+      cvMatchPrivate: "Private result for this exact role",
+      cvMatchContext:
+        "Checked against your latest CV and the current job description.",
+      reviewCvMatch: "Review match report",
       matchSignals: "Profile signals compared",
       viewJobDetails: "View job details",
       loginForMatch: "Log in to view your fit",
@@ -502,6 +566,14 @@ export const homeCopy = {
       completeProfileAction: "Complete your profile now →",
       completeProfileNote: "Usually takes about two minutes",
       lockedMatchLabel: "Profile match is locked",
+      noPersonalMatches: "No personalized matches are available yet",
+      noPersonalMatchesDescription:
+        "Your profile is ready. We will show a match when a suitable opportunity is available.",
+      matchUnavailable: "We can't calculate your fit right now",
+      matchUnavailableDescription:
+        "Your profile may be ready, but matching data is temporarily unavailable. You can still explore all opportunities.",
+      matchUnavailableLabel: "Personalized match unavailable",
+      browseOpportunities: "Browse opportunities",
       save: "Save job",
       saved: "Saved",
       saving: "Saving…",
@@ -558,6 +630,69 @@ export const homeCopy = {
       employerEyebrow: "FOR EMPLOYERS",
       employerTitle: "Find the right candidates for your open roles.",
     },
+    aiCvPolicy: {
+      backToHome: "Back to Home",
+      effective: "Effective",
+      policyVersion: "Policy version",
+      eyebrow: "SMART HIRE POLICY & TRANSPARENCY",
+      title: "AI & CV analysis policy",
+      description:
+        "Smart Hire may use AI to provide a reference assessment of how well your CV fits the role you apply for. This policy is published independently by Smart Hire on this platform.",
+      principles: [
+        {
+          key: "optional",
+          title: "Always optional",
+          body: "AI analysis is never required to submit an application.",
+        },
+        {
+          key: "human",
+          title: "No automatic rejection",
+          body: "AI results are a reference for you and recruiters, never a hiring decision.",
+        },
+        {
+          key: "integrity",
+          title: "Your CV stays intact",
+          body: "AI analysis does not alter the content of your original CV.",
+        },
+      ],
+      sections: [
+        {
+          title: "How AI is used",
+          paragraphs: [
+            "When you actively choose to give consent, Smart Hire analyzes skills, experience, and professional information in your CV to provide a fit estimate and a short explanation.",
+          ],
+        },
+        {
+          title: "Your choice",
+          paragraphs: [
+            "AI analysis is optional and is not required to apply.",
+            "If you do not consent, your application is still sent to the recruiter as usual. Smart Hire simply does not generate an AI fit score or recommendation for that application.",
+          ],
+        },
+        {
+          title: "Data and transparency",
+          paragraphs: [
+            "Smart Hire uses your CV and the role you apply for only to the extent needed for the stated purpose. The result remains connected to that specific application.",
+            "You can contact Smart Hire to ask about an analysis result or request human support.",
+          ],
+        },
+        {
+          title: "Contact and concerns",
+          paragraphs: [
+            "If you have questions about this policy or want to share feedback about how AI is used, contact the Smart Hire support team from your account.",
+          ],
+        },
+      ],
+      importantNoticeLabel: "Important",
+      importantNotice:
+        "AI assessments are informational only and are never the final hiring decision.",
+      dataHighlights: [
+        "Your original CV is not changed",
+        "Candidates are not rejected automatically",
+      ],
+      supportAction: "Open account support",
+      copyright: "© {year} Smart Hire. All rights reserved.",
+    },
     footer: {
       description:
         "An intelligent recruitment platform and professional career community.",
@@ -567,6 +702,10 @@ export const homeCopy = {
       informationLabel: "Company information",
       jobs: "Jobs",
       companies: "Hiring companies",
+      support: "Help & support",
+      privacy: "Privacy",
+      terms: "Terms",
+      cookies: "Cookies",
       aiCvPolicy: "AI & CV policy",
       establishedYear: 2026,
       copyright: "© {year} Smart Hire. All rights reserved.",
@@ -601,6 +740,10 @@ export const homeCopy = {
       dashboard: "Trang tổng quan",
       applications: "Đơn ứng tuyển của tôi",
       savedJobs: "Việc làm đã lưu",
+      notificationLabel: "Thông báo",
+      notificationPromptTitle: "Không bỏ lỡ thông tin mới",
+      notificationPromptDescription:
+        "Đăng nhập hoặc tạo tài khoản để nhận thông báo từ hệ thống.",
     },
     hero: {
       eyebrow: "SMART HIRE — TUYỂN DỤNG THÔNG MINH BẰNG AI",
@@ -748,6 +891,7 @@ export const homeCopy = {
       personal: "Gợi ý việc làm phù hợp với bạn",
       illustrative: "Ví dụ Smart Match minh họa",
       personalScore: "Ước tính phù hợp cá nhân",
+      cvScore: "Điểm CV Match Check: {score}%",
       sampleScore: "Ước tính phù hợp minh họa",
       matchingSkills: "Kỹ năng phù hợp",
       improvementAreas: "Điểm có thể cải thiện",
@@ -771,14 +915,19 @@ export const homeCopy = {
       illustrativeJobTitle: "Frontend Developer",
       compositionTitle: "Cấu thành điểm phù hợp",
       skillsContribution: "Kỹ năng",
+      roleAndSkillsContribution: "Vai trò & kỹ năng",
+      preferencesContribution: "Địa điểm & lương",
       experienceContribution: "Kinh nghiệm",
       educationContribution: "Học vấn",
+      unmatchedContribution: "Yêu cầu chưa phù hợp",
       insufficientData: "Chưa đủ dữ liệu",
       scoreSuffix: "phù hợp",
       scoreLabel: "Ước tính phù hợp: {score}%",
       illustrativeCaption:
         "Ví dụ minh hoạ cách AI ghép hồ sơ ứng viên với yêu cầu công việc — không dùng dữ liệu thật.",
       estimateDetailsLabel: "Thông tin về ước tính phù hợp",
+      cvMatchLimitation:
+        "Đây là kết quả CV Match Check hoàn tất gần nhất cho vị trí này, dựa trên CV và mô tả công việc bạn đã dùng khi chấm.",
     },
     careerPaths: {
       eyebrow: "ĐỊNH HƯỚNG",
@@ -844,6 +993,9 @@ export const homeCopy = {
       title: "Cơ hội đang nổi bật",
       matchEstimate: "ước tính phù hợp",
       bestMatch: "PHÙ HỢP NHẤT VỚI BẠN",
+      topSuggestion: "GỢI Ý HÀNG ĐẦU",
+      lowMatchNotice:
+        "Đây là ước tính có độ tin cậy thấp dựa trên hồ sơ hiện tại, chưa phải một vị trí phù hợp cao.",
       featured: "NỔI BẬT",
       postedRecently: "Đăng gần đây",
       negotiableSalary: "Thỏa thuận",
@@ -851,6 +1003,12 @@ export const homeCopy = {
       hourlySalaryUnit: "triệu / giờ",
       yearlySalaryUnit: "triệu / năm",
       profileMatch: "Độ phù hợp với hồ sơ",
+      profileMatchEstimate: "Ước tính phù hợp từ hồ sơ",
+      cvMatchScore: "Điểm CV Match Check",
+      cvMatchPrivate: "Kết quả riêng tư cho đúng vị trí này",
+      cvMatchContext:
+        "Đã chấm bằng CV mới nhất của bạn và mô tả công việc hiện tại.",
+      reviewCvMatch: "Xem lại báo cáo đối chiếu",
       matchSignals: "Tín hiệu hồ sơ được đối chiếu",
       viewJobDetails: "Xem chi tiết vị trí",
       loginForMatch: "Đăng nhập để xem điểm phù hợp",
@@ -862,6 +1020,14 @@ export const homeCopy = {
       completeProfileAction: "Hoàn thiện hồ sơ ngay →",
       completeProfileNote: "Chỉ mất khoảng 2 phút",
       lockedMatchLabel: "Điểm phù hợp đang bị khóa",
+      noPersonalMatches: "Chưa có gợi ý phù hợp được cá nhân hóa",
+      noPersonalMatchesDescription:
+        "Hồ sơ của bạn đã sẵn sàng. Chúng tôi sẽ hiển thị điểm phù hợp khi có cơ hội phù hợp.",
+      matchUnavailable: "Chưa thể tính độ phù hợp lúc này",
+      matchUnavailableDescription:
+        "Hồ sơ của bạn có thể đã sẵn sàng, nhưng dữ liệu đối chiếu đang tạm thời không khả dụng. Bạn vẫn có thể xem tất cả cơ hội việc làm.",
+      matchUnavailableLabel: "Chưa có điểm phù hợp cá nhân hóa",
+      browseOpportunities: "Xem cơ hội việc làm",
       save: "Lưu việc làm",
       saved: "Đã lưu",
       saving: "Đang lưu…",
@@ -915,6 +1081,69 @@ export const homeCopy = {
       employerEyebrow: "DÀNH CHO DOANH NGHIỆP",
       employerTitle: "Tìm ứng viên phù hợp cho vị trí đang tuyển.",
     },
+    aiCvPolicy: {
+      backToHome: "Quay lại trang chủ",
+      effective: "Hiệu lực",
+      policyVersion: "Phiên bản chính sách",
+      eyebrow: "CHÍNH SÁCH & MINH BẠCH SMART HIRE",
+      title: "Chính sách phân tích CV bằng AI",
+      description:
+        "Smart Hire có thể dùng AI để tạo một nhận định tham khảo về mức độ phù hợp giữa CV của bạn và vị trí bạn đang ứng tuyển. Đây là nội dung độc lập của Smart Hire và được công bố riêng trên nền tảng này.",
+      principles: [
+        {
+          key: "optional",
+          title: "Tùy chọn tự nguyện",
+          body: "Không bắt buộc phải bật AI để nộp hồ sơ ứng tuyển.",
+        },
+        {
+          key: "human",
+          title: "Không tự động loại",
+          body: "Điểm AI chỉ mang tính tham khảo cho bạn và nhà tuyển dụng.",
+        },
+        {
+          key: "integrity",
+          title: "Bảo mật nguyên vẹn",
+          body: "Không làm thay đổi hay chỉnh sửa nội dung file CV gốc.",
+        },
+      ],
+      sections: [
+        {
+          title: "AI được dùng để làm gì?",
+          paragraphs: [
+            "Khi bạn chủ động bật lựa chọn đồng ý, Smart Hire phân tích các kỹ năng, kinh nghiệm và thông tin nghề nghiệp có trong CV để đưa ra điểm phù hợp và phần giải thích ngắn.",
+          ],
+        },
+        {
+          title: "Quyền lựa chọn của bạn",
+          paragraphs: [
+            "Đồng ý phân tích AI là tùy chọn và không phải điều kiện bắt buộc để ứng tuyển.",
+            "Nếu không đồng ý, hồ sơ của bạn vẫn được chuyển tới nhà tuyển dụng bình thường; Smart Hire chỉ không tạo điểm số hoặc gợi ý phù hợp bằng AI cho lần ứng tuyển đó.",
+          ],
+        },
+        {
+          title: "Dữ liệu và tính minh bạch",
+          paragraphs: [
+            "Smart Hire chỉ sử dụng CV và vị trí ứng tuyển trong phạm vi cần thiết cho mục đích đã thông báo. Kết quả được gắn liền với lần ứng tuyển tương ứng.",
+            "Bạn luôn có quyền liên hệ với Smart Hire để giải đáp về kết quả phân tích hoặc yêu cầu hỗ trợ đối soát thủ công từ chuyên viên.",
+          ],
+        },
+        {
+          title: "Liên hệ & Khiếu nại",
+          paragraphs: [
+            "Nếu bạn có bất kỳ câu hỏi nào về chính sách này hoặc muốn phản hồi về cơ chế AI, hãy liên hệ trực tiếp với đội ngũ hỗ trợ Smart Hire từ trang tài khoản của bạn.",
+          ],
+        },
+      ],
+      importantNoticeLabel: "Lưu ý quan trọng",
+      importantNotice:
+        "Kết quả đánh giá chỉ mang tính tham khảo, không phải quyết định tuyển dụng cuối cùng.",
+      dataHighlights: [
+        "Không thay đổi nội dung CV",
+        "Không tự động loại ứng viên",
+      ],
+      supportAction: "Mở trung tâm hỗ trợ tài khoản",
+      copyright: "© {year} Smart Hire. Bảo lưu mọi quyền.",
+    },
     footer: {
       description:
         "Nền tảng tuyển dụng thông minh và cộng đồng nghề nghiệp chuyên nghiệp.",
@@ -924,6 +1153,10 @@ export const homeCopy = {
       informationLabel: "Thông tin doanh nghiệp",
       jobs: "Việc làm",
       companies: "Doanh nghiệp tuyển dụng",
+      support: "Trợ giúp & hỗ trợ",
+      privacy: "Quyền riêng tư",
+      terms: "Điều khoản sử dụng",
+      cookies: "Cookie",
       aiCvPolicy: "Chính sách AI & CV",
       establishedYear: 2026,
       copyright: "© {year} Smart Hire. Bảo lưu mọi quyền.",

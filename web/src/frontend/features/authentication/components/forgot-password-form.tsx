@@ -14,6 +14,7 @@ export function ForgotPasswordForm() {
   const { status, setStatus } = useReplayableStatus("");
   const [statusTone, setStatusTone] = useState<"error" | "success">("error");
   const [busy, setBusy] = useState(false);
+  const hasValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -56,17 +57,23 @@ export function ForgotPasswordForm() {
             eligible.
           </p>
         </div>
-        <label htmlFor="forgot-email">Email address</label>
-        <input
-          id="forgot-email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          required
-        />
-        <button type="submit" disabled={busy || email.trim().length === 0}>
+        <div className="field">
+          <label htmlFor="forgot-email">Email address</label>
+          <input
+            id="forgot-email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            autoCapitalize="none"
+            spellCheck={false}
+            placeholder="example@email.com"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+          />
+        </div>
+        <button type="submit" disabled={busy || !hasValidEmail}>
           {busy ? "Sending…" : "Send reset instructions"}
         </button>
         <AuthStatus
@@ -74,10 +81,9 @@ export function ForgotPasswordForm() {
           status={status}
           tone={statusTone}
         />
-        <Link href="/account-recovery">
+        <Link className="auth-recovery-link" href="/account-recovery">
           Lost your password and access to two-factor authentication?
         </Link>
-        <Link href="/login">Back to sign in</Link>
       </form>
     </section>
   );

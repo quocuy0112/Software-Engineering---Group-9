@@ -59,9 +59,11 @@ check(
   await canAccess("web/.local/mail", constants.W_OK),
   "email capture directory is writable",
 );
-const lockfiles = (await readdir(root, { recursive: true })).filter(
-  (path) =>
-    !path.includes("node_modules") && path.endsWith("package-lock.json"),
+// This check is intentionally limited to the repository root.  A recursive
+// scan visits ignored tool caches (for example .pytest_cache), which can be
+// temporarily locked on Windows and are irrelevant to the root lockfile.
+const lockfiles = (await readdir(root)).filter(
+  (path) => path === "package-lock.json",
 );
 check(
   lockfiles.length === 1 && lockfiles[0] === "package-lock.json",
@@ -166,8 +168,8 @@ if (await canAccess("web/.env.local")) {
   check(
     appEnvironment.OCR_CV_UNIT_TIMEOUT_SECONDS === "20" &&
       appEnvironment.CV_HYBRID_DEADLINE_SECONDS === "180" &&
-      appEnvironment.OCR_SEARCH_TIMEOUT_SECONDS === "6",
-    "OCR deadlines are exactly 20-second CV, 180-second hybrid, and 6-second search",
+      appEnvironment.OCR_SEARCH_TIMEOUT_SECONDS === "10",
+    "OCR deadlines are exactly 20-second CV, 180-second hybrid, and 10-second search",
   );
 
   const decode32ByteKey = (key) => {
@@ -194,8 +196,8 @@ if (await canAccess("web/.env.local")) {
   const fixedSearchSettings = {
     IMAGE_SEARCH_SOURCE_MAX_BYTES: "5000000",
     IMAGE_SEARCH_MAX_DECODED_PIXELS: "20000000",
-    IMAGE_SEARCH_VISITOR_LIMIT_PER_HOUR: "3",
-    IMAGE_SEARCH_ACCOUNT_LIMIT_PER_HOUR: "10",
+    IMAGE_SEARCH_VISITOR_LIMIT_PER_HOUR: "5",
+    IMAGE_SEARCH_ACCOUNT_LIMIT_PER_HOUR: "15",
     IMAGE_SEARCH_RETENTION_MINUTES: "15",
   };
   check(

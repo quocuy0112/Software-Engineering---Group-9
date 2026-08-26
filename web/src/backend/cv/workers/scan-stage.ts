@@ -55,13 +55,26 @@ function defaults(): Dependencies {
   };
 }
 
-function expectedMagic(kind: "PDF" | "DOCX", leading: Buffer) {
-  return kind === "PDF"
-    ? leading.toString("latin1").startsWith("%PDF-")
-    : leading[0] === 0x50 &&
-        leading[1] === 0x4b &&
-        leading[2] === 0x03 &&
-        leading[3] === 0x04;
+function expectedMagic(kind: "PDF" | "DOC" | "DOCX", leading: Buffer) {
+  if (kind === "PDF") return leading.toString("latin1").startsWith("%PDF-");
+  if (kind === "DOC") {
+    return (
+      leading[0] === 0xd0 &&
+      leading[1] === 0xcf &&
+      leading[2] === 0x11 &&
+      leading[3] === 0xe0 &&
+      leading[4] === 0xa1 &&
+      leading[5] === 0xb1 &&
+      leading[6] === 0x1a &&
+      leading[7] === 0xe1
+    );
+  }
+  return (
+    leading[0] === 0x50 &&
+    leading[1] === 0x4b &&
+    leading[2] === 0x03 &&
+    leading[3] === 0x04
+  );
 }
 
 async function firstBytes(source: AsyncIterable<Uint8Array>, maximum = 8) {
@@ -271,6 +284,8 @@ export class ScanStageProcessor {
       upload.declaredBytes <= 5_000_000 &&
       ((upload.documentKind === "PDF" &&
         upload.declaredMediaType === "application/pdf") ||
+        (upload.documentKind === "DOC" &&
+          upload.declaredMediaType === "application/msword") ||
         (upload.documentKind === "DOCX" &&
           upload.declaredMediaType ===
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document"));

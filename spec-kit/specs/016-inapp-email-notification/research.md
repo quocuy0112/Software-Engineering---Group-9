@@ -114,26 +114,26 @@
 
 ## Existing Event Inventory
 
-| Source family | Existing email behavior | In-app decision |
-|---|---|---|
-| Registration/account email verification | Token/proof email | Exclude |
-| Proposed-email verification | Token/proof email | Exclude |
-| Old-address email-change alert | Existing security event email | Mirror safe alert |
-| Password reset | Token/proof email | Exclude |
-| Password changed | Existing event email | Mirror high severity |
-| Recovery confirmation | Proof/action email | Exclude |
-| Recovery pending/cancelled/completed | Existing event email variants | Mirror safe event variants |
-| Company contact email verification | Token/proof email | Exclude |
-| Account suspension/reinstatement/session revocation | Existing admin security email | Mirror critical/high |
-| Membership suspension/restoration/removal | Existing admin security email | Mirror high |
-| Application stage change | Existing preference-controlled email | Always in-app; preserve email preference |
-| Recruiter verification lifecycle | Existing event emails | Mirror all seven outcomes |
-| Support waiting/resolved | Existing event emails | Mirror both outcomes |
-| Professional connection lifecycle | Existing email plus legacy in-app | Move visible record to unified inbox; preserve email |
-| Application submitted/received | Existing recruitment work only | Convert to in-app only |
-| New conversation message | Existing unread state/socket | Add grouped in-app only |
-| Message report receipt/outcome | Existing report data/toast | Add safe in-app only |
-| General moderation report receipt/outcome | Existing report data/toast/admin queue | Add safe in-app only |
+| Source family                                       | Existing email behavior                | In-app decision                                      |
+| --------------------------------------------------- | -------------------------------------- | ---------------------------------------------------- |
+| Registration/account email verification             | Token/proof email                      | Exclude                                              |
+| Proposed-email verification                         | Token/proof email                      | Exclude                                              |
+| Old-address email-change alert                      | Existing security event email          | Mirror safe alert                                    |
+| Password reset                                      | Token/proof email                      | Exclude                                              |
+| Password changed                                    | Existing event email                   | Mirror high severity                                 |
+| Recovery confirmation                               | Proof/action email                     | Exclude                                              |
+| Recovery pending/cancelled/completed                | Existing event email variants          | Mirror safe event variants                           |
+| Company contact email verification                  | Token/proof email                      | Exclude                                              |
+| Account suspension/reinstatement/session revocation | Existing admin security email          | Mirror critical/high                                 |
+| Membership suspension/restoration/removal           | Existing admin security email          | Mirror high                                          |
+| Application stage change                            | Existing preference-controlled email   | Always in-app; preserve email preference             |
+| Recruiter verification lifecycle                    | Existing event emails                  | Mirror all seven outcomes                            |
+| Support waiting/resolved                            | Existing event emails                  | Mirror both outcomes                                 |
+| Professional connection lifecycle                   | Existing email plus legacy in-app      | Move visible record to unified inbox; preserve email |
+| Application submitted/received                      | Existing recruitment work only         | Convert to in-app only                               |
+| New conversation message                            | Existing unread state/socket           | Add grouped in-app only                              |
+| Message report receipt/outcome                      | Existing report data/toast             | Add safe in-app only                                 |
+| General moderation report receipt/outcome           | Existing report data/toast/admin queue | Add safe in-app only                                 |
 
 ## Recipient Rules
 
@@ -146,3 +146,18 @@
 - Message: the other active conversation participant, excluding sender.
 - Messaging/general report: reporter only; administrators use their existing report queues rather than a private-evidence notification.
 - Administrator account events: administrator receives the same account-level notification through their ordinary user identity when still authorized to authenticate.
+
+## Decision 11: Add Assignment-Aware Actionable Administrator Fan-Out
+
+**Decision**: Add explicit administrator event kinds and resolve recipients from active platform-administrator grants at event time. Unassigned support/report queue work fans out to active administrators; assigned support replies/reopens target the active assignee and fall back to active administrators when the assignment is absent or unauthorized.
+
+**Rationale**: Persistent recipient-owned alerts prevent queue work from being missed when an administrator is not currently viewing the realtime-refreshed resource list. Explicit kinds make severity, copy, destination, diagnostics, and tests exhaustive without overloading requester-facing events.
+
+**Privacy boundary**: Administrator notification variables remain limited to `audience` and safe workflow state. Subject, message, reporter detail, evidence, contact data, notes, rationale, and verification documents are fetched only from the protected resource after re-authorization.
+
+**Alternatives considered**:
+
+- Reuse requester-facing kinds with arbitrary copy: rejected because audience intent and operational severity would be ambiguous.
+- Put case/report content in the bell: rejected because the inbox is a broader surface than step-up-protected detail and would violate data minimization.
+- Notify every administrator about every state change: rejected because it creates alert fatigue; assignment-aware support routing and one logical-event key are required.
+- Detect a stopped worker from that same worker: rejected because a stopped process cannot reliably emit its own failure; external service health monitoring remains the correct boundary.

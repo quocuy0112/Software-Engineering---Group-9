@@ -1,7 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
+import {
+  Bell,
+  CircleHelp,
+  ArrowUpRight,
+  History,
+  Search,
+  ShieldCheck,
+  UsersRound,
+  UserRoundPlus,
+} from "lucide-react";
+import { Badge } from "@/frontend/components/ui/badge";
+import { Panel } from "@/frontend/components/ui/design-system";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { WorkspacePageHeader } from "@/frontend/features/dashboard/components/page-header";
 import type {
@@ -9,7 +21,16 @@ import type {
   ParticipantProposal,
   ProfessionalConnectionProjection,
 } from "@/shared/contracts/connections";
+import type { DiscoverableProfile } from "@/shared/contracts/profile-discovery";
 import { useConnectionInvalidation } from "../client/use-connection-invalidation";
+
+type RecentProfileSearch = {
+  userId: string;
+  displayName: string;
+};
+
+const RECENT_PROFILE_SEARCHES_KEY = "smarthire:recent-profile-searches";
+const MAX_RECENT_PROFILE_SEARCHES = 6;
 
 function formatConnectionDate(value: string, locale: string) {
   return new Intl.DateTimeFormat(locale, {
@@ -196,11 +217,13 @@ export function ConnectionsWorkspace({
   initialProposals,
   initialConnections,
   initialNotifications,
+  currentUserId = "",
 }: {
   csrfProof: string;
   initialProposals: ParticipantProposal[];
   initialConnections: ProfessionalConnectionProjection[];
   initialNotifications: ConnectionNotificationProjection[];
+  currentUserId?: string;
 }) {
   const locale = useWorkspaceLocale();
   const copy = connectionCopy(locale);
@@ -209,6 +232,56 @@ export function ConnectionsWorkspace({
   const [notifications, setNotifications] = useState(initialNotifications);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [lookupId, setLookupId] = useState("");
+  const [lookupResult, setLookupResult] = useState<DiscoverableProfile | null>(
+    null,
+  );
+  const [lookupMessage, setLookupMessage] = useState<string | null>(null);
+  const [lookupBusy, setLookupBusy] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<RecentProfileSearch[]>(
+    [],
+  );
+
+  useEffect(() => {
+    try {
+      const parsed: unknown = JSON.parse(
+        window.localStorage.getItem(RECENT_PROFILE_SEARCHES_KEY) ?? "[]",
+      );
+      if (!Array.isArray(parsed)) return;
+      setRecentSearches(
+        parsed
+          .filter(
+            (item): item is RecentProfileSearch =>
+              typeof item === "object" &&
+              item !== null &&
+              typeof item.userId === "string" &&
+              typeof item.displayName === "string",
+          )
+          .slice(0, MAX_RECENT_PROFILE_SEARCHES),
+      );
+    } catch {
+      // History is a local convenience; unavailable browser storage is safe to ignore.
+    }
+  }, []);
+
+  function rememberProfile(result: DiscoverableProfile) {
+    const entry = { userId: result.userId, displayName: result.displayName };
+    setRecentSearches((current) => {
+      const next = [
+        entry,
+        ...current.filter((item) => item.userId !== entry.userId),
+      ].slice(0, MAX_RECENT_PROFILE_SEARCHES);
+      try {
+        window.localStorage.setItem(
+          RECENT_PROFILE_SEARCHES_KEY,
+          JSON.stringify(next),
+        );
+      } catch {
+        // Do not let unavailable local storage block a lookup.
+      }
+      return next;
+    });
+  }
   const refresh = useCallback(async () => {
     const [proposalBody, connectionBody, notificationBody] = await Promise.all([
       connectionApi("/api/connections/proposals?limit=50", csrfProof),
@@ -225,6 +298,39 @@ export function ConnectionsWorkspace({
   const activeProposals = proposals.filter((item) =>
     ["PENDING_BOTH", "PARTIALLY_ACCEPTED"].includes(item.state),
   );
+  async function findProfile(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const target = lookupId.trim();
+    setLookupResult(null);
+    setLookupMessage(null);
+    if (!target) return;
+    if (target === currentUserId) {
+      setLookupMessage(
+        "This is your account ID. Manage your profile from Profile settings.",
+      );
+      return;
+    }
+    setLookupBusy(true);
+    try {
+      const response = await fetch(
+        `/api/people/lookup?userId=${encodeURIComponent(target)}`,
+        { cache: "no-store", credentials: "same-origin" },
+      );
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setLookupMessage(body.message ?? "Unable to complete this search.");
+        return;
+      }
+      const result = body.result ?? null;
+      setLookupResult(result);
+      if (result) rememberProfile(result);
+      else setLookupMessage("No visible profile found.");
+    } catch {
+      setLookupMessage("Unable to complete this search.");
+    } finally {
+      setLookupBusy(false);
+    }
+  }
   async function decide(
     proposal: ParticipantProposal,
     decision: "ACCEPTED" | "DECLINED",
@@ -251,39 +357,6 @@ export function ConnectionsWorkspace({
           reason.message !== "CONNECTION_REQUEST_FAILED"
           ? reason.message
           : copy.saveError,
-      );
-      await refresh().catch(() => undefined);
-    } finally {
-      setBusyId(null);
-    }
-  }
-  async function disconnect(connection: ProfessionalConnectionProjection) {
-    if (
-      !window.confirm(copy.endConfirm(connection.otherParticipant.displayName))
-    )
-      return;
-    setBusyId(connection.id);
-    setError(null);
-    try {
-      await connectionApi(
-        `/api/connections/${encodeURIComponent(connection.id)}/disconnect`,
-        csrfProof,
-        {
-          method: "POST",
-          headers: {
-            "if-match-version": String(connection.version),
-            "idempotency-key": crypto.randomUUID(),
-          },
-          body: JSON.stringify({ confirmation: true }),
-        },
-      );
-      await refresh();
-    } catch (reason) {
-      setError(
-        reason instanceof Error &&
-          reason.message !== "CONNECTION_REQUEST_FAILED"
-          ? reason.message
-          : copy.disconnectError,
       );
       await refresh().catch(() => undefined);
     } finally {
@@ -326,46 +399,118 @@ export function ConnectionsWorkspace({
             | "offline",
         }}
       />
+      <section
+        className="connections-profile-lookup"
+        aria-labelledby="profile-lookup-title"
+      >
+        <div className="connections-profile-lookup__heading">
+          <span className="connections-profile-lookup__icon">
+            <Search aria-hidden="true" />
+          </span>
+          <div>
+            <p className="connections-profile-lookup__eyebrow">
+              PROFILE DISCOVERY
+            </p>
+            <h2 id="profile-lookup-title">Find a professional by ID</h2>
+            <p>Only profiles that allow exact-ID discovery appear here.</p>
+          </div>
+        </div>
+        <form
+          onSubmit={findProfile}
+          className="connections-profile-lookup__form"
+        >
+          <label htmlFor="candidate-profile-id">Candidate ID</label>
+          <div>
+            <input
+              id="candidate-profile-id"
+              value={lookupId}
+              onChange={(event) => setLookupId(event.target.value)}
+              autoComplete="off"
+              maxLength={128}
+              required
+            />
+            <button type="submit" className="primary" disabled={lookupBusy}>
+              {lookupBusy ? "Searching…" : "Search"}
+            </button>
+          </div>
+        </form>
+        {lookupMessage ? <p role="status">{lookupMessage}</p> : null}
+        {lookupResult ? (
+          <article className="connections-profile-result">
+            <div className="connection-avatar" aria-hidden="true">
+              {lookupResult.displayName.slice(0, 1).toUpperCase()}
+            </div>
+            <div>
+              <h3>{lookupResult.displayName}</h3>
+              {lookupResult.sections.headline ? (
+                <p>{lookupResult.sections.headline}</p>
+              ) : null}
+              {lookupResult.sections.location ? (
+                <p>{lookupResult.sections.location}</p>
+              ) : null}
+              {lookupResult.sections.skills?.length ? (
+                <p>{lookupResult.sections.skills.join(" · ")}</p>
+              ) : null}
+            </div>
+            <Link
+              className="connections-profile-result__action"
+              href={`/people/${encodeURIComponent(lookupResult.userId)}`}
+              aria-label={`View ${lookupResult.displayName}'s profile`}
+            >
+              <span>View profile</span>
+              <ArrowUpRight aria-hidden="true" />
+            </Link>
+          </article>
+        ) : null}
+      </section>
       {error ? (
         <p className="connections-alert" role="alert">
           {error}
         </p>
       ) : null}
-      <section className="connections-flow" aria-label={copy.title}>
-        {copy.flow.map((step, index) => (
-          <div className="connections-flow__group" key={step.title}>
-            <article className="connections-flow__step">
-              <span
-                className="connections-flow__icon"
-                data-step={index + 1}
-                aria-hidden="true"
-              >
-                <ConsentFlowIcon step={index + 1} />
-              </span>
-              <div>
-                <h2>{step.title}</h2>
-                <p>{step.description}</p>
-              </div>
-            </article>
-            {index < copy.flow.length - 1 ? (
-              <span className="connections-flow__arrow" aria-hidden="true">
-                <ArrowIcon />
-              </span>
-            ) : null}
+      <section className="connections-summary" aria-label="Connection overview">
+        <article>
+          <span>
+            <UsersRound aria-hidden="true" />
+          </span>
+          <div>
+            <strong>
+              {connections.filter((item) => item.state === "ACCEPTED").length}
+            </strong>
+            <small>Active connections</small>
           </div>
-        ))}
+        </article>
+        <article>
+          <span>
+            <UserRoundPlus aria-hidden="true" />
+          </span>
+          <div>
+            <strong>{activeProposals.length}</strong>
+            <small>Awaiting your response</small>
+          </div>
+        </article>
+        <article>
+          <span>
+            <ShieldCheck aria-hidden="true" />
+          </span>
+          <div>
+            <strong>Private by design</strong>
+            <small>Messaging opens only with consent</small>
+          </div>
+        </article>
       </section>
       <section className="connections-grid">
-        <article className="connections-panel connections-panel--mini">
-          <header>
-            <div>
-              <p>{copy.consent}</p>
-              <h2>{copy.proposals}</h2>
-            </div>
-            <span>
+        <Panel
+          as="article"
+          className="connections-panel connections-panel--mini"
+          eyebrow={copy.consent}
+          title={copy.proposals}
+          rightSlot={
+            <span className="count-pill connections-count connections-count--pending">
               {activeProposals.length} {copy.pending}
             </span>
-          </header>
+          }
+        >
           {proposals.length === 0 ? (
             <CompactEmpty
               title={copy.noProposals}
@@ -437,71 +582,40 @@ export function ConnectionsWorkspace({
               })}
             </div>
           )}
-        </article>
-        <article className="connections-panel connections-panel--mini">
-          <header>
-            <div>
-              <p>{copy.messagingAccess}</p>
-              <h2>{copy.connections}</h2>
-            </div>
-            <span>
-              {connections.filter((item) => item.state === "ACCEPTED").length}{" "}
-              {copy.active}
+        </Panel>
+        <Panel
+          as="article"
+          className="connections-panel connections-panel--mini"
+          eyebrow="PROFILE DISCOVERY"
+          title="Recent profile searches"
+          rightSlot={
+            <span className="count-pill connections-count connections-count--saved">
+              {recentSearches.length} saved
             </span>
-          </header>
-          {connections.length === 0 ? (
+          }
+        >
+          {recentSearches.length === 0 ? (
             <CompactEmpty
-              title={copy.noConnections}
-              description={copy.noConnectionsCopy}
+              title="No recent searches"
+              description="Profiles you find by exact candidate ID will appear here for quick access on this browser."
             />
           ) : (
-            <div className="connection-card-list">
-              {connections.map((connection) => (
-                <section
-                  className="connection-card compact"
-                  key={connection.id}
+            <div className="recent-profile-searches">
+              {recentSearches.map((search) => (
+                <Link
+                  href={`/people/${encodeURIComponent(search.userId)}`}
+                  key={search.userId}
                 >
-                  <div className="connection-person">
-                    <div className="connection-avatar" aria-hidden="true">
-                      {connection.otherParticipant.displayName
-                        .slice(0, 1)
-                        .toUpperCase()}
-                    </div>
-                    <div>
-                      <h3>{connection.otherParticipant.displayName}</h3>
-                      <p>
-                        {connection.state === "ACCEPTED"
-                          ? copy.messagingEnabled
-                          : copy.connectionEnded}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="connection-actions">
-                    {connection.state === "ACCEPTED" ? (
-                      <>
-                        <Link className="primary link" href="/messages">
-                          {copy.openMessages}
-                        </Link>
-                        <button
-                          type="button"
-                          className="secondary"
-                          disabled={busyId === connection.id}
-                          onClick={() => void disconnect(connection)}
-                        >
-                          {copy.disconnect}
-                        </button>
-                      </>
-                    ) : (
-                      <Link className="secondary link" href="/messages">
-                        {copy.viewHistory}
-                      </Link>
-                    )}
-                  </div>
-                </section>
+                  <span className="connection-avatar" aria-hidden="true">
+                    {search.displayName.slice(0, 1).toUpperCase()}
+                  </span>
+                  <span>{search.displayName}</span>
+                  <History aria-hidden="true" />
+                </Link>
               ))}
             </div>
           )}
-        </article>
+        </Panel>
         <aside
           className="connections-notification-strip"
           data-populated={notifications.length > 0}
@@ -560,51 +674,10 @@ function CompactEmpty({
   );
 }
 
-function ConsentFlowIcon({ step }: { step: number }) {
-  if (step === 1)
-    return (
-      <svg viewBox="0 0 24 24">
-        <circle cx="9" cy="7" r="3" />
-        <path d="M3.5 20.5a5.5 5.5 0 0 1 11 0M18 7v6m-3-3h6" />
-      </svg>
-    );
-  if (step === 2)
-    return (
-      <svg viewBox="0 0 24 24">
-        <path d="m5 12 4.2 4.2L19 6.5" />
-        <path d="M21 12a9 9 0 1 1-3-6.7" />
-      </svg>
-    );
-  return (
-    <svg viewBox="0 0 24 24">
-      <path d="M19.5 11.5A4.5 4.5 0 0 1 15 16h-5l-4.5 3v-7.5A4.5 4.5 0 0 1 10 7h2" />
-      <rect x="14" y="6.5" width="6" height="5.5" rx="1" />
-      <path d="M15.5 6.5V5a1.5 1.5 0 0 1 3 0v1.5" />
-    </svg>
-  );
-}
-
-function ArrowIcon() {
-  return (
-    <svg viewBox="0 0 24 24">
-      <path d="M4 12h15m-5-5 5 5-5 5" />
-    </svg>
-  );
-}
-
 function EmptyStateIcon() {
-  return (
-    <svg viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="7" />
-      <path d="M12 8v4m0 3h.01" />
-    </svg>
-  );
+  return <CircleHelp aria-hidden="true" />;
 }
 
 function NotificationIcon() {
-  return (
-    <svg viewBox="0 0 24 24">
-      <path d="M18 10a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
-    </svg>
-  );
+  return <Bell aria-hidden="true" />;
 }

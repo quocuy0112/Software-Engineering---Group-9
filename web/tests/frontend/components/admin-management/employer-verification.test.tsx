@@ -39,7 +39,10 @@ describe("employer verification components", () => {
         accessible={false}
       />,
     );
-    expect(screen.getByText(/Decisions are disabled/u)).toBeVisible();
+    expect(screen.getByText("Evidence unavailable for review.")).toBeVisible();
+    expect(
+      screen.getByText("This evidence is not currently available for review."),
+    ).toBeVisible();
   });
 
   it("exposes an explicit recruiter approval action for reviewable requests", () => {
@@ -51,6 +54,11 @@ describe("employer verification components", () => {
         requestedRole="RECRUITER"
         resubmissionCount={0}
         disabled={false}
+        assignment={{
+          status: "MINE",
+          assignedAdminRef: "admin-1",
+          canClaim: false,
+        }}
         onDone={vi.fn()}
       />,
     );
@@ -67,6 +75,11 @@ describe("employer verification components", () => {
         state="APPROVED"
         resubmissionCount={0}
         disabled={false}
+        assignment={{
+          status: "UNASSIGNED",
+          assignedAdminRef: null,
+          canClaim: false,
+        }}
         onDone={vi.fn()}
       />,
     );

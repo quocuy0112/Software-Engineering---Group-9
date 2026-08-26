@@ -7,6 +7,7 @@ type PolicyName =
   | "messagingDiscovery"
   | "messagingDiscoveryNetwork"
   | "messagingConversationCreate"
+  | "messagingSend"
   | "messagingBlock"
   | "messagingReport";
 

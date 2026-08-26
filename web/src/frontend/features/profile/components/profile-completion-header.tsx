@@ -1,99 +1,22 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import { Camera, ArrowRight } from "lucide-react";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
+import { ProgressBar } from "@/frontend/components/ui/design-system";
+import {
+  getProfileBasicsMissingRequirement,
+  getProfileCompletion,
+  type ProfileCompletionSection,
+} from "../lib/profile-completeness";
 
 type ProfileCompletionLocale = "vi" | "en";
 
-export type ProfileCompletionSection =
-  | "avatar"
-  | "basics"
-  | "skills"
-  | "experience"
-  | "education"
-  | "socialLinks";
-
-type CompletionItem = {
-  key: ProfileCompletionSection;
-  targetId: string;
-  complete: boolean;
+export {
+  getProfileBasicsMissingRequirement,
+  getProfileCompletion,
+  type ProfileCompletionSection,
 };
-
-const circumference = 2 * Math.PI * 45;
-
-function hasText(value: string | null | undefined) {
-  return Boolean(value?.trim());
-}
-
-function hasProfessionalLink(value: string) {
-  try {
-    const url = new URL(value);
-    return (
-      ["http:", "https:"].includes(url.protocol) &&
-      !url.username &&
-      !url.password
-    );
-  } catch {
-    return false;
-  }
-}
-
-export function getProfileCompletion(
-  profile: CandidateProfileContract,
-  avatar: string | null | undefined,
-) {
-  const items: CompletionItem[] = [
-    {
-      key: "avatar",
-      targetId: "profile-avatar-section",
-      complete: Boolean(avatar),
-    },
-    {
-      key: "basics",
-      targetId: "profile-basics-section",
-      complete:
-        hasText(profile.basics.headline) &&
-        [
-          profile.basics.summary,
-          profile.basics.phone,
-          profile.basics.location,
-        ].some(hasText),
-    },
-    {
-      key: "skills",
-      targetId: "profile-skills-section",
-      complete: profile.skills.some((skill) => hasText(skill.label)),
-    },
-    {
-      key: "experience",
-      targetId: "profile-experience-section",
-      complete: profile.experience.some(
-        (entry) => hasText(entry.title) && hasText(entry.company),
-      ),
-    },
-    {
-      key: "education",
-      targetId: "profile-education-section",
-      complete: profile.education.some(
-        (entry) => hasText(entry.institution) && hasText(entry.degree),
-      ),
-    },
-    {
-      key: "socialLinks",
-      targetId: "profile-social-section",
-      complete: profile.socialLinks.some((link) =>
-        hasProfessionalLink(link.url),
-      ),
-    },
-  ];
-
-  const completed = items.filter((item) => item.complete).length;
-  return {
-    items,
-    completed,
-    percentage: Math.round((completed / items.length) * 100),
-  };
-}
 
 function profileCompletionCopy(locale: ProfileCompletionLocale) {
   return locale === "vi"
@@ -148,13 +71,6 @@ export function ProfileCompletionHeader({
 }) {
   const copy = profileCompletionCopy(locale);
   const completion = getProfileCompletion(profile, avatar);
-  const ringStyle = {
-    "--profile-completion-circumference": String(circumference),
-    "--profile-completion-offset": String(
-      circumference * (1 - completion.percentage / 100),
-    ),
-  } as CSSProperties;
-
   function focusSection(targetId: string) {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -184,49 +100,9 @@ export function ProfileCompletionHeader({
       aria-labelledby="profile-completion-title"
     >
       <div className="profile-completion__visual">
-        <div
-          className="profile-completion__ring"
-          role="progressbar"
-          aria-label={copy.progress}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={completion.percentage}
-          style={ringStyle}
-        >
-          <svg aria-hidden="true" viewBox="0 0 104 104">
-            <defs>
-              <linearGradient
-                id="profile-completion-gradient"
-                x1="0%"
-                y1="0%"
-                x2="100%"
-                y2="100%"
-              >
-                <stop offset="0%" stopColor="var(--sh-color-brand-primary)" />
-                <stop
-                  offset="100%"
-                  stopColor="var(--sh-color-brand-primary-hover)"
-                />
-              </linearGradient>
-            </defs>
-            <circle
-              className="profile-completion__ring-track"
-              cx="52"
-              cy="52"
-              r="45"
-            />
-            <circle
-              className="profile-completion__ring-value"
-              cx="52"
-              cy="52"
-              r="45"
-            />
-          </svg>
-          <div className="profile-completion__ring-copy" aria-hidden="true">
-            <strong>{completion.percentage}%</strong>
-            <span>{copy.progressLabel}</span>
-          </div>
-        </div>
+        <strong>{completion.percentage}%</strong>
+        <span>{copy.progressLabel}</span>
+        <ProgressBar percent={completion.percentage} label={copy.progress} />
         <p aria-hidden="true">
           {copy.completedCount(completion.completed, completion.items.length)}
         </p>
@@ -268,6 +144,159 @@ export function ProfileCompletionHeader({
             );
           })}
         </div>
+      </div>
+    </section>
+  );
+}
+
+function profileInitials(name: string) {
+  return (
+    name
+      .trim()
+      .split(/\s+/u)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "SH"
+  );
+}
+
+export function LegacyProfileIdentityHeader({
+  profile,
+  avatar,
+  locale,
+  accountName,
+}: {
+  profile: CandidateProfileContract;
+  avatar: string | null | undefined;
+  locale: ProfileCompletionLocale;
+  accountName?: string;
+}) {
+  const copy = profileCompletionCopy(locale);
+  const completion = getProfileCompletion(profile, avatar);
+  const displayName = accountName?.trim() || "SmartHire candidate";
+  const headline =
+    profile.basics.headline?.trim() ||
+    (locale === "vi"
+      ? "Thêm tiêu đề nghề nghiệp để nhà tuyển dụng dễ nhận diện bạn."
+      : "Add a professional headline so employers can recognize you.");
+
+  function focusSection(targetId: string) {
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    const reduceMotion =
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    target.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+      block: "start",
+    });
+    window.setTimeout(
+      () => {
+        target
+          .querySelector<HTMLElement>(
+            "input, textarea, button, select, a[href]",
+          )
+          ?.focus({ preventScroll: true });
+      },
+      reduceMotion ? 0 : 260,
+    );
+  }
+
+  const firstIncomplete =
+    completion.items.find((item) => !item.complete) ?? completion.items[0];
+
+  return (
+    <section
+      className="profile-completion profile-completion--identity"
+      aria-labelledby="profile-completion-title"
+    >
+      <div className="profile-identity-main">
+        <button
+          type="button"
+          className="profile-completion__avatar-button"
+          aria-label={
+            locale === "vi" ? "Chỉnh sửa ảnh đại diện" : "Edit profile photo"
+          }
+          onClick={() => focusSection("profile-avatar-section")}
+        >
+          <span
+            className="profile-completion__avatar"
+            role={avatar ? "img" : undefined}
+            aria-label={avatar ? `${displayName} profile photo` : undefined}
+            style={
+              avatar
+                ? ({
+                    backgroundImage: `url(${JSON.stringify(avatar)})`,
+                  } as CSSProperties)
+                : undefined
+            }
+          >
+            {!avatar ? profileInitials(displayName) : null}
+          </span>
+          <span className="profile-completion__camera" aria-hidden="true">
+            <Camera />
+          </span>
+        </button>
+
+        <div className="profile-identity-copy">
+          <p className="profile-identity-kicker">
+            <span aria-hidden="true" />
+            {locale === "vi" ? "HỒ SƠ CỦA BẠN" : "YOUR PROFILE"}
+          </p>
+          <h2 id="profile-completion-title">{displayName}</h2>
+          <p className="profile-identity-headline">{headline}</p>
+          <div className="profile-completion__chips" aria-label={copy.progress}>
+            {completion.items.map((item) => {
+              const label = copy[item.key];
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  className={item.complete ? "is-complete" : "is-incomplete"}
+                  aria-label={`${label}: ${
+                    item.complete ? copy.complete : copy.incomplete
+                  }`}
+                  onClick={() => focusSection(item.targetId)}
+                >
+                  <span
+                    className="profile-completion__chip-indicator"
+                    aria-hidden="true"
+                  >
+                    {item.complete ? "✓" : "!"}
+                  </span>
+                  <span className="profile-completion__chip-copy">
+                    <strong>{label}</strong>
+                    <small>
+                      {item.complete ? copy.complete : copy.incomplete}
+                    </small>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="profile-identity-progress">
+        <div className="profile-identity-progress-top">
+          <strong>{completion.percentage}%</strong>
+          <span>{copy.progressLabel}</span>
+        </div>
+        <ProgressBar
+          className="profile-identity-progress-bar"
+          percent={completion.percentage}
+          label={copy.progress}
+        />
+        <button
+          type="button"
+          className="profile-completion-cta"
+          onClick={() =>
+            firstIncomplete ? focusSection(firstIncomplete.targetId) : undefined
+          }
+        >
+          {locale === "vi" ? "Hoàn thiện hồ sơ" : "Complete profile"}
+          <ArrowRight aria-hidden="true" />
+        </button>
       </div>
     </section>
   );

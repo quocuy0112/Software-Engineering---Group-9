@@ -67,7 +67,7 @@ describe("SharpImageNormalizer", () => {
       downscaled: false,
       normalizer: "sharp",
       normalizerVersion: "0.35.3",
-      rulesVersion: "search-image-normalize-v2",
+      rulesVersion: "search-image-normalize-v3",
     });
     const metadata = await sharp(result.bytes).metadata();
     expect(metadata.format).toBe("png");
@@ -100,12 +100,12 @@ describe("SharpImageNormalizer", () => {
     );
 
     expect(result).toMatchObject({
-      width: 1_600,
-      height: 1_018,
+      width: 2_048,
+      height: 1_303,
       sourceDecodedPixels: 2_239 * 1_425,
-      normalizedPixels: 1_600 * 1_018,
+      normalizedPixels: 2_048 * 1_303,
       downscaled: true,
-      rulesVersion: "search-image-normalize-v2",
+      rulesVersion: "search-image-normalize-v3",
     });
   });
 

@@ -11,6 +11,10 @@ import {
   membershipSecurityEmailText,
 } from "./membership-security-templates";
 import {
+  CompanyModerationEmail,
+  companyModerationEmailText,
+} from "./company-moderation-templates";
+import {
   VerificationEmail,
   verificationEmailText,
 } from "./verification-templates";
@@ -35,12 +39,18 @@ const eventBase = z.object({
 });
 const accountPayload = eventBase.extend({
   resultingState: z.enum(["ACTIVE", "SUSPENDED"]),
+  recipientName: z.string().trim().min(1).max(120).optional(),
   reasonCategory: z.string().trim().min(1).max(80).default("OTHER"),
-  supportPath: z.literal("/support/account-security").default("/support/account-security"),
+  supportPath: z
+    .literal("/support/account-security")
+    .default("/support/account-security"),
 });
 const membershipPayload = eventBase.extend({
   companyDisplayName: z.string().trim().min(1).max(200),
   resultingState: z.enum(["ACTIVE", "SUSPENDED", "REMOVED"]),
+});
+const companyModerationPayload = eventBase.extend({
+  companyDisplayName: z.string().trim().min(1).max(200),
 });
 const verificationPayload = eventBase.extend({
   requestId: z.string().min(1).max(128),
@@ -115,24 +125,40 @@ export async function renderFeature006Email(input: {
         text: membershipSecurityEmailText(props),
       };
     }
+    if (raw.eventKind?.startsWith("COMPANY_")) {
+      const payload = companyModerationPayload.parse(input.payloadRef);
+      const props = {
+        ...payload,
+        eventKind: payload.eventKind as "COMPANY_BANNED" | "COMPANY_UNBANNED",
+      };
+      return {
+        subject:
+          props.eventKind === "COMPANY_BANNED"
+            ? "Company access disabled"
+            : "Company access restored",
+        html: await render(createElement(CompanyModerationEmail, props)),
+        text: companyModerationEmailText(props),
+      };
+    }
     const payload = accountPayload.parse(input.payloadRef);
     const props = {
       ...payload,
-        eventKind: payload.eventKind as Extract<
-          AdminSecurityEventKind,
-          | "ACCOUNT_SUSPENDED"
-          | "ACCOUNT_REINSTATED"
-          | "ACCOUNT_RESTORED"
-          | "ALL_SESSIONS_REVOKED"
+      eventKind: payload.eventKind as Extract<
+        AdminSecurityEventKind,
+        | "ACCOUNT_SUSPENDED"
+        | "ACCOUNT_REINSTATED"
+        | "ACCOUNT_RESTORED"
+        | "ALL_SESSIONS_REVOKED"
       >,
       supportUrl: new URL("/support/account-security", input.appUrl).toString(),
+      appUrl: input.appUrl,
     };
     return {
       subject:
         props.eventKind === "ACCOUNT_SUSPENDED"
           ? "Your SmartHire account was suspended"
-            : props.eventKind === "ACCOUNT_REINSTATED" ||
-                props.eventKind === "ACCOUNT_RESTORED"
+          : props.eventKind === "ACCOUNT_REINSTATED" ||
+              props.eventKind === "ACCOUNT_RESTORED"
             ? "Your SmartHire account is active"
             : "Your SmartHire sessions were revoked",
       html: await render(createElement(AccountSecurityEmail, props)),

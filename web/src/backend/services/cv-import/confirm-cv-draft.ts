@@ -4,7 +4,10 @@ import { createHmac } from "node:crypto";
 
 import { serverEnvironment } from "@/backend/env/runtime";
 import { PrismaCvConfirmationRepository } from "@/backend/repositories/cv-import/prisma-cv-confirmation-repository";
-import { ensureCandidateCvLibrary } from "@/backend/services/profile/candidate-cv-library";
+import {
+  ensureCandidateCvLibrary,
+  materializeConfirmedCandidateCv,
+} from "@/backend/services/profile/candidate-cv-library";
 import {
   confirmCvDraftRequestSchema,
   type ConfirmCvDraftRequest,
@@ -63,6 +66,10 @@ export class ConfirmCvDraftService {
     // cannot roll back an otherwise valid CV confirmation.
     try {
       await ensureCandidateCvLibrary(input.accountId);
+      await materializeConfirmedCandidateCv(
+        input.accountId,
+        result.receipt.uploadId,
+      );
     } catch (error) {
       logCandidateCvProjectionFailure(error, {
         accountId: input.accountId,

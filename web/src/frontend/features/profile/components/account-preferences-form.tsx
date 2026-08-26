@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import type { AccountPreferences } from "@/shared/contracts/account/preferences";
 import {
   getTimezoneOptions,
@@ -97,16 +98,25 @@ function TimezonePicker({
           setQuery("");
         }}
       >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="m6 9 6 6 6-6" />
-        </svg>
+        <ChevronDown aria-hidden="true" size={16} />
       </button>
       {open ? (
-        <div className="account-timezone-results" id="preference-timezone-options">
+        <div
+          className="account-timezone-results"
+          id="preference-timezone-options"
+        >
           <ul role="listbox" aria-label="Timezone options">
             {visibleOptions.map((option) => (
-              <li key={option.value} role="option" aria-selected={option.value === value}>
-                <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => choose(option.value)}>
+              <li
+                key={option.value}
+                role="option"
+                aria-selected={option.value === value}
+              >
+                <button
+                  type="button"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => choose(option.value)}
+                >
                   {option.label}
                 </button>
               </li>

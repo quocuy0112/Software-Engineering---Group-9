@@ -1,15 +1,19 @@
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { config as loadEnvironment } from "dotenv";
 import { z } from "zod";
-import { Prisma, PrismaClient } from "../src/backend/generated/prisma/client";
+import {
+  CompanyVerificationState,
+  Prisma,
+  PrismaClient,
+} from "../src/backend/generated/prisma/client";
 
 const webRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const defaultCompaniesPath = resolve(webRoot, "data/jobs/companies.json");
+const defaultCompaniesPath = resolve(webRoot, "data/companies/companies.json");
 const defaultJobsPath = resolve(webRoot, "data/jobs/jobs.json");
 const jobBatchSize = 50;
 const jobImportConcurrency = 4;
@@ -194,6 +198,43 @@ async function readJsonFile(path: string, label: string): Promise<unknown> {
   }
 }
 
+async function readJobsFixture(path: string): Promise<unknown> {
+  try {
+    return await readJsonFile(path, "jobs");
+  } catch (error) {
+    const missingSource =
+      path === defaultJobsPath &&
+      (error as Error & { cause?: NodeJS.ErrnoException }).cause?.code ===
+        "ENOENT";
+    if (!missingSource) throw error;
+
+    const entries = await readdir(resolve(webRoot, "data/jobs"), {
+      withFileTypes: true,
+    });
+    const splitPaths = entries
+      .filter(
+        (entry) => entry.isFile() && /^jobs_.+_r\d{2}\.json$/u.test(entry.name),
+      )
+      .map((entry) => resolve(webRoot, "data/jobs", entry.name))
+      .sort((left, right) => left.localeCompare(right));
+    if (splitPaths.length !== 29) {
+      throw new Error(
+        "jobs.json is missing and the 29 split industry files are incomplete.",
+        { cause: error },
+      );
+    }
+    const documents = await Promise.all(
+      splitPaths.map((splitPath) => readJsonFile(splitPath, "split jobs")),
+    );
+    return documents.flatMap((document) => {
+      if (!Array.isArray(document)) {
+        throw new Error("A split jobs fixture must contain an array.");
+      }
+      return document;
+    });
+  }
+}
+
 function assertUnique(values: string[], label: string) {
   if (new Set(values).size !== values.length) {
     throw new Error("Fixture contains duplicate " + label + ".");
@@ -253,7 +294,7 @@ async function loadSplitFixtures(): Promise<{
   const jobsPath = argumentPath("--jobs", defaultJobsPath);
   const [companiesDocument, jobsDocument] = await Promise.all([
     readJsonFile(companiesPath, "companies"),
-    readJsonFile(jobsPath, "jobs"),
+    readJobsFixture(jobsPath),
   ]);
   const companies = z
     .array(sourceCompanySchema)
@@ -400,6 +441,7 @@ async function importReferenceData(
 
   return prisma.$transaction(async (transaction) => {
     for (const company of companies) {
+      const isVerified = verifiedCompanyIds.has(company.id);
       const data = {
         slug: company.slug,
         legalName: company.name,
@@ -411,9 +453,11 @@ async function importReferenceData(
         size: company.size,
         industry: company.industry,
         address: company.address,
-        verifiedAt: verifiedCompanyIds.has(company.id)
-          ? new Date(splitFixtureVerificationDate)
-          : null,
+        verifiedAt: isVerified ? new Date(splitFixtureVerificationDate) : null,
+        verificationState: isVerified
+          ? CompanyVerificationState.ACTIVE
+          : CompanyVerificationState.UNVERIFIED,
+        verificationInactiveAt: null,
       };
       await transaction.company.upsert({
         where: { id: company.id },

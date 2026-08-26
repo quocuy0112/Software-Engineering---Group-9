@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { profileBasicsSchema } from "@/shared/contracts/account/profile";
 
+export const MAX_APPLICATION_ATTEMPTS = 5;
+export const MAX_APPLICATION_ATTEMPTS_MESSAGE =
+  "You have reached the maximum number of applications for this job.";
+
 export const jobProblemSchema = z
   .object({
     code: z.string().min(1).max(80),
@@ -78,6 +82,9 @@ export const applicationContactSnapshotSchema = z
       .string()
       .trim()
       .regex(/^(?:0|\+84)(?:3|5|7|8|9)\d{8}$/u),
+    // Phone and location can be edited for one application. Keep this
+    // optional so legacy direct-application clients remain compatible.
+    location: z.string().trim().max(160).optional(),
   })
   .strict();
 
@@ -116,6 +123,8 @@ export const applicationFormSchema = z
     questions: z.array(applicationQuestionSchema).max(20),
     consentVersion: z.string().min(1).max(64),
     csrfToken: z.string().min(1).max(256),
+    applicationCount: z.number().int().nonnegative().optional(),
+    maxApplicationAttempts: z.literal(MAX_APPLICATION_ATTEMPTS).optional(),
   })
   .strict();
 
@@ -128,13 +137,32 @@ export const applicationAnswerInputSchema = z
 
 export const DIRECT_APPLICATION_CV_ID = "application-upload";
 
+export const applicationCoverLetterInputSchema = z.union([
+  z.string().trim().max(5_000),
+  z.object({ kind: z.literal("NONE") }).strict(),
+  z
+    .object({
+      kind: z.literal("TEXT"),
+      text: z.string().trim().min(1).max(10_000),
+    })
+    .strict(),
+  z
+    .object({
+      kind: z.literal("FILE"),
+      validatedDocumentId: z.string().min(1).max(128),
+    })
+    .strict(),
+]);
+
 export const applicationSubmissionSchema = z
   .object({
     cvId: z.string().min(1).max(128),
     cvFileRef: z.string().min(1).max(256).nullable().optional(),
     contactSnapshot: applicationContactSnapshotSchema.optional(),
+    shareContactWithRecruiter: z.boolean().optional(),
     answers: z.array(applicationAnswerInputSchema).max(20),
-    coverLetter: z.string().trim().max(5000).nullable(),
+    coverLetter: applicationCoverLetterInputSchema.nullable(),
+    message: z.string().trim().max(2_000).nullable().optional(),
     consentVersion: z.string().min(1).max(64),
     consentAccepted: z.literal(true),
     aiAnalysisConsent: z.boolean().optional(),
@@ -156,11 +184,13 @@ export const applicationOutcomeSchema = z
     applicationId: z.string().min(1).max(128),
     jobId: z.string().min(1).max(128),
     stage: z.literal("APPLIED"),
+    stageVersion: z.number().int().positive().optional(),
     submittedAt: z.string().datetime(),
     created: z.boolean(),
     message: z.string().min(1).max(300),
     aiAnalysisConsent: z.boolean().optional(),
     aiMatchScore: z.number().int().min(0).max(100).nullable().optional(),
+    applicationAttemptNumber: z.number().int().positive().optional(),
   })
   .strict();
 

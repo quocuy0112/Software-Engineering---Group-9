@@ -19,10 +19,32 @@ const createRequest = {
 } as const;
 
 describe("CV upload HTTP contract", () => {
-  it("accepts only strict PDF/DOCX reservation metadata from 1 to 5,000,000 bytes", () => {
+  it("accepts only strict PDF/DOC/DOCX reservation metadata from 1 to 5,000,000 bytes", () => {
     expect(createCvImportRequestSchema.parse(createRequest)).toEqual(
       createRequest,
     );
+    expect(
+      createCvImportRequestSchema.parse({
+        ...createRequest,
+        displayFilename: "synthetic-candidate.doc",
+        declaredMediaType: "application/msword",
+      }),
+    ).toMatchObject({
+      displayFilename: "synthetic-candidate.doc",
+      declaredMediaType: "application/msword",
+    });
+    expect(
+      createCvImportRequestSchema.parse({
+        ...createRequest,
+        displayFilename: "synthetic-candidate.docx",
+        declaredMediaType:
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      }),
+    ).toMatchObject({
+      displayFilename: "synthetic-candidate.docx",
+      declaredMediaType:
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    });
     expect(
       createCvImportRequestSchema.safeParse({
         ...createRequest,

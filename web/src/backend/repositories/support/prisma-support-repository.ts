@@ -14,6 +14,7 @@ import type {
 } from "@/shared/contracts/support";
 import { SupportError } from "@/backend/support/support-errors";
 import { createInAppNotification } from "@/backend/notifications/notification-service";
+import { notifyActionableAdministrators } from "@/backend/notifications/admin-notification-fanout";
 
 type SupportDb = typeof prisma | Prisma.TransactionClient;
 type SupportState =
@@ -236,6 +237,15 @@ export class PrismaSupportRepository {
       version: row.version,
       occurredAt: input.now,
     });
+    await notifyActionableAdministrators(this.db, {
+      kind: "SUPPORT_CASE_RECEIVED",
+      eventKey: `${row.id}:created:${row.version}`,
+      correlationId: input.clientOperationId,
+      occurredAt: input.now,
+      contextType: "SUPPORT_CASE",
+      contextId: row.id,
+      state: row.state,
+    });
     const detail = await this.detailRequester(row.id, input.userId);
     if (!detail) throw new SupportError("PERSISTENCE_UNAVAILABLE", 503, true);
     return {
@@ -348,6 +358,16 @@ export class PrismaSupportRepository {
       version,
       occurredAt: input.now,
     });
+    await notifyActionableAdministrators(this.db, {
+      kind: reopened ? "SUPPORT_CASE_REOPENED" : "SUPPORT_REQUESTER_REPLIED",
+      eventKey: `${row.id}:${reopened ? "reopened" : "requester-replied"}:${version}`,
+      correlationId: input.clientOperationId,
+      occurredAt: input.now,
+      contextType: "SUPPORT_CASE",
+      contextId: row.id,
+      preferredRecipientUserId: row.currentAssigneeUserId,
+      state: "WAITING_FOR_SUPPORT",
+    });
     const detail = await this.detailRequester(row.id, input.userId);
     if (!detail) throw new SupportError("PERSISTENCE_UNAVAILABLE", 503, true);
     return {
@@ -378,6 +398,8 @@ export class PrismaSupportRepository {
         ? input.filter.assigneeId
         : undefined;
     const minimumAgeHours = Number(input.filter.age ?? NaN);
+    const q = typeof input.filter.q === "string" ? input.filter.q.trim() : "";
+    const tokens = q.split(/\s+/u).filter(Boolean).slice(0, 8);
     const supportedStates: SupportState[] = [...activeStates, "CLOSED"];
     const supportedCategories: SupportCategory[] = [
       "ACCOUNT_ACCESS",
@@ -408,6 +430,25 @@ export class PrismaSupportRepository {
       conditions.push(
         Prisma.sql`c."createdAt" <= ${new Date(Date.now() - minimumAgeHours * 60 * 60_000)}`,
       );
+    }
+    if (q) {
+      conditions.push(Prisma.sql`(
+        c."id" = ${q}
+        OR c."requesterUserId" = ${q}
+        OR c."currentAssigneeUserId" = ${q}
+        OR EXISTS (
+          SELECT 1 FROM "user" u
+          WHERE u."id" = c."requesterUserId"
+          AND ${Prisma.join(
+            tokens.map((token) => Prisma.sql`u."name" ILIKE ${`%${token}%`}`),
+            " AND ",
+          )}
+        )
+        OR ${Prisma.join(
+          tokens.map((token) => Prisma.sql`c."subject" ILIKE ${`%${token}%`}`),
+          " AND ",
+        )}
+      )`);
     }
     const where = Prisma.join(conditions, " AND ");
     const offset = (input.page - 1) * input.perPage;
@@ -457,7 +498,10 @@ export class PrismaSupportRepository {
       include: {
         requester: { select: { name: true, email: true } },
         messages: { orderBy: { sequence: "asc" } },
-        internalNotes: { orderBy: { createdAt: "asc" } },
+        internalNotes: {
+          orderBy: { createdAt: "asc" },
+          include: { author: { select: { name: true } } },
+        },
         assignments: { orderBy: { assignedAt: "asc" } },
         history: { orderBy: { occurredAt: "asc" } },
       },
@@ -480,6 +524,7 @@ export class PrismaSupportRepository {
         : row.internalNotes.map((note) => ({
             id: note.id,
             authorAdminUserId: note.authorAdminUserId,
+            authorAdminDisplayName: note.author.name,
             normalizedText: note.normalizedText,
             createdAt: note.createdAt.toISOString(),
           })),

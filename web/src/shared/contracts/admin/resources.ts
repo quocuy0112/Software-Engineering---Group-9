@@ -95,6 +95,9 @@ export const accountDirectoryItemSchema = z
     type: z.enum(["CANDIDATE", "RECRUITER"]),
     status: z.enum(["ACTIVE", "SUSPENDED"]),
     version: z.number().int().min(0),
+    hasCandidateIdentity: z.boolean(),
+    activeMembershipCount: z.number().int().nonnegative(),
+    hasActiveAdministratorGrant: z.boolean(),
     counts: z.union([
       candidateActivityCountsSchema,
       recruiterActivityCountsSchema,
@@ -211,6 +214,7 @@ export const moderationListItemSchema = z
   .object({
     id: adminReferenceSchema,
     reporterAccountId: adminReferenceSchema,
+    reporterDisplayName: z.string().min(1).max(200),
     targetType: z.enum(["JOB", "COMPANY", "MEMBERSHIP", "CANDIDATE"]),
     targetReference: adminReferenceSchema,
     category: reportCategorySchema,

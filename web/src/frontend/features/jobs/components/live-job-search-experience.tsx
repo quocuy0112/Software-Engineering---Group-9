@@ -12,6 +12,7 @@ import {
 } from "./job-search-form";
 import { JobResultsList } from "./job-results-list";
 import { JobsWorkspaceNav } from "./jobs-workspace";
+import type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
 
 const scalarCriteriaNames = [
   "q",
@@ -28,6 +29,10 @@ const scalarCriteriaNames = [
 ] as const;
 
 const arrayCriteriaNames = [
+  "district",
+  "categoryFamily",
+  "categoryId",
+  "categoryTitle",
   "employmentType",
   "experienceLevel",
   "workArrangement",
@@ -37,6 +42,7 @@ const arrayCriteriaNames = [
 type HistoryMode = "none" | "replace" | "push";
 
 export type JobsLiveCopy = Readonly<{
+  locale: "vi" | "en";
   kicker: string;
   title: string;
   intro: string;
@@ -55,6 +61,7 @@ export type JobsLiveCopy = Readonly<{
   nextPage: string;
   lastPage: string;
   page: string;
+  perPage: string;
   empty: string;
   emptyCopy: string;
   clear: string;
@@ -120,8 +127,11 @@ function pageFromSearchParams(params: URLSearchParams) {
 }
 
 function pageNumbers(currentPage: number, totalPages: number) {
+  if (totalPages <= 5)
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+
   const first = Math.max(1, currentPage - 1);
-  const last = Math.min(totalPages, currentPage + 1);
+  const last = Math.min(totalPages, Math.max(currentPage + 1, 3));
   return Array.from({ length: last - first + 1 }, (_, index) => first + index);
 }
 
@@ -135,11 +145,13 @@ export function LiveJobSearchExperience({
   initialResult,
   initialError,
   copy,
+  taxonomy,
 }: Readonly<{
   initialCriteria: Record<string, string | string[] | undefined>;
   initialResult: JobSearchResponse | null;
   initialError: string | null;
   copy: JobsLiveCopy;
+  taxonomy?: JobSearchTaxonomy;
 }>) {
   const [criteria, setCriteria] = useState<JobSearchCriteria>(() =>
     criteriaFromInitial(initialCriteria),
@@ -152,6 +164,7 @@ export function LiveJobSearchExperience({
     initialError ? copy.tryAgain : null,
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const requestId = useRef(0);
   const abortController = useRef<AbortController | null>(null);
   const debounceTimer = useRef<number | null>(null);
@@ -285,12 +298,29 @@ export function LiveJobSearchExperience({
   const total = result?.total;
   const resultSummary =
     total === undefined ? "" : `${total} ${copy.opportunities}`;
+  const pageSize = Number(one(criteria.limit) ?? "20") || 20;
+  const resultStart = result && result.total ? (page - 1) * pageSize + 1 : 0;
+  const resultEnd = result ? Math.min(page * pageSize, result.total) : 0;
+  const sort = one(criteria.sort) || "RELEVANCE";
+  const sortOptions = [
+    [
+      "RELEVANCE",
+      "Phù hợp nhất với hồ sơ của bạn",
+      "Best match for your profile",
+    ],
+    ["NEWEST", "Ngày đăng", "Date posted"],
+    ["UPDATED", "Ngày cập nhật", "Date updated"],
+    ["URGENT", "Cần tuyển gấp", "Urgent hiring first"],
+  ] as const;
+  const activeSort =
+    sortOptions.find(([value]) => value === sort) ?? sortOptions[0];
 
   return (
     <>
       <div className="jobs-fixed-region">
-        <header className="page-heading jobs-heading">
-          <div>
+        <JobsWorkspaceNav activeTab="search" />
+        <header className="jobs-workspace-heading jobs-workspace-heading--wide">
+          <div className="jobs-workspace-heading-content">
             <p className="workspace-kicker">{copy.kicker}</p>
             <h1 id="workspace-page-title">{copy.title}</h1>
             <p className="page-heading-copy">{copy.intro}</p>
@@ -307,7 +337,6 @@ export function LiveJobSearchExperience({
             </span>
           ) : null}
         </header>
-        <JobsWorkspaceNav activeTab="search" />
       </div>
 
       <div className="jobs-grid">
@@ -318,6 +347,7 @@ export function LiveJobSearchExperience({
             onClear={clearFilters}
             resultCount={total}
             isLoading={isLoading}
+            taxonomy={taxonomy}
           />
         </aside>
 
@@ -326,6 +356,71 @@ export function LiveJobSearchExperience({
           aria-labelledby="job-results-heading"
           aria-busy={isLoading}
         >
+          <div
+            className="job-results-toolbar"
+            aria-label={
+              copy.locale === "vi"
+                ? "Tùy chọn sắp xếp kết quả"
+                : "Search result sorting"
+            }
+          >
+            <div className="job-results-sort">
+              <span>{copy.locale === "vi" ? "Sắp xếp theo:" : "Sort by:"}</span>
+              <button
+                type="button"
+                aria-expanded={sortMenuOpen}
+                aria-haspopup="listbox"
+                onClick={() => setSortMenuOpen((open) => !open)}
+              >
+                {copy.locale === "vi" ? activeSort[1] : activeSort[2]}
+                <svg
+                  className="job-results-sort-chevron"
+                  viewBox="0 0 20 20"
+                  aria-hidden="true"
+                >
+                  <path d="m5.5 7.5 4.5 4.5 4.5-4.5" />
+                </svg>
+              </button>
+              {sortMenuOpen ? (
+                <div
+                  className="job-results-sort-menu"
+                  role="listbox"
+                  aria-label={
+                    copy.locale === "vi"
+                      ? "Các tùy chọn sắp xếp"
+                      : "Sort options"
+                  }
+                >
+                  {sortOptions.map(([value, vietnamese, english]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      role="option"
+                      aria-selected={sort === value}
+                      onClick={() => {
+                        setSortMenuOpen(false);
+                        runCriteriaChange(
+                          { ...criteria, sort: value },
+                          "immediate",
+                        );
+                      }}
+                    >
+                      <span>{copy.locale === "vi" ? vietnamese : english}</span>
+                      {sort === value ? (
+                        <strong
+                          aria-label={
+                            copy.locale === "vi" ? "Đang chọn" : "Selected"
+                          }
+                        >
+                          ✓
+                        </strong>
+                      ) : null}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </div>
           <header className="job-results-header">
             <p className="panel-kicker" id="job-results-heading">
               {error ? copy.loadFailed : copy.results}
@@ -370,11 +465,45 @@ export function LiveJobSearchExperience({
               <>
                 <JobResultsList jobs={result.items} />
                 {result.totalPages > 1 ? (
-                  <nav className="job-pagination" aria-label="Job result pages">
+                  <nav
+                    className="job-pagination job-pagination--compact"
+                    aria-label="Job result pages"
+                  >
+                    <div className="job-pagination-summary">
+                      <span>
+                        {copy.showing}{" "}
+                        <strong>
+                          {resultStart}–{resultEnd}
+                        </strong>{" "}
+                        {copy.of} <strong>{result.total}</strong> {copy.jobs}
+                      </span>
+                      <span
+                        className="job-pagination-divider"
+                        aria-hidden="true"
+                      />
+                      <label>
+                        {copy.perPage}
+                        <select
+                          value={String(pageSize)}
+                          onChange={(event) =>
+                            runCriteriaChange(
+                              { ...criteria, limit: event.target.value },
+                              "immediate",
+                            )
+                          }
+                        >
+                          {[10, 20, 50].map((size) => (
+                            <option key={size} value={size}>
+                              {size}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
                     <button
                       className="job-pagination-control"
                       type="button"
-                      disabled={result.page === 1}
+                      disabled={page === 1}
                       aria-label={copy.firstPage}
                       title={copy.firstPage}
                       onClick={() => goToPage(1)}
@@ -387,10 +516,10 @@ export function LiveJobSearchExperience({
                     <button
                       className="job-pagination-control"
                       type="button"
-                      disabled={result.page === 1}
+                      disabled={page === 1}
                       aria-label={copy.previousPage}
                       title={copy.previousPage}
-                      onClick={() => goToPage(result.page - 1)}
+                      onClick={() => goToPage(page - 1)}
                     >
                       <span aria-hidden="true">‹</span>
                       <span className="job-pagination-control-label">
@@ -399,34 +528,32 @@ export function LiveJobSearchExperience({
                     </button>
                     <div className="job-pagination-pages">
                       <ol>
-                        {pageNumbers(result.page, result.totalPages).map(
-                          (number) => (
-                            <li key={number}>
-                              <button
-                                className={`job-pagination-page${
-                                  number === result.page ? " is-current" : ""
-                                }`}
-                                type="button"
-                                aria-current={
-                                  number === result.page ? "page" : undefined
-                                }
-                                aria-label={`${copy.page} ${number}`}
-                                onClick={() => goToPage(number)}
-                              >
-                                {number}
-                              </button>
-                            </li>
-                          ),
-                        )}
+                        {pageNumbers(page, result.totalPages).map((number) => (
+                          <li key={number}>
+                            <button
+                              className={`job-pagination-page${
+                                number === page ? "is-current" : ""
+                              }`}
+                              type="button"
+                              aria-current={
+                                number === page ? "page" : undefined
+                              }
+                              aria-label={`${copy.page} ${number}`}
+                              onClick={() => goToPage(number)}
+                            >
+                              {number}
+                            </button>
+                          </li>
+                        ))}
                       </ol>
                     </div>
                     <button
                       className="job-pagination-control"
                       type="button"
-                      disabled={result.page === result.totalPages}
+                      disabled={page === result.totalPages}
                       aria-label={copy.nextPage}
                       title={copy.nextPage}
-                      onClick={() => goToPage(result.page + 1)}
+                      onClick={() => goToPage(page + 1)}
                     >
                       <span className="job-pagination-control-label">
                         {copy.nextPage}
@@ -436,7 +563,7 @@ export function LiveJobSearchExperience({
                     <button
                       className="job-pagination-control"
                       type="button"
-                      disabled={result.page === result.totalPages}
+                      disabled={page === result.totalPages}
                       aria-label={copy.lastPage}
                       title={copy.lastPage}
                       onClick={() => goToPage(result.totalPages)}
@@ -447,7 +574,7 @@ export function LiveJobSearchExperience({
                       <span aria-hidden="true">»</span>
                     </button>
                     <p className="job-pagination-progress" aria-live="polite">
-                      {copy.page} {result.page} / {result.totalPages}
+                      {copy.page} {page} / {result.totalPages}
                     </p>
                   </nav>
                 ) : null}

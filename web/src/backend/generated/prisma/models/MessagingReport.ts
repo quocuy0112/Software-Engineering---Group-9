@@ -39,8 +39,10 @@ export type MessagingReportMinAggregateOutputType = {
   reporterUserId: string | null
   targetUserId: string | null
   conversationId: string | null
+  recruitmentThreadId: string | null
   targetType: $Enums.MessagingReportTargetType | null
   evidenceMessageId: string | null
+  recruitmentEvidenceMessageId: string | null
   category: $Enums.ModerationReportCategory | null
   normalizedDetail: string | null
   state: $Enums.ModerationReportState | null
@@ -60,8 +62,10 @@ export type MessagingReportMaxAggregateOutputType = {
   reporterUserId: string | null
   targetUserId: string | null
   conversationId: string | null
+  recruitmentThreadId: string | null
   targetType: $Enums.MessagingReportTargetType | null
   evidenceMessageId: string | null
+  recruitmentEvidenceMessageId: string | null
   category: $Enums.ModerationReportCategory | null
   normalizedDetail: string | null
   state: $Enums.ModerationReportState | null
@@ -81,8 +85,10 @@ export type MessagingReportCountAggregateOutputType = {
   reporterUserId: number
   targetUserId: number
   conversationId: number
+  recruitmentThreadId: number
   targetType: number
   evidenceMessageId: number
+  recruitmentEvidenceMessageId: number
   category: number
   normalizedDetail: number
   state: number
@@ -112,8 +118,10 @@ export type MessagingReportMinAggregateInputType = {
   reporterUserId?: true
   targetUserId?: true
   conversationId?: true
+  recruitmentThreadId?: true
   targetType?: true
   evidenceMessageId?: true
+  recruitmentEvidenceMessageId?: true
   category?: true
   normalizedDetail?: true
   state?: true
@@ -133,8 +141,10 @@ export type MessagingReportMaxAggregateInputType = {
   reporterUserId?: true
   targetUserId?: true
   conversationId?: true
+  recruitmentThreadId?: true
   targetType?: true
   evidenceMessageId?: true
+  recruitmentEvidenceMessageId?: true
   category?: true
   normalizedDetail?: true
   state?: true
@@ -154,8 +164,10 @@ export type MessagingReportCountAggregateInputType = {
   reporterUserId?: true
   targetUserId?: true
   conversationId?: true
+  recruitmentThreadId?: true
   targetType?: true
   evidenceMessageId?: true
+  recruitmentEvidenceMessageId?: true
   category?: true
   normalizedDetail?: true
   state?: true
@@ -261,9 +273,11 @@ export type MessagingReportGroupByOutputType = {
   id: string
   reporterUserId: string
   targetUserId: string
-  conversationId: string
+  conversationId: string | null
+  recruitmentThreadId: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId: string | null
+  recruitmentEvidenceMessageId: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail: string | null
   state: $Enums.ModerationReportState
@@ -305,9 +319,11 @@ export type MessagingReportWhereInput = {
   id?: Prisma.StringFilter<"MessagingReport"> | string
   reporterUserId?: Prisma.StringFilter<"MessagingReport"> | string
   targetUserId?: Prisma.StringFilter<"MessagingReport"> | string
-  conversationId?: Prisma.StringFilter<"MessagingReport"> | string
+  conversationId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  recruitmentThreadId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFilter<"MessagingReport"> | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  recruitmentEvidenceMessageId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
   category?: Prisma.EnumModerationReportCategoryFilter<"MessagingReport"> | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
   state?: Prisma.EnumModerationReportStateFilter<"MessagingReport"> | $Enums.ModerationReportState
@@ -324,8 +340,10 @@ export type MessagingReportWhereInput = {
   target?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   assignedAdmin?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
   handledByAdmin?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
-  conversation?: Prisma.XOR<Prisma.MessagingConversationScalarRelationFilter, Prisma.MessagingConversationWhereInput>
+  conversation?: Prisma.XOR<Prisma.MessagingConversationNullableScalarRelationFilter, Prisma.MessagingConversationWhereInput> | null
   evidenceMessage?: Prisma.XOR<Prisma.MessagingMessageNullableScalarRelationFilter, Prisma.MessagingMessageWhereInput> | null
+  recruitmentThread?: Prisma.XOR<Prisma.RecruitmentThreadNullableScalarRelationFilter, Prisma.RecruitmentThreadWhereInput> | null
+  recruitmentEvidenceMessage?: Prisma.XOR<Prisma.RecruitmentMessageNullableScalarRelationFilter, Prisma.RecruitmentMessageWhereInput> | null
   reviewEvents?: Prisma.MessagingReportReviewEventListRelationFilter
   privateNotes?: Prisma.MessagingReportPrivateNoteListRelationFilter
 }
@@ -334,9 +352,11 @@ export type MessagingReportOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   reporterUserId?: Prisma.SortOrder
   targetUserId?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  recruitmentThreadId?: Prisma.SortOrderInput | Prisma.SortOrder
   targetType?: Prisma.SortOrder
   evidenceMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
+  recruitmentEvidenceMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
   normalizedDetail?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -355,6 +375,8 @@ export type MessagingReportOrderByWithRelationInput = {
   handledByAdmin?: Prisma.UserAccountOrderByWithRelationInput
   conversation?: Prisma.MessagingConversationOrderByWithRelationInput
   evidenceMessage?: Prisma.MessagingMessageOrderByWithRelationInput
+  recruitmentThread?: Prisma.RecruitmentThreadOrderByWithRelationInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageOrderByWithRelationInput
   reviewEvents?: Prisma.MessagingReportReviewEventOrderByRelationAggregateInput
   privateNotes?: Prisma.MessagingReportPrivateNoteOrderByRelationAggregateInput
 }
@@ -367,9 +389,11 @@ export type MessagingReportWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.MessagingReportWhereInput | Prisma.MessagingReportWhereInput[]
   reporterUserId?: Prisma.StringFilter<"MessagingReport"> | string
   targetUserId?: Prisma.StringFilter<"MessagingReport"> | string
-  conversationId?: Prisma.StringFilter<"MessagingReport"> | string
+  conversationId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  recruitmentThreadId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFilter<"MessagingReport"> | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  recruitmentEvidenceMessageId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
   category?: Prisma.EnumModerationReportCategoryFilter<"MessagingReport"> | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
   state?: Prisma.EnumModerationReportStateFilter<"MessagingReport"> | $Enums.ModerationReportState
@@ -385,8 +409,10 @@ export type MessagingReportWhereUniqueInput = Prisma.AtLeast<{
   target?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   assignedAdmin?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
   handledByAdmin?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
-  conversation?: Prisma.XOR<Prisma.MessagingConversationScalarRelationFilter, Prisma.MessagingConversationWhereInput>
+  conversation?: Prisma.XOR<Prisma.MessagingConversationNullableScalarRelationFilter, Prisma.MessagingConversationWhereInput> | null
   evidenceMessage?: Prisma.XOR<Prisma.MessagingMessageNullableScalarRelationFilter, Prisma.MessagingMessageWhereInput> | null
+  recruitmentThread?: Prisma.XOR<Prisma.RecruitmentThreadNullableScalarRelationFilter, Prisma.RecruitmentThreadWhereInput> | null
+  recruitmentEvidenceMessage?: Prisma.XOR<Prisma.RecruitmentMessageNullableScalarRelationFilter, Prisma.RecruitmentMessageWhereInput> | null
   reviewEvents?: Prisma.MessagingReportReviewEventListRelationFilter
   privateNotes?: Prisma.MessagingReportPrivateNoteListRelationFilter
 }, "id" | "unresolvedKey">
@@ -395,9 +421,11 @@ export type MessagingReportOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   reporterUserId?: Prisma.SortOrder
   targetUserId?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  recruitmentThreadId?: Prisma.SortOrderInput | Prisma.SortOrder
   targetType?: Prisma.SortOrder
   evidenceMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
+  recruitmentEvidenceMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
   normalizedDetail?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -424,9 +452,11 @@ export type MessagingReportScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"MessagingReport"> | string
   reporterUserId?: Prisma.StringWithAggregatesFilter<"MessagingReport"> | string
   targetUserId?: Prisma.StringWithAggregatesFilter<"MessagingReport"> | string
-  conversationId?: Prisma.StringWithAggregatesFilter<"MessagingReport"> | string
+  conversationId?: Prisma.StringNullableWithAggregatesFilter<"MessagingReport"> | string | null
+  recruitmentThreadId?: Prisma.StringNullableWithAggregatesFilter<"MessagingReport"> | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeWithAggregatesFilter<"MessagingReport"> | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.StringNullableWithAggregatesFilter<"MessagingReport"> | string | null
+  recruitmentEvidenceMessageId?: Prisma.StringNullableWithAggregatesFilter<"MessagingReport"> | string | null
   category?: Prisma.EnumModerationReportCategoryWithAggregatesFilter<"MessagingReport"> | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.StringNullableWithAggregatesFilter<"MessagingReport"> | string | null
   state?: Prisma.EnumModerationReportStateWithAggregatesFilter<"MessagingReport"> | $Enums.ModerationReportState
@@ -458,8 +488,10 @@ export type MessagingReportCreateInput = {
   target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
   handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
-  conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  conversation?: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
   evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  recruitmentThread?: Prisma.RecruitmentThreadCreateNestedOneWithoutReportsInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageCreateNestedOneWithoutEvidenceForReportsInput
   reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
   privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
 }
@@ -468,9 +500,11 @@ export type MessagingReportUncheckedCreateInput = {
   id?: string
   reporterUserId: string
   targetUserId: string
-  conversationId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -504,8 +538,10 @@ export type MessagingReportUpdateInput = {
   target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
   handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
-  conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
+  conversation?: Prisma.MessagingConversationUpdateOneWithoutReportsNestedInput
   evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  recruitmentThread?: Prisma.RecruitmentThreadUpdateOneWithoutReportsNestedInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageUpdateOneWithoutEvidenceForReportsNestedInput
   reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
   privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
 }
@@ -514,9 +550,11 @@ export type MessagingReportUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
   targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -537,9 +575,11 @@ export type MessagingReportCreateManyInput = {
   id?: string
   reporterUserId: string
   targetUserId: string
-  conversationId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -573,9 +613,11 @@ export type MessagingReportUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
   targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -605,8 +647,10 @@ export type MessagingReportCountOrderByAggregateInput = {
   reporterUserId?: Prisma.SortOrder
   targetUserId?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
+  recruitmentThreadId?: Prisma.SortOrder
   targetType?: Prisma.SortOrder
   evidenceMessageId?: Prisma.SortOrder
+  recruitmentEvidenceMessageId?: Prisma.SortOrder
   category?: Prisma.SortOrder
   normalizedDetail?: Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -630,8 +674,10 @@ export type MessagingReportMaxOrderByAggregateInput = {
   reporterUserId?: Prisma.SortOrder
   targetUserId?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
+  recruitmentThreadId?: Prisma.SortOrder
   targetType?: Prisma.SortOrder
   evidenceMessageId?: Prisma.SortOrder
+  recruitmentEvidenceMessageId?: Prisma.SortOrder
   category?: Prisma.SortOrder
   normalizedDetail?: Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -651,8 +697,10 @@ export type MessagingReportMinOrderByAggregateInput = {
   reporterUserId?: Prisma.SortOrder
   targetUserId?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
+  recruitmentThreadId?: Prisma.SortOrder
   targetType?: Prisma.SortOrder
   evidenceMessageId?: Prisma.SortOrder
+  recruitmentEvidenceMessageId?: Prisma.SortOrder
   category?: Prisma.SortOrder
   normalizedDetail?: Prisma.SortOrder
   state?: Prisma.SortOrder
@@ -844,6 +892,90 @@ export type MessagingReportUncheckedUpdateManyWithoutHandledByAdminNestedInput =
   deleteMany?: Prisma.MessagingReportScalarWhereInput | Prisma.MessagingReportScalarWhereInput[]
 }
 
+export type MessagingReportCreateNestedManyWithoutRecruitmentThreadInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutRecruitmentThreadInput, Prisma.MessagingReportUncheckedCreateWithoutRecruitmentThreadInput> | Prisma.MessagingReportCreateWithoutRecruitmentThreadInput[] | Prisma.MessagingReportUncheckedCreateWithoutRecruitmentThreadInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutRecruitmentThreadInput | Prisma.MessagingReportCreateOrConnectWithoutRecruitmentThreadInput[]
+  createMany?: Prisma.MessagingReportCreateManyRecruitmentThreadInputEnvelope
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+}
+
+export type MessagingReportUncheckedCreateNestedManyWithoutRecruitmentThreadInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutRecruitmentThreadInput, Prisma.MessagingReportUncheckedCreateWithoutRecruitmentThreadInput> | Prisma.MessagingReportCreateWithoutRecruitmentThreadInput[] | Prisma.MessagingReportUncheckedCreateWithoutRecruitmentThreadInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutRecruitmentThreadInput | Prisma.MessagingReportCreateOrConnectWithoutRecruitmentThreadInput[]
+  createMany?: Prisma.MessagingReportCreateManyRecruitmentThreadInputEnvelope
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+}
+
+export type MessagingReportUpdateManyWithoutRecruitmentThreadNestedInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutRecruitmentThreadInput, Prisma.MessagingReportUncheckedCreateWithoutRecruitmentThreadInput> | Prisma.MessagingReportCreateWithoutRecruitmentThreadInput[] | Prisma.MessagingReportUncheckedCreateWithoutRecruitmentThreadInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutRecruitmentThreadInput | Prisma.MessagingReportCreateOrConnectWithoutRecruitmentThreadInput[]
+  upsert?: Prisma.MessagingReportUpsertWithWhereUniqueWithoutRecruitmentThreadInput | Prisma.MessagingReportUpsertWithWhereUniqueWithoutRecruitmentThreadInput[]
+  createMany?: Prisma.MessagingReportCreateManyRecruitmentThreadInputEnvelope
+  set?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  disconnect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  delete?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  update?: Prisma.MessagingReportUpdateWithWhereUniqueWithoutRecruitmentThreadInput | Prisma.MessagingReportUpdateWithWhereUniqueWithoutRecruitmentThreadInput[]
+  updateMany?: Prisma.MessagingReportUpdateManyWithWhereWithoutRecruitmentThreadInput | Prisma.MessagingReportUpdateManyWithWhereWithoutRecruitmentThreadInput[]
+  deleteMany?: Prisma.MessagingReportScalarWhereInput | Prisma.MessagingReportScalarWhereInput[]
+}
+
+export type MessagingReportUncheckedUpdateManyWithoutRecruitmentThreadNestedInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutRecruitmentThreadInput, Prisma.MessagingReportUncheckedCreateWithoutRecruitmentThreadInput> | Prisma.MessagingReportCreateWithoutRecruitmentThreadInput[] | Prisma.MessagingReportUncheckedCreateWithoutRecruitmentThreadInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutRecruitmentThreadInput | Prisma.MessagingReportCreateOrConnectWithoutRecruitmentThreadInput[]
+  upsert?: Prisma.MessagingReportUpsertWithWhereUniqueWithoutRecruitmentThreadInput | Prisma.MessagingReportUpsertWithWhereUniqueWithoutRecruitmentThreadInput[]
+  createMany?: Prisma.MessagingReportCreateManyRecruitmentThreadInputEnvelope
+  set?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  disconnect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  delete?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  update?: Prisma.MessagingReportUpdateWithWhereUniqueWithoutRecruitmentThreadInput | Prisma.MessagingReportUpdateWithWhereUniqueWithoutRecruitmentThreadInput[]
+  updateMany?: Prisma.MessagingReportUpdateManyWithWhereWithoutRecruitmentThreadInput | Prisma.MessagingReportUpdateManyWithWhereWithoutRecruitmentThreadInput[]
+  deleteMany?: Prisma.MessagingReportScalarWhereInput | Prisma.MessagingReportScalarWhereInput[]
+}
+
+export type MessagingReportCreateNestedManyWithoutRecruitmentEvidenceMessageInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutRecruitmentEvidenceMessageInput, Prisma.MessagingReportUncheckedCreateWithoutRecruitmentEvidenceMessageInput> | Prisma.MessagingReportCreateWithoutRecruitmentEvidenceMessageInput[] | Prisma.MessagingReportUncheckedCreateWithoutRecruitmentEvidenceMessageInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutRecruitmentEvidenceMessageInput | Prisma.MessagingReportCreateOrConnectWithoutRecruitmentEvidenceMessageInput[]
+  createMany?: Prisma.MessagingReportCreateManyRecruitmentEvidenceMessageInputEnvelope
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+}
+
+export type MessagingReportUncheckedCreateNestedManyWithoutRecruitmentEvidenceMessageInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutRecruitmentEvidenceMessageInput, Prisma.MessagingReportUncheckedCreateWithoutRecruitmentEvidenceMessageInput> | Prisma.MessagingReportCreateWithoutRecruitmentEvidenceMessageInput[] | Prisma.MessagingReportUncheckedCreateWithoutRecruitmentEvidenceMessageInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutRecruitmentEvidenceMessageInput | Prisma.MessagingReportCreateOrConnectWithoutRecruitmentEvidenceMessageInput[]
+  createMany?: Prisma.MessagingReportCreateManyRecruitmentEvidenceMessageInputEnvelope
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+}
+
+export type MessagingReportUpdateManyWithoutRecruitmentEvidenceMessageNestedInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutRecruitmentEvidenceMessageInput, Prisma.MessagingReportUncheckedCreateWithoutRecruitmentEvidenceMessageInput> | Prisma.MessagingReportCreateWithoutRecruitmentEvidenceMessageInput[] | Prisma.MessagingReportUncheckedCreateWithoutRecruitmentEvidenceMessageInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutRecruitmentEvidenceMessageInput | Prisma.MessagingReportCreateOrConnectWithoutRecruitmentEvidenceMessageInput[]
+  upsert?: Prisma.MessagingReportUpsertWithWhereUniqueWithoutRecruitmentEvidenceMessageInput | Prisma.MessagingReportUpsertWithWhereUniqueWithoutRecruitmentEvidenceMessageInput[]
+  createMany?: Prisma.MessagingReportCreateManyRecruitmentEvidenceMessageInputEnvelope
+  set?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  disconnect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  delete?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  update?: Prisma.MessagingReportUpdateWithWhereUniqueWithoutRecruitmentEvidenceMessageInput | Prisma.MessagingReportUpdateWithWhereUniqueWithoutRecruitmentEvidenceMessageInput[]
+  updateMany?: Prisma.MessagingReportUpdateManyWithWhereWithoutRecruitmentEvidenceMessageInput | Prisma.MessagingReportUpdateManyWithWhereWithoutRecruitmentEvidenceMessageInput[]
+  deleteMany?: Prisma.MessagingReportScalarWhereInput | Prisma.MessagingReportScalarWhereInput[]
+}
+
+export type MessagingReportUncheckedUpdateManyWithoutRecruitmentEvidenceMessageNestedInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutRecruitmentEvidenceMessageInput, Prisma.MessagingReportUncheckedCreateWithoutRecruitmentEvidenceMessageInput> | Prisma.MessagingReportCreateWithoutRecruitmentEvidenceMessageInput[] | Prisma.MessagingReportUncheckedCreateWithoutRecruitmentEvidenceMessageInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutRecruitmentEvidenceMessageInput | Prisma.MessagingReportCreateOrConnectWithoutRecruitmentEvidenceMessageInput[]
+  upsert?: Prisma.MessagingReportUpsertWithWhereUniqueWithoutRecruitmentEvidenceMessageInput | Prisma.MessagingReportUpsertWithWhereUniqueWithoutRecruitmentEvidenceMessageInput[]
+  createMany?: Prisma.MessagingReportCreateManyRecruitmentEvidenceMessageInputEnvelope
+  set?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  disconnect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  delete?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  update?: Prisma.MessagingReportUpdateWithWhereUniqueWithoutRecruitmentEvidenceMessageInput | Prisma.MessagingReportUpdateWithWhereUniqueWithoutRecruitmentEvidenceMessageInput[]
+  updateMany?: Prisma.MessagingReportUpdateManyWithWhereWithoutRecruitmentEvidenceMessageInput | Prisma.MessagingReportUpdateManyWithWhereWithoutRecruitmentEvidenceMessageInput[]
+  deleteMany?: Prisma.MessagingReportScalarWhereInput | Prisma.MessagingReportScalarWhereInput[]
+}
+
 export type MessagingReportCreateNestedManyWithoutConversationInput = {
   create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutConversationInput, Prisma.MessagingReportUncheckedCreateWithoutConversationInput> | Prisma.MessagingReportCreateWithoutConversationInput[] | Prisma.MessagingReportUncheckedCreateWithoutConversationInput[]
   connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutConversationInput | Prisma.MessagingReportCreateOrConnectWithoutConversationInput[]
@@ -976,8 +1108,10 @@ export type MessagingReportCreateWithoutReporterInput = {
   target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
   handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
-  conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  conversation?: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
   evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  recruitmentThread?: Prisma.RecruitmentThreadCreateNestedOneWithoutReportsInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageCreateNestedOneWithoutEvidenceForReportsInput
   reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
   privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
 }
@@ -985,9 +1119,11 @@ export type MessagingReportCreateWithoutReporterInput = {
 export type MessagingReportUncheckedCreateWithoutReporterInput = {
   id?: string
   targetUserId: string
-  conversationId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -1030,8 +1166,10 @@ export type MessagingReportCreateWithoutTargetInput = {
   reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedMessagingReportsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
   handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
-  conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  conversation?: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
   evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  recruitmentThread?: Prisma.RecruitmentThreadCreateNestedOneWithoutReportsInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageCreateNestedOneWithoutEvidenceForReportsInput
   reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
   privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
 }
@@ -1039,9 +1177,11 @@ export type MessagingReportCreateWithoutTargetInput = {
 export type MessagingReportUncheckedCreateWithoutTargetInput = {
   id?: string
   reporterUserId: string
-  conversationId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -1084,8 +1224,10 @@ export type MessagingReportCreateWithoutAssignedAdminInput = {
   reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedMessagingReportsInput
   target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
   handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
-  conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  conversation?: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
   evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  recruitmentThread?: Prisma.RecruitmentThreadCreateNestedOneWithoutReportsInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageCreateNestedOneWithoutEvidenceForReportsInput
   reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
   privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
 }
@@ -1094,9 +1236,11 @@ export type MessagingReportUncheckedCreateWithoutAssignedAdminInput = {
   id?: string
   reporterUserId: string
   targetUserId: string
-  conversationId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -1138,8 +1282,10 @@ export type MessagingReportCreateWithoutHandledByAdminInput = {
   reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedMessagingReportsInput
   target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
-  conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  conversation?: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
   evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  recruitmentThread?: Prisma.RecruitmentThreadCreateNestedOneWithoutReportsInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageCreateNestedOneWithoutEvidenceForReportsInput
   reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
   privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
 }
@@ -1148,9 +1294,11 @@ export type MessagingReportUncheckedCreateWithoutHandledByAdminInput = {
   id?: string
   reporterUserId: string
   targetUserId: string
-  conversationId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -1199,9 +1347,11 @@ export type MessagingReportScalarWhereInput = {
   id?: Prisma.StringFilter<"MessagingReport"> | string
   reporterUserId?: Prisma.StringFilter<"MessagingReport"> | string
   targetUserId?: Prisma.StringFilter<"MessagingReport"> | string
-  conversationId?: Prisma.StringFilter<"MessagingReport"> | string
+  conversationId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  recruitmentThreadId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFilter<"MessagingReport"> | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  recruitmentEvidenceMessageId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
   category?: Prisma.EnumModerationReportCategoryFilter<"MessagingReport"> | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
   state?: Prisma.EnumModerationReportStateFilter<"MessagingReport"> | $Enums.ModerationReportState
@@ -1264,6 +1414,154 @@ export type MessagingReportUpdateManyWithWhereWithoutHandledByAdminInput = {
   data: Prisma.XOR<Prisma.MessagingReportUpdateManyMutationInput, Prisma.MessagingReportUncheckedUpdateManyWithoutHandledByAdminInput>
 }
 
+export type MessagingReportCreateWithoutRecruitmentThreadInput = {
+  id?: string
+  targetType: $Enums.MessagingReportTargetType
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedMessagingReportsInput
+  target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
+  assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
+  handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
+  conversation?: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageCreateNestedOneWithoutEvidenceForReportsInput
+  reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
+}
+
+export type MessagingReportUncheckedCreateWithoutRecruitmentThreadInput = {
+  id?: string
+  reporterUserId: string
+  targetUserId: string
+  conversationId?: string | null
+  targetType: $Enums.MessagingReportTargetType
+  evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedCreateNestedManyWithoutReportInput
+}
+
+export type MessagingReportCreateOrConnectWithoutRecruitmentThreadInput = {
+  where: Prisma.MessagingReportWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessagingReportCreateWithoutRecruitmentThreadInput, Prisma.MessagingReportUncheckedCreateWithoutRecruitmentThreadInput>
+}
+
+export type MessagingReportCreateManyRecruitmentThreadInputEnvelope = {
+  data: Prisma.MessagingReportCreateManyRecruitmentThreadInput | Prisma.MessagingReportCreateManyRecruitmentThreadInput[]
+  skipDuplicates?: boolean
+}
+
+export type MessagingReportUpsertWithWhereUniqueWithoutRecruitmentThreadInput = {
+  where: Prisma.MessagingReportWhereUniqueInput
+  update: Prisma.XOR<Prisma.MessagingReportUpdateWithoutRecruitmentThreadInput, Prisma.MessagingReportUncheckedUpdateWithoutRecruitmentThreadInput>
+  create: Prisma.XOR<Prisma.MessagingReportCreateWithoutRecruitmentThreadInput, Prisma.MessagingReportUncheckedCreateWithoutRecruitmentThreadInput>
+}
+
+export type MessagingReportUpdateWithWhereUniqueWithoutRecruitmentThreadInput = {
+  where: Prisma.MessagingReportWhereUniqueInput
+  data: Prisma.XOR<Prisma.MessagingReportUpdateWithoutRecruitmentThreadInput, Prisma.MessagingReportUncheckedUpdateWithoutRecruitmentThreadInput>
+}
+
+export type MessagingReportUpdateManyWithWhereWithoutRecruitmentThreadInput = {
+  where: Prisma.MessagingReportScalarWhereInput
+  data: Prisma.XOR<Prisma.MessagingReportUpdateManyMutationInput, Prisma.MessagingReportUncheckedUpdateManyWithoutRecruitmentThreadInput>
+}
+
+export type MessagingReportCreateWithoutRecruitmentEvidenceMessageInput = {
+  id?: string
+  targetType: $Enums.MessagingReportTargetType
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedMessagingReportsInput
+  target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
+  assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
+  handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
+  conversation?: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  recruitmentThread?: Prisma.RecruitmentThreadCreateNestedOneWithoutReportsInput
+  reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
+}
+
+export type MessagingReportUncheckedCreateWithoutRecruitmentEvidenceMessageInput = {
+  id?: string
+  reporterUserId: string
+  targetUserId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
+  targetType: $Enums.MessagingReportTargetType
+  evidenceMessageId?: string | null
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedCreateNestedManyWithoutReportInput
+}
+
+export type MessagingReportCreateOrConnectWithoutRecruitmentEvidenceMessageInput = {
+  where: Prisma.MessagingReportWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessagingReportCreateWithoutRecruitmentEvidenceMessageInput, Prisma.MessagingReportUncheckedCreateWithoutRecruitmentEvidenceMessageInput>
+}
+
+export type MessagingReportCreateManyRecruitmentEvidenceMessageInputEnvelope = {
+  data: Prisma.MessagingReportCreateManyRecruitmentEvidenceMessageInput | Prisma.MessagingReportCreateManyRecruitmentEvidenceMessageInput[]
+  skipDuplicates?: boolean
+}
+
+export type MessagingReportUpsertWithWhereUniqueWithoutRecruitmentEvidenceMessageInput = {
+  where: Prisma.MessagingReportWhereUniqueInput
+  update: Prisma.XOR<Prisma.MessagingReportUpdateWithoutRecruitmentEvidenceMessageInput, Prisma.MessagingReportUncheckedUpdateWithoutRecruitmentEvidenceMessageInput>
+  create: Prisma.XOR<Prisma.MessagingReportCreateWithoutRecruitmentEvidenceMessageInput, Prisma.MessagingReportUncheckedCreateWithoutRecruitmentEvidenceMessageInput>
+}
+
+export type MessagingReportUpdateWithWhereUniqueWithoutRecruitmentEvidenceMessageInput = {
+  where: Prisma.MessagingReportWhereUniqueInput
+  data: Prisma.XOR<Prisma.MessagingReportUpdateWithoutRecruitmentEvidenceMessageInput, Prisma.MessagingReportUncheckedUpdateWithoutRecruitmentEvidenceMessageInput>
+}
+
+export type MessagingReportUpdateManyWithWhereWithoutRecruitmentEvidenceMessageInput = {
+  where: Prisma.MessagingReportScalarWhereInput
+  data: Prisma.XOR<Prisma.MessagingReportUpdateManyMutationInput, Prisma.MessagingReportUncheckedUpdateManyWithoutRecruitmentEvidenceMessageInput>
+}
+
 export type MessagingReportCreateWithoutConversationInput = {
   id?: string
   targetType: $Enums.MessagingReportTargetType
@@ -1282,6 +1580,8 @@ export type MessagingReportCreateWithoutConversationInput = {
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
   handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
   evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  recruitmentThread?: Prisma.RecruitmentThreadCreateNestedOneWithoutReportsInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageCreateNestedOneWithoutEvidenceForReportsInput
   reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
   privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
 }
@@ -1290,8 +1590,10 @@ export type MessagingReportUncheckedCreateWithoutConversationInput = {
   id?: string
   reporterUserId: string
   targetUserId: string
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -1351,7 +1653,9 @@ export type MessagingReportCreateWithoutEvidenceMessageInput = {
   target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
   handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
-  conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  conversation?: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  recruitmentThread?: Prisma.RecruitmentThreadCreateNestedOneWithoutReportsInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageCreateNestedOneWithoutEvidenceForReportsInput
   reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
   privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
 }
@@ -1360,8 +1664,10 @@ export type MessagingReportUncheckedCreateWithoutEvidenceMessageInput = {
   id?: string
   reporterUserId: string
   targetUserId: string
-  conversationId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -1421,8 +1727,10 @@ export type MessagingReportCreateWithoutReviewEventsInput = {
   target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
   handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
-  conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  conversation?: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
   evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  recruitmentThread?: Prisma.RecruitmentThreadCreateNestedOneWithoutReportsInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageCreateNestedOneWithoutEvidenceForReportsInput
   privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
 }
 
@@ -1430,9 +1738,11 @@ export type MessagingReportUncheckedCreateWithoutReviewEventsInput = {
   id?: string
   reporterUserId: string
   targetUserId: string
-  conversationId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -1481,8 +1791,10 @@ export type MessagingReportUpdateWithoutReviewEventsInput = {
   target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
   handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
-  conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
+  conversation?: Prisma.MessagingConversationUpdateOneWithoutReportsNestedInput
   evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  recruitmentThread?: Prisma.RecruitmentThreadUpdateOneWithoutReportsNestedInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageUpdateOneWithoutEvidenceForReportsNestedInput
   privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
 }
 
@@ -1490,9 +1802,11 @@ export type MessagingReportUncheckedUpdateWithoutReviewEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
   targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -1525,8 +1839,10 @@ export type MessagingReportCreateWithoutPrivateNotesInput = {
   target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
   handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
-  conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  conversation?: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
   evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  recruitmentThread?: Prisma.RecruitmentThreadCreateNestedOneWithoutReportsInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageCreateNestedOneWithoutEvidenceForReportsInput
   reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
 }
 
@@ -1534,9 +1850,11 @@ export type MessagingReportUncheckedCreateWithoutPrivateNotesInput = {
   id?: string
   reporterUserId: string
   targetUserId: string
-  conversationId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -1585,8 +1903,10 @@ export type MessagingReportUpdateWithoutPrivateNotesInput = {
   target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
   handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
-  conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
+  conversation?: Prisma.MessagingConversationUpdateOneWithoutReportsNestedInput
   evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  recruitmentThread?: Prisma.RecruitmentThreadUpdateOneWithoutReportsNestedInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageUpdateOneWithoutEvidenceForReportsNestedInput
   reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
 }
 
@@ -1594,9 +1914,11 @@ export type MessagingReportUncheckedUpdateWithoutPrivateNotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
   targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -1615,9 +1937,11 @@ export type MessagingReportUncheckedUpdateWithoutPrivateNotesInput = {
 export type MessagingReportCreateManyReporterInput = {
   id?: string
   targetUserId: string
-  conversationId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -1635,9 +1959,11 @@ export type MessagingReportCreateManyReporterInput = {
 export type MessagingReportCreateManyTargetInput = {
   id?: string
   reporterUserId: string
-  conversationId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -1656,9 +1982,11 @@ export type MessagingReportCreateManyAssignedAdminInput = {
   id?: string
   reporterUserId: string
   targetUserId: string
-  conversationId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -1676,9 +2004,11 @@ export type MessagingReportCreateManyHandledByAdminInput = {
   id?: string
   reporterUserId: string
   targetUserId: string
-  conversationId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -1708,8 +2038,10 @@ export type MessagingReportUpdateWithoutReporterInput = {
   target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
   handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
-  conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
+  conversation?: Prisma.MessagingConversationUpdateOneWithoutReportsNestedInput
   evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  recruitmentThread?: Prisma.RecruitmentThreadUpdateOneWithoutReportsNestedInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageUpdateOneWithoutEvidenceForReportsNestedInput
   reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
   privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
 }
@@ -1717,9 +2049,11 @@ export type MessagingReportUpdateWithoutReporterInput = {
 export type MessagingReportUncheckedUpdateWithoutReporterInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -1739,9 +2073,11 @@ export type MessagingReportUncheckedUpdateWithoutReporterInput = {
 export type MessagingReportUncheckedUpdateManyWithoutReporterInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -1772,8 +2108,10 @@ export type MessagingReportUpdateWithoutTargetInput = {
   reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedMessagingReportsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
   handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
-  conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
+  conversation?: Prisma.MessagingConversationUpdateOneWithoutReportsNestedInput
   evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  recruitmentThread?: Prisma.RecruitmentThreadUpdateOneWithoutReportsNestedInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageUpdateOneWithoutEvidenceForReportsNestedInput
   reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
   privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
 }
@@ -1781,9 +2119,11 @@ export type MessagingReportUpdateWithoutTargetInput = {
 export type MessagingReportUncheckedUpdateWithoutTargetInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -1803,9 +2143,11 @@ export type MessagingReportUncheckedUpdateWithoutTargetInput = {
 export type MessagingReportUncheckedUpdateManyWithoutTargetInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -1836,8 +2178,10 @@ export type MessagingReportUpdateWithoutAssignedAdminInput = {
   reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedMessagingReportsNestedInput
   target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
   handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
-  conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
+  conversation?: Prisma.MessagingConversationUpdateOneWithoutReportsNestedInput
   evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  recruitmentThread?: Prisma.RecruitmentThreadUpdateOneWithoutReportsNestedInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageUpdateOneWithoutEvidenceForReportsNestedInput
   reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
   privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
 }
@@ -1846,9 +2190,11 @@ export type MessagingReportUncheckedUpdateWithoutAssignedAdminInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
   targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -1868,9 +2214,11 @@ export type MessagingReportUncheckedUpdateManyWithoutAssignedAdminInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
   targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -1900,8 +2248,10 @@ export type MessagingReportUpdateWithoutHandledByAdminInput = {
   reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedMessagingReportsNestedInput
   target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
-  conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
+  conversation?: Prisma.MessagingConversationUpdateOneWithoutReportsNestedInput
   evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  recruitmentThread?: Prisma.RecruitmentThreadUpdateOneWithoutReportsNestedInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageUpdateOneWithoutEvidenceForReportsNestedInput
   reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
   privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
 }
@@ -1910,9 +2260,11 @@ export type MessagingReportUncheckedUpdateWithoutHandledByAdminInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
   targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -1932,9 +2284,11 @@ export type MessagingReportUncheckedUpdateManyWithoutHandledByAdminInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
   targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -1948,12 +2302,198 @@ export type MessagingReportUncheckedUpdateManyWithoutHandledByAdminInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type MessagingReportCreateManyRecruitmentThreadInput = {
+  id?: string
+  reporterUserId: string
+  targetUserId: string
+  conversationId?: string | null
+  targetType: $Enums.MessagingReportTargetType
+  evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MessagingReportUpdateWithoutRecruitmentThreadInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedMessagingReportsNestedInput
+  target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
+  assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
+  handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
+  conversation?: Prisma.MessagingConversationUpdateOneWithoutReportsNestedInput
+  evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
+}
+
+export type MessagingReportUncheckedUpdateWithoutRecruitmentThreadInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedUpdateManyWithoutReportNestedInput
+}
+
+export type MessagingReportUncheckedUpdateManyWithoutRecruitmentThreadInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MessagingReportCreateManyRecruitmentEvidenceMessageInput = {
+  id?: string
+  reporterUserId: string
+  targetUserId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
+  targetType: $Enums.MessagingReportTargetType
+  evidenceMessageId?: string | null
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MessagingReportUpdateWithoutRecruitmentEvidenceMessageInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedMessagingReportsNestedInput
+  target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
+  assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
+  handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
+  conversation?: Prisma.MessagingConversationUpdateOneWithoutReportsNestedInput
+  evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  recruitmentThread?: Prisma.RecruitmentThreadUpdateOneWithoutReportsNestedInput
+  reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
+}
+
+export type MessagingReportUncheckedUpdateWithoutRecruitmentEvidenceMessageInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedUpdateManyWithoutReportNestedInput
+}
+
+export type MessagingReportUncheckedUpdateManyWithoutRecruitmentEvidenceMessageInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type MessagingReportCreateManyConversationInput = {
   id?: string
   reporterUserId: string
   targetUserId: string
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
   evidenceMessageId?: string | null
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -1986,6 +2526,8 @@ export type MessagingReportUpdateWithoutConversationInput = {
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
   handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
   evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  recruitmentThread?: Prisma.RecruitmentThreadUpdateOneWithoutReportsNestedInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageUpdateOneWithoutEvidenceForReportsNestedInput
   reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
   privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
 }
@@ -1994,8 +2536,10 @@ export type MessagingReportUncheckedUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
   targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -2016,8 +2560,10 @@ export type MessagingReportUncheckedUpdateManyWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
   targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
   evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -2036,8 +2582,10 @@ export type MessagingReportCreateManyEvidenceMessageInput = {
   id?: string
   reporterUserId: string
   targetUserId: string
-  conversationId: string
+  conversationId?: string | null
+  recruitmentThreadId?: string | null
   targetType: $Enums.MessagingReportTargetType
+  recruitmentEvidenceMessageId?: string | null
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
@@ -2069,7 +2617,9 @@ export type MessagingReportUpdateWithoutEvidenceMessageInput = {
   target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
   handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
-  conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
+  conversation?: Prisma.MessagingConversationUpdateOneWithoutReportsNestedInput
+  recruitmentThread?: Prisma.RecruitmentThreadUpdateOneWithoutReportsNestedInput
+  recruitmentEvidenceMessage?: Prisma.RecruitmentMessageUpdateOneWithoutEvidenceForReportsNestedInput
   reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
   privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
 }
@@ -2078,8 +2628,10 @@ export type MessagingReportUncheckedUpdateWithoutEvidenceMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
   targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -2100,8 +2652,10 @@ export type MessagingReportUncheckedUpdateManyWithoutEvidenceMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
   targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recruitmentThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  recruitmentEvidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
@@ -2161,8 +2715,10 @@ export type MessagingReportSelect<ExtArgs extends runtime.Types.Extensions.Inter
   reporterUserId?: boolean
   targetUserId?: boolean
   conversationId?: boolean
+  recruitmentThreadId?: boolean
   targetType?: boolean
   evidenceMessageId?: boolean
+  recruitmentEvidenceMessageId?: boolean
   category?: boolean
   normalizedDetail?: boolean
   state?: boolean
@@ -2179,8 +2735,10 @@ export type MessagingReportSelect<ExtArgs extends runtime.Types.Extensions.Inter
   target?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   assignedAdmin?: boolean | Prisma.MessagingReport$assignedAdminArgs<ExtArgs>
   handledByAdmin?: boolean | Prisma.MessagingReport$handledByAdminArgs<ExtArgs>
-  conversation?: boolean | Prisma.MessagingConversationDefaultArgs<ExtArgs>
+  conversation?: boolean | Prisma.MessagingReport$conversationArgs<ExtArgs>
   evidenceMessage?: boolean | Prisma.MessagingReport$evidenceMessageArgs<ExtArgs>
+  recruitmentThread?: boolean | Prisma.MessagingReport$recruitmentThreadArgs<ExtArgs>
+  recruitmentEvidenceMessage?: boolean | Prisma.MessagingReport$recruitmentEvidenceMessageArgs<ExtArgs>
   reviewEvents?: boolean | Prisma.MessagingReport$reviewEventsArgs<ExtArgs>
   privateNotes?: boolean | Prisma.MessagingReport$privateNotesArgs<ExtArgs>
   _count?: boolean | Prisma.MessagingReportCountOutputTypeDefaultArgs<ExtArgs>
@@ -2191,8 +2749,10 @@ export type MessagingReportSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   reporterUserId?: boolean
   targetUserId?: boolean
   conversationId?: boolean
+  recruitmentThreadId?: boolean
   targetType?: boolean
   evidenceMessageId?: boolean
+  recruitmentEvidenceMessageId?: boolean
   category?: boolean
   normalizedDetail?: boolean
   state?: boolean
@@ -2209,8 +2769,10 @@ export type MessagingReportSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   target?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   assignedAdmin?: boolean | Prisma.MessagingReport$assignedAdminArgs<ExtArgs>
   handledByAdmin?: boolean | Prisma.MessagingReport$handledByAdminArgs<ExtArgs>
-  conversation?: boolean | Prisma.MessagingConversationDefaultArgs<ExtArgs>
+  conversation?: boolean | Prisma.MessagingReport$conversationArgs<ExtArgs>
   evidenceMessage?: boolean | Prisma.MessagingReport$evidenceMessageArgs<ExtArgs>
+  recruitmentThread?: boolean | Prisma.MessagingReport$recruitmentThreadArgs<ExtArgs>
+  recruitmentEvidenceMessage?: boolean | Prisma.MessagingReport$recruitmentEvidenceMessageArgs<ExtArgs>
 }, ExtArgs["result"]["messagingReport"]>
 
 export type MessagingReportSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2218,8 +2780,10 @@ export type MessagingReportSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   reporterUserId?: boolean
   targetUserId?: boolean
   conversationId?: boolean
+  recruitmentThreadId?: boolean
   targetType?: boolean
   evidenceMessageId?: boolean
+  recruitmentEvidenceMessageId?: boolean
   category?: boolean
   normalizedDetail?: boolean
   state?: boolean
@@ -2236,8 +2800,10 @@ export type MessagingReportSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   target?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   assignedAdmin?: boolean | Prisma.MessagingReport$assignedAdminArgs<ExtArgs>
   handledByAdmin?: boolean | Prisma.MessagingReport$handledByAdminArgs<ExtArgs>
-  conversation?: boolean | Prisma.MessagingConversationDefaultArgs<ExtArgs>
+  conversation?: boolean | Prisma.MessagingReport$conversationArgs<ExtArgs>
   evidenceMessage?: boolean | Prisma.MessagingReport$evidenceMessageArgs<ExtArgs>
+  recruitmentThread?: boolean | Prisma.MessagingReport$recruitmentThreadArgs<ExtArgs>
+  recruitmentEvidenceMessage?: boolean | Prisma.MessagingReport$recruitmentEvidenceMessageArgs<ExtArgs>
 }, ExtArgs["result"]["messagingReport"]>
 
 export type MessagingReportSelectScalar = {
@@ -2245,8 +2811,10 @@ export type MessagingReportSelectScalar = {
   reporterUserId?: boolean
   targetUserId?: boolean
   conversationId?: boolean
+  recruitmentThreadId?: boolean
   targetType?: boolean
   evidenceMessageId?: boolean
+  recruitmentEvidenceMessageId?: boolean
   category?: boolean
   normalizedDetail?: boolean
   state?: boolean
@@ -2261,14 +2829,16 @@ export type MessagingReportSelectScalar = {
   updatedAt?: boolean
 }
 
-export type MessagingReportOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reporterUserId" | "targetUserId" | "conversationId" | "targetType" | "evidenceMessageId" | "category" | "normalizedDetail" | "state" | "assignedAdminUserId" | "handledByAdminUserId" | "enforcementCorrelationId" | "version" | "unresolvedKey" | "handledAt" | "preserveUntil" | "createdAt" | "updatedAt", ExtArgs["result"]["messagingReport"]>
+export type MessagingReportOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reporterUserId" | "targetUserId" | "conversationId" | "recruitmentThreadId" | "targetType" | "evidenceMessageId" | "recruitmentEvidenceMessageId" | "category" | "normalizedDetail" | "state" | "assignedAdminUserId" | "handledByAdminUserId" | "enforcementCorrelationId" | "version" | "unresolvedKey" | "handledAt" | "preserveUntil" | "createdAt" | "updatedAt", ExtArgs["result"]["messagingReport"]>
 export type MessagingReportInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reporter?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   target?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   assignedAdmin?: boolean | Prisma.MessagingReport$assignedAdminArgs<ExtArgs>
   handledByAdmin?: boolean | Prisma.MessagingReport$handledByAdminArgs<ExtArgs>
-  conversation?: boolean | Prisma.MessagingConversationDefaultArgs<ExtArgs>
+  conversation?: boolean | Prisma.MessagingReport$conversationArgs<ExtArgs>
   evidenceMessage?: boolean | Prisma.MessagingReport$evidenceMessageArgs<ExtArgs>
+  recruitmentThread?: boolean | Prisma.MessagingReport$recruitmentThreadArgs<ExtArgs>
+  recruitmentEvidenceMessage?: boolean | Prisma.MessagingReport$recruitmentEvidenceMessageArgs<ExtArgs>
   reviewEvents?: boolean | Prisma.MessagingReport$reviewEventsArgs<ExtArgs>
   privateNotes?: boolean | Prisma.MessagingReport$privateNotesArgs<ExtArgs>
   _count?: boolean | Prisma.MessagingReportCountOutputTypeDefaultArgs<ExtArgs>
@@ -2278,16 +2848,20 @@ export type MessagingReportIncludeCreateManyAndReturn<ExtArgs extends runtime.Ty
   target?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   assignedAdmin?: boolean | Prisma.MessagingReport$assignedAdminArgs<ExtArgs>
   handledByAdmin?: boolean | Prisma.MessagingReport$handledByAdminArgs<ExtArgs>
-  conversation?: boolean | Prisma.MessagingConversationDefaultArgs<ExtArgs>
+  conversation?: boolean | Prisma.MessagingReport$conversationArgs<ExtArgs>
   evidenceMessage?: boolean | Prisma.MessagingReport$evidenceMessageArgs<ExtArgs>
+  recruitmentThread?: boolean | Prisma.MessagingReport$recruitmentThreadArgs<ExtArgs>
+  recruitmentEvidenceMessage?: boolean | Prisma.MessagingReport$recruitmentEvidenceMessageArgs<ExtArgs>
 }
 export type MessagingReportIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reporter?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   target?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   assignedAdmin?: boolean | Prisma.MessagingReport$assignedAdminArgs<ExtArgs>
   handledByAdmin?: boolean | Prisma.MessagingReport$handledByAdminArgs<ExtArgs>
-  conversation?: boolean | Prisma.MessagingConversationDefaultArgs<ExtArgs>
+  conversation?: boolean | Prisma.MessagingReport$conversationArgs<ExtArgs>
   evidenceMessage?: boolean | Prisma.MessagingReport$evidenceMessageArgs<ExtArgs>
+  recruitmentThread?: boolean | Prisma.MessagingReport$recruitmentThreadArgs<ExtArgs>
+  recruitmentEvidenceMessage?: boolean | Prisma.MessagingReport$recruitmentEvidenceMessageArgs<ExtArgs>
 }
 
 export type $MessagingReportPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2297,8 +2871,10 @@ export type $MessagingReportPayload<ExtArgs extends runtime.Types.Extensions.Int
     target: Prisma.$UserAccountPayload<ExtArgs>
     assignedAdmin: Prisma.$UserAccountPayload<ExtArgs> | null
     handledByAdmin: Prisma.$UserAccountPayload<ExtArgs> | null
-    conversation: Prisma.$MessagingConversationPayload<ExtArgs>
+    conversation: Prisma.$MessagingConversationPayload<ExtArgs> | null
     evidenceMessage: Prisma.$MessagingMessagePayload<ExtArgs> | null
+    recruitmentThread: Prisma.$RecruitmentThreadPayload<ExtArgs> | null
+    recruitmentEvidenceMessage: Prisma.$RecruitmentMessagePayload<ExtArgs> | null
     reviewEvents: Prisma.$MessagingReportReviewEventPayload<ExtArgs>[]
     privateNotes: Prisma.$MessagingReportPrivateNotePayload<ExtArgs>[]
   }
@@ -2306,9 +2882,11 @@ export type $MessagingReportPayload<ExtArgs extends runtime.Types.Extensions.Int
     id: string
     reporterUserId: string
     targetUserId: string
-    conversationId: string
+    conversationId: string | null
+    recruitmentThreadId: string | null
     targetType: $Enums.MessagingReportTargetType
     evidenceMessageId: string | null
+    recruitmentEvidenceMessageId: string | null
     category: $Enums.ModerationReportCategory
     normalizedDetail: string | null
     state: $Enums.ModerationReportState
@@ -2719,8 +3297,10 @@ export interface Prisma__MessagingReportClient<T, Null = never, ExtArgs extends 
   target<T extends Prisma.UserAccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccountDefaultArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   assignedAdmin<T extends Prisma.MessagingReport$assignedAdminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingReport$assignedAdminArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   handledByAdmin<T extends Prisma.MessagingReport$handledByAdminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingReport$handledByAdminArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  conversation<T extends Prisma.MessagingConversationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingConversationDefaultArgs<ExtArgs>>): Prisma.Prisma__MessagingConversationClient<runtime.Types.Result.GetResult<Prisma.$MessagingConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  conversation<T extends Prisma.MessagingReport$conversationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingReport$conversationArgs<ExtArgs>>): Prisma.Prisma__MessagingConversationClient<runtime.Types.Result.GetResult<Prisma.$MessagingConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   evidenceMessage<T extends Prisma.MessagingReport$evidenceMessageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingReport$evidenceMessageArgs<ExtArgs>>): Prisma.Prisma__MessagingMessageClient<runtime.Types.Result.GetResult<Prisma.$MessagingMessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  recruitmentThread<T extends Prisma.MessagingReport$recruitmentThreadArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingReport$recruitmentThreadArgs<ExtArgs>>): Prisma.Prisma__RecruitmentThreadClient<runtime.Types.Result.GetResult<Prisma.$RecruitmentThreadPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  recruitmentEvidenceMessage<T extends Prisma.MessagingReport$recruitmentEvidenceMessageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingReport$recruitmentEvidenceMessageArgs<ExtArgs>>): Prisma.Prisma__RecruitmentMessageClient<runtime.Types.Result.GetResult<Prisma.$RecruitmentMessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   reviewEvents<T extends Prisma.MessagingReport$reviewEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingReport$reviewEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingReportReviewEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   privateNotes<T extends Prisma.MessagingReport$privateNotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingReport$privateNotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingReportPrivateNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -2756,8 +3336,10 @@ export interface MessagingReportFieldRefs {
   readonly reporterUserId: Prisma.FieldRef<"MessagingReport", 'String'>
   readonly targetUserId: Prisma.FieldRef<"MessagingReport", 'String'>
   readonly conversationId: Prisma.FieldRef<"MessagingReport", 'String'>
+  readonly recruitmentThreadId: Prisma.FieldRef<"MessagingReport", 'String'>
   readonly targetType: Prisma.FieldRef<"MessagingReport", 'MessagingReportTargetType'>
   readonly evidenceMessageId: Prisma.FieldRef<"MessagingReport", 'String'>
+  readonly recruitmentEvidenceMessageId: Prisma.FieldRef<"MessagingReport", 'String'>
   readonly category: Prisma.FieldRef<"MessagingReport", 'ModerationReportCategory'>
   readonly normalizedDetail: Prisma.FieldRef<"MessagingReport", 'String'>
   readonly state: Prisma.FieldRef<"MessagingReport", 'ModerationReportState'>
@@ -3209,6 +3791,25 @@ export type MessagingReport$handledByAdminArgs<ExtArgs extends runtime.Types.Ext
 }
 
 /**
+ * MessagingReport.conversation
+ */
+export type MessagingReport$conversationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MessagingConversation
+   */
+  select?: Prisma.MessagingConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MessagingConversation
+   */
+  omit?: Prisma.MessagingConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessagingConversationInclude<ExtArgs> | null
+  where?: Prisma.MessagingConversationWhereInput
+}
+
+/**
  * MessagingReport.evidenceMessage
  */
 export type MessagingReport$evidenceMessageArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3225,6 +3826,44 @@ export type MessagingReport$evidenceMessageArgs<ExtArgs extends runtime.Types.Ex
    */
   include?: Prisma.MessagingMessageInclude<ExtArgs> | null
   where?: Prisma.MessagingMessageWhereInput
+}
+
+/**
+ * MessagingReport.recruitmentThread
+ */
+export type MessagingReport$recruitmentThreadArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RecruitmentThread
+   */
+  select?: Prisma.RecruitmentThreadSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RecruitmentThread
+   */
+  omit?: Prisma.RecruitmentThreadOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecruitmentThreadInclude<ExtArgs> | null
+  where?: Prisma.RecruitmentThreadWhereInput
+}
+
+/**
+ * MessagingReport.recruitmentEvidenceMessage
+ */
+export type MessagingReport$recruitmentEvidenceMessageArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RecruitmentMessage
+   */
+  select?: Prisma.RecruitmentMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RecruitmentMessage
+   */
+  omit?: Prisma.RecruitmentMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecruitmentMessageInclude<ExtArgs> | null
+  where?: Prisma.RecruitmentMessageWhereInput
 }
 
 /**

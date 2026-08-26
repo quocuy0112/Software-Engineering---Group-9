@@ -18,7 +18,7 @@ export function MessageComposer({
   const copy = messagingCopy(locale);
   const [content, setContent] = useState("");
   const [validation, setValidation] = useState<string | null>(null);
-  const { outbox, send } = useSendMessage(conversationId);
+  const { send } = useSendMessage(conversationId);
 
   async function submit() {
     const parsed = messageContentSchema.safeParse(content);
@@ -33,34 +33,6 @@ export function MessageComposer({
 
   return (
     <section className="messaging-composer" aria-label={copy.composeMessage}>
-      <ul className="messaging-outbox" aria-label={copy.sendingMessages}>
-        {outbox.map((item) => (
-          <li
-            key={item.clientOperationId}
-            data-status={item.status.toLocaleLowerCase()}
-          >
-            <span className="messaging-outbox-copy">{item.content}</span>
-            <span className="messaging-outbox-status">
-              {item.status === "PENDING" ? (
-                <span className="messaging-spinner" aria-hidden="true" />
-              ) : null}
-              {item.status === "PENDING"
-                ? copy.sending
-                : item.status === "SENT"
-                  ? copy.deliverySent
-                  : copy.sendFailed}
-            </span>
-            {item.status === "FAILED" ? (
-              <button
-                type="button"
-                onClick={() => void send(item.content, item.clientOperationId)}
-              >
-                {copy.retry}
-              </button>
-            ) : null}
-          </li>
-        ))}
-      </ul>
       <form
         onSubmit={(event) => {
           event.preventDefault();

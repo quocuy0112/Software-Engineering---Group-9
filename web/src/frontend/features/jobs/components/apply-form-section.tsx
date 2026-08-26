@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { LockKeyhole, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
 import {
   useCallback,
   useEffect,
@@ -24,6 +26,7 @@ import {
   applicationFormSchema,
   applicationOutcomeSchema,
 } from "@/shared/contracts/jobs/actions";
+import { validateCvFile } from "@/shared/cv-file-validation";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 
 const MAX_CV_BYTES = 5_000_000;
@@ -33,6 +36,18 @@ const ACCEPTED_CV_TYPES = new Set([
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]);
+
+function prefilledCvId(form: ApplicationForm) {
+  if (typeof window !== "undefined") {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("jobId") === form.jobId) {
+      const requested = params.get("cvVersionId");
+      if (requested && form.cvs.some((cv) => cv.id === requested))
+        return requested;
+    }
+  }
+  return form.cvs.length === 1 ? form.cvs[0]!.id : "";
+}
 type FieldErrors = Record<string, string>;
 function formatBytes(bytes: number) {
   if (bytes < 1024) return bytes + " B";
@@ -111,9 +126,7 @@ function InlineApplicationForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const idempotencyKey = useRef<string | null>(null);
   const cvUploadIdempotencyKey = useRef<string | null>(null);
-  const [selectedCvId, setSelectedCvId] = useState(() =>
-    form.cvs.length === 1 ? form.cvs[0]!.id : "",
-  );
+  const [selectedCvId, setSelectedCvId] = useState(() => prefilledCvId(form));
   const [savedCvs, setSavedCvs] = useState(() => form.cvs);
   const [newCvFile, setNewCvFile] = useState<File | null>(null);
   const [newCvAttached, setNewCvAttached] = useState(false);
@@ -160,7 +173,18 @@ function InlineApplicationForm({
     onContactChange(next);
   }
 
-  function chooseFile(file: File | undefined) {
+  function clearNewCvSelection() {
+    setNewCvFile(null);
+    setNewCvAttached(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  function showCvUploadError(message: string) {
+    setCvSelectionError(message);
+    toast.error(message, { id: "candidate-cv-upload-error" });
+  }
+
+  async function chooseFile(file: File | undefined) {
     if (!file) return;
     const extension = file.name.toLowerCase().split(".").pop();
     const accepted =
@@ -169,9 +193,8 @@ function InlineApplicationForm({
       extension === "doc" ||
       extension === "docx";
     if (!accepted) {
-      setNewCvFile(null);
-      setNewCvAttached(false);
-      setCvSelectionError("CV files must be PDF, DOC, or DOCX.");
+      clearNewCvSelection();
+      showCvUploadError("Only PDF, DOC, or DOCX files are supported.");
       setErrors((current) => {
         const next = { ...current };
         delete next.cv;
@@ -180,10 +203,27 @@ function InlineApplicationForm({
       return;
     }
     if (file.size < 1 || file.size > MAX_CV_BYTES) {
-      setNewCvFile(null);
-      setNewCvAttached(false);
-      setCvSelectionError(
-        "CV files must be between 1 and 5 MB and must be PDF, DOC, or DOCX.",
+      clearNewCvSelection();
+      showCvUploadError(
+        file.size > MAX_CV_BYTES
+          ? "File size must not exceed 5MB."
+          : "The uploaded file is empty.",
+      );
+      setErrors((current) => {
+        const next = { ...current };
+        delete next.cv;
+        return next;
+      });
+      return;
+    }
+    try {
+      await validateCvFile(file);
+    } catch (cause) {
+      clearNewCvSelection();
+      showCvUploadError(
+        cause instanceof Error
+          ? cause.message
+          : "Only valid PDF, DOC, or DOCX files are supported.",
       );
       setErrors((current) => {
         const next = { ...current };
@@ -245,11 +285,14 @@ function InlineApplicationForm({
         return next;
       });
     } catch (caught) {
-      setError(
+      const message =
         caught instanceof Error
           ? caught.message
-          : "Unable to save this CV to your Profile.",
-      );
+          : "Unable to save this CV to your Profile.";
+      clearNewCvSelection();
+      setSelectedCvId("");
+      cvUploadIdempotencyKey.current = null;
+      showCvUploadError(message);
     } finally {
       setCvSaving(false);
     }
@@ -435,7 +478,7 @@ function InlineApplicationForm({
       onSubmitted({
         ...outcome,
         aiAnalysisConsent: aiConsent,
-        aiMatchScore: aiConsent ? 82 : null,
+        aiMatchScore: outcome.aiMatchScore,
       });
     } catch {
       setError("Unable to submit your application. Please try again.");
@@ -456,6 +499,7 @@ function InlineApplicationForm({
   );
   const profileReady = missingProfileFields.length === 0;
   const submitDisabled = pending || locationSaving || cvSaving;
+  const cvErrorMessage = errors.cv ?? cvSelectionError;
 
   return (
     <form
@@ -527,7 +571,7 @@ function InlineApplicationForm({
           onDragOver={(event) => event.preventDefault()}
           onDrop={(event: DragEvent<HTMLLabelElement>) => {
             event.preventDefault();
-            chooseFile(event.dataTransfer.files[0]);
+            void chooseFile(event.dataTransfer.files[0]);
           }}
         >
           <span className="job-cv-dropzone-title">
@@ -542,10 +586,10 @@ function InlineApplicationForm({
             name="newCvFile"
             type="file"
             accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            aria-describedby={errors.cv ? "cv-error" : undefined}
+            aria-describedby={cvErrorMessage ? "cv-error" : undefined}
             disabled={pending || cvSaving}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
-              chooseFile(event.currentTarget.files?.[0]);
+              void chooseFile(event.currentTarget.files?.[0]);
               event.currentTarget.value = "";
             }}
           />
@@ -593,9 +637,9 @@ function InlineApplicationForm({
             {cvSaving ? "Saving CV..." : "Import CV"}
           </button>
         ) : null}
-        {errors.cv ? (
+        {cvErrorMessage ? (
           <p id="cv-error" className="job-field-error" role="alert">
-            {errors.cv}
+            {cvErrorMessage}
           </p>
         ) : null}
       </fieldset>
@@ -787,6 +831,28 @@ function InlineApplicationForm({
           {error}
         </div>
       ) : null}
+      <section
+        className="job-application-transparency"
+        aria-label="Transparency about automated support"
+      >
+        <div className="job-application-transparency-heading">
+          <ShieldCheck aria-hidden="true" />
+          <strong>Transparency about automated support</strong>
+        </div>
+        <p>
+          Recruiters may use automated tools to compare an application with job
+          requirements. Scores, rankings, and internal notes are not shown to
+          candidates and do not make the final hiring decision.
+        </p>
+        <div className="job-application-private-note">
+          <LockKeyhole aria-hidden="true" />
+          <span>
+            Your private CV Match Check is separate. It is visible only to you,
+            is not included in this application, and does not change recruiter
+            ranking.
+          </span>
+        </div>
+      </section>
       <div className="job-actions">
         <div className="job-ai-consent">
           <label className="job-checkbox-label" htmlFor="application-consent">
@@ -1070,13 +1136,10 @@ export function ApplyFormSection({
                 Application submitted successfully for{" "}
                 {form?.jobTitle ?? jobTitle}.
               </strong>
-              <p>The employer will contact you if there is a match.</p>
-              {outcome.aiAnalysisConsent ? (
-                <p>
-                  AI match: <strong>{outcome.aiMatchScore ?? 82}%</strong> —
-                  based on skills and experience relevant to this role.
-                </p>
-              ) : null}
+              <p>
+                The employer will contact you if there is a match. You can
+                follow the application status from Applications.
+              </p>
             </div>
           ) : applied ? (
             <div className="job-application-confirmation" role="status">

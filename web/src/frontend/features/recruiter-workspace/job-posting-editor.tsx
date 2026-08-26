@@ -1,7 +1,42 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
+import {
+  Activity,
+  ArrowLeft,
+  Award,
+  BookOpen,
+  Briefcase,
+  CalendarDays,
+  Car,
+  CheckCircle2,
+  ChevronDown,
+  Coffee,
+  DollarSign,
+  Gift,
+  Globe,
+  Heart,
+  Shield,
+  Smile,
+  TrendingUp,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { Badge } from "@/frontend/components/ui/badge";
+import { Modal } from "@/frontend/components/ui/modal";
+import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
+import {
+  requestUnsavedChangesNavigation,
+  useUnsavedChangesGuard,
+} from "@/frontend/features/profile/client/unsaved-changes";
 import {
   formatVndInput,
   parseVndInput,
@@ -10,6 +45,14 @@ import {
   type RecruiterJob,
   type RecruiterJobFieldErrors,
 } from "@/shared/contracts/recruiter-job-posting";
+import {
+  deriveRecruiterClassification,
+  recruiterIndustryByCode,
+  recruiterIndustryOptionFor,
+  recruiterIndustryTaxonomy,
+  type RecruiterIndustryCode,
+  type RecruiterSubIndustrySuggestions,
+} from "@/shared/contracts/jobs/industry-taxonomy";
 import type {
   JobCatalogItem,
   JobPostingStatus,
@@ -26,6 +69,158 @@ import {
   titleCase,
 } from "./job-posting-editor-options";
 import { JobPostingPreview } from "./job-posting-preview";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruiterJobPostingCopy } from "./recruiter-job-posting-copy";
+
+const benefitIconByName: Record<string, LucideIcon> = {
+  award: Award,
+  gift: Gift,
+  coffee: Coffee,
+  car: Car,
+  "trending-up": TrendingUp,
+  briefcase: Briefcase,
+  calendar: CalendarDays,
+  "dollar-sign": DollarSign,
+  globe: Globe,
+  users: Users,
+  "book-open": BookOpen,
+  activity: Activity,
+  heart: Heart,
+  shield: Shield,
+  smile: Smile,
+};
+
+const customSubIndustryValue = "__custom_sub_industry__";
+const recruiterDraftAutoSaveStoragePrefix =
+  "smarthire.recruiter.job-draft-autosave";
+const recruiterDraftAutoSaveChangedEvent =
+  "smarthire:recruiter-draft-autosave-changed";
+const recruiterDraftAutoSaveDelayMs = 300;
+
+function useRecruiterDraftAutoSave(storageKey: string) {
+  const subscribe = useCallback(
+    (notify: () => void) => {
+      const handleStorage = (event: StorageEvent) => {
+        if (event.key === storageKey) notify();
+      };
+      window.addEventListener("storage", handleStorage);
+      window.addEventListener(recruiterDraftAutoSaveChangedEvent, notify);
+      return () => {
+        window.removeEventListener("storage", handleStorage);
+        window.removeEventListener(recruiterDraftAutoSaveChangedEvent, notify);
+      };
+    },
+    [storageKey],
+  );
+  const getSnapshot = useCallback(
+    () => window.localStorage.getItem(storageKey) === "enabled",
+    [storageKey],
+  );
+  return useSyncExternalStore(subscribe, getSnapshot, () => false);
+}
+
+function normalizedOption(value: string) {
+  return value.trim().toLowerCase();
+}
+
+function subIndustryLabels(
+  industry: ReturnType<typeof recruiterIndustryOptionFor>,
+  suggestions: RecruiterSubIndustrySuggestions,
+) {
+  const labels = new Map<string, string>();
+  for (const [label] of industry.subIndustries ?? []) {
+    labels.set(normalizedOption(label), label);
+  }
+  for (const label of suggestions[industry.code] ?? []) {
+    const trimmed = label.trim();
+    if (trimmed) labels.set(normalizedOption(trimmed), trimmed);
+  }
+  return [...labels.values()];
+}
+
+function toJobCatalogPayload(job: RecruiterJob): JobCatalogItem {
+  const payload: Record<string, unknown> = { ...job };
+  delete payload.company;
+  delete payload.review;
+  delete payload.correctionRequest;
+  return payload as unknown as JobCatalogItem;
+}
+
+function formLevelError(
+  message: string | undefined,
+  fallback: string,
+  fieldErrors: RecruiterJobFieldErrors,
+) {
+  return Object.keys(fieldErrors).length === 0 ? (message ?? fallback) : "";
+}
+
+function formatReasonCode(code: string): string {
+  const reasonLabels: Record<string, string> = {
+    INCOMPLETE_OR_UNCLEAR: "Incomplete or unclear information",
+    MISLEADING_CONTENT: "Misleading content",
+    INAPPROPRIATE_LANGUAGE: "Inappropriate language",
+    DUPLICATE_POSTING: "Duplicate posting",
+    INVALID_REQUIREMENTS: "Invalid requirements",
+    INSUFFICIENT_COMPENSATION: "Insufficient compensation details",
+    VERIFICATION_MISMATCH: "Verification mismatch",
+    PROHIBITED_CONTENT: "Prohibited content",
+    OTHER: "Other reason",
+  };
+  return reasonLabels[code] || code.replace(/_/g, " ");
+}
+
+function skillInputToTags(value: string) {
+  return value
+    .split(",")
+    .map((skill) => skill.trim())
+    .filter(Boolean);
+}
+
+function dateInputToIso(value: string) {
+  const normalized = value.trim();
+  if (!normalized) return null;
+
+  const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/u.exec(normalized);
+  const localizedMatch = /^(\d{2})\/(\d{2})\/(\d{4})$/u.exec(normalized);
+  const year = isoMatch
+    ? Number(isoMatch[1])
+    : localizedMatch
+      ? Number(localizedMatch[3])
+      : NaN;
+  const month = isoMatch
+    ? Number(isoMatch[2])
+    : localizedMatch
+      ? Number(localizedMatch[2])
+      : NaN;
+  const day = isoMatch
+    ? Number(isoMatch[3])
+    : localizedMatch
+      ? Number(localizedMatch[1])
+      : NaN;
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
+    !Number.isInteger(day)
+  ) {
+    return null;
+  }
+
+  const date = new Date(Date.UTC(year, month - 1, day, 23, 59, 59));
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  ) {
+    return null;
+  }
+  return date.toISOString();
+}
+
+function limitDateInputYear(value: string) {
+  const match = /^(\d{5,})-(\d{2})-(\d{2})$/u.exec(value);
+  return match ? `${match[1].slice(0, 4)}-${match[2]}-${match[3]}` : value;
+}
 
 function FieldError({
   field,
@@ -93,22 +288,32 @@ function EditorSection({
   children,
   complete,
   description,
+  inProgressLabel,
   number,
   onToggle,
   open,
+  readyLabel,
   title,
 }: {
   children: ReactNode;
   complete: boolean;
   description: string;
+  inProgressLabel: string;
   number: number;
   onToggle: (open: boolean) => void;
   open: boolean;
+  readyLabel: string;
   title: string;
 }) {
   return (
     <details
-      className="recruiter-editor-section recruiter-surface-card"
+      className={[
+        "recruiter-editor-section",
+        "recruiter-surface-card",
+        complete ? "is-complete" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       open={open}
       onToggle={(event) => onToggle(event.currentTarget.open)}
     >
@@ -119,13 +324,19 @@ function EditorSection({
           <small>{description}</small>
         </span>
         <span
-          className={`recruiter-editor-section__status${complete ? "is-complete" : ""}`}
+          className={[
+            "recruiter-editor-section__status",
+            complete ? "is-complete" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
         >
-          {complete ? "Ready" : "In progress"}
+          {complete ? readyLabel : inProgressLabel}
         </span>
-        <span className="recruiter-editor-section__chevron" aria-hidden="true">
-          ⌄
-        </span>
+        <ChevronDown
+          className="recruiter-editor-section__chevron"
+          aria-hidden="true"
+        />
       </summary>
       <div className="recruiter-editor-section__body">{children}</div>
     </details>
@@ -135,31 +346,64 @@ function EditorSection({
 export function JobPostingEditor({
   initialJob,
   companyName,
+  autoSavePreferenceScope,
+  subIndustrySuggestions = {},
+  awaitDraftSaveBeforeBack = false,
   onBack,
+  onDraftAutoSaved,
   onSaved,
 }: {
-  initialJob: JobCatalogItem;
+  initialJob: RecruiterJob;
   companyName: string;
+  autoSavePreferenceScope?: string;
+  subIndustrySuggestions?: RecruiterSubIndustrySuggestions;
+  /** Routed editors refresh the list page after the draft response arrives. */
+  awaitDraftSaveBeforeBack?: boolean;
   onBack: () => void;
+  onDraftAutoSaved?: (job: RecruiterJob) => void;
   onSaved: (job: RecruiterJob) => void;
 }) {
-  const [job, setJob] = useState(initialJob);
+  const normalizedInitialJob: RecruiterJob = {
+    ...initialJob,
+    ...prepareRecruiterJobForSave(initialJob),
+  };
+  const [job, setJob] = useState<RecruiterJob>(normalizedInitialJob);
+  const catalogueUpdatedAt = useRef(
+    initialJob.id === "new-job" ? null : initialJob.updatedAt,
+  );
+  const savedIndustryCode = useRef(initialJob.industryCode);
+  const csrfProof = useCsrfProof();
   const [saving, setSaving] = useState(false);
+  const [pendingSubmission, setPendingSubmission] =
+    useState<RecruiterJob | null>(null);
+  const submissionKey = useRef<string | null>(null);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<RecruiterJobFieldErrors>({});
   const [openSections, setOpenSections] = useState<boolean[]>(
     sectionNames.map(() => true),
   );
   const [salaryInputs, setSalaryInputs] = useState({
-    min: formatVndInput(initialJob.salary.min),
-    max: formatVndInput(initialJob.salary.max),
+    min: formatVndInput(normalizedInitialJob.salary.min),
+    max: formatVndInput(normalizedInitialJob.salary.max),
   });
-  const readOnly = job.status === "pending_approval";
+  const [skillInput, setSkillInput] = useState(
+    normalizedInitialJob.skillTags.join(", "),
+  );
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [hasSavedDraft, setHasSavedDraft] = useState(false);
+  const editRevision = useRef(0);
+  const autoSaveBlockedRevision = useRef<number | null>(null);
+  const autoSaveStorageKey = `${recruiterDraftAutoSaveStoragePrefix}:${autoSavePreferenceScope ?? initialJob.companyId}`;
+  const autoSaveEnabled = useRecruiterDraftAutoSave(autoSaveStorageKey);
+  const locale = useWorkspaceLocale();
+  const copy = recruiterJobPostingCopy(locale);
+  const readOnly = job.status === "pending_approval" || job.status === "closed";
   const canSubmitForApproval =
     job.id === "new-job" || job.status === "draft" || job.status === "rejected";
   const defaultSaveStatus: JobPostingStatus = canSubmitForApproval
     ? "draft"
     : job.status;
+  useUnsavedChangesGuard(hasUnsavedChanges && !readOnly);
   const salaryRangeInvalid =
     job.salary.max > 0 && job.salary.max < job.salary.min;
   const displayedErrors = salaryRangeInvalid
@@ -169,6 +413,30 @@ export function JobPostingEditor({
           "Maximum salary must be greater than or equal to minimum salary.",
       }
     : fieldErrors;
+
+  const selectedIndustry = recruiterIndustryOptionFor({
+    code: job.industryCode,
+    label: job.industry,
+  });
+  const availableSubIndustries = useMemo(
+    () => subIndustryLabels(selectedIndustry, subIndustrySuggestions),
+    [selectedIndustry, subIndustrySuggestions],
+  );
+  const initialIndustry = recruiterIndustryOptionFor(initialJob);
+  const initialSubIndustryOptions = subIndustryLabels(
+    initialIndustry,
+    subIndustrySuggestions,
+  );
+  const [usesCustomSubIndustry, setUsesCustomSubIndustry] = useState(
+    () =>
+      initialSubIndustryOptions.length === 0 ||
+      (Boolean(initialJob.subIndustry) &&
+        !initialSubIndustryOptions.some(
+          (label) =>
+            normalizedOption(label) ===
+            normalizedOption(initialJob.subIndustry),
+        )),
+  );
 
   const clearFieldErrors = (...fields: string[]) => {
     setFieldErrors((current) => {
@@ -196,9 +464,13 @@ export function JobPostingEditor({
     updater: (current: JobCatalogItem) => JobCatalogItem,
     ...fields: string[]
   ) => {
+    editRevision.current += 1;
+    autoSaveBlockedRevision.current = null;
+    setHasUnsavedChanges(true);
     clearFieldErrors(...fields);
     setJob((current) => ({
       ...updater(current),
+      company: current.company,
       updatedAt: new Date().toISOString(),
     }));
   };
@@ -207,6 +479,67 @@ export function JobPostingEditor({
     field: K,
     value: JobCatalogItem[K],
   ) => changeJob((current) => ({ ...current, [field]: value }), String(field));
+
+  const updateIndustry = (code: string) => {
+    const nextIndustry = recruiterIndustryByCode.get(
+      code as RecruiterIndustryCode,
+    );
+    if (!nextIndustry) return;
+    setUsesCustomSubIndustry(
+      subIndustryLabels(nextIndustry, subIndustrySuggestions).length === 0,
+    );
+    changeJob(
+      (current) => ({
+        ...current,
+        industry: nextIndustry.label,
+        industryCode: nextIndustry.code,
+        subIndustry: "",
+        categoryFamily: nextIndustry.code,
+        categoryIds: [],
+        description: {
+          ...current.description,
+          generalInfo: {
+            ...current.description.generalInfo,
+            department: null,
+          },
+        },
+      }),
+      "industry",
+      "subIndustry",
+      "categoryFamily",
+      "categoryIds",
+      "description.generalInfo.department",
+    );
+  };
+
+  const updateSubIndustry = (value: string) => {
+    const classification = deriveRecruiterClassification({
+      industry: selectedIndustry.label,
+      industryCode: selectedIndustry.code,
+      subIndustry: value,
+    });
+    changeJob(
+      (current) => ({
+        ...current,
+        industry: classification.industry,
+        industryCode: classification.industryCode,
+        subIndustry: classification.subIndustry,
+        categoryFamily: classification.categoryFamily,
+        categoryIds: classification.categoryIds,
+        description: {
+          ...current.description,
+          generalInfo: {
+            ...current.description.generalInfo,
+            department: classification.department,
+          },
+        },
+      }),
+      "subIndustry",
+      "categoryFamily",
+      "categoryIds",
+      "description.generalInfo.department",
+    );
+  };
 
   const updateSalary = (field: "min" | "max", input: string) => {
     const hasLetters = /[a-zA-ZÀ-ỹ]/u.test(input);
@@ -280,9 +613,231 @@ export function JobPostingEditor({
       },
     }));
 
+  const persist = useCallback(
+    async (
+      prepared: RecruiterJob,
+      targetStatus: JobPostingStatus,
+      options: {
+        stayInEditor?: boolean;
+        revision?: number;
+        keepalive?: boolean;
+      } = {},
+    ): Promise<boolean> => {
+      setSaving(true);
+      setError("");
+      try {
+        if (targetStatus === "pending_approval") {
+          // Submission is intentionally two-phase: first persist the exact
+          // working copy as a draft, then create the immutable review version.
+          // A failed review request therefore never loses the recruiter's work.
+          let savedDraft: RecruiterJob = { ...prepared, status: "draft" };
+          const shouldPersistDraft =
+            prepared.id === "new-job" ||
+            prepared.status !== "draft" ||
+            prepared.review?.state === "WITHDRAWN" ||
+            hasUnsavedChanges;
+          if (shouldPersistDraft) {
+            const draftJob = toJobCatalogPayload(prepared);
+            const draftMethod = prepared.id === "new-job" ? "POST" : "PATCH";
+            const previousIndustryCode = savedIndustryCode.current;
+            const draftResponse = await fetch("/api/recruiter/job-postings", {
+              method: draftMethod,
+              headers: {
+                "Content-Type": "application/json",
+                "x-csrf-token": csrfProof,
+              },
+              body: JSON.stringify(
+                draftMethod === "POST"
+                  ? { job: draftJob, status: "draft" }
+                  : {
+                      ...draftJob,
+                      status: "draft",
+                      previousIndustryCode,
+                    },
+              ),
+            });
+            const draftPayload = (await draftResponse
+              .json()
+              .catch(() => null)) as
+              | (RecruiterJob & {
+                  message?: string;
+                  fieldErrors?: RecruiterJobFieldErrors;
+                })
+              | null;
+            if (!draftResponse.ok || !draftPayload) {
+              const nextFieldErrors = draftPayload?.fieldErrors ?? {};
+              setFieldErrors(nextFieldErrors);
+              setError(
+                formLevelError(
+                  draftPayload?.message,
+                  "Unable to save the draft.",
+                  nextFieldErrors,
+                ),
+              );
+              return false;
+            }
+
+            savedDraft = {
+              ...draftPayload,
+              status: "draft",
+              company: prepared.company,
+            };
+          }
+
+          catalogueUpdatedAt.current = savedDraft.updatedAt;
+          savedIndustryCode.current = savedDraft.industryCode;
+          setJob(savedDraft);
+          setHasUnsavedChanges(false);
+          setHasSavedDraft(true);
+
+          const reviewJob = toJobCatalogPayload(savedDraft);
+          submissionKey.current ??= crypto.randomUUID();
+          const submissionResponse = await fetch(
+            `/api/recruiter/job-postings/${encodeURIComponent(savedDraft.id)}/submit-review`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "idempotency-key": submissionKey.current,
+                "x-csrf-token": csrfProof,
+              },
+              body: JSON.stringify({
+                expectedWorkingUpdatedAt: savedDraft.updatedAt,
+                expectedCatalogueUpdatedAt: savedDraft.updatedAt,
+                job: reviewJob,
+              }),
+            },
+          );
+          const review = (await submissionResponse.json().catch(() => null)) as
+            | (NonNullable<RecruiterJob["review"]> & {
+                message?: string;
+                fieldErrors?: RecruiterJobFieldErrors;
+              })
+            | { message?: string; fieldErrors?: RecruiterJobFieldErrors }
+            | null;
+          if (!submissionResponse.ok || !review || !("reviewId" in review)) {
+            const nextFieldErrors =
+              review && "fieldErrors" in review
+                ? (review.fieldErrors ?? {})
+                : {};
+            setFieldErrors(nextFieldErrors);
+            setError(
+              formLevelError(
+                review && "message" in review ? review.message : undefined,
+                "Unable to submit this posting for review.",
+                nextFieldErrors,
+              ),
+            );
+            return false;
+          }
+          submissionKey.current = null;
+          setHasUnsavedChanges(false);
+          onSaved({
+            ...savedDraft,
+            id: review.jobId,
+            status: "pending_approval",
+            company: savedDraft.company,
+            review: {
+              ...review,
+              reasonCode: review.reasonCode ?? null,
+              publicExplanation: review.publicExplanation ?? null,
+              decidedAt: review.decidedAt ?? null,
+            },
+          });
+          return true;
+        }
+
+        const method = prepared.id === "new-job" ? "POST" : "PATCH";
+        // Keep the recruiter-only company projection out of the request. This
+        // also reduces exit-time keepalive payloads.
+        const draftJob = toJobCatalogPayload(prepared);
+        const previousIndustryCode = savedIndustryCode.current;
+        const response = await fetch("/api/recruiter/job-postings", {
+          method,
+          keepalive: options.keepalive,
+          headers: {
+            "Content-Type": "application/json",
+            "x-csrf-token": csrfProof,
+          },
+          body: JSON.stringify(
+            method === "POST"
+              ? { job: draftJob, status: "draft" }
+              : {
+                  ...draftJob,
+                  status: "draft",
+                  previousIndustryCode,
+                },
+          ),
+        });
+        const payload = (await response.json().catch(() => null)) as
+          | (RecruiterJob & {
+              message?: string;
+              fieldErrors?: RecruiterJobFieldErrors;
+            })
+          | null;
+        if (!response.ok) {
+          const nextFieldErrors = payload?.fieldErrors ?? {};
+          setFieldErrors(nextFieldErrors);
+          setError(
+            formLevelError(
+              payload?.message,
+              "Unable to save posting.",
+              nextFieldErrors,
+            ),
+          );
+          return false;
+        }
+        if (!payload) {
+          setError("The server returned an invalid response.");
+          return false;
+        }
+        catalogueUpdatedAt.current = payload.updatedAt;
+        savedIndustryCode.current = payload.industryCode;
+        setHasSavedDraft(true);
+        if (options.stayInEditor) {
+          const savedRevision = options.revision ?? editRevision.current;
+          const hasNewerChanges = editRevision.current !== savedRevision;
+          setJob((current) =>
+            hasNewerChanges
+              ? {
+                  ...current,
+                  id: payload.id,
+                  slug: payload.slug,
+                  createdByUserId: payload.createdByUserId,
+                  postedAt: payload.postedAt,
+                  status: "draft",
+                }
+              : {
+                  ...payload,
+                  company: current.company,
+                },
+          );
+          setHasUnsavedChanges(hasNewerChanges);
+          onDraftAutoSaved?.({ ...payload, company: prepared.company });
+        } else {
+          setHasUnsavedChanges(false);
+          onSaved(payload);
+        }
+        return true;
+      } catch {
+        setError(
+          "Unable to reach the server. Your changes are still available in this form.",
+        );
+        return false;
+      } finally {
+        setSaving(false);
+      }
+    },
+    [csrfProof, hasUnsavedChanges, onDraftAutoSaved, onSaved],
+  );
+
   const save = async (targetStatus: JobPostingStatus) => {
     if (readOnly) return;
-    const prepared = prepareRecruiterJobForSave(job);
+    const prepared: RecruiterJob = {
+      ...job,
+      ...prepareRecruiterJobForSave(job),
+      company: job.company,
+    };
     const nextErrors = validateRecruiterJobForSave(prepared, targetStatus);
     setJob(prepared);
     setFieldErrors(nextErrors);
@@ -315,12 +870,18 @@ export function JobPostingEditor({
           paths.some(
             (path) =>
               path.startsWith("experience.") ||
-              ["level", "education"].includes(path),
+              ["level", "education", "description.requirements"].includes(path),
           )
         )
           next[2] = true;
         if (paths.some((path) => path.startsWith("salary."))) next[3] = true;
-        if (paths.some((path) => path.startsWith("description.")))
+        if (
+          paths.some((path) =>
+            ["description.overview", "description.responsibilities"].includes(
+              path,
+            ),
+          )
+        )
           next[4] = true;
         if (
           paths.some((path) =>
@@ -330,50 +891,117 @@ export function JobPostingEditor({
           next[5] = true;
         return next;
       });
-      setError("Review the highlighted fields before saving this posting.");
+      setError("");
       return;
     }
 
-    setSaving(true);
-    setError("");
-    try {
-      const method = prepared.id === "new-job" ? "POST" : "PATCH";
-      const response = await fetch("/api/recruiter/job-postings", {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(
-          method === "POST"
-            ? { job: prepared, status: targetStatus }
-            : { ...prepared, status: targetStatus },
-        ),
-      });
-      const payload = (await response.json().catch(() => null)) as
-        | (RecruiterJob & {
-            message?: string;
-            fieldErrors?: RecruiterJobFieldErrors;
-          })
-        | null;
-      if (!response.ok) {
-        setFieldErrors(payload?.fieldErrors ?? {});
-        setError(payload?.message ?? "Unable to save posting.");
-        return;
-      }
-      if (!payload) {
-        setError("The server returned an invalid response.");
-        return;
-      }
-      onSaved(payload);
-    } catch {
-      setError(
-        "Unable to reach the server. Your changes are still available in this form.",
-      );
-    } finally {
-      setSaving(false);
+    if (targetStatus === "pending_approval") {
+      setError("");
+      setPendingSubmission(prepared);
+      return;
     }
+
+    await persist(prepared, targetStatus);
   };
 
-  const department = job.description.generalInfo.department ?? "";
+  const confirmSubmission = () => {
+    if (!pendingSubmission) return;
+    const prepared = pendingSubmission;
+    setPendingSubmission(null);
+    void persist(prepared, "pending_approval");
+  };
+
+  const toggleAutomaticDraftSave = () => {
+    const enabled = !autoSaveEnabled;
+    autoSaveBlockedRevision.current = null;
+    if (enabled) {
+      window.localStorage.setItem(autoSaveStorageKey, "enabled");
+    } else {
+      window.localStorage.removeItem(autoSaveStorageKey);
+    }
+    window.dispatchEvent(new Event(recruiterDraftAutoSaveChangedEvent));
+  };
+
+  const leaveEditor = async () => {
+    if (autoSaveEnabled && hasUnsavedChanges && !saving && !readOnly) {
+      const prepared: RecruiterJob = {
+        ...job,
+        ...prepareRecruiterJobForSave(job),
+        company: job.company,
+      };
+      const draftErrors = validateRecruiterJobForSave(prepared, "draft");
+      if (Object.keys(draftErrors).length === 0) {
+        const saved = persist(prepared, "draft", {
+          stayInEditor: true,
+          revision: editRevision.current,
+          keepalive: true,
+        });
+        if (awaitDraftSaveBeforeBack) {
+          if (await saved) onBack();
+        } else {
+          void saved;
+          onBack();
+        }
+        return;
+      }
+    }
+    requestUnsavedChangesNavigation(onBack);
+  };
+
+  useEffect(() => {
+    if (
+      !autoSaveEnabled ||
+      readOnly ||
+      saving ||
+      !hasUnsavedChanges ||
+      autoSaveBlockedRevision.current === editRevision.current
+    ) {
+      return;
+    }
+
+    const prepared: RecruiterJob = {
+      ...job,
+      ...prepareRecruiterJobForSave(job),
+      company: job.company,
+    };
+    if (Object.keys(validateRecruiterJobForSave(prepared, "draft")).length) {
+      return;
+    }
+
+    const revision = editRevision.current;
+    let started = false;
+    let timer = 0;
+    const saveDraft = (keepalive = false) => {
+      if (started) return;
+      started = true;
+      window.clearTimeout(timer);
+      void persist(prepared, "draft", {
+        stayInEditor: true,
+        revision,
+        keepalive,
+      }).then((saved) => {
+        if (!saved) autoSaveBlockedRevision.current = revision;
+      });
+    };
+    const saveWhenHidden = () => {
+      if (document.visibilityState === "hidden") saveDraft(true);
+    };
+    const saveOnPageHide = () => saveDraft(true);
+    timer = window.setTimeout(
+      () => saveDraft(true),
+      recruiterDraftAutoSaveDelayMs,
+    );
+    window.addEventListener("pagehide", saveOnPageHide);
+    document.addEventListener("visibilitychange", saveWhenHidden);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("pagehide", saveOnPageHide);
+      document.removeEventListener("visibilitychange", saveWhenHidden);
+    };
+  }, [autoSaveEnabled, hasUnsavedChanges, job, persist, readOnly, saving]);
+
   const minDeadline = new Date().toISOString().slice(0, 10);
+  const maxDeadline = "9999-12-31";
   const sectionCompletion = [
     Boolean(
       job.title &&
@@ -394,6 +1022,13 @@ export function JobPostingEditor({
     ),
   ];
   const completedSections = sectionCompletion.filter(Boolean).length;
+  const saveStatus = saving
+    ? copy.saving
+    : hasUnsavedChanges
+      ? copy.unsaved
+      : hasSavedDraft
+        ? copy.saved
+        : "";
   const setSectionOpen = (index: number, open: boolean) =>
     setOpenSections((current) =>
       current[index] === open
@@ -409,28 +1044,87 @@ export function JobPostingEditor({
         <button
           type="button"
           className="recruiter-back-button"
-          onClick={onBack}
+          disabled={awaitDraftSaveBeforeBack && saving}
+          onClick={() => void leaveEditor()}
         >
-          ← All job postings
+          <ArrowLeft aria-hidden="true" />
+          {copy.back}
         </button>
-        <p className="recruiter-eyebrow">
-          {job.id === "new-job" ? "Create job posting" : "Edit posting"}
-        </p>
-        <h1>{job.title || "Untitled job posting"}</h1>
+        <div className="recruiter-editor__heading-row">
+          <div>
+            <h1>
+              {job.id === "new-job" ? copy.create : job.title || copy.edit}
+            </h1>
+          </div>
+          <button
+            type="button"
+            className="recruiter-editor-auto-save"
+            role="switch"
+            aria-checked={autoSaveEnabled}
+            aria-label={`${copy.automaticSave}: ${autoSaveEnabled ? copy.on : copy.off}`}
+            onClick={toggleAutomaticDraftSave}
+          >
+            <span className="recruiter-editor-auto-save__label">AutoSave</span>
+            <span
+              className="recruiter-editor-auto-save__track"
+              aria-hidden="true"
+            >
+              <span className="recruiter-editor-auto-save__state">
+                {autoSaveEnabled ? copy.on : copy.off}
+              </span>
+              <span className="recruiter-editor-auto-save__thumb" />
+            </span>
+          </button>
+        </div>
         <p>
           Build a complete, structured listing and review exactly what
           candidates will see.
         </p>
+        {job.review?.state === "REJECTED" && job.review.reasonCode ? (
+          <div
+            className="recruiter-editor-rejection-notice"
+            role="alert"
+            aria-live="polite"
+          >
+            <strong>Revision needed</strong>
+            <p>
+              <strong>{formatReasonCode(job.review.reasonCode)}</strong>
+              {job.review.publicExplanation
+                ? `: ${job.review.publicExplanation}`
+                : null}
+            </p>
+            <p>Make the required changes and submit again for a new review.</p>
+          </div>
+        ) : null}
+        {job.correctionRequest ? (
+          <div
+            className="recruiter-editor-rejection-notice"
+            role="status"
+            aria-live="polite"
+          >
+            <strong>Administrator requested changes</strong>
+            <p>{job.correctionRequest.publicExplanation}</p>
+            <p>
+              The current approved version remains live until your revised
+              version is reviewed.
+            </p>
+          </div>
+        ) : null}
       </div>
 
       <div className="recruiter-editor-progress recruiter-surface-card">
-        <div>
-          <strong>{completedSections} of 6 sections ready</strong>
-          <span>
-            Save a draft after the core required fields are ready; add a
-            deadline before submission.
+        <div className="recruiter-editor-progress__copy">
+          <span className="recruiter-editor-progress__icon" aria-hidden="true">
+            <CheckCircle2 />
           </span>
+          <div>
+            <strong>{copy.completed(completedSections)}</strong>
+            <span>{copy.progressHelp}</span>
+          </div>
         </div>
+        <strong className="recruiter-editor-progress__percentage">
+          {copy.completion(completedSections)}
+        </strong>
         <div
           className="recruiter-editor-progress__track"
           role="progressbar"
@@ -450,13 +1144,16 @@ export function JobPostingEditor({
           noValidate
         >
           <p className="recruiter-required-note">
-            Fields marked * are required.
+            Fields marked * are required before submission. Drafts can be saved
+            at any time.
           </p>
 
           <EditorSection
             number={1}
             title="Basic info"
             description="Define how candidates discover and understand the role."
+            readyLabel={copy.ready}
+            inProgressLabel={copy.inProgress}
             complete={sectionCompletion[0]}
             open={openSections[0]}
             onToggle={(open) => setSectionOpen(0, open)}
@@ -490,105 +1187,95 @@ export function JobPostingEditor({
             <div className="recruiter-form-grid">
               <label>
                 Industry *
-                <input
+                <select
                   disabled={readOnly}
                   required
-                  maxLength={160}
-                  value={job.industry}
+                  value={selectedIndustry.code}
                   onChange={(event) =>
-                    changeJob(
-                      (current) => ({
-                        ...current,
-                        industry: event.target.value,
-                        industryCode: "",
-                      }),
-                      "industry",
-                    )
+                    updateIndustry(event.currentTarget.value)
                   }
                   {...fieldA11y("industry")}
-                />
+                >
+                  {recruiterIndustryTaxonomy.map((industry) => (
+                    <option key={industry.code} value={industry.code}>
+                      {industry.label}
+                    </option>
+                  ))}
+                </select>
                 <FieldError field="industry" errors={displayedErrors} />
               </label>
-              <label>
-                Sub-industry *
-                <input
-                  disabled={readOnly}
-                  required
-                  maxLength={160}
-                  value={job.subIndustry}
-                  onChange={(event) =>
-                    update("subIndustry", event.target.value)
-                  }
-                  placeholder="e.g. Software development"
-                  {...fieldA11y("subIndustry")}
-                />
+              <div className="recruiter-sub-industry-field">
+                {availableSubIndustries.length > 0 ? (
+                  <>
+                    <label htmlFor="recruiter-sub-industry">
+                      Sub-industry *
+                    </label>
+                    <select
+                      id="recruiter-sub-industry"
+                      disabled={readOnly}
+                      required
+                      value={
+                        usesCustomSubIndustry
+                          ? customSubIndustryValue
+                          : job.subIndustry
+                      }
+                      onChange={(event) => {
+                        const value = event.currentTarget.value;
+                        if (value === customSubIndustryValue) {
+                          setUsesCustomSubIndustry(true);
+                          updateSubIndustry("");
+                          return;
+                        }
+                        setUsesCustomSubIndustry(false);
+                        updateSubIndustry(value);
+                      }}
+                      {...fieldA11y("subIndustry")}
+                    >
+                      <option value="" disabled>
+                        Choose a sub-industry
+                      </option>
+                      {availableSubIndustries.map((label) => (
+                        <option key={label} value={label}>
+                          {label}
+                        </option>
+                      ))}
+                      <option value={customSubIndustryValue}>
+                        Add a new sub-industry…
+                      </option>
+                    </select>
+                  </>
+                ) : null}
+                {usesCustomSubIndustry ||
+                availableSubIndustries.length === 0 ? (
+                  <label htmlFor="recruiter-custom-sub-industry">
+                    {availableSubIndustries.length > 0
+                      ? "New sub-industry *"
+                      : "Sub-industry *"}
+                    <input
+                      id="recruiter-custom-sub-industry"
+                      disabled={readOnly}
+                      required
+                      maxLength={160}
+                      value={job.subIndustry}
+                      onChange={(event) =>
+                        updateSubIndustry(event.currentTarget.value)
+                      }
+                      placeholder="e.g. Aerospace Engineering"
+                      {...fieldA11y("subIndustry")}
+                    />
+                  </label>
+                ) : null}
                 <FieldError field="subIndustry" errors={displayedErrors} />
-              </label>
+              </div>
             </div>
-            <div className="recruiter-form-grid">
-              <label>
-                Job category *
-                <input
-                  disabled={readOnly}
-                  required
-                  maxLength={80}
-                  value={job.categoryFamily}
-                  onChange={(event) =>
-                    update("categoryFamily", event.target.value)
-                  }
-                  placeholder="e.g. Engineering"
-                  {...fieldA11y("categoryFamily")}
-                />
-                <FieldError field="categoryFamily" errors={displayedErrors} />
-              </label>
-              <label>
-                Department
-                <input
-                  disabled={readOnly}
-                  maxLength={160}
-                  value={department}
-                  onChange={(event) =>
-                    changeJob((current) => ({
-                      ...current,
-                      description: {
-                        ...current.description,
-                        generalInfo: {
-                          ...current.description.generalInfo,
-                          department: event.target.value || null,
-                        },
-                      },
-                    }))
-                  }
-                  placeholder="e.g. Product & Design"
-                />
-              </label>
-            </div>
-            <label>
-              Category IDs
-              <span className="recruiter-field-help">
-                Separate structured category IDs with commas.
-              </span>
-              <input
-                disabled={readOnly}
-                value={job.categoryIds.join(", ")}
-                onChange={(event) =>
-                  update(
-                    "categoryIds",
-                    event.target.value
-                      .split(",")
-                      .map((item) => item.trim())
-                      .filter(Boolean),
-                  )
-                }
-                placeholder="engineering, frontend"
-              />
-            </label>
           </EditorSection>
 
           <EditorSection
             number={2}
             title="Location & work arrangement"
             description="Set where and how the team works."
+            readyLabel={copy.ready}
+            inProgressLabel={copy.inProgress}
             complete={sectionCompletion[1]}
             open={openSections[1]}
             onToggle={(open) => setSectionOpen(1, open)}
@@ -745,6 +1432,8 @@ export function JobPostingEditor({
             number={3}
             title="Candidate requirements"
             description="Describe the experience and qualifications needed to succeed."
+            readyLabel={copy.ready}
+            inProgressLabel={copy.inProgress}
             complete={sectionCompletion[2]}
             open={openSections[2]}
             onToggle={(open) => setSectionOpen(2, open)}
@@ -874,20 +1563,16 @@ export function JobPostingEditor({
             <label>
               Skills
               <span className="recruiter-field-help">
-                Separate skills with commas.
+                Separate skills with commas; spaces are allowed inside a skill.
               </span>
               <input
                 disabled={readOnly}
-                value={job.skillTags.join(", ")}
-                onChange={(event) =>
-                  update(
-                    "skillTags",
-                    event.target.value
-                      .split(",")
-                      .map((skill) => skill.trim())
-                      .filter(Boolean),
-                  )
-                }
+                value={skillInput}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setSkillInput(value);
+                  update("skillTags", skillInputToTags(value));
+                }}
                 placeholder="React, TypeScript, Product design"
               />
             </label>
@@ -913,6 +1598,10 @@ export function JobPostingEditor({
                   "3+ years in a similar role\nStrong communication skills\nPortfolio of relevant work"
                 }
               />
+              <FieldError
+                field="description.requirements"
+                errors={displayedErrors}
+              />
             </label>
           </EditorSection>
 
@@ -920,6 +1609,8 @@ export function JobPostingEditor({
             number={4}
             title="Salary & benefits"
             description="Use readable VND amounts and highlight the complete rewards package."
+            readyLabel={copy.ready}
+            inProgressLabel={copy.inProgress}
             complete={sectionCompletion[3]}
             open={openSections[3]}
             onToggle={(open) => setSectionOpen(3, open)}
@@ -992,6 +1683,7 @@ export function JobPostingEditor({
                   const selected = job.description.benefits.find(
                     (benefit) => benefit.icon === option.icon,
                   );
+                  const Icon = benefitIconByName[option.icon] ?? Award;
                   return (
                     <div
                       className={[
@@ -1020,7 +1712,7 @@ export function JobPostingEditor({
                           className="recruiter-benefit-icon"
                           aria-hidden="true"
                         >
-                          {option.glyph}
+                          <Icon />
                         </span>
                         <span className="recruiter-benefit-card__label">
                           {option.label}
@@ -1063,6 +1755,8 @@ export function JobPostingEditor({
             number={5}
             title="Job description"
             description="Explain the impact, day-to-day work, and strongest reasons to join."
+            readyLabel={copy.ready}
+            inProgressLabel={copy.inProgress}
             complete={sectionCompletion[4]}
             open={openSections[4]}
             onToggle={(open) => setSectionOpen(4, open)}
@@ -1142,6 +1836,10 @@ export function JobPostingEditor({
                   "Own the roadmap for your domain\nCollaborate with product and engineering\nShare progress with stakeholders"
                 }
               />
+              <FieldError
+                field="description.responsibilities"
+                errors={displayedErrors}
+              />
             </label>
             <label>
               Reports to
@@ -1170,6 +1868,8 @@ export function JobPostingEditor({
             number={6}
             title="Hiring settings"
             description="Set headcount, urgency, and the application window."
+            readyLabel={copy.ready}
+            inProgressLabel={copy.inProgress}
             complete={sectionCompletion[5]}
             open={openSections[5]}
             onToggle={(open) => setSectionOpen(5, open)}
@@ -1199,18 +1899,34 @@ export function JobPostingEditor({
                   disabled={readOnly}
                   type="date"
                   min={minDeadline}
-                  value={job.applyDeadline?.slice(0, 10) ?? ""}
+                  max={maxDeadline}
+                  defaultValue={job.applyDeadline?.slice(0, 10) ?? ""}
+                  onInput={(event) => {
+                    const input = event.currentTarget;
+                    input.value = limitDateInputYear(input.value);
+                  }}
                   onChange={(event) => {
-                    clearFieldErrors("applyDeadline");
-                    setJob((current) => ({
-                      ...current,
-                      applyDeadline: event.target.value
-                        ? new Date(
-                            `${event.target.value}T23:59:59.000Z`,
-                          ).toISOString()
-                        : null,
-                      updatedAt: new Date().toISOString(),
-                    }));
+                    const rawValue = limitDateInputYear(
+                      event.currentTarget.value,
+                    );
+                    if (rawValue !== event.currentTarget.value) {
+                      event.currentTarget.value = rawValue;
+                    }
+                    const applyDeadline = dateInputToIso(rawValue);
+                    changeJob(
+                      (current) => ({ ...current, applyDeadline }),
+                      "applyDeadline",
+                    );
+                  }}
+                  onBlur={(event) => {
+                    const rawValue = event.target.value;
+                    if (rawValue && !dateInputToIso(rawValue)) {
+                      setFieldErrors((current) => ({
+                        ...current,
+                        applyDeadline: "Enter a valid application deadline.",
+                      }));
+                      setError("");
+                    }
                   }}
                   {...fieldA11y("applyDeadline")}
                 />
@@ -1236,15 +1952,23 @@ export function JobPostingEditor({
           ) : null}
 
           <div className="recruiter-editor__actions recruiter-surface-card">
+            <span className="recruiter-editor__action-status" role="status">
+              {saveStatus}
+            </span>
             <button
               type="button"
               className="recruiter-outline-button"
-              onClick={onBack}
+              disabled={awaitDraftSaveBeforeBack && saving}
+              onClick={() => void leaveEditor()}
             >
               Cancel
             </button>
             {readOnly ? (
-              <Badge tone="warning">Editing locked during review</Badge>
+              <Badge tone={job.status === "closed" ? "neutral" : "warning"}>
+                {job.status === "closed"
+                  ? "Closed posting — view only"
+                  : "Editing locked during review"}
+              </Badge>
             ) : canSubmitForApproval ? (
               <>
                 <button
@@ -1283,6 +2007,46 @@ export function JobPostingEditor({
 
         <JobPostingPreview companyName={companyName} job={job} />
       </div>
+
+      {/* The accessible Modal is the confirmation equivalent of window.confirm. */}
+      <Modal
+        open={Boolean(pendingSubmission)}
+        title="Submit job for approval?"
+        description="Send this posting to an Administrator for review."
+        icon="✓"
+        onClose={() => setPendingSubmission(null)}
+      >
+        <div className="recruiter-submit-confirmation">
+          <p className="recruiter-submit-confirmation__lead">
+            Once submitted, this version is locked and cannot be edited until
+            the review is complete.
+          </p>
+          <div className="recruiter-submit-confirmation__notice">
+            <strong>Before you submit</strong>
+            <span>
+              Make sure the title, salary, deadline, and required skills are
+              correct.
+            </span>
+          </div>
+          <div className="sh-modal-actions">
+            <button
+              type="button"
+              className="recruiter-outline-button"
+              data-autofocus
+              onClick={() => setPendingSubmission(null)}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="recruiter-primary-button"
+              onClick={confirmSubmission}
+            >
+              Submit for approval
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

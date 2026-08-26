@@ -1,6 +1,7 @@
 "use client";
 
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { useState, type FormEvent } from "react";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 import type {
   ProfileEditorFeedback,
@@ -12,7 +13,11 @@ import {
   useUnsavedChangesGuard,
 } from "../client/unsaved-changes";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { ProfileCompactSection } from "./profile-compact-section";
 import { ProfileSaveFeedback } from "./profile-save-feedback";
+import { formatProfileDateRange } from "./profile-display";
+import { BriefcaseBusiness, CirclePlus } from "lucide-react";
+import { Timeline, TimelineItem } from "@/frontend/components/ui/design-system";
 
 type ExperienceValues = {
   experience: Array<{
@@ -34,6 +39,12 @@ const valuesFrom = (profile: CandidateProfileContract): ExperienceValues => ({
   })),
 });
 
+function growDescription(event: FormEvent<HTMLTextAreaElement>) {
+  const textarea = event.currentTarget;
+  textarea.style.height = "auto";
+  textarea.style.height = `${Math.max(112, textarea.scrollHeight)}px`;
+}
+
 export function ProfileExperienceForm({
   profile,
   saving,
@@ -49,8 +60,9 @@ export function ProfileExperienceForm({
   const copy =
     locale === "vi"
       ? {
-          kicker: "KINH NGHIỆM LÀM VIỆC",
-          title: "Kinh nghiệm",
+          kicker: "Kinh nghiệm",
+          title: "Quá trình làm việc",
+          count: (count: number) => `${count} vị trí`,
           saving: "Đang lưu kinh nghiệm…",
           save: "Lưu kinh nghiệm",
           empty: "Bạn chưa thêm kinh nghiệm nào.",
@@ -60,15 +72,19 @@ export function ProfileExperienceForm({
           description: "Mô tả",
           start: "Ngày bắt đầu",
           end: "Ngày kết thúc",
-          current: "Đang làm việc tại đây",
+          current: "Hiện tại",
           up: "Di chuyển lên",
           down: "Di chuyển xuống",
           remove: "Xóa",
-          add: "Thêm kinh nghiệm",
+          add: "+ Thêm kinh nghiệm",
+          addOther: "Thêm kinh nghiệm khác",
+          addOtherSub: "Bổ sung công việc, dự án hoặc hoạt động ngoại khoá",
         }
       : {
-          kicker: "WORK HISTORY",
-          title: "Experience",
+          kicker: "Experience",
+          title: "Work history",
+          count: (count: number) =>
+            `${count} ${count === 1 ? "position" : "positions"}`,
           saving: "Saving experience…",
           save: "Save experience",
           empty: "No experience added yet.",
@@ -78,12 +94,17 @@ export function ProfileExperienceForm({
           description: "Description",
           start: "Start date",
           end: "End date",
-          current: "Current role",
+          current: "Current",
           up: "Move up",
           down: "Move down",
           remove: "Remove",
-          add: "Add experience",
+          add: "+ Add experience",
+          addOther: "Add another experience",
+          addOtherSub: "Add roles, projects, or extracurricular activities",
         };
+  const editLabel =
+    locale === "vi" ? "Chỉnh sửa kinh nghiệm" : "Edit experience";
+  const cancelLabel = locale === "vi" ? "Hủy" : "Cancel";
   const {
     control,
     register,
@@ -98,19 +119,98 @@ export function ProfileExperienceForm({
     keyName: "fieldKey",
   });
   const values = useWatch({ control, name: "experience" });
+  const hasExperience = profile.experience.length > 0;
+  const [isEditing, setIsEditing] = useState(!hasExperience);
 
   useServerFormReconciliation(valuesFrom(profile), reset);
-  useUnsavedChangesGuard(isDirty);
+  useUnsavedChangesGuard(isDirty && isEditing);
 
   const fieldError = (path: string) => feedback?.fieldErrors?.[path]?.[0];
+
+  if (!isEditing) {
+    return (
+      <ProfileCompactSection
+        sectionId="profile-experience-section"
+        titleId="profile-experience-title"
+        kicker={copy.kicker}
+        title={copy.title}
+        mark="EX"
+        count={copy.count(profile.experience.length)}
+        feedback={<ProfileSaveFeedback feedback={feedback} />}
+        content={
+          hasExperience ? (
+            <>
+              <Timeline
+                aria-label="Saved experience"
+                className="profile-timeline"
+              >
+                {profile.experience.map((entry, idx) => (
+                  <TimelineItem
+                    key={entry.id || idx}
+                    icon={<BriefcaseBusiness />}
+                    title={entry.title}
+                    current={entry.current ? copy.current : undefined}
+                    subtitle={`${entry.company} · ${formatProfileDateRange(
+                      entry.startDate,
+                      entry.endDate,
+                      entry.current,
+                      locale,
+                    )}`}
+                    description={entry.description || undefined}
+                    showConnector={idx < profile.experience.length - 1}
+                  />
+                ))}
+              </Timeline>
+              <button
+                type="button"
+                className="candidate-add-card"
+                onClick={() => setIsEditing(true)}
+              >
+                <CirclePlus aria-hidden="true" />
+                <span className="candidate-add-card__copy">
+                  <strong>{copy.addOther}</strong>
+                  <small>{copy.addOtherSub}</small>
+                </span>
+              </button>
+            </>
+          ) : (
+            <div className="profile-compact-empty-text">
+              <strong>{copy.empty}</strong>
+              <span>
+                {locale === "vi"
+                  ? "Bổ sung quá trình làm việc để nhà tuyển dụng hiểu rõ năng lực của bạn."
+                  : "Show employers where you have applied your skills."}
+              </span>
+            </div>
+          )
+        }
+        action={
+          <button
+            className={
+              hasExperience
+                ? "profile-section-edit-button btn-ghost"
+                : "profile-section-secondary-button"
+            }
+            style={
+              hasExperience ? { width: "auto", padding: "6px 14px" } : undefined
+            }
+            type="button"
+            onClick={() => setIsEditing(true)}
+          >
+            {hasExperience ? editLabel : copy.add}
+          </button>
+        }
+      />
+    );
+  }
 
   return (
     <form
       id="profile-experience-section"
-      className="professional-profile-section"
+      className="candidate-section candidate-section--editing"
       aria-labelledby="profile-experience-title"
       onSubmit={handleSubmit(async ({ experience }) => {
-        await onSave({
+        const saved = await onSave({
           section: "experience",
           experience: experience.map(({ id, ...entry }) => ({
             ...(id ? { id } : {}),
@@ -119,6 +219,7 @@ export function ProfileExperienceForm({
             endDate: entry.current ? null : entry.endDate || null,
           })),
         });
+        if (saved) setIsEditing(false);
       })}
     >
       <div className="professional-profile-section-heading">
@@ -127,9 +228,23 @@ export function ProfileExperienceForm({
           <h2 id="profile-experience-title">{copy.title}</h2>
           <UnsavedChangesIndicator dirty={isDirty} />
         </div>
-        <button type="submit" disabled={saving}>
-          {saving ? copy.saving : copy.save}
-        </button>
+        <div className="profile-section-action-group">
+          <button type="submit" disabled={saving}>
+            {saving ? copy.saving : copy.save}
+          </button>
+          {hasExperience ? (
+            <button
+              className="profile-section-secondary-button"
+              type="button"
+              onClick={() => {
+                reset(valuesFrom(profile));
+                setIsEditing(false);
+              }}
+            >
+              {cancelLabel}
+            </button>
+          ) : null}
+        </div>
       </div>
       <ProfileSaveFeedback feedback={feedback} />
       {fields.length === 0 ? <p>{copy.empty}</p> : null}
@@ -170,6 +285,7 @@ export function ProfileExperienceForm({
                 <textarea
                   maxLength={3_000}
                   rows={4}
+                  onInput={growDescription}
                   data-field-path={`experience.${index}.description`}
                   aria-invalid={Boolean(
                     fieldError(`experience.${index}.description`),
@@ -204,6 +320,9 @@ export function ProfileExperienceForm({
               <label className="professional-profile-checkbox">
                 <input
                   type="checkbox"
+                  aria-label={
+                    locale === "vi" ? "Vai trò hiện tại" : "Current role"
+                  }
                   data-field-path={`experience.${index}.current`}
                   aria-invalid={Boolean(
                     fieldError(`experience.${index}.current`),
@@ -262,6 +381,7 @@ export function ProfileExperienceForm({
       <div className="professional-profile-add-row">
         <button
           type="button"
+          aria-label={locale === "vi" ? "Thêm kinh nghiệm" : "Add experience"}
           disabled={fields.length >= 50}
           onClick={() =>
             append({

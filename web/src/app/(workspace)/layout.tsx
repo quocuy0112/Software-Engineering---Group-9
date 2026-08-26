@@ -1,6 +1,7 @@
 import "../../frontend/styles/workspace.css";
 import "../../frontend/styles/responsive.css";
 import "../../frontend/styles/recruiter-workspace-full.css";
+import "../../frontend/features/profile/styles/professional-profile.css";
 import { redirect } from "next/navigation";
 import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
 import { WorkspaceShell } from "@/frontend/features/dashboard/components/workspace-shell";

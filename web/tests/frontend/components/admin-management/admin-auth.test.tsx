@@ -68,7 +68,7 @@ describe("admin authentication UI", () => {
   it("uses a labelled modal for sensitive-action step-up", () => {
     render(<StepUpDialog open onCancel={vi.fn()} onVerified={vi.fn()} />);
     expect(
-      screen.getByRole("dialog", { name: "Confirm sensitive action" }),
+      screen.getByRole("dialog", { name: "Verify sensitive action" }),
     ).toBeVisible();
     expect(screen.getByRole("button", { name: "Verify" })).toBeDisabled();
   });

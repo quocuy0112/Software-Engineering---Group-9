@@ -6,6 +6,7 @@ import {
 } from "@/frontend/features/jobs/components/job-card";
 import { JobSearchForm } from "@/frontend/features/jobs/components/job-search-form";
 import { CompanyAvatar } from "@/frontend/features/jobs/components/company-avatar";
+import { WorkspaceLocaleProvider } from "@/frontend/features/dashboard/client/workspace-locale";
 import JobsLoading from "@/app/jobs/loading";
 
 const job = {
@@ -75,7 +76,7 @@ describe("job discovery presentation", () => {
     expect(screen.getByText("Hồ Chí Minh")).toBeVisible();
   });
 
-  it("routes authenticated card Apply clicks to the detail-page modal", () => {
+  it("routes authenticated card Apply clicks to the page-based flow", () => {
     render(
       <ApplyButton
         job={{
@@ -87,8 +88,34 @@ describe("job discovery presentation", () => {
 
     expect(screen.getByRole("link", { name: "Apply" })).toHaveAttribute(
       "href",
-      "/jobs/lap-trinh-vien?apply=true",
+      "/jobs/lap-trinh-vien/apply",
     );
+  });
+
+  it("shows the permanent per-job attempt limit after five attempts", () => {
+    render(
+      <ApplyButton
+        job={{
+          ...job,
+          actions: {
+            ...job.actions,
+            authenticated: true,
+            canApply: false,
+            applicationCount: 5,
+            applicationLimitReached: true,
+            applicationLimitMessage:
+              "You have reached the maximum number of applications for this job.",
+          },
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("status", {
+        name: "You have reached the maximum number of applications for this job.",
+      }),
+    ).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Apply" })).toBeNull();
   });
 
   it("keeps secondary actions visible and preserves action order", () => {
@@ -118,13 +145,15 @@ describe("job discovery presentation", () => {
     ]);
   });
 
-  it("exposes labeled filters and a clear action", () => {
-    render(<JobSearchForm criteria={{ q: "TypeScript" }} />);
+  it("exposes redesigned filters and a clear action", () => {
+    render(<JobSearchForm criteria={{}} />);
     expect(screen.getByText("Refine search")).toBeVisible();
-    expect(screen.getByLabelText(/keywords/i)).toHaveValue("TypeScript");
-    expect(screen.getByLabelText(/maximum salary/i)).toBeVisible();
-    expect(screen.getByRole("option", { name: "3 days" })).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText(/location/i), {
+    expect(screen.queryByText("Job category")).not.toBeInTheDocument();
+    expect(screen.getByText("Salary")).toBeVisible();
+    expect(screen.getByText("10 - 15M")).toBeVisible();
+    expect(screen.queryByText("10 - 15 triệu")).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/work arrangement/i)).toBeVisible();
+    fireEvent.change(screen.getByLabelText(/skill/i), {
       target: { value: "Đà Nẵng" },
     });
     expect(
@@ -135,21 +164,33 @@ describe("job discovery presentation", () => {
     ).toHaveAttribute("href", "/jobs");
   });
 
-  it("reports text and discrete filter changes with the right trigger", () => {
+  it("uses one consistent Vietnamese locale for redesigned filters", () => {
+    render(
+      <WorkspaceLocaleProvider initialLocale="vi">
+        <JobSearchForm criteria={{}} />
+      </WorkspaceLocaleProvider>,
+    );
+
+    expect(screen.getByText("Mức lương")).toBeVisible();
+    expect(screen.getByText("10 - 15 triệu")).toBeVisible();
+    expect(screen.getByText("Không yêu cầu kinh nghiệm")).toBeVisible();
+    expect(screen.queryByText("Salary")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("No experience required"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("reports redesigned filter changes with the right trigger", () => {
     const onCriteriaChange = vi.fn();
     render(<JobSearchForm criteria={{}} onCriteriaChange={onCriteriaChange} />);
 
-    fireEvent.change(screen.getByLabelText(/keywords/i), {
-      target: { value: "TypeScript" },
-    });
+    fireEvent.click(screen.getByLabelText("Under 10M"));
     expect(onCriteriaChange).toHaveBeenLastCalledWith(
-      { q: "TypeScript" },
-      "debounced",
+      { salaryMax: "10000000" },
+      "immediate",
     );
 
-    fireEvent.change(screen.getByLabelText(/employment type/i), {
-      target: { value: "FULL_TIME" },
-    });
+    fireEvent.click(screen.getByLabelText("Full-time"));
     expect(onCriteriaChange).toHaveBeenLastCalledWith(
       { employmentType: "FULL_TIME" },
       "immediate",

@@ -1,6 +1,7 @@
 "use client";
 
 import { cloneElement, useState, type ReactElement } from "react";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -9,16 +10,18 @@ import {
   type RegistrationInput,
 } from "@/shared/contracts/identity/registration";
 import { PasswordField } from "./password-field";
+import { PasswordRequirementChecklist } from "./password-requirement-checklist";
 
 const GENERIC_REGISTRATION_ERROR =
   "Registration is temporarily unavailable. Please try again.";
 
 export function RegisterForm() {
-  const [complete, setComplete] = useState(false);
+  const router = useRouter();
   const [serverStatus, setServerStatus] = useState("");
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
     setError,
   } = useForm<RegistrationInput>({
@@ -30,6 +33,7 @@ export function RegisterForm() {
       passwordConfirmation: "",
     },
   });
+  const password = watch("password");
   const submit = handleSubmit(async (values) => {
     setServerStatus("");
     try {
@@ -54,22 +58,15 @@ export function RegisterForm() {
         toast.error("Registration needs attention.");
         return;
       }
-      setComplete(true);
+      const email = values.email.trim().toLowerCase();
+      sessionStorage.setItem("pending_verification_email", email);
       toast.success("Check your email.");
+      router.push(`/check-email?email=${encodeURIComponent(email)}`);
     } catch {
       setServerStatus(GENERIC_REGISTRATION_ERROR);
       toast.error("Registration needs attention.");
     }
   });
-  if (complete)
-    return (
-      <div role="status" tabIndex={-1}>
-        <h1>Check your email</h1>
-        <p>
-          If the address can be registered, a verification link has been sent.
-        </p>
-      </div>
-    );
   return (
     <form
       className="auth-form"
@@ -90,6 +87,9 @@ export function RegisterForm() {
           type="email"
           autoComplete="email"
           inputMode="email"
+          autoCapitalize="none"
+          spellCheck={false}
+          placeholder="example@email.com"
           {...register("email")}
         />
       </Field>
@@ -99,6 +99,7 @@ export function RegisterForm() {
         autoComplete="new-password"
         {...register("password")}
       />
+      <PasswordRequirementChecklist value={password} />
       <PasswordField
         label="Confirm password"
         error={errors.passwordConfirmation?.message}

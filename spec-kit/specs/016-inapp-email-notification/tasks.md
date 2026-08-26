@@ -228,6 +228,28 @@
 
 ---
 
+## Phase 10: User Story 7 - Actionable Administrator Alerts (Priority: P1)
+
+**Goal**: Notify only authorized administrators about newly actionable support/report work, verification evidence escalation, and security-delivery manual intervention without placing protected content in the inbox.
+
+### Specification and Tests
+
+- [x] T089 [US7] Extend Feature 016 spec, plan, research, data model, and task traceability in `spec-kit/specs/016-inapp-email-notification/`
+- [x] T090 [P] [US7] Add exhaustive policy, migration, privacy, active-recipient, assignment-fallback, producer, and idempotency tests in `web/tests/backend/{unit,integration}/notifications/`, affected feature integration suites, and `web/tests/security/notifications/`
+
+### Implementation
+
+- [x] T091 [US7] Add administrator notification kinds to `web/src/shared/contracts/notifications/index.ts`, `web/prisma/schema.prisma`, and additive migration `web/prisma/migrations/036_actionable_admin_notifications/migration.sql`, then regenerate Prisma output
+- [x] T092 [US7] Add transaction-compatible active/assigned administrator recipient resolution and safe fan-out in `web/src/backend/notifications/notification-recipient-policy.ts` and `web/src/backend/notifications/admin-notification-fanout.ts`
+- [x] T093 [US7] Add support created/requester-replied/reopened administrator notifications in `web/src/backend/repositories/support/prisma-support-repository.ts`
+- [x] T094 [US7] Add new messaging/general moderation report administrator notifications in `web/src/backend/repositories/messaging/prisma-messaging-report-repository.ts` and `web/src/backend/admin/moderation/moderation-submission-service.ts`
+- [x] T095 [US7] Add verification evidence escalation administrator notification in `web/src/backend/admin/workers/verification-lifecycle-loop.ts`
+- [x] T096 [US7] Add manual-intervention administrator notification while preserving external operations alerts in `web/src/backend/admin/notifications/security-notification-ops-alert.ts`
+- [x] T097 [US7] Run Prisma gates, focused/affected tests, typecheck, lint, migration checks, production build, update `quickstart.md`, and complete the security/diff review
+- [x] T098 [US7] Prevent administrator notification integration tests from leaving orphaned notifications in a shared development database, remove verified stale test artifacts, and run focused regression validation
+
+---
+
 ## Dependencies and Execution Order
 
 ### Phase Dependencies

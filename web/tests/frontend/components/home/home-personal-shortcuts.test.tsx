@@ -30,7 +30,7 @@ describe("Home personal shortcuts", () => {
       [...container.querySelectorAll("a")].map((link) =>
         link.getAttribute("href"),
       ),
-    ).toEqual(["/dashboard", "https://recruiter.example.test"]);
+    ).toEqual(["/dashboard", "/recruiter/job-postings"]);
     expect(screen.queryByText("My Applications")).not.toBeInTheDocument();
     expect(screen.queryByText("Saved Jobs")).not.toBeInTheDocument();
   });

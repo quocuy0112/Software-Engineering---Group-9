@@ -17,6 +17,25 @@ function salaryValue(job: JobCard, key: "minimum" | "maximum") {
   return job.salary?.[key] ?? -1;
 }
 
+/**
+ * Keep the browser-side result guard aligned with the repository search.
+ *
+ * The API already applies the authoritative candidate-visible predicates. We
+ * still filter the hydrated page locally for URL-driven controls, so this
+ * normalizer deliberately mirrors the server's accent-insensitive token
+ * matching without importing server-only modules into a client component.
+ */
+function normalizeClientSearchText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[đĐ]/gu, "d")
+    .replace(/\p{M}+/gu, "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim()
+    .replace(/\s+/gu, " ");
+}
+
 function sortJobs(jobs: JobCard[], mode: JobSortMode) {
   return [...jobs].sort((left, right) => {
     if (mode === "salary-high")
@@ -73,8 +92,8 @@ export function JobBoardExperience({
 
   const allJobs = useMemo(() => result?.items ?? [], [result]);
   const clientFilteredJobs = useMemo(() => {
-    const query = (searchParams.get("q") ?? "").trim().toLowerCase();
-    const queryWords = query.split(/\s+/u).filter(Boolean);
+    const query = normalizeClientSearchText(searchParams.get("q") ?? "");
+    const queryWords = query.split(" ").filter(Boolean);
     const searchBy = searchParams.get("searchBy") ?? "BOTH";
     const minimumYears = Number(searchParams.get("experienceMinYears") ?? "");
     const categoryFamily = (
@@ -87,8 +106,8 @@ export function JobBoardExperience({
           ? job.title
           : searchBy === "COMPANY"
             ? job.company.displayName
-            : job.title + " " + job.company.displayName;
-      const normalizedTarget = target.toLowerCase();
+            : [job.title, job.company.displayName, ...job.skills].join(" ");
+      const normalizedTarget = normalizeClientSearchText(target);
       const matchesQuery = queryWords.every((word) =>
         normalizedTarget.includes(word),
       );
@@ -98,7 +117,9 @@ export function JobBoardExperience({
         (job.experienceMinYears ?? 0) >= minimumYears;
       const matchesCategory =
         !categoryFamily ||
-        (job.categoryFamily ?? "").toLowerCase().includes(categoryFamily);
+        (job.categoryFamily ?? "").toLowerCase().includes(categoryFamily) ||
+        ((categoryFamily === "r29" || categoryFamily === "other") &&
+          ["r29", "other"].includes((job.categoryFamily ?? "").toLowerCase()));
       const matchesSaturday = !saturdayOnly || job.workOnSaturday === true;
       return (
         matchesQuery && matchesExperience && matchesCategory && matchesSaturday

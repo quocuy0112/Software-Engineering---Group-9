@@ -106,6 +106,55 @@ export const AuditResult = {
 export type AuditResult = (typeof AuditResult)[keyof typeof AuditResult]
 
 
+export const AnalyticsViewQualification = {
+  QUALIFIED: 'QUALIFIED',
+  OWNER_PREVIEW: 'OWNER_PREVIEW',
+  AUTOMATED: 'AUTOMATED',
+  INVALID: 'INVALID'
+} as const
+
+export type AnalyticsViewQualification = (typeof AnalyticsViewQualification)[keyof typeof AnalyticsViewQualification]
+
+
+export const ExportFormat = {
+  CSV: 'CSV',
+  XLSX: 'XLSX'
+} as const
+
+export type ExportFormat = (typeof ExportFormat)[keyof typeof ExportFormat]
+
+
+export const ExportRequestStatus = {
+  QUEUED: 'QUEUED',
+  LEASED: 'LEASED',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+  EXPIRED: 'EXPIRED',
+  DELETING: 'DELETING',
+  DELETED: 'DELETED'
+} as const
+
+export type ExportRequestStatus = (typeof ExportRequestStatus)[keyof typeof ExportRequestStatus]
+
+
+export const BackupRunTrigger = {
+  MANUAL: 'MANUAL',
+  SCHEDULED: 'SCHEDULED'
+} as const
+
+export type BackupRunTrigger = (typeof BackupRunTrigger)[keyof typeof BackupRunTrigger]
+
+
+export const BackupRunStatus = {
+  QUEUED: 'QUEUED',
+  LEASED: 'LEASED',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED'
+} as const
+
+export type BackupRunStatus = (typeof BackupRunStatus)[keyof typeof BackupRunStatus]
+
+
 export const EmailKind = {
   VERIFY_EMAIL: 'VERIFY_EMAIL',
   EMAIL_CHANGE_VERIFY: 'EMAIL_CHANGE_VERIFY',
@@ -122,7 +171,9 @@ export const EmailKind = {
   VERIFICATION_EXPIRED: 'VERIFICATION_EXPIRED',
   SUPPORT_CASE_UPDATED: 'SUPPORT_CASE_UPDATED',
   PROFESSIONAL_CONNECTION_UPDATED: 'PROFESSIONAL_CONNECTION_UPDATED',
-  COMPANY_EMAIL_VERIFY: 'COMPANY_EMAIL_VERIFY'
+  COMPANY_EMAIL_VERIFY: 'COMPANY_EMAIL_VERIFY',
+  COMPANY_INVITATION: 'COMPANY_INVITATION',
+  COMPANY_INVITATION_RESPONSE: 'COMPANY_INVITATION_RESPONSE'
 } as const
 
 export type EmailKind = (typeof EmailKind)[keyof typeof EmailKind]
@@ -163,10 +214,29 @@ export const InAppNotificationContextType = {
   CONNECTION: 'CONNECTION',
   CONVERSATION: 'CONVERSATION',
   MESSAGING_REPORT: 'MESSAGING_REPORT',
-  MODERATION_REPORT: 'MODERATION_REPORT'
+  MODERATION_REPORT: 'MODERATION_REPORT',
+  JOB_POST_REVIEW: 'JOB_POST_REVIEW',
+  COMPANY_INVITATION: 'COMPANY_INVITATION'
 } as const
 
 export type InAppNotificationContextType = (typeof InAppNotificationContextType)[keyof typeof InAppNotificationContextType]
+
+
+export const InAppNotificationAudience = {
+  USER: 'USER',
+  ADMIN: 'ADMIN'
+} as const
+
+export type InAppNotificationAudience = (typeof InAppNotificationAudience)[keyof typeof InAppNotificationAudience]
+
+
+export const InAppNotificationRecipientRole = {
+  CANDIDATE: 'CANDIDATE',
+  RECRUITER: 'RECRUITER',
+  ADMIN: 'ADMIN'
+} as const
+
+export type InAppNotificationRecipientRole = (typeof InAppNotificationRecipientRole)[keyof typeof InAppNotificationRecipientRole]
 
 
 export const InAppNotificationKind = {
@@ -181,6 +251,11 @@ export const InAppNotificationKind = {
   MEMBERSHIP_SUSPENDED: 'MEMBERSHIP_SUSPENDED',
   MEMBERSHIP_RESTORED: 'MEMBERSHIP_RESTORED',
   MEMBERSHIP_REMOVED: 'MEMBERSHIP_REMOVED',
+  COMPANY_BANNED: 'COMPANY_BANNED',
+  COMPANY_UNBANNED: 'COMPANY_UNBANNED',
+  COMPANY_INVITATION_RECEIVED: 'COMPANY_INVITATION_RECEIVED',
+  COMPANY_INVITATION_ACCEPTED: 'COMPANY_INVITATION_ACCEPTED',
+  COMPANY_INVITATION_DECLINED: 'COMPANY_INVITATION_DECLINED',
   APPLICATION_SUBMITTED: 'APPLICATION_SUBMITTED',
   APPLICATION_RECEIVED: 'APPLICATION_RECEIVED',
   APPLICATION_STAGE_CHANGED: 'APPLICATION_STAGE_CHANGED',
@@ -193,6 +268,9 @@ export const InAppNotificationKind = {
   VERIFICATION_EXPIRED: 'VERIFICATION_EXPIRED',
   SUPPORT_WAITING_FOR_USER: 'SUPPORT_WAITING_FOR_USER',
   SUPPORT_RESOLVED: 'SUPPORT_RESOLVED',
+  SUPPORT_CASE_RECEIVED: 'SUPPORT_CASE_RECEIVED',
+  SUPPORT_REQUESTER_REPLIED: 'SUPPORT_REQUESTER_REPLIED',
+  SUPPORT_CASE_REOPENED: 'SUPPORT_CASE_REOPENED',
   CONNECTION_PROPOSAL_CREATED: 'CONNECTION_PROPOSAL_CREATED',
   CONNECTION_PROPOSAL_UPDATED: 'CONNECTION_PROPOSAL_UPDATED',
   CONNECTION_PROPOSAL_INACTIVE: 'CONNECTION_PROPOSAL_INACTIVE',
@@ -202,9 +280,17 @@ export const InAppNotificationKind = {
   MESSAGE_REPORT_RECEIVED: 'MESSAGE_REPORT_RECEIVED',
   MESSAGE_REPORT_RESOLVED: 'MESSAGE_REPORT_RESOLVED',
   MESSAGE_REPORT_DISMISSED: 'MESSAGE_REPORT_DISMISSED',
+  MESSAGE_REPORT_RECEIVED_ADMIN: 'MESSAGE_REPORT_RECEIVED_ADMIN',
   MODERATION_REPORT_RECEIVED: 'MODERATION_REPORT_RECEIVED',
   MODERATION_REPORT_RESOLVED: 'MODERATION_REPORT_RESOLVED',
-  MODERATION_REPORT_DISMISSED: 'MODERATION_REPORT_DISMISSED'
+  MODERATION_REPORT_DISMISSED: 'MODERATION_REPORT_DISMISSED',
+  MODERATION_REPORT_RECEIVED_ADMIN: 'MODERATION_REPORT_RECEIVED_ADMIN',
+  VERIFICATION_REVIEW_OVERDUE: 'VERIFICATION_REVIEW_OVERDUE',
+  DELIVERY_MANUAL_INTERVENTION_REQUIRED: 'DELIVERY_MANUAL_INTERVENTION_REQUIRED',
+  JOB_POST_REVIEW_REQUESTED_ADMIN: 'JOB_POST_REVIEW_REQUESTED_ADMIN',
+  JOB_POST_APPROVED: 'JOB_POST_APPROVED',
+  JOB_POST_REJECTED: 'JOB_POST_REJECTED',
+  JOB_POST_CHANGES_REQUESTED: 'JOB_POST_CHANGES_REQUESTED'
 } as const
 
 export type InAppNotificationKind = (typeof InAppNotificationKind)[keyof typeof InAppNotificationKind]
@@ -317,6 +403,104 @@ export const SalaryPeriod = {
 export type SalaryPeriod = (typeof SalaryPeriod)[keyof typeof SalaryPeriod]
 
 
+export const JobPostReviewState = {
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  WITHDRAWN: 'WITHDRAWN'
+} as const
+
+export type JobPostReviewState = (typeof JobPostReviewState)[keyof typeof JobPostReviewState]
+
+
+export const JobPostReviewReasonCode = {
+  INCOMPLETE_OR_UNCLEAR: 'INCOMPLETE_OR_UNCLEAR',
+  MISLEADING_CONTENT: 'MISLEADING_CONTENT',
+  COMPENSATION_OR_LOCATION_UNCLEAR: 'COMPENSATION_OR_LOCATION_UNCLEAR',
+  DISCRIMINATORY_OR_PROHIBITED: 'DISCRIMINATORY_OR_PROHIBITED',
+  COMPANY_OR_ROLE_MISMATCH: 'COMPANY_OR_ROLE_MISMATCH',
+  DUPLICATE_OR_SPAM: 'DUPLICATE_OR_SPAM',
+  EXPIRED_OR_INVALID_DEADLINE: 'EXPIRED_OR_INVALID_DEADLINE',
+  POLICY_OR_LEGAL_RISK: 'POLICY_OR_LEGAL_RISK',
+  OTHER_ACTION_REQUIRED: 'OTHER_ACTION_REQUIRED'
+} as const
+
+export type JobPostReviewReasonCode = (typeof JobPostReviewReasonCode)[keyof typeof JobPostReviewReasonCode]
+
+
+export const JobPostReviewHistoryAction = {
+  SUBMITTED: 'SUBMITTED',
+  CLAIMED: 'CLAIMED',
+  REASSIGNED: 'REASSIGNED',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  RESUBMITTED: 'RESUBMITTED',
+  LEGACY_BASELINE_IMPORTED: 'LEGACY_BASELINE_IMPORTED',
+  CLOSED: 'CLOSED',
+  WITHDRAWN: 'WITHDRAWN',
+  REOPENED: 'REOPENED'
+} as const
+
+export type JobPostReviewHistoryAction = (typeof JobPostReviewHistoryAction)[keyof typeof JobPostReviewHistoryAction]
+
+
+export const JobPostVisibilityState = {
+  PUBLISHED: 'PUBLISHED',
+  HIDDEN: 'HIDDEN',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type JobPostVisibilityState = (typeof JobPostVisibilityState)[keyof typeof JobPostVisibilityState]
+
+
+export const JobPostApplicationState = {
+  OPEN: 'OPEN',
+  CLOSED: 'CLOSED'
+} as const
+
+export type JobPostApplicationState = (typeof JobPostApplicationState)[keyof typeof JobPostApplicationState]
+
+
+export const JobPostRevisionRequestState = {
+  OPEN: 'OPEN',
+  SATISFIED: 'SATISFIED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type JobPostRevisionRequestState = (typeof JobPostRevisionRequestState)[keyof typeof JobPostRevisionRequestState]
+
+
+export const JobPostFeatureState = {
+  SCHEDULED: 'SCHEDULED',
+  ACTIVE: 'ACTIVE',
+  ENDED: 'ENDED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type JobPostFeatureState = (typeof JobPostFeatureState)[keyof typeof JobPostFeatureState]
+
+
+export const JobPostEnforcementType = {
+  HIDE_JOB: 'HIDE_JOB',
+  CLOSE_APPLICATIONS: 'CLOSE_APPLICATIONS',
+  REQUEST_CHANGES: 'REQUEST_CHANGES',
+  SOFT_DELETE_JOB: 'SOFT_DELETE_JOB',
+  SUSPEND_COMPANY: 'SUSPEND_COMPANY',
+  SUSPEND_RECRUITER: 'SUSPEND_RECRUITER'
+} as const
+
+export type JobPostEnforcementType = (typeof JobPostEnforcementType)[keyof typeof JobPostEnforcementType]
+
+
+export const PlatformAdministratorScope = {
+  JOB_POST_MODERATE: 'JOB_POST_MODERATE',
+  JOB_POST_FEATURE: 'JOB_POST_FEATURE',
+  JOB_POST_ENFORCE: 'JOB_POST_ENFORCE'
+} as const
+
+export type PlatformAdministratorScope = (typeof PlatformAdministratorScope)[keyof typeof PlatformAdministratorScope]
+
+
 export const ApplicationQuestionKind = {
   TEXT: 'TEXT',
   BOOLEAN: 'BOOLEAN',
@@ -362,6 +546,65 @@ export const ApplicationStage = {
 export type ApplicationStage = (typeof ApplicationStage)[keyof typeof ApplicationStage]
 
 
+export const RecruitmentThreadState = {
+  OPEN: 'OPEN',
+  READ_ONLY: 'READ_ONLY'
+} as const
+
+export type RecruitmentThreadState = (typeof RecruitmentThreadState)[keyof typeof RecruitmentThreadState]
+
+
+export const ApplicationWithdrawalOutcome = {
+  CANDIDATE_WITHDRAWN: 'CANDIDATE_WITHDRAWN'
+} as const
+
+export type ApplicationWithdrawalOutcome = (typeof ApplicationWithdrawalOutcome)[keyof typeof ApplicationWithdrawalOutcome]
+
+
+export const ApplicationIntakeState = {
+  RECEIVED: 'RECEIVED',
+  CHECKING_FILES: 'CHECKING_FILES',
+  SENT_TO_RECRUITER: 'SENT_TO_RECRUITER',
+  ATTENTION_REQUIRED: 'ATTENTION_REQUIRED'
+} as const
+
+export type ApplicationIntakeState = (typeof ApplicationIntakeState)[keyof typeof ApplicationIntakeState]
+
+
+export const ApplicationPublicUpdateKind = {
+  SUBMITTED: 'SUBMITTED',
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  INTERVIEW: 'INTERVIEW',
+  OUTCOME: 'OUTCOME',
+  WITHDRAWN: 'WITHDRAWN',
+  TECHNICAL_UPDATE: 'TECHNICAL_UPDATE'
+} as const
+
+export type ApplicationPublicUpdateKind = (typeof ApplicationPublicUpdateKind)[keyof typeof ApplicationPublicUpdateKind]
+
+
+export const ApplicationPublicStage = {
+  APPLICATION_SUBMITTED: 'APPLICATION_SUBMITTED',
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  INTERVIEW: 'INTERVIEW',
+  OUTCOME: 'OUTCOME'
+} as const
+
+export type ApplicationPublicStage = (typeof ApplicationPublicStage)[keyof typeof ApplicationPublicStage]
+
+
+export const ApplicationPublicOutcome = {
+  OFFERED: 'OFFERED',
+  HIRED: 'HIRED',
+  OFFER_DECLINED: 'OFFER_DECLINED',
+  REJECTED: 'REJECTED',
+  WAITLISTED: 'WAITLISTED',
+  WITHDRAWN: 'WITHDRAWN'
+} as const
+
+export type ApplicationPublicOutcome = (typeof ApplicationPublicOutcome)[keyof typeof ApplicationPublicOutcome]
+
+
 export const ApplicationScoringStatus = {
   NOT_REQUESTED: 'NOT_REQUESTED',
   PENDING: 'PENDING',
@@ -371,6 +614,194 @@ export const ApplicationScoringStatus = {
 } as const
 
 export type ApplicationScoringStatus = (typeof ApplicationScoringStatus)[keyof typeof ApplicationScoringStatus]
+
+
+export const ApplicationDocumentKind = {
+  CV: 'CV',
+  COVER_LETTER: 'COVER_LETTER'
+} as const
+
+export type ApplicationDocumentKind = (typeof ApplicationDocumentKind)[keyof typeof ApplicationDocumentKind]
+
+
+export const ApplicationArtifactPromotionState = {
+  PROMOTED: 'PROMOTED',
+  COMMITTED: 'COMMITTED',
+  DELETE_PENDING: 'DELETE_PENDING',
+  DELETING: 'DELETING',
+  DELETED: 'DELETED',
+  DELETE_FAILED: 'DELETE_FAILED'
+} as const
+
+export type ApplicationArtifactPromotionState = (typeof ApplicationArtifactPromotionState)[keyof typeof ApplicationArtifactPromotionState]
+
+
+export const ApplicationLegacyDocumentState = {
+  CURRENT: 'CURRENT',
+  BACKFILLABLE: 'BACKFILLABLE',
+  UNAVAILABLE: 'UNAVAILABLE'
+} as const
+
+export type ApplicationLegacyDocumentState = (typeof ApplicationLegacyDocumentState)[keyof typeof ApplicationLegacyDocumentState]
+
+
+export const ScoringResultState = {
+  DETERMINISTIC_ONLY: 'DETERMINISTIC_ONLY',
+  SCORED: 'SCORED'
+} as const
+
+export type ScoringResultState = (typeof ScoringResultState)[keyof typeof ScoringResultState]
+
+
+export const ScoringParseStatus = {
+  PARSED_SUCCESSFULLY: 'PARSED_SUCCESSFULLY',
+  PARSED_WITH_ERRORS: 'PARSED_WITH_ERRORS',
+  FAILED: 'FAILED'
+} as const
+
+export type ScoringParseStatus = (typeof ScoringParseStatus)[keyof typeof ScoringParseStatus]
+
+
+export const ScoringSkillRequirementKind = {
+  REQUIRED: 'REQUIRED',
+  PREFERRED: 'PREFERRED'
+} as const
+
+export type ScoringSkillRequirementKind = (typeof ScoringSkillRequirementKind)[keyof typeof ScoringSkillRequirementKind]
+
+
+export const ScoringSkillMatchState = {
+  FOUND: 'FOUND',
+  MISSING: 'MISSING',
+  NEUTRAL_PREFERRED: 'NEUTRAL_PREFERRED'
+} as const
+
+export type ScoringSkillMatchState = (typeof ScoringSkillMatchState)[keyof typeof ScoringSkillMatchState]
+
+
+export const ScoringAiConfidenceLevel = {
+  LOW: 'LOW',
+  STANDARD: 'STANDARD',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH'
+} as const
+
+export type ScoringAiConfidenceLevel = (typeof ScoringAiConfidenceLevel)[keyof typeof ScoringAiConfidenceLevel]
+
+
+export const ScoringAiQuestionState = {
+  GENERATED: 'GENERATED',
+  INSUFFICIENT_DATA: 'INSUFFICIENT_DATA'
+} as const
+
+export type ScoringAiQuestionState = (typeof ScoringAiQuestionState)[keyof typeof ScoringAiQuestionState]
+
+
+export const ScoringOperationKind = {
+  INITIAL: 'INITIAL',
+  JOB_RESCORE: 'JOB_RESCORE',
+  AI_RETRY: 'AI_RETRY'
+} as const
+
+export type ScoringOperationKind = (typeof ScoringOperationKind)[keyof typeof ScoringOperationKind]
+
+
+export const ScoringOperationState = {
+  QUEUED: 'QUEUED',
+  RUNNING: 'RUNNING',
+  COMPLETED: 'COMPLETED',
+  COMPLETED_WITH_FAILURES: 'COMPLETED_WITH_FAILURES',
+  FAILED: 'FAILED'
+} as const
+
+export type ScoringOperationState = (typeof ScoringOperationState)[keyof typeof ScoringOperationState]
+
+
+export const ScoringWorkItemState = {
+  QUEUED: 'QUEUED',
+  LEASED: 'LEASED',
+  AUTOMATIC_READY: 'AUTOMATIC_READY',
+  AI_PENDING: 'AI_PENDING',
+  PUBLISHED: 'PUBLISHED',
+  DETERMINISTIC_ONLY: 'DETERMINISTIC_ONLY',
+  FAILED: 'FAILED',
+  SUPERSEDED: 'SUPERSEDED'
+} as const
+
+export type ScoringWorkItemState = (typeof ScoringWorkItemState)[keyof typeof ScoringWorkItemState]
+
+
+export const PrivateCvMatchCheckState = {
+  QUEUED: 'QUEUED',
+  ANALYZING: 'ANALYZING',
+  LIMITED: 'LIMITED',
+  READY: 'READY',
+  FAILED: 'FAILED',
+  INACCESSIBLE: 'INACCESSIBLE'
+} as const
+
+export type PrivateCvMatchCheckState = (typeof PrivateCvMatchCheckState)[keyof typeof PrivateCvMatchCheckState]
+
+
+export const PrivateCvMatchAttemptTrigger = {
+  INITIAL: 'INITIAL',
+  AI_RETRY: 'AI_RETRY'
+} as const
+
+export type PrivateCvMatchAttemptTrigger = (typeof PrivateCvMatchAttemptTrigger)[keyof typeof PrivateCvMatchAttemptTrigger]
+
+
+export const PrivateCvMatchAttemptState = {
+  QUEUED: 'QUEUED',
+  AUTOMATIC_RUNNING: 'AUTOMATIC_RUNNING',
+  AUTOMATIC_READY: 'AUTOMATIC_READY',
+  AI_RUNNING: 'AI_RUNNING',
+  READY: 'READY',
+  LIMITED: 'LIMITED',
+  FAILED: 'FAILED'
+} as const
+
+export type PrivateCvMatchAttemptState = (typeof PrivateCvMatchAttemptState)[keyof typeof PrivateCvMatchAttemptState]
+
+
+export const PrivateMatchEvidenceClassification = {
+  SKILL: 'SKILL',
+  PROJECT: 'PROJECT',
+  IMPACT: 'IMPACT',
+  EXPERIENCE: 'EXPERIENCE',
+  EDUCATION: 'EDUCATION',
+  OTHER: 'OTHER'
+} as const
+
+export type PrivateMatchEvidenceClassification = (typeof PrivateMatchEvidenceClassification)[keyof typeof PrivateMatchEvidenceClassification]
+
+
+export const ManualPriorityValue = {
+  HIGH: 'HIGH',
+  NORMAL: 'NORMAL',
+  LOW: 'LOW',
+  HOLD: 'HOLD'
+} as const
+
+export type ManualPriorityValue = (typeof ManualPriorityValue)[keyof typeof ManualPriorityValue]
+
+
+export const ScoringDecisionKind = {
+  MOVE_TO_INTERVIEW: 'MOVE_TO_INTERVIEW',
+  REJECT: 'REJECT'
+} as const
+
+export type ScoringDecisionKind = (typeof ScoringDecisionKind)[keyof typeof ScoringDecisionKind]
+
+
+export const ScoringNotificationStatus = {
+  NOT_REQUIRED: 'NOT_REQUIRED',
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  FAILED_RETRYING: 'FAILED_RETRYING'
+} as const
+
+export type ScoringNotificationStatus = (typeof ScoringNotificationStatus)[keyof typeof ScoringNotificationStatus]
 
 
 export const RecruitmentNotificationAudience = {
@@ -407,6 +838,31 @@ export const CompanyMembershipStatus = {
 } as const
 
 export type CompanyMembershipStatus = (typeof CompanyMembershipStatus)[keyof typeof CompanyMembershipStatus]
+
+
+export const CompanyInvitationState = {
+  PENDING: 'PENDING',
+  REVOKED: 'REVOKED',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type CompanyInvitationState = (typeof CompanyInvitationState)[keyof typeof CompanyInvitationState]
+
+
+export const CompanyTeamActivityKind = {
+  INVITED: 'INVITED',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED',
+  REVOKED: 'REVOKED',
+  ROLE_CHANGED: 'ROLE_CHANGED',
+  SUSPENDED: 'SUSPENDED',
+  RESTORED: 'RESTORED',
+  REMOVED: 'REMOVED'
+} as const
+
+export type CompanyTeamActivityKind = (typeof CompanyTeamActivityKind)[keyof typeof CompanyTeamActivityKind]
 
 
 export const ProfessionalConnectionStatus = {
@@ -529,6 +985,14 @@ export const CompanyVerificationState = {
 } as const
 
 export type CompanyVerificationState = (typeof CompanyVerificationState)[keyof typeof CompanyVerificationState]
+
+
+export const CompanyModerationState = {
+  ACTIVE: 'ACTIVE',
+  BANNED: 'BANNED'
+} as const
+
+export type CompanyModerationState = (typeof CompanyModerationState)[keyof typeof CompanyModerationState]
 
 
 export const RecruiterVerificationState = {
@@ -720,6 +1184,7 @@ export type ApplicationStageActorType = (typeof ApplicationStageActorType)[keyof
 
 export const CvDocumentKind = {
   PDF: 'PDF',
+  DOC: 'DOC',
   DOCX: 'DOCX'
 } as const
 

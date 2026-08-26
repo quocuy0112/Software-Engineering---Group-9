@@ -7,6 +7,11 @@
 
 ## Summary
 
+**Feature 024 synchronization (2026-08-19):** The verified-company membership
+model remains authoritative. An active Owner may now invite and manage
+HR_MANAGER/RECRUITER memberships through Feature 024; this does not change
+verification approval authority or account-suspension semantics.
+
 Extend the existing Feature 006 Platform Administrator console rather than
 create a second administration application. Group 1 enriches the existing
 account list with exact Candidate/Recruiter classification, registration-date

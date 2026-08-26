@@ -1,92 +1,108 @@
 .page {
+  --cv-bg: var(--sh-color-surface-page);
+  --cv-card: var(--sh-color-surface-card);
+  --cv-border: var(--sh-color-border-subtle);
+  --cv-ink: var(--sh-color-text-primary);
+  --cv-ink-soft: var(--sh-color-text-secondary);
+  --cv-ink-faint: var(--sh-color-text-muted);
+  --cv-accent: var(--sh-color-brand-primary);
+  --cv-accent-soft: var(--sh-color-brand-soft);
+  --cv-good: var(--sh-color-success);
+  --cv-good-soft: var(--sh-color-success-bg);
+  --cv-warn: var(--sh-color-warning);
+  --cv-warn-soft: var(--sh-color-warning-bg);
+  --cv-danger: var(--sh-color-error);
+  --cv-danger-soft: var(--sh-color-error-bg);
+
   width: 100%;
   min-width: 0;
 }
 
+.workspace {
+  display: grid;
+  width: min(100%, 1040px);
+  gap: 26px;
+  margin: 0 auto;
+  font-family: var(--sh-profile-font-body, "Be Vietnam Pro", sans-serif);
+}
+
 .header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--sh-space-8);
-  margin-bottom: var(--sh-space-6);
-  padding: var(--sh-space-6);
-  border: 1px solid var(--sh-color-border-subtle);
-  border-radius: var(--sh-radius-lg);
-  background:
-    linear-gradient(115deg, var(--sh-color-surface-card) 58%, transparent),
-    var(--sh-color-info-bg);
-  box-shadow: var(--sh-shadow-card);
+  margin: 0;
 }
 
 .backLink {
   display: inline-flex;
-  min-height: 44px;
   align-items: center;
-  gap: var(--sh-space-2);
-  margin-bottom: var(--sh-space-3);
-  color: var(--sh-color-brand-primary);
-  font-size: var(--sh-font-size-body-sm);
-  font-weight: var(--sh-font-weight-semibold);
+  gap: 6px;
+  margin-bottom: 16px;
+  color: var(--cv-accent);
+  font-size: 12.5px;
+  font-weight: 700;
   text-decoration: none;
+  transition: opacity 150ms ease;
 }
 
 .backLink:hover {
-  color: var(--sh-color-brand-primary-hover);
-  text-decoration: underline;
+  opacity: 0.82;
+  text-decoration: none;
 }
 
-.kicker {
-  margin: 0;
-  color: var(--sh-color-brand-primary);
-  font-size: var(--sh-font-size-caption);
-  font-weight: var(--sh-font-weight-bold);
-  line-height: var(--sh-line-height-caption);
-  letter-spacing: 0.11em;
+.pageHeader {
+  margin-bottom: 0;
 }
 
-.header h1 {
-  margin: var(--sh-space-2) 0 0;
-  font-size: var(--sh-font-size-h1);
-  line-height: var(--sh-line-height-h1);
-  letter-spacing: -0.025em;
+.pageHeader h1 {
+  margin-bottom: 5px;
+  color: var(--cv-ink);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
 }
 
-.lede {
-  max-width: 680px;
-  margin: var(--sh-space-3) 0 0;
-  color: var(--sh-color-text-secondary);
-  font-size: var(--sh-font-size-body-sm);
-  line-height: var(--sh-line-height-body-sm);
+.pageHeader p[class*="subtitle"] {
+  max-width: 540px;
+  color: var(--cv-ink-soft);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.pageHeader p[class*="eyebrow"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  color: var(--cv-accent);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .privacyBadge {
   display: inline-flex;
-  min-height: 32px;
   flex: 0 0 auto;
   align-items: center;
-  padding: 0 var(--sh-space-3);
-  border: 1px solid var(--sh-color-success);
-  border-radius: var(--sh-radius-full);
-  color: var(--sh-color-success);
-  background: var(--sh-color-success-bg);
-  font-size: var(--sh-font-size-caption);
-  font-weight: var(--sh-font-weight-semibold);
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid color-mix(in srgb, var(--cv-good) 44%, var(--cv-border));
+  border-radius: 20px;
+  color: var(--cv-good);
+  background: var(--cv-good-soft);
+  font-size: 11.5px;
+  font-weight: 700;
   white-space: nowrap;
 }
 
 .content {
   display: grid;
-  gap: var(--sh-space-5);
-  width: min(100%, 880px);
-  margin-inline: auto;
+  gap: 24px;
+  width: 100%;
 }
 
 @media (max-width: 40rem) {
-  .header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: var(--sh-space-4);
-    padding: var(--sh-space-5);
+  .pageHeader h1 {
+    font-size: 22px;
   }
 }
 

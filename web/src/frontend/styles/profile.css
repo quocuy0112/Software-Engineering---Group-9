@@ -1,51 +1,70 @@
 /* Profile, security, and sessions */
 .profile-navigation {
   display: flex;
-  gap: var(--sh-space-2);
+  align-items: center;
+  gap: var(--sh-space-4);
   margin: 0 0 var(--sh-space-6);
-  padding: var(--sh-space-1);
-  overflow-x: auto;
-  border: 1px solid var(--sh-color-border-subtle);
-  border-radius: var(--sh-radius-md);
-  background: var(--sh-color-surface-card);
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.profile-navigation .sh-topbar__tabs {
+  padding: 4px;
+  border: 1px solid var(--sh-profile-border);
+  border-radius: 999px;
+  background: var(--sh-profile-surface-alt);
   box-shadow: var(--sh-shadow-control);
 }
 
 .profile-navigation a {
   position: relative;
   display: inline-flex;
-  min-height: 48px;
+  min-height: 38px;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  padding: 0 var(--sh-space-4);
-  border-radius: var(--sh-radius-sm);
-  color: var(--sh-color-text-secondary);
-  font-size: var(--sh-font-size-body-sm);
-  font-weight: var(--sh-font-weight-medium);
+  padding: 8px 18px;
+  border-radius: 999px;
+  color: var(--text-muted, var(--sh-color-text-secondary));
+  font-size: 13.5px;
+  font-weight: 500;
   text-decoration: none;
+  transition: all 0.15s ease;
 }
 
 .profile-navigation a:hover {
-  color: var(--sh-color-brand-primary);
-  background: var(--sh-color-info-bg);
+  color: var(--text, var(--sh-color-text-primary));
+  background: color-mix(in srgb, var(--sh-profile-surface) 60%, transparent);
 }
 
 .profile-navigation a[aria-current="page"] {
-  color: var(--sh-color-brand-primary);
-  background: var(--sh-color-brand-soft);
-  font-weight: var(--sh-font-weight-semibold);
+  color: var(--primary, var(--sh-color-brand-primary));
+  background: var(--sh-profile-surface);
+  font-weight: 600;
+  box-shadow: var(--sh-shadow-control);
 }
 
-.profile-navigation a[aria-current="page"]::after {
-  position: absolute;
-  right: var(--sh-space-4);
-  bottom: 3px;
-  left: var(--sh-space-4);
-  height: 2px;
-  border-radius: var(--sh-radius-full);
-  background: var(--sh-color-brand-primary);
-  content: "";
+.profile-navigation__brand-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--sh-profile-primary);
+}
+
+/* Profile and account pages share one centred reading column. The segmented
+   navigation intentionally hugs its items rather than filling unused space. */
+.profile-page:not(.candidate-profile-page) {
+  width: min(1040px, 100%);
+  margin-inline: auto;
+}
+
+.profile-navigation .sh-topbar__tabs {
+  flex: 0 1 auto;
+  max-width: 100%;
 }
 
 @media (max-width: 479px) {
@@ -53,6 +72,10 @@
     gap: var(--sh-space-1);
     overflow-x: auto;
     scrollbar-width: thin;
+  }
+
+  .profile-navigation .sh-topbar__tabs {
+    min-width: max-content;
   }
 
   .profile-navigation a {
@@ -91,12 +114,13 @@
 }
 
 .profile-avatar-copy h2 {
-  margin: var(--sh-space-2) 0 var(--sh-space-3);
-  font-size: var(--sh-font-size-h2);
-  font-weight: var(--sh-font-weight-bold);
-  line-height: var(--sh-line-height-h2);
-  letter-spacing: -0.02em;
-  text-wrap: balance;
+  margin: 6px 0 var(--sh-space-3);
+  color: var(--sh-profile-text);
+  font-family: var(--sh-profile-font-body);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0;
 }
 
 .profile-avatar-copy > p:last-child {
@@ -141,6 +165,12 @@
   letter-spacing: -0.04em;
 }
 
+.profile-avatar-preview-wrap {
+  position: relative;
+  width: 176px;
+  aspect-ratio: 1;
+}
+
 .profile-avatar-preview img {
   width: 100%;
   height: 100%;
@@ -169,6 +199,7 @@
   min-height: var(--sh-control-height);
   align-items: center;
   justify-content: center;
+  gap: var(--sh-space-2);
   grid-column: 1 / -1;
   padding: 0 var(--sh-space-4);
   border: 1px dashed var(--sh-color-brand-primary);
@@ -178,6 +209,39 @@
   font-size: var(--sh-font-size-button);
   font-weight: var(--sh-font-weight-semibold);
   cursor: pointer;
+}
+
+.profile-avatar-file-label svg {
+  width: 17px;
+  height: 17px;
+}
+
+.profile-avatar-camera {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-full);
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-control);
+  cursor: pointer;
+}
+
+.profile-avatar-camera:hover,
+.profile-avatar-camera:focus-visible {
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+}
+
+.profile-avatar-camera svg {
+  width: 16px;
+  height: 16px;
 }
 
 .profile-avatar-file:focus-visible + .profile-avatar-file-label,
@@ -208,6 +272,19 @@
   color: var(--sh-color-text-muted);
   font-size: var(--sh-font-size-caption);
   line-height: var(--sh-line-height-caption);
+}
+
+.profile-avatar-help {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.profile-avatar-help svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  margin-top: 1px;
 }
 
 .profile-avatar-feedback p {
@@ -258,6 +335,41 @@
   gap: var(--sh-space-4);
   padding-bottom: var(--sh-space-3);
   border-bottom: 1px solid var(--sh-color-border-subtle);
+}
+
+/* Keep every account label/value on the same visual columns. The shared
+   InfoRow still works as a flex row elsewhere; only account details use this
+   three-column layout so the icon, label, and value stay aligned. */
+.profile-account-details > .sh-info-row {
+  display: grid;
+  grid-template-columns: 40px minmax(120px, 0.85fr) minmax(0, 1.15fr);
+  align-items: center;
+  column-gap: var(--sh-space-3);
+  min-height: 58px;
+  padding: var(--sh-space-2) 0;
+}
+
+.profile-account-details > .sh-info-row .sh-info-row__icon {
+  display: inline-grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+}
+
+.profile-account-details > .sh-info-row .sh-info-row__label {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.profile-account-details > .sh-info-row .sh-info-row__value {
+  justify-self: stretch;
+  max-width: none;
+  min-width: 0;
+}
+
+.profile-account-details > .sh-info-row .profile-account-id-value {
+  min-width: 0;
+  width: 100%;
 }
 
 .profile-account-details dt {
@@ -422,9 +534,13 @@
 }
 
 .security-panel-heading h2 {
-  margin: var(--sh-space-1) 0 0;
-  font-size: var(--sh-font-size-h3);
-  line-height: var(--sh-line-height-h3);
+  margin: 6px 0 0;
+  color: var(--sh-profile-text);
+  font-family: var(--sh-profile-font-body);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0;
 }
 
 .security-panel-icon--success {
@@ -536,6 +652,29 @@
   font-size: var(--sh-font-size-body-sm);
   line-height: var(--sh-line-height-body-sm);
   text-align: right;
+}
+
+.sessions-panel-heading .panel-kicker,
+.security-panel-heading .panel-kicker,
+.profile-avatar-copy .panel-kicker {
+  margin: 0;
+  color: var(--sh-profile-primary);
+  font-family: var(--sh-profile-font-label);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.sessions-panel-heading h2 {
+  margin: 6px 0 0;
+  color: var(--sh-profile-text);
+  font-family: var(--sh-profile-font-body);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0;
 }
 
 .session-list {
@@ -692,5 +831,834 @@
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+}
+
+/* Security cards follow the same calm, saved-state pattern as profile and
+   account preferences while keeping sensitive actions explicit. */
+.security-grid {
+  align-items: start;
+}
+
+.security-grid > .security-panel,
+.security-grid > .security-recovery-notice {
+  min-width: 0;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-md);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--sh-color-brand-soft) 18%, transparent),
+      transparent 170px
+    ),
+    var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-card);
+}
+
+.security-grid .security-panel-heading {
+  margin-bottom: var(--sh-space-5);
+}
+
+.security-readonly-summary {
+  display: grid;
+  gap: var(--sh-space-4);
+}
+
+.security-readonly-status {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr);
+  gap: var(--sh-space-3);
+  align-items: start;
+  padding: var(--sh-space-4);
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--sh-color-success) 24%,
+      var(--sh-color-border-subtle)
+    );
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-color-success-bg);
+}
+
+.security-status-dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 0.3rem;
+  border-radius: var(--sh-radius-full);
+  background: var(--sh-color-success);
+  box-shadow: 0 0 0 4px
+    color-mix(in srgb, var(--sh-color-success) 14%, transparent);
+}
+
+.security-readonly-status strong {
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-body-sm);
+}
+
+.security-readonly-status p {
+  margin: var(--sh-space-1) 0 0;
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-body-sm);
+  line-height: var(--sh-line-height-body-sm);
+}
+
+.security-readonly-summary .profile-section-edit-button {
+  width: fit-content;
+}
+
+.security-cancel-button {
+  width: fit-content;
+  margin-top: calc(-1 * var(--sh-space-2));
+}
+
+@media (max-width: 640px) {
+  .security-readonly-summary .profile-section-edit-button,
+  .security-cancel-button {
+    width: 100%;
+  }
+}
+
+/* Candidate security workspace -------------------------------------------
+ * Both sensitive tasks use the same calm card shell, with the dangerous
+ * action deliberately secondary to the recommended security action. */
+.profile-page--standalone .security-grid {
+  gap: 24px;
+}
+
+.profile-page--standalone .security-grid > .security-panel {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  padding: 28px;
+  border-radius: 18px;
+  background: var(--sh-color-surface-card);
+  box-shadow:
+    0 1px 3px rgb(15 23 42 / 5%),
+    0 1px 2px rgb(15 23 42 / 3%);
+  font-family: var(--sh-font-family);
+}
+
+.profile-page--standalone .security-panel-heading {
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+  padding-bottom: 18px;
+}
+
+.profile-page--standalone .security-panel-heading h2 {
+  margin-top: 3px;
+  font-family: var(--sh-font-family);
+  font-size: 22px;
+  font-weight: var(--sh-font-weight-bold);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.profile-page--standalone .security-panel-heading .panel-kicker {
+  color: var(--sh-color-brand-primary);
+  font-family: var(--sh-font-family);
+  font-size: 11px;
+  font-weight: var(--sh-font-weight-bold);
+  letter-spacing: 0.1em;
+}
+
+.profile-page--standalone .security-panel-icon {
+  width: 44px;
+  height: 44px;
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--sh-color-brand-primary) 13%,
+      var(--sh-color-border-subtle)
+    );
+  border-radius: 13px;
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+}
+
+.profile-page--standalone .security-panel-icon--success {
+  color: var(--sh-color-success);
+  background: var(--sh-color-success-bg);
+}
+
+.profile-page--standalone .security-warning-callout,
+.profile-page--standalone .security-password-protected {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 11px;
+  margin: 0 0 22px;
+  padding: 14px 16px;
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--sh-color-warning) 28%,
+      var(--sh-color-border-subtle)
+    );
+  border-radius: 13px;
+  color: color-mix(
+    in srgb,
+    var(--sh-color-warning) 76%,
+    var(--sh-color-text-primary)
+  );
+  background: var(--sh-color-warning-bg);
+  font-family: var(--sh-font-family);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.profile-page--standalone .security-warning-callout svg {
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  color: var(--sh-color-warning);
+}
+
+.profile-page--standalone .security-password-protected {
+  grid-template-columns: 12px minmax(0, 1fr);
+  align-items: start;
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-success) 24%,
+    var(--sh-color-border-subtle)
+  );
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-success-bg);
+}
+
+.profile-page--standalone .security-password-protected .security-status-dot {
+  margin-top: 4px;
+}
+
+.profile-page--standalone .security-password-protected strong {
+  display: block;
+  font-size: 15px;
+  font-weight: var(--sh-font-weight-bold);
+}
+
+.profile-page--standalone .security-password-protected p {
+  margin: 4px 0 0;
+  color: var(--sh-color-text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.profile-page--standalone .security-panel-copy:not(.security-warning-callout) {
+  margin: -10px 0 18px;
+  color: var(--sh-color-text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.profile-page--standalone .security-management-fields,
+.profile-page--standalone .password-change-form {
+  gap: 16px;
+}
+
+.profile-page--standalone .security-panel .field {
+  gap: 7px;
+}
+
+.profile-page--standalone .security-panel .field > label,
+.profile-page--standalone .security-field-label label {
+  color: var(--sh-color-text-primary);
+  font-family: var(--sh-font-family);
+  font-size: 14px;
+  font-weight: var(--sh-font-weight-semibold);
+}
+
+.profile-page--standalone .security-panel .field input {
+  min-height: 48px;
+  border-radius: 12px;
+  background: var(--sh-color-surface-subtle);
+  font-family: var(--sh-font-family);
+  font-size: 14px;
+}
+
+.profile-page--standalone .security-field-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.profile-page--standalone .security-field-label span {
+  color: var(--sh-color-text-muted);
+  font-size: 12px;
+}
+
+.profile-page--standalone .security-totp-input {
+  position: relative;
+}
+
+.profile-page--standalone .security-totp-input input {
+  width: 100%;
+  padding-right: 44px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.25em;
+}
+
+.profile-page--standalone .security-totp-input svg {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  color: var(--sh-color-text-muted);
+  pointer-events: none;
+}
+
+.profile-page--standalone .security-actions {
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.profile-page--standalone .security-primary-action,
+.profile-page--standalone .security-danger-action {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  padding: 0 18px;
+  border-radius: 12px;
+  font-family: var(--sh-font-family);
+  font-size: 14px;
+  font-weight: var(--sh-font-weight-semibold);
+}
+
+.profile-page--standalone .security-primary-action {
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-brand-primary);
+  box-shadow: 0 6px 20px -3px rgb(26 86 219 / 35%);
+}
+
+.profile-page--standalone .security-primary-action:hover:not(:disabled) {
+  border-color: var(--sh-color-brand-primary-hover);
+  background: var(--sh-color-brand-primary-hover);
+}
+
+.profile-page--standalone .security-primary-action svg,
+.profile-page--standalone .security-danger-action svg {
+  width: 18px;
+  height: 18px;
+}
+
+.profile-page--standalone .security-danger-action {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-error) 28%,
+    var(--sh-color-border-subtle)
+  );
+  color: var(--sh-color-error);
+  background: color-mix(in srgb, var(--sh-color-error-bg) 54%, #fff);
+}
+
+.profile-page--standalone .security-danger-action:hover:not(:disabled) {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-error) 50%,
+    var(--sh-color-border-subtle)
+  );
+  background: var(--sh-color-error-bg);
+}
+
+.profile-page--standalone .security-cancel-button {
+  align-self: flex-start;
+  margin-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .profile-page--standalone .security-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .profile-page--standalone .security-grid > .security-panel {
+    padding: 22px 18px;
+  }
+
+  .profile-page--standalone .security-panel-heading h2 {
+    font-size: 20px;
+  }
+}
+
+/* Reference-level refinement for the candidate Security screen. */
+.profile-page--standalone .security-grid {
+  align-items: stretch;
+  gap: 28px;
+}
+
+.profile-page--standalone .security-grid > .security-panel {
+  min-height: 100%;
+  padding: 30px;
+  border-color: #e5e8f2;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 4%);
+}
+
+.profile-page--standalone .security-panel-heading {
+  gap: 16px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+}
+
+.profile-page--standalone .security-panel-heading h2 {
+  margin-top: 4px;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.profile-page--standalone .security-panel-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+}
+
+.profile-page--standalone .security-warning-callout,
+.profile-page--standalone .security-password-protected {
+  min-height: 74px;
+  margin-bottom: 26px;
+  padding: 16px 18px;
+  border-radius: 14px;
+}
+
+.profile-page--standalone .security-warning-callout {
+  grid-template-columns: 20px minmax(0, 1fr);
+  color: #825b12;
+  background: #fff9e8;
+}
+
+.profile-page--standalone .security-warning-callout svg {
+  width: 20px;
+  height: 20px;
+  color: var(--sh-color-warning);
+}
+
+.profile-page--standalone .security-password-protected {
+  grid-template-columns: 14px minmax(0, 1fr);
+  background: #effbf6;
+}
+
+.profile-page--standalone .security-password-protected strong {
+  font-size: 16px;
+}
+
+.profile-page--standalone .security-password-protected p {
+  font-size: 14px;
+}
+
+/* The password rule remains associated with fields for assistive technology,
+   while the protected-state callout is the visible guidance in this compact
+   layout. */
+.profile-page--standalone .security-password-policy {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.profile-page--standalone .security-management-fields,
+.profile-page--standalone .password-change-form {
+  gap: 18px;
+}
+
+.profile-page--standalone .security-panel .field {
+  gap: 9px;
+}
+
+.profile-page--standalone .security-panel .field > label,
+.profile-page--standalone .security-field-label label {
+  font-size: 15px;
+}
+
+.profile-page--standalone .security-panel .field input {
+  min-height: 62px;
+  padding-inline: 20px 48px;
+  border-color: #e5e8f2;
+  border-radius: 13px;
+  background: #fafbff;
+  font-size: 15px;
+}
+
+.profile-page--standalone .security-totp-input input {
+  padding-right: 48px;
+}
+
+.profile-page--standalone .security-field-label span {
+  font-size: 13px;
+}
+
+.profile-page--standalone .security-actions {
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.profile-page--standalone .security-primary-action,
+.profile-page--standalone .security-danger-action {
+  min-height: 62px;
+  border-radius: 13px;
+  font-size: 16px;
+}
+
+.profile-page--standalone .security-primary-action {
+  box-shadow: 0 8px 22px -4px rgb(26 86 219 / 32%);
+}
+
+.profile-page--standalone .security-danger-action {
+  background: #fffdfd;
+}
+
+.profile-page--standalone .password-change-feedback:not(:empty) {
+  margin-bottom: 18px;
+}
+
+@media (max-width: 900px) {
+  .profile-page--standalone .security-grid {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 560px) {
+  .profile-page--standalone .security-grid > .security-panel {
+    padding: 22px 18px;
+  }
+
+  .profile-page--standalone .security-panel .field input,
+  .profile-page--standalone .security-primary-action,
+  .profile-page--standalone .security-danger-action {
+    min-height: 52px;
+  }
+}
+
+/* Keep candidate Security at the compact proportions used by the shared
+   workspace cards. These values intentionally mirror the supplied component:
+   p-7 cards, w-10 icons, text-lg titles and py-2.5 form controls. */
+.profile-page--standalone .security-grid {
+  align-items: start;
+  gap: 24px;
+}
+
+.profile-page--standalone .security-grid > .security-panel {
+  min-height: 0;
+  padding: 28px;
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-border-subtle) 90%,
+    transparent
+  );
+  border-radius: 16px;
+}
+
+.profile-page--standalone .security-panel-heading {
+  gap: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+}
+
+.profile-page--standalone .security-panel-heading h2 {
+  margin-top: 3px;
+  font-size: 18px;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+
+.profile-page--standalone .security-panel-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+.profile-page--standalone .security-warning-callout,
+.profile-page--standalone .security-password-protected {
+  min-height: 0;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.profile-page--standalone .security-warning-callout {
+  grid-template-columns: 16px minmax(0, 1fr);
+}
+
+.profile-page--standalone .security-warning-callout svg {
+  width: 16px;
+  height: 16px;
+}
+
+.profile-page--standalone .security-password-protected {
+  grid-template-columns: 12px minmax(0, 1fr);
+}
+
+.profile-page--standalone .security-password-protected strong {
+  font-size: 14px;
+}
+
+.profile-page--standalone .security-password-protected p {
+  font-size: 12px;
+}
+
+.profile-page--standalone .security-management-fields,
+.profile-page--standalone .password-change-form {
+  gap: 16px;
+}
+
+.profile-page--standalone .security-panel .field {
+  gap: 6px;
+}
+
+.profile-page--standalone .security-panel .field > label,
+.profile-page--standalone .security-field-label label {
+  font-size: 14px;
+}
+
+.profile-page--standalone .security-panel .field input {
+  min-height: 42px;
+  padding: 10px 40px 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.profile-page--standalone .security-field-label span {
+  font-size: 11px;
+}
+
+.profile-page--standalone .security-actions {
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.profile-page--standalone .security-primary-action,
+.profile-page--standalone .security-danger-action {
+  min-height: 42px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.profile-page--standalone .security-primary-action svg,
+.profile-page--standalone .security-danger-action svg {
+  width: 16px;
+  height: 16px;
+}
+
+.profile-page--standalone .password-change-current-password-form {
+  display: grid;
+  gap: 16px;
+}
+
+.profile-page--standalone
+  .sh-modal:has(.password-change-current-password-form)
+  .field {
+  gap: 8px;
+}
+
+@media (max-width: 560px) {
+  .profile-page--standalone .security-grid > .security-panel {
+    padding: 24px 20px;
+  }
+
+  .profile-page--standalone .security-panel .field input,
+  .profile-page--standalone .security-primary-action,
+  .profile-page--standalone .security-danger-action {
+    min-height: 42px;
+  }
+}
+
+/* Candidate Security must follow the workspace theme all the way down to
+ * its reference-level refinements. Those refinements intentionally tune the
+ * compact layout, but their original light-only surface values leaked into
+ * dark mode. */
+:root[data-theme="dark"] .profile-page--standalone .security-grid > .security-panel {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-card);
+}
+
+:root[data-theme="dark"] .profile-page--standalone .security-warning-callout {
+  color: var(--sh-color-warning);
+  background: var(--sh-color-warning-bg);
+}
+
+:root[data-theme="dark"] .profile-page--standalone .security-password-protected {
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-success-bg);
+}
+
+:root[data-theme="dark"] .profile-page--standalone .security-panel .field input {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] .profile-page--standalone .security-danger-action {
+  background: color-mix(
+    in srgb,
+    var(--sh-color-error-bg) 72%,
+    var(--sh-color-surface-card)
+  );
+}
+
+/* Keep every security label and helper readable after the compact reference
+ * refinements above. PasswordField uses shared .field/.password-field-label
+ * primitives, so the standalone scope is intentional and does not alter auth
+ * forms outside Profile > Security. */
+:root[data-theme="dark"] .profile-page--standalone .security-panel,
+:root[data-theme="dark"] .profile-page--standalone .security-panel h2,
+:root[data-theme="dark"] .profile-page--standalone .security-panel label,
+:root[data-theme="dark"] .profile-page--standalone .security-field-label label,
+:root[data-theme="dark"] .profile-page--standalone .password-field-label label {
+  color: var(--sh-color-text-primary);
+}
+
+:root[data-theme="dark"] .profile-page--standalone .security-panel .panel-kicker {
+  color: var(--sh-color-brand-accent);
+}
+
+:root[data-theme="dark"] .profile-page--standalone .security-field-label span,
+:root[data-theme="dark"] .profile-page--standalone .password-field-hint,
+:root[data-theme="dark"] .profile-page--standalone .security-panel-copy,
+:root[data-theme="dark"] .profile-page--standalone .password-change-form .field > p {
+  color: var(--sh-color-text-muted);
+}
+
+:root[data-theme="dark"] .profile-page--standalone .security-panel input,
+:root[data-theme="dark"] .profile-page--standalone .security-panel textarea {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-text-primary);
+  caret-color: var(--sh-color-brand-accent);
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] .profile-page--standalone .password-field-hint-tooltip {
+  color: var(--sh-color-text-primary);
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-card);
+}
+
+/* Final security typography pass. PasswordField is shared with auth, so keep
+ * this normalization scoped to Profile > Security. It prevents the modal
+ * current-password label and the inline new-password/TOTP labels from
+ * drifting to different sizes after the reference refinements above. */
+.profile-page--standalone .security-panel .password-field-label,
+.profile-page--standalone .security-panel .security-field-label {
+  min-width: 0;
+  font-family: var(--sh-font-family);
+}
+
+.profile-page--standalone .security-panel .password-field-label label,
+.profile-page--standalone .security-panel .security-field-label label,
+.profile-page--standalone .security-panel .field > label {
+  color: var(--sh-color-text-primary);
+  font-family: var(--sh-font-family);
+  font-size: 14px !important;
+  font-weight: var(--sh-font-weight-semibold);
+  line-height: 1.4;
+}
+
+.profile-page--standalone .password-requirement-checklist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.profile-page--standalone .password-requirement-checklist li {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-full);
+  color: var(--sh-color-text-muted);
+  background: var(--sh-color-surface-subtle);
+  font-family: var(--sh-font-family);
+  font-size: 11.5px;
+  font-weight: var(--sh-font-weight-semibold);
+  line-height: 1.25;
+}
+
+.profile-page--standalone .password-requirement-checklist li[data-met="true"] {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-success) 24%,
+    var(--sh-color-border-subtle)
+  );
+  color: var(--sh-color-success);
+  background: var(--sh-color-success-bg);
+}
+
+:root[data-theme="dark"] .profile-page--standalone .password-requirement-checklist li {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-text-muted);
+  background: var(--sh-color-surface-subtle);
+}
+
+:root[data-theme="dark"] .profile-page--standalone .password-requirement-checklist li[data-met="true"] {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-success) 34%,
+    var(--sh-color-border-subtle)
+  );
+  color: var(--sh-color-success);
+  background: var(--sh-color-success-bg);
+}
+/* Security separates profile-discovery privacy from account credentials.
+   The split mirrors the two independent responsibilities while retaining the
+   existing controls and their save behavior. */
+.profile-page--standalone .profile-security-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 24px;
+}
+
+.profile-security-layout__privacy,
+.profile-security-layout__account {
+  min-width: 0;
+}
+
+.profile-security-layout__privacy .profile-visibility {
+  margin: 0;
+}
+
+.profile-page--standalone .profile-visibility .workspace-kicker {
+  color: var(--sh-color-brand-primary);
+  font-family: var(--sh-font-family);
+  font-size: 11px;
+  font-weight: var(--sh-font-weight-bold);
+  letter-spacing: 0.1em;
+}
+
+.profile-page--standalone .profile-visibility .profile-compact-header h2 {
+  margin: 3px 0 0;
+  font-family: var(--sh-font-family);
+  font-size: 18px;
+  font-weight: var(--sh-font-weight-bold);
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+
+.profile-security-layout__account .security-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 980px) {
+  .profile-page--standalone .profile-security-layout {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

@@ -32,7 +32,8 @@ function evidenceSafetyState(item: {
     item.previewStatus,
   ];
   if (values.some((value) => value === "FAIL")) return "FAIL" as const;
-  if (values.some((value) => value === "INDETERMINATE")) return "ERROR" as const;
+  if (values.some((value) => value === "INDETERMINATE"))
+    return "ERROR" as const;
   if (values.every((value) => value === "PASS")) return "PASS" as const;
   return "PENDING" as const;
 }
@@ -47,6 +48,23 @@ function evidenceAccessibility(item: {
   if (item.contentInaccessibleAt || item.supersededAt || !item.qualified)
     return "INACCESSIBLE" as const;
   return "AVAILABLE" as const;
+}
+
+function evidenceUnavailabilityReason(input: {
+  contentInaccessibleAt: Date | null;
+  deletedAt: Date | null;
+  supersededAt: Date | null;
+  isCurrentSubmission: boolean;
+  safetyState: "PENDING" | "PASS" | "FAIL" | "ERROR";
+  targetCompanyIsActive: boolean;
+}) {
+  if (input.deletedAt) return "DELETED" as const;
+  if (input.contentInaccessibleAt) return "CONTENT_RESTRICTED" as const;
+  if (input.supersededAt) return "SUPERSEDED" as const;
+  if (!input.isCurrentSubmission) return "NOT_CURRENT_SUBMISSION" as const;
+  if (input.safetyState !== "PASS") return "SAFETY_CHECK_INCOMPLETE" as const;
+  if (!input.targetCompanyIsActive) return "TARGET_COMPANY_INACTIVE" as const;
+  return null;
 }
 
 function evidenceFileName(mediaType: string, version: number) {
@@ -72,8 +90,42 @@ export class PrismaVerificationRepository {
       pageSize: input.pageSize,
     });
     const taxCode = filter.taxCode ?? filter.taxIdentifier;
+    const nameTokens =
+      filter.q?.split(/\s+/u).filter(Boolean).slice(0, 8) ?? [];
     const where: Prisma.RecruiterVerificationRequestWhereInput = {
-      state: filter.state,
+      ...(filter.q
+        ? {
+            OR: [
+              { id: filter.q },
+              { applicantUserId: filter.q },
+              { targetCompanyId: filter.q },
+              { normalizedTaxIdentifier: filter.q },
+              ...(nameTokens.length
+                ? [
+                    {
+                      AND: nameTokens.map((token) => ({
+                        submittedCompanyName: {
+                          contains: token,
+                          mode: "insensitive" as const,
+                        },
+                      })),
+                    },
+                    {
+                      AND: nameTokens.map((token) => ({
+                        applicant: {
+                          name: {
+                            contains: token,
+                            mode: "insensitive" as const,
+                          },
+                        },
+                      })),
+                    },
+                  ]
+                : []),
+            ],
+          }
+        : {}),
+      ...(filter.state ? { state: filter.state } : {}),
       applicant: {
         state:
           filter.applicantEligibility === "ACTIVE_ONLY"
@@ -89,6 +141,9 @@ export class PrismaVerificationRepository {
               mode: "insensitive",
             },
           }
+        : {}),
+      ...(filter.targetCompanyId
+        ? { targetCompanyId: filter.targetCompanyId }
         : {}),
       ...(taxCode ? { normalizedTaxIdentifier: taxCode } : {}),
       ...(filter.applicantId ? { applicantUserId: filter.applicantId } : {}),
@@ -126,11 +181,18 @@ export class PrismaVerificationRepository {
         applicantId: row.applicantUserId,
         companyName: row.submittedCompanyName,
         taxCode: row.normalizedTaxIdentifier,
+        targetCompanyId: row.targetCompanyId,
         state: row.state,
         applicantEligibility: row.applicant.state,
         submittedAt: row.createdAt.toISOString(),
         resubmissionCount: row.resubmissionCount,
         assignedAdminRef: row.assignedAdminUserId,
+        assignmentStatus:
+          row.assignedAdminUserId === null
+            ? "UNASSIGNED"
+            : row.assignedAdminUserId === input.adminUserId
+              ? "MINE"
+              : "ASSIGNED_TO_OTHER",
         version: row.version,
       })),
       page: filter.page,
@@ -140,7 +202,7 @@ export class PrismaVerificationRepository {
     });
   }
 
-  async reviewDetail(id: string) {
+  async reviewDetail(id: string, adminUserId: string) {
     const now = new Date();
     const row = await prisma.recruiterVerificationRequest.findUnique({
       where: { id },
@@ -167,11 +229,19 @@ export class PrismaVerificationRepository {
     );
     const metadata = row.evidence.map((item) => {
       const safetyState = evidenceSafetyState(item);
-      const qualified =
-        item.id === row.currentEvidenceId &&
-        item.submissionVersion === row.currentSubmissionVersion &&
-        safetyState === "PASS" &&
-        (!row.targetCompany || row.targetCompany.verificationState === "ACTIVE");
+      const unavailabilityReason = evidenceUnavailabilityReason({
+        contentInaccessibleAt: item.contentInaccessibleAt,
+        deletedAt: item.deletedAt,
+        supersededAt: item.supersededAt,
+        isCurrentSubmission:
+          item.id === row.currentEvidenceId &&
+          item.submissionVersion === row.currentSubmissionVersion,
+        safetyState,
+        targetCompanyIsActive:
+          !row.targetCompany ||
+          row.targetCompany.verificationState === "ACTIVE",
+      });
+      const qualified = unavailabilityReason === null;
       return {
         id: item.id,
         version: item.submissionVersion,
@@ -188,53 +258,70 @@ export class PrismaVerificationRepository {
           supersededAt: item.supersededAt,
           qualified,
         }),
+        unavailabilityReason,
       };
     });
-    const current = metadata.find((item) => item.id === currentEvidence?.id) ?? null;
-    const applicantActive = row.applicant.state === "ACTIVE" && !row.applicant.deletedAt;
+    const current =
+      metadata.find((item) => item.id === currentEvidence?.id) ?? null;
+    const applicantActive =
+      row.applicant.state === "ACTIVE" && !row.applicant.deletedAt;
     const prerequisiteAvailable =
       !row.targetCompanyId ||
       (prerequisite?.state === "AVAILABLE" &&
         (!prerequisite.expiresAt || prerequisite.expiresAt > now));
     const evidenceAvailable = current?.accessibility === "AVAILABLE";
-    const canDecide =
+    const assignmentStatus =
+      row.assignedAdminUserId === null
+        ? "UNASSIGNED"
+        : row.assignedAdminUserId === adminUserId
+          ? "MINE"
+          : "ASSIGNED_TO_OTHER";
+    const workflowEligible =
       row.state === "PENDING_REVIEW" &&
       applicantActive &&
       Boolean(evidenceAvailable) &&
       prerequisiteAvailable &&
       (!row.submissionIdempotencyKey || Boolean(row.businessFacts));
+    const canDecide = workflowEligible && assignmentStatus === "MINE";
     const blockReason = canDecide
       ? null
-      : !applicantActive
-        ? "APPLICANT_SUSPENDED"
-        : row.state !== "PENDING_REVIEW"
-          ? "INVALID_STATE"
-          : !evidenceAvailable
-            ? "EVIDENCE_UNAVAILABLE"
-            : !prerequisiteAvailable
-              ? "RELATIONSHIP_REQUIRED"
-              : "ENRICHED_FACTS_REQUIRED";
+      : row.state !== "PENDING_REVIEW"
+        ? "INVALID_STATE"
+        : assignmentStatus === "UNASSIGNED"
+          ? "CLAIM_REQUIRED"
+          : assignmentStatus === "ASSIGNED_TO_OTHER"
+            ? "ASSIGNED_TO_OTHER"
+            : !applicantActive
+              ? "APPLICANT_SUSPENDED"
+              : !evidenceAvailable
+                ? "EVIDENCE_UNAVAILABLE"
+                : !prerequisiteAvailable
+                  ? "RELATIONSHIP_REQUIRED"
+                  : "ENRICHED_FACTS_REQUIRED";
     const request = {
       id: row.id,
       applicantId: row.applicantUserId,
       companyName: row.submittedCompanyName,
       taxCode: row.normalizedTaxIdentifier,
+      targetCompanyId: row.targetCompanyId,
       state: row.state,
       applicantEligibility:
         row.applicant.state === "ACTIVE" ? "ACTIVE" : "SUSPENDED",
       submittedAt: row.createdAt.toISOString(),
       resubmissionCount: row.resubmissionCount,
       assignedAdminRef: row.assignedAdminUserId,
+      assignmentStatus,
       version: row.version,
     };
     return verificationReviewDetailSchema.parse({
       request,
       company: {
+        id: row.targetCompanyId,
         name: row.submittedCompanyName,
         taxCode: row.normalizedTaxIdentifier,
         targetKind: row.targetCompanyId ? "EXISTING_COMPANY" : "NEW_COMPANY",
         prerequisiteState: row.targetCompanyId
-          ? prerequisite?.state ?? "UNAVAILABLE"
+          ? (prerequisite?.state ?? "UNAVAILABLE")
           : "NOT_REQUIRED",
       },
       evidence: current,
@@ -250,7 +337,7 @@ export class PrismaVerificationRepository {
         category: decision.rejectionCategory,
         applicantComment:
           decision.resultingState === "REJECTED"
-            ? row.adminComment ?? null
+            ? (row.adminComment ?? null)
             : null,
         decidedAt: decision.decidedAt.toISOString(),
         reviewerRef: decision.actorAdminUserId,
@@ -262,6 +349,12 @@ export class PrismaVerificationRepository {
         createdAt: note.createdAt.toISOString(),
       })),
       applicantComment: row.adminComment ?? null,
+      assignment: {
+        status: assignmentStatus,
+        assignedAdminRef: row.assignedAdminUserId,
+        canClaim:
+          row.state === "PENDING_REVIEW" && assignmentStatus === "UNASSIGNED",
+      },
       canDecide,
       blockReason,
       calculatedAt: now.toISOString(),
@@ -286,6 +379,9 @@ export class PrismaVerificationRepository {
               mode: "insensitive" as const,
             },
           }
+        : {}),
+      ...(typeof input.filter.targetCompanyId === "string"
+        ? { targetCompanyId: input.filter.targetCompanyId }
         : {}),
       ...(typeof input.filter.taxIdentifier === "string"
         ? { normalizedTaxIdentifier: input.filter.taxIdentifier }
@@ -408,17 +504,14 @@ export class PrismaVerificationRepository {
               stale:
                 row.businessFacts.lookupSnapshot.expiresAt.getTime() <=
                 Date.now(),
-              legalName:
-                row.businessFacts.lookupSnapshot.registryLegalName,
+              legalName: row.businessFacts.lookupSnapshot.registryLegalName,
               registeredAddress:
                 row.businessFacts.lookupSnapshot.registryRegisteredAddress,
               establishedAt:
                 row.businessFacts.lookupSnapshot.registryEstablishedAt?.toISOString() ??
                 null,
-              legalStatus:
-                row.businessFacts.lookupSnapshot.registryLegalStatus,
-              entityType:
-                row.businessFacts.lookupSnapshot.registryEntityType,
+              legalStatus: row.businessFacts.lookupSnapshot.registryLegalStatus,
+              entityType: row.businessFacts.lookupSnapshot.registryEntityType,
               representativeName:
                 row.businessFacts.lookupSnapshot.registryRepresentativeName,
             },

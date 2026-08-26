@@ -201,13 +201,17 @@
 
 .workspace-navigation-scroll {
   display: flex;
+  width: 100%;
   min-height: 0;
+  min-width: 0;
   flex: 1 1 auto;
   flex-direction: column;
   gap: var(--sh-space-2);
+  box-sizing: border-box;
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding-right: var(--sh-space-1);
+  padding-right: calc(var(--sh-space-1) + 2px);
   scrollbar-color: color-mix(
       in srgb,
       var(--sh-color-sidebar-muted) 36%,
@@ -234,12 +238,15 @@
 .workspace-navigation button {
   display: flex;
   width: 100%;
+  max-width: 100%;
   min-height: var(--sh-control-height);
+  min-width: 0;
   align-items: center;
   gap: var(--sh-space-3);
   padding: 0 var(--sh-space-3);
   border: 1px solid transparent;
   border-radius: var(--sh-radius-sm);
+  box-sizing: border-box;
   color: var(--sh-color-sidebar-text);
   background: transparent;
   font-size: var(--sh-font-size-body-sm);
@@ -264,13 +271,11 @@
 .workspace-navigation a[aria-current="page"] {
   color: var(--sh-color-text-inverse);
   background: var(--sh-color-sidebar-active);
-  border-color: color-mix(
-    in srgb,
-    var(--sh-color-text-inverse) 16%,
-    transparent
-  );
+  border-color: transparent;
   box-shadow:
     0 6px 16px rgb(3 12 28 / 20%),
+    inset 0 0 0 1px
+      color-mix(in srgb, var(--sh-color-text-inverse) 18%, transparent),
     inset 0 1px 0 rgb(255 255 255 / 13%);
   font-weight: var(--sh-font-weight-semibold);
 }
@@ -363,7 +368,7 @@
   display: grid;
   width: 100%;
   min-height: var(--sh-topbar-height);
-  grid-template-columns: max-content minmax(280px, 1fr) max-content;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
   align-items: center;
   gap: var(--sh-space-4);
   padding: var(--sh-space-2) var(--sh-space-6);
@@ -378,12 +383,32 @@
   justify-self: center;
 }
 
+.workspace-header-job-search-slot {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  justify-self: center;
+}
+
+.workspace-header-job-search-slot > .global-image-search {
+  width: 100%;
+  max-width: none;
+}
+
 .workspace-header-actions {
   display: flex;
   min-width: 0;
   align-items: center;
   justify-self: end;
   gap: var(--sh-space-3);
+}
+
+.workspace-main[data-content-mode="job-board"]
+  .workspace-header:has(
+    .workspace-header-job-search-slot > .global-image-search
+  )
+  .recruiter-header-action {
+  flex: 0 0 auto;
 }
 
 .workspace-topbar-kicker,
@@ -404,8 +429,13 @@
   line-height: var(--sh-line-height-body-sm);
 }
 
+.workspace-topbar-name {
+  color: var(--sh-color-brand-primary);
+}
+
 .workspace-account-chip {
   display: flex;
+  flex: 0 0 auto;
   min-width: 0;
   min-height: 48px;
   align-items: center;
@@ -420,6 +450,11 @@
 .workspace-account-chip:hover {
   border-color: var(--sh-color-border-subtle);
   background: var(--sh-color-surface-tinted);
+}
+
+.workspace-account-copy {
+  flex: 0 0 auto;
+  min-width: 0;
 }
 
 .workspace-account-avatar,
@@ -456,7 +491,6 @@
   object-fit: cover;
 }
 
-.workspace-account-chip strong,
 .workspace-account-chip small {
   display: block;
   max-width: 220px;
@@ -466,8 +500,10 @@
 }
 
 .workspace-account-chip strong {
+  display: block;
   font-size: var(--sh-font-size-body-sm);
   line-height: var(--sh-line-height-body-sm);
+  white-space: nowrap;
 }
 
 .workspace-account-chip small {
@@ -554,7 +590,7 @@
 
 .workspace-page-header__eyebrow {
   color: var(--sh-color-brand-primary);
-  font-family: var(--sh-font-family-label);
+  font-family: var(--sh-font-family);
   font-size: 11px;
   font-weight: var(--sh-font-weight-bold);
   line-height: var(--sh-line-height-caption);
@@ -563,13 +599,7 @@
 }
 
 .workspace-page-header__eyebrow::before {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin: 0 7px 1px 0;
-  border-radius: var(--sh-radius-full);
-  background: currentColor;
-  content: "";
+  display: none;
 }
 
 .workspace-page-header h1 {
@@ -1228,6 +1258,11 @@
     max-width: none;
   }
 
+  .workspace-main[data-content-mode="job-board"]
+    .workspace-header-job-search-slot:empty {
+    display: none;
+  }
+
   .workspace-header-actions {
     gap: var(--sh-space-2);
   }
@@ -1298,6 +1333,7 @@
 
 .workspace-navigation-item {
   width: 100%;
+  min-width: 0;
 }
 
 .workspace-navigation-subnav {
@@ -1512,4 +1548,35 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.8;
+}
+
+/* The recruiter header has four compact controls. On narrow screens keep
+ * them inside the viewport and retain the account link through its avatar;
+ * the full account details remain available via its accessible name/title. */
+@media (max-width: 760px) {
+  .workspace-main:has(.workspace-content[data-workspace-mode="recruiter"])
+    .workspace-header-actions {
+    justify-content: flex-end;
+    overflow-x: hidden;
+  }
+
+  .workspace-main:has(.workspace-content[data-workspace-mode="recruiter"])
+    .workspace-account-chip
+    > span:last-child {
+    display: none;
+  }
+
+  .workspace-main:has(.workspace-content[data-workspace-mode="recruiter"])
+    .recruiter-header-action__label {
+    max-width: 112px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (max-width: 380px) {
+  .workspace-main:has(.workspace-content[data-workspace-mode="recruiter"])
+    .recruiter-header-action__label {
+    max-width: 72px;
+  }
 }

@@ -9,7 +9,16 @@ const hostname = process.env.HOSTNAME ?? "127.0.0.1";
 const port = Number.parseInt(process.env.PORT ?? "3001", 10);
 const internalShellHeader = "x-smarthire-internal-shell";
 loadEnvConfig(process.cwd(), development);
-const app = next({ dev: development, port });
+const app = next({
+  dev: development,
+  port,
+  // Turbopack is the default in Next.js 16. Keep Webpack as an opt-in
+  // development fallback for Windows environments where a loader subprocess
+  // is unexpectedly interrupted.
+  ...(development && process.env.NEXT_DEV_BUNDLER === "webpack"
+    ? { webpack: true }
+    : {}),
+});
 const handle = app.getRequestHandler();
 
 function expectedHost(origin: string | undefined, fallback: string) {
@@ -19,7 +28,10 @@ function expectedHost(origin: string | undefined, fallback: string) {
 function routeProductShell(request: Parameters<typeof handle>[0]) {
   delete request.headers[internalShellHeader];
   const host = request.headers.host?.toLowerCase() ?? "";
-  const requestUrl = new URL(request.url ?? "/", `http://${host || "localhost"}`);
+  const requestUrl = new URL(
+    request.url ?? "/",
+    `http://${host || "localhost"}`,
+  );
   const pathname = requestUrl.pathname;
   if (
     pathname.startsWith("/api/") ||
@@ -53,23 +65,29 @@ function routeProductShell(request: Parameters<typeof handle>[0]) {
 }
 
 export async function start() {
-  const { acquireNextOutputLock } = await import(
-    "./scripts/next-output-lock.mjs"
-  );
+  const { acquireNextOutputLock } =
+    await import("./scripts/next-output-lock.mjs");
   const releaseNextOutputLock = await acquireNextOutputLock(
     development ? "next-development-server" : "next-production-server",
   );
 
   try {
-    const { attachSocketIoChatGateway } = await import(
-      "./src/backend/messaging/realtime/socket-io-chat-gateway"
-    );
+    const { attachSocketIoChatGateway } =
+      await import("./src/backend/messaging/realtime/socket-io-chat-gateway");
     await app.prepare();
     const server = createServer((request, response) => {
       routeProductShell(request);
       return handle(request, response);
     });
     const chat = attachSocketIoChatGateway(server);
+    const { ScoringWorkerRuntime } =
+      await import("./src/backend/scoring/workers/scoring-worker-runtime");
+    const { CandidateExportWorkerRuntime } =
+      await import("./src/backend/exports/candidate-export-worker-runtime");
+    const scoring = new ScoringWorkerRuntime();
+    const candidateExports = new CandidateExportWorkerRuntime();
+    scoring.start();
+    candidateExports.start();
     server.on("error", (error) => {
       console.error("SmartHire HTTP server failed", error);
       process.exitCode = 1;
@@ -81,6 +99,8 @@ export async function start() {
     let closing: Promise<void> | null = null;
     const close = () => {
       if (closing) return closing;
+      scoring.stop();
+      candidateExports.stop();
       closing = new Promise<void>((resolveClose, rejectClose) =>
         chat.close((error) => {
           if (error) rejectClose(error);

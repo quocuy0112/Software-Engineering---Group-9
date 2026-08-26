@@ -258,7 +258,7 @@ inferred from a skipped test.
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
-| Prisma schema and migration sequence | Pass | `prisma validate` passed; client generation passed; 22 migrations end at `022_realtime_messaging`; migration 022 applied successfully to local PostgreSQL. |
+| Prisma schema and migration sequence | Pass | `prisma validate` passed; client generation passed; 23 migrations end at `023_realtime_messaging`; migration 023 applied successfully to local PostgreSQL. |
 | TypeScript and Feature 008 lint | Pass | `npm run typecheck` passed; ESLint over the custom server, messaging source, scripts, and tests returned zero errors. |
 | Focused messaging suites | Pass | `npm run test:messaging`: 27 files and 60 tests passed, including contract, unit, integration, security, architecture, accessibility, and retention checks. |
 | Production browser journeys | Pass | `npm run test:messaging:e2e`: ten-run Candidate/Recruiter usability protocol passed; three block/report/session/membership/multi-tab safety journeys passed; two-user realtime, read, offline, reload, and reconnect journey passed. Each spec used a fresh PostgreSQL fixture and production custom server. |

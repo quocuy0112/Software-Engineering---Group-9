@@ -52,7 +52,7 @@ Open `http://localhost:3001/`; `/home` must redirect to `/`.
     rendered or client-managed Home state.
 11. Verify personal Smart Match is described as a candidate-facing job-fit
     recommendation rather than applicant screening; it does not claim to use or
-    replace the separate constitutional 60/40 screening formula.
+    replace the separate constitutional 40/60 screening formula.
 12. At desktop/tablet/mobile widths and 200% zoom, complete bilingual navigation,
     compact menu, search, CTA, save/login, and logout keyboard-only; assert
     semantic headings, visible focus, reduced motion, no overlap, and no

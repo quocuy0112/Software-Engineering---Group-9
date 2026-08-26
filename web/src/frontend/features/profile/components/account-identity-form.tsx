@@ -8,6 +8,11 @@ import {
   UnsavedChangesIndicator,
   useUnsavedChangesGuard,
 } from "../client/unsaved-changes";
+import { Badge } from "@/frontend/components/ui/badge";
+import { Button } from "@/frontend/components/ui/button";
+import { Panel } from "@/frontend/components/ui/design-system";
+import { InfoRow } from "@/frontend/components/ui/info-row";
+import { TextField } from "@/frontend/components/ui/text-field";
 
 export function AccountIdentityForm({
   identity,
@@ -64,56 +69,58 @@ export function AccountIdentityForm({
   useUnsavedChangesGuard(isDirty);
 
   return (
-    <section
-      className="account-identity-panel"
+    <Panel
+      as="section"
+      className="candidate-account-panel"
       aria-labelledby="identity-title"
+      eyebrow={copy.kicker}
+      title={copy.title}
+      titleId="identity-title"
     >
-      <div className="account-panel-heading">
-        <div>
-          <p className="panel-kicker">{copy.kicker}</p>
-          <h2 id="identity-title">{copy.title}</h2>
-          <UnsavedChangesIndicator dirty={isDirty} />
-        </div>
-      </div>
+      <UnsavedChangesIndicator dirty={isDirty} />
       <form
+        className="candidate-account-panel__form"
         onSubmit={handleSubmit(async ({ name }) => {
           await onSave(name);
         })}
       >
-        <label htmlFor="account-full-name">{copy.fullName}</label>
-        <input
+        <TextField
           id="account-full-name"
+          label={copy.fullName}
           maxLength={150}
           autoComplete="name"
           {...register("name")}
         />
-        <button type="submit" disabled={saving}>
+        <Button fullWidth type="submit" disabled={saving || !isDirty}>
           {saving ? copy.saving : copy.save}
-        </button>
+        </Button>
       </form>
-      <dl className="account-identity-metadata">
-        <div>
-          <dt>{copy.email}</dt>
-          <dd>{identity.email}</dd>
-        </div>
-        <div>
-          <dt>{copy.verification}</dt>
-          <dd>{identity.emailVerified ? copy.verified : copy.notVerified}</dd>
-        </div>
-        <div>
-          <dt>{copy.status}</dt>
-          <dd>{copy.active}</dd>
-        </div>
-        <div>
-          <dt>{copy.created}</dt>
-          <dd>
-            {new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en", {
-              dateStyle: "medium",
-              timeZone: "UTC",
-            }).format(new Date(identity.createdAt))}
-          </dd>
-        </div>
+      <dl className="candidate-account-panel__metadata">
+        <InfoRow asDefinition label={copy.email} value={identity.email} />
+        <InfoRow
+          asDefinition
+          label={copy.verification}
+          value={
+            <Badge tone={identity.emailVerified ? "teal" : "neutral"}>
+              {identity.emailVerified ? copy.verified : copy.notVerified}
+            </Badge>
+          }
+        />
+        <InfoRow
+          asDefinition
+          label={copy.status}
+          value={copy.active}
+          valueTone="success"
+        />
+        <InfoRow
+          asDefinition
+          label={copy.created}
+          value={new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en", {
+            dateStyle: "medium",
+            timeZone: "UTC",
+          }).format(new Date(identity.createdAt))}
+        />
       </dl>
-    </section>
+    </Panel>
   );
 }

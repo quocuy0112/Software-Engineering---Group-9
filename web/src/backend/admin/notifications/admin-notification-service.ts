@@ -3,7 +3,9 @@ import "server-only";
 import type { Prisma } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
 import { NotificationService } from "@/backend/notifications/notification-service";
+import { PrismaNotificationRepository } from "@/backend/repositories/notifications/prisma-notification-repository";
 import { renderNotificationCopy } from "@/backend/notifications/event-policy";
+import { resolveNotificationHref } from "@/backend/notifications/notification-destination-resolver";
 import {
   notificationItemSchema,
   type NotificationCategory,
@@ -37,6 +39,22 @@ const toItem = (row: NotificationRow): NotificationItem => {
   return notificationItemSchema.parse({
     ...publicRow,
     ...renderNotificationCopy(row.kind, variables, "EN"),
+    href: resolveNotificationHref({
+      notificationId: row.id,
+      kind: row.kind,
+      contextType: row.contextType,
+      contextId: row.contextId,
+      recipientRole: "ADMIN",
+      occurrenceCount: row.occurrenceCount,
+      lastOccurredAt: row.lastOccurredAt,
+      jobId:
+        typeof variables === "object" &&
+        variables !== null &&
+        "jobId" in variables &&
+        typeof variables.jobId === "string"
+          ? variables.jobId
+          : null,
+    }),
     readAt: row.readAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
     lastOccurredAt: row.lastOccurredAt.toISOString(),
@@ -46,7 +64,9 @@ const toItem = (row: NotificationRow): NotificationItem => {
 
 export class AdminNotificationService {
   constructor(
-    private readonly notifications = new NotificationService(),
+    private readonly notifications = new NotificationService(
+      new PrismaNotificationRepository(prisma, "ALL"),
+    ),
     private readonly now: () => Date = () => new Date(),
   ) {}
 

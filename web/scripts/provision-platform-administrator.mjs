@@ -4,13 +4,33 @@ import { config as loadEnvironment } from "dotenv";
 import { randomUUID } from "node:crypto";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { distributeUnassignedPendingReviews } from "../src/backend/jobs/review/job-post-review-assignment.ts";
 
 const webRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 loadEnvironment({ path: resolve(webRoot, ".env.local"), quiet: true });
 
 const email = process.argv[2]?.trim().toLowerCase();
 if (!email)
-  throw new Error("Usage: provision-platform-administrator.mjs <email>");
+  throw new Error(
+    "Usage: provision-platform-administrator.mjs <email> [--scope JOB_POST_FEATURE|JOB_POST_ENFORCE]",
+  );
+// Moderation is the minimum grant. Elevated actions require an explicit flag.
+const validScopes = new Set([
+  "JOB_POST_MODERATE",
+  "JOB_POST_FEATURE",
+  "JOB_POST_ENFORCE",
+]);
+const requestedScopes = new Set(["JOB_POST_MODERATE"]);
+for (let index = 3; index < process.argv.length; index += 2) {
+  if (process.argv[index] !== "--scope" || !process.argv[index + 1]) {
+    throw new Error(
+      "Use --scope JOB_POST_FEATURE or --scope JOB_POST_ENFORCE after the email.",
+    );
+  }
+  const scope = process.argv[index + 1].trim().toUpperCase();
+  if (!validScopes.has(scope)) throw new Error(`Unsupported scope: ${scope}`);
+  requestedScopes.add(scope);
+}
 const databaseUrl = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
 if (!databaseUrl)
   throw new Error("DIRECT_URL or DATABASE_URL is required in web/.env.local");
@@ -86,6 +106,19 @@ try {
           data: { userId: user.id, state: "ACTIVE" },
         });
 
+    await transaction.platformAdministratorGrantScopeAssignment.createMany({
+      data: [...requestedScopes].map((scope) => ({
+        grantId: grant.id,
+        scope,
+      })),
+      skipDuplicates: true,
+    });
+
+    const assignedPendingReviews = await distributeUnassignedPendingReviews(
+      transaction,
+      now,
+    );
+
     await transaction.auditEvent.create({
       data: {
         occurredAt: now,
@@ -99,11 +132,24 @@ try {
           source: "operator_terminal",
           previousState: existing?.state ?? null,
           changed: !existing || reactivating || existing.expiresAt !== null,
+          assignedPendingReviews,
         },
       },
     });
 
-    return { grantId: grant.id, userId: user.id, state: grant.state };
+    const scopes =
+      await transaction.platformAdministratorGrantScopeAssignment.findMany({
+        where: { grantId: grant.id },
+        select: { scope: true },
+        orderBy: { scope: "asc" },
+      });
+    return {
+      grantId: grant.id,
+      userId: user.id,
+      state: grant.state,
+      scopes: scopes.map((assignment) => assignment.scope),
+      assignedPendingReviews,
+    };
   });
   console.log(JSON.stringify(result));
 } finally {

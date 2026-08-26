@@ -17,11 +17,14 @@ const navigation = vi.hoisted(() => ({
   prefetch: vi.fn(),
   replace: vi.fn(),
 }));
+const toastError = vi.hoisted(() => vi.fn());
 vi.mock("next/navigation", () => ({ useRouter: () => navigation }));
+vi.mock("sonner", () => ({ toast: { error: toastError } }));
 
 beforeEach(() => {
   navigation.prefetch.mockClear();
   navigation.replace.mockClear();
+  toastError.mockReset();
 });
 
 afterEach(() => vi.useRealTimers());
@@ -54,7 +57,7 @@ describe("CV upload and authoritative status UI", () => {
     expect(screen.getByRole("button", { name: /upload cv/i })).toBeEnabled();
   });
 
-  it("shows parser availability without making one parser globally exclusive", () => {
+  it("locks new uploads to the approved external parser", () => {
     render(
       <CvUploadForm
         csrfProof="csrf_fixture"
@@ -62,16 +65,12 @@ describe("CV upload and authoritative status UI", () => {
         parserAvailability={{ deterministic: true, external: true }}
       />,
     );
-    const deterministic = screen.getByRole("radio", {
-      name: /smarthire deterministic/i,
-    });
     const external = screen.getByRole("radio", { name: /external openai/i });
-    expect(deterministic).toBeEnabled();
     expect(external).toBeEnabled();
-    fireEvent.click(external);
     expect(external).toBeChecked();
-    fireEvent.click(deterministic);
-    expect(deterministic).toBeChecked();
+    expect(
+      screen.queryByRole("radio", { name: /smarthire deterministic/i }),
+    ).not.toBeInTheDocument();
   });
 
   it("validates exact type/5 MB, uploads by keyboard, and preserves text progress", async () => {
@@ -87,7 +86,10 @@ describe("CV upload and authoritative status UI", () => {
         ],
       },
     });
-    expect(await screen.findByRole("alert")).toHaveTextContent("5 MB");
+    expect(await screen.findByRole("alert")).toHaveTextContent("5MB");
+    expect(toastError).toHaveBeenCalledWith("File size must not exceed 5MB.", {
+      id: "candidate-cv-upload-error",
+    });
     expect(input).toHaveFocus();
 
     fireEvent.change(input, {
@@ -99,6 +101,11 @@ describe("CV upload and authoritative status UI", () => {
         ],
       },
     });
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent(
+        /synthetic\.pdf is ready/i,
+      ),
+    );
     fireEvent.keyDown(screen.getByRole("button", { name: /upload cv/i }), {
       key: "Enter",
     });

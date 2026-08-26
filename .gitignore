@@ -16,6 +16,7 @@ web/.env.local
 # Build output
 **/dist/
 **/build/
+**/*.tsbuildinfo
 
 # Python OCR engine
 **/.pytest_cache/
@@ -34,6 +35,9 @@ web/.local/cv-storage/
 web/.private-admin-evidence/
 mail-output/
 email-preview/
+
+# Local job data (companies, jobs, user state, and applications)
+web/data/jobs/
 
 # Prisma local artifacts
 **/prisma/*.db
@@ -75,3 +79,14 @@ node_modules
 
 # Prisma ignore
 .prisma/migrations/
+
+# TypeScript build cache
+web/tsconfig.tsbuildinfo
+
+# backup worker
+**/backup-worker/.next/
+./backup-worker/
+
+# Local Google Drive backup credentials
+/SmartHireBackup/
+/backupwoker/

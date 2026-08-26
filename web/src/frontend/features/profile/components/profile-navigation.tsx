@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { TopBar } from "@/frontend/components/layout/top-bar";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
 export type ProfileNavigationDestination = {
@@ -16,6 +16,7 @@ export const foundationProfileDestinations = [
   { href: "/profile/preferences", label: "Preferences", key: "preferences" },
   { href: "/profile/security", label: "Security", key: "security" },
   { href: "/profile/sessions", label: "Sessions", key: "sessions" },
+  { href: "/profile/about", label: "About me", key: "about" },
 ] as const satisfies readonly ProfileNavigationDestination[];
 
 export function ProfileNavigation({
@@ -23,35 +24,41 @@ export function ProfileNavigation({
   destinations = foundationProfileDestinations,
 }: {
   active: string;
+  // Retained only so existing callers do not break; the navigation no longer
+  // repeats a separate account avatar next to the workspace shell identity.
+  accountName?: string;
   destinations?: readonly ProfileNavigationDestination[];
 }) {
   const locale = useWorkspaceLocale();
-  const labels =
+  const brand = locale === "vi" ? "Hồ sơ và tài khoản" : "Profile and account";
+  const labels: Record<string, string> | null =
     locale === "vi"
       ? {
-          overview: "Nghề nghiệp",
+          overview: "Hồ sơ chuyên môn",
           "cv-imports": "Nhập CV",
           account: "Tài khoản",
           preferences: "Tùy chọn",
           security: "Bảo mật",
           sessions: "Phiên đăng nhập",
+          about: "Về bạn",
         }
       : null;
+
   return (
-    <nav
+    <TopBar
       className="profile-navigation"
-      aria-label={locale === "vi" ? "Hồ sơ" : "Profile"}
-    >
-      {destinations.map((destination) => (
-        <Link
-          key={destination.href}
-          href={destination.href}
-          aria-current={destination.key === active ? "page" : undefined}
-        >
-          {labels?.[destination.key as keyof typeof labels] ??
-            destination.label}
-        </Link>
-      ))}
-    </nav>
+      ariaLabel={locale === "vi" ? "Hồ sơ" : "Profile"}
+      brand={
+        <span className="profile-navigation__brand">
+          <span className="profile-navigation__brand-dot" aria-hidden="true" />
+          {brand}
+        </span>
+      }
+      tabs={destinations.map((destination) => ({
+        href: destination.href,
+        label: labels?.[destination.key] ?? destination.label,
+        active: destination.key === active,
+      }))}
+    />
   );
 }

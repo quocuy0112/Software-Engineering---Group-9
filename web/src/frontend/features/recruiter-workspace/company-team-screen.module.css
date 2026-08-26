@@ -1,0 +1,420 @@
+.page {
+  width: min(100%, 1120px);
+  margin: 0 auto;
+  padding: 38px 28px 72px;
+  color: var(--sh-color-text-primary);
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 28px;
+}
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--sh-color-brand-primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.header h1 {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 34px);
+  letter-spacing: -0.04em;
+}
+.header p:not(.eyebrow) {
+  margin: 8px 0 0;
+  color: var(--sh-color-text-secondary);
+  font-size: 14px;
+}
+.memberCount {
+  min-width: 116px;
+  padding: 12px 16px;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: 14px;
+  background: var(--sh-color-surface-card);
+  text-align: center;
+  box-shadow: var(--sh-shadow-control);
+}
+.memberCount strong {
+  display: block;
+  color: var(--sh-color-brand-primary);
+  font-size: 20px;
+}
+.memberCount span {
+  color: var(--sh-color-text-muted);
+  font-size: 12px;
+}
+.notice {
+  min-height: 20px;
+  margin: 0 0 14px;
+  color: var(--sh-color-brand-primary);
+  font-size: 13px;
+  font-weight: 650;
+}
+.inviteCard,
+.linkCard,
+.section {
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: 18px;
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-card);
+}
+.inviteCard {
+  padding: 22px;
+  margin-bottom: 22px;
+}
+.cardTitle {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--sh-color-brand-soft);
+  color: var(--sh-color-brand-primary);
+  font-size: 24px;
+}
+.cardTitle h2,
+.section h2,
+.linkCard h2 {
+  margin: 0;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+.cardTitle p,
+.sectionHeading p,
+.linkCard p {
+  margin: 4px 0 0;
+  color: var(--sh-color-text-muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.inviteForm {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.7fr) minmax(150px, 0.8fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+.field {
+  display: grid;
+  gap: 7px;
+  color: var(--sh-color-text-secondary);
+  font-size: 12px;
+  font-weight: 800;
+}
+.field input,
+.field select,
+.linkRow input {
+  width: 100%;
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: 10px;
+  padding: 11px 12px;
+  background: var(--sh-color-surface-subtle);
+  color: var(--sh-color-text-primary);
+  font: inherit;
+  font-size: 13px;
+}
+.field input:focus-visible,
+.field select:focus-visible,
+.linkRow input:focus-visible {
+  outline: 3px solid var(--sh-color-focus-ring-bg);
+  border-color: var(--sh-color-border-focus);
+}
+.primaryButton,
+.secondaryButton,
+.textButton,
+.removeButton {
+  border: 0;
+  border-radius: 10px;
+  padding: 11px 14px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  transition: 0.15s;
+}
+.primaryButton {
+  background: var(--sh-color-brand-primary);
+  color: var(--sh-color-on-brand);
+  white-space: nowrap;
+}
+.primaryButton:hover:not(:disabled) {
+  background: var(--sh-color-brand-primary-hover);
+  transform: translateY(-1px);
+}
+.primaryButton:disabled,
+.textButton:disabled,
+.removeButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.linkCard {
+  display: grid;
+  grid-template-columns: 1fr minmax(300px, 0.9fr);
+  gap: 18px;
+  align-items: center;
+  padding: 18px 20px;
+  margin: -6px 0 22px;
+  background: var(--sh-color-surface-tinted);
+  border-color: var(--sh-color-brand-soft);
+}
+.linkRow {
+  display: flex;
+  gap: 8px;
+}
+.linkRow input {
+  min-width: 0;
+  color: var(--sh-color-text-secondary);
+}
+.secondaryButton {
+  border: 1px solid var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-card);
+  color: var(--sh-color-brand-primary);
+  white-space: nowrap;
+}
+.section {
+  overflow: hidden;
+  margin-top: 22px;
+}
+.sectionHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--sh-color-border-subtle);
+}
+.sectionHeading > span {
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: var(--sh-color-surface-subtle);
+  color: var(--sh-color-text-muted);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.memberList,
+.invitationList {
+  display: grid;
+}
+.memberRow,
+.invitationRow {
+  display: grid;
+  grid-template-columns: 42px minmax(190px, 1fr) 120px 92px auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--sh-color-border-subtle);
+}
+.memberRow:last-child,
+.invitationRow:last-child {
+  border-bottom: 0;
+}
+.avatar,
+.pendingAvatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    var(--sh-color-brand-soft),
+    var(--sh-color-info-bg)
+  );
+  color: var(--sh-color-brand-primary);
+  font-size: 12px;
+  font-weight: 850;
+}
+.memberIdentity,
+.invitationRow > div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+.memberIdentity strong,
+.invitationRow strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.5px;
+}
+.memberIdentity span,
+.invitationRow span {
+  overflow: hidden;
+  color: var(--sh-color-text-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.roleBadge,
+.statusBadge {
+  justify-self: start;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 11px;
+  font-weight: 800;
+}
+.roleBadge {
+  background: var(--sh-color-surface-subtle);
+  color: var(--sh-color-text-secondary);
+}
+.statusBadge {
+  background: var(--sh-color-success-bg);
+  color: var(--sh-color-success);
+}
+.suspended {
+  background: var(--sh-color-warning-bg);
+  color: var(--sh-color-warning);
+}
+.removed {
+  background: var(--sh-color-error-bg);
+  color: var(--sh-color-error);
+}
+.actions {
+  display: flex;
+  justify-content: end;
+  gap: 6px;
+}
+.textButton {
+  background: var(--sh-color-surface-subtle);
+  color: var(--sh-color-text-secondary);
+  padding: 8px 9px;
+}
+.textButton:hover:not(:disabled) {
+  background: var(--sh-color-brand-soft);
+  color: var(--sh-color-brand-primary);
+}
+.removeButton {
+  background: transparent;
+  color: var(--sh-color-error);
+  padding: 8px 9px;
+}
+.removeButton:hover:not(:disabled) {
+  background: var(--sh-color-error-bg);
+}
+.ownerNote {
+  color: var(--sh-color-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+}
+.invitationRow {
+  grid-template-columns: 42px 1fr auto;
+}
+.pendingAvatar {
+  border-radius: 12px;
+  background: var(--sh-color-warning-bg);
+  color: var(--sh-color-warning);
+}
+.emptyState {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 27px 22px;
+  color: var(--sh-color-text-muted);
+}
+.emptyState > span {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sh-color-surface-subtle);
+  color: var(--sh-color-brand-accent);
+}
+.emptyState strong {
+  display: block;
+  font-size: 13px;
+}
+.emptyState p {
+  margin: 3px 0 0;
+  font-size: 12px;
+}
+@media (max-width: 900px) {
+  .memberRow {
+    grid-template-columns: 42px minmax(150px, 1fr) 100px auto;
+  }
+  .memberRow .statusBadge {
+    display: none;
+  }
+  .actions {
+    grid-column: 2/-1;
+    justify-content: start;
+  }
+  .ownerNote {
+    grid-column: 2/-1;
+    text-align: left;
+  }
+}
+@media (max-width: 650px) {
+  .page {
+    padding: 25px 16px 48px;
+  }
+  .header,
+  .linkCard {
+    display: grid;
+  }
+  .memberCount {
+    justify-self: start;
+  }
+  .inviteForm {
+    grid-template-columns: 1fr;
+  }
+  .primaryButton {
+    width: 100%;
+  }
+  .linkRow {
+    display: grid;
+  }
+  .memberRow {
+    grid-template-columns: 42px 1fr auto;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+  .memberRow .roleBadge {
+    display: none;
+  }
+  .sectionHeading {
+    padding: 17px 16px;
+  }
+  .invitationRow {
+    grid-template-columns: 38px 1fr;
+    padding: 14px 16px;
+  }
+  .invitationRow .removeButton {
+    grid-column: 2;
+    justify-self: start;
+    padding-left: 0;
+  }
+  .actions {
+    flex-wrap: wrap;
+  }
+  .memberIdentity span,
+  .invitationRow span {
+    white-space: normal;
+  }
+}
+
+.sectionHeading > span.pendingColor {
+  background: var(--sh-color-warning-bg);
+  color: var(--sh-color-warning);
+}
+
+.sectionHeading > span.recentColor {
+  background: var(--sh-color-surface-subtle);
+  color: var(--sh-color-brand-accent);
+}
+
+.sectionHeading > span.totalColor {
+  background: var(--sh-color-success-bg);
+  color: var(--sh-color-success);
+}

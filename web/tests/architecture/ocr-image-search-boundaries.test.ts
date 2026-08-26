@@ -25,6 +25,7 @@ describe("Feature 005 architecture boundaries", () => {
       homeHeader,
       jobHeader,
       workspaceShell,
+      liveJobSearch,
     ] = await Promise.all([
       readFile(resolve(source, "app/layout.tsx"), "utf8"),
       readFile(resolve(source, "app/(auth)/layout.tsx"), "utf8"),
@@ -53,6 +54,13 @@ describe("Feature 005 architecture boundaries", () => {
         ),
         "utf8",
       ),
+      readFile(
+        resolve(
+          source,
+          "frontend/features/jobs/components/live-job-search-experience.tsx",
+        ),
+        "utf8",
+      ),
     ]);
 
     expect(rootLayout).not.toContain("<GlobalImageSearch");
@@ -61,15 +69,17 @@ describe("Feature 005 architecture boundaries", () => {
     expect(homeHeader).toContain("<GlobalImageSearch");
     expect(jobHeader).toContain("<GlobalImageSearch");
     expect(workspaceShell).toContain('contentMode === "job-board"');
-    expect(workspaceShell).toContain("<GlobalImageSearch");
+    expect(workspaceShell).not.toContain("<GlobalImageSearch");
+    expect(liveJobSearch).toContain("<GlobalImageSearch");
   });
 
   it("preserves scanner signatures when resetting the local database", async () => {
-    const [resetScript, rootPackage] = await Promise.all([
+    const [resetScript, userResetScript, rootPackage] = await Promise.all([
       readFile(
         resolve(process.cwd(), "../scripts/reset-local-database.mjs"),
         "utf8",
       ),
+      readFile(resolve(process.cwd(), "../scripts/db-reset-user.mjs"), "utf8"),
       readFile(resolve(process.cwd(), "../package.json"), "utf8"),
     ]);
     expect(resetScript).toContain('run(docker, ["compose", "down"]);');
@@ -77,13 +87,41 @@ describe("Feature 005 architecture boundaries", () => {
       'run(docker, ["volume", "rm", postgresVolume]);',
     );
     expect(resetScript).not.toContain('["compose", "down", "-v"]');
-    expect(resetScript).toContain(
-      'runNpm(["run", "db:deploy", "--workspace", "@smarthire/web"]);',
-    );
-    expect(resetScript).not.toContain('"db:migrate"');
+    expect(resetScript).toContain('"db:migrate"');
+    expect(resetScript).not.toContain('runNpm(["run", "db:seed:jobs"]);');
+    expect(resetScript).toContain("Skipping job/company/skill fixture import");
     expect(JSON.parse(rootPackage).scripts["db:reset:empty"]).toBe(
       "node scripts/reset-local-database.mjs --empty",
     );
+    expect(JSON.parse(rootPackage).scripts["db:reset"]).toBe(
+      "node scripts/db-reset-user.mjs",
+    );
+    expect(userResetScript).toContain(
+      "transaction.authProviderAccount.deleteMany",
+    );
+    expect(userResetScript).toContain("const userIds = accounts.map");
+    expect(userResetScript).not.toContain("Multiple user accounts found");
+    expect(userResetScript).toContain("smarthire.cv_retention_mode");
+    expect(userResetScript).toContain(
+      "Parse jobs reference consent with ON DELETE SET NULL",
+    );
+    expect(userResetScript).toContain("transaction.emailOutbox.deleteMany");
+    expect(userResetScript).toContain(
+      "transaction.platformAdministratorGrant.deleteMany",
+    );
+    expect(userResetScript).toContain(
+      "transaction.jobPostReviewVersion.deleteMany",
+    );
+    expect(userResetScript).toContain(
+      "transaction.companyMembership.deleteMany",
+    );
+    expect(userResetScript).toContain(
+      "transaction.companyMembershipHistory.deleteMany",
+    );
+    expect(userResetScript).toContain("imported catalog");
+    expect(userResetScript).toContain('state: "DELETED"');
+    expect(userResetScript).toContain("transaction.userAccount.update");
+    expect(userResetScript).toContain("email: resetEmail");
   });
 
   it("keeps image-search routes thin and free of Prisma, storage, OCR, scanner, and providers", async () => {

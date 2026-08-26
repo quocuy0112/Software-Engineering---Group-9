@@ -2,166 +2,180 @@
 .card {
   display: grid;
   min-width: 0;
-  gap: var(--sh-space-4);
+  gap: 16px;
 }
-
+.root {
+  color: var(--sh-color-text-primary);
+  font-family: var(--sh-profile-font-body);
+}
+.root :is(input, textarea, button) {
+  font: inherit;
+}
 .root > h2 {
-  margin: var(--sh-space-3) 0 0;
-  font-size: var(--sh-font-size-h2);
-  line-height: var(--sh-line-height-h2);
+  margin: 2px 0 0;
+  color: var(--sh-color-text-primary);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
 }
-
 .card {
-  padding: var(--sh-space-5);
+  padding: 22px;
   border: 1px solid var(--sh-color-border-subtle);
-  border-radius: var(--sh-radius-md);
+  border-radius: 16px;
   background: var(--sh-color-surface-card);
-  box-shadow: var(--sh-shadow-control);
 }
-
 .card > h3 {
   margin: 0;
-  padding-bottom: var(--sh-space-3);
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--sh-color-border-subtle);
-  font-size: var(--sh-font-size-h3);
-  line-height: var(--sh-line-height-h3);
-  text-transform: capitalize;
+  color: var(--sh-color-text-primary);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-transform: none;
 }
-
 .comparison {
   display: grid;
-  gap: var(--sh-space-4);
+  gap: 18px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-
 .comparison > div,
 .choices {
   display: grid;
   min-width: 0;
-  gap: var(--sh-space-2);
+  gap: 8px;
 }
-
+.comparison > div:first-child {
+  align-content: start;
+  padding: 14px 16px;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: 10px;
+  background: var(--sh-color-surface-subtle);
+}
+.comparison strong,
+.decisionTitle {
+  color: var(--sh-color-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+.comparison label {
+  color: var(--sh-color-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+}
+.comparison p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--sh-color-text-muted);
+  font-size: 13px;
+  white-space: pre-wrap;
+}
+.comparison input,
+.comparison textarea {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: 10px;
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+  font-weight: 400;
+  box-shadow: none;
+}
+.comparison textarea {
+  min-block-size: 8rem;
+  resize: vertical;
+}
+.comparison :is(input, textarea)[aria-invalid="true"],
 .choices[aria-invalid="true"] {
   border-color: var(--color-error, #b91c1c);
   background: var(--color-error-surface, #fef2f2);
   box-shadow: 0 0 0 1px var(--color-error, #b91c1c);
 }
-
-.comparison > div:first-child {
-  align-content: start;
-  padding: var(--sh-space-4);
-  border: 1px solid var(--sh-color-border-subtle);
-  border-radius: var(--sh-radius-sm);
-  background: var(--sh-color-surface-subtle);
-}
-
-.comparison strong,
-.comparison label,
-.choices legend {
-  color: var(--sh-color-text-primary);
-  font-size: var(--sh-font-size-body-sm);
-  font-weight: var(--sh-font-weight-semibold);
-}
-
-.decisionHint {
-  grid-column: 1 / -1;
-  margin: 0;
-  color: var(--sh-color-text-secondary);
-  font-size: var(--sh-font-size-caption);
-  font-weight: var(--sh-font-weight-regular);
-  line-height: var(--sh-line-height-caption);
-}
-
-.choices .fieldError {
-  grid-column: 1 / -1;
-}
-
-.comparison p {
-  margin: 0;
-  overflow-wrap: anywhere;
-  color: var(--sh-color-text-secondary);
-  font-size: var(--sh-font-size-body-sm);
-  white-space: pre-wrap;
-}
-
-.comparison input,
-.comparison textarea {
-  box-sizing: border-box;
-  inline-size: 100%;
-  min-block-size: var(--sh-control-height);
-  padding: 11px var(--sh-space-3);
-  border: 1px solid var(--sh-color-border-default);
-  border-radius: var(--sh-radius-sm);
-  color: var(--sh-color-text-primary);
-  background: var(--sh-color-surface-card);
-  box-shadow: var(--sh-shadow-control);
-}
-
-.comparison :is(input, textarea)[aria-invalid="true"] {
-  border-color: var(--color-error, #b91c1c);
-  background: var(--color-error-surface, #fef2f2);
-  box-shadow: 0 0 0 1px var(--color-error, #b91c1c);
-}
-
 .fieldError {
   margin: 0;
   color: var(--color-error-text, #7f1d1d);
-  font-size: var(--sh-font-size-caption);
-  font-weight: var(--sh-font-weight-semibold);
-  line-height: var(--sh-line-height-caption);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
 }
-
-.comparison textarea {
-  min-block-size: 8rem;
-  resize: vertical;
-}
-
-.choices {
-  grid-template-columns: repeat(3, minmax(0, max-content));
+.decisionHint {
   margin: 0;
-  padding: var(--sh-space-3) var(--sh-space-4);
-  border: 1px solid var(--sh-color-border-subtle);
-  border-radius: var(--sh-radius-sm);
-  background: var(--sh-color-surface-tinted);
+  color: var(--sh-color-text-muted);
+  font-size: 12px;
+  line-height: 1.45;
 }
-
-.choices legend {
-  padding-inline: var(--sh-space-2);
+.choices {
+  grid-template-columns: 1fr;
+  margin: 0;
+  padding: 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--sh-color-info-bg);
 }
-
-.choices label {
+.decisionTitle {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.actionOptions {
   display: flex;
-  min-height: 36px;
-  align-items: center;
-  gap: var(--sh-space-2);
-  padding-inline: var(--sh-space-2);
-  border-radius: 6px;
-  font-size: var(--sh-font-size-body-sm);
-  text-transform: capitalize;
+  flex-wrap: wrap;
+  gap: 8px;
 }
-
-.choices input {
+.actionOptions label {
+  display: flex;
+  flex: 0 1 170px;
+  min-height: 38px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: 8px;
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-card);
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: none;
+}
+.actionOptions input {
   width: 18px;
   height: 18px;
   accent-color: var(--sh-color-brand-primary);
 }
-
 .card :is(input, textarea):focus-visible {
   outline: 3px solid var(--color-focus, #1d4ed8);
   outline-offset: 2px;
 }
-
-@media (max-width: 32rem) {
-  .card {
-    padding: var(--sh-space-4);
-  }
-
-  .comparison,
-  .choices {
+@media (max-width: 44rem) {
+  .comparison {
     grid-template-columns: 1fr;
   }
 }
-
+@media (max-width: 32rem) {
+  .card {
+    padding: 18px;
+  }
+  .comparison,
+  .actionOptions {
+    grid-template-columns: 1fr;
+  }
+  .actionOptions label {
+    flex-basis: 100%;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .card * {
     scroll-behavior: auto;

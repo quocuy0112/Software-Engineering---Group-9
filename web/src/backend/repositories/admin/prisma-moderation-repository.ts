@@ -15,6 +15,18 @@ export class PrismaModerationRepository {
         ? Number(input.filter.age)
         : Number.NaN;
     const where = {
+      ...(typeof input.filter.q === "string" && input.filter.q.trim()
+        ? {
+            OR: [
+              { id: input.filter.q.trim() },
+              { reporterUserId: input.filter.q.trim() },
+              { targetReference: input.filter.q.trim() },
+              { companyReference: input.filter.q.trim() },
+              { jobReference: input.filter.q.trim() },
+              { applicationReference: input.filter.q.trim() },
+            ],
+          }
+        : {}),
       ...(typeof input.filter.targetType === "string"
         ? { targetType: input.filter.targetType as never }
         : {}),
@@ -46,6 +58,7 @@ export class PrismaModerationRepository {
     };
     const rows = await prisma.moderationReport.findMany({
       where,
+      include: { reporter: { select: { name: true } } },
       orderBy: [{ createdAt: "asc" }, { id: "asc" }],
     });
     rows.sort(
@@ -63,6 +76,7 @@ export class PrismaModerationRepository {
       data: page.map((row) => ({
         id: row.id,
         reporterAccountId: row.reporterUserId,
+        reporterDisplayName: row.reporter.name,
         targetType: row.targetType,
         targetReference: row.targetReference,
         companyReference: row.companyReference,
@@ -85,6 +99,13 @@ export class PrismaModerationRepository {
       include: {
         history: { orderBy: [{ occurredAt: "asc" }, { id: "asc" }] },
         notes: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
+        enforcementLinks: {
+          include: {
+            enforcementAction: {
+              include: { targets: true },
+            },
+          },
+        },
       },
     });
     return row

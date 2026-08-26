@@ -4,10 +4,14 @@ import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/500.css";
 import "@fontsource/be-vietnam-pro/600.css";
 import "@fontsource/be-vietnam-pro/700.css";
+import "@fontsource/space-grotesk/500.css";
+import "@fontsource/space-grotesk/600.css";
+import "@fontsource/space-grotesk/700.css";
 import "@fontsource-variable/manrope/wght.css";
 import { serverEnvironment } from "@/backend/env/runtime";
 import { ThemeProvider } from "@/frontend/providers/theme-provider";
 import "./globals.css";
+import "@/frontend/components/ui/design-system.css";
 import { Toaster } from "sonner";
 import "@/frontend/features/jobs/image-search/styles/image-search.css";
 import "@/frontend/features/notifications/styles/notifications.css";
@@ -20,9 +24,19 @@ export const metadata: Metadata = {
 const themeBootstrapScript = [
   "(function () {",
   "  try {",
+  "    var pathname = window.location.pathname;",
+  "    var publicRoutes = [",
+  '      "/", "/home", "/login", "/register", "/forgot-password",',
+  '      "/reset-password", "/two-factor", "/check-email", "/verify-email",',
+  '      "/verify-company-email", "/verify-email-change", "/account-recovery",',
+  '      "/business", "/help", "/legal"',
+  "    ];",
+  "    var forceLight = publicRoutes.some(function (route) {",
+  '      return pathname === route || (route !== "/" && pathname.indexOf(route + "/") === 0);',
+  "    });",
   '    var stored = window.localStorage.getItem("smarthire-theme");',
   "    var theme =",
-  '      stored === "dark" || stored === "light"',
+  '      forceLight ? "light" : stored === "dark" || stored === "light"',
   "        ? stored",
   "        : window.matchMedia &&",
   '            window.matchMedia("(prefers-color-scheme: dark)").matches',
@@ -48,11 +62,13 @@ export default function RootLayout({
     >
       <head>
         <meta charSet="utf-8" />
+        <Script
+          id="smarthire-theme-bootstrap"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
+        />
       </head>
       <body suppressHydrationWarning>
-        <Script id="smarthire-theme-bootstrap" strategy="beforeInteractive">
-          {themeBootstrapScript}
-        </Script>
         <ThemeProvider>
           {children}
           <Toaster

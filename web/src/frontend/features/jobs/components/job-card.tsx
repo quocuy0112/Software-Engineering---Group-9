@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { JobCard as JobCardData } from "@/shared/contracts/jobs/discovery";
+import { MAX_APPLICATION_ATTEMPTS_MESSAGE } from "@/shared/contracts/jobs/actions";
 import {
   formatRelativeTime,
   formatSalary,
@@ -52,10 +53,17 @@ function visibleTagValues(job: JobCardData) {
   );
 }
 
-function HeartIcon() {
+function SaveIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M20.8 8.8c0 5.3-8.8 10.4-8.8 10.4S3.2 14.1 3.2 8.8A4.6 4.6 0 0 1 12 6.3a4.6 4.6 0 0 1 8.8 2.5Z" />
+      <path
+        d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-3.8L6 21V4.5Z"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.2"
+      />
     </svg>
   );
 }
@@ -63,7 +71,14 @@ function HeartIcon() {
 function HideIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 4.2A10.7 10.7 0 0 0 2.5 12c1.5 4 5 7 9.5 7 1.2 0 2.3-.2 3.3-.6M14.1 4.8c3.5.8 6.3 3.6 7.4 7.2a12 12 0 0 1-2.1 4.1" />
+      <path
+        d="M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 4.2A10.7 10.7 0 0 0 2.5 12c1.5 4 5 7 9.5 7 1.2 0 2.3-.2 3.3-.6M14.1 4.8c3.5.8 6.3 3.6 7.4 7.2a12 12 0 0 1-2.1 4.1"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
     </svg>
   );
 }
@@ -71,8 +86,22 @@ function HideIcon() {
 function QuickViewIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
-      <circle cx="12" cy="12" r="2.5" />
+      <path
+        d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+      <circle
+        cx="12"
+        cy="12"
+        r="2.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
     </svg>
   );
 }
@@ -80,8 +109,22 @@ function QuickViewIcon() {
 function ClockIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="8.5" />
-      <path d="M12 7.5v5l3.2 1.8" />
+      <circle
+        cx="12"
+        cy="12"
+        r="8.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M12 7.5v5l3.2 1.8"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
     </svg>
   );
 }
@@ -155,7 +198,10 @@ export function JobCardBody({ job }: { job: JobCardData }) {
       </p>
       <div className="job-card-tags" aria-label="Job tags">
         {secondaryTags.map((tag, index) => (
-          <span className="job-card-tag job-card-tag--neutral" key={tag + index}>
+          <span
+            className="job-card-tag job-card-tag--neutral"
+            key={tag + index}
+          >
             {tag}
           </span>
         ))}
@@ -180,7 +226,7 @@ export function JobCardBody({ job }: { job: JobCardData }) {
 }
 
 function SignInApplyLink({ job }: { job: JobCardData }) {
-  const returnTo = "/jobs/" + job.slug + "?apply=true";
+  const returnTo = "/jobs/" + job.slug + "/apply";
   return (
     <Link
       className="sh-button job-card-apply-button"
@@ -204,6 +250,16 @@ export function ApplyButton({ job }: { job: JobCardData }) {
     );
   }
 
+  if (job.actions.applicationLimitReached) {
+    const message =
+      job.actions.applicationLimitMessage ?? MAX_APPLICATION_ATTEMPTS_MESSAGE;
+    return (
+      <span role="status" aria-label={message} className="job-closed-state">
+        {message}
+      </span>
+    );
+  }
+
   if (!job.actions.canApply) {
     return <span className="job-closed-state">Applications closed</span>;
   }
@@ -213,7 +269,7 @@ export function ApplyButton({ job }: { job: JobCardData }) {
   return (
     <Link
       className="sh-button job-card-apply-button"
-      href={"/jobs/" + job.slug + "?apply=true"}
+      href={"/jobs/" + job.slug + "/apply"}
     >
       Apply
     </Link>
@@ -239,7 +295,7 @@ export function SaveButton({ job }: { job: JobCardData }) {
       aria-label="Sign in to save this job"
       title="Sign in to save this job"
     >
-      <HeartIcon />
+      <SaveIcon />
     </Link>
   );
 }

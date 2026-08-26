@@ -1,7 +1,10 @@
 "use client";
-import { Box, Typography } from "@mui/material";
+
+import { Box, Chip, Divider, Paper, Stack, Typography } from "@mui/material";
 import { Show, useRecordContext, useRefresh } from "react-admin";
 import { ReportActionPanel } from "./report-action-panel";
+import { adminReasonLabel } from "../shared/admin-reason-label";
+
 type Report = {
   id: string;
   reporterUserId: string;
@@ -19,7 +22,7 @@ type Report = {
   history: Array<{
     id: string;
     action: string;
-    priorState: string;
+    priorState: string | null;
     resultingState: string;
     occurredAt: string;
   }>;
@@ -29,55 +32,353 @@ type Report = {
     normalizedText: string;
     createdAt: string;
   }>;
+  enforcementLinks: Array<{
+    enforcementAction: {
+      id: string;
+      type: string;
+      reason: string;
+      occurredAt: string;
+      targets: Array<{ targetType: string; targetReference: string }>;
+    };
+  }>;
 };
+
+function sentenceCase(value: string) {
+  return value
+    .replaceAll("_", " ")
+    .toLowerCase()
+    .replace(/\b\w/gu, (letter) => letter.toUpperCase());
+}
+
+function lifecycleStateColor(state: string) {
+  return state === "RESOLVED"
+    ? "success"
+    : state === "DISMISSED"
+      ? "default"
+      : "warning";
+}
+
+function Detail({ label, value }: { label: string; value: string }) {
+  return (
+    <Box>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ display: "block", mb: 0.25 }}
+      >
+        {label}
+      </Typography>
+      <Typography variant="body2" sx={{ overflowWrap: "anywhere" }}>
+        {value}
+      </Typography>
+    </Box>
+  );
+}
+
+function Section({
+  id,
+  title,
+  children,
+}: {
+  id: string;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Paper
+      component="section"
+      aria-labelledby={id}
+      variant="outlined"
+      sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: 2 }}
+    >
+      <Stack spacing={1.75}>
+        <Typography id={id} component="h2" variant="h6">
+          {title}
+        </Typography>
+        {children}
+      </Stack>
+    </Paper>
+  );
+}
+
 function Review() {
   const record = useRecordContext<Report>();
   const refresh = useRefresh();
   if (!record) return null;
+  const priorityColor =
+    record.priority === "CRITICAL"
+      ? "error"
+      : record.priority === "HIGH"
+        ? "warning"
+        : "default";
+  const stateColor =
+    record.state === "RESOLVED"
+      ? "success"
+      : record.state === "DISMISSED"
+        ? "default"
+        : "warning";
+
   return (
-    <Box sx={{ p: 2, display: "grid", gap: 2 }}>
-      <Typography component="h1" variant="h5">
-        Moderation report {record.id}
-      </Typography>
-      <Typography>Reporter account: {record.reporterUserId}</Typography>
-      <Typography>
-        Target: {record.targetType} / {record.targetReference}
-      </Typography>
-      <Typography>
-        Originating references: company {record.companyReference ?? "none"}; job{" "}
-        {record.jobReference ?? "none"}; application{" "}
-        {record.applicationReference ?? "none"}
-      </Typography>
-      <Typography>
-        Category: {record.category}; priority: {record.priority}; state:{" "}
-        {record.state}
-      </Typography>
-      <Typography sx={{ whiteSpace: "pre-wrap" }}>
-        Detail: {record.normalizedDetail ?? "No optional detail"}
-      </Typography>
-      <Typography component="h2" variant="h6">
-        Private investigation notes
-      </Typography>
-      {record.notes.map((note) => (
-        <Typography key={note.id}>{note.normalizedText}</Typography>
-      ))}
-      <Typography component="h2" variant="h6">
-        Immutable history
-      </Typography>
-      {record.history.map((item) => (
-        <Typography key={item.id}>
-          {item.action}: {item.priorState} to {item.resultingState}
-        </Typography>
-      ))}
-      <ReportActionPanel
-        reportId={record.id}
-        version={record.version}
-        state={record.state}
-        onDone={refresh}
-      />
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: 1200,
+        mx: "auto",
+        p: { xs: 1, sm: 2 },
+        display: "grid",
+        gap: 2.5,
+      }}
+    >
+      <Paper
+        component="header"
+        elevation={0}
+        sx={{
+          p: { xs: 2, sm: 2.5 },
+          border: 1,
+          borderColor: "divider",
+          borderRadius: 2,
+          background:
+            "linear-gradient(135deg, rgba(237, 108, 2, 0.10), transparent 60%)",
+        }}
+      >
+        <Stack spacing={2}>
+          <Box>
+            <Typography component="h1" variant="h5" sx={{ fontWeight: 700 }}>
+              Moderation report
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Reference: {record.id}
+            </Typography>
+          </Box>
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            <Chip label={record.state} color={stateColor} />
+            <Chip
+              label={`${record.priority} priority`}
+              color={priorityColor}
+              variant="outlined"
+            />
+            <Chip
+              label={adminReasonLabel(record.category)}
+              variant="outlined"
+            />
+          </Stack>
+          <Divider />
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(3, minmax(0, 1fr))",
+              },
+              gap: 2,
+            }}
+          >
+            <Detail label="Reporter account" value={record.reporterUserId} />
+            <Detail
+              label="Target"
+              value={`${record.targetType} · ${record.targetReference}`}
+            />
+            <Detail
+              label="Assigned administrator"
+              value={record.assignedAdminUserId ?? "Unassigned"}
+            />
+          </Box>
+        </Stack>
+      </Paper>
+
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            lg: "minmax(0, 1.45fr) minmax(300px, 0.85fr)",
+          },
+          gap: 2.5,
+          alignItems: "start",
+        }}
+      >
+        <Stack spacing={2.5}>
+          <Section id="report-detail-heading" title="Report detail">
+            <Typography sx={{ whiteSpace: "pre-wrap", lineHeight: 1.7 }}>
+              {record.normalizedDetail ?? "No optional detail was supplied."}
+            </Typography>
+            <Divider />
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(3, minmax(0, 1fr))",
+                },
+                gap: 2,
+              }}
+            >
+              <Detail
+                label="Company reference"
+                value={record.companyReference ?? "None"}
+              />
+              <Detail
+                label="Job reference"
+                value={record.jobReference ?? "None"}
+              />
+              <Detail
+                label="Application reference"
+                value={record.applicationReference ?? "None"}
+              />
+            </Box>
+          </Section>
+          <Section id="notes-heading" title="Private investigation notes">
+            {record.notes.length === 0 ? (
+              <Typography color="text.secondary">
+                No private notes recorded.
+              </Typography>
+            ) : (
+              <Stack spacing={1.25} divider={<Divider flexItem />}>
+                {record.notes.map((note) => (
+                  <Box key={note.id}>
+                    <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+                      {note.normalizedText}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {note.authorAdminUserId} ·{" "}
+                      {new Date(note.createdAt).toLocaleString()}
+                    </Typography>
+                  </Box>
+                ))}
+              </Stack>
+            )}
+          </Section>
+          <Section id="enforcement-heading" title="Linked enforcement">
+            {record.enforcementLinks.length ? (
+              <Stack spacing={1.25} divider={<Divider flexItem />}>
+                {record.enforcementLinks.map(({ enforcementAction }) => (
+                  <Box key={enforcementAction.id}>
+                    <Typography variant="body2" fontWeight={600}>
+                      {enforcementAction.type}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {enforcementAction.reason}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {enforcementAction.targets
+                        .map(
+                          (target) =>
+                            `${target.targetType} ${target.targetReference}`,
+                        )
+                        .join(", ")}{" "}
+                      ·{" "}
+                      {new Date(enforcementAction.occurredAt).toLocaleString()}
+                    </Typography>
+                  </Box>
+                ))}
+              </Stack>
+            ) : (
+              <Typography color="text.secondary">
+                No enforcement linked.
+              </Typography>
+            )}
+          </Section>
+        </Stack>
+
+        <Stack
+          spacing={2.5}
+          sx={{ position: { lg: "sticky" }, top: { lg: 16 } }}
+        >
+          <Section id="report-actions-heading" title="Report actions">
+            <ReportActionPanel
+              reportId={record.id}
+              version={record.version}
+              state={record.state}
+              onDone={refresh}
+            />
+          </Section>
+          <Section id="history-heading" title="Immutable history">
+            {record.history.length === 0 ? (
+              <Typography color="text.secondary">
+                No history recorded.
+              </Typography>
+            ) : (
+              <Stack spacing={0}>
+                {record.history.map((item, index) => (
+                  <Box
+                    key={item.id}
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "18px minmax(0, 1fr)",
+                      columnGap: 1.25,
+                      pb: index === record.history.length - 1 ? 0 : 2,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        position: "relative",
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 10,
+                          height: 10,
+                          mt: 0.75,
+                          borderRadius: "50%",
+                          bgcolor: `${lifecycleStateColor(item.resultingState)}.main`,
+                          boxShadow: 1,
+                          zIndex: 1,
+                        }}
+                      />
+                      {index < record.history.length - 1 && (
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            top: 15,
+                            bottom: -1,
+                            borderLeft: 2,
+                            borderColor: "divider",
+                          }}
+                        />
+                      )}
+                    </Box>
+                    <Stack spacing={0.6} sx={{ minWidth: 0 }}>
+                      <Typography variant="body2" fontWeight={700}>
+                        {sentenceCase(item.action)}
+                      </Typography>
+                      <Stack
+                        direction="row"
+                        spacing={0.5}
+                        alignItems="center"
+                        flexWrap="wrap"
+                        useFlexGap
+                      >
+                        <Chip
+                          label={sentenceCase(item.priorState ?? "CREATED")}
+                          size="small"
+                          variant="outlined"
+                        />
+                        <Typography variant="caption" color="text.secondary">
+                          to
+                        </Typography>
+                        <Chip
+                          label={sentenceCase(item.resultingState)}
+                          color={lifecycleStateColor(item.resultingState)}
+                          size="small"
+                        />
+                      </Stack>
+                      <Typography variant="caption" color="text.secondary">
+                        {new Date(item.occurredAt).toLocaleString()}
+                      </Typography>
+                    </Stack>
+                  </Box>
+                ))}
+              </Stack>
+            )}
+          </Section>
+        </Stack>
+      </Box>
     </Box>
   );
 }
+
 export function ModerationReviewShow() {
   return (
     <Show>

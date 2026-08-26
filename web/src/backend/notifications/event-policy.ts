@@ -5,13 +5,21 @@ import type {
   NotificationContextType,
   NotificationKind,
   NotificationSeverity,
+  NotificationRecipientRole,
 } from "@/shared/contracts/notifications";
 import { notificationKindSchema } from "@/shared/contracts/notifications";
 
 export const notificationVariablesSchema = z
   .object({
     companyName: z.string().trim().min(1).max(120).optional(),
-    audience: z.enum(["ADMIN"]).optional(),
+    targetEmail: z.string().email().max(320).optional(),
+    jobId: z.string().trim().min(1).max(128).optional(),
+    threadId: z.string().trim().min(1).max(128).optional(),
+    audience: z.enum(["USER", "ADMIN"]).optional(),
+    recipientRole: z.enum(["CANDIDATE", "RECRUITER", "ADMIN"]).optional(),
+    safeReason: z
+      .enum(["POLICY_VIOLATION", "QUALITY_ISSUE", "DUPLICATE"])
+      .optional(),
     stage: z.string().trim().min(1).max(64).optional(),
     state: z.string().trim().min(1).max(64).optional(),
     count: z.number().int().min(1).max(999).optional(),
@@ -165,6 +173,51 @@ const policies = {
       "You were removed from a company on SmartHire.",
     ),
   },
+  COMPANY_BANNED: {
+    category: "ACCOUNT",
+    severity: "CRITICAL",
+    title: { vi: "Công ty bị cấm", en: "Company banned" },
+    summary: (locale, variables) =>
+      locale === "vi"
+        ? `Quyền truy cập ${variables.companyName ?? "công ty"} đã bị vô hiệu hóa.`
+        : `Access to ${variables.companyName ?? "your company"} was disabled.`,
+  },
+  COMPANY_UNBANNED: {
+    category: "ACCOUNT",
+    severity: "HIGH",
+    title: { vi: "Công ty được mở cấm", en: "Company unbanned" },
+    summary: (locale, variables) =>
+      locale === "vi"
+        ? `Quyền truy cập ${variables.companyName ?? "công ty"} đã được khôi phục.`
+        : `Access to ${variables.companyName ?? "your company"} was restored.`,
+  },
+  COMPANY_INVITATION_RECEIVED: {
+    category: "ACCOUNT",
+    severity: "MEDIUM",
+    title: { vi: "Lời mời tham gia công ty", en: "Company team invitation" },
+    summary: (locale, variables) =>
+      locale === "vi"
+        ? `Bạn đã được mời tham gia đội ngũ${variables.companyName ? ` của ${variables.companyName}` : ""}. Kiểm tra email để chấp nhận lời mời.`
+        : `You were invited to join${variables.companyName ? ` ${variables.companyName}` : " a company team"}. Check your email to accept the invitation.`,
+  },
+  COMPANY_INVITATION_ACCEPTED: {
+    category: "ACCOUNT",
+    severity: "LOW",
+    title: { vi: "Lời mời đã được chấp nhận", en: "Invitation accepted" },
+    summary: (locale, variables) =>
+      locale === "vi"
+        ? `${variables.targetEmail ?? "Người được mời"} đã chấp nhận lời mời${variables.companyName ? ` tham gia ${variables.companyName}` : ""}.`
+        : `${variables.targetEmail ?? "The invited account"} accepted the invitation${variables.companyName ? ` to join ${variables.companyName}` : ""}.`,
+  },
+  COMPANY_INVITATION_DECLINED: {
+    category: "ACCOUNT",
+    severity: "LOW",
+    title: { vi: "Lời mời đã bị từ chối", en: "Invitation declined" },
+    summary: (locale, variables) =>
+      locale === "vi"
+        ? `${variables.targetEmail ?? "Người được mời"} đã từ chối lời mời${variables.companyName ? ` tham gia ${variables.companyName}` : ""}.`
+        : `${variables.targetEmail ?? "The invited account"} declined the invitation${variables.companyName ? ` to join ${variables.companyName}` : ""}.`,
+  },
   APPLICATION_SUBMITTED: {
     category: "APPLICATION",
     severity: "LOW",
@@ -282,6 +335,33 @@ const policies = {
       "Your support case was resolved.",
     ),
   },
+  SUPPORT_CASE_RECEIVED: {
+    category: "SUPPORT",
+    severity: "MEDIUM",
+    title: { vi: "Yêu cầu hỗ trợ mới", en: "New support case" },
+    summary: generic(
+      "Một yêu cầu hỗ trợ mới đang chờ quản trị viên xem xét.",
+      "A new support case is awaiting administrator review.",
+    ),
+  },
+  SUPPORT_REQUESTER_REPLIED: {
+    category: "SUPPORT",
+    severity: "HIGH",
+    title: { vi: "Người yêu cầu đã phản hồi", en: "Support requester replied" },
+    summary: generic(
+      "Người yêu cầu đã phản hồi một trường hợp hỗ trợ được phân công.",
+      "A requester replied to an assigned support case.",
+    ),
+  },
+  SUPPORT_CASE_REOPENED: {
+    category: "SUPPORT",
+    severity: "HIGH",
+    title: { vi: "Yêu cầu hỗ trợ được mở lại", en: "Support case reopened" },
+    summary: generic(
+      "Một yêu cầu hỗ trợ đã giải quyết vừa được người yêu cầu mở lại.",
+      "A resolved support case was reopened by its requester.",
+    ),
+  },
   CONNECTION_PROPOSAL_CREATED: {
     category: "CONNECTION",
     severity: "MEDIUM",
@@ -370,6 +450,15 @@ const policies = {
       "Your message report was reviewed and closed.",
     ),
   },
+  MESSAGE_REPORT_RECEIVED_ADMIN: {
+    category: "MODERATION",
+    severity: "HIGH",
+    title: { vi: "Báo cáo tin nhắn mới", en: "New message report" },
+    summary: generic(
+      "Một báo cáo tin nhắn mới đang chờ xem xét được bảo vệ.",
+      "A new message report is awaiting protected review.",
+    ),
+  },
   MODERATION_REPORT_RECEIVED: {
     category: "MODERATION",
     severity: "LOW",
@@ -397,34 +486,80 @@ const policies = {
       "Your report was reviewed and closed.",
     ),
   },
+  MODERATION_REPORT_RECEIVED_ADMIN: {
+    category: "MODERATION",
+    severity: "HIGH",
+    title: { vi: "Báo cáo kiểm duyệt mới", en: "New moderation report" },
+    summary: generic(
+      "Một báo cáo kiểm duyệt mới đang chờ xem xét.",
+      "A new moderation report is awaiting review.",
+    ),
+  },
+  VERIFICATION_REVIEW_OVERDUE: {
+    category: "VERIFICATION",
+    severity: "HIGH",
+    title: { vi: "Xác minh cần chú ý", en: "Verification requires attention" },
+    summary: generic(
+      "Bằng chứng xác minh không thể xem trong thời hạn leo thang và cần được kiểm tra.",
+      "Verification evidence has remained unavailable through the escalation threshold.",
+    ),
+  },
+  DELIVERY_MANUAL_INTERVENTION_REQUIRED: {
+    category: "SYSTEM",
+    severity: "CRITICAL",
+    title: {
+      vi: "Gửi thông báo cần can thiệp",
+      en: "Notification delivery needs intervention",
+    },
+    summary: generic(
+      "Một thông báo bảo mật không thể gửi và cần quản trị viên can thiệp.",
+      "A security notification could not be delivered and requires administrator intervention.",
+    ),
+  },
+  JOB_POST_REVIEW_REQUESTED_ADMIN: {
+    category: "MODERATION",
+    severity: "MEDIUM",
+    title: { vi: "Bài đăng cần xem xét", en: "Job post awaiting review" },
+    summary: generic(
+      "Một bài đăng tuyển dụng mới đang chờ quản trị viên xem xét.",
+      "A new job post is awaiting administrator review.",
+    ),
+  },
+  JOB_POST_APPROVED: {
+    category: "MODERATION",
+    severity: "LOW",
+    title: { vi: "Bài đăng đã được duyệt", en: "Job post approved" },
+    summary: generic(
+      "Bài đăng tuyển dụng của bạn đã được duyệt.",
+      "Your job post has been approved.",
+    ),
+  },
+  JOB_POST_REJECTED: {
+    category: "MODERATION",
+    severity: "MEDIUM",
+    title: { vi: "Bài đăng cần chỉnh sửa", en: "Job post needs revision" },
+    summary: generic(
+      "Bài đăng tuyển dụng của bạn cần được chỉnh sửa trước khi gửi lại.",
+      "Your job post needs revision before it can be submitted again.",
+    ),
+  },
+  JOB_POST_CHANGES_REQUESTED: {
+    category: "MODERATION",
+    severity: "MEDIUM",
+    title: { vi: "Bài đăng cần chỉnh sửa", en: "Your post needs changes" },
+    summary: generic(
+      "Quản trị viên yêu cầu bạn chỉnh sửa bài đăng trước khi gửi lại.",
+      "An administrator requested changes before this post can be submitted again.",
+    ),
+  },
 } satisfies Record<NotificationKind, Policy>;
-
-const hrefForContext = (
-  kind: NotificationKind,
-  contextType?: NotificationContextType,
-  contextId?: string,
-) => {
-  if (!contextType || !contextId) return null;
-  if (contextType === "ACCOUNT") return "/profile/security";
-  if (contextType === "MEMBERSHIP") return "/recruiter";
-  if (contextType === "APPLICATION")
-    return kind === "APPLICATION_RECEIVED"
-      ? "/recruiter"
-      : `/jobs/applied/${encodeURIComponent(contextId)}`;
-  if (contextType === "VERIFICATION_REQUEST")
-    return "/dashboard/employer-verification";
-  if (contextType === "SUPPORT_CASE") return "/support";
-  if (contextType === "CONNECTION_PROPOSAL" || contextType === "CONNECTION")
-    return "/connections";
-  if (contextType === "CONVERSATION")
-    return `/messages?conversation=${encodeURIComponent(contextId)}`;
-  return null;
-};
 
 export type BuiltNotification = {
   kind: NotificationKind;
   category: NotificationCategory;
   severity: NotificationSeverity;
+  audience: "USER" | "ADMIN";
+  recipientRole?: NotificationRecipientRole;
   title: string;
   summary: string;
   href: string | null;
@@ -479,13 +614,18 @@ export function buildNotification(
     kind,
     category: policy.category,
     severity: policy.severity,
+    audience: variables.audience === "ADMIN" ? "ADMIN" : "USER",
+    recipientRole:
+      variables.recipientRole ??
+      (variables.audience === "ADMIN"
+        ? "ADMIN"
+        : kind === "APPLICATION_RECEIVED" || kind.startsWith("JOB_POST_")
+          ? "RECRUITER"
+          : "CANDIDATE"),
     title,
     summary,
-    href: hrefForContext(
-      kind,
-      contextType ?? undefined,
-      contextId ?? undefined,
-    ),
+    // Context is durable; href is resolved for the current recipient when served.
+    href: null,
     contextType,
     contextId,
     deduplicationKey: input.deduplicationKey,

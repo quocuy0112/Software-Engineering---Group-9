@@ -25,15 +25,16 @@ describe("Feature 006 email renderer registry", () => {
         appUrl,
         payloadRef: { eventKind, resultingState: state, occurredAt },
       });
-      expect(rendered.text).toContain(occurredAt);
+      expect(rendered.text).toContain("Aug 10, 2026");
+      expect(rendered.text).not.toContain(occurredAt);
       if (eventKind === "ACCOUNT_SUSPENDED") {
-        expect(rendered.text).toContain("SUSPENDED");
-        expect(rendered.text).toContain("All sessions have been revoked");
-        expect(rendered.text).toContain("appeal");
+        expect(rendered.text).toContain("was suspended on");
+        expect(rendered.text).toContain("Reason:");
+        expect(rendered.text).toContain("restoring your account");
       } else if (eventKind === "ACCOUNT_REINSTATED") {
-        expect(rendered.text).toContain("ACTIVE");
-        expect(rendered.text).toContain("old sessions are not restored");
-        expect(rendered.text).toContain("memberships suspended separately");
+        expect(rendered.text).toContain("reactivated");
+        expect(rendered.text).toContain("fully operational");
+        expect(rendered.text).toContain("has been resolved");
       } else {
         expect(rendered.text).toContain("All SmartHire sessions were revoked");
       }
@@ -60,7 +61,9 @@ describe("Feature 006 email renderer registry", () => {
         },
       });
       expect(rendered.text).toContain("Acme Vietnam");
-      expect(rendered.text).toContain(state);
+      expect(rendered.text.toLowerCase()).toContain(
+        state === "SUSPENDED" ? "suspended" : state === "REMOVED" ? "removed" : "restored",
+      );
       expect(rendered.text.toLowerCase()).not.toContain("account suspended");
       expect(rendered.text.toLowerCase()).not.toContain("account locked");
     },
@@ -85,8 +88,9 @@ describe("Feature 006 email renderer registry", () => {
         nextAction: "WAIT_FOR_REVIEW",
       },
     });
-    expect(rendered.text).toContain("request-1");
-    expect(rendered.text).toContain("WAIT_FOR_REVIEW");
+    expect(rendered.text).toContain("Aug 10, 2026, at 12:00 AM");
+    expect(rendered.text).toContain("employer verification");
+    expect(rendered.text).not.toContain("WAIT_FOR_REVIEW");
     for (const value of forbidden)
       expect(rendered.text.toLowerCase()).not.toContain(value);
   });
@@ -106,9 +110,27 @@ describe("Feature 006 email renderer registry", () => {
       },
     });
     expect(rendered.text).toContain("Acme Vietnam is verified");
-    expect(rendered.text).toContain("Company membership role: RECRUITER");
+    expect(rendered.text).toContain("Company membership role: Recruiter");
     expect(rendered.text).toContain("console.recruiter.localhost");
     expect(rendered.text).toContain("Candidate identity remains unchanged");
+  });
+
+  it("renders account security email with recipient greeting and team signature", async () => {
+    const rendered = await renderFeature006Email({
+      templateVersion: "admin-security-v1",
+      appUrl,
+      payloadRef: {
+        eventKind: "ACCOUNT_REINSTATED",
+        resultingState: "ACTIVE",
+        recipientName: "Khoi",
+        occurredAt,
+      },
+    });
+    expect(rendered.text).toContain("Hi Khoi,");
+    expect(rendered.text).toContain("The SmartHire Team");
+    expect(rendered.text).toContain("Log In to SmartHire");
+    expect(rendered.text).not.toContain("resultingState");
+    expect(rendered.text).not.toContain("reasonCategory");
   });
 
   it("fails unsupported event kinds explicitly instead of using token fallback", async () => {

@@ -14,13 +14,11 @@ import {
   useDataProvider,
   useNotify,
   useRecordContext,
-  useRedirect,
   useRefresh,
   useUpdate,
 } from "react-admin";
 import type { NotificationItem } from "@/shared/contracts/notifications";
 import type { AdminDataProvider } from "../app/data-provider";
-import { adminNotificationTarget } from "./admin-notification-navigation";
 
 const filters = [
   <SelectInput
@@ -85,15 +83,13 @@ function AdminNotificationListActions() {
 function AdminNotificationOpenButton() {
   const notification = useRecordContext<NotificationItem>();
   const notify = useNotify();
-  const redirect = useRedirect();
   const refresh = useRefresh();
   const [update, { isPending }] = useUpdate<NotificationItem>();
   if (!notification) return null;
   const current = notification;
-  const target = adminNotificationTarget(current);
 
   function navigate() {
-    if (target) redirect("show", target.resource, target.id);
+    if (current.href) window.location.assign(current.href);
   }
 
   function open() {
@@ -109,21 +105,19 @@ function AdminNotificationOpenButton() {
         previousData: current,
       },
       {
-        mutationMode: "pessimistic",
-        onSuccess: () => {
-          refresh();
-          navigate();
-        },
+        mutationMode: "optimistic",
+        onSettled: () => refresh(),
         onError: () =>
           notify("Unable to mark notification as read", { type: "error" }),
       },
     );
+    navigate();
   }
 
   return (
     <Button
-      label={target ? "Open" : current.readAt ? "Read" : "Mark read"}
-      disabled={isPending || (Boolean(current.readAt) && !target)}
+      label={current.href ? "Open" : current.readAt ? "Read" : "Mark read"}
+      disabled={isPending || (Boolean(current.readAt) && !current.href)}
       onClick={open}
     >
       <OpenInNewIcon />
@@ -142,7 +136,18 @@ export function AdminNotificationList() {
       pagination={<Pagination rowsPerPageOptions={[25, 50, 100]} />}
       sort={{ field: "lastOccurredAt", order: "DESC" }}
     >
-      <Datagrid bulkActionButtons={false} rowClick={false}>
+      <Datagrid
+        bulkActionButtons={false}
+        rowClick={false}
+        rowSx={(record: NotificationItem) =>
+          record.readAt
+            ? {}
+            : {
+                backgroundColor: "grey.100",
+                "&:hover": { backgroundColor: "grey.200" },
+              }
+        }
+      >
         <TextField source="severity" />
         <TextField source="category" />
         <TextField source="title" />

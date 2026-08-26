@@ -9,7 +9,7 @@ export type SafeOwnedCvUpload = Readonly<{
   id: string;
   accountId: string;
   profileId: string;
-  documentKind: "PDF" | "DOCX";
+  documentKind: "PDF" | "DOC" | "DOCX";
   parserClass: "DETERMINISTIC_INTERNAL" | "EXTERNAL_OPENAI";
   status: string;
   declaredMediaType: string;

@@ -16,6 +16,7 @@ import {
   jobSearchQuerySchema,
   type JobCard,
 } from "@/shared/contracts/jobs/discovery";
+import { listJobSearchTaxonomy } from "./job-search-taxonomy";
 import {
   computeDiscoveryJobs,
   computeRelatedJobs,
@@ -24,6 +25,11 @@ import {
 import { GetProfileAggregateService } from "@/backend/services/profile/get-profile-aggregate";
 import { normalizeSalaryAmount } from "@/shared/utils/jobs/job-display";
 import { rankJobsForCandidate } from "./candidate-job-match";
+import { jobReviewSnapshotSchema } from "@/shared/contracts/recruiter-job-posting";
+import {
+  MAX_APPLICATION_ATTEMPTS,
+  MAX_APPLICATION_ATTEMPTS_MESSAGE,
+} from "@/shared/contracts/jobs/actions";
 
 const experienceYears: Record<string, number> = {
   ENTRY: 0,
@@ -33,6 +39,13 @@ const experienceYears: Record<string, number> = {
   LEAD: 6,
   MANAGER: 7,
 };
+
+function approvedSnapshot(row: PublicJobRow) {
+  const parsed = jobReviewSnapshotSchema.safeParse(
+    row.reviewAggregate?.approvedVersion?.snapshot,
+  );
+  return parsed.success ? parsed.data : null;
+}
 
 type CandidateSignal = JobSimilarityInput & { row: PublicJobRow };
 
@@ -57,6 +70,14 @@ export function parseJobSearchCriteria(raw: unknown): NormalizedJobSearch {
     normalizedQuery: normalizeSearchText(parsed.q),
     searchBy: parsed.searchBy,
     normalizedLocation: normalizeSearchText(parsed.location, 160),
+    normalizedDistricts: parsed.district.map((district) =>
+      normalizeSearchText(district, 160),
+    ),
+    categoryFamily: parsed.categoryFamily,
+    categoryIds: parsed.categoryId,
+    normalizedRoleTitles: parsed.categoryTitle.map((title) =>
+      normalizeSearchText(title, 160),
+    ),
     normalizedSkills: parsed.skills.map((skill) =>
       normalizeSearchText(skill, 80),
     ),
@@ -106,13 +127,17 @@ function similarityInput(row: PublicJobRow): JobSimilarityInput {
     skillTags?: unknown;
     location?: unknown;
   };
-  const skillTags = Array.isArray(signals.skillTags)
-    ? signals.skillTags.filter(
-        (skill): skill is string => typeof skill === "string",
-      )
-    : row.skills.map((skill) => skill.displayName);
-  const location =
-    signals.location && typeof signals.location === "object"
+  const snapshot = approvedSnapshot(row);
+  const skillTags = snapshot
+    ? snapshot.skillTags
+    : Array.isArray(signals.skillTags)
+      ? signals.skillTags.filter(
+          (skill): skill is string => typeof skill === "string",
+        )
+      : row.skills.map((skill) => skill.displayName);
+  const location = snapshot
+    ? snapshot.location.city
+    : signals.location && typeof signals.location === "object"
       ? (signals.location as { city?: unknown }).city
       : signals.location;
 
@@ -122,13 +147,16 @@ function similarityInput(row: PublicJobRow): JobSimilarityInput {
     companyId: row.companyId,
     industry: row.company.industry ?? undefined,
     status: row.status === "ACTIVE" ? "open" : row.status.toLowerCase(),
-    categoryIds: Array.isArray(signals.categoryIds)
-      ? signals.categoryIds.filter(
-          (category): category is string => typeof category === "string",
-        )
-      : undefined,
-    categoryFamily:
-      typeof signals.categoryFamily === "string"
+    categoryIds: snapshot
+      ? snapshot.categoryIds
+      : Array.isArray(signals.categoryIds)
+        ? signals.categoryIds.filter(
+            (category): category is string => typeof category === "string",
+          )
+        : undefined,
+    categoryFamily: snapshot
+      ? snapshot.categoryFamily
+      : typeof signals.categoryFamily === "string"
         ? signals.categoryFamily
         : undefined,
     skillTags,
@@ -157,7 +185,14 @@ function card(
     categoryIds?: unknown;
     categoryFamily?: unknown;
   };
+  const snapshot = approvedSnapshot(row);
   const authenticated = actor.kind === "user";
+  const applicationCount = authenticated
+    ? (row.applicationAttemptCounters?.[0]?.applicationCount ??
+      Math.min(row.applications.length, 1))
+    : 0;
+  const applicationLimitReached =
+    authenticated && applicationCount >= MAX_APPLICATION_ATTEMPTS;
   const urgent =
     row.applicationDeadline !== null &&
     row.applicationDeadline.getTime() - now.getTime() <= 14 * 86_400_000 &&
@@ -176,7 +211,9 @@ function card(
     employmentType: row.employmentType,
     experienceLevel: row.experienceLevel,
     workArrangement: row.workArrangement,
-    salary: salary(row),
+    salary: snapshot
+      ? { ...salary(row)!, isNegotiable: snapshot.salary.isNegotiable }
+      : salary(row),
     summary: row.summary,
     education: row.education ?? undefined,
     numberOfHires: row.numberOfHires ?? undefined,
@@ -184,26 +221,34 @@ function card(
     skills: row.skills.map((skill) => skill.displayName),
     requirementHighlights: textBullets(row.requirements),
     benefitHighlights: textBullets(row.benefits),
-    benefitItems: textBullets(row.benefits).map((label) => ({
-      icon: "spark",
-      label,
-    })),
+    benefitItems:
+      snapshot?.description.benefits ??
+      textBullets(row.benefits).map((label) => ({
+        icon: "spark",
+        label,
+      })),
     publishedAt: row.publishedAt!.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
     applicationDeadline: row.applicationDeadline?.toISOString() ?? null,
-    isUrgent: urgent,
-    workOnSaturday: false,
+    isUrgent: snapshot?.isUrgent ?? urgent,
+    workOnSaturday: snapshot?.workOnSaturday ?? false,
     isVerified: true,
-    categoryIds: Array.isArray(signals.categoryIds)
-      ? signals.categoryIds.filter(
-          (category): category is string => typeof category === "string",
-        )
-      : undefined,
-    categoryFamily:
-      typeof signals.categoryFamily === "string"
+    categoryIds: snapshot
+      ? snapshot.categoryIds
+      : Array.isArray(signals.categoryIds)
+        ? signals.categoryIds.filter(
+            (category): category is string => typeof category === "string",
+          )
+        : undefined,
+    categoryFamily: snapshot
+      ? snapshot.categoryFamily
+      : typeof signals.categoryFamily === "string"
         ? signals.categoryFamily
         : undefined,
-    experienceMinYears: experienceYears[row.experienceLevel] ?? undefined,
+    experienceMinYears:
+      snapshot?.experience.minYears ??
+      experienceYears[row.experienceLevel] ??
+      undefined,
     matchScore,
     actions: {
       authenticated,
@@ -211,7 +256,12 @@ function card(
       applied: row.applications.length > 0,
       canSave: authenticated,
       canReport: authenticated,
-      canApply: true,
+      canApply: !applicationLimitReached,
+      applicationCount: authenticated ? applicationCount : undefined,
+      applicationLimitReached,
+      applicationLimitMessage: applicationLimitReached
+        ? MAX_APPLICATION_ATTEMPTS_MESSAGE
+        : undefined,
     },
   };
 }
@@ -248,8 +298,38 @@ export class JobDiscoveryService {
       new (
         await import("@/backend/repositories/jobs/prisma-public-job-repository")
       ).PrismaPublicJobRepository();
+    const taxonomy =
+      criteria.categoryFamily?.length || criteria.categoryIds?.length
+        ? await listJobSearchTaxonomy()
+        : null;
+    const normalizedCategoryNames = taxonomy
+      ? taxonomy.industries
+          .filter((industry) =>
+            criteria.categoryFamily?.includes(industry.code),
+          )
+          .map((industry) => normalizeSearchText(industry.name, 160))
+      : undefined;
+    const normalizedCategoryTitleNames = taxonomy
+      ? taxonomy.industries
+          .flatMap((industry) => industry.subIndustries)
+          .flatMap((subIndustry) => subIndustry.titles)
+          .filter((title) =>
+            title.categoryIds.some((id) => criteria.categoryIds?.includes(id)),
+          )
+          .map((title) => normalizeSearchText(title.name, 160))
+      : undefined;
+    const repositoryCriteria = {
+      ...criteria,
+      ...(normalizedCategoryNames?.length ? { normalizedCategoryNames } : {}),
+      ...(normalizedCategoryTitleNames?.length
+        ? { normalizedCategoryTitleNames }
+        : {}),
+      ...(criteria.normalizedRoleTitles?.length
+        ? { normalizedRoleTitles: criteria.normalizedRoleTitles }
+        : {}),
+    };
     const result = await repository.search(
-      criteria,
+      repositoryCriteria,
       actor.kind === "user" ? actor.userId : null,
       now,
     );
@@ -263,6 +343,10 @@ export class JobDiscoveryService {
         q: criteria.normalizedQuery,
         searchBy: criteria.searchBy,
         location: criteria.normalizedLocation,
+        district: criteria.normalizedDistricts,
+        categoryFamily: criteria.categoryFamily,
+        categoryId: criteria.categoryIds,
+        categoryTitle: criteria.normalizedRoleTitles,
         employmentType: criteria.employmentType,
         experienceLevel: criteria.experienceLevel,
         workArrangement: criteria.workArrangement,
@@ -277,6 +361,26 @@ export class JobDiscoveryService {
         limit: criteria.limit,
       },
     };
+  }
+
+  /**
+   * Returns every currently candidate-visible posting for a server-side
+   * recommendation calculation. This deliberately has no page-size limit:
+   * callers must rank the collection on the server and project only the
+   * selected results to a page.
+   */
+  async listRecommendationCandidates(actor: JobActor, now = new Date()) {
+    const repository =
+      this.repository ??
+      new (
+        await import("@/backend/repositories/jobs/prisma-public-job-repository")
+      ).PrismaPublicJobRepository();
+    if (!repository.findPublicRecommendationCandidates) return [];
+    const rows = await repository.findPublicRecommendationCandidates(
+      actor.kind === "user" ? actor.userId : null,
+      now,
+    );
+    return rows.map((row) => card(row, actor, now));
   }
 
   async detail(
@@ -386,13 +490,24 @@ export class JobDiscoveryService {
       ...summary,
       actions: {
         ...summary.actions,
-        canApply: state === "ACTIVE" && !summary.actions.applied,
+        canApply:
+          state === "ACTIVE" &&
+          !summary.actions.applied &&
+          summary.actions.canApply,
       },
       state,
-      description: row.description,
-      responsibilities: row.responsibilities,
-      requirements: row.requirements,
-      benefits: row.benefits,
+      description:
+        approvedSnapshot(row)?.description.overview ?? row.description,
+      responsibilities:
+        approvedSnapshot(row)?.description.responsibilities.join("\n") ??
+        row.responsibilities,
+      requirements:
+        approvedSnapshot(row)?.description.requirements.join("\n") ??
+        row.requirements,
+      benefits:
+        approvedSnapshot(row)
+          ?.description.benefits.map((benefit) => benefit.label)
+          .join("\n") ?? row.benefits,
       canonicalUrl: new URL("/jobs/" + row.slug, canonicalOrigin).toString(),
       relatedJobs,
       recommendedJobs,

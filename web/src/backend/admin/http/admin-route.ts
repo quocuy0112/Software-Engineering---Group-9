@@ -116,6 +116,12 @@ export function adminRouteError(error: unknown) {
       ADMIN_AUTHORITY_STALE: 403,
       VALIDATION_FAILED: 400,
       ACTION_BLOCKED: 423,
+      CLAIM_REQUIRED: 409,
+      ASSIGNED_TO_OTHER: 423,
+      CORRECTION_REQUEST_OPEN: 409,
+      FEATURE_CAPACITY_CONFLICT: 409,
+      INVALID_REPORT_RANGE: 400,
+      ANALYTICS_RANGE_UNAVAILABLE: 404,
     };
     if (known[error.message])
       return adminJson(
@@ -159,7 +165,8 @@ export function commandHeaders(
 ) {
   const ifMatch = options.strictIfMatch
     ? request.headers.get("If-Match")
-    : request.headers.get("If-Match") ?? request.headers.get("if-match-version");
+    : (request.headers.get("If-Match") ??
+      request.headers.get("if-match-version"));
   const parsed = options.strictIfMatch
     ? ifMatch?.match(/^"(\d+)"$/u)
     : ifMatch?.match(/^"?(\d+)"?$/u);

@@ -56,6 +56,7 @@ async function seed(
 
 class ReconciliationStorage implements PrivateCvStorage {
   readonly deleted: string[] = [];
+  deleteFailures = new Set<string>();
   missing = new Set<string>();
   inventoryItems: Array<{
     locator: ReturnType<typeof sensitiveStorageLocator>;
@@ -76,6 +77,9 @@ class ReconciliationStorage implements PrivateCvStorage {
   }
   async delete(locator: string) {
     this.deleted.push(locator);
+    if (this.deleteFailures.has(locator)) {
+      throw new CvStorageError("CV_STORAGE_OPERATION_FAILED");
+    }
     return { deleted: true } as const;
   }
   async inventory() {
@@ -273,9 +277,43 @@ describe("CV deletion and storage reconciliation", () => {
   it("schedules missing references safely and deletes only grace-aged untracked inventory", async () => {
     const fixture = await seed("reconciliation");
     const storage = new ReconciliationStorage();
+    const job = await pool.query<{ id: string }>(
+      `SELECT "id" FROM "JobPosting" ORDER BY "id" LIMIT 1`,
+    );
+    const jobPostingId = job.rows[0]?.id;
+    if (!jobPostingId) throw new Error("reconciliation test requires a job");
+    const draftLocator = "draft_cover_letter_locator_1";
+    const draftCoverLetter = JSON.stringify({
+      kind: "FILE",
+      file: {
+        versionId: "draft-cover-version-1",
+        displayName: "cover.pdf",
+        fileName: "cover.pdf",
+        mimeType: "application/pdf",
+        byteSize: 9,
+        parseStatus: "NOT_APPLICABLE",
+        storageKey: draftLocator,
+        checksumSha256: "a".repeat(64),
+      },
+    });
     const locators = await pool.query<{ storageLocator: string }>(
       `SELECT "storageLocator" FROM "CvStoredArtifact" WHERE "uploadId" = $1 ORDER BY "kind"`,
       [fixture.uploadId],
+    );
+    await pool.query(
+      `INSERT INTO "CandidateApplicationDraft" (
+         "id", "candidateUserId", "jobPostingId", "revision", "personalInfoDraft",
+         "selectedCvId", "coverLetterDraft", "messageDraft", "confirmationAccepted",
+         "createdAt", "updatedAt", "expiresAt"
+       ) VALUES ($1, $2, $3, 1, '{}'::jsonb, NULL, $4::jsonb, NULL, false, $5, $5, $6)`,
+      [
+        `reconciliation-draft-${fixture.accountId}`,
+        fixture.accountId,
+        jobPostingId,
+        draftCoverLetter,
+        initial,
+        new Date(initial.getTime() + 24 * 60 * 60_000),
+      ],
     );
     storage.missing.add(locators.rows[0]!.storageLocator);
     const runAt = new Date(initial.getTime() + 2 * 60 * 60_000);
@@ -291,6 +329,11 @@ describe("CV deletion and storage reconciliation", () => {
         createdAt: initial,
       },
       {
+        locator: sensitiveStorageLocator(draftLocator),
+        bytes: 9,
+        createdAt: initial,
+      },
+      {
         locator: sensitiveStorageLocator("recent_locator_abcdefghijkl"),
         bytes: 8,
         createdAt: runAt,
@@ -303,7 +346,7 @@ describe("CV deletion and storage reconciliation", () => {
     expect(result).toMatchObject({
       referencesChecked: 2,
       missingScheduled: 1,
-      inventoryChecked: 3,
+      inventoryChecked: 4,
       orphansDeleted: 1,
     });
     expect(storage.deleted).toEqual(["orphan_locator_abcdefghijkl"]);
@@ -323,6 +366,38 @@ describe("CV deletion and storage reconciliation", () => {
     expect(audit.rows[0]?.serialized).not.toMatch(
       /orphan_locator|storageLocator/iu,
     );
+  });
+
+  it("continues reconciliation when an orphan delete fails", async () => {
+    await seed("reconciliation-delete-failure");
+    const storage = new ReconciliationStorage();
+    const failedLocator = "orphan_delete_failure_locator";
+    const deletedLocator = "orphan_delete_success_locator";
+    storage.deleteFailures.add(failedLocator);
+    storage.inventoryItems = [
+      {
+        locator: sensitiveStorageLocator(failedLocator),
+        bytes: 7,
+        createdAt: initial,
+      },
+      {
+        locator: sensitiveStorageLocator(deletedLocator),
+        bytes: 8,
+        createdAt: initial,
+      },
+    ];
+
+    const runAt = new Date(initial.getTime() + 2 * 60 * 60_000);
+    const result = await new CvStorageReconciliation(
+      storage,
+      new ControlledClock(runAt),
+    ).runOnce();
+
+    expect(result).toMatchObject({
+      inventoryChecked: 2,
+      orphansDeleted: 1,
+    });
+    expect(storage.deleted).toEqual([failedLocator, deletedLocator]);
   });
 
   it("requires cleanup even for a delete-only runtime when processing is disabled", async () => {

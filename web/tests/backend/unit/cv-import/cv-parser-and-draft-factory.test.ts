@@ -30,10 +30,10 @@ describe("CV parser and draft factory", () => {
   });
 
   it("validates the whole parser output, evidence IDs, collections, and byte caps", async () => {
-    const writes: unknown[] = [];
+    const writes: Array<{ proposalPayload: unknown }> = [];
     const service = new CreateCvDraftService({
       saveDraft: async (draft) => {
-        writes.push(draft);
+        writes.push({ proposalPayload: draft.proposalPayload });
         return draft;
       },
     });
@@ -66,6 +66,41 @@ describe("CV parser and draft factory", () => {
         expiresAt: new Date("2026-08-31T00:00:00.000Z"),
       }),
     ).rejects.toMatchObject({ code: "PARSER_OUTPUT_INVALID" });
+  });
+
+  it("normalizes a model's current entry when it also supplies an end date", async () => {
+    const writes: Array<{ proposalPayload: unknown }> = [];
+    const base = buildCvFixtureParserOutput();
+    const output = {
+      ...base,
+      experiences: [
+        {
+          ...base.experiences[0]!,
+          isCurrent: true,
+          endDate: "2025-01-01",
+        },
+      ],
+    };
+    const service = new CreateCvDraftService({
+      saveDraft: async (draft) => {
+        writes.push({ proposalPayload: draft.proposalPayload });
+        return draft;
+      },
+    });
+    await service.execute({
+      accountId: "account_fixture",
+      uploadId: "upload_fixture_current",
+      parseJobId: "parse_fixture_current",
+      profileId: "profile_fixture",
+      sourceProfileRevision: 7,
+      output,
+      segments,
+      expiresAt: new Date("2026-08-31T00:00:00.000Z"),
+    });
+    const payload = writes[0]?.proposalPayload as {
+      experiences: Array<{ value: { endDate: string | null } }>;
+    };
+    expect(payload.experiences[0]?.value.endDate).toBeNull();
   });
 
   it("does not expose any CandidateProfile mutation dependency", () => {

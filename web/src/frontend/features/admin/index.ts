@@ -12,3 +12,4 @@ export { ModerationReportList } from "./moderation/moderation-report-list";
 export { VerificationRequestList } from "./verification/verification-request-list";
 export { SupportCaseList } from "./support/support-case-list";
 export { SupportCaseShow } from "./support/support-case-show";
+export { AdminGrowthDashboard } from "./analytics/admin-growth-dashboard";

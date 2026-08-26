@@ -2,7 +2,7 @@ import "server-only";
 
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 import {
-  computeMatchScore,
+  computeMatchScoreDetails,
   type CandidateJobProfile,
   type JobSimilarityInput,
 } from "@/shared/utils/jobs/similarity";
@@ -30,6 +30,7 @@ export function hasCandidateJobSignals(profile: CandidateProfileContract) {
     !profile.empty &&
     (profile.skills.length > 0 ||
       profile.experience.length > 0 ||
+      Boolean(profile.basics.headline?.trim()) ||
       Boolean(profile.basics.location?.trim()))
   );
 }
@@ -38,10 +39,13 @@ export function candidateProfileSignals(
   profile: CandidateProfileContract,
   now = new Date(),
 ): CandidateJobProfile {
+  const currentRole = profile.experience.find((item) => item.current)?.title;
+  const latestRole = profile.experience.at(-1)?.title;
   return {
     skillTags: profile.skills.map((skill) => skill.label),
     city: profile.basics.location ?? undefined,
     experienceMinYears: experienceYears(profile, now),
+    title: profile.basics.headline?.trim() || currentRole || latestRole,
   };
 }
 
@@ -49,49 +53,14 @@ export type CandidateJobMatch<T extends JobSimilarityInput> = {
   candidate: T;
   matchScore: number;
   matchBreakdown?: Readonly<{
-    skills: number;
+    roleAndSkills: number;
+    preferences: number;
     experience: number;
-    education: number;
+    unmatched: number;
   }>;
   matchingSkills: readonly string[];
   improvementAreas: readonly string[];
 };
-
-function normalizeBreakdown(values: readonly number[]) {
-  const total = values.reduce((sum, value) => sum + value, 0);
-  if (!total) return undefined;
-  const skills = Math.round((values[0] / total) * 100);
-  const experience = Math.round((values[1] / total) * 100);
-  return {
-    skills,
-    experience,
-    education: Math.max(0, 100 - skills - experience),
-  };
-}
-
-function profileSignalBreakdown<T extends JobSimilarityInput>(
-  profile: CandidateProfileContract,
-  signals: CandidateJobProfile,
-  candidate: T,
-  matchingSkills: readonly string[],
-) {
-  const requiredSkills = candidate.skillTags?.length ?? 0;
-  const skills = requiredSkills ? matchingSkills.length / requiredSkills : 0;
-  const requiredExperience = candidate.experienceMinYears;
-  const candidateExperience = signals.experienceMinYears;
-  const experience =
-    candidateExperience === null || candidateExperience === undefined
-      ? 0
-      : requiredExperience === null || requiredExperience === undefined
-        ? 0.5
-        : Math.min(1, candidateExperience / Math.max(1, requiredExperience));
-  const education = candidate.education?.trim()
-    ? profile.education.length
-      ? 1
-      : 0
-    : 0;
-  return normalizeBreakdown([skills, experience, education]);
-}
 
 const normalized = (value: string) =>
   value
@@ -119,15 +88,14 @@ export function rankJobsForCandidate<T extends JobSimilarityInput>(
       const matchingSkills = skills.filter((skill) =>
         profileSkills.has(normalized(skill)),
       );
+      const details = computeMatchScoreDetails(signals, candidate);
       return {
         candidate,
-        matchScore: computeMatchScore(signals, candidate),
-        matchBreakdown: profileSignalBreakdown(
-          profile,
-          signals,
-          candidate,
-          matchingSkills,
-        ),
+        matchScore: details.score,
+        matchBreakdown: {
+          ...details.breakdown,
+          unmatched: 100 - details.score,
+        },
         matchingSkills,
         improvementAreas: skills
           .filter((skill) => !profileSkills.has(normalized(skill)))

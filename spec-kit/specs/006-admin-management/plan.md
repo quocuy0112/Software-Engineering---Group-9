@@ -9,6 +9,11 @@ React Admin for `console.admin.localhost:3001`.
 
 ## Summary
 
+**Feature 024 synchronization (2026-08-19):** Platform Administrator membership
+commands remain independent of the Owner-facing Team workflow. The latter is
+company-scoped and does not change admin authority, audit views, or existing
+membership lifecycle guarantees.
+
 Feature 006 adds a separately authorized Platform Administrator console for
 dashboard operations, account/session enforcement, employer verification,
 company-membership enforcement, moderation reports, notification-delivery

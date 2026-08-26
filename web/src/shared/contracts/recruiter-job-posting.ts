@@ -1,16 +1,60 @@
 import {
   companyCatalogSchema,
+  jobDraftCatalogSchema,
   jobCatalogSchema,
   jobPostingStatusSchema,
   type CompanyCatalogItem,
   type JobCatalogItem,
   type JobPostingStatus,
 } from "./jobs/catalog";
+import {
+  deriveRecruiterClassification,
+  isRecruiterIndustrySelectionValid,
+} from "./jobs/industry-taxonomy";
+import { z } from "zod";
+import type { RecruiterReviewProjection } from "./admin/job-post-review";
 
-export { companyCatalogSchema, jobCatalogSchema, jobPostingStatusSchema };
+export {
+  companyCatalogSchema,
+  jobDraftCatalogSchema,
+  jobCatalogSchema,
+  jobPostingStatusSchema,
+};
 export type { CompanyCatalogItem, JobCatalogItem, JobPostingStatus };
 
 export type RecruiterJobStatus = JobPostingStatus;
+
+const serverOwnedJobFields = {
+  status: true,
+  approvalComment: true,
+  isVerified: true,
+  postedAt: true,
+  updatedAt: true,
+  stats: true,
+} as const;
+
+/** Immutable, normalized content captured by the server at submission time. */
+export const jobReviewSnapshotSchema = jobCatalogSchema
+  .omit(serverOwnedJobFields)
+  .strict();
+
+/** Fields a Recruiter may author. Identity and lifecycle facts are server-derived. */
+export const recruiterJobReviewInputSchema = jobReviewSnapshotSchema
+  .omit({ id: true, slug: true, companyId: true })
+  .strict();
+
+export const submitJobReviewCommandSchema = z
+  .object({ expectedWorkingUpdatedAt: z.string().datetime() })
+  .extend({
+    job: jobCatalogSchema.optional(),
+    expectedCatalogueUpdatedAt: z.string().datetime().optional(),
+  })
+  .strict();
+
+export type JobReviewSnapshot = z.infer<typeof jobReviewSnapshotSchema>;
+export type RecruiterJobReviewInput = z.infer<
+  typeof recruiterJobReviewInputSchema
+>;
 
 export const recruiterJobStatusMeta: Record<
   RecruiterJobStatus,
@@ -56,14 +100,24 @@ export type RecruiterCompanyView = Omit<
   >;
 export type RecruiterJob = JobCatalogItem & {
   company: RecruiterCompanyView;
+  review?: RecruiterReviewProjection;
+  correctionRequest?: {
+    id: string;
+    publicExplanation: string;
+    hideImmediately: boolean;
+    createdAt: string;
+  };
 };
 
 export type RecruiterJobManagementData = {
   jobs: RecruiterJob[];
   companies: RecruiterCompanyView[];
   companyId: string | null;
+  recruiterUserId?: string;
   companyProfileComplete?: boolean;
-  missingCompanyProfileFields?: Array<"name" | "industry" | "size" | "address" | "logo">;
+  missingCompanyProfileFields?: Array<
+    "name" | "industry" | "size" | "address" | "logo"
+  >;
 };
 
 export type RecruiterJobFieldErrors = Record<string, string>;
@@ -79,10 +133,11 @@ export function parseVndInput(value: string): number {
   const normalized = value.trim().toLowerCase();
   if (!normalized) return 0;
 
-  const hasMillionSuffix = /(?:tr|trieu|triÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡u|m)\s*$/iu.test(normalized);
+  const millionSuffix = /(?:tr|trieu|triệu|m)\s*$/iu;
+  const hasMillionSuffix = millionSuffix.test(normalized);
   if (hasMillionSuffix) {
     const numericPart = normalized
-      .replace(/(?:tr|trieu|triÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡u|m)\s*$/iu, "")
+      .replace(millionSuffix, "")
       .replace(/\s+/gu, "")
       .replace(",", ".");
     const millions = Number.parseFloat(numericPart);
@@ -124,9 +179,10 @@ const requiredFieldMessages: Record<string, string> = {
   shortPitch: "Add a short pitch.",
   industry: "Enter an industry.",
   subIndustry: "Enter a sub-industry.",
-  categoryFamily: "Enter a job category.",
   "location.city": "Enter a city.",
   "description.overview": "Add a role overview.",
+  "description.responsibilities": "Add at least one responsibility.",
+  "description.requirements": "Add at least one requirement.",
   "experience.label": "Enter an experience level.",
   level: "Enter a job level.",
   employmentType: "Choose an employment type.",
@@ -145,29 +201,19 @@ function nullableTrimmed(value: string | null) {
   return trimmed || null;
 }
 
-function slugPart(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/\p{M}+/gu, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/gu, "-")
-    .replace(/^-|-$/gu, "")
-    .slice(0, 80);
-}
-
 export function prepareRecruiterJobForSave(
   job: JobCatalogItem,
 ): JobCatalogItem {
-  const industry = job.industry.trim();
+  const classification = deriveRecruiterClassification(job);
   return {
     ...job,
     title: job.title.trim(),
     shortPitch: job.shortPitch.trim(),
-    industry,
-    industryCode: job.industryCode.trim() || slugPart(industry),
-    subIndustry: job.subIndustry.trim(),
-    categoryIds: uniqueTrimmed(job.categoryIds),
-    categoryFamily: job.categoryFamily.trim(),
+    industry: classification.industry,
+    industryCode: classification.industryCode,
+    subIndustry: classification.subIndustry,
+    categoryIds: classification.categoryIds,
+    categoryFamily: classification.categoryFamily,
     skillTags: uniqueTrimmed(job.skillTags),
     location: {
       ...job.location,
@@ -197,7 +243,7 @@ export function prepareRecruiterJobForSave(
         .filter((benefit) => benefit.icon && benefit.label),
       generalInfo: {
         reportsTo: nullableTrimmed(job.description.generalInfo.reportsTo),
-        department: nullableTrimmed(job.description.generalInfo.department),
+        department: classification.department,
         workingHours: nullableTrimmed(job.description.generalInfo.workingHours),
         workAddress: nullableTrimmed(job.description.generalInfo.workAddress),
       },
@@ -211,21 +257,41 @@ export function validateRecruiterJobForSave(
   now = new Date(),
 ): RecruiterJobFieldErrors {
   const prepared = prepareRecruiterJobForSave(job);
+  const classification = deriveRecruiterClassification(job);
   const errors: RecruiterJobFieldErrors = {};
 
-  for (const [path, message] of Object.entries(requiredFieldMessages)) {
-    const value =
-      path === "location.city"
-        ? prepared.location.city
-        : path === "description.overview"
-          ? prepared.description.overview
-          : path === "experience.label"
-            ? prepared.experience.label
-            : prepared[path as keyof JobCatalogItem];
-    if (typeof value === "string" && !value) errors[path] = message;
+  if (!isRecruiterIndustrySelectionValid(job)) {
+    errors.industry = "Choose an industry from the list.";
+  }
+  if (targetStatus !== "draft" && !classification.valid) {
+    errors.subIndustry = classification.subIndustry
+      ? "Enter a valid sub-industry."
+      : "Enter a sub-industry.";
   }
 
-  if (prepared.numberOfHires < 1) {
+  if (targetStatus !== "draft") {
+    for (const [path, message] of Object.entries(requiredFieldMessages)) {
+      const value =
+        path === "location.city"
+          ? prepared.location.city
+          : path === "description.overview"
+            ? prepared.description.overview
+            : path === "experience.label"
+              ? prepared.experience.label
+              : prepared[path as keyof JobCatalogItem];
+      if (typeof value === "string" && !value) errors[path] = message;
+    }
+    if (!prepared.description.responsibilities.length) {
+      errors["description.responsibilities"] =
+        requiredFieldMessages["description.responsibilities"];
+    }
+    if (!prepared.description.requirements.length) {
+      errors["description.requirements"] =
+        requiredFieldMessages["description.requirements"];
+    }
+  }
+
+  if (targetStatus !== "draft" && prepared.numberOfHires < 1) {
     errors.numberOfHires = "Number of hires must be at least 1.";
   }
   if (prepared.experience.minYears < 0) {
@@ -234,20 +300,23 @@ export function validateRecruiterJobForSave(
   if (prepared.salary.min < 0) {
     errors["salary.min"] = "Minimum salary cannot be less than 0.";
   }
-  if (prepared.salary.max < prepared.salary.min) {
+  if (targetStatus !== "draft" && prepared.salary.max < prepared.salary.min) {
     errors["salary.max"] =
       "Maximum salary must be greater than or equal to minimum salary.";
   }
   if (targetStatus === "pending_approval" && !prepared.applyDeadline) {
     errors.applyDeadline = "Choose an application deadline.";
   } else if (
+    targetStatus !== "draft" &&
     prepared.applyDeadline &&
     new Date(prepared.applyDeadline).getTime() <= now.getTime()
   ) {
     errors.applyDeadline = "Application deadline must be in the future.";
   }
 
-  const parsed = jobCatalogSchema.safeParse({
+  const parsed = (
+    targetStatus === "draft" ? jobDraftCatalogSchema : jobCatalogSchema
+  ).safeParse({
     ...prepared,
     status: targetStatus,
   });
@@ -275,11 +344,11 @@ export function createEmptyJobPosting(
     companyId,
     title: "",
     shortPitch: "",
-    industry: "Technology",
-    industryCode: "technology",
-    subIndustry: "Software & Technology Services",
-    categoryIds: [],
-    categoryFamily: "technology",
+    industry: "Information Technology (IT)",
+    industryCode: "r03",
+    subIndustry: "Software Development",
+    categoryIds: ["r03-software-development"],
+    categoryFamily: "r03",
     skillTags: [],
     location: {
       city: "Ho Chi Minh City",
@@ -316,7 +385,7 @@ export function createEmptyJobPosting(
       benefits: [],
       generalInfo: {
         reportsTo: null,
-        department: null,
+        department: "Software Development",
         workingHours: null,
         workAddress: null,
       },

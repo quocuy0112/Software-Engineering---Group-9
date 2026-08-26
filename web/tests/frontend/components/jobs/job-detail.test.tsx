@@ -76,7 +76,7 @@ describe("job detail presentation", () => {
     for (const link of signInLinks) {
       expect(link).toHaveAttribute(
         "href",
-        "/login?returnTo=%2Fjobs%2Flap-trinh-vien",
+        "/login?returnTo=%2Fjobs%2Flap-trinh-vien%2Fapply",
       );
     }
   });
@@ -105,5 +105,30 @@ describe("job detail presentation", () => {
     );
     expect(screen.getByText("Closed")).toBeVisible();
     expect(screen.queryByRole("link", { name: /apply/i })).toBeNull();
+  });
+
+  it("explains when the candidate has permanently reached the job limit", () => {
+    render(
+      <JobDetailView
+        job={{
+          ...detail,
+          actions: {
+            ...detail.actions,
+            authenticated: true,
+            canApply: false,
+            applicationCount: 5,
+            applicationLimitReached: true,
+            applicationLimitMessage:
+              "You have reached the maximum number of applications for this job.",
+          },
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("status", {
+        name: "You have reached the maximum number of applications for this job.",
+      }),
+    ).toBeVisible();
   });
 });

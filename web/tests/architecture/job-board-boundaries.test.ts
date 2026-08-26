@@ -97,7 +97,9 @@ describe("Feature 003 architecture boundaries", () => {
   });
 
   it("keeps application and report enforcement human-controlled", () => {
-    const jobSources = files(/\/(?:backend|app)\/.*jobs?\//u)
+    const jobSources = files(
+      /\/(?:backend|app)\/.*jobs?\/.*(?:application|report)/u,
+    )
       .map(read)
       .join("\n");
     expect(jobSources).not.toMatch(

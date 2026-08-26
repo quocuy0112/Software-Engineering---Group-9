@@ -229,6 +229,25 @@ textarea {
   border-color: var(--sh-color-brand-primary);
 }
 
+.sh-button--outline {
+  color: var(--sh-color-brand-primary);
+  background: transparent;
+  border-color: var(--sh-color-brand-primary);
+  box-shadow: none;
+}
+
+.sh-button--outline:hover:not(:disabled) {
+  color: var(--sh-color-brand-primary-hover);
+  background: var(--sh-color-brand-soft);
+  border-color: var(--sh-color-brand-primary-hover);
+}
+
+.sh-button--outline:active:not(:disabled) {
+  color: var(--sh-color-brand-primary-pressed);
+  background: var(--sh-color-brand-soft);
+  border-color: var(--sh-color-brand-primary-pressed);
+}
+
 .sh-button--danger,
 .security-panel .danger-action {
   color: var(--sh-color-error);
@@ -257,6 +276,10 @@ textarea {
   width: var(--sh-control-height);
   min-width: var(--sh-control-height);
   padding: 0;
+}
+
+.sh-button--full {
+  width: 100%;
 }
 
 .sh-input,

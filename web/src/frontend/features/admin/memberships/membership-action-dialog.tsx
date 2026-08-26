@@ -14,6 +14,10 @@ import {
   TextField,
 } from "@mui/material";
 import { AccountStateDialog } from "../accounts/account-state-dialog";
+import {
+  adminReasonLabel,
+  privilegedReasonCategories,
+} from "../shared/admin-reason-label";
 
 type Command = {
   reasonCategory: string;
@@ -46,16 +50,6 @@ export function RestoreMembershipDialog(props: Props) {
     />
   );
 }
-
-const categories = [
-  "SECURITY_COMPROMISE",
-  "POLICY_VIOLATION",
-  "USER_REQUEST",
-  "VERIFICATION_FAILURE",
-  "INCIDENT_RESOLVED",
-  "ACCESS_CLEANUP",
-  "OTHER",
-];
 
 export function RemoveMembershipDialog(
   props: Props & { confirmationText: string },
@@ -92,9 +86,9 @@ export function RemoveMembershipDialog(
             value={category}
             onChange={(event) => setCategory(event.target.value)}
           >
-            {categories.map((value) => (
+            {privilegedReasonCategories.map((value) => (
               <MenuItem key={value} value={value}>
-                {value}
+                {adminReasonLabel(value)}
               </MenuItem>
             ))}
           </Select>

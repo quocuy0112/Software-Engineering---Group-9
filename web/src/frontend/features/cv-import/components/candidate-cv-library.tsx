@@ -20,9 +20,11 @@ function formatBytes(bytes: number) {
 export function CandidateCvLibrary({
   csrfProof,
   initialItems,
+  embedded = false,
 }: {
   csrfProof: string;
   initialItems: readonly CandidateCvSummary[];
+  embedded?: boolean;
 }) {
   const locale = useWorkspaceLocale();
   const [items, setItems] = useState(() => [...initialItems]);
@@ -33,7 +35,7 @@ export function CandidateCvLibrary({
 
   function beginRename(item: CandidateCvSummary) {
     setEditingId(item.id);
-    setDraftName(item.displayName);
+    setDraftName(item.fileName);
     setError(null);
   }
 
@@ -121,17 +123,21 @@ export function CandidateCvLibrary({
   return (
     <section
       className={styles.root}
-      aria-labelledby="candidate-cv-library-heading"
+      aria-labelledby={embedded ? undefined : "candidate-cv-library-heading"}
+      aria-label={embedded ? "Saved CVs" : undefined}
+      data-embedded={embedded ? "true" : undefined}
     >
-      <header className={styles.heading}>
-        <div>
-          <p className={styles.kicker}>APPLICATION CVs</p>
-          <h2 id="candidate-cv-library-heading">
-            {locale === "vi" ? "CV đã lưu" : "Saved CVs"}
-          </h2>
-        </div>
-        <span>{items.length}</span>
-      </header>
+      {embedded ? null : (
+        <header className={styles.heading}>
+          <div>
+            <p className={styles.kicker}>APPLICATION CVs</p>
+            <h2 id="candidate-cv-library-heading">
+              {locale === "vi" ? "CV đã lưu" : "Saved CVs"}
+            </h2>
+          </div>
+          <span>{items.length}</span>
+        </header>
+      )}
       {error ? (
         <p className={styles.error} role="alert">
           {error}
@@ -147,7 +153,7 @@ export function CandidateCvLibrary({
                 <div className={styles.copy}>
                   {editing ? (
                     <label>
-                      <span className={styles.srOnly}>CV display name</span>
+                      <span className={styles.srOnly}>CV filename</span>
                       <input
                         value={draftName}
                         maxLength={200}

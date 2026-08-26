@@ -2,21 +2,27 @@
 
 import { ProfileNavigation } from "./profile-navigation";
 import { ProfileSecurity } from "./profile-security";
-import { Badge } from "@/frontend/components/ui/badge";
+import { PageHeader } from "@/frontend/components/layout/page-header";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
+import { useProfileEditor } from "../client/use-profile-editor";
+import { ProfileVisibilityForm } from "./profile-visibility-form";
 
 type ProfileSecurityViewProps = {
   twoFactorEnabled: boolean;
   recoveryCompleted: boolean;
   csrfProof: string;
+  initialProfile: CandidateProfileContract;
 };
 
 export function ProfileSecurityView({
   twoFactorEnabled,
   recoveryCompleted,
   csrfProof,
+  initialProfile,
 }: ProfileSecurityViewProps) {
   const locale = useWorkspaceLocale();
+  const editor = useProfileEditor(initialProfile, csrfProof);
   const copy =
     locale === "vi"
       ? {
@@ -37,22 +43,41 @@ export function ProfileSecurityView({
         };
   return (
     <div className="profile-page profile-page--standalone">
-      <header className="page-heading profile-heading">
-        <div>
-          <p className="workspace-kicker">{copy.kicker}</p>
-          <h1 id="workspace-page-title">{copy.title}</h1>
-          <p className="page-heading-copy">{copy.subtitle}</p>
-        </div>
-        <Badge tone={twoFactorEnabled ? "success" : "warning"}>
-          {twoFactorEnabled ? copy.enabled : copy.recommended}
-        </Badge>
-      </header>
       <ProfileNavigation active="security" />
-      <ProfileSecurity
-        initialTwoFactorEnabled={twoFactorEnabled}
-        recoveryCompleted={recoveryCompleted}
-        csrfProof={csrfProof}
+      <PageHeader
+        className="profile-heading"
+        eyebrow={copy.kicker}
+        title={copy.title}
+        titleId="workspace-page-title"
+        subtitle={copy.subtitle}
+        status={{
+          label: twoFactorEnabled ? copy.enabled : copy.recommended,
+          tone: twoFactorEnabled ? "success" : "warning",
+        }}
       />
+      <div className="profile-security-layout">
+        <div className="profile-security-layout__privacy">
+          {editor.profile ? (
+            <ProfileVisibilityForm
+              profile={editor.profile}
+              saving={editor.savingSection === "visibility"}
+              feedback={
+                editor.feedback?.section === "visibility"
+                  ? editor.feedback
+                  : null
+              }
+              onSave={editor.save}
+            />
+          ) : null}
+        </div>
+        <div className="profile-security-layout__account">
+          <ProfileSecurity
+            initialTwoFactorEnabled={twoFactorEnabled}
+            recoveryCompleted={recoveryCompleted}
+            csrfProof={csrfProof}
+          />
+        </div>
+      </div>
     </div>
   );
 }
