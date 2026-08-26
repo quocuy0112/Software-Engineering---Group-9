@@ -181,6 +181,8 @@ const requiredFieldMessages: Record<string, string> = {
   subIndustry: "Enter a sub-industry.",
   "location.city": "Enter a city.",
   "description.overview": "Add a role overview.",
+  "description.responsibilities": "Add at least one responsibility.",
+  "description.requirements": "Add at least one requirement.",
   "experience.label": "Enter an experience level.",
   level: "Enter a job level.",
   employmentType: "Choose an employment type.",
@@ -279,6 +281,14 @@ export function validateRecruiterJobForSave(
               : prepared[path as keyof JobCatalogItem];
       if (typeof value === "string" && !value) errors[path] = message;
     }
+    if (!prepared.description.responsibilities.length) {
+      errors["description.responsibilities"] =
+        requiredFieldMessages["description.responsibilities"];
+    }
+    if (!prepared.description.requirements.length) {
+      errors["description.requirements"] =
+        requiredFieldMessages["description.requirements"];
+    }
   }
 
   if (targetStatus !== "draft" && prepared.numberOfHires < 1) {
@@ -304,9 +314,8 @@ export function validateRecruiterJobForSave(
     errors.applyDeadline = "Application deadline must be in the future.";
   }
 
-  const parsed = (targetStatus === "draft"
-    ? jobDraftCatalogSchema
-    : jobCatalogSchema
+  const parsed = (
+    targetStatus === "draft" ? jobDraftCatalogSchema : jobCatalogSchema
   ).safeParse({
     ...prepared,
     status: targetStatus,

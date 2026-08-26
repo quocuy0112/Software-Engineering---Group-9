@@ -870,12 +870,18 @@ export function JobPostingEditor({
           paths.some(
             (path) =>
               path.startsWith("experience.") ||
-              ["level", "education"].includes(path),
+              ["level", "education", "description.requirements"].includes(path),
           )
         )
           next[2] = true;
         if (paths.some((path) => path.startsWith("salary."))) next[3] = true;
-        if (paths.some((path) => path.startsWith("description.")))
+        if (
+          paths.some((path) =>
+            ["description.overview", "description.responsibilities"].includes(
+              path,
+            ),
+          )
+        )
           next[4] = true;
         if (
           paths.some((path) =>
@@ -1592,6 +1598,10 @@ export function JobPostingEditor({
                   "3+ years in a similar role\nStrong communication skills\nPortfolio of relevant work"
                 }
               />
+              <FieldError
+                field="description.requirements"
+                errors={displayedErrors}
+              />
             </label>
           </EditorSection>
 
@@ -1825,6 +1835,10 @@ export function JobPostingEditor({
                 placeholder={
                   "Own the roadmap for your domain\nCollaborate with product and engineering\nShare progress with stakeholders"
                 }
+              />
+              <FieldError
+                field="description.responsibilities"
+                errors={displayedErrors}
               />
             </label>
             <label>

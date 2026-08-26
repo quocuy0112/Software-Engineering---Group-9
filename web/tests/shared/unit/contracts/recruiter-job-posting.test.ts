@@ -23,6 +23,8 @@ describe("recruiter job posting editor contract", () => {
         shortPitch: "Add a short pitch.",
         subIndustry: "Enter a sub-industry.",
         "description.overview": "Add a role overview.",
+        "description.responsibilities": "Add at least one responsibility.",
+        "description.requirements": "Add at least one requirement.",
         applyDeadline: "Choose an application deadline.",
       }),
     );
@@ -64,6 +66,8 @@ describe("recruiter job posting editor contract", () => {
     job.subIndustry = "  HR Technology  ";
     job.skillTags = [" Figma ", "Figma", " Research "];
     job.description.overview = "  Own end-to-end product design.  ";
+    job.description.responsibilities = ["Shape product direction."];
+    job.description.requirements = ["Strong product design experience."];
     job.applyDeadline = "2099-12-31T23:59:59.000Z";
 
     const prepared = prepareRecruiterJobForSave(job);
