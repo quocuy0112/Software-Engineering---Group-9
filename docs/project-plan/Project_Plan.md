@@ -343,7 +343,7 @@ A task is considered complete only when:
 
 ### 4.9. PA5 Final Synchronization and Exit Status (2026-08-26)
 
-*Performed by: Lưu Chí Hải | Reviewed by: Pending Nguyễn Minh Khôi | Edited by: Lưu Chí Hải*
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
 
 #### Feature 001–026 status summary
 

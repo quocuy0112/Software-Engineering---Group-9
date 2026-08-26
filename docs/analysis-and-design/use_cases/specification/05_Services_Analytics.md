@@ -1,6 +1,6 @@
 # DGM-05 — Use-Case Specification: Communications and Engagement
 
-_Performed by: Lưu Chí Hải | Reviewed by: Pending Nguyễn Minh Khôi | Edited by: Lưu Chí Hải_
+_Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải_
 
 **Version:** V1.5 (2026-08-26)
 

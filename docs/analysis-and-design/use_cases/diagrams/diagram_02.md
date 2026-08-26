@@ -1,6 +1,6 @@
 # DGM-02 — Candidate Job Journey
 
-*Performed by: Lưu Chí Hải | Reviewed by: Pending Nguyễn Minh Khôi | Edited by: Lưu Chí Hải*
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
 
 **Version:** V1.5 (2026-08-26) — synchronized with Features 003, 005, and 020; PA5 screenshot evidence remains pending for UC-JOB-06 and UC-APP-05–07
 

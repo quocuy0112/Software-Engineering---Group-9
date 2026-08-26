@@ -14,9 +14,9 @@
 | Version | Date | Author/Editor | Summary | Status |
 |---|---|---|---|---|
 | 1.1 | 2026-07-10 | Nguyễn Gia Quốc Uy and Group 9 | Reconciled the project scope, multi-tenant authorization model, feature priorities, measurable quality targets, company-membership workflow, references, and document presentation. | Draft for Team Review |
-| 1.2 | 2026-08-26 | Nguyễn Minh Khôi | Updated NFR, scope, dependency, and AI/release-qualification content. | Awaiting evidence review |
-| 1.3 | 2026-08-26 | Lưu Chí Hải | Synchronized product overview, role taxonomy, Features 001–026 functional baseline, stable FR IDs, and FR-to-UC/code/test traceability without adding Feature 027 to release scope. | Awaiting Nguyễn Minh Khôi review and final integration |
-| 1.4 | 2026-08-26 | Lưu Chí Hải | Replaced the obsolete 12-group Product Features presentation with seven final domains covering F001–F026, retained historical rationale/authorship, recorded domain statuses, and kept Feature 027 outside the baseline. | Awaiting Nguyễn Minh Khôi review and final integration |
+| 1.2 | 2026-08-26 | Nguyễn Minh Khôi | Updated NFR, scope, dependency, and AI/release-qualification content. | Integrated in final synchronization |
+| 1.3 | 2026-08-26 | Lưu Chí Hải | Synchronized product overview, role taxonomy, Features 001–026 functional baseline, stable FR IDs, and FR-to-UC/code/test traceability without adding Feature 027 to release scope. | Integrated in final synchronization |
+| 1.4 | 2026-08-26 | Lưu Chí Hải | Replaced the obsolete 12-group Product Features presentation with seven final domains covering F001–F026, retained historical rationale/authorship, recorded domain statuses, and kept Feature 027 outside the baseline. | Integrated in final synchronization |
 
 ## Changes from PA1 Proposal & How this document was developed
 
@@ -199,7 +199,7 @@ The platform has a base Candidate identity, company-scoped membership roles, and
 
 ### 3.2.4. Company-Scoped Roles and Platform Authority
 
-*Performed by: Lưu Chí Hải | Reviewed by: Pending Nguyễn Minh Khôi | Edited by: Lưu Chí Hải*
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
 
 | Role | Scope | Proven functional boundary |
 |---|---|---|
@@ -316,7 +316,7 @@ The platform competes with both job-search websites and Applicant Tracking Syste
 
 # 4. Product Overview
 
-*Performed by: Lưu Chí Hải | Reviewed by: Pending Nguyễn Minh Khôi | Edited by: Lưu Chí Hải*
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
 
 **Author of this Part:** Nguyễn Minh Khôi<br>
 **Student ID:** 24127066 <br>
@@ -410,7 +410,7 @@ External-service interruptions may temporarily affect related features. However,
 
 # 5. Product Features
 
-*Performed by: Lưu Chí Hải | Reviewed by: Pending Nguyễn Minh Khôi | Edited by: Lưu Chí Hải*
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
 
 **Historical authorship retained:** Original Product Features author — Nguyễn Gia Quốc Uy (Student ID 24127261); PA2 detailed-list modification — Nguyễn Quốc Thành (Student ID 24127542), reviewed by Nguyễn Gia Quốc Uy.
 
@@ -710,7 +710,7 @@ The system shall:
 - securely invalidate user sessions across all active devices upon logout or password reset.
 - enforce password reset through cryptographic email verification tokens.
 - store authentication tokens using HttpOnly, Secure, SameSite cookies, never in localStorage or sessionStorage, to mitigate client-side script injection (XSS).
-- enforce **Step-Up Authentication (Recent 2FA)**: Sensitive administrator actions (including triggering database backup, modifying global security settings, or privileged role assignments) require recent two-factor re-verification within 10 minutes.
+- enforce **Step-Up Authentication (Recent 2FA)**: Sensitive administrator actions (including triggering database backup, modifying global security settings, or privileged role assignments) require recent two-factor re-verification within 15 minutes.
 
 ### Authorization & Multi-Tenant Isolation
 

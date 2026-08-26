@@ -80,7 +80,7 @@ A person can be both a Candidate and a Recruiter / Company Member; company membe
 
 ### 3. Repository Evidence
 
-_Performed by: Lưu Chí Hải | Reviewed by: Pending Nguyễn Minh Khôi | Edited by: Lưu Chí Hải_
+_Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Quốc Thành | Edited by: Lưu Chí Hải_
 
 | Context element | Repository evidence | Qualification |
 |---|---|---|

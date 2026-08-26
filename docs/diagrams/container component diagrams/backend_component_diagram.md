@@ -139,10 +139,10 @@ graph TD
 #### 1. Ingress & Real-Time Gateway Layer
 - **App Router Server Components:** Performs server-side rendering (SSR/RSC) and directly invokes read queries on Identity, Profile, and Job domain services in-process.
 - **Route Handlers:** Next.js App Router HTTP endpoints (`/api/*`). Handles incoming JSON/multipart requests, delegates security validation to Request Security Boundary, and routes commands to appropriate domain services.
-- **Socket.IO Real-Time Gateway:** Custom server (`web/server.ts`) listening on `/chat`. Manages active WebSocket connections for candidate-recruiter messaging, application recruitment threads, and real-time typing/delivery indicators.
+- **Socket.IO Real-Time Gateway:** Custom server (`web/server.ts`) listening on `/chat`. Manages general-message delivery and related realtime invalidation; application-scoped recruitment threads use REST/refetch rather than Socket.IO traffic.
 
 #### 2. Request Security Boundary
-- **Responsibilities:** Validates Better Auth session cookies, verifies multi-tenant company membership, enforces **Step-Up 2FA (recent authentication within 10 minutes)** for privileged admin operations (backup, global security), validates CSRF/origin headers, and parses input payloads via Zod contracts.
+- **Responsibilities:** Validates Better Auth session cookies, verifies multi-tenant company membership, enforces **Step-Up 2FA (recent authentication within 15 minutes)** for privileged admin operations (backup, global security), validates CSRF/origin headers, and parses input payloads via Zod contracts.
 
 #### 3. Domain Services Layer
 - **Identity & Account Services:** Account registration, email verification tokens, password change/recovery, TOTP 2FA setup, and multi-device session revocation.
@@ -274,4 +274,4 @@ graph TD
 - **OCR Engine:** Standalone containerized service running Python 3.12 FastAPI and PaddleOCR with ONNX Runtime CPU over a private Unix socket.
 - **Admin Worker:** Background loop scheduler for verification evidence safety scans, in-app notification retention pruning, support ticket lifecycle, and automated job post expiration archival.
 - **Analytics Export Worker:** Background worker claiming `ExportRequest` jobs to asynchronously generate large Excel (.xlsx) and CSV datasets using ExcelJS without blocking web server threads.
-- **Admin Backup Process:** Privileged backup runner executing `pg_dump`, gzip compression, AES-256-GCM encryption, local artifact storage, and optional Google Drive OAuth2 upload; no restore UI.
+- **Admin Backup Process:** Privileged backup runner executing `pg_dump`, gzip compression, AES-256-GCM encryption, and Google Drive adapter upload with recorded Drive metadata; no restore UI. It is an executable logical process, not a current separate Compose service.

@@ -2,7 +2,7 @@
 
 ## Use-Case Specifications
 
-*Performed by: Nguyễn Gia Quốc Uy and Lưu Chí Hải | Reviewed by: Pending Nguyễn Minh Khôi | Edited by: Lưu Chí Hải*
+*Performed by: Nguyễn Gia Quốc Uy and Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
 
 **Version:** V1.2 (2026-08-26) — synchronized with Features 003, 005, and 020
 

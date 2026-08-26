@@ -1,6 +1,6 @@
 # DGM-05 — Communications and Engagement
 
-*Performed by: Lưu Chí Hải | Reviewed by: Pending Nguyễn Minh Khôi | Edited by: Lưu Chí Hải*
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
 
 **Version:** V1.5 (2026-08-26) — refactored for Features 008, 011, 013, 016, 019, and 025; only UC-NOT-01–02 currently have matching prototype screenshots
 

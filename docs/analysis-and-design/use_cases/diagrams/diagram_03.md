@@ -1,6 +1,6 @@
 # DGM-03 — Recruiter Operations
 
-*Performed by: Lưu Chí Hải | Reviewed by: Pending Nguyễn Minh Khôi | Edited by: Lưu Chí Hải*
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
 
 **Version:** V1.5 (2026-08-26) — synchronized with Features 007, 012, 015, and 021; manual-priority screenshot evidence remains pending
 

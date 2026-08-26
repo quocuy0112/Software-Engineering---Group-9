@@ -144,7 +144,7 @@ The implemented frontend uses **Next.js 16.3**, **React 19**, and **TypeScript 5
 
 ## Frontend Evidence and Revision History
 
-_Performed by: Lưu Chí Hải | Reviewed by: Pending Nguyễn Minh Khôi | Edited by: Lưu Chí Hải_
+_Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Quốc Thành | Edited by: Lưu Chí Hải_
 
 | Component group | Final feature coverage | Repository evidence |
 |---|---|---|
