@@ -58,7 +58,7 @@ export function recruiterJobPostingCopy(locale: WorkspaceLocale) {
         completion: (completed: number) =>
           `${Math.round((completed / 6) * 100)}% completed`,
         progressHelp:
-          "Save a draft after the core required fields are ready; add a deadline before submission.",
+          "Drafts can be saved at any time; complete required fields and add a deadline before submission.",
         livePreview: "Live candidate preview",
         livePreviewHelp: "Updates from the current form data",
         livePreviewStatus: "Synchronized",

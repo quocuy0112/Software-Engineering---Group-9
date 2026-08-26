@@ -28,6 +28,35 @@ describe("recruiter job posting editor contract", () => {
     );
   });
 
+  it("allows incomplete authoring fields in a draft", () => {
+    const job = createEmptyJobPosting("company-1");
+    job.title = "Platform Engineer";
+    job.shortPitch = "";
+    job.subIndustry = "";
+    job.location.city = "";
+    job.description.overview = "";
+    job.experience.label = "";
+    job.level = "";
+    job.employmentType = "";
+    job.workArrangement = "";
+    job.education = "";
+
+    expect(validateRecruiterJobForSave(job, "draft")).toEqual({});
+    expect(validateRecruiterJobForSave(job, "pending_approval")).toEqual(
+      expect.objectContaining({
+        shortPitch: "Add a short pitch.",
+        subIndustry: "Enter a sub-industry.",
+        "location.city": "Enter a city.",
+        "description.overview": "Add a role overview.",
+        "experience.label": "Enter an experience level.",
+        level: "Enter a job level.",
+        employmentType: "Choose an employment type.",
+        workArrangement: "Choose a work arrangement.",
+        education: "Enter an education requirement.",
+      }),
+    );
+  });
+
   it("normalizes user-entered text and accepts a complete posting", () => {
     const job = createEmptyJobPosting("company-1");
     job.title = "  Product Designer  ";
@@ -94,7 +123,7 @@ describe("recruiter job posting editor contract", () => {
     job.description.overview = "Own end-to-end product design.";
     job.salary = { ...job.salary, min: 50_000_000, max: 20_000_000 };
 
-    expect(validateRecruiterJobForSave(job, "draft")).toEqual(
+    expect(validateRecruiterJobForSave(job, "pending_approval")).toEqual(
       expect.objectContaining({
         "salary.max":
           "Maximum salary must be greater than or equal to minimum salary.",

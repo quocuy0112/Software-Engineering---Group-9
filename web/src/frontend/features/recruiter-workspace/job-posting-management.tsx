@@ -889,6 +889,10 @@ export function RecruiterJobPostingManagement({
     setView("editor");
   };
   const storeSavedJob = useCallback((job: RecruiterJob) => {
+    // A background refresh may have started before the PATCH completed. Mark
+    // this local save as a newer mutation so that an older GET response cannot
+    // overwrite the freshly saved draft in the dashboard.
+    mutationEpoch.current += 1;
     setData((currentData) => {
       const next = currentData ?? emptyData;
       const normalizedJob = withCompanyFromState(

@@ -48,15 +48,17 @@ const sourceJobSchema = z
     id: z.string().min(1),
     slug: z.string().min(1),
     companyId: z.string().min(1),
-    title: z.string().min(1),
-    shortPitch: z.string().min(1),
+    // Draft catalogue rows may be incomplete. Only active rows are exposed
+    // below, while managed active jobs are projected from approved snapshots.
+    title: z.string(),
+    shortPitch: z.string(),
     industry: z.string().min(1),
-    subIndustry: z.string().min(1),
+    subIndustry: z.string(),
     categoryIds: z.array(z.string().min(1)),
     categoryFamily: z.string().min(1),
     skillTags: z.array(z.string().min(1)),
     location: z.object({
-      city: z.string().min(1),
+      city: z.string(),
       district: z.string().nullable(),
       isNationwideRemote: z.boolean(),
     }),
@@ -68,15 +70,15 @@ const sourceJobSchema = z
       isNegotiable: z.boolean(),
     }),
     education: z.string().optional(),
-    numberOfHires: z.number().int().positive().optional(),
+    numberOfHires: z.number().int().nonnegative().optional(),
     age: z.string().optional(),
     experience: z.object({
       minYears: z.number().int().nonnegative(),
-      label: z.string().min(1),
+      label: z.string(),
     }),
-    level: z.string().min(1),
-    employmentType: z.string().min(1),
-    workArrangement: z.string().min(1),
+    level: z.string(),
+    employmentType: z.string(),
+    workArrangement: z.string(),
     workOnSaturday: z.boolean(),
     status: z.enum([
       "draft",
@@ -166,7 +168,7 @@ async function readCatalog(): Promise<JobCatalog> {
     const observedAt = new Date();
     const selectedJobs = normalizedJobs.flatMap((job) => {
       const managed = managedByJobId.get(job.id);
-      if (!managed) return [job];
+      if (!managed) return isCandidateWorkspaceRow(job) ? [job] : [];
       const snapshot = jobReviewSnapshotSchema.safeParse(
         managed.approvedVersion?.snapshot,
       );
@@ -236,6 +238,11 @@ function isOpenForApplications(job: SourceJob, now: Date) {
     job.status === "active" &&
     (!job.applyDeadline || new Date(job.applyDeadline) > now)
   );
+}
+
+/** Recruiter-only lifecycle rows must never enter the candidate workspace. */
+function isCandidateWorkspaceRow(job: SourceJob) {
+  return job.status === "active" || job.status === "closed";
 }
 
 function experienceLevel(job: SourceJob): JobCard["experienceLevel"] {

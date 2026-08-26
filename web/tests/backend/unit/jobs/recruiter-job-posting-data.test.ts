@@ -352,10 +352,7 @@ describe("recruiter JSON job persistence", () => {
       publicExplanation: null,
       submittedAt: new Date("2026-08-25T00:00:00.000Z"),
       decidedAt: new Date("2026-08-25T01:00:00.000Z"),
-      snapshot: jobReviewSnapshotFromCatalog(
-        submittedJob,
-        "db-company-1",
-      ),
+      snapshot: jobReviewSnapshotFromCatalog(submittedJob, "db-company-1"),
     };
     prismaMocks.jobPostReviewAggregate.findMany.mockResolvedValue([
       {
@@ -635,6 +632,32 @@ describe("recruiter JSON job persistence", () => {
       },
     });
   });
+
+  it("persists an incomplete recruiter draft with a stable fallback slug", async () => {
+    const draft = createEmptyJobPosting("company-1");
+    draft.subIndustry = "";
+    draft.shortPitch = "";
+    draft.location.city = "";
+    draft.description.overview = "";
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return "[]";
+      if (path.endsWith("companies.json")) return JSON.stringify([company]);
+      if (path.endsWith("applications.json")) return "[]";
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const saved = await createRecruiterJob("recruiter-1", draft, "draft");
+
+    expect(saved).toMatchObject({
+      title: "",
+      shortPitch: "",
+      subIndustry: "",
+      location: { city: "" },
+      description: { overview: "" },
+      status: "draft",
+    });
+    expect(saved.slug).toMatch(/^untitled-job-remote-/u);
+  });
   it("appends a posting without normalizing untouched legacy job statuses", async () => {
     const existing = { ...completeJob("legacy-job"), status: "open" };
     fsMocks.readFile.mockImplementation(async (path: string) => {
@@ -688,6 +711,7 @@ describe("recruiter JSON job persistence", () => {
         hideImmediately: false,
         createdAt: "2026-08-18T02:00:00.000Z",
       },
+      previousIndustryCode: existing.industryCode,
       title: "Updated Product Designer",
     };
     fsMocks.readFile.mockImplementation(async (path: string) => {
