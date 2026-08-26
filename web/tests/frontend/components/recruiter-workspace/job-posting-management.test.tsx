@@ -102,6 +102,7 @@ describe("recruiter job posting management", () => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
     window.localStorage.clear();
+    window.sessionStorage.clear();
   });
 
   it("uses the stable job id when opening candidates from a routed workspace", () => {
@@ -153,6 +154,55 @@ describe("recruiter job posting management", () => {
     expect(within(autoSaveSwitch).getByText("Off")).toBeVisible();
     expect(screen.queryByText("Drafts are saved manually")).toBeNull();
     expect(screen.queryByRole("button", { name: "Save draft" })).toBeNull();
+  });
+
+  it("scopes postings and the create route to the selected company", () => {
+    const secondCompany = {
+      ...initialData.companies[0],
+      id: "company-2",
+      slug: "northstar-analytics",
+      name: "Northstar Analytics",
+    };
+    const secondJob = {
+      ...initialData.jobs[0],
+      id: "job-2",
+      slug: "backend-engineer-job-2",
+      companyId: secondCompany.id,
+      title: "Backend Engineer",
+      company: secondCompany,
+    };
+    const onNavigate = vi.fn();
+
+    render(
+      <RecruiterJobPostingManagement
+        initialData={{
+          ...initialData,
+          companies: [initialData.companies[0], secondCompany],
+          jobs: [initialData.jobs[0], secondJob],
+        }}
+        onNavigate={onNavigate}
+      />,
+    );
+
+    const companyFilter = screen.getByLabelText("Company");
+    expect(companyFilter).toHaveValue("all");
+    expect(screen.getByText("Senior Product Designer")).toBeVisible();
+    expect(screen.getByText("Backend Engineer")).toBeVisible();
+
+    fireEvent.change(companyFilter, { target: { value: "company-2" } });
+
+    expect(screen.queryByText("Senior Product Designer")).toBeNull();
+    expect(screen.getByText("Backend Engineer")).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
+    expect(onNavigate).toHaveBeenCalledWith(
+      "/recruiter/job-postings/create?companyId=company-2",
+    );
+  });
+
+  it("hides the company filter when only one company is available", () => {
+    render(<RecruiterJobPostingManagement initialData={initialData} />);
+
+    expect(screen.queryByLabelText("Company")).not.toBeInTheDocument();
   });
 
   it("automatically reflects an administrator approval without a page refresh", async () => {
@@ -345,7 +395,7 @@ describe("recruiter job posting management", () => {
     );
   });
 
-  it("automatically saves valid drafts and remembers the setting for the next job", async () => {
+  it("quickly saves incomplete drafts and remembers the setting for the next job", async () => {
     vi.useFakeTimers();
     const fetchMock = vi
       .fn()
@@ -387,15 +437,13 @@ describe("recruiter job posting management", () => {
     fireEvent.change(screen.getByLabelText(/Job title/), {
       target: { value: "Platform Engineer" },
     });
-    fireEvent.change(screen.getByLabelText(/Short pitch/), {
-      target: { value: "Build a dependable hiring platform." },
-    });
-    fireEvent.change(screen.getByLabelText(/Overview/), {
-      target: { value: "Own platform reliability and delivery." },
-    });
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(1_500);
+      await vi.advanceTimersByTimeAsync(299);
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1);
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -419,6 +467,250 @@ describe("recruiter job posting management", () => {
     expect(
       screen.getByRole("switch", { name: "Automatic save: Off" }),
     ).toHaveAttribute("aria-checked", "false");
+  });
+
+  it("does not let an older refresh overwrite an automatic draft response", async () => {
+    vi.useFakeTimers();
+    let resolveRefresh: ((response: Response) => void) | undefined;
+    const savedTitle = "Updated title from AutoSave";
+    const fetchMock = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise<Response>((resolve) => {
+            resolveRefresh = resolve;
+          }),
+      )
+      .mockImplementation(async (_url: string, init?: RequestInit) => {
+        const body = JSON.parse(String(init?.body)) as {
+          job: (typeof initialData.jobs)[0];
+        };
+        return new Response(
+          JSON.stringify({
+            ...body.job,
+            id: "job-auto-refresh",
+            slug: "updated-title-auto-refresh",
+            title: savedTitle,
+            status: "draft",
+            company: initialData.companies[0],
+          }),
+          {
+            status: 201,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      });
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <CsrfProofProvider value="csrf-proof">
+        <RecruiterJobPostingManagement initialData={initialData} />
+      </CsrfProofProvider>,
+    );
+
+    window.dispatchEvent(new Event("focus"));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
+    fireEvent.click(
+      screen.getByRole("switch", { name: "Automatic save: Off" }),
+    );
+    fireEvent.change(screen.getByLabelText(/Job title/), {
+      target: { value: savedTitle },
+    });
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(300);
+      await Promise.resolve();
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    resolveRefresh?.(
+      new Response(JSON.stringify(initialData), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    fireEvent.click(screen.getByRole("tab", { name: /Drafts1/ }));
+    expect(
+      screen.getByRole("heading", { name: savedTitle, level: 2 }),
+    ).toBeVisible();
+  });
+
+  it("flushes an incomplete automatic draft immediately when the page is hidden", async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(async (_url: string, init?: RequestInit) => {
+        const request = JSON.parse(String(init?.body)) as {
+          job: (typeof initialData.jobs)[0];
+        };
+        return new Response(
+          JSON.stringify({
+            ...request.job,
+            id: "job-pagehide-draft",
+            slug: "untitled-job-remote-pagehide",
+            status: "draft",
+            updatedAt: "2026-08-25T10:00:00.000Z",
+            company: initialData.companies[0],
+          }),
+          {
+            status: 201,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      });
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <CsrfProofProvider value="csrf-proof">
+        <RecruiterJobPostingManagement initialData={initialData} />
+      </CsrfProofProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
+    fireEvent.click(
+      screen.getByRole("switch", { name: "Automatic save: Off" }),
+    );
+    fireEvent.change(screen.getByLabelText(/Short pitch/), {
+      target: { value: "A partially written posting." },
+    });
+
+    await act(async () => {
+      window.dispatchEvent(new Event("pagehide"));
+      await Promise.resolve();
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/recruiter/job-postings",
+      expect.objectContaining({ keepalive: true }),
+    );
+  });
+
+  it("does not wait for the draft response before leaving the editor", async () => {
+    let resolveFetch: ((response: Response) => void) | undefined;
+    const fetchMock = vi.fn((_url: RequestInfo | URL, _init?: RequestInit) => {
+      void _url;
+      void _init;
+      return new Promise<Response>((resolve) => {
+        resolveFetch = resolve;
+      });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <CsrfProofProvider value="csrf-proof">
+        <RecruiterJobPostingManagement initialData={initialData} />
+      </CsrfProofProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
+    fireEvent.click(
+      screen.getByRole("switch", { name: "Automatic save: Off" }),
+    );
+    fireEvent.change(screen.getByLabelText(/Job title/), {
+      target: { value: "Unfinished role" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(
+      screen.getByRole("button", { name: "Create job posting" }),
+    ).toBeVisible();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/recruiter/job-postings",
+      expect.objectContaining({ keepalive: true }),
+    );
+
+    resolveFetch?.(
+      new Response(
+        JSON.stringify({
+          ...initialData.jobs[0],
+          id: "job-background-draft",
+          slug: "unfinished-role-remote-background",
+          title: "Unfinished role",
+          status: "draft",
+          company: initialData.companies[0],
+        }),
+        { status: 201, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    await act(async () => {
+      await Promise.resolve();
+    });
+  });
+
+  it("flushes an edited industry's partition hint when leaving the editor", async () => {
+    let resolveFetch: ((response: Response) => void) | undefined;
+    const fetchMock = vi.fn((url: RequestInfo | URL, init?: RequestInit) => {
+      void url;
+      void init;
+      return new Promise<Response>((resolve) => {
+        resolveFetch = resolve;
+      });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <CsrfProofProvider value="csrf-proof">
+        <RecruiterJobPostingManagement initialData={initialData} />
+      </CsrfProofProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /Edit job posting/ }));
+    fireEvent.click(
+      screen.getByRole("switch", { name: "Automatic save: Off" }),
+    );
+    fireEvent.change(screen.getByLabelText("Industry *"), {
+      target: { value: "r04" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    const request = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    const payload = JSON.parse(String(request.body)) as {
+      industryCode: string;
+      previousIndustryCode: string;
+      status: string;
+    };
+    expect(payload).toMatchObject({
+      industryCode: "r04",
+      previousIndustryCode: "r03",
+      status: "draft",
+    });
+    expect(request.keepalive).toBe(true);
+    expect(
+      screen.getByRole("button", { name: "Create job posting" }),
+    ).toBeVisible();
+
+    resolveFetch?.(
+      new Response(
+        JSON.stringify({
+          ...initialData.jobs[0],
+          industry: "Accounting / Auditing",
+          industryCode: "r04",
+          subIndustry: "",
+          status: "draft",
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    await act(async () => {
+      await Promise.resolve();
+    });
+  });
+
+  it("warns before unloading while job changes are still unsaved", () => {
+    render(<RecruiterJobPostingManagement initialData={initialData} />);
+    fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
+    fireEvent.change(screen.getByLabelText(/Job title/), {
+      target: { value: "Unfinished role" },
+    });
+
+    const event = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
   });
 
   it("preserves spaces and commas while editing skills", async () => {
@@ -540,6 +832,149 @@ describe("recruiter job posting management", () => {
       new Date(deadline).getTime(),
     );
     expect(screen.getByRole("button", { name: "Close early" })).toBeVisible();
+  });
+
+  it("confirms closing an active job and lets the recruiter cancel", async () => {
+    const closedJob = {
+      ...initialData.jobs[0],
+      status: "closed" as const,
+    };
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(closedJob), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <CsrfProofProvider value="csrf-proof">
+        <RecruiterJobPostingManagement initialData={initialData} />
+      </CsrfProofProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Close early" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Close job early?" });
+    expect(
+      within(dialog).getByText(/stop accepting new applications/i),
+    ).toBeVisible();
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    expect(
+      screen.queryByRole("dialog", { name: "Close job early?" }),
+    ).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Close early" }));
+    fireEvent.click(
+      within(
+        screen.getByRole("dialog", { name: "Close job early?" }),
+      ).getByRole("button", { name: "Close job" }),
+    );
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/recruiter/job-postings?jobId=job-1&industryCode=r03",
+      {
+        method: "DELETE",
+        headers: { "x-csrf-token": "csrf-proof" },
+      },
+    );
+    expect(screen.getByRole("tab", { name: /Closed1/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(
+      within(
+        screen.getByRole("article", { name: "Senior Product Designer" }),
+      ).getByText("Closed"),
+    ).toBeVisible();
+  });
+
+  it("reactivates a closed job only after confirmation", async () => {
+    const closedJob = {
+      ...initialData.jobs[0],
+      status: "closed" as const,
+    };
+    const activeJob = { ...closedJob, status: "active" as const };
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(activeJob), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <CsrfProofProvider value="csrf-proof">
+        <RecruiterJobPostingManagement
+          initialData={{ ...initialData, jobs: [closedJob] }}
+          initialTab="closed"
+        />
+      </CsrfProofProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Reactivate job" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Reactivate job?" });
+    expect(
+      within(dialog).getByText(/start accepting new applications again/i),
+    ).toBeVisible();
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    expect(
+      screen.queryByRole("dialog", { name: "Reactivate job?" }),
+    ).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Reactivate job" }));
+    fireEvent.click(
+      within(screen.getByRole("dialog", { name: "Reactivate job?" })).getByRole(
+        "button",
+        { name: "Reactivate job" },
+      ),
+    );
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/recruiter/job-postings/job-1/reactivate?industryCode=r03",
+      {
+        method: "POST",
+        headers: { "x-csrf-token": "csrf-proof" },
+      },
+    );
+    expect(screen.getByRole("tab", { name: /Active1/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Close early" })).toBeVisible();
+  });
+
+  it("opens a closed posting as view-only without saving or reactivating it", () => {
+    const closedJob = {
+      ...initialData.jobs[0],
+      status: "closed" as const,
+    };
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <RecruiterJobPostingManagement
+        initialData={{ ...initialData, jobs: [closedJob] }}
+        initialTab="closed"
+      />,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "View closed job posting: Senior Product Designer",
+      }),
+    );
+
+    expect(screen.getByText("Closed posting — view only")).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Save changes" })).toBeNull();
+    expect(screen.getByLabelText(/Job title/)).toBeDisabled();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("soft-deletes an active job after confirmation", async () => {

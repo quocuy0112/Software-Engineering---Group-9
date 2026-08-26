@@ -83,7 +83,7 @@ describe("Recruiter canonical job context", () => {
     });
   });
 
-  it("fails safely for absent, ambiguous, removed, or company-mismatched mappings", async () => {
+  it("fails safely for absent, ambiguous, or company-mismatched mappings", async () => {
     db.jobPostReviewAggregate.findMany.mockResolvedValue([
       {
         jobId: "ambiguous-job",
@@ -106,13 +106,6 @@ describe("Recruiter canonical job context", () => {
         publicJobPosting: activeRow(),
         company: activeRow({ companyId: "company-2" }).company,
       },
-      {
-        jobId: "removed-job",
-        companyId: "company-1",
-        publicJobPostingId: "persisted-job-3",
-        publicJobPosting: activeRow({ id: "persisted-job-3", removedAt: new Date() }),
-        company: activeRow().company,
-      },
     ]);
     const authorization = new RecruiterApplicationAuthorization(db as never);
 
@@ -125,6 +118,35 @@ describe("Recruiter canonical job context", () => {
     expect(results).toHaveLength(4);
     expect(results.every((result) => result.authorized === false)).toBe(true);
     expect(results.every((result) => result.companyId === "")).toBe(true);
+  });
+
+  it("keeps owned application documents readable after the public posting is removed", async () => {
+    db.jobPostReviewAggregate.findMany.mockResolvedValue([
+      {
+        jobId: "historical-job",
+        companyId: "company-1",
+        publicJobPostingId: "persisted-job-3",
+        publicJobPosting: activeRow({
+          id: "persisted-job-3",
+          status: "REMOVED",
+          removedAt: new Date(),
+        }),
+        company: activeRow().company,
+      },
+    ]);
+    const authorization = new RecruiterApplicationAuthorization(db as never);
+
+    await expect(authorization.authorizeJob("user-1", "historical-job")).resolves.toMatchObject({
+      authorized: true,
+      requestedJobId: "historical-job",
+      jobPostingId: "persisted-job-3",
+      jobStatus: "CLOSED",
+      canView: true,
+      canMoveStages: false,
+      canReject: false,
+      canRecordOfferDeclined: false,
+      canConfirmHired: false,
+    });
   });
 
   it("queries only ACTIVE/CLOSED non-removed jobs and verified active memberships", async () => {

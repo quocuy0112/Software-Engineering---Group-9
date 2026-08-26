@@ -6,7 +6,7 @@
 
 ## Summary
 
-Complete the Candidate-side application workflow around the existing authoritative `JobApplication`: a 30-day resumable review draft, idempotent snapshot-bound submission, observable technical intake, safe public-stage tracking, per-application notification preferences, and race-safe pre-interview withdrawal. Add a wholly separate Candidate-private CV match aggregate whose background analysis reuses the versioned 60% deterministic/40% AI scoring engine but cannot be queried, copied, or published through employer evaluation paths. Private reports preserve deterministic limited mode, immutable attempt history and provenance, expire after 12 months, and support immediate candidate deletion with bounded cleanup.
+Complete the Candidate-side application workflow around the existing authoritative `JobApplication`: a 30-day resumable review draft, idempotent snapshot-bound submission, observable technical intake, safe public-stage tracking, per-application notification preferences, and race-safe pre-interview withdrawal. Add a wholly separate Candidate-private CV match aggregate whose background analysis reuses the versioned 40% deterministic/60% AI scoring engine but cannot be queried, copied, or published through employer evaluation paths. Private reports preserve deterministic limited mode, immutable attempt history and provenance, expire after 12 months, and support immediate candidate deletion with bounded cleanup.
 
 ## Technical Context
 
@@ -24,7 +24,7 @@ Complete the Candidate-side application workflow around the existing authoritati
 
 **Performance Goals**: Candidate pages usable P95 ≤3 seconds; navigation P95 ≤2 seconds; in-app public-stage visibility P95 ≤5 seconds; private AI evaluation P95 ≤20 seconds asynchronously; mutation acknowledgement P95 ≤2 seconds under documented representative conditions
 
-**Constraints**: One Application per candidate-job pair; immutable submitted snapshots; exact 60/40 formula and score bands; no candidate exposure of employer evaluation; no private-to-employer data flow; AI failure never blocks applying/tracking; pre-interview withdrawal only; private reports expire at 12 months with immediate logical denial and physical deletion within 30 days
+**Constraints**: One Application per candidate-job pair; immutable submitted snapshots; exact 40/60 formula and score bands; no candidate exposure of employer evaluation; no private-to-employer data flow; AI failure never blocks applying/tracking; pre-interview withdrawal only; private reports expire at 12 months with immediate logical denial and physical deletion within 30 days
 
 **Scale/Scope**: Seven Candidate UI states, six primary journeys, application lists at the existing 10,000-applications-per-job baseline, up to 50 retained private checks per Candidate in representative performance fixtures, bounded timelines/attempt histories, and independently retryable background work
 
@@ -36,7 +36,7 @@ _GATE: Passed before Phase 0 research and re-checked after Phase 1 design._
 |---|---|---|
 | Human-controlled recruitment | PASS | No score submits, withdraws, advances, rejects, or hires. Apply now opens review; recruiter stage authority remains unchanged. |
 | Security, privacy, tenant isolation | PASS | Candidate ownership is enforced server-side; application projections are allow-listed; private checks use separate tables/repositories with no recruiter relation or query port; sensitive attributes are excluded. |
-| Deterministic core and explainable AI | PASS | Shared versioned engine preserves `automatic × 0.60 + AI × 0.40`, approved bands, full deterministic evidence, asynchronous AI, explicit limited mode, and retry. |
+| Deterministic core and explainable AI | PASS | Shared versioned engine preserves `automatic × 0.40 + AI × 0.60`, approved bands, full deterministic evidence, asynchronous AI, explicit limited mode, and retry. |
 | State, audit, data integrity | PASS | Existing `JobApplication` and `ApplicationStageEvent` remain canonical; submission, withdrawal outcome, notification intent, and audit writes are transactional/idempotent with optimistic concurrency. |
 | Scope discipline and complete P0 workflows | PASS | The plan completes Candidate submission/tracking and private guidance without recruiter chat, post-submit editing, scoring redesign, SMS/push, or automatic decisions. |
 | Measurable quality and accessibility | PASS | P95 targets, responsive/keyboard/non-color requirements, ownership matrices, fallback tests, and reproducible measurement conditions are included. |
@@ -160,7 +160,7 @@ web/
 1. Shared contract and public-projection tests, including forbidden fields and discriminated fallback states.
 2. Migration and repository tests for uniqueness, ownership, isolation, optimistic concurrency, expiry, leases, and idempotency.
 3. Submission/intake/withdrawal transaction tests with duplicate requests, stage races, job closure, stale drafts, and notification failures.
-4. Scoring-engine parity fixtures proving Candidate and employer invocations use the same 60/40 policy while persisting independently.
+4. Scoring-engine parity fixtures proving Candidate and employer invocations use the same 40/60 policy while persisting independently.
 5. AI timeout/malformed response/retry tests proving deterministic evidence remains complete and no hybrid is fabricated.
 6. Security and architecture tests proving recruiter/company/admin routes cannot discover private check existence or import private modules.
 7. Frontend component/accessibility tests for all seven requested states, mobile layouts, keyboard controls, focus, contrast, and non-color meaning.

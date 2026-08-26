@@ -305,4 +305,62 @@ describe("JSON job catalogue repository", () => {
     ]);
     expect(await readFile(unrelated.filePath, "utf8")).toBe("{not-json");
   });
+
+  it("moves a job between split industries without parsing unrelated files", async () => {
+    const directory = await mkdtemp(
+      join(tmpdir(), "smarthire-multi-partition-catalogue-writer-"),
+    );
+    directories.push(directory);
+    const files = defaultJobIndustryFiles(directory);
+    await mkdir(join(directory, "data", "jobs"), { recursive: true });
+    await Promise.all(
+      files.map(({ filePath, code }) =>
+        writeFile(
+          filePath,
+          `${JSON.stringify(
+            code === "r03" ? [{ id: "job-r03", industryCode: code }] : [],
+            null,
+            2,
+          )}\n`,
+          "utf8",
+        ),
+      ),
+    );
+    const unrelated = files.find(({ code }) => code === "r28")!;
+    const source = files.find(({ code }) => code === "r03")!;
+    const destination = files.find(({ code }) => code === "r04")!;
+    await writeFile(unrelated.filePath, "{not-json", "utf8");
+
+    const repository = new JsonJobCatalogueRepository<{
+      id: string;
+      industryCode: string;
+    }>({
+      filePath: join(directory, "data", "jobs", "jobs.json"),
+      fallbackFiles: files,
+      mode: "writer",
+      writerHostId: "writer-fixture-1",
+      leaseCoordinator: new FakeLeaseCoordinator(),
+      leaseTtlMs: 30_000,
+    });
+
+    await repository.mutateIndustryPartitions(["r03", "r04"], (partitions) => {
+      const current = partitions.get("r03") ?? [];
+      const job = current.find(({ id }) => id === "job-r03");
+      if (!job) throw new Error("job not found");
+      partitions.set(
+        "r03",
+        current.filter(({ id }) => id !== "job-r03"),
+      );
+      partitions.set("r04", [
+        ...(partitions.get("r04") ?? []),
+        { ...job, industryCode: "r04" },
+      ]);
+    });
+
+    expect(JSON.parse(await readFile(source.filePath, "utf8"))).toEqual([]);
+    expect(JSON.parse(await readFile(destination.filePath, "utf8"))).toEqual([
+      { id: "job-r03", industryCode: "r04" },
+    ]);
+    expect(await readFile(unrelated.filePath, "utf8")).toBe("{not-json");
+  });
 });

@@ -16,7 +16,7 @@ export function automaticFixture(
     score: 92,
     cvVersion: "CV-v1",
     jdVersion: "JD-v3",
-    configVersion: "HS-60/40-v1",
+    configVersion: "HS-40/60-v1",
     parserVersion: "parser-v2.4",
     cvParse: scoringFixtureStatus("CV-v1"),
     jdParse: scoringFixtureStatus("JD-v3"),

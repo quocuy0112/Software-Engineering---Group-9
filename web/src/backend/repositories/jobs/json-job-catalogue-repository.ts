@@ -6,6 +6,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import {
   catalogueIndustryCode,
   industryCodeMatchesCatalogue,
+  type JobIndustryCode,
   type JobIndustryFile,
 } from "./job-industry-files";
 
@@ -243,6 +244,23 @@ export class JsonJobCatalogueRepository<T = unknown> {
     }
   }
 
+  /**
+   * Returns a cheap filesystem version for cache validation. Next server
+   * route bundles can have separate module-level caches, so a mutation in
+   * the PATCH route must still be observable by the page route without
+   * reparsing the catalogue just to check freshness.
+   */
+  async readSourceVersion(): Promise<string> {
+    const paths = (await this.sourceExists())
+      ? [this.filePath]
+      : this.fallbackFiles.map(({ filePath }) => filePath);
+    if (paths.length === 0) return "missing";
+    const stats = await Promise.all(paths.map((filePath) => stat(filePath)));
+    return stats
+      .map(({ size, mtimeMs, ctimeMs }) => `${size}:${mtimeMs}:${ctimeMs}`)
+      .join("\u0000");
+  }
+
   async preflight(): Promise<void> {
     if (this.config.mode !== "writer" || !this.config.writerHostId)
       throw new Error("JOB_CATALOGUE_READ_ONLY");
@@ -459,6 +477,178 @@ export class JsonJobCatalogueRepository<T = unknown> {
       return next;
     } finally {
       await rm(temporaryPath, { force: true }).catch(() => undefined);
+      await this.config.leaseCoordinator.release(claim).catch(() => undefined);
+    }
+  }
+
+  /**
+   * Mutates one or more split industry documents under a single catalogue
+   * lease. Recruiter edits can therefore move a job between industries
+   * without reading, cloning, or serializing the complete catalogue.
+   */
+  async mutateIndustryPartitions(
+    industryCodes: readonly string[],
+    mutation: (partitions: Map<JobIndustryCode, T[]>) => void | Promise<void>,
+  ): Promise<void> {
+    const codes = Array.from(
+      new Set(
+        industryCodes
+          .map((industryCode) => catalogueIndustryCode(industryCode))
+          .filter((industryCode): industryCode is JobIndustryCode =>
+            Boolean(industryCode),
+          ),
+      ),
+    );
+    if (codes.length === 0)
+      throw new Error("JOB_CATALOGUE_INDUSTRY_CODE_INVALID");
+
+    const assertPartition = (code: JobIndustryCode, values: T[]) => {
+      if (
+        values.some(
+          (entry) =>
+            !entry ||
+            typeof entry !== "object" ||
+            !("industryCode" in entry) ||
+            !industryCodeMatchesCatalogue(
+              (entry as { industryCode?: unknown }).industryCode,
+              code,
+            ),
+        )
+      ) {
+        throw new Error("JOB_CATALOGUE_INDUSTRY_CODE_INVALID");
+      }
+    };
+
+    // A configured monolithic catalogue keeps the old full-file semantics.
+    // The split fallback path below is the production fast path.
+    if ((await this.sourceExists()) || this.fallbackFiles.length === 0) {
+      await this.mutate(async (values) => {
+        const partitions = new Map(
+          codes.map((code) => [
+            code,
+            values.filter((entry) => {
+              if (!entry || typeof entry !== "object") return false;
+              const entryCode = (entry as { industryCode?: unknown })
+                .industryCode;
+              return (
+                typeof entryCode === "string" &&
+                industryCodeMatchesCatalogue(entryCode, code)
+              );
+            }),
+          ]),
+        );
+        await mutation(partitions);
+        for (const code of codes) {
+          assertPartition(code, partitions.get(code) ?? []);
+        }
+        const targetCodes = new Set(codes);
+        const next = values.filter((entry) => {
+          if (!entry || typeof entry !== "object") return true;
+          const entryCode = (entry as { industryCode?: unknown }).industryCode;
+          const canonicalCode =
+            typeof entryCode === "string"
+              ? catalogueIndustryCode(entryCode)
+              : null;
+          return !canonicalCode || !targetCodes.has(canonicalCode);
+        });
+        for (const code of codes) next.push(...(partitions.get(code) ?? []));
+        return next;
+      });
+      return;
+    }
+
+    await this.preflight();
+    const originals = new Map<
+      JobIndustryCode,
+      { partition: JobIndustryFile; text: string; values: T[] }
+    >();
+    await Promise.all(
+      codes.map(async (code) => {
+        const partition = this.fallbackFiles.find(
+          ({ code: partitionCode }) => partitionCode === code,
+        );
+        if (!partition) throw new Error("JOB_CATALOGUE_INDUSTRY_CODE_INVALID");
+        const text = await readFile(partition.filePath, "utf8");
+        originals.set(code, {
+          partition,
+          text,
+          values: this.parseIndustryDocument(text, partition),
+        });
+      }),
+    );
+
+    const expectedCatalogueSha256 = sha256(
+      codes.map((code) => originals.get(code)!.text).join("\u0000"),
+    );
+    const catalogueKey = sha256(
+      this.fallbackFiles
+        .map(({ filePath }) => filePath.toLowerCase())
+        .join("\u0000"),
+    );
+    const ownerTokenHash = sha256(
+      `${this.config.writerHostId}:${randomBytes(32).toString("hex")}`,
+    );
+    const claim = await this.config.leaseCoordinator.claim({
+      catalogueKey,
+      ownerTokenHash,
+      expectedCatalogueSha256,
+      leaseExpiresAt: new Date(Date.now() + this.config.leaseTtlMs),
+    });
+    const next = new Map(
+      codes.map((code) => [code, structuredClone(originals.get(code)!.values)]),
+    );
+    const changedFiles: Array<{
+      filePath: string;
+      temporaryPath: string;
+      text: string;
+    }> = [];
+    try {
+      await mutation(next);
+      for (const code of codes) {
+        assertPartition(code, next.get(code) ?? []);
+        const original = originals.get(code)!;
+        const text = `${JSON.stringify(next.get(code), null, 2)}\n`;
+        if (text !== original.text) {
+          changedFiles.push({
+            filePath: original.partition.filePath,
+            temporaryPath: `${original.partition.filePath}.${ownerTokenHash.slice(0, 16)}.tmp`,
+            text,
+          });
+        }
+      }
+      const observed = await Promise.all(
+        codes.map((code) =>
+          readFile(originals.get(code)!.partition.filePath, "utf8"),
+        ),
+      );
+      if (sha256(observed.join("\u0000")) !== expectedCatalogueSha256)
+        throw new Error("JOB_CATALOGUE_CHECKSUM_CONFLICT");
+      await this.config.leaseCoordinator.assertOwned(
+        claim,
+        expectedCatalogueSha256,
+      );
+      await Promise.all(
+        changedFiles.map(async ({ temporaryPath, text }) => {
+          const handle = await open(temporaryPath, "wx");
+          try {
+            await handle.writeFile(text, "utf8");
+            await handle.sync();
+          } finally {
+            await handle.close();
+          }
+        }),
+      );
+      await Promise.all(
+        changedFiles.map(({ filePath, temporaryPath }) =>
+          replaceFileWithRetry(temporaryPath, filePath),
+        ),
+      );
+    } finally {
+      await Promise.all(
+        changedFiles.map(({ temporaryPath }) =>
+          rm(temporaryPath, { force: true }).catch(() => undefined),
+        ),
+      );
       await this.config.leaseCoordinator.release(claim).catch(() => undefined);
     }
   }

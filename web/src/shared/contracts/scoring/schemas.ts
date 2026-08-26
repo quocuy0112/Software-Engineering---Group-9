@@ -297,15 +297,24 @@ export const finalScoreSchema = z
     value: z.number().min(0).max(100).multipleOf(0.1),
     formulaText: z.string().min(1),
     formulaVersion: z.string().min(1),
-    automaticWeight: z.literal(0.6),
-    aiWeight: z.literal(0.4),
+    automaticWeight: z.union([z.literal(0.4), z.literal(0.6)]),
+    aiWeight: z.union([z.literal(0.4), z.literal(0.6)]),
     band: explicitLabelSchema,
     cvVersion: z.string().min(1),
     jdVersion: z.string().min(1),
     configVersion: z.string().min(1),
     computedAt: isoDateTime,
   })
-  .strict();
+  .strict()
+  .superRefine((value, context) => {
+    if (value.automaticWeight + value.aiWeight !== 1) {
+      context.addIssue({
+        code: "custom",
+        path: ["automaticWeight"],
+        message: "Hybrid score weights must add up to 1",
+      });
+    }
+  });
 
 const notCalculatedStateSchema = z
   .object({

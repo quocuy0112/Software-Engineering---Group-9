@@ -20,9 +20,15 @@ export const migrationNameMap = Object.freeze([
     "020_verification_outbox_event_unique",
   ],
 
-  ["022_admin_user_management_refinement", "022_admin_user_management_refinement"],
+  [
+    "022_admin_user_management_refinement",
+    "022_admin_user_management_refinement",
+  ],
   ["022_realtime_messaging", "023_realtime_messaging"],
-  ["023_messaging_schema_name_alignment", "024_messaging_schema_name_alignment"],
+  [
+    "023_messaging_schema_name_alignment",
+    "024_messaging_schema_name_alignment",
+  ],
   ["024_messaging_participant_search", "025_messaging_participant_search"],
   ["025_support_center", "026_support_center"],
   [
@@ -51,15 +57,9 @@ export const migrationNameMap = Object.freeze([
     "033_email_outbox_retention_fk_cleanup",
     "033_email_outbox_retention_fk_cleanup",
   ],
-  [
-    "034_notification_locale_payload",
-    "034_notification_locale_payload",
-  ],
+  ["034_notification_locale_payload", "034_notification_locale_payload"],
   ["034_submitted_candidates", "035_submitted_candidates"],
-  [
-    "035_actionable_admin_notifications",
-    "036_actionable_admin_notifications",
-  ],
+  ["035_actionable_admin_notifications", "036_actionable_admin_notifications"],
   ["035_candidate_hybrid_ranking", "037_candidate_hybrid_ranking"],
   ["036_job_post_review_authority", "038_job_post_review_authority"],
   ["037_company_entity_type", "039_company_entity_type"],
@@ -86,15 +86,37 @@ export const migrationNameMap = Object.freeze([
     "046_release_failed_private_match_dedupe",
   ],
   ["042_candidate_application_workflow", "047_candidate_application_workflow"],
-  ["043_waitlisted_public_application_outcome", "049_waitlisted_public_application_outcome"],
+  [
+    "043_waitlisted_public_application_outcome",
+    "049_waitlisted_public_application_outcome",
+  ],
   [
     "044_private_match_retry_deterministic_pointer",
     "051_private_match_retry_deterministic_pointer",
   ],
+  ["052_recruitment_analytics_export", "053_recruitment_analytics_export"],
+  ["053_company_invitation_delivery", "054_company_invitation_delivery"],
   [
-    "20260824051404_thanhtestnef",
-    "065_prisma_schema_alignment",
+    "054_company_invitation_decision_activity",
+    "055_company_invitation_decision_activity",
   ],
+  ["055_recruitment_messaging", "056_recruitment_messaging"],
+  ["056_recruitment_messaging_reports", "057_recruitment_messaging_reports"],
+  ["057_company_ban_lifecycle", "058_company_ban_lifecycle"],
+  ["058_job_application_attempt_limit", "059_job_application_attempt_limit"],
+  ["063_job_posting_skills_required", "067_job_posting_skills_required"],
+  ["065_recruiter_job_withdrawal", "069_recruiter_job_withdrawal"],
+  [
+    "066_recruiter_job_withdrawal_state_constraint",
+    "070_recruiter_job_withdrawal_state_constraint",
+  ],
+  [
+    "067_allow_identical_job_review_resubmission",
+    "071_allow_identical_job_review_resubmission",
+  ],
+  ["068_update_cv_scoring_weights", "072_update_cv_scoring_weights"],
+  ["069_recruiter_job_reactivation", "073_recruiter_job_reactivation"],
+  ["20260826085731_smarthire", "074_prisma_index_name_alignment"],
 ]);
 
 // These groups represent equivalent history shapes. The first two timestamp
@@ -113,10 +135,7 @@ export const migrationHistoryMergeGroups = Object.freeze([
     ]),
     completeLegacySets: Object.freeze([
       Object.freeze(["043_admin_timestamp_defaults_and_indexes"]),
-      Object.freeze([
-        "20260816050940_smarthire",
-        "20260817141725_smarthire",
-      ]),
+      Object.freeze(["20260816050940_smarthire", "20260817141725_smarthire"]),
       Object.freeze(["20260818051344_smarthire"]),
     ]),
   }),
@@ -129,6 +148,63 @@ export const migrationHistoryMergeGroups = Object.freeze([
     completeLegacySets: Object.freeze([
       Object.freeze(["044_job_post_review_title_search"]),
       Object.freeze(["20260818070000_job_post_review_title_search"]),
+    ]),
+  }),
+  Object.freeze({
+    currentName: "060_company_ban_notifications",
+    legacyNames: Object.freeze([
+      "058_company_ban_notifications",
+      "059_company_ban_notifications",
+    ]),
+    completeLegacySets: Object.freeze([
+      Object.freeze(["058_company_ban_notifications"]),
+      Object.freeze(["059_company_ban_notifications"]),
+    ]),
+  }),
+  Object.freeze({
+    currentName: "061_company_invitation_email_state_index",
+    legacyNames: Object.freeze([
+      "060_company_invitation_email_state_index",
+      "20260820163010",
+    ]),
+    completeLegacySets: Object.freeze([
+      Object.freeze(["060_company_invitation_email_state_index"]),
+      Object.freeze(["20260820163010"]),
+    ]),
+  }),
+  Object.freeze({
+    currentName: "062_admin_data_backup",
+    legacyNames: Object.freeze([
+      "061_admin_data_backup",
+      "20260821183000_admin_data_backup",
+    ]),
+    completeLegacySets: Object.freeze([
+      Object.freeze(["061_admin_data_backup"]),
+      Object.freeze(["20260821183000_admin_data_backup"]),
+    ]),
+  }),
+  Object.freeze({
+    currentName: "063_admin_backup_drive_folder",
+    legacyNames: Object.freeze([
+      "062_admin_backup_drive_folder",
+      "20260821190000_admin_backup_drive_folder",
+    ]),
+    completeLegacySets: Object.freeze([
+      Object.freeze(["062_admin_backup_drive_folder"]),
+      Object.freeze(["20260821190000_admin_backup_drive_folder"]),
+    ]),
+  }),
+  Object.freeze({
+    currentName: "068_prisma_schema_alignment",
+    legacyNames: Object.freeze([
+      "065_prisma_schema_alignment",
+      "20260821071231_smarthire",
+      "20260824051404_thanhtestnef",
+    ]),
+    completeLegacySets: Object.freeze([
+      Object.freeze(["065_prisma_schema_alignment"]),
+      Object.freeze(["20260821071231_smarthire"]),
+      Object.freeze(["20260824051404_thanhtestnef"]),
     ]),
   }),
 ]);
@@ -163,5 +239,8 @@ export const migrationChecksumAliases = Object.freeze({
   ]),
   "20260818051344_smarthire": Object.freeze([
     "2b7555ddc2732741b4045d2089070de4468af8ad638a76cd2c5c5ccfe6e684df",
+  ]),
+  "20260821071231_smarthire": Object.freeze([
+    "cd922e0e1a92382b40637737a0240e96e8bf5f77fdcacf235da5e5f36f2d40c4",
   ]),
 });

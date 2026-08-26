@@ -95,7 +95,7 @@ As an authorized Recruiter viewing a job with no submissions, I want a clear emp
 
 - Rule-based skill and experience matching, keyword comparison, and automatic match scores; these belong to Group 2.
 - LLM-based CV analysis, per-criterion AI scores, rationales, prompt design, provider/model selection, and AI failure handling; these belong to Group 3.
-- The `60% Automatic Matching + 40% AI Scoring` calculation, combined score, score ranking, score threshold filtering, and green/yellow/red score indicators; these belong to Group 4.
+- The `40% Automatic Matching + 60% AI Scoring` calculation, combined score, score ranking, score threshold filtering, and green/yellow/red score indicators; these belong to Group 4.
 - Candidate shortlisting, rejection, hiring decisions, pipeline movement after initial `Applied`, notes, interviews, or other application-status changes.
 - Formal Application schema, storage design, API contracts, migration strategy, and document-delivery mechanism; these are deferred to later Spec-Kit steps for Group 1.
 - Groups 2–4 behavior beyond preserving a high-level extension point in the list for later scoring and ranking presentation.

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CircleCheck, KeyRound } from "lucide-react";
 import { PasswordField } from "@/frontend/features/authentication/components/password-field";
+import { PasswordRequirementChecklist } from "@/frontend/features/authentication/components/password-requirement-checklist";
 import { Modal } from "@/frontend/components/ui/modal";
 import { usePasswordChange } from "../client/use-password-change";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
@@ -25,7 +26,7 @@ export function PasswordChangeForm({
           kicker: "BẢO MẬT MẬT KHẨU",
           title: "Đổi mật khẩu",
           policy:
-            "Sử dụng từ 12 đến 128 ký tự Unicode. Có thể dùng khoảng trắng; không bắt buộc riêng chữ hoa, chữ thường, chữ số hay ký hiệu.",
+            "Dùng 12–128 ký tự, gồm ít nhất một chữ hoa, một chữ số và một ký tự đặc biệt. Không dùng ký tự điều khiển.",
           retry: (seconds: number) => ` Thử lại sau ${seconds} giây.`,
           current: "Mật khẩu hiện tại",
           next: "Mật khẩu mới",
@@ -47,7 +48,7 @@ export function PasswordChangeForm({
           kicker: "CREDENTIAL SECURITY",
           title: "Change password",
           policy:
-            "Use 12 to 128 Unicode characters. Spaces are allowed; uppercase, lowercase, digits, and symbols are not individually required.",
+            "Use 12–128 characters, including an uppercase letter, number, and special character. Control characters are not allowed.",
           retry: (seconds: number) => ` Try again in ${seconds} seconds.`,
           current: "Current password",
           next: "New password",
@@ -171,6 +172,7 @@ export function PasswordChangeForm({
             state.updateValue("newPassword", event.target.value)
           }
         />
+        <PasswordRequirementChecklist value={state.values.newPassword} />
         <PasswordField
           className="sh-input"
           id="password-change-confirmation"

@@ -5,7 +5,7 @@ The feature composes one public Home route for guests, candidates, and employers
 - Jobs reuse the existing public Job Discovery and Saved Job boundaries.
 - Candidate Smart Match reuses the existing deterministic, profile-backed job
   recommendation. It ranks jobs for the current candidate and is not applicant
-  screening, a hiring decision, or the separate constitutional 60/40 score.
+  screening, a hiring decision, or the separate constitutional 40/60 score.
 - Companies Hiring uses an independent read-only projection of verified public
   companies with active positions. Counts come from the same active-job rules.
 - Account state reuses Better Auth, Profile, and recruiter-status boundaries.

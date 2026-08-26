@@ -1,8 +1,8 @@
 import type { AiAssessment, AutomaticMatch, ExplicitLabel, FinalScore } from "@/shared/contracts/scoring";
 
-export const AUTOMATIC_WEIGHT = 0.6 as const;
-export const AI_WEIGHT = 0.4 as const;
-export const FORMULA_VERSION = "HS-60/40-v1" as const;
+export const AUTOMATIC_WEIGHT = 0.4 as const;
+export const AI_WEIGHT = 0.6 as const;
+export const FORMULA_VERSION = "HS-40/60-v1" as const;
 
 export function scoreBand(value: number): ExplicitLabel {
   if (value >= 80) return { code: "HIGH_MATCH", label: "Strong match", iconLabel: "\u2713" };
@@ -22,7 +22,7 @@ export function calculateHybridScore(input: {
   const value = Math.round((raw + Number.EPSILON) * 10) / 10;
   return {
     value,
-    formulaText: input.automatic.score + " \u00D7 0.6 + " + input.ai.score + " \u00D7 0.4 = " + value,
+    formulaText: input.automatic.score + " \u00D7 40% + " + input.ai.score + " \u00D7 60% = " + value,
     formulaVersion: FORMULA_VERSION,
     automaticWeight: AUTOMATIC_WEIGHT,
     aiWeight: AI_WEIGHT,

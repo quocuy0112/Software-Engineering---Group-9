@@ -7,6 +7,7 @@ import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-pro
 import styles from "./company-team-screen.module.css";
 
 type Props = {
+  companyId?: string;
   members: Array<{
     id: string;
     role: string;
@@ -69,6 +70,7 @@ const invitationErrorMessage = (code?: string) => {
 };
 
 export function CompanyTeamScreen({
+  companyId,
   members,
   invitations,
   activities = [],
@@ -79,17 +81,23 @@ export function CompanyTeamScreen({
   const [role, setRole] = useState("RECRUITER");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const companyQuery = companyId
+    ? `?companyId=${encodeURIComponent(companyId)}`
+    : "";
 
   async function invite(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
     setMessage("");
     try {
-      const response = await fetch("/api/recruiter/company/team/invitations", {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-csrf-token": csrf },
-        body: JSON.stringify({ email, role }),
-      });
+      const response = await fetch(
+        `/api/recruiter/company/team/invitations${companyQuery}`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-csrf-token": csrf },
+          body: JSON.stringify({ email, role }),
+        },
+      );
       const payload = (await response.json().catch(() => ({}))) as {
         code?: string;
         message?: string;
@@ -118,7 +126,7 @@ export function CompanyTeamScreen({
     setMessage("");
     try {
       const response = await fetch(
-        `/api/recruiter/company/team/memberships/${id}`,
+        `/api/recruiter/company/team/memberships/${id}${companyQuery}`,
         {
           method: "PATCH",
           headers: { "content-type": "application/json", "x-csrf-token": csrf },
@@ -152,7 +160,7 @@ export function CompanyTeamScreen({
     setBusy(true);
     try {
       const response = await fetch(
-        `/api/recruiter/company/team/invitations/${id}/revoke`,
+        `/api/recruiter/company/team/invitations/${id}/revoke${companyQuery}`,
         { method: "POST", headers: { "x-csrf-token": csrf } },
       );
       if (!response.ok) throw new Error("Unable to revoke this invitation.");

@@ -296,6 +296,7 @@
   border: 1px solid var(--sh-color-border-subtle);
   border-radius: var(--sh-radius-md);
   background: var(--sh-color-surface-card);
+  container-type: inline-size;
 }
 
 .image-search-privacy {
@@ -529,6 +530,91 @@
 .image-search-recovery {
   display: grid;
   gap: var(--sh-space-2);
+  padding: var(--sh-space-4);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-md);
+}
+
+.image-search-recovery h3 {
+  margin: 0;
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-bold);
+  line-height: var(--sh-line-height-body-sm);
+}
+
+.image-search-recovery p {
+  margin: 0;
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-caption);
+  line-height: var(--sh-line-height-caption);
+}
+
+.image-search-recovery-retry-detail {
+  color: var(--sh-color-text-muted) !important;
+  font-weight: var(--sh-font-weight-semibold);
+}
+
+.image-search-recovery-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sh-space-2);
+  margin-top: var(--sh-space-1);
+}
+
+.global-image-search .image-search-recovery-actions button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sh-space-2);
+  padding: 0 var(--sh-space-3);
+  white-space: nowrap;
+  box-shadow: none;
+}
+
+.image-search-recovery-actions svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  stroke-width: 2;
+}
+
+.global-image-search .image-search-recovery-primary {
+  color: var(--sh-color-text-inverse);
+  border-color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-primary);
+}
+
+.global-image-search .image-search-recovery-primary:hover:not(:disabled) {
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-brand-primary-hover);
+  transform: none;
+}
+
+.global-image-search .image-search-recovery-primary:disabled {
+  color: var(--sh-color-disabled-text);
+  border-color: var(--sh-color-disabled-bg);
+  background: var(--sh-color-disabled-bg);
+  cursor: not-allowed;
+}
+
+.global-image-search .image-search-recovery-secondary {
+  color: var(--sh-color-text-primary);
+  border-color: var(--sh-color-border-default);
+  background: var(--sh-color-surface-card);
+}
+
+.global-image-search .image-search-recovery-secondary:hover:not(:disabled) {
+  color: var(--sh-color-brand-primary);
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-brand-primary) 42%,
+    var(--sh-color-border-default)
+  );
+  background: var(--sh-color-brand-soft);
+  transform: none;
 }
 
 .image-search-recovery-warning {
@@ -617,7 +703,16 @@
   background: var(--sh-color-info-bg);
 }
 
+.image-search-proposal-field-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sh-space-2);
+}
+
 .image-search-proposals label {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: var(--sh-space-2);
@@ -658,38 +753,294 @@
 }
 
 .image-search-proposals small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--sh-color-text-muted);
   font-size: var(--sh-font-size-caption);
   line-height: 18px;
 }
 
-.image-search-proposals li > button {
-  justify-self: start;
-  min-height: 34px;
-  padding-inline: var(--sh-space-3);
+.image-search-proposal-evidence {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--sh-space-2);
+}
+
+.image-search-proposal-remove {
+  display: inline-flex;
+  flex: 0 0 auto;
+  min-height: 30px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 var(--sh-space-2);
   color: var(--sh-color-error);
   border-color: transparent;
   background: transparent;
   box-shadow: none;
+  font-size: var(--sh-font-size-caption);
+}
+
+.image-search-proposal-remove svg,
+.image-search-actions svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
+}
+
+.image-search-proposal-remove:hover:not(:disabled) {
+  color: var(--sh-color-error);
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-error) 25%,
+    var(--sh-color-border-subtle)
+  );
+  background: var(--sh-color-error-bg);
+  transform: none;
 }
 
 .image-search-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 10px var(--sh-space-2);
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--sh-color-border-subtle);
+}
+
+.image-search-action-edit,
+.image-search-action-utilities,
+.image-search-action-commit,
+.image-search-empty-actions {
   display: flex;
-  flex-wrap: wrap;
+  min-width: 0;
+  box-sizing: border-box;
+  align-items: center;
   gap: var(--sh-space-2);
 }
 
-.global-image-search .image-search-apply-button,
-.image-search-recovery button:first-of-type {
+.image-search-action-edit {
+  overflow: hidden;
+}
+
+.image-search-selection-summary {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--sh-space-2);
+  margin: 0;
+  white-space: nowrap;
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-semibold);
+  line-height: var(--sh-line-height-caption);
+}
+
+.image-search-selection-summary strong {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: var(--sh-radius-full);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+  font-size: var(--sh-font-size-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.image-search-action-utilities {
+  min-width: 0;
+  margin-left: auto;
+}
+
+.image-search-action-commit {
+  justify-content: flex-end;
+}
+
+.image-search-empty-actions {
+  justify-content: flex-end;
+  margin-top: var(--sh-space-3);
+  padding-top: var(--sh-space-3);
+  border-top: 1px solid var(--sh-color-border-subtle);
+}
+
+.image-search-actions button,
+.image-search-empty-actions button {
+  display: inline-flex;
+  position: static;
+  inset: auto;
+  flex: 0 0 auto;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  gap: 6px;
+  padding: 0 var(--sh-space-3);
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: var(--sh-radius-sm);
+  font: inherit;
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-semibold);
+  white-space: nowrap;
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.image-search-reverse-button,
+.image-search-close-button {
+  color: var(--sh-color-text-secondary);
+  border-color: var(--sh-color-border-default);
+  background: var(--sh-color-surface-card);
+}
+
+.image-search-reverse-button:hover:not(:disabled),
+.image-search-close-button:hover:not(:disabled) {
+  color: var(--sh-color-brand-primary);
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-brand-primary) 42%,
+    var(--sh-color-border-default)
+  );
+  background: var(--sh-color-brand-soft);
+  transform: none;
+}
+
+.image-search-clear-button {
+  color: var(--sh-color-error);
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-error) 32%,
+    var(--sh-color-border-subtle)
+  );
+  background: var(--sh-color-surface-card);
+}
+
+.image-search-clear-button:hover:not(:disabled) {
+  color: var(--sh-color-error);
+  border-color: var(--sh-color-error);
+  background: var(--sh-color-error-bg);
+  transform: none;
+}
+
+.image-search-apply-button {
   color: var(--sh-color-text-inverse);
   border-color: var(--sh-color-brand-primary);
   background: var(--sh-color-brand-primary);
 }
 
-.global-image-search .image-search-apply-button:hover:not(:disabled),
-.image-search-recovery button:first-of-type:hover:not(:disabled) {
+.image-search-apply-button:hover:not(:disabled) {
   color: var(--sh-color-text-inverse);
   background: var(--sh-color-brand-primary-hover);
+}
+
+.image-search-apply-button {
+  min-width: 184px;
+}
+
+.image-search-actions button:disabled {
+  color: var(--sh-color-disabled-text);
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-disabled-bg);
+  cursor: not-allowed;
+}
+
+.image-search-apply-count {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  margin-left: 2px;
+  border-radius: var(--sh-radius-full);
+  color: var(--sh-color-text-inverse);
+  background: color-mix(in srgb, var(--sh-color-surface-card) 20%, transparent);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+@container (max-width: 920px) {
+  .image-search-actions[data-has-bulk-actions="true"] {
+    grid-template-columns: 1fr;
+  }
+
+  .image-search-actions[data-has-bulk-actions="true"] .image-search-action-commit {
+    justify-content: flex-end;
+  }
+}
+
+@container (max-width: 620px) {
+  .image-search-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .image-search-action-edit {
+    flex-wrap: nowrap;
+    overflow: visible;
+  }
+
+  .image-search-action-utilities {
+    width: auto;
+    margin-left: auto;
+  }
+
+  .image-search-action-commit {
+    justify-content: flex-end;
+  }
+
+  .image-search-proposal-evidence {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--sh-space-1);
+  }
+
+  .image-search-proposals small {
+    width: 100%;
+  }
+
+  .image-search-actions[data-has-bulk-actions="true"]
+    .image-search-action-edit {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .image-search-actions[data-has-bulk-actions="true"]
+    .image-search-action-utilities {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@container (max-width: 420px) {
+  .image-search-action-commit {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .image-search-action-commit button,
+  .image-search-actions[data-has-bulk-actions="true"]
+    .image-search-action-utilities
+    button {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 @keyframes image-search-spin {
@@ -709,7 +1060,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .global-image-search {
     max-width: none;
   }
@@ -720,10 +1071,20 @@
     padding: var(--sh-space-3);
   }
 
-  .image-search-actions,
-  .image-search-actions button,
-  .image-search-recovery button {
+  .image-search-recovery-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .global-image-search .image-search-recovery-actions button {
     width: 100%;
+  }
+
+}
+
+@media (max-width: 340px) {
+  .image-search-recovery-actions {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -913,23 +1274,25 @@ body:has(.global-image-search-overlay) {
 
 /* Candidate image-search is opened from Find Jobs, so its modal needs the
  * same theme contract as the surrounding workspace. */
-:root[data-theme="dark"] :is(
-  .global-image-search-panel,
-  .global-image-search .global-image-search-close,
-  .image-search-demo-poster,
-  .image-search-retention-callout,
-  .image-search-consent,
-  .image-search-file-control[aria-disabled="false"]
-) {
+:root[data-theme="dark"]
+  :is(
+    .global-image-search-panel,
+    .global-image-search .global-image-search-close,
+    .image-search-demo-poster,
+    .image-search-retention-callout,
+    .image-search-consent,
+    .image-search-file-control[aria-disabled="false"]
+  ) {
   border-color: var(--sh-color-border-subtle);
   color: var(--sh-color-text-primary);
   background: var(--sh-color-surface-card);
 }
 
-:root[data-theme="dark"] :is(
-  .global-image-search-panel-heading p,
-  .global-image-search .global-image-search-close
-) {
+:root[data-theme="dark"]
+  :is(
+    .global-image-search-panel-heading p,
+    .global-image-search .global-image-search-close
+  ) {
   color: var(--sh-color-text-muted);
 }
 
@@ -937,10 +1300,8 @@ body:has(.global-image-search-overlay) {
   background: var(--sh-color-info-bg);
 }
 
-:root[data-theme="dark"] :is(
-  .image-search-demo-chips span,
-  .image-search-privacy
-) {
+:root[data-theme="dark"]
+  :is(.image-search-demo-chips span, .image-search-privacy) {
   color: var(--sh-color-brand-accent);
   background: var(--sh-color-brand-soft);
 }

@@ -4,6 +4,114 @@
   padding: var(--sh-space-6) var(--sh-space-4) var(--sh-space-16);
 }
 
+.companySwitcher {
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid var(--sh-color-border-subtle, #e5e8f2);
+  border-radius: 16px;
+  background: var(--sh-color-surface-card, #ffffff);
+  box-shadow: var(--sh-shadow-card);
+}
+
+.companySwitcherHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.switcherLabel {
+  margin: 0 0 4px;
+  color: var(--sh-color-text-muted, #9aa0b4);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.switcherHint {
+  margin: 0;
+  color: var(--sh-color-text-secondary, #6c7288);
+  font-size: 12px;
+}
+
+.createCompanyLink {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--sh-color-brand-primary, #4453e8);
+  border-radius: 9px;
+  color: var(--sh-color-brand-primary, #4453e8);
+  background: var(--sh-color-surface-card, #ffffff);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.createCompanyLink:hover {
+  background: var(--sh-color-brand-soft, #edeffc);
+}
+
+.companySwitcherList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.companySwitcherList > div {
+  min-width: 0;
+}
+
+.companySwitcherItem {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--sh-color-border-subtle, #e5e8f2);
+  border-radius: 12px;
+  color: var(--sh-color-text-primary, #10142b);
+  background: var(--sh-color-surface-subtle, #f8f9fc);
+  cursor: pointer;
+  text-align: left;
+}
+
+.companySwitcherItem:hover {
+  border-color: var(--sh-color-brand-primary, #4453e8);
+}
+
+.companySwitcherItemActive {
+  border-color: var(--sh-color-brand-primary, #4453e8);
+  background: var(--sh-color-brand-soft, #edeffc);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--sh-color-brand-primary, #4453e8) 12%, transparent);
+}
+
+.companySwitcherCopy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.companySwitcherName {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.companySwitcherRole {
+  color: var(--sh-color-text-secondary, #6c7288);
+  font-size: 11px;
+  font-weight: 700;
+}
+
 .emptySection {
   background: var(--sh-color-surface-card, #ffffff);
   border: 1px solid var(--sh-color-border-subtle, #e5e8f2);
@@ -636,6 +744,200 @@
   cursor: not-allowed;
 }
 
+.dangerZone {
+  display: grid;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid
+    color-mix(
+      in srgb,
+      var(--sh-color-error, #d9534f) 24%,
+      var(--sh-color-border-subtle, #e5e8f2)
+    );
+}
+
+.dangerLabel {
+  margin: 0;
+  color: var(--sh-color-error, #d9534f);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.dangerText {
+  margin: 0 0 4px;
+  color: var(--sh-color-text-secondary, #6c7288);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.btnDelete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border: 1px solid var(--sh-color-error, #d9534f);
+  border-radius: 10px;
+  padding: 9px 14px;
+  color: var(--sh-color-error, #d9534f);
+  background: var(--sh-color-surface-card, #ffffff);
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all var(--sh-motion-fast) ease;
+}
+
+.btnDelete:hover:not(:disabled) {
+  color: #ffffff;
+  background: var(--sh-color-error, #d9534f);
+}
+
+.btnDelete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.deleteDialogBackdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(16 20 43 / 48%);
+}
+
+.deleteDialog {
+  width: min(100%, 480px);
+  padding: 24px;
+  border: 1px solid var(--sh-color-border-subtle, #e5e8f2);
+  border-radius: 16px;
+  background: var(--sh-color-surface-card, #ffffff);
+  box-shadow: 0 24px 70px rgb(16 20 43 / 24%);
+}
+
+.deleteDialogHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.deleteDialog h2 {
+  margin: 4px 0 0;
+  color: var(--sh-color-text-primary, #10142b);
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.deleteDialogClose {
+  display: inline-grid;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid var(--sh-color-border-subtle, #e5e8f2);
+  border-radius: 8px;
+  color: var(--sh-color-text-secondary, #6c7288);
+  background: var(--sh-color-surface-card, #ffffff);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.deleteDialogClose:hover:not(:disabled) {
+  color: var(--sh-color-text-primary, #10142b);
+  background: var(--sh-color-surface-subtle, #f8f9fc);
+}
+
+.deleteDialogClose:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.deleteDialogText {
+  margin: 16px 0;
+  color: var(--sh-color-text-secondary, #6c7288);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.deleteConfirmationLabel {
+  display: grid;
+  gap: 8px;
+  color: var(--sh-color-text-primary, #10142b);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.deleteConfirmationLabel strong {
+  font-weight: 800;
+}
+
+.deleteConfirmationInput {
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 11px;
+  border: 1px solid var(--sh-color-border-default, #d8dceb);
+  border-radius: 9px;
+  color: var(--sh-color-text-primary, #10142b);
+  background: var(--sh-color-surface-card, #ffffff);
+  font: inherit;
+}
+
+.deleteConfirmationInput:focus {
+  outline: 2px solid
+    color-mix(in srgb, var(--sh-color-error, #d9534f) 35%, transparent);
+  outline-offset: 1px;
+  border-color: var(--sh-color-error, #d9534f);
+}
+
+.deleteDialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btnCancelDelete,
+.btnDeleteConfirm {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btnCancelDelete {
+  border: 1px solid var(--sh-color-border-default, #d8dceb);
+  color: var(--sh-color-text-secondary, #6c7288);
+  background: var(--sh-color-surface-card, #ffffff);
+}
+
+.btnCancelDelete:hover:not(:disabled) {
+  color: var(--sh-color-text-primary, #10142b);
+  background: var(--sh-color-surface-subtle, #f8f9fc);
+}
+
+.btnDeleteConfirm {
+  border: 1px solid var(--sh-color-error, #d9534f);
+  color: #ffffff;
+  background: var(--sh-color-error, #d9534f);
+}
+
+.btnDeleteConfirm:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sh-color-error, #d9534f) 88%, #000000);
+}
+
+.btnCancelDelete:disabled,
+.btnDeleteConfirm:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 /* sidebar ownership */
 .sideCard {
   background: var(--sh-color-surface-card, #ffffff);
@@ -717,6 +1019,14 @@
 }
 
 @media (max-width: 600px) {
+  .companySwitcherHeader {
+    flex-direction: column;
+  }
+
+  .createCompanyLink {
+    width: 100%;
+  }
+
   .identityGrid,
   .gateChecklist,
   .readonlyGrid {
@@ -733,6 +1043,15 @@
   }
 
   .btnEdit {
+    width: 100%;
+  }
+
+  .deleteDialogActions {
+    flex-direction: column-reverse;
+  }
+
+  .btnCancelDelete,
+  .btnDeleteConfirm {
     width: 100%;
   }
 }

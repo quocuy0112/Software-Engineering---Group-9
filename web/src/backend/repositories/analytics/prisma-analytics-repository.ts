@@ -28,6 +28,11 @@ type LifecycleRow = {
   postingVersion: number;
   toStatus: string;
 };
+
+const analyticsMigrationNames = [
+  "052_recruitment_analytics_export",
+  "053_recruitment_analytics_export",
+] as const;
 export type ExportDatabaseRow = {
   id: string;
   contactSnapshot: unknown;
@@ -110,7 +115,24 @@ export class PrismaAnalyticsRepository {
       orderBy: [{ effectiveAt: "asc" }, { id: "asc" }],
       select: { effectiveAt: true },
     });
-    return first?.effectiveAt ?? new Date();
+    if (first) return first.effectiveAt;
+
+    // A database can legitimately have no lifecycle rows when the analytics
+    // migration was applied before the first posting was created. Use the
+    // migration completion time as the stable collection baseline; returning
+    // `new Date()` here makes the client retry with an ever-moving baseline
+    // and leaves the dashboard permanently unavailable.
+    const migrationBaseline = await this.db.$queryRaw<
+      Array<{ finishedAt: Date | null }>
+    >`
+      SELECT "finished_at" AS "finishedAt"
+      FROM "_prisma_migrations"
+      WHERE "migration_name" IN (${analyticsMigrationNames[0]}, ${analyticsMigrationNames[1]})
+        AND "finished_at" IS NOT NULL
+      ORDER BY "finished_at" ASC
+      LIMIT 1
+    `;
+    return migrationBaseline[0]?.finishedAt ?? new Date(0);
   }
 
   async adminGrowth(

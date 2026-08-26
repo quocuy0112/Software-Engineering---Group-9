@@ -95,4 +95,71 @@ describe.skipIf(!databaseAvailable)("PostgreSQL public job search", () => {
     expect(fixtureRows[0]?.id).toBe(fixture.jobs.active.id);
     expect(fixtureRows[0]?.title).toBe("Lập trình viên TypeScript");
   });
+
+  it("searches skills and accent-insensitive company names from the free-text field", async () => {
+    const skillResult = await repository.search(
+      {
+        normalizedQuery: "typescript",
+        searchBy: "BOTH",
+        normalizedLocation: "",
+        normalizedSkills: [],
+        employmentType: [],
+        experienceLevel: [],
+        workArrangement: [],
+        salaryCurrency: "VND",
+        salaryPeriod: "MONTH",
+        sort: "NEWEST",
+        limit: 20,
+      },
+      null,
+      fixture.now,
+    );
+    expect(
+      skillResult.rows.filter((row) => row.companyId === fixture.company.id),
+    ).toHaveLength(2);
+
+    const companyResult = await repository.search(
+      {
+        normalizedQuery: "cong ty smarthire",
+        searchBy: "COMPANY",
+        normalizedLocation: "",
+        normalizedSkills: [],
+        employmentType: [],
+        experienceLevel: [],
+        workArrangement: [],
+        salaryCurrency: "VND",
+        salaryPeriod: "MONTH",
+        sort: "NEWEST",
+        limit: 20,
+      },
+      null,
+      fixture.now,
+    );
+    expect(
+      companyResult.rows.filter((row) => row.companyId === fixture.company.id),
+    ).toHaveLength(2);
+  });
+
+  it("matches location terms regardless of the order entered by the visitor", async () => {
+    const result = await repository.search(
+      {
+        normalizedQuery: "",
+        normalizedLocation: "minh chi ho",
+        normalizedSkills: [],
+        employmentType: [],
+        experienceLevel: [],
+        workArrangement: [],
+        salaryCurrency: "VND",
+        salaryPeriod: "MONTH",
+        sort: "NEWEST",
+        limit: 20,
+      },
+      null,
+      fixture.now,
+    );
+    const fixtureRows = result.rows.filter(
+      (row) => row.companyId === fixture.company.id,
+    );
+    expect(fixtureRows.map((row) => row.id)).toEqual([fixture.jobs.active.id]);
+  });
 });

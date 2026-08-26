@@ -79,8 +79,8 @@ async function acceptedChecksums(sourceName, extraNames = []) {
   return new Set([
     ...(await sourceChecksumVariants(sourceName)),
     ...(migrationChecksumAliases[sourceName] ?? []),
-    ...extraNames.flatMap((aliasName) =>
-      migrationChecksumAliases[aliasName] ?? [],
+    ...extraNames.flatMap(
+      (aliasName) => migrationChecksumAliases[aliasName] ?? [],
     ),
   ]);
 }
@@ -98,6 +98,23 @@ const historyNames = [
 ];
 
 await client.connect();
+const migrationTable = await client.query(
+  `SELECT to_regclass('public."_prisma_migrations"') AS table_name`,
+);
+if (!migrationTable.rows[0]?.table_name) {
+  await client.end();
+  console.log(
+    JSON.stringify(
+      {
+        mode: apply ? "apply" : "check",
+        results: [{ status: "NO_MIGRATION_TABLE" }],
+      },
+      null,
+      2,
+    ),
+  );
+  process.exit(0);
+}
 try {
   await client.query("BEGIN");
   const historyResult = await client.query(
@@ -327,7 +344,9 @@ try {
   await client.end();
 }
 
-console.log(JSON.stringify({ mode: apply ? "apply" : "check", results }, null, 2));
+console.log(
+  JSON.stringify({ mode: apply ? "apply" : "check", results }, null, 2),
+);
 if (
   !apply &&
   results.some((entry) =>

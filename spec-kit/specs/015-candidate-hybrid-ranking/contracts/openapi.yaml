@@ -321,8 +321,8 @@ components:
         value: { type: number, minimum: 0, maximum: 100, multipleOf: 0.1 }
         formulaText: { type: string, pattern: '^.+ × 0\\.6 \+ .+ × 0\\.4 = .+$' }
         formulaVersion: { type: string }
-        automaticWeight: { const: 0.6 }
-        aiWeight: { const: 0.4 }
+        automaticWeight: { const: 0.4 }
+        aiWeight: { const: 0.6 }
         band: { $ref: '#/components/schemas/ExplicitLabel' }
         cvVersion: { type: string }
         jdVersion: { type: string }

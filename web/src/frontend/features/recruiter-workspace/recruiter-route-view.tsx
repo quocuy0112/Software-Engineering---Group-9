@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { JobPostingEditor } from "./job-posting-editor";
 import { RecruiterJobPostingManagement } from "./job-posting-management";
 import {
@@ -17,6 +18,7 @@ type RecruiterRouteViewProps = {
   initialData: RecruiterJobManagementData;
   jobId?: string;
   initialTab?: RecruiterJobPostingTab;
+  initialCompanyId?: string;
 };
 
 export function RecruiterRouteView({
@@ -24,9 +26,20 @@ export function RecruiterRouteView({
   initialData,
   jobId,
   initialTab,
+  initialCompanyId,
 }: RecruiterRouteViewProps) {
   const router = useRouter();
-  const companyName = initialData.companies[0]?.name ?? "Your company";
+  const selectedCompany =
+    initialData.companies.find((item) => item.id === initialCompanyId) ??
+    initialData.companies.find((item) => item.id === initialData.companyId);
+
+  useEffect(() => {
+    // A previously visited edit route can be restored from the App Router
+    // cache. Force one server refresh on entry so the editor hydrates from the
+    // latest catalogue snapshot after an AutoSave made in another route
+    // bundle.
+    if (view === "edit") router.refresh();
+  }, [jobId, router, view]);
 
   if (view === "list") {
     return (
@@ -47,15 +60,19 @@ export function RecruiterRouteView({
     return <RecruiterJobPostingManagement initialData={initialData} />;
   }
 
+  const targetCompany =
+    selectedCompany ??
+    initialData.companies.find((item) => item.id === initialData.companyId);
+  const targetCompanyId = targetCompany?.id ?? initialData.companyId;
+
   const job =
     view === "edit"
       ? initialData.jobs.find((item) => item.id === jobId)
       : ({
-          ...createEmptyJobPosting(initialData.companyId),
+          ...createEmptyJobPosting(targetCompanyId),
           company:
-            initialData.companies.find(
-              (item) => item.id === initialData.companyId,
-            ) ?? initialData.companies[0],
+            initialData.companies.find((item) => item.id === targetCompanyId) ??
+            initialData.companies[0],
         } as RecruiterJob);
 
   if (!job) {
@@ -74,16 +91,26 @@ export function RecruiterRouteView({
     );
   }
 
+  const returnToJobPostings = () => {
+    // The list page can be retained in the App Router cache while the editor
+    // is open. Refresh after returning so its draft card cannot reuse the
+    // pre-edit server snapshot.
+    router.replace(recruiterRoutes.jobPostings);
+    window.setTimeout(() => router.refresh(), 0);
+  };
+
   return (
     <JobPostingEditor
+      key={view === "edit" ? `${job.id}:${job.updatedAt}` : undefined}
       initialJob={job}
-      companyName={companyName}
+      companyName={job.company.name}
       autoSavePreferenceScope={initialData.recruiterUserId}
       subIndustrySuggestions={collectRecruiterSubIndustrySuggestions(
         initialData.jobs,
       )}
-      onBack={() => router.back()}
-      onSaved={() => router.replace(recruiterRoutes.jobPostings)}
+      awaitDraftSaveBeforeBack
+      onBack={returnToJobPostings}
+      onSaved={returnToJobPostings}
     />
   );
 }

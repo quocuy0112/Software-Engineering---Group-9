@@ -18,8 +18,8 @@ export async function createJobBoardDatabaseFixture(
     data: {
       id: `company-${suffix}`,
       slug: `smart-hire-${suffix}`,
-      legalName: "SmartHire Test Company Limited",
-      displayName: "SmartHire Test",
+      legalName: "Công Ty SmartHire Limited",
+      displayName: "Công Ty SmartHire",
       publicDescription: "A disposable company used by integration tests.",
       publicLocation: "Hồ Chí Minh",
       verifiedAt: new Date(now.getTime() - 30 * 24 * 60 * 60_000),

@@ -437,7 +437,8 @@ export const JobPostReviewHistoryAction = {
   RESUBMITTED: 'RESUBMITTED',
   LEGACY_BASELINE_IMPORTED: 'LEGACY_BASELINE_IMPORTED',
   CLOSED: 'CLOSED',
-  WITHDRAWN: 'WITHDRAWN'
+  WITHDRAWN: 'WITHDRAWN',
+  REOPENED: 'REOPENED'
 } as const
 
 export type JobPostReviewHistoryAction = (typeof JobPostReviewHistoryAction)[keyof typeof JobPostReviewHistoryAction]

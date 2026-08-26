@@ -99,11 +99,14 @@ export class JobPostSubmissionService {
     } catch (error) {
       if (
         error instanceof Error &&
-        error.message === "UNPUBLISHABLE_JOB_MAPPING"
+        (error.message === "UNPUBLISHABLE_JOB_MAPPING" ||
+          error.message === "UNPUBLISHABLE_JOB_CONTENT")
       ) {
         throw new JobPostReviewError(
           "JOB_POST_REVIEW_VALIDATION",
-          "Choose a supported experience level, employment type, work arrangement, and salary period before submitting.",
+          error.message === "UNPUBLISHABLE_JOB_CONTENT"
+            ? "Add at least one responsibility and requirement, and keep the published text within its limits before submitting."
+            : "Choose a supported experience level, employment type, work arrangement, and salary period before submitting.",
         );
       }
       throw error;

@@ -6,7 +6,7 @@ const base = {
   applicationId: "app-1",
   cvVersion: "CV-v1",
   jdVersion: "JD-v3",
-  configVersion: "HS-60/40-v1",
+  configVersion: "HS-40/60-v1",
   parserVersion: "parser-v2.4",
   cvParse: { code: "PARSED_SUCCESSFULLY" as const, label: "Parsed successfully" as const, parserVersion: "parser-v2.4", processingMilliseconds: 12, snapshotVersion: "CV-v1" },
   jdParse: { code: "PARSED_SUCCESSFULLY" as const, label: "Parsed successfully" as const, parserVersion: "parser-v2.4", processingMilliseconds: 12, snapshotVersion: "JD-v3" },

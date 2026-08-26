@@ -167,6 +167,10 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
           id="login-email"
           type="email"
           autoComplete="email"
+          inputMode="email"
+          autoCapitalize="none"
+          spellCheck={false}
+          placeholder="example@email.com"
           aria-invalid={Boolean(errors.email)}
           {...register("email")}
         />
@@ -175,6 +179,7 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
       <PasswordField
         label="Password"
         autoComplete="current-password"
+        hint="Use 12–128 characters, including an uppercase letter, a number, and a special character."
         error={errors.password?.message}
         {...register("password")}
       />

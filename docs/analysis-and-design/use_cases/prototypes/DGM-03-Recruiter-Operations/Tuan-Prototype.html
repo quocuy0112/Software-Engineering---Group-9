@@ -1146,7 +1146,7 @@
     $('#mainRing').style.setProperty('--pct', s);
     $('#subResume').textContent = c.resumeScore;
     $('#subSkill').textContent = c.skillScore;
-    $('#explainCard').innerHTML = '<strong>AI Explanation ·</strong> Hybrid score combines a resume-model match (60% weight) and a structured skill-test result (40% weight). ' +
+    $('#explainCard').innerHTML = '<strong>AI Explanation ·</strong> Hybrid score combines a structured automatic match (40% weight) and an AI/resume-model evaluation (60% weight). ' +
       (s>=75 ? 'This candidate ranks in the top band for this role.' : s>=50 ? 'This candidate is a moderate match; consider a closer manual review.' : 'This candidate ranks below the typical bar for this role.');
     setEvalState('ready');
   }

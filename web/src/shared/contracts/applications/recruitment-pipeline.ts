@@ -25,6 +25,7 @@ export const pipelineBoardColumnStages = [
 export const terminalPipelineStages = [
   "HIRED",
   "OFFER_DECLINED",
+  "REJECTED",
 ] as const satisfies readonly ApplicationStage[];
 
 export function isTerminalPipelineStage(stage: ApplicationStage) {

@@ -16,6 +16,12 @@ import {
 import type { JobPerformanceReport } from "@/shared/contracts/analytics/employer";
 import type { RecruiterJob } from "@/shared/contracts/recruiter-job-posting";
 import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
+import type { RecruiterCompanyView } from "@/shared/contracts/recruiter-job-posting";
+import { RecruiterCompanyFilter } from "@/frontend/features/recruiter-workspace/recruiter-company-filter";
+import {
+  companyMatchesScope,
+  useRecruiterCompanyScope,
+} from "@/frontend/features/recruiter-workspace/recruiter-company-scope";
 import { AnalyticsDateRangeControls } from "./analytics-filters";
 import {
   defaultAnalyticsDateRange,
@@ -31,6 +37,8 @@ type PerformanceState =
   | { status: "error"; message: string };
 
 type SortKey = "title" | "views" | "applications" | "conversion";
+
+const emptyCompanies: RecruiterCompanyView[] = [];
 
 function formatNumber(value: number) {
   return value.toLocaleString("en-US");
@@ -100,11 +108,16 @@ function reportValue(
 
 export function RecruiterAnalyticsOverview({
   jobs,
+  companies,
   initialJobId,
 }: {
   jobs: RecruiterJob[];
+  companies?: RecruiterCompanyView[];
   initialJobId?: string;
 }) {
+  const companyOptions = companies ?? emptyCompanies;
+  const { companyId, selectedCompanyId, setCompanyId } =
+    useRecruiterCompanyScope(companyOptions);
   const [range, setRange] = useState<AnalyticsDateRange>(() =>
     defaultAnalyticsDateRange(),
   );
@@ -122,8 +135,12 @@ export function RecruiterAnalyticsOverview({
 
   const reportableJobs = useMemo(
     () =>
-      jobs.filter((job) => job.status === "active" || job.status === "closed"),
-    [jobs],
+      jobs.filter(
+        (job) =>
+          (job.status === "active" || job.status === "closed") &&
+          companyMatchesScope(job.companyId, selectedCompanyId),
+      ),
+    [jobs, selectedCompanyId],
   );
 
   function requestRefresh(background = false) {
@@ -298,6 +315,14 @@ export function RecruiterAnalyticsOverview({
   const selectedReport =
     selectedState?.status === "success" ? selectedState.report : null;
   const backgroundRefreshActive = isRefreshing && reportableJobs.length > 0;
+  const filtersClassName = [
+    "recruiter-analytics-overview__filters",
+    companyOptions.length > 1
+      ? "recruiter-analytics-overview__filters--with-company"
+      : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   function sortBy(nextKey: SortKey) {
     if (nextKey === sortKey) {
@@ -339,12 +364,20 @@ export function RecruiterAnalyticsOverview({
         </Link>
       </header>
 
-      <AnalyticsDateRangeControls
-        key={range.fromDate + ":" + range.toDate}
-        range={range}
-        onApply={applyRange}
-        busy={loadingReports}
-      />
+      <div className={filtersClassName}>
+        <RecruiterCompanyFilter
+          companies={companyOptions}
+          value={companyId}
+          onChange={setCompanyId}
+          id="recruiter-overview-company"
+        />
+        <AnalyticsDateRangeControls
+          key={range.fromDate + ":" + range.toDate}
+          range={range}
+          onApply={applyRange}
+          busy={loadingReports}
+        />
+      </div>
 
       <div className="recruiter-analytics-overview__context" role="note">
         <span
@@ -392,7 +425,7 @@ export function RecruiterAnalyticsOverview({
         <MetricCard
           label="Active job postings"
           value={formatNumber(
-            jobs.filter((job) => job.status === "active").length,
+            reportableJobs.filter((job) => job.status === "active").length,
           )}
           description="Currently visible to candidates"
           tone="blue"
@@ -485,7 +518,13 @@ export function RecruiterAnalyticsOverview({
               applications.
             </p>
             <Link
-              href={recruiterRoutes.jobPostingCreate}
+              href={
+                selectedCompanyId
+                  ? recruiterRoutes.jobPostingCreateForCompany(
+                      selectedCompanyId,
+                    )
+                  : recruiterRoutes.jobPostingCreate
+              }
               className="recruiter-analytics-primary-link"
             >
               <Plus aria-hidden="true" />

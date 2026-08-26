@@ -6,8 +6,8 @@ function automatic(score: number, evidenceCoverage = 100): AutomaticMatchingResu
   return {
     resultId: "automatic-1",
     score,
-    weight: 0.6,
-    weightedContribution: score * 0.6,
+    weight: 0.4,
+    weightedContribution: score * 0.4,
     matchedRequirements: [],
     gaps: [],
     requiredExperience: null,
@@ -19,7 +19,7 @@ function automatic(score: number, evidenceCoverage = 100): AutomaticMatchingResu
     mayBeIncomplete: false,
     cvVersion: "cv-v1",
     jdVersion: "jd-v1",
-    configVersion: "HS-60/40-v1",
+    configVersion: "HS-40/60-v1",
   };
 }
 
@@ -27,8 +27,8 @@ function ai(score: number, confidence = 0): AiEvaluationResult {
   return {
     resultId: "ai-1",
     score,
-    weight: 0.4,
-    weightedContribution: score * 0.4,
+    weight: 0.6,
+    weightedContribution: score * 0.6,
     summary: "Summary",
     strengths: [],
     mainGap: null,
@@ -38,22 +38,22 @@ function ai(score: number, confidence = 0): AiEvaluationResult {
     provider: "test",
     model: "test-model",
     promptVersion: "prompt-v1",
-    policyVersion: "HS-60/40-v1",
+    policyVersion: "HS-40/60-v1",
     durationMs: 1,
     completedAt: new Date("2026-08-16T00:00:00.000Z"),
     cvVersion: "cv-v1",
     jdVersion: "jd-v1",
-    configVersion: "HS-60/40-v1",
+    configVersion: "HS-40/60-v1",
   };
 }
 
 describe("private CV match scoring boundary", () => {
-  it("reuses 60/40 arithmetic and rounds only the final value", () => {
+  it("reuses 40/60 arithmetic and rounds only the final value", () => {
     const result = calculatePrivateHybridScore(automatic(92, 10), ai(88, 0));
-    expect(result.value).toBe(90.4);
-    expect(result.automaticContribution).toBe(55.2);
-    expect(result.aiContribution).toBe(35.2);
-    expect(result.formulaText).toContain("90.4");
+    expect(result.value).toBe(89.6);
+    expect(result.automaticContribution).toBe(36.8);
+    expect(result.aiContribution).toBe(52.8);
+    expect(result.formulaText).toContain("89.6");
   });
 
   it("uses exact 80 and 60 band thresholds", () => {

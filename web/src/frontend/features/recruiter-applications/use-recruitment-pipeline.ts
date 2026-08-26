@@ -227,7 +227,11 @@ export function useRecruitmentPipeline(jobId: string) {
   }, [csrfProof, jobId, load, loadStage]);
 
   const move = useCallback(async (card: PipelineApplicationCard, targetStage: ApplicationStage, extras: StageMoveExtras = {}) => {
-    if (isTerminalPipelineStage(card.stage) || card.withdrawalOutcome === "CANDIDATE_WITHDRAWN" || !card.allowedDestinations.includes(targetStage) || pendingApplicationIdRef.current) return false;
+    const destinations =
+      extras.intent === "drag"
+        ? (card.dragDestinations ?? [])
+        : card.allowedDestinations;
+    if (isTerminalPipelineStage(card.stage) || card.withdrawalOutcome === "CANDIDATE_WITHDRAWN" || !destinations.includes(targetStage) || pendingApplicationIdRef.current) return false;
     setCanRetryStageMove(false);
     return submitStageMove({ card, targetStage, extras, idempotencyKey: crypto.randomUUID() }, true);
   }, [submitStageMove]);

@@ -3196,14 +3196,18 @@
 }
 
 .private-match-setup-page .private-match-picker-results {
-  /* Keep a full result set selectable without letting a long search result
-     dominate the setup page. About six options remain visible at once. */
-  max-height: 360px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
   display: grid;
   gap: 7px;
   margin-top: 10px;
+}
+
+.private-match-setup-page .private-match-picker-results.is-scrollable {
+  /* The default six-job set stays part of the document flow so wheel input
+     continues to scroll the page. Only genuinely long search results receive
+     an inner scroller; `auto` preserves scroll chaining at its boundaries. */
+  max-height: 360px;
+  overflow-y: auto;
+  overscroll-behavior-y: auto;
 }
 
 .private-match-setup-page .private-match-picker-option {
@@ -6423,6 +6427,37 @@
   background: var(--sh-color-surface-subtle);
 }
 
+/* Some match states still carry utility classes from the first visual pass.
+ * Remap only those utilities inside the candidate match workspace so a light
+ * card cannot leak into dark mode while preserving the page's blue actions. */
+:root[data-theme="dark"] .private-match-page:not(.pmr-page) :is(
+  [class*="bg-white"],
+  [class*="bg-slate-50"]
+) {
+  border-color: var(--sh-color-border-subtle) !important;
+  background: var(--sh-color-surface-card) !important;
+}
+
+:root[data-theme="dark"] .private-match-page:not(.pmr-page) [class*="bg-slate-100"] {
+  background: var(--sh-color-surface-subtle) !important;
+}
+
+:root[data-theme="dark"] .private-match-page:not(.pmr-page) :is(
+  [class*="text-slate-900"],
+  [class*="text-slate-800"],
+  [class*="text-slate-700"]
+) {
+  color: var(--sh-color-text-primary) !important;
+}
+
+:root[data-theme="dark"] .private-match-page:not(.pmr-page) :is(
+  [class*="text-slate-600"],
+  [class*="text-slate-500"],
+  [class*="text-slate-400"]
+) {
+  color: var(--sh-color-text-muted) !important;
+}
+
 :root[data-theme="dark"] .pmr-page > header,
 :root[data-theme="dark"] .pmr-page :is(
   [class*="bg-white"],
@@ -6466,4 +6501,157 @@
   [class*="text-slate-300"]
 ) {
   color: var(--sh-color-text-muted) !important;
+}
+
+/* Report output is currently rendered by the compact `pmr-page` variant,
+ * while the older stylesheet rules are scoped to `.private-match-report-page`.
+ * Keep both roots on the same semantic palette so report cards do not fall
+ * back to white utility surfaces in dark mode. */
+:root[data-theme="dark"] .pmr-page {
+  --private-report-blue: var(--sh-color-brand-primary);
+  --private-report-blue-dark: var(--sh-color-brand-accent);
+  --private-report-blue-50: var(--sh-color-info-bg);
+  --private-report-blue-100: var(--sh-color-border-subtle);
+  --private-report-ink-900: var(--sh-color-text-primary);
+  --private-report-ink-700: var(--sh-color-text-secondary);
+  --private-report-ink-500: var(--sh-color-text-muted);
+  --private-report-ink-400: var(--sh-color-disabled-text);
+  --private-report-line: var(--sh-color-border-subtle);
+  --private-report-line-soft: var(--sh-color-border-subtle);
+  --private-report-green-50: var(--sh-color-success-bg);
+  --private-report-green-600: var(--sh-color-success);
+  --private-report-green-700: var(--sh-color-success);
+  --private-report-amber-50: var(--sh-color-warning-bg);
+  --private-report-amber-100: color-mix(
+    in srgb,
+    var(--sh-color-warning) 42%,
+    var(--sh-color-border-subtle)
+  );
+  --private-report-amber-200: color-mix(
+    in srgb,
+    var(--sh-color-warning) 52%,
+    var(--sh-color-border-subtle)
+  );
+  --private-report-amber-600: var(--sh-color-warning);
+  --private-report-amber-700: var(--sh-color-warning);
+  color: var(--sh-color-text-secondary);
+}
+
+:root[data-theme="dark"] .pmr-page :is(
+  .pmr-hero,
+  .pmr-card,
+  .pmr-metric,
+  .pmr-score,
+  .pmr-diagnostic,
+  .pmr-experience,
+  .pmr-evidence-list > li,
+  .pmr-action-list > li,
+  .pmr-calc-card,
+  .pmr-calc-card > div > div
+) {
+  border-color: var(--sh-color-border-subtle) !important;
+  background: var(--sh-color-surface-card) !important;
+  box-shadow: var(--sh-shadow-card);
+}
+
+:root[data-theme="dark"] .pmr-page :is(
+  .pmr-score,
+  .pmr-diagnostic,
+  .pmr-experience,
+  .pmr-evidence-list > li,
+  .pmr-action-list > li,
+  .pmr-calc-card > div > div
+) {
+  background: var(--sh-color-surface-subtle) !important;
+}
+
+:root[data-theme="dark"] .pmr-page .pmr-score {
+  background: linear-gradient(
+    180deg,
+    var(--sh-color-info-bg),
+    var(--sh-color-surface-card)
+  ) !important;
+}
+
+:root[data-theme="dark"] .pmr-page :is(
+  [class*="bg-white"],
+  [class*="bg-slate-50"],
+  [class*="bg-slate-100"],
+  [class*="bg-brand-50"],
+  [class*="bg-emerald-50"],
+  [class*="bg-emerald-100"],
+  [class*="bg-amber-50"],
+  [class*="bg-amber-100"]
+) {
+  border-color: var(--sh-color-border-subtle) !important;
+  background: var(--sh-color-surface-subtle) !important;
+}
+
+:root[data-theme="dark"] .pmr-page :is(
+  [class*="bg-emerald-50"],
+  [class*="bg-emerald-100"]
+) {
+  background: var(--sh-color-success-bg) !important;
+}
+
+:root[data-theme="dark"] .pmr-page :is(
+  [class*="bg-amber-50"],
+  [class*="bg-amber-100"]
+) {
+  background: var(--sh-color-warning-bg) !important;
+}
+
+:root[data-theme="dark"] .pmr-page :is(
+  [class*="text-slate-900"],
+  [class*="text-slate-800"],
+  [class*="text-slate-700"]
+) {
+  color: var(--sh-color-text-primary) !important;
+}
+
+:root[data-theme="dark"] .pmr-page :is(
+  [class*="text-slate-600"],
+  [class*="text-slate-500"],
+  [class*="text-slate-400"],
+  [class*="text-slate-300"]
+) {
+  color: var(--sh-color-text-muted) !important;
+}
+
+/* The setup/ready variants still contain a few legacy literal white
+ * declarations. Override only their content surfaces; action buttons keep
+ * their brand colors and therefore retain clear affordance. */
+:root[data-theme="dark"] .private-match-setup-page :is(
+  .private-match-stepper-card,
+  .private-match-card,
+  .private-match-picker,
+  .private-match-picker-option,
+  .private-match-large-icon,
+  .private-match-inset,
+  .private-match-local-import,
+  .private-match-cv-picker,
+  .private-match-privacy-card
+) {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-card);
+}
+
+:root[data-theme="dark"] .private-match-ready-page :is(
+  .private-match-status-card,
+  .private-match-ready-banner,
+  .private-match-card,
+  .private-match-preview-score
+) {
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-card);
+}
+
+:root[data-theme="dark"] .private-match-ready-page .private-match-preview-score,
+:root[data-theme="dark"] .private-match-ready-page .private-match-guidance-banner {
+  background: linear-gradient(
+    135deg,
+    var(--sh-color-info-bg),
+    var(--sh-color-surface-card)
+  );
 }

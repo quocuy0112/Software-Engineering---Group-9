@@ -514,7 +514,7 @@ The scoring system uses a hybrid algorithm that combines automatic skill/experie
 **Scoring formula:**
 
 ```
-Final Score = 60% × Auto Matching Score + 40% × AI Score
+Final Score = 40% × Auto Matching Score + 60% × AI Score
 ```
 
 **Score classification (out of 100):**
@@ -535,10 +535,10 @@ flowchart TD
     Parsed -->|Skill and Experience Matching| AutoScore[Auto Matching Score<br/>Skill/Experience vs JD]
     Parsed -->|LLM reads full context| AIScore[AI Score<br/>Deep Semantic Analysis vs JD]
 
-    AutoScore -->|Weight 60 percent| Combine{Weighted Score Aggregation}
-    AIScore -->|Weight 40 percent| Combine
+    AutoScore -->|Weight 40 percent| Combine{Weighted Score Aggregation}
+    AIScore -->|Weight 60 percent| Combine
 
-    Combine -->|Total Score = 60% Auto Match + 40% AI| FinalScore[Final Combined Score / 100]
+    Combine -->|Total Score = 40% Auto Match + 60% AI| FinalScore[Final Combined Score / 100]
 
     FinalScore --> Explanation[Explanation to Recruiter and Candidate]
     Explanation --> Classify{Score Classification}
@@ -572,7 +572,7 @@ flowchart TD
 2. **Parsed CV Text**: The CV Parser converts the original CV into normalized raw text.
 3. **Auto Matching Score**: An algorithm directly compares the skills/experience in the CV against the JD requirements.
 4. **AI Score**: An LLM reads the entire text, understands deep context (handling abbreviations and mixed languages), and compares it against the JD to score each criterion in detail.
-5. **Weighted Score Aggregation**: The two scores are combined using a weighted formula: 60% (Auto) / 40% (AI).
+5. **Weighted Score Aggregation**: The two scores are combined using a weighted formula: 40% (Auto) / 60% (AI).
 6. **Final Combined Score**: The final aggregated score on a scale of 100.
 7. **Score Explanation Generation**: The LLM generates a human-readable explanation describing why the candidate received that score, identifying strengths and gaps
 8. **Score Classification**: The score is classified and assigned a color theme (green/yellow/red) based on thresholds for visual display.

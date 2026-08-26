@@ -34,8 +34,8 @@
 
 - [ ] T006 Define application draft, intake, public update, notification preference, withdrawal outcome, private check, private attempt, private component, evidence, and cleanup models with required indexes and constraints in `web/prisma/schema.prisma`
 - [ ] T007 Implement the additive schema migration, legacy intake/default-preference backfill, private-pipeline isolation constraints, and reversible indexes in `web/prisma/migrations/<timestamp>_candidate_application_tracking_private_match/migration.sql`
-- [x] T008 [P] Implement shared Zod value contracts for score inputs, provenance, 60/40 components, bands, and limited/full discriminated states in `web/src/backend/scoring-engine/scoring-contracts.ts`
-- [x] T009 [P] Implement the exact one-time-rounding 60/40 formula and approved band policy in `web/src/backend/scoring-engine/hybrid-score-policy.ts`
+- [x] T008 [P] Implement shared Zod value contracts for score inputs, provenance, 40/60 components, bands, and limited/full discriminated states in `web/src/backend/scoring-engine/scoring-contracts.ts`
+- [x] T009 [P] Implement the exact one-time-rounding 40/60 formula and approved band policy in `web/src/backend/scoring-engine/hybrid-score-policy.ts`
 - [x] T010 [P] Define persistence-free automatic matching and AI evaluation ports in `web/src/backend/scoring-engine/automatic-matching-port.ts` and `web/src/backend/scoring-engine/ai-evaluation-port.ts`
 - [x] T011 Adapt the existing Feature 015 deterministic matcher and the selected OpenAI Responses API adapter (`gpt-5.4-mini-2026-03-17` baseline) behind purpose-neutral ports with DPA/cross-border/privacy/zero-data-retention gates in `web/src/backend/scoring-engine/scoring-engine-adapter.ts`
 - [ ] T012 [P] Implement Candidate session, ownership, CSRF, and indistinguishable-unavailable helpers in `web/src/backend/security/candidate-application-request-boundary.ts`
@@ -85,7 +85,7 @@
 
 ## Phase 4: User Story 2 - Run and Inspect a Private CV Match Check (Priority: P1)
 
-**Goal**: Let an authenticated Candidate run a completely private normal 60/40 check and view its report without creating or influencing employer evaluation.
+**Goal**: Let an authenticated Candidate run a completely private normal 40/60 check and view its report without creating or influencing employer evaluation.
 
 **Independent Test**: Analyze one owned parsed CV against one visible job with AI available, verify the full explainable score/provenance, and prove recruiter/company/admin paths cannot discover the check or mutate employer scoring.
 

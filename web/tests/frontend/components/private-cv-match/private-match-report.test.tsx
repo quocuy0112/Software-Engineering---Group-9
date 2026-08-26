@@ -33,7 +33,7 @@ const base = {
     cvVersionId: "cv-1",
     cvVersion: 2,
     jdVersion: 4,
-    scoringConfigVersion: "HS-60/40-v1",
+    scoringConfigVersion: "HS-40/60-v1",
     aiProvider: "openai",
     aiModel: "gpt-5.4-mini-2026-03-17",
     promptVersion: "private-match-v1",
@@ -67,8 +67,8 @@ const base = {
 
 const automatic: PrivateAutomaticComponent = {
   score: 92,
-  weight: 0.6,
-  weightedContribution: 55.2,
+  weight: 0.4,
+  weightedContribution: 36.8,
   evidenceCoverage: 82,
   evidenceConfidence: 88,
   matchedRequirements: [
@@ -120,13 +120,13 @@ const fullReport: FullPrivateReport = {
   view: "FULL_REPORT",
   state: "READY",
   mode: "HYBRID",
-  hybridScore: 86.4,
+  hybridScore: 83.6,
   matchBand: "HIGH_MATCH",
   automatic,
   aiEvaluation: {
     score: 78,
-    weight: 0.4,
-    weightedContribution: 31.2,
+    weight: 0.6,
+    weightedContribution: 46.8,
     summary: "Your strongest evidence is in platform delivery.",
     strengths: [],
     mainGap: "Verify Kafka experience.",
@@ -235,13 +235,13 @@ describe("PrivateMatchReport", () => {
         (caption) => caption.textContent,
       ),
     ).toEqual([
-      "Weighted contribution: 55.2",
-      "Weighted contribution: 31.2",
+      "Weighted contribution: 36.8",
+      "Weighted contribution: 46.8",
       "Clear evidence for 2 of 3 checks",
       "Confidence is not part of the score",
     ]);
-    expect(screen.getByText(/92 .* 60%.*78 .* 40%/u)).toBeVisible();
-    expect(screen.getByText(/JD v4.*CV v2.*HS-60\/40-v1/u)).toBeVisible();
+    expect(screen.getByText(/92 .* 40%.*78 .* 60%/u)).toBeVisible();
+    expect(screen.getByText(/JD v4.*CV v2.*HS-40\/60-v1/u)).toBeVisible();
     expect(screen.getByText("Project")).toBeVisible();
     expect(screen.getByText("Impact")).toBeVisible();
     expect(screen.getByText("Kafka", { selector: "strong" })).toBeVisible();

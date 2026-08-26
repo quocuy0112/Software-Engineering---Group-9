@@ -50,6 +50,22 @@ const rejectedCard: PipelineApplicationCard = {
   dragDestinations: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING"],
 };
 
+const waitlistedCard: PipelineApplicationCard = {
+  ...card,
+  applicationId: "application-waitlisted",
+  stage: "WAITLISTED",
+  allowedDestinations: [],
+  dragDestinations: ["VIEWED", "SHORTLISTED", "INTERVIEWING", "REJECTED"],
+};
+
+const interviewingCard: PipelineApplicationCard = {
+  ...card,
+  applicationId: "application-interviewing",
+  stage: "INTERVIEWING",
+  allowedDestinations: ["OFFERED", "REJECTED", "WAITLISTED"],
+  dragDestinations: ["OFFERED", "REJECTED", "WAITLISTED"],
+};
+
 const withdrawnCard: PipelineApplicationCard = {
   ...card,
   applicationId: "application-withdrawn",
@@ -144,6 +160,11 @@ describe("RecruitmentPipelineCard interactions", () => {
       screen.queryByRole("button", { name: "Change Stage" }),
     ).not.toBeInTheDocument();
 
+    const pipelineCard = screen.getByText("Ada Candidate").closest("article");
+    expect(pipelineCard).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(screen.getByText("Ada Candidate"));
+    expect(pipelineCard).toHaveAttribute("aria-expanded", "true");
+
     fireEvent.pointerDown(screen.getByText("Ada Candidate"));
 
     expect(pointerDown).not.toHaveBeenCalled();
@@ -176,8 +197,51 @@ describe("RecruitmentPipelineCard interactions", () => {
     expect(onChangeStage).not.toHaveBeenCalled();
   });
 
-  it("allows Rejected cards to start dragging from the card body", () => {
+  it("keeps Rejected cards read-only even when stale destinations are present", () => {
     render(<RecruitmentPipelineCard card={rejectedCard} jobId="job-1" />);
+
+    expect(
+      screen.queryByRole("button", {
+        name: "Drag Ada Candidate to another stage",
+      }),
+    ).not.toBeInTheDocument();
+    fireEvent.pointerDown(screen.getByText("Ada Candidate"));
+
+    expect(pointerDown).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["OFFERED", "offered"],
+    ["HIRED", "hired"],
+    ["OFFER_DECLINED", "offer-declined"],
+    ["REJECTED", "rejected"],
+    ["WAITLISTED", "waitlisted"],
+  ] as const)(
+    "supports click-to-view actions for %s cards",
+    (stage, applicationId) => {
+      const stageCard: PipelineApplicationCard = {
+        ...card,
+        applicationId: `application-${applicationId}`,
+        stage,
+        allowedDestinations: [],
+        dragDestinations: [],
+      };
+
+      render(<RecruitmentPipelineCard card={stageCard} jobId="job-1" />);
+
+      const pipelineCard = screen.getByText("Ada Candidate").closest("article");
+      expect(pipelineCard).toHaveClass("is-collapsible");
+      expect(pipelineCard).toHaveAttribute("aria-expanded", "false");
+
+      fireEvent.click(screen.getByText("Ada Candidate"));
+
+      expect(pipelineCard).toHaveAttribute("aria-expanded", "true");
+      expect(screen.getByText("Click to collapse")).toBeInTheDocument();
+    },
+  );
+
+  it("allows Waitlisted cards to drag to their server-projected destinations", () => {
+    render(<RecruitmentPipelineCard card={waitlistedCard} jobId="job-1" />);
 
     expect(
       screen.getByRole("button", {
@@ -187,6 +251,22 @@ describe("RecruitmentPipelineCard interactions", () => {
     fireEvent.pointerDown(screen.getByText("Ada Candidate"));
 
     expect(pointerDown).toHaveBeenCalledOnce();
+  });
+
+  it("shows Send offer for Interviewing cards and submits the Offered target", () => {
+    const onChangeStage = vi.fn();
+    render(
+      <RecruitmentPipelineCard
+        card={interviewingCard}
+        jobId="job-1"
+        onChangeStage={onChangeStage}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Ada Candidate"));
+    fireEvent.click(screen.getByRole("button", { name: "Send offer" }));
+
+    expect(onChangeStage).toHaveBeenCalledWith(interviewingCard, "OFFERED");
   });
 
   it("displays the final score and final-score tier badge", () => {

@@ -16,6 +16,7 @@ export const foundationProfileDestinations = [
   { href: "/profile/preferences", label: "Preferences", key: "preferences" },
   { href: "/profile/security", label: "Security", key: "security" },
   { href: "/profile/sessions", label: "Sessions", key: "sessions" },
+  { href: "/profile/about", label: "About me", key: "about" },
 ] as const satisfies readonly ProfileNavigationDestination[];
 
 export function ProfileNavigation({
@@ -39,6 +40,7 @@ export function ProfileNavigation({
           preferences: "Tùy chọn",
           security: "Bảo mật",
           sessions: "Phiên đăng nhập",
+          about: "Về bạn",
         }
       : null;
 

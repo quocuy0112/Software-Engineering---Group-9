@@ -151,7 +151,12 @@ export async function DELETE(request: Request) {
       );
       return NextResponse.json(result, { headers: noStore });
     }
-    const job = await closeRecruiterJob(current.userId, jobId);
+    const industryCode = new URL(request.url).searchParams.get("industryCode");
+    const job = await closeRecruiterJob(
+      current.userId,
+      jobId,
+      industryCode && industryCode.length <= 16 ? industryCode : undefined,
+    );
     return NextResponse.json(job, { headers: noStore });
   } catch (error) {
     return mutationErrorResponse(error, "Unable to close job posting.");

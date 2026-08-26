@@ -28,6 +28,11 @@ import {
   recruiterRoutes,
   type RecruiterJobPostingTab,
 } from "@/shared/routing/recruiter-routes";
+import { RecruiterCompanyFilter } from "./recruiter-company-filter";
+import {
+  companyMatchesScope,
+  useRecruiterCompanyScope,
+} from "./recruiter-company-scope";
 
 const tabs: Array<{
   value: RecruiterJobPostingTab;
@@ -235,7 +240,7 @@ function StatusPill({ status }: { status: RecruiterJobStatus }) {
 }
 
 type JobActionConfirmation = {
-  kind: "delete" | "withdraw";
+  kind: "close" | "reactivate" | "delete" | "withdraw";
   job: RecruiterJob;
 };
 
@@ -253,34 +258,57 @@ function JobActionConfirmationDialog({
   onConfirm: () => void;
 }) {
   const { job, kind } = confirmation;
+  const closing = kind === "close";
+  const reactivating = kind === "reactivate";
   const activeDelete = kind === "delete" && job.status === "active";
-  const title =
-    kind === "withdraw"
-      ? "Withdraw submission?"
-      : activeDelete
-        ? "Delete active job?"
-        : "Delete draft?";
-  const confirmLabel =
-    kind === "withdraw"
-      ? "Withdraw to Drafts"
-      : activeDelete
-        ? "Delete active job"
-        : "Delete draft";
-  const description =
-    kind === "withdraw"
-      ? "The submission will leave the administrator review queue and return to Drafts. You can edit and submit it again later."
-      : activeDelete
-        ? "This job will be removed from the public job data and candidate search immediately. Existing applications and audit history will be preserved."
-        : "This draft will be permanently removed from the draft data. This action cannot be undone.";
+  const title = closing
+    ? "Close job early?"
+    : reactivating
+      ? "Reactivate job?"
+      : kind === "withdraw"
+        ? "Withdraw submission?"
+        : activeDelete
+          ? "Delete active job?"
+          : "Delete draft?";
+  const confirmLabel = closing
+    ? "Close job"
+    : reactivating
+      ? "Reactivate job"
+      : kind === "withdraw"
+        ? "Withdraw to Drafts"
+        : activeDelete
+          ? "Delete active job"
+          : "Delete draft";
+  const description = closing
+    ? "This posting will stop accepting new applications and move to Closed. Existing applications will remain available in your recruitment pipeline."
+    : reactivating
+      ? "This posting will start accepting new applications again and move back to Active."
+      : kind === "withdraw"
+        ? "The submission will leave the administrator review queue and return to Drafts. You can edit and submit it again later."
+        : activeDelete
+          ? "This job will be removed from the public job data and candidate search immediately. Existing applications and audit history will be preserved."
+          : "This draft will be permanently removed from the draft data. This action cannot be undone.";
 
   return (
     <Modal
       open
       title={title}
       description={description}
-      tone={kind === "delete" ? "destructive" : "standard"}
+      tone={closing || kind === "delete" ? "destructive" : "standard"}
       busy={busy}
-      icon={<Icon name={kind === "delete" ? "trash" : "undo"} />}
+      icon={
+        <Icon
+          name={
+            closing
+              ? "lock"
+              : reactivating
+                ? "undo"
+                : kind === "delete"
+                  ? "trash"
+                  : "undo"
+          }
+        />
+      }
       className="recruiter-job-confirm-modal"
       onClose={onCancel}
     >
@@ -305,7 +333,7 @@ function JobActionConfirmationDialog({
         <button
           type="button"
           className={
-            kind === "delete"
+            closing || kind === "delete"
               ? "recruiter-primary-button recruiter-primary-button--danger"
               : "recruiter-primary-button"
           }
@@ -324,6 +352,7 @@ function JobPostingCard({
   onEdit,
   onApplicants,
   onClose,
+  onReactivate,
   onExtend,
   onDelete,
   onWithdraw,
@@ -333,6 +362,7 @@ function JobPostingCard({
   onEdit: () => void;
   onApplicants: () => void;
   onClose: () => void;
+  onReactivate: () => void;
   onExtend: () => void;
   onDelete: () => void;
   onWithdraw: () => void;
@@ -415,7 +445,9 @@ function JobPostingCard({
             ) : null}
             {job.review.state === "APPROVED" ? (
               <p className="recruiter-review-approved-note" role="status">
-                This job post has been approved and is visible to candidates.
+                {job.status === "closed"
+                  ? "This approved job post is closed and no longer accepting applications."
+                  : "This job post has been approved and is visible to candidates."}
               </p>
             ) : null}
           </>
@@ -477,7 +509,9 @@ function JobPostingCard({
                 ? `Revise rejected job posting: ${title}`
                 : job.status === "pending_approval"
                   ? `View job posting under review: ${title}`
-                  : `Edit job posting: ${title}`
+                  : job.status === "closed"
+                    ? `View closed job posting: ${title}`
+                    : `Edit job posting: ${title}`
             }
           >
             <Icon name="edit" />
@@ -485,7 +519,9 @@ function JobPostingCard({
               ? "Revise posting"
               : job.status === "pending_approval"
                 ? "View posting"
-                : "Edit posting"}
+                : job.status === "closed"
+                  ? "View posting"
+                  : "Edit posting"}
           </button>
           {job.status === "active" ? (
             <>
@@ -528,6 +564,17 @@ function JobPostingCard({
             >
               <Icon name="undo" />
               Withdraw to draft
+            </button>
+          ) : null}
+          {job.status === "closed" ? (
+            <button
+              type="button"
+              className="recruiter-primary-button"
+              onClick={onReactivate}
+              disabled={actionPending}
+            >
+              <Icon name="undo" />
+              Reactivate job
             </button>
           ) : null}
         </div>
@@ -801,12 +848,39 @@ export function RecruiterJobPostingManagement({
   }, [initialData]);
 
   const current = data ?? emptyData;
-  const companyReady = Boolean(current.companyId && current.companies.length);
+  const { companyId, selectedCompanyId, setCompanyId } =
+    useRecruiterCompanyScope(current.companies);
+  const scopedJobs = useMemo(
+    () =>
+      current.jobs.filter((job) =>
+        companyMatchesScope(job.companyId, selectedCompanyId),
+      ),
+    [current.jobs, selectedCompanyId],
+  );
+  const selectedCompany =
+    (selectedCompanyId
+      ? current.companies.find((company) => company.id === selectedCompanyId)
+      : current.companies.find(
+          (company) => company.id === current.companyId,
+        )) ?? current.companies[0];
+  // In the aggregate view, use a complete company as the default create
+  // context so one unfinished profile does not hide another company's
+  // existing postings or block its create flow.
+  const targetCompany = selectedCompanyId
+    ? selectedCompany
+    : (current.companies.find((company) => company.profileComplete !== false) ??
+      selectedCompany);
+  const targetCompanyId = targetCompany?.id ?? current.companyId;
+  const companyReady = Boolean(targetCompanyId && current.companies.length);
+  const selectedCompanyProfileComplete =
+    targetCompany?.profileComplete ?? current.companyProfileComplete;
+  const selectedCompanyMissingFields =
+    targetCompany?.missingProfileFields ?? current.missingCompanyProfileFields;
   const departments = useMemo(
     () =>
       Array.from(
         new Set(
-          current.jobs
+          scopedJobs
             .map(
               (job) =>
                 job.description.generalInfo.department || job.categoryFamily,
@@ -814,24 +888,24 @@ export function RecruiterJobPostingManagement({
             .filter(Boolean),
         ),
       ).sort(),
-    [current.jobs],
+    [scopedJobs],
   );
   const counts = useMemo(
     () => ({
-      active: current.jobs.filter((job) => job.status === "active").length,
-      applicants: current.jobs.reduce(
+      active: scopedJobs.filter((job) => job.status === "active").length,
+      applicants: scopedJobs.reduce(
         (sum, job) => sum + job.stats.applicantCount,
         0,
       ),
-      pending: current.jobs.filter((job) => job.status === "pending_approval")
+      pending: scopedJobs.filter((job) => job.status === "pending_approval")
         .length,
-      closing: current.jobs.filter(isClosingSoon).length,
+      closing: scopedJobs.filter(isClosingSoon).length,
     }),
-    [current.jobs],
+    [scopedJobs],
   );
   const filteredJobs = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return current.jobs
+    return scopedJobs
       .filter((job) => statusForTab(job, activeTab))
       .filter(
         (job) =>
@@ -855,28 +929,30 @@ export function RecruiterJobPostingManagement({
             .includes(query),
       )
       .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
-  }, [activeTab, current.jobs, department, search]);
+  }, [activeTab, department, scopedJobs, search]);
   const subIndustrySuggestions = useMemo(
     () => collectRecruiterSubIndustrySuggestions(current.jobs),
     [current.jobs],
   );
 
   const openCreate = () => {
-    if (current.companyProfileComplete === false) {
+    if (selectedCompanyProfileComplete === false) {
       if (onNavigate) {
-        onNavigate("/recruiter/company-settings?required=profile");
+        onNavigate(
+          `/recruiter/company-settings?required=profile&companyId=${encodeURIComponent(targetCompanyId ?? "")}`,
+        );
       }
       return;
     }
-    if (!current.companyId) {
+    if (!targetCompanyId) {
       return;
     }
     if (onNavigate) {
-      onNavigate(recruiterRoutes.jobPostingCreate);
+      onNavigate(recruiterRoutes.jobPostingCreateForCompany(targetCompanyId));
       return;
     }
     setEditorJob(
-      withCompany(createEmptyJobPosting(current.companyId), current.companies),
+      withCompany(createEmptyJobPosting(targetCompanyId), current.companies),
     );
     setView("editor");
   };
@@ -889,6 +965,10 @@ export function RecruiterJobPostingManagement({
     setView("editor");
   };
   const storeSavedJob = useCallback((job: RecruiterJob) => {
+    // A background refresh may have started before the PATCH completed. Mark
+    // this local save as a newer mutation so that an older GET response cannot
+    // overwrite the freshly saved draft in the dashboard.
+    mutationEpoch.current += 1;
     setData((currentData) => {
       const next = currentData ?? emptyData;
       const normalizedJob = withCompanyFromState(
@@ -924,22 +1004,76 @@ export function RecruiterJobPostingManagement({
     [selectTab, storeSavedJob],
   );
   const closeJob = async (job: RecruiterJob) => {
-    const response = await fetch(
-      "/api/recruiter/job-postings?jobId=" + encodeURIComponent(job.id),
-      {
-        method: "DELETE",
-        headers: { "x-csrf-token": csrfProof },
-      },
-    );
-    const payload = (await response.json().catch(() => null)) as
-      | (JobCatalogItem & { message?: string })
-      | null;
-    if (!response.ok || !payload) {
-      return;
+    setActionError("");
+    setActionPendingJobId(job.id);
+    mutationEpoch.current += 1;
+    try {
+      const response = await fetch(
+        "/api/recruiter/job-postings?jobId=" +
+          encodeURIComponent(job.id) +
+          "&industryCode=" +
+          encodeURIComponent(job.industryCode),
+        {
+          method: "DELETE",
+          headers: { "x-csrf-token": csrfProof },
+        },
+      );
+      const payload = (await response.json().catch(() => null)) as
+        | (JobCatalogItem & { message?: string })
+        | null;
+      if (!response.ok || !payload) {
+        setActionError(
+          payload?.message === "Try again in a moment."
+            ? "Unable to close this posting right now. Please try again."
+            : (payload?.message ?? "Unable to close this posting."),
+        );
+        return false;
+      }
+      receiveSavedJob(
+        withCompanyFromState(payload, current.companies, current.jobs),
+      );
+      return true;
+    } catch {
+      setActionError("Unable to close this posting right now.");
+      return false;
+    } finally {
+      setActionPendingJobId(null);
     }
-    receiveSavedJob(
-      withCompanyFromState(payload, current.companies, current.jobs),
-    );
+  };
+
+  const reactivateJob = async (job: RecruiterJob) => {
+    setActionError("");
+    setActionPendingJobId(job.id);
+    mutationEpoch.current += 1;
+    try {
+      const response = await fetch(
+        `/api/recruiter/job-postings/${encodeURIComponent(job.id)}/reactivate?industryCode=${encodeURIComponent(job.industryCode)}`,
+        {
+          method: "POST",
+          headers: { "x-csrf-token": csrfProof },
+        },
+      );
+      const payload = (await response.json().catch(() => null)) as
+        | (JobCatalogItem & { message?: string })
+        | null;
+      if (!response.ok || !payload) {
+        setActionError(
+          payload?.message === "Try again in a moment."
+            ? "Unable to reactivate this posting right now. Please try again."
+            : (payload?.message ?? "Unable to reactivate this posting."),
+        );
+        return false;
+      }
+      receiveSavedJob(
+        withCompanyFromState(payload, current.companies, current.jobs),
+      );
+      return true;
+    } catch {
+      setActionError("Unable to reactivate this posting right now.");
+      return false;
+    } finally {
+      setActionPendingJobId(null);
+    }
   };
 
   const deleteJob = async (job: RecruiterJob) => {
@@ -1061,7 +1195,7 @@ export function RecruiterJobPostingManagement({
     return (
       <JobPostingEditor
         initialJob={editorJob}
-        companyName={current.companies[0]?.name ?? "Your company"}
+        companyName={targetCompany?.name ?? "Your company"}
         autoSavePreferenceScope={
           current.recruiterUserId ?? current.companyId ?? undefined
         }
@@ -1081,7 +1215,7 @@ export function RecruiterJobPostingManagement({
       />
     );
 
-  if (!loading && current.companyProfileComplete === false) {
+  if (!loading && selectedCompanyProfileComplete === false) {
     return (
       <div className="recruiter-management">
         <PageHeader
@@ -1100,9 +1234,19 @@ export function RecruiterJobPostingManagement({
             </button>
           }
         />
+        {current.companies.length > 1 ? (
+          <div className="recruiter-filter-panel recruiter-surface-card recruiter-profile-scope-filter recruiter-filter-panel--with-company">
+            <RecruiterCompanyFilter
+              companies={current.companies}
+              value={companyId}
+              onChange={setCompanyId}
+              id="recruiter-job-postings-company-required"
+            />
+          </div>
+        ) : null}
         <CompanyProfileRequiredState
           missingFields={
-            current.missingCompanyProfileFields ?? [
+            selectedCompanyMissingFields ?? [
               "name",
               "industry",
               "size",
@@ -1215,14 +1359,16 @@ export function RecruiterJobPostingManagement({
               {tab.label}
               <span>
                 {
-                  current.jobs.filter((job) => statusForTab(job, tab.value))
+                  scopedJobs.filter((job) => statusForTab(job, tab.value))
                     .length
                 }
               </span>
             </button>
           ))}
         </nav>
-        <div className="recruiter-filter-panel recruiter-surface-card">
+        <div
+          className={`recruiter-filter-panel recruiter-surface-card${current.companies.length > 1 ? "recruiter-filter-panel--with-company" : ""}`}
+        >
           <label htmlFor="recruiter-job-postings-search">
             <span>Search postings</span>
             <div className="recruiter-input-with-icon">
@@ -1255,6 +1401,12 @@ export function RecruiterJobPostingManagement({
               <Icon name="chevron-down" />
             </div>
           </label>
+          <RecruiterCompanyFilter
+            companies={current.companies}
+            value={companyId}
+            onChange={setCompanyId}
+            id="recruiter-job-postings-company"
+          />
         </div>
         <div
           id="recruiter-job-postings-panel"
@@ -1280,7 +1432,14 @@ export function RecruiterJobPostingManagement({
                     setApplicantJob(job);
                     setView("applicants");
                   }}
-                  onClose={() => void closeJob(job)}
+                  onClose={() => {
+                    setActionError("");
+                    setConfirmation({ kind: "close", job });
+                  }}
+                  onReactivate={() => {
+                    setActionError("");
+                    setConfirmation({ kind: "reactivate", job });
+                  }}
                   onExtend={() => void extendJob(job)}
                   onDelete={() => {
                     setActionError("");
@@ -1296,7 +1455,7 @@ export function RecruiterJobPostingManagement({
             </div>
           ) : (
             <EmptyState
-              hasAnyJobs={current.jobs.length > 0}
+              hasAnyJobs={scopedJobs.length > 0}
               tab={activeTab}
               onCreate={openCreate}
             />
@@ -1314,9 +1473,13 @@ export function RecruiterJobPostingManagement({
           }}
           onConfirm={() => {
             const operation =
-              confirmation.kind === "delete"
-                ? deleteJob(confirmation.job)
-                : withdrawJob(confirmation.job);
+              confirmation.kind === "close"
+                ? closeJob(confirmation.job)
+                : confirmation.kind === "reactivate"
+                  ? reactivateJob(confirmation.job)
+                  : confirmation.kind === "delete"
+                    ? deleteJob(confirmation.job)
+                    : withdrawJob(confirmation.job);
             void operation.then((completed) => {
               if (completed) setConfirmation(null);
             });

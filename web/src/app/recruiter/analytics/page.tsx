@@ -12,5 +12,7 @@ export default async function RecruiterAnalyticsPage() {
   const data = await readRecruiterJobManagementData(context.userId);
   if (!data.companyId) redirect("/recruiter/company-settings?required=profile");
 
-  return <RecruiterAnalyticsOverview jobs={data.jobs} />;
+  return (
+    <RecruiterAnalyticsOverview jobs={data.jobs} companies={data.companies} />
+  );
 }

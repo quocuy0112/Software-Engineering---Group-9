@@ -55,6 +55,22 @@ describe("job-post review policy", () => {
     ).toThrow("UNPUBLISHABLE_JOB_MAPPING");
   });
 
+  it("blocks snapshots whose joined public text would violate the relational projection", () => {
+    const snapshot = buildJobReviewSnapshot();
+    expect(() =>
+      projectJobReviewSnapshot({
+        ...snapshot,
+        description: { ...snapshot.description, responsibilities: [] },
+      }),
+    ).toThrow("UNPUBLISHABLE_JOB_CONTENT");
+    expect(() =>
+      projectJobReviewSnapshot({
+        ...snapshot,
+        description: { ...snapshot.description, requirements: [] },
+      }),
+    ).toThrow("UNPUBLISHABLE_JOB_CONTENT");
+  });
+
   it("permits one terminal decision and never reopens a terminal version", () => {
     expect(canTransitionJobPostReview("PENDING_REVIEW", "APPROVED")).toBe(true);
     expect(canTransitionJobPostReview("PENDING_REVIEW", "REJECTED")).toBe(true);

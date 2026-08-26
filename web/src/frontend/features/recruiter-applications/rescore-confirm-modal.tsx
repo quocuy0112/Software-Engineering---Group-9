@@ -41,7 +41,7 @@ export function RescoreConfirmModal({
           body: JSON.stringify({
             confirmed: true,
             jdVersion: "JD-v3",
-            scoringConfigVersion: "HS-60/40-v1",
+            scoringConfigVersion: "HS-40/60-v1",
           }),
         },
       );
@@ -83,7 +83,7 @@ export function RescoreConfirmModal({
       <p className="ai-ranking-modal__lead">
         This will rescore{" "}
         <strong>{totalCount.toLocaleString("en-US")} applications</strong> using
-        the 60/40 hybrid method.
+        the 40/60 hybrid method (40% automatic matching and 60% AI evaluation).
       </p>
       <dl className="ai-ranking-modal__facts">
         <div>
@@ -99,7 +99,7 @@ export function RescoreConfirmModal({
             <ShieldCheck aria-hidden="true" />
             <span>Scoring config</span>
           </dt>
-          <dd>HS-60/40-v1</dd>
+          <dd>HS-40/60-v1</dd>
         </div>
         <div>
           <dt>

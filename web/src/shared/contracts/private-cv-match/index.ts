@@ -121,7 +121,7 @@ export const privateRequirementGapSchema = z
 export const privateAutomaticComponentSchema = z
   .object({
     score: z.number().min(0).max(100),
-    weight: z.literal(0.6),
+    weight: z.union([z.literal(0.4), z.literal(0.6)]),
     weightedContribution: z.number().min(0).max(60),
     evidenceCoverage: z.number().min(0).max(100),
     evidenceConfidence: z.number().min(0).max(100),
@@ -139,13 +139,22 @@ export const privateAutomaticComponentSchema = z
       .strict(),
     mayBeIncomplete: z.boolean(),
   })
-  .strict();
+  .strict()
+  .superRefine((value, context) => {
+    if (value.weightedContribution > value.weight * 100) {
+      context.addIssue({
+        code: "custom",
+        path: ["weightedContribution"],
+        message: "Weighted contribution exceeds the component weight",
+      });
+    }
+  });
 
 export const privateAiEvaluationSchema = z
   .object({
     score: z.number().min(0).max(100),
-    weight: z.literal(0.4),
-    weightedContribution: z.number().min(0).max(40),
+    weight: z.union([z.literal(0.4), z.literal(0.6)]),
+    weightedContribution: z.number().min(0).max(60),
     summary: z.string().min(1).max(1_000),
     strengths: z
       .array(
@@ -168,7 +177,16 @@ export const privateAiEvaluationSchema = z
     durationMs: z.number().int().nonnegative(),
     completedAt: isoDateTime,
   })
-  .strict();
+  .strict()
+  .superRefine((value, context) => {
+    if (value.weightedContribution > value.weight * 100) {
+      context.addIssue({
+        code: "custom",
+        path: ["weightedContribution"],
+        message: "Weighted contribution exceeds the component weight",
+      });
+    }
+  });
 
 const privateMatchBaseSchema = {
   checkId: z.string().min(1).max(128),

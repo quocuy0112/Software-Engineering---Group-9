@@ -21,8 +21,9 @@ import type {
   PrivateJdSnapshot,
 } from "./private-match-types";
 import { partitionJobSkillsForMatching } from "@/backend/scoring/domain/job-skill-requirement-policy";
+import { FORMULA_VERSION } from "@/backend/scoring/domain/hybrid-score-calculator";
 
-export const PRIVATE_SCORING_CONFIG_VERSION = "HS-60/40-v1";
+export const PRIVATE_SCORING_CONFIG_VERSION = FORMULA_VERSION;
 export const PRIVATE_PARSER_VERSION = "private-cv-match-parser-v1";
 
 export { PrivateCvMatchError } from "./private-match-errors";

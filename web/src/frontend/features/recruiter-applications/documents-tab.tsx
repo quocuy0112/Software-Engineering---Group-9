@@ -33,6 +33,10 @@ const previewCache = new Map<
 function readPreviewCache(key: string): PreviewState | null {
   const cached = previewCache.get(key);
   if (!cached) return null;
+  if (cached.state.status === "missing") {
+    previewCache.delete(key);
+    return null;
+  }
   if (Date.now() - cached.cachedAt > CLIENT_PREVIEW_CACHE_TTL_MS) {
     previewCache.delete(key);
     return null;
@@ -194,8 +198,11 @@ export function DocumentsTab({
       void request
         .then((state) => {
           if (controller.signal.aborted) return;
-          if (state.status === "ready" || state.status === "missing")
-            writePreviewCache(key, state);
+          // A missing document can become available after the candidate
+          // finishes or replaces an application. Cache successful previews
+          // only so a long-lived recruiter drawer never preserves an old
+          // "Cover letter not provided" result.
+          if (state.status === "ready") writePreviewCache(key, state);
           setPreviews((current) => ({ ...current, [kind]: state }));
         })
         .catch(() => undefined);

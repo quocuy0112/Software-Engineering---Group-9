@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   canTransitionApplicationStage,
+  canRecruiterPipelineTransition,
   isTerminalApplicationStage,
   ordinaryApplicationTransitions,
   recruiterPipelineButtonTransitions,
@@ -23,7 +24,7 @@ const expected: Record<ApplicationStage, ApplicationStage[]> = {
   OFFERED: ["HIRED", "OFFER_DECLINED", "REJECTED", "WAITLISTED"],
   HIRED: [],
   OFFER_DECLINED: [],
-  REJECTED: ["APPLIED", "VIEWED", "SHORTLISTED", "INTERVIEWING"],
+  REJECTED: [],
   WAITLISTED: ["VIEWED", "SHORTLISTED", "INTERVIEWING", "OFFERED", "REJECTED"],
 };
 
@@ -42,6 +43,16 @@ describe("application stage transition policy", () => {
     );
   });
 
+  it("allows Interviewing to reach Offered by button or drag", () => {
+    expect(
+      canRecruiterPipelineTransition("INTERVIEWING", "OFFERED", "button"),
+    ).toBe(true);
+    expect(
+      canRecruiterPipelineTransition("INTERVIEWING", "OFFERED", "drag"),
+    ).toBe(true);
+    expect(recruiterPipelineDragTransitions.INTERVIEWING).toContain("OFFERED");
+  });
+
   it("supports resuming a waitlisted application", () => {
     expect(canTransitionApplicationStage("WAITLISTED", "INTERVIEWING")).toBe(
       true,
@@ -49,23 +60,48 @@ describe("application stage transition policy", () => {
   });
 
   it("keeps final outcome stages closed to ordinary transitions", () => {
-    for (const stage of ["HIRED", "OFFER_DECLINED"] as const) {
+    for (const stage of ["HIRED", "OFFER_DECLINED", "REJECTED"] as const) {
       expect(isTerminalApplicationStage(stage)).toBe(true);
       expect(canTransitionApplicationStage(stage, "SHORTLISTED")).toBe(false);
     }
-    expect(isTerminalApplicationStage("REJECTED")).toBe(false);
   });
 
   it("keeps terminal pipeline cards without recruiter controls", () => {
     expect(recruiterPipelineButtonTransitions.HIRED).toEqual([]);
     expect(recruiterPipelineDragTransitions.HIRED).toEqual([]);
     expect(recruiterPipelineButtonTransitions.OFFER_DECLINED).toEqual([]);
-    expect(recruiterPipelineDragTransitions.REJECTED).toEqual([
-      "APPLIED",
+    expect(recruiterPipelineButtonTransitions.REJECTED).toEqual([]);
+    expect(recruiterPipelineDragTransitions.REJECTED).toEqual([]);
+  });
+
+  it("limits Waitlisted drag destinations to the four permitted stages", () => {
+    expect(recruiterPipelineDragTransitions.WAITLISTED).toEqual([
       "VIEWED",
       "SHORTLISTED",
       "INTERVIEWING",
+      "REJECTED",
     ]);
+    for (const stage of [
+      "VIEWED",
+      "SHORTLISTED",
+      "INTERVIEWING",
+      "REJECTED",
+    ] as const) {
+      expect(canRecruiterPipelineTransition("WAITLISTED", stage, "drag")).toBe(
+        true,
+      );
+    }
+    for (const stage of [
+      "APPLIED",
+      "OFFERED",
+      "HIRED",
+      "OFFER_DECLINED",
+      "WAITLISTED",
+    ] as const) {
+      expect(canRecruiterPipelineTransition("WAITLISTED", stage, "drag")).toBe(
+        false,
+      );
+    }
   });
 
   it("does not create duplicate same-stage transitions", () => {

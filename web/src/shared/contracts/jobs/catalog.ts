@@ -127,6 +127,41 @@ export const jobCatalogSchema = z
   })
   .strict();
 
+/**
+ * Drafts retain the complete catalogue shape so they can move through the
+ * existing repositories, but authoring fields may be empty until submission.
+ * Primitive bounds remain enforced while completeness and cross-field checks
+ * are deferred to submission.
+ */
+export const jobDraftCatalogSchema = jobCatalogSchema.extend({
+  title: z.string().max(200),
+  shortPitch: z.string().max(500),
+  subIndustry: z.string().max(160),
+  salary: z
+    .object({
+      min: z.number().nonnegative(),
+      max: z.number().nonnegative(),
+      currency: z.string().regex(/^[A-Z]{3}$/u),
+      period: z.enum(["hour", "month", "year"]),
+      isNegotiable: z.boolean(),
+    })
+    .strict(),
+  location: jobCatalogSchema.shape.location.extend({
+    city: z.string().max(160),
+  }),
+  description: jobCatalogSchema.shape.description.extend({
+    overview: z.string().max(20_000),
+  }),
+  experience: jobCatalogSchema.shape.experience.extend({
+    label: z.string().max(80),
+  }),
+  level: z.string().max(80),
+  employmentType: z.string().max(80),
+  workArrangement: z.string().max(80),
+  education: z.string().max(200),
+  numberOfHires: z.number().int().nonnegative(),
+});
+
 export const companyCatalogSchema = z
   .object({
     id: z.string().min(1).max(128),
@@ -185,8 +220,18 @@ export type JobCatalogItem = z.infer<typeof jobCatalogSchema>;
 export type CompanyCatalogItem = z.infer<typeof companyCatalogSchema>;
 export type JobPostingStatus = z.infer<typeof jobPostingStatusSchema>;
 export type UserJobState = z.infer<typeof userJobStateSchema>;
+
+export type RecruiterCompanyRole =
+  | "OWNER"
+  | "HR_MANAGER"
+  | "RECRUITER"
+  | "HIRING_MANAGER"
+  | "MEMBER";
+
 export type RecruiterCompanySettings = {
   id: string;
+  /** Persistent company id used by company-team APIs when the job catalogue id differs. */
+  databaseId?: string;
   slug: string;
   name: string;
   entityType: string | null;
@@ -200,6 +245,7 @@ export type RecruiterCompanySettings = {
   memberUserIds: string[];
   taxCode: string;
   verificationStatus: "pending" | "approved" | "rejected";
+  role?: RecruiterCompanyRole;
   profileComplete: boolean;
   missingProfileFields: Array<
     "name" | "industry" | "size" | "address" | "logo"

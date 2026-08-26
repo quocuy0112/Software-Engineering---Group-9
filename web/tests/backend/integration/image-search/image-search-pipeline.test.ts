@@ -114,7 +114,7 @@ describe.sequential("image-search worker pipeline", () => {
           downscaled: false,
           normalizer: "sharp",
           normalizerVersion: "0.35.3",
-          rulesVersion: "search-image-normalize-v2",
+          rulesVersion: "search-image-normalize-v3",
         };
       },
     };

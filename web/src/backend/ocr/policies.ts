@@ -12,7 +12,7 @@ export const OCR_PURPOSE_PROFILES = {
     maximumLines: 2_000,
   },
   JOB_IMAGE_SEARCH: {
-    unitDeadlineMs: 6_000,
+    unitDeadlineMs: 10_000,
     maximumOutputUtf8Bytes: 32_768,
     maximumLines: 2_000,
   },

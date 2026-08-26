@@ -78,6 +78,10 @@ function validJob(row: JobRow): boolean {
   );
 }
 
+function readableHistoricalJob(row: JobRow): boolean {
+  return row.status === "EXPIRED" || row.status === "REMOVED" || Boolean(row.removedAt);
+}
+
 function denied(requestedJobId: string): RecruiterAuthorizationResult {
   return {
     authorized: false,
@@ -100,9 +104,11 @@ function authorized(
   requestedJobId: string,
   row: JobRow,
   membership: MembershipRow,
+  allowMutation = true,
 ): RecruiterAuthorizationResult {
   const membershipRole = membership.role as RecruiterRole;
-  const canMutate = recruiterApplicationMutationRoleAllowed(membershipRole);
+  const canMutate =
+    allowMutation && recruiterApplicationMutationRoleAllowed(membershipRole);
   return {
     authorized: true,
     requestedJobId,
@@ -193,15 +199,10 @@ export class RecruiterApplicationAuthorization {
         ? []
         : ((await this.db.jobPostReviewAggregate.findMany({
             where: {
+              softDeletedAt: null,
               jobId: { in: unresolvedIds },
               publicJobPostingId: { not: null },
               company: companyAccessWhere(userId),
-              publicJobPosting: {
-                is: {
-                  status: { in: ["ACTIVE", "CLOSED"] },
-                  removedAt: null,
-                },
-              },
             },
             select: {
               jobId: true,
@@ -250,16 +251,22 @@ export class RecruiterApplicationAuthorization {
         !aggregate.publicJobPostingId ||
         aggregate.publicJobPostingId !== row.id ||
         aggregate.companyId !== row.companyId ||
-        !validJob(row)
+        (!validJob(row) && !readableHistoricalJob(row))
       ) {
         continue;
       }
       const aggregateMembership = activeMembership(aggregate.company);
       const postingMembership = activeMembership(row.company);
       if (!aggregateMembership || !postingMembership) continue;
+      const historical = !validJob(row);
       mappedByRequestedId.set(
         requestedJobId,
-        authorized(requestedJobId, row, postingMembership),
+        authorized(
+          requestedJobId,
+          historical ? { ...row, status: "CLOSED" } : row,
+          postingMembership,
+          !historical,
+        ),
       );
     }
 

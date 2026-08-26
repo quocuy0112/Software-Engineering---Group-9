@@ -1,7 +1,9 @@
 import { Buffer } from "node:buffer";
 import sharp, { type Metadata, type OutputInfo } from "sharp";
 
-const JOB_IMAGE_SEARCH_MAX_DIMENSION = 1_600;
+// Preserve small text in mobile screenshots and dense job posters while still
+// bounding decoded pixels and output bytes before OCR.
+const JOB_IMAGE_SEARCH_MAX_DIMENSION = 2_048;
 
 export type ImageNormalizationPurpose = "DOCX_BODY_IMAGE" | "JOB_IMAGE_SEARCH";
 
@@ -30,7 +32,7 @@ export type ImageNormalizationResult = Readonly<{
   downscaled: boolean;
   normalizer: "sharp";
   normalizerVersion: "0.35.3";
-  rulesVersion: "search-image-normalize-v2" | "docx-image-normalize-v1";
+  rulesVersion: "search-image-normalize-v3" | "docx-image-normalize-v1";
 }>;
 
 type Dependencies = Readonly<{
@@ -181,7 +183,7 @@ export class SharpImageNormalizer implements ImageNormalizer {
       normalizerVersion: "0.35.3",
       rulesVersion:
         input.purpose === "JOB_IMAGE_SEARCH"
-          ? "search-image-normalize-v2"
+          ? "search-image-normalize-v3"
           : "docx-image-normalize-v1",
     };
   }
