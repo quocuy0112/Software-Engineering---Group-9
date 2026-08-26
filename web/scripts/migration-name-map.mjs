@@ -200,11 +200,13 @@ export const migrationHistoryMergeGroups = Object.freeze([
       "065_prisma_schema_alignment",
       "20260821071231_smarthire",
       "20260824051404_thanhtestnef",
+      "20260821125940_smarthire",
     ]),
     completeLegacySets: Object.freeze([
       Object.freeze(["065_prisma_schema_alignment"]),
       Object.freeze(["20260821071231_smarthire"]),
       Object.freeze(["20260824051404_thanhtestnef"]),
+      Object.freeze(["20260821125940_smarthire"]),
     ]),
   }),
 ]);
@@ -241,6 +243,9 @@ export const migrationChecksumAliases = Object.freeze({
     "2b7555ddc2732741b4045d2089070de4468af8ad638a76cd2c5c5ccfe6e684df",
   ]),
   "20260821071231_smarthire": Object.freeze([
+    "cd922e0e1a92382b40637737a0240e96e8bf5f77fdcacf235da5e5f36f2d40c4",
+  ]),
+  "20260821125940_smarthire": Object.freeze([
     "cd922e0e1a92382b40637737a0240e96e8bf5f77fdcacf235da5e5f36f2d40c4",
   ]),
 });
