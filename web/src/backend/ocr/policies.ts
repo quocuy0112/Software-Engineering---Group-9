@@ -13,6 +13,9 @@ export const OCR_PURPOSE_PROFILES = {
   },
   JOB_IMAGE_SEARCH: {
     unitDeadlineMs: 10_000,
+    // The OCR engine stops before the worker/UDS deadline so it can merge,
+    // serialize and deliver a valid partial response without a socket race.
+    computeGraceMs: 900,
     maximumOutputUtf8Bytes: 32_768,
     maximumLines: 2_000,
   },

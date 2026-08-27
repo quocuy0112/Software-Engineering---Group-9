@@ -194,7 +194,7 @@ function NotificationCenterContent({
                             e.stopPropagation();
                             markItemRead(item);
                           }}
-                          aria-label={`Mark ${item.title} as read`}
+                          aria-label={`${copy.markAsRead}: ${item.title}`}
                         >
                           {copy.markAsRead}
                         </button>

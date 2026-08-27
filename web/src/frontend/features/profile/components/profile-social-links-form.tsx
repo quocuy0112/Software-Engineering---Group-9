@@ -140,6 +140,8 @@ export function ProfileSocialLinksForm({
           addProfile: "Thêm hồ sơ",
           hint: "Dùng địa chỉ http:// hoặc https:// đầy đủ và không chứa thông tin đăng nhập.",
           empty: "Bạn chưa thêm liên kết nghề nghiệp nào.",
+          emptyDescription: "Kết nối những hồ sơ bạn muốn nhà tuyển dụng nhìn thấy.",
+          saved: "Các liên kết nghề nghiệp đã lưu",
           generic: "Liên kết",
           incomplete: "Hãy nhập đầy đủ tên tài khoản hoặc đường dẫn hồ sơ.",
           open: "Mở thử",
@@ -161,6 +163,8 @@ export function ProfileSocialLinksForm({
           addProfile: "Add profile",
           hint: "Use a complete http:// or https:// address without embedded credentials.",
           empty: "No professional links added yet.",
+          emptyDescription: "Connect the profiles you want employers to see.",
+          saved: "Saved professional links",
           generic: "Social link",
           incomplete: "Complete the username or profile path before saving.",
           open: "Open link",
@@ -234,7 +238,7 @@ export function ProfileSocialLinksForm({
           hasSocialLinks ? (
             <div
               className="profile-social-link-list"
-              aria-label="Saved professional links"
+              aria-label={copy.saved}
             >
               {profile.socialLinks.map((link, index) => {
                 const platform = platformFor(link.url);
@@ -271,8 +275,8 @@ export function ProfileSocialLinksForm({
             </div>
           ) : (
             <div className="profile-compact-empty-text">
-              <strong>No professional links added yet.</strong>
-              <span>Connect the profiles you want employers to see.</span>
+              <strong>{copy.empty}</strong>
+              <span>{copy.emptyDescription}</span>
             </div>
           )
         }

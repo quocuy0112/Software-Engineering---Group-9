@@ -15,21 +15,15 @@ import {
   X,
 } from "lucide-react";
 import type { JobCard } from "@/shared/contracts/jobs/discovery";
-import { MAX_APPLICATION_ATTEMPTS_MESSAGE } from "@/shared/contracts/jobs/actions";
 import { formatSalary } from "@/shared/utils/jobs/job-display";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { JobApplicationAction } from "./job-application-form";
 import { QuickSkillChips } from "./quick-skill-chips";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 import { SaveBookmarkIcon, SaveJobAction } from "./save-job-action";
 import { jobWhyHighlights } from "./job-detail-data";
 import { CompanyAvatar } from "./company-avatar";
-
-function experienceLabel(value: string) {
-  return value
-    .replace("_", " ")
-    .toLowerCase()
-    .replace(/\b\w/gu, (character) => character.toUpperCase());
-}
+import { jobCopy, jobExperienceLabel } from "./job-copy";
 
 export function QuickViewPanel({
   jobs,
@@ -44,6 +38,8 @@ export function QuickViewPanel({
 }) {
   const panelRef = useRef<HTMLElement>(null);
   const returnTarget = useRef<HTMLElement | null>(null);
+  const locale = useWorkspaceLocale();
+  const copy = jobCopy(locale);
   const shared = useOptionalJobInteraction();
   const job = useMemo(
     () => jobs.find((item) => item.id === jobId) ?? null,
@@ -52,8 +48,12 @@ export function QuickViewPanel({
   const applied = job
     ? job.actions.applied || Boolean(shared?.records[job.id]?.applied)
     : false;
+  const applicationLimitMessage =
+    locale === "vi"
+      ? copy.applicationLimitReached
+      : (job?.actions.applicationLimitMessage ?? copy.applicationLimitReached);
   const index = job ? jobs.findIndex((item) => item.id === job.id) : -1;
-  const highlights = job ? jobWhyHighlights(job).slice(0, 3) : [];
+  const highlights = job ? jobWhyHighlights(job, locale).slice(0, 3) : [];
 
   useEffect(() => {
     if (!job) return;
@@ -108,15 +108,15 @@ export function QuickViewPanel({
       >
         <header className="job-quick-view-header">
           <div>
-            <p className="panel-kicker">Quick view</p>
+            <p className="panel-kicker">{copy.quickView}</p>
             <p className="job-quick-view-counter">
-              {index + 1} of {jobs.length} jobs
+              {copy.quickViewCounter(index + 1, jobs.length)}
             </p>
           </div>
           <button
             className="job-icon-button"
             type="button"
-            aria-label="Close quick view"
+            aria-label={copy.closeQuickView}
             onClick={onClose}
           >
             <X aria-hidden="true" />
@@ -136,7 +136,7 @@ export function QuickViewPanel({
               <div className="job-quick-view-company-meta">
                 <p className="job-company-name">{job.company.displayName}</p>
                 <span className="job-verified-inline">
-                  <BadgeCheck aria-hidden="true" /> Verified company
+                  <BadgeCheck aria-hidden="true" /> {copy.verifiedCompany}
                 </span>
               </div>
               <h2 id="quick-view-title">{job.title}</h2>
@@ -146,7 +146,7 @@ export function QuickViewPanel({
           <dl className="job-quick-view-meta">
             <div>
               <dt>
-                <WalletCards aria-hidden="true" /> Salary
+                <WalletCards aria-hidden="true" /> {copy.salary}
               </dt>
               <dd
                 className={
@@ -155,20 +155,20 @@ export function QuickViewPanel({
                     : undefined
                 }
               >
-                {formatSalary(job.salary)}
+                {formatSalary(job.salary, locale)}
               </dd>
             </div>
             <div>
               <dt>
-                <MapPin aria-hidden="true" /> Location
+                <MapPin aria-hidden="true" /> {copy.location}
               </dt>
               <dd>{job.location}</dd>
             </div>
             <div>
               <dt>
-                <BriefcaseBusiness aria-hidden="true" /> Experience
+                <BriefcaseBusiness aria-hidden="true" /> {copy.experience}
               </dt>
-              <dd>{experienceLabel(job.experienceLevel)}</dd>
+              <dd>{jobExperienceLabel(job.experienceLevel, locale)}</dd>
             </div>
           </dl>
 
@@ -178,7 +178,7 @@ export function QuickViewPanel({
           >
             <div className="job-quick-view-block-heading">
               <p className="panel-kicker" id="quick-skills-heading">
-                Required skills
+                {copy.requiredSkills}
               </p>
               <CircleHelp aria-hidden="true" />
             </div>
@@ -191,7 +191,7 @@ export function QuickViewPanel({
           >
             <div className="job-quick-view-block-heading">
               <h3 id="quick-reasons-heading">
-                <Sparkles aria-hidden="true" /> Why you&apos;ll love it
+                <Sparkles aria-hidden="true" /> {copy.whyYouWillLoveIt}
               </h3>
             </div>
             <ul className="job-quick-view-reasons">
@@ -209,25 +209,21 @@ export function QuickViewPanel({
             href={"/jobs/" + job.slug}
             onClick={onClose}
           >
-            View full job details <ChevronRight aria-hidden="true" />
+            {copy.viewFullJobDetails} <ChevronRight aria-hidden="true" />
           </Link>
         </div>
 
         <footer className="job-quick-view-footer job-quick-view-footer--redesign">
           <div className="job-quick-view-cta">
             {applied ? (
-              <span className="job-applied-state">✓ Applied</span>
+              <span className="job-applied-state">✓ {copy.applied}</span>
             ) : job.actions.applicationLimitReached ? (
               <span
                 role="status"
-                aria-label={
-                  job.actions.applicationLimitMessage ??
-                  MAX_APPLICATION_ATTEMPTS_MESSAGE
-                }
+                aria-label={applicationLimitMessage}
                 className="job-closed-state"
               >
-                {job.actions.applicationLimitMessage ??
-                  MAX_APPLICATION_ATTEMPTS_MESSAGE}
+                {applicationLimitMessage}
               </span>
             ) : job.actions.canApply ? (
               job.actions.authenticated ? (
@@ -245,11 +241,13 @@ export function QuickViewPanel({
                   }
                   onClick={onClose}
                 >
-                  Sign in to apply
+                  {copy.signInToApply}
                 </Link>
               )
             ) : (
-              <span className="job-closed-state">Applications closed</span>
+              <span className="job-closed-state">
+                {copy.applicationsClosed}
+              </span>
             )}
 
             {job.actions.authenticated && job.actions.canSave ? (
@@ -268,18 +266,18 @@ export function QuickViewPanel({
                 onClick={onClose}
               >
                 <SaveBookmarkIcon />
-                <span>Save</span>
+                <span>{copy.save}</span>
               </Link>
             )}
           </div>
           <div
             className="job-quick-view-navigation"
-            aria-label="Quick view navigation"
+            aria-label={copy.quickViewNavigation}
           >
             <button
               className="job-icon-button"
               type="button"
-              aria-label="Previous job"
+              aria-label={copy.previousJob}
               disabled={index <= 0}
               onClick={() => onJobChange(jobs[index - 1]!.id)}
             >
@@ -288,7 +286,7 @@ export function QuickViewPanel({
             <button
               className="job-icon-button"
               type="button"
-              aria-label="Next job"
+              aria-label={copy.nextJob}
               disabled={index >= jobs.length - 1}
               onClick={() => onJobChange(jobs[index + 1]!.id)}
             >

@@ -9,6 +9,8 @@ import {
 } from "@/shared/contracts/analytics/exports";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruitmentAnalyticsCopy } from "./recruitment-analytics-copy";
 
 function idempotencyKey() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -17,26 +19,10 @@ function idempotencyKey() {
   return "analytics-export-" + Date.now() + "-" + Math.random().toString(36);
 }
 
-async function responseError(response: Response, fallback: string) {
-  const body = (await response.json().catch(() => null)) as {
-    message?: unknown;
-    code?: unknown;
-  } | null;
-  return typeof body?.message === "string"
-    ? body.message
-    : typeof body?.code === "string"
-      ? body.code
-      : fallback;
-}
-
-function statusLabel(status: ExportStatus["status"]) {
-  return {
-    QUEUED: "Queued",
-    PROCESSING: "Preparing file",
-    SUCCEEDED: "Ready to download",
-    FAILED: "Export failed",
-    EXPIRED: "Export expired",
-  }[status];
+async function responseError(_response: Response, fallback: string) {
+  // API errors are intentionally reduced to a localised UI message. Raw
+  // server messages may be in a different language than the active workspace.
+  return fallback;
 }
 
 export function CandidateExportPanel({
@@ -46,6 +32,9 @@ export function CandidateExportPanel({
   jobId: string;
   jobTitle: string;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = recruitmentAnalyticsCopy(locale);
+  const exportCopy = copy.export;
   const csrfProof = useCsrfProof();
   const [format, setFormat] = useState<ExportFormat>("CSV");
   const [status, setStatus] = useState<ExportStatus | null>(null);
@@ -100,27 +89,25 @@ export function CandidateExportPanel({
         csrfProof,
       );
       if (!response.ok) {
-        setMessage(
-          await responseError(response, "The export could not be started."),
-        );
+        setMessage(await responseError(response, exportCopy.startError));
         setStatus(null);
         return;
       }
       const body = await response.json().catch(() => null);
       const parsed = exportStatusSchema.safeParse(body);
       if (!parsed.success) {
-        setMessage("The export response was invalid.");
+        setMessage(exportCopy.responseError);
         setStatus(null);
         return;
       }
       setStatus(parsed.data);
       setMessage(
         parsed.data.status === "SUCCEEDED"
-          ? "Your file is ready."
-          : "Your export is being prepared.",
+          ? exportCopy.fileReady
+          : exportCopy.preparingMessage,
       );
     } catch {
-      setMessage("Network error. Try exporting again.");
+      setMessage(exportCopy.networkExportError);
       setStatus(null);
     } finally {
       setBusy(false);
@@ -149,9 +136,7 @@ export function CandidateExportPanel({
         });
       }
       if (!response.ok) {
-        setMessage(
-          await responseError(response, "The download is unavailable."),
-        );
+        setMessage(await responseError(response, exportCopy.downloadError));
         return;
       }
       const blob = await response.blob();
@@ -169,9 +154,9 @@ export function CandidateExportPanel({
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(objectUrl);
-      setMessage("Download started.");
+      setMessage(exportCopy.downloadStarted);
     } catch {
-      setMessage("Network error. Try downloading again.");
+      setMessage(exportCopy.networkDownloadError);
     } finally {
       setBusy(false);
     }
@@ -184,16 +169,16 @@ export function CandidateExportPanel({
   return (
     <div
       className="candidate-export-panel"
-      aria-label={"Export candidates for " + jobTitle}
+      aria-label={exportCopy.panelFor(jobTitle)}
     >
       <div className="candidate-export-panel__controls">
         <label>
-          <span className="sr-only">Export format</span>
+          <span className="sr-only">{exportCopy.format}</span>
           <select
             value={format}
             onChange={(event) => setFormat(event.target.value as ExportFormat)}
             disabled={processing}
-            aria-label={"Export format for " + jobTitle}
+            aria-label={exportCopy.formatFor(jobTitle)}
           >
             <option value="CSV">CSV</option>
             <option value="XLSX">Excel</option>
@@ -211,7 +196,7 @@ export function CandidateExportPanel({
           ) : (
             <FileSpreadsheet aria-hidden="true" />
           )}
-          {processing ? "Preparing…" : "Export"}
+          {processing ? exportCopy.preparing : exportCopy.export}
         </button>
         {canDownload ? (
           <button
@@ -221,7 +206,7 @@ export function CandidateExportPanel({
             disabled={busy}
           >
             <Download aria-hidden="true" />
-            Download
+            {exportCopy.download}
           </button>
         ) : null}
       </div>
@@ -238,9 +223,10 @@ export function CandidateExportPanel({
           role="status"
           aria-live="polite"
         >
-          {statusLabel(status.status)}
+          {exportCopy.status[status.status]}
           {status.rowCount !== null
-            ? " · " + status.rowCount.toLocaleString("en-US") + " rows"
+            ? " · " +
+              exportCopy.rows(status.rowCount.toLocaleString(copy.locale))
             : ""}
         </p>
       ) : null}

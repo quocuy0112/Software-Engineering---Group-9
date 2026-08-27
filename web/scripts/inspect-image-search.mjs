@@ -5,11 +5,15 @@ import process from "node:process";
 import { pathToFileURL } from "node:url";
 
 import { ClamAvScanner } from "../src/backend/cv/scanning/clamav.ts";
-import { OCR_EXPECTED_MODEL_MANIFEST_SHA256 } from "../src/backend/image-search/config.ts";
+import {
+  OCR_EXPECTED_ENGINE_VERSION,
+  OCR_EXPECTED_MODEL_MANIFEST_SHA256,
+} from "../src/backend/image-search/config.ts";
 import { OpenAiSearchIntentInterpreter } from "../src/backend/image-search/interpretation/openai.ts";
 import { SearchIntentSelectionPolicy } from "../src/backend/image-search/interpretation/selection-policy.ts";
 import { SharpImageNormalizer } from "../src/backend/ocr/image-normalizer.ts";
 import { UnixOcrEngine } from "../src/backend/ocr/unix-ocr-engine.ts";
+import { OCR_PURPOSE_PROFILES } from "../src/backend/ocr/policies.ts";
 import { IMAGE_SEARCH_ALLOWED_FIELDS } from "../src/shared/contracts/jobs/search-intent.ts";
 
 const MAXIMUM_SOURCE_BYTES = 5_000_000;
@@ -218,7 +222,7 @@ async function inspect(input) {
     socketPath:
       process.env.OCR_ENGINE_SOCKET_PATH ?? "/run/smarthire-ocr/ocr.sock",
     expectedEngineName: "paddleocr-onnx",
-    expectedEngineVersion: "1.0.0",
+    expectedEngineVersion: OCR_EXPECTED_ENGINE_VERSION,
     expectedModelName: "PP-OCRv6-medium",
   });
   await ocr.assertReady(OCR_EXPECTED_MODEL_MANIFEST_SHA256);
@@ -234,6 +238,10 @@ async function inspect(input) {
       sha256: createHash("sha256").update(normalized.bytes).digest(),
     },
     deadline: ocrDeadline,
+    computeDeadline: new Date(
+      ocrDeadline.getTime() -
+        OCR_PURPOSE_PROFILES.JOB_IMAGE_SEARCH.computeGraceMs,
+    ),
     expectedModelManifestSha256: OCR_EXPECTED_MODEL_MANIFEST_SHA256,
     signal: new AbortController().signal,
   });

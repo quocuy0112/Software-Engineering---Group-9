@@ -3,6 +3,8 @@ import { useId, useState, type InputHTMLAttributes } from "react";
 import { Info } from "lucide-react";
 import { Input } from "@/frontend/components/ui/input";
 import { PasswordVisibilityButton } from "@/frontend/components/ui/password-visibility-button";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { authCopy } from "./auth-copy";
 
 type Props = Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & {
   label: string;
@@ -16,6 +18,7 @@ export function PasswordField({
   id: suppliedId,
   ...props
 }: Props) {
+  const copy = authCopy(useWorkspaceLocale());
   const generatedId = useId();
   const id = suppliedId ?? generatedId;
   const [visible, setVisible] = useState(false);
@@ -37,7 +40,7 @@ export function PasswordField({
             <button
               type="button"
               className="password-field-hint-trigger"
-              aria-label={`${label} requirements`}
+              aria-label={copy.common.passwordRequirements(label)}
               aria-describedby={hintId}
             >
               <Info aria-hidden="true" size={16} strokeWidth={2.25} />
@@ -62,7 +65,7 @@ export function PasswordField({
         />
         <PasswordVisibilityButton
           controls={id}
-          label={`${visible ? "Hide" : "Show"} password`}
+          label={visible ? copy.common.hidePassword : copy.common.showPassword}
           visible={visible}
           onClick={() => setVisible((value) => !value)}
         />

@@ -64,19 +64,22 @@ export function CvEvidence({ evidence }: { evidence: Evidence }) {
       </p>
       {evidence.sourceLocations?.length || evidence.sourceMethods?.length ? (
         <details className={styles.technicalDetails}>
-          <summary>
-            {locale === "vi" ? "Chi tiết nguồn dữ liệu" : "Data source details"}
-          </summary>
+          <summary>{copy.sourceDetails}</summary>
           {evidence.sourceLocations?.length ? (
             <p>
-              {locale === "vi" ? "Nguồn" : "Source"}:{" "}
-              {evidence.sourceLocations.join(", ")}
+              {copy.source}: {evidence.sourceLocations.join(", ")}
             </p>
           ) : null}
           {evidence.sourceMethods?.length ? (
             <p>
-              {locale === "vi" ? "Phương thức trích xuất" : "Extraction method"}
-              : {evidence.sourceMethods.join(", ")}
+              {copy.extractionMethod}:{" "}
+              {evidence.sourceMethods
+                .map(
+                  (method) =>
+                    copy.sourceMethodLabels[method] ??
+                    (locale === "vi" ? copy.unknownWarning : method),
+                )
+                .join(", ")}
             </p>
           ) : null}
         </details>
@@ -98,7 +101,10 @@ export function CvEvidence({ evidence }: { evidence: Evidence }) {
           <p>
             {evidence.warnings?.length
               ? evidence.warnings
-                  .map((warning) => warning.replaceAll("_", " ").toLowerCase())
+                  .map(
+                    (warning) =>
+                      copy.warningLabels[warning] ?? copy.unknownWarning,
+                  )
                   .join(", ")
               : locale === "vi"
                 ? "Độ tin cậy của nội dung nhận dạng cần được xác nhận."

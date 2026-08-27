@@ -11,6 +11,8 @@ import {
   X,
 } from "lucide-react";
 import type { RankedApplicationRow } from "@/shared/contracts/scoring";
+import type { WorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruiterApplicationsCopy } from "./recruiter-applications-copy";
 
 export type RankingTone =
   | "blue"
@@ -20,27 +22,31 @@ export type RankingTone =
   | "purple"
   | "slate";
 
-const pipelineStageLabels: Record<string, string> = {
-  APPLIED: "New",
-  VIEWED: "Viewed",
-  SHORTLISTED: "Shortlisted",
-  WAITLISTED: "Needs details",
-  INTERVIEWING: "Interviewing",
-  OFFERED: "Offer",
-  HIRED: "Hired",
-  OFFER_DECLINED: "Offer declined",
-  REJECTED: "Rejected",
-  WITHDRAWN: "Withdrawn",
-};
-
-export function statusLabel(value: string, withdrawalOutcome?: string | null) {
-  if (withdrawalOutcome === "CANDIDATE_WITHDRAWN") return "Withdrawn";
+export function statusLabel(
+  value: string,
+  withdrawalOutcome?: string | null,
+  locale: WorkspaceLocale = "en",
+) {
+  const copy = recruiterApplicationsCopy(locale).ranking.filters;
+  const labels: Record<string, string> = {
+    APPLIED: copy.new,
+    VIEWED: copy.viewed,
+    SHORTLISTED: copy.shortlisted,
+    WAITLISTED: copy.needsDetails,
+    INTERVIEWING: copy.interviewing,
+    OFFERED: locale === "vi" ? "Đã đề nghị" : "Offer",
+    HIRED: locale === "vi" ? "Đã tuyển" : "Hired",
+    OFFER_DECLINED: locale === "vi" ? "Từ chối đề nghị" : "Offer declined",
+    REJECTED: copy.rejected,
+    WITHDRAWN: copy.withdrawn,
+  };
+  if (withdrawalOutcome === "CANDIDATE_WITHDRAWN") return copy.withdrawn;
   return (
-    pipelineStageLabels[value] ??
-    value
+    labels[value] ??
+    (locale === "vi" ? copy.unknownStatus : value
       .replaceAll("_", " ")
       .toLowerCase()
-      .replace(/\b\w/gu, (letter) => letter.toUpperCase())
+      .replace(/\b\w/gu, (letter) => letter.toUpperCase()))
   );
 }
 
@@ -61,11 +67,15 @@ export type ScoreBadgeMeta = {
   icon: LucideIcon;
 };
 
-export function scoreBadgeForRow(row: RankedApplicationRow): ScoreBadgeMeta {
+export function scoreBadgeForRow(
+  row: RankedApplicationRow,
+  locale: WorkspaceLocale = "en",
+): ScoreBadgeMeta {
+  const copy = recruiterApplicationsCopy(locale).ranking;
   if (row.scoring.kind === "FAILED") {
     return {
       code: "FAILED",
-      label: "Scoring failed",
+      label: locale === "vi" ? "Tính điểm thất bại" : "Scoring failed",
       tone: "red",
       icon: CircleX,
     };
@@ -73,7 +83,7 @@ export function scoreBadgeForRow(row: RankedApplicationRow): ScoreBadgeMeta {
   if (row.scoring.kind === "UNAVAILABLE") {
     return {
       code: "RULE_BASED",
-      label: "Rule-based only",
+      label: locale === "vi" ? "Chỉ dựa trên quy tắc" : "Rule-based only",
       tone: "amber",
       icon: Check,
     };
@@ -81,7 +91,7 @@ export function scoreBadgeForRow(row: RankedApplicationRow): ScoreBadgeMeta {
   if (row.scoring.kind === "PENDING") {
     return {
       code: "PENDING",
-      label: "Processing",
+      label: copy.stats.processing,
       tone: "purple",
       icon: LoaderCircle,
     };
@@ -89,7 +99,7 @@ export function scoreBadgeForRow(row: RankedApplicationRow): ScoreBadgeMeta {
   if (row.scoring.kind === "PROCESSING") {
     return {
       code: "PROCESSING",
-      label: "Processing",
+      label: copy.stats.processing,
       tone: "purple",
       icon: LoaderCircle,
     };
@@ -97,14 +107,19 @@ export function scoreBadgeForRow(row: RankedApplicationRow): ScoreBadgeMeta {
   if (row.scoreSummary.band) {
     const band = row.scoreSummary.band.code;
     if (band === "HIGH_MATCH") {
-      return { code: band, label: "Strong match", tone: "green", icon: Check };
+      return {
+        code: band,
+        label: copy.stats.strong,
+        tone: "green",
+        icon: Check,
+      };
     }
     if (band === "LOW_MATCH") {
-      return { code: band, label: "Low match", tone: "red", icon: X };
+      return { code: band, label: copy.stats.low, tone: "red", icon: X };
     }
     return {
       code: band,
-      label: "Review needed",
+      label: copy.stats.review,
       tone: "amber",
       icon: AlertCircle,
     };
@@ -112,7 +127,7 @@ export function scoreBadgeForRow(row: RankedApplicationRow): ScoreBadgeMeta {
 
   return {
     code: "NOT_CALCULATED",
-    label: "Not calculated",
+    label: copy.filters.notCalculated,
     tone: "slate",
     icon: CircleDot,
   };

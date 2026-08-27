@@ -28,18 +28,19 @@ import { Modal } from "@/frontend/components/ui/modal";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { NOTIFICATION_CHANGED_EVENT } from "@/frontend/features/notifications/client/use-notification-context-read";
 import { useOptionalJobInteraction } from "@/frontend/features/jobs/components/job-interaction-provider";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import {
+  applicationCopy,
+  applicationErrorMessage,
+  type ApplicationCopy,
+  type ApplicationLocale,
+} from "../i18n/application-copy";
+import { jobCopy } from "@/frontend/features/jobs/components/job-copy";
 import {
   applicationTrackerSchema,
   notificationPreferenceSchema,
   type ApplicationTracker,
 } from "@/shared/contracts/candidate-applications";
-
-const steps = [
-  { id: 0, label: "Application submitted" },
-  { id: 1, label: "Under review" },
-  { id: 2, label: "Interview" },
-  { id: 3, label: "Outcome" },
-] as const;
 
 const canonicalStepIndex: Record<ApplicationTracker["canonicalStage"], number> =
   {
@@ -54,14 +55,21 @@ const canonicalStepIndex: Record<ApplicationTracker["canonicalStage"], number> =
     WAITLISTED: 3,
   };
 
-function date(value: string) {
-  return new Intl.DateTimeFormat("en", {
+function date(value: string, locale: ApplicationLocale) {
+  return new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-US", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
 }
 
-function label(value: string) {
+function label(value: string, locale: ApplicationLocale) {
+  const copy = jobCopy(locale);
+  const labels: Record<string, string> = {
+    ...copy.employmentTypeLabels,
+    ...copy.experienceLevelLabels,
+    ...copy.workArrangementLabels,
+  };
+  if (labels[value]) return labels[value];
   return value
     .toLowerCase()
     .replaceAll("_", " ")
@@ -71,94 +79,28 @@ function label(value: string) {
 function stageCopy(
   canonicalStage: ApplicationTracker["canonicalStage"],
   outcome: ApplicationTracker["publicOutcome"],
+  copy: ApplicationCopy,
 ) {
   if (outcome === "WITHDRAWN") {
-    return [
-      "Application withdrawn",
-      "You withdrew this application. The recruitment team has been notified.",
-    ];
+    return [copy.tracker.withdrawnHeadline, copy.tracker.withdrawnDescription];
   }
-  if (canonicalStage === "APPLIED") {
-    return [
-      "Application submitted",
-      "Your application has been received and is ready for the recruiter's review.",
-    ];
-  }
-  if (canonicalStage === "VIEWED") {
-    return ["Application viewed", "The recruiter has opened your application."];
-  }
-  if (canonicalStage === "SHORTLISTED") {
-    return [
-      "Application shortlisted",
-      "The recruiter is considering you for the next step.",
-    ];
-  }
-  if (canonicalStage === "INTERVIEWING") {
-    return [
-      "Interview stage",
-      "The recruiter has moved your application to the interview stage.",
-    ];
-  }
-  if (canonicalStage === "OFFERED") {
-    return [
-      "Offer sent",
-      "Review the offer and choose whether you would like to accept it.",
-    ];
-  }
-  if (canonicalStage === "HIRED") {
-    return [
-      "Offer accepted",
-      "Congratulations! The recruiter has marked this application as hired.",
-    ];
-  }
-  if (canonicalStage === "OFFER_DECLINED") {
-    return [
-      "Offer declined",
-      "You declined this offer. This application is now complete.",
-    ];
-  }
-  if (canonicalStage === "REJECTED") {
-    return [
-      "Application rejected",
-      "The recruiter is not moving forward with this application.",
-    ];
-  }
-  if (canonicalStage === "WAITLISTED") {
-    return [
-      "Application waitlisted",
-      "There is no open interview slot right now, but your application may be considered again.",
-    ];
-  }
+  const stage = canonicalStage as Exclude<
+    ApplicationTracker["canonicalStage"],
+    "WITHDRAWN"
+  >;
   return [
-    "Recruitment outcome",
-    "The recruiter has published an update for this application.",
+    copy.applicationsList.statuses[stage] ?? copy.tracker.defaultHeadline,
+    copy.stageNextStep[stage] ?? copy.tracker.defaultDescription,
   ];
 }
 
-function updateDescription(update: ApplicationTracker["updates"][number]) {
-  switch (update.canonicalStage) {
-    case "APPLIED":
-      return "Your application was successfully submitted.";
-    case "VIEWED":
-      return "The recruiter has opened your application.";
-    case "SHORTLISTED":
-      return "The recruiter has shortlisted your application.";
-    case "INTERVIEWING":
-      return "The recruiter has moved your application to the interview stage.";
-    case "OFFERED":
-      return "An offer has been sent and is waiting for your response.";
-    case "HIRED":
-      return "You accepted the offer and the application is now marked hired.";
-    case "OFFER_DECLINED":
-      return "You declined the offer for this application.";
-    case "REJECTED":
-      return "The recruiter is not moving forward with this application.";
-    case "WAITLISTED":
-      return "The recruiter has waitlisted your application because no interview slot is open.";
-  }
-  if (update.kind === "WITHDRAWN")
-    return "Your application is no longer active.";
-  return "The recruitment status has been updated.";
+function updateDescription(
+  update: ApplicationTracker["updates"][number],
+  copy: ApplicationCopy,
+) {
+  if (update.kind === "WITHDRAWN") return copy.tracker.updateWithdrawn;
+  const stage = update.canonicalStage as keyof typeof copy.stageNextStep;
+  return copy.stageNextStep[stage] ?? copy.tracker.updateDefault;
 }
 
 function updateIcon(update: ApplicationTracker["updates"][number]) {
@@ -234,6 +176,15 @@ export function ApplicationTracker({
   const [error, setError] = useState<string | null>(null);
   const applicationId = tracker.applicationId;
   const shared = useOptionalJobInteraction();
+  const locale = useWorkspaceLocale();
+  const copy = applicationCopy(locale);
+  const trackerCopy = copy.tracker;
+  const steps = [
+    { id: 0, label: trackerCopy.steps.submitted },
+    { id: 1, label: trackerCopy.steps.underReview },
+    { id: 2, label: trackerCopy.steps.interview },
+    { id: 3, label: trackerCopy.steps.outcome },
+  ];
 
   const poll = useCallback(async () => {
     try {
@@ -318,9 +269,7 @@ export function ApplicationTracker({
         csrfProof,
       );
       if (!response.ok) {
-        throw new Error(
-          "Notification settings could not be updated. Refresh and try again.",
-        );
+        throw new Error(trackerCopy.preferenceError);
       }
       const preference = notificationPreferenceSchema.parse(
         await response.json(),
@@ -331,9 +280,7 @@ export function ApplicationTracker({
       }));
     } catch (caught) {
       setError(
-        caught instanceof Error
-          ? caught.message
-          : "Notification settings could not be updated.",
+        applicationErrorMessage(locale, caught, trackerCopy.preferenceError),
       );
     } finally {
       setPending(null);
@@ -363,9 +310,7 @@ export function ApplicationTracker({
         csrfProof,
       );
       if (!response.ok) {
-        throw new Error(
-          "This application could not be withdrawn. Refresh and try again.",
-        );
+        throw new Error(trackerCopy.withdrawError);
       }
       shared?.clearApplied(tracker.job.jobId);
       await poll();
@@ -373,9 +318,7 @@ export function ApplicationTracker({
     } catch (caught) {
       setWithdrawConfirmationOpen(false);
       setError(
-        caught instanceof Error
-          ? caught.message
-          : "This application could not be withdrawn.",
+        applicationErrorMessage(locale, caught, trackerCopy.withdrawError),
       );
     } finally {
       setPending(null);
@@ -388,15 +331,33 @@ export function ApplicationTracker({
     try {
       const response = await mutateWithCurrentCsrf(
         `/api/candidate/applications/${encodeURIComponent(applicationId)}/contact-consent`,
-        { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ shared, expectedVersion: tracker.contactConsent?.version }) },
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            shared,
+            expectedVersion: tracker.contactConsent?.version,
+          }),
+        },
         csrfProof,
       );
-      if (!response.ok) throw new Error("Contact sharing could not be updated. Refresh and try again.");
-      const next = await response.json() as { shared: boolean; version: number };
+      if (!response.ok) throw new Error(trackerCopy.contactConsentError);
+      const next = (await response.json()) as {
+        shared: boolean;
+        version: number;
+      };
       setTracker((current) => ({ ...current, contactConsent: next }));
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Contact sharing could not be updated.");
-    } finally { setPending(null); }
+      setError(
+        applicationErrorMessage(
+          locale,
+          caught,
+          trackerCopy.contactConsentError,
+        ),
+      );
+    } finally {
+      setPending(null);
+    }
   }
 
   async function respondToOffer(decision: "ACCEPT" | "DECLINE") {
@@ -419,23 +380,16 @@ export function ApplicationTracker({
         },
         csrfProof,
       );
-      const payload = (await response.json().catch(() => null)) as {
-        message?: string;
-      } | null;
+      await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error(
-          payload?.message ??
-            "Your offer response could not be recorded. Refresh and try again.",
-        );
+        throw new Error(trackerCopy.offerResponseError);
       }
       await poll();
       setOfferDecision(null);
     } catch (caught) {
       setOfferDecision(null);
       setError(
-        caught instanceof Error
-          ? caught.message
-          : "Your offer response could not be recorded.",
+        applicationErrorMessage(locale, caught, trackerCopy.offerResponseError),
       );
     } finally {
       setPending(null);
@@ -469,21 +423,22 @@ export function ApplicationTracker({
         : canonicalStepIndex[tracker.canonicalStage];
   const outcomeDetail =
     tracker.publicOutcome === "WITHDRAWN"
-      ? "Withdrawn"
+      ? copy.applicationsList.statuses.WITHDRAWN
       : tracker.canonicalStage === "OFFERED"
-        ? "Awaiting response"
+        ? trackerCopy.awaitingResponse
         : tracker.canonicalStage === "HIRED"
-          ? "Hired"
+          ? copy.applicationsList.statuses.HIRED
           : tracker.canonicalStage === "OFFER_DECLINED"
-            ? "Offer declined"
+            ? copy.applicationsList.statuses.OFFER_DECLINED
             : tracker.canonicalStage === "REJECTED"
-              ? "Rejected"
+              ? copy.applicationsList.statuses.REJECTED
               : tracker.canonicalStage === "WAITLISTED"
-                ? "Waitlisted"
-                : "Not started";
+                ? copy.applicationsList.statuses.WAITLISTED
+                : trackerCopy.notStarted;
   const [headline, description] = stageCopy(
     tracker.canonicalStage,
     tracker.publicOutcome,
+    copy,
   );
 
   return (
@@ -493,20 +448,23 @@ export function ApplicationTracker({
     >
       <header className="application-ui__header">
         <div>
-          <nav className="application-ui__breadcrumb" aria-label="Breadcrumb">
-            <Link href="/jobs/applied">Applications</Link>
+          <nav
+            className="application-ui__breadcrumb"
+            aria-label={trackerCopy.breadcrumb}
+          >
+            <Link href="/jobs/applied">{trackerCopy.applications}</Link>
             <span>/</span>
             <span>{tracker.job.title}</span>
           </nav>
-          <h1 id="application-tracker-title">My application</h1>
-          <p>Follow official updates from the recruiter.</p>
+          <h1 id="application-tracker-title">{trackerCopy.title}</h1>
+          <p>{trackerCopy.subtitle}</p>
         </div>
         <Link
           className="application-ui-button application-ui-button--secondary"
           href={`/jobs/applied/${encodeURIComponent(tracker.applicationId)}/messages`}
         >
           <MessageCircle aria-hidden="true" />
-          Contact recruiter
+          {trackerCopy.contactRecruiter}
         </Link>
       </header>
 
@@ -531,13 +489,13 @@ export function ApplicationTracker({
           )}
         </span>
         <div>
-          <span>CURRENT STATUS</span>
+          <span>{trackerCopy.currentStatus}</span>
           <h2 id="current-status-title">{headline}</h2>
           <p>{description}</p>
         </div>
-        <aside aria-label="Latest application update">
-          <small>Latest update</small>
-          <strong>{date(tracker.lastUpdatedAt)}</strong>
+        <aside aria-label={trackerCopy.latestUpdate}>
+          <small>{trackerCopy.latestUpdate}</small>
+          <strong>{date(tracker.lastUpdatedAt, locale)}</strong>
           <code>{applicationId}</code>
         </aside>
       </section>
@@ -546,7 +504,7 @@ export function ApplicationTracker({
         className="application-ui-card application-ui-progress-card"
         aria-labelledby="recruitment-progress-title"
       >
-        <h2 id="recruitment-progress-title">Recruitment progress</h2>
+        <h2 id="recruitment-progress-title">{trackerCopy.progress}</h2>
         <ol className="application-ui-stage-progress">
           {steps.map((step, index) => {
             const skipped =
@@ -558,27 +516,27 @@ export function ApplicationTracker({
                 : index < activeIndex);
             const active = !skipped && index === activeIndex;
             const detail = skipped
-              ? "Skipped"
+              ? trackerCopy.skipped
               : index === 1 &&
                   (tracker.canonicalStage === "VIEWED" ||
                     tracker.canonicalStage === "SHORTLISTED" ||
                     (isBranchOutcome && transitionOriginIndex === 1))
                 ? tracker.canonicalStage === "VIEWED" ||
                   (isBranchOutcome && tracker.transitionFromStage === "VIEWED")
-                  ? "Viewed"
-                  : "Shortlisted"
+                  ? trackerCopy.viewed
+                  : trackerCopy.shortlisted
                 : index === 2 &&
                     (tracker.canonicalStage === "INTERVIEWING" ||
                       (isBranchOutcome &&
                         tracker.transitionFromStage === "INTERVIEWING"))
-                  ? "Interviewing"
+                  ? trackerCopy.interviewing
                   : index === 3
                     ? outcomeDetail
                     : complete
-                      ? "Complete"
+                      ? trackerCopy.complete
                       : active
-                        ? "Current"
-                        : "Not started";
+                        ? trackerCopy.current
+                        : trackerCopy.notStarted;
             return (
               <li
                 key={step.id}
@@ -620,14 +578,11 @@ export function ApplicationTracker({
         >
           <div className="application-ui-offer-response__badge">
             <Send aria-hidden="true" />
-            <span>OFFER SENT</span>
+            <span>{trackerCopy.offerSent}</span>
           </div>
           <div className="application-ui-offer-response__copy">
-            <h2 id="offer-response-title">You have received an offer</h2>
-            <p>
-              Review the offer details shared by the recruiter and let them know
-              your decision.
-            </p>
+            <h2 id="offer-response-title">{trackerCopy.offerTitle}</h2>
+            <p>{trackerCopy.offerDescription}</p>
           </div>
           <div className="application-ui-offer-response__actions">
             <button
@@ -638,7 +593,9 @@ export function ApplicationTracker({
               onClick={() => requestOfferResponse("ACCEPT")}
             >
               <Handshake aria-hidden="true" />
-              {pending === "accept-offer" ? "Accepting…" : "Accept offer"}
+              {pending === "accept-offer"
+                ? trackerCopy.accepting
+                : trackerCopy.acceptOffer}
             </button>
             <button
               type="button"
@@ -648,7 +605,9 @@ export function ApplicationTracker({
               onClick={() => requestOfferResponse("DECLINE")}
             >
               <CircleSlash aria-hidden="true" />
-              {pending === "decline-offer" ? "Declining…" : "Decline offer"}
+              {pending === "decline-offer"
+                ? trackerCopy.declining
+                : trackerCopy.declineOffer}
             </button>
           </div>
         </section>
@@ -658,13 +617,13 @@ export function ApplicationTracker({
         open={offerDecision !== null}
         title={
           offerDecision === "ACCEPT"
-            ? "Accept this offer?"
-            : "Decline this offer?"
+            ? trackerCopy.acceptTitle
+            : trackerCopy.declineTitle
         }
         description={
           offerDecision === "ACCEPT"
-            ? "This will mark your application as hired. Please confirm that you want to accept the offer."
-            : "This will close your application as offer declined. Please confirm that you want to decline the offer."
+            ? trackerCopy.acceptDescription
+            : trackerCopy.declineDescription
         }
         tone={offerDecision === "DECLINE" ? "destructive" : "standard"}
         icon={
@@ -685,7 +644,7 @@ export function ApplicationTracker({
             disabled={pending !== null}
             onClick={() => setOfferDecision(null)}
           >
-            Cancel
+            {trackerCopy.cancel}
           </button>
           <button
             type="button"
@@ -696,17 +655,17 @@ export function ApplicationTracker({
             }}
           >
             {pending !== null
-              ? "Confirming…"
+              ? trackerCopy.confirming
               : offerDecision === "ACCEPT"
-                ? "Confirm acceptance"
-                : "Confirm decline"}
+                ? trackerCopy.confirmAcceptance
+                : trackerCopy.confirmDecline}
           </button>
         </div>
       </Modal>
       <Modal
         open={withdrawConfirmationOpen}
-        title="Withdraw this application?"
-        description="This action cannot be undone. You can apply to this job again unless you have reached the maximum of 5 applications."
+        title={trackerCopy.withdrawTitle}
+        description={trackerCopy.withdrawDescription}
         tone="destructive"
         icon={<Undo2 aria-hidden="true" />}
         busy={pending === "withdraw"}
@@ -722,7 +681,7 @@ export function ApplicationTracker({
             disabled={pending !== null}
             onClick={() => setWithdrawConfirmationOpen(false)}
           >
-            Cancel
+            {trackerCopy.cancel}
           </button>
           <button
             type="button"
@@ -730,7 +689,9 @@ export function ApplicationTracker({
             disabled={pending !== null}
             onClick={() => void withdraw()}
           >
-            {pending === "withdraw" ? "Withdrawing…" : "Confirm withdrawal"}
+            {pending === "withdraw"
+              ? trackerCopy.withdrawing
+              : trackerCopy.confirmWithdrawal}
           </button>
         </div>
       </Modal>
@@ -740,7 +701,7 @@ export function ApplicationTracker({
             className="application-ui-card"
             aria-labelledby="recent-updates-title"
           >
-            <h2 id="recent-updates-title">Recent updates</h2>
+            <h2 id="recent-updates-title">{trackerCopy.recentUpdates}</h2>
             {tracker.updates.length ? (
               <ol className="application-ui-timeline">
                 {[...tracker.updates].reverse().map((update, index) => (
@@ -759,16 +720,18 @@ export function ApplicationTracker({
                     </span>
                     <div>
                       <strong>{update.title}</strong>
-                      <p>{updateDescription(update)}</p>
+                      <p>{updateDescription(update, copy)}</p>
                     </div>
                     <time dateTime={update.occurredAt}>
-                      {date(update.occurredAt)}
+                      {date(update.occurredAt, locale)}
                     </time>
                   </li>
                 ))}
               </ol>
             ) : (
-              <p className="application-ui-muted">No public updates yet.</p>
+              <p className="application-ui-muted">
+                {trackerCopy.noPublicUpdates}
+              </p>
             )}
           </section>
 
@@ -778,10 +741,10 @@ export function ApplicationTracker({
             aria-labelledby="submitted-files-title"
           >
             <div className="application-ui-card__heading">
-              <h2 id="submitted-files-title">Submitted files</h2>
+              <h2 id="submitted-files-title">{trackerCopy.submittedFiles}</h2>
               <span className="application-ui-lock">
                 <LockKeyhole aria-hidden="true" />
-                Version locked
+                {trackerCopy.versionLocked}
               </span>
             </div>
             <ul className="application-ui-file-list">
@@ -797,9 +760,11 @@ export function ApplicationTracker({
                     className="application-ui-file-action"
                     type="button"
                     disabled
-                    aria-label={`View unavailable for ${file.displayName}`}
+                    aria-label={trackerCopy.viewUnavailableFor(
+                      file.displayName,
+                    )}
                   >
-                    View unavailable
+                    {trackerCopy.viewUnavailable}
                   </button>
                 </li>
               ))}
@@ -807,8 +772,8 @@ export function ApplicationTracker({
             <div className="application-ui-disclosure application-ui-disclosure--compact">
               <LockKeyhole aria-hidden="true" />
               <p>
-                <strong>Screening status: Completed.</strong> Match scores, AI
-                scores, rankings, and internal recruiter notes remain private.
+                <strong>{trackerCopy.screeningStatus}</strong>{" "}
+                {trackerCopy.screeningPrivacy}
               </p>
             </div>
           </section>
@@ -817,26 +782,27 @@ export function ApplicationTracker({
         <aside className="application-ui__sidebar">
           <section className="application-ui-card application-ui-job-card">
             <span className="application-ui-job-card__eyebrow">
-              APPLICATION
+              {trackerCopy.applicationEyebrow}
             </span>
             <h2>{tracker.job.title}</h2>
             <p>{tracker.job.companyName}</p>
             <small>
-              {tracker.job.location} · {label(tracker.job.workArrangement)}
+              {tracker.job.location} ·{" "}
+              {label(tracker.job.workArrangement, locale)}
             </small>
             <div className="application-ui-tags">
-              <span>{label(tracker.job.employmentType)}</span>
-              <span>{label(tracker.job.experienceLevel)}</span>
+              <span>{label(tracker.job.employmentType, locale)}</span>
+              <span>{label(tracker.job.experienceLevel, locale)}</span>
             </div>
             <div className="application-ui-job-info">
               <div>
-                <span>Submitted</span>
+                <span>{trackerCopy.submitted}</span>
                 <time dateTime={tracker.submittedAt}>
-                  {date(tracker.submittedAt)}
+                  {date(tracker.submittedAt, locale)}
                 </time>
               </div>
               <div>
-                <span>Application ID</span>
+                <span>{trackerCopy.applicationId}</span>
                 <code>{applicationId}</code>
               </div>
             </div>
@@ -846,7 +812,9 @@ export function ApplicationTracker({
             className="application-ui-card"
             aria-labelledby="status-notifications-title"
           >
-            <h2 id="status-notifications-title">Status notifications</h2>
+            <h2 id="status-notifications-title">
+              {trackerCopy.statusNotifications}
+            </h2>
             <button
               type="button"
               className="application-ui-toggle"
@@ -862,11 +830,11 @@ export function ApplicationTracker({
               <span className="application-ui-toggle__content">
                 <Mail aria-hidden="true" />
                 <span>
-                  <strong>Email</strong>
+                  <strong>{trackerCopy.email}</strong>
                   <small>
                     {tracker.notificationPreference.emailEnabled
-                      ? "Enabled"
-                      : "Disabled"}
+                      ? trackerCopy.enabled
+                      : trackerCopy.disabled}
                   </small>
                 </span>
               </span>
@@ -891,11 +859,11 @@ export function ApplicationTracker({
               <span className="application-ui-toggle__content">
                 <Bell aria-hidden="true" />
                 <span>
-                  <strong>In-app notifications</strong>
+                  <strong>{trackerCopy.inAppNotifications}</strong>
                   <small>
                     {tracker.notificationPreference.inAppEnabled
-                      ? "Enabled"
-                      : "Disabled"}
+                      ? trackerCopy.enabled
+                      : trackerCopy.disabled}
                   </small>
                 </span>
               </span>
@@ -905,9 +873,33 @@ export function ApplicationTracker({
                 <ToggleLeft aria-hidden="true" />
               )}
             </button>
-            <button type="button" className="application-ui-toggle" disabled={pending !== null} aria-pressed={tracker.contactConsent?.shared ?? false} onClick={() => void setContactConsent(!(tracker.contactConsent?.shared ?? false))}>
-              <span className="application-ui-toggle__content"><Mail aria-hidden="true" /><span><strong>Share contact with recruiter</strong><small>{tracker.contactConsent?.shared ? "Enabled for this application" : "Private"}</small></span></span>
-              {tracker.contactConsent?.shared ? <ToggleRight aria-hidden="true" /> : <ToggleLeft aria-hidden="true" />}
+            <button
+              type="button"
+              className="application-ui-toggle"
+              disabled={pending !== null}
+              aria-pressed={tracker.contactConsent?.shared ?? false}
+              onClick={() =>
+                void setContactConsent(
+                  !(tracker.contactConsent?.shared ?? false),
+                )
+              }
+            >
+              <span className="application-ui-toggle__content">
+                <Mail aria-hidden="true" />
+                <span>
+                  <strong>{trackerCopy.shareContact}</strong>
+                  <small>
+                    {tracker.contactConsent?.shared
+                      ? trackerCopy.enabledForApplication
+                      : trackerCopy.private}
+                  </small>
+                </span>
+              </span>
+              {tracker.contactConsent?.shared ? (
+                <ToggleRight aria-hidden="true" />
+              ) : (
+                <ToggleLeft aria-hidden="true" />
+              )}
             </button>
           </section>
 
@@ -917,7 +909,7 @@ export function ApplicationTracker({
               href={`/jobs/applied/${encodeURIComponent(applicationId)}/submitted`}
             >
               <Copy aria-hidden="true" />
-              View submitted application
+              {trackerCopy.viewSubmittedApplication}
             </Link>
             {tracker.canWithdraw ? (
               <button
@@ -929,13 +921,12 @@ export function ApplicationTracker({
               >
                 <Undo2 aria-hidden="true" />
                 {pending === "withdraw"
-                  ? "Withdrawing…"
-                  : "Withdraw application"}
+                  ? trackerCopy.withdrawing
+                  : trackerCopy.withdrawApplication}
               </button>
             ) : (
               <p className="application-ui-withdraw-note">
-                Withdrawal is no longer available once an application reaches
-                the interview stage.
+                {trackerCopy.withdrawalUnavailable}
               </p>
             )}
           </div>

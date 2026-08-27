@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RankedApplicationPage } from "@/shared/contracts/scoring";
+import type { WorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruiterApplicationsCopy } from "./recruiter-applications-copy";
 
 export type RankedCandidateQuery = Readonly<{
   sort: "FINAL_SCORE" | "MANUAL_PRIORITY" | "SUBMITTED_AT";
@@ -117,6 +119,7 @@ export function useRankedCandidates(
   jobId: string,
   query: RankedCandidateQuery,
   pageSize: number,
+  locale: WorkspaceLocale = "en",
 ) {
   const queryKey = useMemo(
     () => JSON.stringify({ ...query, pageSize }),
@@ -186,23 +189,17 @@ export function useRankedCandidates(
           (cause instanceof Error &&
             ["AbortError", "TimeoutError"].includes(cause.name));
         if (isAbortError) {
-          setError("Candidate ranking took too long to respond.");
+          setError(recruiterApplicationsCopy(locale).ranking.loadError);
           return;
         }
         if (
           cause instanceof TypeError &&
           /failed to fetch/iu.test(cause.message)
         ) {
-          setError(
-            "The ranking service is temporarily unavailable. Please retry.",
-          );
+          setError(recruiterApplicationsCopy(locale).ranking.loadError);
           return;
         }
-        setError(
-          cause instanceof Error
-            ? cause.message
-            : "Unable to load candidate ranking.",
-        );
+        setError(recruiterApplicationsCopy(locale).ranking.loadError);
       } finally {
         if (id === requestId.current) {
           setLoading(false);
@@ -211,7 +208,7 @@ export function useRankedCandidates(
         }
       }
     },
-    [jobId, pageSize, query, queryKey],
+    [jobId, locale, pageSize, query, queryKey],
   );
 
   useEffect(() => {

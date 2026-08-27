@@ -5,6 +5,8 @@ import { useMutation } from "@tanstack/react-query";
 import { AppProviders } from "@/frontend/providers/app-providers";
 import { AuthStatus } from "./auth-status";
 import { resendVerificationMutationOptions } from "@/frontend/features/authentication/client/query-options";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { authCopy, localizedAuthMessage } from "./auth-copy";
 
 export function ResendVerificationForm() {
   return (
@@ -15,6 +17,8 @@ export function ResendVerificationForm() {
 }
 
 function ResendVerificationFields() {
+  const locale = useWorkspaceLocale();
+  const copy = authCopy(locale);
   const [status, setStatus] = useState("");
   const [email, setEmail] = useState("");
   const resend = useMutation(
@@ -24,8 +28,16 @@ function ResendVerificationFields() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      const result = (await response.json()) as { message: string };
-      setStatus(result.message);
+      const result = (await response.json().catch(() => null)) as {
+        message?: string;
+      } | null;
+      setStatus(
+        localizedAuthMessage(
+          locale,
+          result?.message,
+          response.ok ? copy.resendVerification.sent : copy.resendVerification.error,
+        ),
+      );
       return { ok: response.ok };
     }),
   );
@@ -39,7 +51,7 @@ function ResendVerificationFields() {
         resend.mutate();
       }}
     >
-      <label htmlFor="resend-email">Email address</label>
+      <label htmlFor="resend-email">{copy.common.emailAddress}</label>
       <input
         id="resend-email"
         name="email"
@@ -48,13 +60,13 @@ function ResendVerificationFields() {
         inputMode="email"
         autoCapitalize="none"
         spellCheck={false}
-        placeholder="example@email.com"
+        placeholder={copy.common.emailPlaceholder}
         value={email}
         onChange={(event) => setEmail(event.target.value)}
         required
       />
       <button disabled={busy} type="submit">
-        {busy ? "Sending…" : "Resend verification"}
+        {busy ? copy.resendVerification.sending : copy.resendVerification.resend}
       </button>
       <AuthStatus status={status} />
     </form>

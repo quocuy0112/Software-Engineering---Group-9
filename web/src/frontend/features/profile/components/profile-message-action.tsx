@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { EligibleContext } from "@/shared/contracts/messaging/common";
 import { openConversation } from "@/frontend/features/messaging/client/messaging-api";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { messagingCopy } from "../../messaging/messaging-copy";
 
 export function ProfileMessageAction({
   csrfProof,
@@ -17,12 +19,15 @@ export function ProfileMessageAction({
   contexts: EligibleContext[];
 }) {
   const router = useRouter();
+  const copy = messagingCopy(useWorkspaceLocale());
   const [reference, setReference] = useState(contexts[0]?.reference ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function start() {
-    const context = contexts.find((candidate) => candidate.reference === reference);
+    const context = contexts.find(
+      (candidate) => candidate.reference === reference,
+    );
     if (!context) return;
     setBusy(true);
     setError(null);
@@ -40,9 +45,11 @@ export function ProfileMessageAction({
         },
         csrfProof,
       );
-      router.push(`/messages?conversation=${encodeURIComponent(conversation.id)}`);
+      router.push(
+        `/messages?conversation=${encodeURIComponent(conversation.id)}`,
+      );
     } catch {
-      setError("Messaging is not currently available for this profile.");
+      setError(copy.privateMessagingNotice);
     } finally {
       setBusy(false);
     }
@@ -52,8 +59,11 @@ export function ProfileMessageAction({
     <div>
       {contexts.length > 1 ? (
         <label>
-          Conversation context
-          <select value={reference} onChange={(event) => setReference(event.target.value)}>
+          {copy.conversationContext}
+          <select
+            value={reference}
+            onChange={(event) => setReference(event.target.value)}
+          >
             {contexts.map((context) => (
               <option value={context.reference} key={context.reference}>
                 {context.label}
@@ -65,10 +75,10 @@ export function ProfileMessageAction({
       <button
         type="button"
         disabled={busy || contexts.length === 0}
-        aria-label={`Message ${participantName}`}
+        aria-label={`${copy.messagePerson} ${participantName}`}
         onClick={() => void start()}
       >
-        {busy ? "Opening conversation..." : "Message"}
+        {busy ? copy.opening : copy.message}
       </button>
       {error ? <p role="alert">{error}</p> : null}
     </div>

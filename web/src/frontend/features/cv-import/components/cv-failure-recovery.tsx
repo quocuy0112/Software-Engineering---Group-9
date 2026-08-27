@@ -123,7 +123,7 @@ export function CvFailureRecovery({
           setCountdown(Math.max(1, error.retryAfterSeconds));
           setCountdownRun((current) => current + 1);
         }
-        setActionMessage(error.message);
+        setActionMessage(cvKnownError(locale, error.message));
       } else {
         setActionMessage(
           locale === "vi"
@@ -151,7 +151,7 @@ export function CvFailureRecovery({
     } catch (error) {
       setActionMessage(
         error instanceof CvRecoveryActionError
-          ? error.message
+          ? cvKnownError(locale, error.message)
           : copy.deleteFailed,
       );
       heading.current?.focus();
@@ -221,7 +221,7 @@ export function CvFailureRecovery({
         {statusMessage}
       </p>
 
-      <div className={styles.actions} aria-label="CV failure recovery actions">
+      <div className={styles.actions} aria-label={copy.actions}>
         {canRetry ? (
           <button
             type="button"

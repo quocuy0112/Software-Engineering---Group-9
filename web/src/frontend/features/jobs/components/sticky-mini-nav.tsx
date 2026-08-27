@@ -1,5 +1,8 @@
 "use client";
 
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { jobCopy } from "./job-copy";
+
 export function StickyMiniNav({
   onApply,
   applyOpen = false,
@@ -11,16 +14,17 @@ export function StickyMiniNav({
   applyDisabled?: boolean;
   applyHref?: string;
 }) {
+  const copy = jobCopy(useWorkspaceLocale());
   if (!applyHref && !onApply) return null;
 
   return (
     <nav
       className="job-sticky-mini-nav job-sticky-mini-nav--actions"
-      aria-label="Job actions"
+      aria-label={copy.jobActions}
     >
       {applyHref ? (
         <a className="job-mini-nav-apply" href={applyHref}>
-          Sign in to apply
+          {copy.signInToApply}
         </a>
       ) : onApply ? (
         <button
@@ -31,7 +35,7 @@ export function StickyMiniNav({
           disabled={applyDisabled}
           onClick={onApply}
         >
-          {applyOpen ? "Hide application form" : "Apply now"}
+          {applyOpen ? copy.hideApplicationForm : copy.applyNow}
         </button>
       ) : null}
     </nav>

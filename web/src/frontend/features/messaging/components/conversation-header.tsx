@@ -64,7 +64,7 @@ export function ConversationHeader({
           className="messaging-view-profile"
           onClick={onViewProfile}
         >
-          View profile
+          {copy.viewProfile}
         </button>
         </div>
       </div>

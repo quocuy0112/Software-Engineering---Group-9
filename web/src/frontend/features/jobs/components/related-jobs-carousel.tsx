@@ -8,12 +8,14 @@ import {
   formatRelativeTime,
   formatSalary,
 } from "@/shared/utils/jobs/job-display";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { CompanyLogo } from "./job-detail-sidebar";
 import { SaveJobAction } from "./save-job-action";
+import { jobCopy } from "./job-copy";
 
 function relatedBadge(job: JobCard) {
-  if (job.isUrgent) return "New";
-  if ((job.matchScore ?? 0) >= 80) return "Featured";
+  if (job.isUrgent) return "new";
+  if ((job.matchScore ?? 0) >= 80) return "featured";
   return null;
 }
 
@@ -26,6 +28,7 @@ function HeartIcon() {
 }
 
 function RelatedJobSave({ job }: { job: JobCard }) {
+  const copy = jobCopy(useWorkspaceLocale());
   if (job.actions.authenticated && job.actions.canSave) {
     return (
       <SaveJobAction
@@ -42,7 +45,7 @@ function RelatedJobSave({ job }: { job: JobCard }) {
     <Link
       className="job-icon-button job-heart-button"
       href={"/login?returnTo=" + returnTo}
-      aria-label="Save job"
+      aria-label={copy.saveJob}
     >
       <HeartIcon />
     </Link>
@@ -56,6 +59,9 @@ export function RelatedJobsCarousel({
   jobs: JobCard[];
   title?: string;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = jobCopy(locale);
+  const resolvedTitle = title === "Related jobs" ? copy.relatedJobs : title;
   const rankedJobs = useMemo(
     () =>
       [...jobs]
@@ -73,16 +79,16 @@ export function RelatedJobsCarousel({
     >
       <div className="job-related-heading">
         <div>
-          <p className="panel-kicker">Keep exploring</p>
-          <h2 id="related-jobs-heading">{title}</h2>
+          <p className="panel-kicker">{copy.keepExploring}</p>
+          <h2 id="related-jobs-heading">{resolvedTitle}</h2>
         </div>
         <Link className="job-related-see-more" href="/jobs">
-          See more jobs <span aria-hidden="true">→</span>
+          {copy.seeMoreJobs} <span aria-hidden="true">→</span>
         </Link>
       </div>
 
       {rankedJobs.length ? (
-        <div className="job-related-list" aria-label={title}>
+        <div className="job-related-list" aria-label={resolvedTitle}>
           {rankedJobs.map((job) => {
             const badge = relatedBadge(job);
             return (
@@ -92,12 +98,20 @@ export function RelatedJobsCarousel({
                 avatarLabel={job.company.displayName.slice(0, 2).toUpperCase()}
                 avatar={<CompanyLogo company={job.company} />}
                 title={job.title}
-                isNew={badge === "New"}
-                badgeLabel={badge ?? undefined}
+                isNew={badge === "new"}
+                badgeLabel={
+                  badge === "new"
+                    ? copy.newJob
+                    : badge === "featured"
+                      ? copy.featuredJob
+                      : undefined
+                }
                 company={job.company.displayName}
                 location={job.location}
-                updatedAt={`Updated ${formatRelativeTime(job.updatedAt ?? job.publishedAt)}`}
-                salaryRange={formatSalary(job.salary)}
+                updatedAt={copy.updatedAt(
+                  formatRelativeTime(job.updatedAt ?? job.publishedAt, locale),
+                )}
+                salaryRange={formatSalary(job.salary, locale)}
                 saved={job.actions.saved}
                 saveAction={<RelatedJobSave job={job} />}
               />
@@ -105,9 +119,7 @@ export function RelatedJobsCarousel({
           })}
         </div>
       ) : (
-        <p className="job-section-muted">
-          No closely matched roles are available right now.
-        </p>
+        <p className="job-section-muted">{copy.noRelatedJobs}</p>
       )}
     </section>
   );

@@ -17,6 +17,7 @@ import type { JobPerformanceReport } from "@/shared/contracts/analytics/employer
 import type { RecruiterJob } from "@/shared/contracts/recruiter-job-posting";
 import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
 import type { RecruiterCompanyView } from "@/shared/contracts/recruiter-job-posting";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { RecruiterCompanyFilter } from "@/frontend/features/recruiter-workspace/recruiter-company-filter";
 import {
   companyMatchesScope,
@@ -27,9 +28,10 @@ import {
   defaultAnalyticsDateRange,
   type AnalyticsDateRange,
 } from "./analytics-date-range";
-import { AnalyticsApiError, fetchJobPerformance } from "./analytics-api";
+import { fetchJobPerformance } from "./analytics-api";
 import { CandidateExportPanel } from "./candidate-export-panel";
 import { JobPerformanceReport as JobPerformanceReportPanel } from "./job-performance-report";
+import { recruitmentAnalyticsCopy } from "./recruitment-analytics-copy";
 
 type PerformanceState =
   | { status: "loading" }
@@ -40,22 +42,25 @@ type SortKey = "title" | "views" | "applications" | "conversion";
 
 const emptyCompanies: RecruiterCompanyView[] = [];
 
-function formatNumber(value: number) {
-  return value.toLocaleString("en-US");
+function formatNumber(value: number, locale: string) {
+  return value.toLocaleString(locale);
 }
 
-function formatRate(value: number | null) {
-  return value === null ? "N/A" : value.toFixed(2) + "%";
+function formatRate(value: number | null, notAvailable: string) {
+  return value === null ? notAvailable : value.toFixed(2) + "%";
 }
 
-function conversionDescription(value: number | null) {
+function conversionDescription(
+  value: number | null,
+  copy: ReturnType<typeof recruitmentAnalyticsCopy>["overview"],
+) {
   return value === null
-    ? "No qualified views in the selected window"
-    : "Applications divided by qualified views";
+    ? copy.metrics.conversionUnavailable
+    : copy.metrics.conversionFormula;
 }
 
-function formatAnalyticsInstant(value: string) {
-  return new Intl.DateTimeFormat("en-GB", {
+function formatAnalyticsInstant(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
     timeZone: "Asia/Ho_Chi_Minh",
     dateStyle: "medium",
     timeStyle: "short",
@@ -116,6 +121,9 @@ export function RecruiterAnalyticsOverview({
   initialJobId?: string;
 }) {
   const companyOptions = companies ?? emptyCompanies;
+  const locale = useWorkspaceLocale();
+  const analyticsCopy = recruitmentAnalyticsCopy(locale);
+  const copy = analyticsCopy.overview;
   const { companyId, selectedCompanyId, setCompanyId } =
     useRecruiterCompanyScope(companyOptions);
   const [range, setRange] = useState<AnalyticsDateRange>(() =>
@@ -190,16 +198,13 @@ export function RecruiterAnalyticsOverview({
               string,
               PerformanceState,
             ];
-          } catch (error) {
+          } catch {
             if (controller.signal.aborted) return null;
             return [
               job.id,
               {
                 status: "error",
-                message:
-                  error instanceof AnalyticsApiError
-                    ? error.message
-                    : "This posting's analytics are unavailable.",
+                message: copy.jobUnavailable,
               },
             ] as [string, PerformanceState];
           }
@@ -222,7 +227,7 @@ export function RecruiterAnalyticsOverview({
       controller.abort();
       window.clearTimeout(timeoutId);
     };
-  }, [range, refreshVersion, reportableJobs]);
+  }, [copy.jobUnavailable, locale, range, refreshVersion, reportableJobs]);
 
   useEffect(() => {
     const refreshWhenVisible = () => {
@@ -259,12 +264,6 @@ export function RecruiterAnalyticsOverview({
   const failedReports = reportableJobs.filter(
     (job) => performance[job.id]?.status === "error",
   );
-  const firstFailureMessage = failedReports
-    .map((job) => performance[job.id])
-    .find(
-      (state): state is { status: "error"; message: string } =>
-        state?.status === "error",
-    )?.message;
   const adjustedReports = successfulReports.filter(
     (report) =>
       new Date(report.metadata.from).getTime() > new Date(range.from).getTime(),
@@ -290,9 +289,9 @@ export function RecruiterAnalyticsOverview({
     const copy = [...reportableJobs];
     copy.sort((left, right) => {
       if (sortKey === "title") {
-        const comparison = (left.title || "Untitled job posting").localeCompare(
-          right.title || "Untitled job posting",
-        );
+        const comparison = (
+          left.title || analyticsCopy.untitledJob
+        ).localeCompare(right.title || analyticsCopy.untitledJob);
         return sortDirection === "asc" ? comparison : -comparison;
       }
 
@@ -304,7 +303,13 @@ export function RecruiterAnalyticsOverview({
       return sortDirection === "asc" ? comparison : -comparison;
     });
     return copy;
-  }, [performance, reportableJobs, sortDirection, sortKey]);
+  }, [
+    analyticsCopy.untitledJob,
+    performance,
+    reportableJobs,
+    sortDirection,
+    sortKey,
+  ]);
 
   const selectedJob =
     reportableJobs.find((job) => job.id === selectedJobId) ?? reportableJobs[0];
@@ -348,19 +353,16 @@ export function RecruiterAnalyticsOverview({
     >
       <header className="recruiter-analytics-overview__header">
         <div>
-          <p className="recruiter-analytics-eyebrow">Recruiter workspace</p>
-          <h1 id="recruiter-analytics-title">Hiring overview</h1>
-          <p>
-            See which postings attract attention, where candidates progress, and
-            what deserves your next review.
-          </p>
+          <p className="recruiter-analytics-eyebrow">{copy.eyebrow}</p>
+          <h1 id="recruiter-analytics-title">{copy.title}</h1>
+          <p>{copy.intro}</p>
         </div>
         <Link
           href={recruiterRoutes.jobPostings}
           className="recruiter-analytics-secondary-link"
         >
           <BriefcaseBusiness aria-hidden="true" />
-          Manage job postings
+          {copy.manageJobs}
         </Link>
       </header>
 
@@ -384,21 +386,19 @@ export function RecruiterAnalyticsOverview({
           className="recruiter-analytics-overview__context-dot"
           aria-hidden="true"
         />
-        <span>
-          Metrics use qualified views and submitted applications in the selected
-          window. The end date includes the full local calendar day in{" "}
-          {range.timeZone}. Withdrawn applications are shown separately and
-          excluded from the current funnel snapshot.
-        </span>
+        <span>{copy.contextMetrics(range.timeZone)}</span>
         {adjustedReports.length > 0 ? (
           <span>
-            The selected window begins before analytics collection started; data
-            is shown from{" "}
-            {formatAnalyticsInstant(adjustedReports[0]!.metadata.from)}.
+            {copy.contextCollectionStarted(
+              formatAnalyticsInstant(
+                adjustedReports[0]!.metadata.from,
+                analyticsCopy.locale,
+              ),
+            )}
           </span>
         ) : null}
         <span className="recruiter-analytics-overview__context-badge">
-          {successfulReports.length}/{reportableJobs.length} reports ready
+          {copy.reportsReady(successfulReports.length, reportableJobs.length)}
         </span>
         <span
           className="recruiter-analytics-overview__context-updated"
@@ -406,12 +406,14 @@ export function RecruiterAnalyticsOverview({
           aria-live="polite"
         >
           {loadingReports
-            ? "Loading analytics..."
+            ? copy.loading
             : backgroundRefreshActive
-              ? "Updating analytics..."
+              ? copy.updating
               : lastUpdatedAt
-                ? "Updated " + formatAnalyticsInstant(lastUpdatedAt)
-                : "Auto-refreshes every 15 seconds"}
+                ? copy.updated(
+                    formatAnalyticsInstant(lastUpdatedAt, analyticsCopy.locale),
+                  )
+                : copy.autoRefresh}
         </span>
       </div>
 
@@ -420,45 +422,46 @@ export function RecruiterAnalyticsOverview({
         aria-labelledby="recruiter-overview-metrics-title"
       >
         <div className="sr-only">
-          <h2 id="recruiter-overview-metrics-title">Overview metrics</h2>
+          <h2 id="recruiter-overview-metrics-title">{copy.metricsTitle}</h2>
         </div>
         <MetricCard
-          label="Active job postings"
+          label={copy.metrics.activeJobs}
           value={formatNumber(
             reportableJobs.filter((job) => job.status === "active").length,
+            analyticsCopy.locale,
           )}
-          description="Currently visible to candidates"
+          description={copy.metrics.activeJobsDescription}
           tone="blue"
           icon={<BriefcaseBusiness />}
         />
         <MetricCard
-          label="Qualified views"
-          value={formatNumber(totalViews)}
-          description="Across active and closed postings"
+          label={copy.metrics.qualifiedViews}
+          value={formatNumber(totalViews, analyticsCopy.locale)}
+          description={copy.metrics.qualifiedViewsDescription}
           tone="teal"
           icon={<Eye />}
           loading={loadingReports}
         />
         <MetricCard
-          label="Applications"
-          value={formatNumber(totalApplications)}
-          description="Submitted in the selected window"
+          label={copy.metrics.applications}
+          value={formatNumber(totalApplications, analyticsCopy.locale)}
+          description={copy.metrics.applicationsDescription}
           tone="violet"
           icon={<UsersRound />}
           loading={loadingReports}
         />
         <MetricCard
-          label="Withdrawn applications"
-          value={formatNumber(totalWithdrawnApplications)}
-          description="Excluded from the current funnel snapshot"
+          label={copy.metrics.withdrawn}
+          value={formatNumber(totalWithdrawnApplications, analyticsCopy.locale)}
+          description={copy.metrics.withdrawnDescription}
           tone="amber"
           icon={<UserRoundX />}
           loading={loadingReports}
         />
         <MetricCard
-          label="Overall conversion"
-          value={formatRate(overallConversion)}
-          description={conversionDescription(overallConversion)}
+          label={copy.metrics.conversion}
+          value={formatRate(overallConversion, analyticsCopy.notAvailable)}
+          description={conversionDescription(overallConversion, copy)}
           tone="amber"
           icon={<Percent />}
           loading={loadingReports}
@@ -468,13 +471,9 @@ export function RecruiterAnalyticsOverview({
       {failedReports.length > 0 ? (
         <div className="recruiter-analytics-inline-alert" role="status">
           <AlertCircle aria-hidden="true" />
-          <span>
-            Analytics are unavailable for {failedReports.length} posting
-            {failedReports.length === 1 ? "" : "s"}. Available rows are still
-            shown below. {firstFailureMessage ?? ""}
-          </span>
+          <span>{copy.unavailable(failedReports.length)}</span>
           <button type="button" onClick={() => requestRefresh()}>
-            Retry
+            {copy.retry}
           </button>
         </div>
       ) : null}
@@ -485,12 +484,11 @@ export function RecruiterAnalyticsOverview({
       >
         <header className="recruiter-analytics-panel__heading">
           <div>
-            <p className="recruiter-analytics-eyebrow">Posting performance</p>
-            <h2 id="posting-performance-title">Job postings</h2>
-            <p>
-              Sort by acquisition volume or conversion, then select a posting to
-              inspect its funnel.
+            <p className="recruiter-analytics-eyebrow">
+              {copy.performanceEyebrow}
             </p>
+            <h2 id="posting-performance-title">{copy.performanceTitle}</h2>
+            <p>{copy.performanceDescription}</p>
           </div>
           <button
             type="button"
@@ -506,17 +504,14 @@ export function RecruiterAnalyticsOverview({
                   : undefined
               }
             />
-            Refresh
+            {copy.refresh}
           </button>
         </header>
         {reportableJobs.length === 0 ? (
           <div className="recruiter-analytics-empty">
             <FileText aria-hidden="true" />
-            <h3>No active job postings to analyze</h3>
-            <p>
-              Publish a job posting to start collecting qualified views and
-              applications.
-            </p>
+            <h3>{copy.emptyTitle}</h3>
+            <p>{copy.emptyDescription}</p>
             <Link
               href={
                 selectedCompanyId
@@ -528,23 +523,20 @@ export function RecruiterAnalyticsOverview({
               className="recruiter-analytics-primary-link"
             >
               <Plus aria-hidden="true" />
-              Create a job posting
+              {copy.createJob}
             </Link>
           </div>
         ) : (
           <div className="recruiter-analytics-table-wrap">
             <table className="recruiter-analytics-performance-table">
-              <caption className="sr-only">
-                Job posting views, applications, withdrawn applications,
-                conversion, and export actions
-              </caption>
+              <caption className="sr-only">{copy.tableCaption}</caption>
               <thead>
                 <tr>
                   {[
-                    ["title", "Job posting"],
-                    ["views", "Views"],
-                    ["applications", "Applications"],
-                    ["conversion", "Conversion"],
+                    ["title", copy.columns.job],
+                    ["views", copy.columns.views],
+                    ["applications", copy.columns.applications],
+                    ["conversion", copy.columns.conversion],
                   ].map(([key, label]) => (
                     <th
                       key={key}
@@ -554,15 +546,15 @@ export function RecruiterAnalyticsOverview({
                       <button
                         type="button"
                         onClick={() => sortBy(key as SortKey)}
-                        aria-label={"Sort by " + label}
+                        aria-label={copy.columns.sortBy(label)}
                       >
                         {label}
                         <span aria-hidden="true">↕</span>
                       </button>
                     </th>
                   ))}
-                  <th scope="col">Withdrawn</th>
-                  <th scope="col">Export candidates</th>
+                  <th scope="col">{copy.columns.withdrawn}</th>
+                  <th scope="col">{copy.columns.export}</th>
                 </tr>
               </thead>
               <tbody>
@@ -570,7 +562,7 @@ export function RecruiterAnalyticsOverview({
                   const state = performance[job.id];
                   const report =
                     state?.status === "success" ? state.report : null;
-                  const title = job.title || "Untitled job posting";
+                  const title = job.title || analyticsCopy.untitledJob;
                   return (
                     <tr
                       key={job.id}
@@ -586,7 +578,9 @@ export function RecruiterAnalyticsOverview({
                         >
                           <strong>{title}</strong>
                           <span>
-                            {job.status === "active" ? "Active" : "Closed"}
+                            {job.status === "active"
+                              ? copy.active
+                              : copy.closed}
                           </span>
                         </button>
                       </th>
@@ -594,28 +588,40 @@ export function RecruiterAnalyticsOverview({
                         {state?.status === "loading"
                           ? "…"
                           : report
-                            ? formatNumber(report.qualifiedViews)
+                            ? formatNumber(
+                                report.qualifiedViews,
+                                analyticsCopy.locale,
+                              )
                             : "—"}
                       </td>
                       <td>
                         {state?.status === "loading"
                           ? "…"
                           : report
-                            ? formatNumber(report.submittedApplications)
+                            ? formatNumber(
+                                report.submittedApplications,
+                                analyticsCopy.locale,
+                              )
                             : "—"}
                       </td>
                       <td>
                         {state?.status === "loading"
                           ? "…"
                           : report
-                            ? formatRate(report.conversionRate.value)
+                            ? formatRate(
+                                report.conversionRate.value,
+                                analyticsCopy.notAvailable,
+                              )
                             : "—"}
                       </td>
                       <td>
                         {state?.status === "loading"
                           ? "\u2026"
                           : report
-                            ? formatNumber(report.withdrawnApplications)
+                            ? formatNumber(
+                                report.withdrawnApplications,
+                                analyticsCopy.locale,
+                              )
                             : "\u2014"}
                       </td>
                       <td>
@@ -634,8 +640,12 @@ export function RecruiterAnalyticsOverview({
         <section className="recruiter-analytics-loading-panel" role="status">
           <RefreshCw className="is-spinning" aria-hidden="true" />
           <div>
-            <strong>Loading {selectedJob.title || "posting"} analytics…</strong>
-            <p>Fetching the selected reporting window.</p>
+            <strong>
+              {copy.selectedLoading(
+                selectedJob.title || analyticsCopy.untitledJob,
+              )}
+            </strong>
+            <p>{copy.selectedLoadingDescription}</p>
           </div>
         </section>
       ) : null}

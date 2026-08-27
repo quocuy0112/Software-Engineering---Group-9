@@ -44,18 +44,28 @@ const copy: JobsLiveCopy = {
   lastPage: "Last page",
   page: "Page",
   perPage: "Per page:",
+  resultPages: "Job result pages",
   empty: "No jobs match these criteria",
   emptyCopy: "Try widening one or more criteria.",
+  resetSearch: "Reset search",
+  emptyPage: "No jobs on this page",
+  emptyPageCopy: "Return to the first page to see the available results.",
   clear: "Clear filters",
 };
 
-function result(total: number): JobSearchResponse {
+function result(
+  total: number,
+  includeItems = total > 0,
+  page = 1,
+): JobSearchResponse {
   return {
-    items: [],
+    items: includeItems
+      ? ([{ id: "job-1" }] as JobSearchResponse["items"])
+      : [],
     total,
     nextCursor: null,
-    page: 1,
-    totalPages: 1,
+    page,
+    totalPages: Math.max(1, Math.ceil(total / 20)),
     criteria: {},
   };
 }
@@ -63,14 +73,17 @@ function result(total: number): JobSearchResponse {
 function response(total: number) {
   return {
     ok: true,
-    json: async () => result(total),
+    json: async () => result(total, false),
   };
 }
 
-function renderExperience(initialResult = result(1)) {
+function renderExperience(
+  initialResult = result(1),
+  initialCriteria: Record<string, string | string[] | undefined> = {},
+) {
   return render(
     <LiveJobSearchExperience
-      initialCriteria={{}}
+      initialCriteria={initialCriteria}
       initialResult={initialResult}
       initialError={null}
       copy={copy}
@@ -117,6 +130,46 @@ describe("live job search experience", () => {
         .getByRole("button", { name: /best match for your profile/i })
         .querySelector(".job-results-sort-chevron"),
     ).not.toBeNull();
+  });
+
+  it("renders a guided empty state for a true zero-result search", () => {
+    renderExperience(result(0, false), { q: "nonexistent" });
+
+    expect(
+      screen.getByRole("heading", { name: "No jobs match these criteria" }),
+    ).toBeVisible();
+    expect(
+      screen.getByText("Try widening one or more criteria."),
+    ).toBeVisible();
+    expect(screen.getByRole("button", { name: "Reset search" })).toBeVisible();
+    expect(screen.queryByText("Sort by:")).not.toBeInTheDocument();
+  });
+
+  it("resets the search from the empty state", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response(1));
+    vi.stubGlobal("fetch", fetchMock);
+    renderExperience(result(0, false), { q: "nonexistent" });
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset search" }));
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/jobs?",
+      expect.objectContaining({ headers: { Accept: "application/json" } }),
+    );
+    expect(window.location.pathname).toBe("/jobs");
+  });
+
+  it("does not describe an out-of-range page as a zero-match search", () => {
+    renderExperience(result(21, false, 2), { q: "frontend" });
+
+    expect(
+      screen.getByRole("heading", { name: "No jobs on this page" }),
+    ).toBeVisible();
+    expect(screen.getByRole("button", { name: "First page" })).toBeVisible();
+    expect(
+      screen.queryByRole("heading", { name: "No jobs match these criteria" }),
+    ).not.toBeInTheDocument();
   });
 
   it("keeps only the latest response when filters change quickly", async () => {

@@ -39,6 +39,41 @@ describe("two-factor challenge", () => {
     expect(backupCode).toHaveAttribute("aria-pressed", "true");
   });
 
+  it("shows the caret in the next empty authenticator cell", () => {
+    render(<TwoFactorChallenge />);
+    const input = screen.getByLabelText("Authentication code");
+    const cells = document.querySelectorAll(".totp-code-cell");
+
+    expect([...cells].map((cell) => cell.textContent)).toEqual([
+      "|",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ]);
+
+    fireEvent.change(input, { target: { value: "123" } });
+    expect([...cells].map((cell) => cell.textContent)).toEqual([
+      "1",
+      "2",
+      "3",
+      "|",
+      "",
+      "",
+    ]);
+
+    fireEvent.change(input, { target: { value: "123456" } });
+    expect([...cells].map((cell) => cell.textContent)).toEqual([
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+    ]);
+  });
+
   it("shows a complete authenticator code across six cells and submits it", async () => {
     const fetch = vi
       .spyOn(globalThis, "fetch")
@@ -69,7 +104,7 @@ describe("two-factor challenge", () => {
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
     expect(fetch.mock.calls[0][1]?.body as string).toContain("123456");
     expect([...cells].map((cell) => cell.textContent)).toEqual([
-      "",
+      "|",
       "",
       "",
       "",

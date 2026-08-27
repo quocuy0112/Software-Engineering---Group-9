@@ -6,6 +6,7 @@ import { CandidateApplicationError } from "@/backend/candidate-applications/cand
 import { listCandidateCvLibrary } from "@/backend/services/profile/candidate-cv-library";
 import { ApplicationWizard } from "@/frontend/features/candidate-applications/components/application-wizard";
 import { JobsWorkspace } from "@/frontend/features/jobs/components/jobs-workspace";
+import { jobCopy } from "@/frontend/features/jobs/components/job-copy";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -21,6 +22,7 @@ export default async function CandidateApplicationRoute({
   const { slug } = await params;
   if (!context)
     redirect(`/login?returnTo=${encodeURIComponent(`/jobs/${slug}/apply`)}`);
+  const copy = jobCopy(context.initialLocale);
   const rawQuery = await searchParams;
   const query = (name: string) => {
     const value = rawQuery[name];
@@ -45,9 +47,9 @@ export default async function CandidateApplicationRoute({
       return (
         <JobsWorkspace>
           <section role="alert" aria-labelledby="application-limit-heading">
-            <h1 id="application-limit-heading">Maximum applications reached</h1>
-            <p>{error.message}</p>
-            <Link href="/jobs">Return to Find Jobs</Link>
+            <h1 id="application-limit-heading">{copy.maxApplicationsTitle}</h1>
+            <p>{copy.applicationLimitReached}</p>
+            <Link href="/jobs">{copy.returnToFindJobs}</Link>
           </section>
         </JobsWorkspace>
       );

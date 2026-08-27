@@ -1,4 +1,5 @@
 import { ANALYTICS_PLATFORM_TIME_ZONE } from "@/shared/contracts/analytics";
+import type { WorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 
 export type AnalyticsDateRange = {
   fromDate: string;
@@ -61,8 +62,11 @@ export function defaultAnalyticsDateRange(days = 30) {
   );
 }
 
-export function formatAnalyticsDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
+export function formatAnalyticsDate(
+  value: string,
+  locale: WorkspaceLocale = "en",
+) {
+  return new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-US", {
     timeZone: "UTC",
     month: "short",
     day: "numeric",
@@ -70,11 +74,14 @@ export function formatAnalyticsDate(value: string) {
   }).format(new Date(value + "T00:00:00.000Z"));
 }
 
-export function formatAnalyticsRange(range: AnalyticsDateRange) {
+export function formatAnalyticsRange(
+  range: AnalyticsDateRange,
+  locale: WorkspaceLocale = "en",
+) {
   return (
-    formatAnalyticsDate(range.fromDate) +
+    formatAnalyticsDate(range.fromDate, locale) +
     " – " +
-    formatAnalyticsDate(range.toDate)
+    formatAnalyticsDate(range.toDate, locale)
   );
 }
 

@@ -1,10 +1,11 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { TWO_FACTOR_GENERIC_ERROR } from "@/shared/contracts/identity/two-factor";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { AuthStatus } from "./auth-status";
 import { useReplayableStatus } from "./use-status";
+import { authCopy, type AuthCopy } from "./auth-copy";
 
 const MAX_TWO_FACTOR_ATTEMPTS = 5;
 const TWO_FACTOR_ATTEMPTS_WINDOW_SECONDS = 10 * 60;
@@ -68,12 +69,14 @@ function writeAttemptState(
   );
 }
 
-function getLockedMessage(lockedUntil: number) {
+function getLockedMessage(lockedUntil: number, copy: AuthCopy["twoFactor"]) {
   const minutes = Math.max(1, Math.ceil((lockedUntil - Date.now()) / 60000));
-  return `Too many failed attempts. This verification flow is temporarily locked. Please try again in ${minutes} minute${minutes === 1 ? "" : "s"}.`;
+  return copy.locked(minutes);
 }
 
 export function TwoFactorChallenge() {
+  const locale = useWorkspaceLocale();
+  const copy = useMemo(() => authCopy(locale), [locale]);
   const router = useRouter(),
     backupCodeInput = useRef<HTMLInputElement>(null),
     totpInput = useRef<HTMLInputElement>(null),
@@ -86,6 +89,7 @@ export function TwoFactorChallenge() {
     [isLocked, setIsLocked] = useState(false);
 
   const code = factor === "totp" ? totp : backupCode;
+  const activeTotpIndex = totp.length < TOTP_LENGTH ? totp.length : -1;
   const clearCode = () => {
     if (factor === "totp") setTotp("");
     else setBackupCode("");
@@ -105,14 +109,14 @@ export function TwoFactorChallenge() {
       if (state.lockedUntil && state.lockedUntil > Date.now()) {
         setIsLocked(true);
         setTone("error");
-        setStatus(getLockedMessage(state.lockedUntil));
+        setStatus(getLockedMessage(state.lockedUntil, copy.twoFactor));
       } else {
         setIsLocked(false);
         setStatus("");
       }
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [factor, focusActiveCode, setStatus]);
+  }, [copy.twoFactor, factor, focusActiveCode, setStatus]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -122,7 +126,7 @@ export function TwoFactorChallenge() {
     if (state.lockedUntil && state.lockedUntil > Date.now()) {
       setIsLocked(true);
       setTone("error");
-      setStatus(getLockedMessage(state.lockedUntil));
+      setStatus(getLockedMessage(state.lockedUntil, copy.twoFactor));
       return;
     }
 
@@ -148,14 +152,14 @@ export function TwoFactorChallenge() {
         if (lockedUntil) {
           setIsLocked(true);
           setTone("error");
-          setStatus(getLockedMessage(lockedUntil));
+          setStatus(getLockedMessage(lockedUntil, copy.twoFactor));
         } else {
           setIsLocked(false);
           setTone("error");
           setStatus(
             factor === "totp"
-              ? `That authentication code is invalid. (${remainingAttempts} attempt${remainingAttempts === 1 ? "" : "s"} remaining)`
-              : `That backup code is invalid. (${remainingAttempts} attempt${remainingAttempts === 1 ? "" : "s"} remaining)`,
+              ? copy.twoFactor.invalidAuthenticator(remainingAttempts)
+              : copy.twoFactor.invalidBackup(remainingAttempts),
           );
         }
         focusActiveCode();
@@ -164,11 +168,11 @@ export function TwoFactorChallenge() {
       writeAttemptState(factor, 0);
       setIsLocked(false);
       setTone("success");
-      setStatus("Verification complete.");
+      setStatus(copy.twoFactor.complete);
       router.replace("/dashboard");
     } catch {
       setTone("error");
-      setStatus(TWO_FACTOR_GENERIC_ERROR);
+      setStatus(copy.twoFactor.genericError);
     } finally {
       setBusy(false);
     }
@@ -177,14 +181,14 @@ export function TwoFactorChallenge() {
     <section className="auth-form-content">
       <form onSubmit={submit} noValidate aria-busy={busy} className="auth-form">
         <div className="auth-form-heading">
-          <p className="form-kicker">VERIFY YOUR IDENTITY</p>
-          <h1>Two-factor verification</h1>
-          <p>Use your authenticator or one backup code.</p>
+          <p className="form-kicker">{copy.twoFactor.kicker}</p>
+          <h1>{copy.twoFactor.title}</h1>
+          <p>{copy.twoFactor.description}</p>
         </div>
         <div
           className="factor-mode-switcher"
           role="group"
-          aria-label="Verification method"
+          aria-label={copy.twoFactor.method}
         >
           <button
             type="button"
@@ -194,7 +198,7 @@ export function TwoFactorChallenge() {
             }}
             aria-pressed={factor === "totp"}
           >
-            Authenticator code
+            {copy.twoFactor.authenticator}
           </button>
           <button
             type="button"
@@ -204,7 +208,7 @@ export function TwoFactorChallenge() {
             }}
             aria-pressed={factor === "backup-code"}
           >
-            Backup code
+            {copy.twoFactor.backup}
           </button>
         </div>
         <div className="field">
@@ -212,7 +216,7 @@ export function TwoFactorChallenge() {
             <div
               className="totp-code-inputs"
               role="group"
-              aria-label="Six-digit authentication code"
+              aria-label={copy.twoFactor.sixDigit}
               aria-describedby="two-factor-status"
             >
               <input
@@ -227,13 +231,18 @@ export function TwoFactorChallenge() {
                 enterKeyHint="done"
                 maxLength={TOTP_LENGTH}
                 value={totp}
-                aria-label="Authentication code"
+                aria-label={copy.twoFactor.authenticationCode}
                 onChange={(event) => updateTotp(event.currentTarget.value)}
                 required
               />
               {Array.from({ length: TOTP_LENGTH }, (_, index) => (
                 <span className="totp-code-cell" aria-hidden="true" key={index}>
-                  {totp[index] ?? ""}
+                  {totp[index] ??
+                    (index === activeTotpIndex ? (
+                      <span className="totp-code-caret" aria-hidden="true">
+                        |
+                      </span>
+                    ) : null)}
                 </span>
               ))}
             </div>
@@ -247,7 +256,7 @@ export function TwoFactorChallenge() {
               autoComplete="one-time-code"
               maxLength={128}
               value={backupCode}
-              aria-label="Backup code"
+              aria-label={copy.twoFactor.backupCode}
               onChange={(event) =>
                 setBackupCode(event.currentTarget.value.slice(0, 128))
               }
@@ -264,10 +273,10 @@ export function TwoFactorChallenge() {
             (factor === "totp" ? code.length !== 6 : code.trim().length < 8)
           }
         >
-          {busy ? "Verifying…" : "Verify"}
+          {busy ? copy.twoFactor.verifying : copy.twoFactor.verify}
         </button>
         <AuthStatus id="two-factor-status" status={status} tone={tone} />
-        <Link href="/login">Back to sign in</Link>
+        <Link href="/login">{copy.common.backToSignIn}</Link>
       </form>
     </section>
   );

@@ -1,247 +1,291 @@
 # SmartHire
 
-SmartHire is a security-focused recruitment platform for Candidates, Recruiters, and Platform Administrators. It combines account and profile management, a job workspace, protected CV processing, purpose-specific OCR, employer verification, platform administration, and one-to-one professional messaging in a single modular Next.js application.
+**Human-controlled, AI-assisted recruitment for candidates, recruiters, and platform administrators.**
 
-The repository is a private npm workspace. PostgreSQL is the authoritative data store, Better Auth owns the browser session, background work is isolated in dedicated processes, and Socket.IO provides realtime messaging through the same Node.js process as Next.js.
+SmartHire is a full-stack recruitment platform that combines account security, candidate profiles, job discovery and applications, recruiter workflows, platform administration, protected document processing, OCR-assisted image search, hybrid CV scoring, analytics, notifications, support, and realtime messaging.
 
-## Table of Contents
+The application is implemented as a modular Next.js monolith with explicit service and repository boundaries. PostgreSQL is the authoritative data store, Better Auth owns browser sessions, Socket.IO provides realtime communication, and long-running or sensitive work is isolated in supervised host processes and Docker workers.
+
+> SmartHire assists recruitment work; it does not make autonomous hiring decisions. Recruiters and administrators retain authority over review, stage changes, rejection, interview, offer, and hiring actions.
+
+## Table of contents
 
 - [Overview](#overview)
-- [Techstack](#techstack)
-- [Command](#command)
-- [Run local](#run-local)
-- [Run test](#run-test)
-- [Document](#document)
+- [User roles](#user-roles)
+- [Key capabilities](#key-capabilities)
+- [Architecture](#architecture)
+- [Technology stack](#technology-stack)
+- [Local service topology](#local-service-topology)
+- [Repository structure](#repository-structure)
+- [Prerequisites](#prerequisites)
+- [Quick start](#quick-start)
+- [Environment configuration](#environment-configuration)
+- [Local URLs](#local-urls)
+- [Command reference](#command-reference)
+- [Testing](#testing)
+- [Documentation map](#documentation-map)
+- [Security privacy and AI boundaries](#security-privacy-and-ai-boundaries)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
 - [License](#license)
 
 ## Overview
 
-### Architecture
+SmartHire supports the recruitment lifecycle from candidate identity and profile creation through job discovery, application intake, recruiter review, communication, pipeline management, and reporting.
 
-SmartHire is a modular monolith. Presentation, transport, business logic, and persistence remain separate even though they are deployed as one application.
+The current implementation includes:
 
-```text
-Browser
-  |-- HTTP/HTTPS -----------------------------------------------+
-  |                                                            |
-  |                                                   Next.js App Router
-  |                                                            |
-  |                                                   Route Handlers
-  |                                                            |
-  |                                                   Application services
-  |                                                            |
-  |                                                   Repositories/adapters
-  |                                                            |
-  |-- WebSocket /chat --> Socket.IO gateway --> typed services-+
-                                                               |
-                                                        PostgreSQL 16
+- Three exact-host application surfaces for candidates, recruiters, and platform administrators.
+- Server-side authorization for account-, application-, company-, and administrator-scoped operations.
+- Public job discovery plus saved jobs, applications, reporting, application tracking, and private CV matching.
+- Protected PDF/DOCX CV import with malware scanning, extraction, OCR fallback, candidate review, retention, and deletion.
+- Ephemeral PNG/JPEG image-assisted job search with OCR and AI-assisted query interpretation while database retrieval remains deterministic.
+- Recruiter job-posting review, candidate review, hybrid scoring, recruitment pipeline, application messaging, company membership, and analytics workflows.
+- Administrator account, employer verification, company, job, moderation, support, messaging-report, audit, and backup workflows.
+- Durable in-app notifications, transactional email, professional connections, support cases, and Socket.IO messaging.
 
-Background processes
-  |-- Email outbox worker
-  |-- Candidate private-match worker -> approved OpenAI boundary
-  |-- CV worker ------> ClamAV Unix socket
-  |                 `-> OCR Unix socket
-  |-- Image-search worker -> OCR Unix socket / approved OpenAI boundary
-  `-- Admin worker
-```
+Feature specifications and plans live under [`spec-kit/specs/`](spec-kit/specs/). They document intended behavior; current source code, database migrations, and tests remain the implementation evidence.
 
-- Ordinary backend HTTP endpoints use Next.js App Router Route Handlers, which validate input and call application services — business rules do not live in UI components or transport handlers.
-- Prisma repositories own PostgreSQL access and transactional writes.
-- Shared Zod schemas and TypeScript types define trust-boundary contracts.
-- `web/server.ts` is the Node.js entrypoint for both development and production; it delegates HTTP to Next.js and attaches the `/chat` Socket.IO namespace to the same HTTP server.
-- PostgreSQL owns durable account, recruitment, messaging, audit, and worker state. Browser caches and Socket.IO rooms are never authoritative.
+## User roles
 
-### Product capabilities
+| Role                   | Primary responsibilities                                                                                                                                                                                       |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Candidate              | Maintain a professional profile, import CVs, discover and save jobs, apply, track applications, control profile visibility, connect with professionals, and communicate with authorized recruiters.            |
+| Recruiter              | Operate under a current company membership, create and submit job posts, review applicants, request consented scoring, manage pipeline stages, communicate with applicants, and inspect recruitment analytics. |
+| Platform Administrator | Use the isolated admin host to manage accounts and companies, review employer evidence and job posts, handle reports and support cases, inspect audit evidence, and control platform backups.                  |
 
-**Identity and account security**
+The same authenticated account may receive different capabilities only when the relevant server-side role, company membership, verification state, and resource authority are valid.
 
-- Account registration, verified email ownership, login, and logout.
-- Better Auth opaque, database-backed browser sessions.
-- TOTP two-factor authentication, backup codes, session limits, session listing, and revocation.
-- Password reset and full account recovery with a security hold.
-- Rate limiting, CSRF/origin validation, audit events, and safe error envelopes.
+## Key capabilities
 
-**Candidate profile and account management**
+### Candidate experience
 
-- Professional summary, contact-safe profile fields, avatar, experience, education, skills, and social links.
-- Verified email changes and secure password changes.
-- Account preferences and persisted workspace state.
-- Account-scoped ownership of profile, CV, saved-job, application, and messaging data.
+- Registration, email verification, login, logout, password reset, account recovery, TOTP two-factor authentication, backup codes, and session management.
+- Professional profile sections for personal details, summary, skills, experience, education, social links, avatar, preferences, account data, security, and active sessions.
+- Privacy-scoped candidate profile discovery, field-level visibility projection, contact-consent controls, rate limiting, and audit events.
+- Public job browsing with keyword search, Vietnamese text normalization, structured filters, sorting, pagination, saved jobs, hidden jobs, reports, and privacy-safe unavailable states.
+- Job applications with drafts, CV selection or upload, cover letters, review, asynchronous intake, canonical status tracking, withdrawal, offer response, notification preferences, and application-scoped messaging.
+- Private CV-to-job matching with deterministic retrieval, optional AI analysis, retry handling, and candidate-visible explanations.
+- Professional connection proposals, decisions, disconnects, notifications, and eligible one-to-one messaging.
+- In-app notifications and support cases with realtime updates where the relevant feature boundary permits them.
 
-**Job board and candidate workspace**
-
-- Public browsing of approved and currently available jobs.
-- Case-insensitive and Vietnamese-diacritic-insensitive search.
-- Structured filters, job details, saved jobs, and hidden jobs.
-- Candidate applications with canonical application tracking.
-- Job reporting and privacy-safe unavailable-job responses.
-- Optional image-assisted search that turns an ephemeral image query into visible, editable filters while deterministic retrieval remains authoritative.
+### CV import and OCR-assisted job search
 
 **Protected CV import**
 
-- PDF and DOCX input only, capped at 5,000,000 bytes.
-- Private encrypted local storage in development; S3/SSE-KMS boundaries in approved production deployments.
-- ClamAV malware scanning over a private Unix socket.
-- Text extraction with PDF.js and Mammoth, plus purpose-specific OCR.
-- Deterministic local parsing or an approved OpenAI parser boundary.
-- Candidate review before parsed data is applied to the profile.
-- Retry, consent, quota, cleanup, retention, and deletion workflows.
+- Accepts PDF and DOCX files up to exactly 5,000,000 bytes.
+- Stores encrypted private artifacts locally in development or behind approved S3/SSE-KMS boundaries in production.
+- Scans files through ClamAV before extraction or parsing.
+- Extracts text with PDF.js and Mammoth, with purpose-specific OCR for supported embedded content and scanned documents.
+- Supports deterministic parsing or a separately gated OpenAI parser.
+- Requires candidate review before parsed profile data is applied.
+- Enforces upload quotas, consent, retries, cleanup, retention, deletion, and audit boundaries.
 
-**Platform administration and employer verification**
+**Image-assisted job search**
 
-- Exact-host Platform Administrator console.
-- Account suspension/restoration and session deactivation.
-- Recruiter business verification and company membership administration.
-- Moderation/report workflows and privacy-minimized audit records.
-- Background dashboard snapshots, evidence safety checks, verification deadlines, security notifications, and retention reconciliation.
+- Accepts standalone PNG/JPEG query images up to 5,000,000 bytes and 20,000,000 decoded pixels.
+- Uses private temporary storage, malware scanning, image decoding, OCR, and bounded query interpretation.
+- Presents derived criteria as a search proposal that the user can review or edit.
+- Keeps job retrieval deterministic: AI may interpret the image query but does not choose job IDs or alter job visibility rules.
+- Uses a 10-second OCR/search processing deadline and a configurable 15-minute default artifact retention window.
+- Keeps the adaptive tiling strategy behind `OCR_SEARCH_ADAPTIVE_TILING_ENABLED`; it is disabled by default in the checked-in environment templates.
 
-**Realtime professional messaging**
+### Recruiter workspace
 
-- Eligible one-to-one Candidate/Recruiter conversations, gated by an accepted connection or an application with current company-scoped Recruiter authority.
-- Durable plain-text messages, unread counts, monotonic read state, and cursor pagination.
-- Socket.IO realtime delivery, reconnect recovery, and approximate presence.
-- Bidirectional communication blocking, force-leave enforcement, and reporting.
-- No group chat, attachments, typing indicators, calls, message mutation, exact last-seen history, or cross-module realtime feed.
+- Recruiter entitlement and header status derived from current company membership and verification state.
+- Company setup, business-email verification, evidence preparation, invitations, member management, and role-aware company settings.
+- Job-post creation and editing, submission for administrator review, withdrawal, review outcomes, publication, expiry, and reactivation.
+- Application-scoped candidate lists, profile projection, document preview/download, viewed-state tracking, priority, shortlist, and human decisions.
+- Consent-gated hybrid CV scoring, deterministic-only fallback, retry/rescore workflows, explanations, and ranked candidate views.
+- Kanban-style recruitment pipeline with authorized stage transitions, withdrawn handling, and explicit decision actions.
+- Application-scoped recruitment threads and recruiter message oversight.
+- Job performance metrics, recruitment funnel reporting, time-series analytics, and asynchronous exports.
 
-## Techstack
+### Platform administration
 
-| Area             | Technology                                                                                |
-| ---------------- | ----------------------------------------------------------------------------------------- |
-| Runtime          | Node.js 24.18.x, npm 11.16.x                                                              |
-| Application      | Next.js 16.x, React 19.2.x, TypeScript 5.9.x                                              |
-| Styling/UI       | Tailwind CSS 4, shadcn-style primitives, MUI/React Admin (isolated admin console), Motion |
-| Authentication   | Better Auth 1.6.25                                                                        |
-| Database         | PostgreSQL 16.12, Prisma 7.9.0, `@prisma/adapter-pg`                                      |
-| Validation/forms | Zod 4, React Hook Form                                                                    |
-| Realtime         | Socket.IO 4.8.3, single `/chat` namespace                                                 |
-| Server state     | TanStack Query                                                                            |
-| CV processing    | ClamAV 1.4, PDF.js, Mammoth, Sharp                                                        |
-| OCR              | Isolated Python OCR engine using pinned PaddleOCR-derived ONNX models                     |
-| AI integration   | OpenAI SDK behind purpose-specific service boundaries                                     |
-| Email            | Local capture, SMTP, or Resend through a transactional outbox                             |
-| Testing          | Vitest, Testing Library, axe-core, Playwright                                             |
+- Exact-host administrator console with administrator authentication, TOTP, recent-auth/step-up controls, and auditable sessions.
+- Account search, account detail, suspension, restoration, session revocation, and security-state management.
+- Employer verification with immutable business facts, private evidence access, provider failure handling, claims, deadlines, and explicit human approval or rejection.
+- Company and membership administration with tenant-aware authorization.
+- Job-post review, approval/rejection/change requests, publication projection, lifecycle enforcement, feature controls, and platform job management.
+- Moderation reports, messaging-report review, professional-connection oversight, support-case handling, rationales, and privacy-minimized audit trails.
+- Dashboard snapshots, security and lifecycle notifications, retention loops, evidence safety checks, and encrypted PostgreSQL backup runs.
 
-Exact dependency versions are defined in the root `package-lock.json` and `web/package.json`.
+### Shared platform services
 
-### Local service topology
+- Transactional email through an outbox with local capture, SMTP, or Resend adapters.
+- Durable in-app notifications with unread counts, deep links, read-all operations, and recipient policies.
+- Socket.IO realtime messaging and support updates over the authenticated browser session.
+- Shared Zod contracts, structured error envelopes, rate limiting, idempotency, audit events, and retention workers.
 
-`npm run dev` supervises local Node processes, recovers the core Docker infrastructure, starts restartable workers without waiting for ClamAV health, and then starts the web application.
+## Architecture
 
-| Process/service       | Runtime      | Purpose                                             | Lifecycle                   |
-| --------------------- | ------------ | --------------------------------------------------- | --------------------------- |
-| Web application       | Host Node.js | Next.js HTTP plus Socket.IO                         | Supervised by `npm run dev` |
-| Email worker          | Host Node.js | Delivers transactional outbox records               | Supervised by `npm run dev` |
-| Candidate match worker | Host Node.js | Scores private CV match attempts and retries         | Supervised by `npm run dev` |
-| Application intake worker | Host Node.js | Verifies submitted files and advances intake state   | Supervised by `npm run dev` |
-| `postgres`            | Docker       | Authoritative PostgreSQL database                   | `unless-stopped`            |
-| `clamav`              | Docker       | Malware scanner and FreshClam updater               | `unless-stopped`            |
-| `ocr-engine`          | Docker       | Private Unix-socket OCR service                     | `unless-stopped`            |
-| `cv-worker`           | Docker       | Scan/extract/parse/cleanup CV jobs                  | `unless-stopped`            |
-| `image-search-worker` | Docker       | Ephemeral image-search processing/cleanup           | `unless-stopped`            |
-| `admin-worker`        | Docker       | Admin evidence, notifications, snapshots, retention | `unless-stopped`            |
+SmartHire uses a modular-monolith architecture. UI, transport, application logic, persistence, and external providers remain separate even though the primary application is deployed as one long-lived Node.js process.
 
-The Compose services run detached. Stopping the `npm run dev` terminal stops the web and email supervisor processes but intentionally leaves Docker infrastructure running. Use `npm run infra:down` to remove the Compose containers.
+```text
+Candidate host       Recruiter host       Administrator host
+      \                    |                     /
+       +---------- HTTPS / exact-host routing --+
+                              |
+                     web/server.ts
+                  Next.js + Socket.IO
+                              |
+          +-------------------+-------------------+
+          |                                       |
+  App Router pages and                    /chat gateway
+  thin Route Handlers                    typed realtime hubs
+          |                                       |
+          +----------- application services ------+
+                              |
+                  repositories and adapters
+                              |
+                       PostgreSQL 16
 
-## Command
+Asynchronous boundaries
+  Host: email outbox, application intake, candidate private match
+  In-process: application scoring and candidate data export runtimes
+  Docker: CV worker, OCR engine, image-search worker, admin worker
+  Providers: ClamAV, OpenAI, email adapters, S3/KMS, Google Drive backup
+```
 
-### Prerequisites
+### Request and data boundaries
 
-- Git
-- Node.js `24.18.x`
-- npm `11.16.x`
-- Docker Desktop or Docker Engine with Docker Compose v2
-- A working internet connection for the first dependency/image/model build and ClamAV signature updates
-- An OpenAI API key when local image-assisted job search remains enabled
+- `web/server.ts` is the custom development and production entrypoint. It serves Next.js, attaches the authenticated Socket.IO gateway, and owns graceful shutdown.
+- `web/src/app/` contains App Router pages and thin Route Handlers.
+- `web/src/backend/` contains application services, authorization policies, repositories, workers, and provider adapters.
+- `web/src/shared/` contains transport-neutral schemas, contracts, and types.
+- Prisma repositories own PostgreSQL access and transactional writes.
+- PostgreSQL is authoritative for account, recruitment, notification, messaging, audit, and worker state. Browser caches and socket rooms are projections only.
+- Sensitive providers are purpose-specific: CV parsing, image-query interpretation, email, object storage, malware scanning, OCR, and backup each have separate configuration and policy boundaries.
 
-Recommended local resources: 16 GB+ host memory, ~14 GB available to Docker when running the full OCR stack, and sufficient disk space for npm packages, Docker images, OCR models, and local development artifacts.
+## Technology stack
 
-PostgreSQL, `psql`, Python OCR dependencies, and ClamAV do not need to be installed directly on the host.
+| Area                      | Technology                                                                    |
+| ------------------------- | ----------------------------------------------------------------------------- |
+| Runtime and workspace     | Node.js 24.18.x, npm 11.16.x, npm workspaces                                  |
+| Web application           | Next.js 16.3, React 19.2, TypeScript 5.9                                      |
+| Styling and UI            | Tailwind CSS 4, CSS modules, Material UI, React Admin, Lucide icons, Recharts |
+| Authentication            | Better Auth 1.6                                                               |
+| Database                  | PostgreSQL 16.12, Prisma 7.9, `@prisma/adapter-pg`                            |
+| Validation and forms      | Zod 4, React Hook Form                                                        |
+| Server state and realtime | TanStack Query, Socket.IO 4.8                                                 |
+| CV processing             | ClamAV 1.4, PDF.js, Mammoth, Sharp                                            |
+| OCR                       | Isolated Python 3.12 service with pinned PaddleOCR-derived ONNX models        |
+| AI integration            | OpenAI SDK behind consent, configuration, and privacy gates                   |
+| Email                     | Local capture, SMTP, or Resend through a transactional outbox                 |
+| Testing                   | Vitest, Testing Library, axe-core, Playwright                                 |
 
-### Setup and application
+Exact dependency versions are recorded in [`package-lock.json`](package-lock.json) and [`web/package.json`](web/package.json).
 
-| Command             | Purpose                                                                      |
-| ------------------- | ---------------------------------------------------------------------------- |
-| `npm ci`            | Install the exact root lockfile dependency graph                             |
-| `npm run env:init`  | Generate/preserve local environment files, secrets, and private directories  |
-| `npm run env:check` | Validate runtime, Docker, environment, storage, database, and provider gates |
-| `npm run dev`       | Recover Compose services without blocking on ClamAV, then run web and email  |
-| `npm run dev:web`   | Start only the custom Next.js/Socket.IO server                               |
-| `npm start`         | Start an already-built production-mode custom server                         |
-| `npm run build`     | Build the Next.js application                                                |
+## Local service topology
 
-### Infrastructure and database
+`npm run dev` coordinates both host processes and Docker services:
 
-| Command                         | Purpose                                                        |
-| ------------------------------- | -------------------------------------------------------------- |
-| `npm run infra:up`              | Build and start all six Compose services                       |
-| `npm run infra:down`            | Remove all Compose containers and retain named volumes         |
-| `npm run db:up`                 | Start only PostgreSQL                                          |
-| `npm run db:down`               | Stop only PostgreSQL                                           |
-| `npm run db:status`             | Show PostgreSQL Compose status                                 |
-| `npm run db:logs`               | Follow PostgreSQL logs                                         |
-| `npm run db:validate`           | Validate the Prisma schema                                     |
-| `npm run db:deploy`             | Apply committed migrations                                     |
-| `npm run db:migrate`            | Create/apply a development migration                           |
-| `npm run db:migrations:check`   | Validate migration naming and sequence                         |
-| `npm run db:verify`             | Verify migrations against a clean temporary database           |
-| `npm run db:seed:jobs`          | Seed local demonstration jobs                                  |
-| `npm run db:studio`             | Open Prisma Studio                                             |
-| `npm run db:reset:empty`        | Recreate an empty local database                               |
-| `npm run db:reset`              | Delete the local PostgreSQL volume, reapply migrations, reseed |
-| `npm run db:reset:user -- <id>` | Delete one user's activity/profile/CV data, keep auth records  |
+1. It checks whether the OCR, CV, image-search, and admin worker images are missing or changed and builds them in the background.
+2. It starts or recovers PostgreSQL and ClamAV without making web startup wait for ClamAV health.
+3. It starts the web server, email worker, application-intake watcher, and candidate-match watcher on the host.
+4. When worker images are ready, it starts the OCR, CV, image-search, and admin services without recreating their dependencies.
 
-> ⚠️ Database reset commands are destructive. Never point them at a shared or production database.
+| Process or service        | Runtime      | Responsibility                                                                             | Development lifecycle       |
+| ------------------------- | ------------ | ------------------------------------------------------------------------------------------ | --------------------------- |
+| Web application           | Host Node.js | Next.js HTTP, exact-host shells, Socket.IO, scoring runtime, candidate data export runtime | Supervised by `npm run dev` |
+| Email worker              | Host Node.js | Transactional outbox delivery                                                              | Supervised by `npm run dev` |
+| Application intake worker | Host Node.js | Submitted-document verification and intake progression                                     | Supervised in watch mode    |
+| Candidate match worker    | Host Node.js | Private CV-match attempts and retries                                                      | Supervised in watch mode    |
+| `postgres`                | Docker       | Authoritative PostgreSQL database                                                          | Compose                     |
+| `clamav`                  | Docker       | Malware scanning and signature updates                                                     | Compose                     |
+| `ocr-engine`              | Docker       | Private Unix-socket OCR inference                                                          | Compose                     |
+| `cv-worker`               | Docker       | CV scan, extraction, parsing, and cleanup                                                  | Compose                     |
+| `image-search-worker`     | Docker       | Ephemeral image-query processing and cleanup                                               | Compose                     |
+| `admin-worker`            | Docker       | Verification, support, notification, retention, snapshot, and backup loops                 | Compose                     |
 
-### Worker and administration probes
+The Compose stack contains six services. `Ctrl+C` stops the supervised host processes, but detached Compose services intentionally remain running. Use `npm run infra:down` when you want to stop and remove the containers while retaining named volumes.
 
-| Command                             | Purpose                                                            |
-| ----------------------------------- | ------------------------------------------------------------------ |
-| `npm run email:worker`              | Run only the email outbox worker on the host                       |
-| `npm run candidate-match:worker`    | Drain queued private CV match attempts once                       |
-| `npm run applications:intake`       | Drain currently queued application intake checks                  |
-| `npm run applications:intake:watch` | Run the application intake worker continuously                     |
-| `npm run cv:worker:probe`           | Probe CV worker configuration/runtime boundaries                   |
-| `npm run cv:scanner:check`          | Check the configured scanner boundary                              |
-| `npm run ocr:up`                    | Build/start only the OCR engine                                    |
-| `npm run ocr:check`                 | Check OCR readiness                                                |
-| `npm run image-search:worker:probe` | Probe image-search worker dependencies                             |
-| `npm run admin:worker:probe`        | Probe admin worker loops                                           |
-| `npm run admin:evidence:check`      | Validate admin evidence readiness                                  |
-| `npm run admin:provision -- <args>` | Provision a Platform Administrator through the controlled CLI      |
-| `npm run admin:revoke -- <args>`    | Revoke Platform Administrator authority through the controlled CLI |
+## Repository structure
 
-## Run local
+```text
+.
+|-- AGENTS.md                         # Repository instructions for coding agents
+|-- compose.yaml                      # PostgreSQL, ClamAV, OCR and worker topology
+|-- Dockerfile.*                      # Admin, image-search and OCR worker images
+|-- package.json                      # Root workspace commands
+|-- package-lock.json                 # Single authoritative dependency lockfile
+|-- scripts/                          # Local setup, supervisor and database tools
+|-- infra/clamav/                     # clamd and FreshClam configuration
+|-- ocr-engine/                       # Isolated Python OCR service and model manifest
+|-- deploy/                           # Deployment policies and evidence
+|-- docs/                             # Architecture, operations and testing documents
+|-- spec-kit/
+|   |-- .specify/memory/constitution.md
+|   `-- specs/                       # Feature specs, plans, contracts and tasks
+`-- web/
+    |-- server.ts                     # Custom Next.js and Socket.IO entrypoint
+    |-- prisma/
+    |   |-- schema.prisma
+    |   `-- migrations/              # Numbered Prisma migration history
+    |-- scripts/                      # Worker, migration, seed, probe and test tools
+    |-- src/
+    |   |-- app/                      # Pages and thin Route Handlers
+    |   |-- frontend/features/        # Feature UI and browser adapters
+    |   |-- backend/                  # Services, repositories, workers and providers
+    |   `-- shared/                  # Schemas, contracts and shared types
+    `-- tests/                       # Unit through system-level test suites
+```
 
-Run all commands from the repository root.
+Generated Prisma output is written to `web/src/backend/generated/prisma/`. Do not hand-edit generated files; update the schema/migrations and regenerate instead.
 
-### 1. Clone and enter the repository
+## Prerequisites
+
+- Git.
+- Node.js `24.18.x` (the repository pins `24.18.0` in [`.nvmrc`](.nvmrc)).
+- npm `11.16.x`.
+- Docker Desktop or Docker Engine with Docker Compose v2.
+- Internet access for the initial npm install, Docker images, OCR model build, ClamAV signatures, and enabled external providers.
+- A valid `OPENAI_API_KEY` for the fresh local configuration generated by `npm run env:init`, which enables the OpenAI CV parser and image-query interpreter.
+
+PostgreSQL, `psql`, Python OCR packages, and ClamAV do not need to be installed directly on the host.
+
+## Quick start
+
+Run every command from the repository root.
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/quocuy0112/Software-Engineering---Group-9.git
 cd Software-Engineering---Group-9
 ```
 
-### 2. Install the locked dependencies
+### 2. Install locked dependencies
 
 ```bash
 npm ci
 ```
 
-Use `npm ci`, not a workspace-local install — the repository owns one root lockfile.
+Use the root install. The repository owns one lockfile for the `web` workspace.
 
-### 3. Generate local environment files and private keys
+### 3. Create local configuration and private directories
 
 ```bash
 npm run env:init
 ```
 
-Creates/updates `.env` (Docker/worker settings), `web/.env.local` (application), private local storage directories under `web/.local/`, and random database/auth/token/encryption/HMAC secrets when missing. Existing secret values are preserved and never printed.
+This command creates or extends:
 
-### 4. Configure the required local provider key
+- `.env` for Compose and worker settings.
+- `web/.env.local` for the application runtime.
+- Private local artifact, mail, and evidence directories under `web/.local/`.
+- Random database, authentication, encryption, capability, and HMAC secrets when missing.
 
-Set `OPENAI_API_KEY` to the same non-empty value in `.env` and `web/.env.local` when `IMAGE_SEARCH_WORKER_ENABLED=true`. Never commit either environment file. The CV parser remains deterministic by default.
+Existing secret values are preserved and are not printed.
 
-### 5. Start PostgreSQL and apply migrations
+### 4. Configure the local provider key
+
+Set the same non-empty `OPENAI_API_KEY` in `.env` and `web/.env.local`. Never commit either file.
+
+The generated local setup selects the OpenAI CV parser and OpenAI image-search interpreter. A deterministic CV parser is supported, but changing that mode requires all related CV flags to remain consistent; image search still requires its configured interpreter and provider gate.
+
+### 5. Start PostgreSQL and prepare the schema
 
 ```bash
 npm run db:up
@@ -249,7 +293,9 @@ npm run db:deploy
 npm run db:seed:jobs
 ```
 
-Use `db:deploy` for committed migrations, and `db:migrate` only when developing a new Prisma migration.
+`db:seed:jobs` is optional when the database already contains a suitable local catalogue.
+
+Use `db:deploy` to apply committed migrations. Use `db:migrate` only while authoring a new development migration and only against a disposable local database.
 
 ### 6. Validate the environment
 
@@ -257,7 +303,7 @@ Use `db:deploy` for committed migrations, and `db:migrate` only when developing 
 npm run env:check
 ```
 
-Checks runtime versions, Docker/Compose, environment invariants, storage boundaries, database connectivity, provider gates, and administrative evidence readiness without printing secret values.
+The check validates Node and Docker availability, required environment values, key separation, exact origins, storage/provider gates, database connectivity, and worker prerequisites without printing secret values.
 
 ### 7. Start the complete development environment
 
@@ -265,11 +311,9 @@ Checks runtime versions, Docker/Compose, environment invariants, storage boundar
 npm run dev
 ```
 
-The first run may take several minutes because worker images and OCR assets must be built; subsequent builds use Docker layer caching. Wait for:
+The first run may take several minutes while Docker builds worker images and downloads OCR assets. Later runs reuse Docker layer caches.
 
-```text
-SmartHire ready at http://127.0.0.1:3001
-```
+The server binds to `127.0.0.1:3001` by default, but the product surfaces should be opened with the exact `localhost` hostnames listed below.
 
 ### 8. Verify health
 
@@ -278,72 +322,120 @@ curl http://localhost:3001/api/health
 docker compose ps
 ```
 
-On PowerShell:
+PowerShell:
 
 ```powershell
 Invoke-WebRequest -UseBasicParsing http://localhost:3001/api/health
 docker compose ps
 ```
 
-### Local URLs
+## Environment configuration
 
-| Surface                  | URL                                       | Status                                                                          |
-| ------------------------ | ----------------------------------------- | ------------------------------------------------------------------------------- |
-| Candidate application    | `http://localhost:3001`                   | Active                                                                          |
-| Messaging workspace      | `http://localhost:3001/messages`          | Active after authentication                                                     |
-| Platform Admin console   | `http://console.admin.localhost:3001`     | Active for authorized administrators                                            |
-| Health endpoint          | `http://localhost:3001/api/health`        | Public operational health                                                       |
+Start from [`.env.example`](.env.example) and [`web/.env.example`](web/.env.example), or let `npm run env:init` generate the local files. The important groups are:
 
-The application validates exact hosts — do not use the admin console through the Candidate hostname.
+| Group                      | Representative settings                                            | Purpose                                                           |
+| -------------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| Application and database   | `APP_ENV`, `NEXT_PUBLIC_APP_URL`, `DATABASE_URL`, `DIRECT_URL`     | Runtime mode, public origin, pooled/direct database access        |
+| Authentication and origins | `BETTER_AUTH_URL`, auth secrets, candidate/admin/recruiter origins | Session signing, cookies, CSRF and exact-host enforcement         |
+| Email                      | `EMAIL_DRIVER`, SMTP/Resend settings, local capture directory      | Transactional outbox delivery                                     |
+| CV import                  | `CV_STORAGE_*`, `CV_PARSER_ADAPTER`, `CV_OPENAI_*`, `CV_CLAMD_*`   | Private storage, scanning, parsing, quotas and retention          |
+| OCR                        | `OCR_ENGINE_*`, `OCR_SEARCH_*`                                     | Unix-socket engine, model identity, deadlines and optional tiling |
+| Image search               | `IMAGE_SEARCH_*`                                                   | Storage, capability keys, provider, limits, consent and retention |
+| Recruitment                | job catalogue, application, scoring and analytics settings         | Workflow policy, workers, exports and retention                   |
+| Administration             | admin origin, evidence, notifications and worker settings          | Isolated console and administrative background loops              |
+| Backup                     | `BACKUP_ENCRYPTION_KEY`, `GOOGLE_DRIVE_BACKUP_*`                   | Encrypted PostgreSQL backup destination and credentials           |
 
-### Stopping development
+Additional rules:
 
-- `Ctrl+C` in the `npm run dev` terminal stops the web and email supervisor processes; Docker infrastructure keeps running.
-- `npm run infra:down` removes all Compose containers while retaining named volumes.
-- `npm run db:down` stops only PostgreSQL.
+- Do not commit `.env`, `web/.env.local`, credentials, local artifacts, or database dumps.
+- Candidate, recruiter, and administrator origins must be exact; production origins must use HTTPS.
+- Development filesystem storage is not a production substitute. Production CV/image storage requires the configured S3, encryption, role-credential, and privacy gates.
+- OpenAI production use is fail-closed until the relevant DPA, cross-border, privacy, and zero-data-retention approvals are explicitly configured.
+- The business-registry adapter is independently configurable and never auto-approves an employer.
 
-### Running only selected components
+## Local URLs
 
-```bash
-npm run dev:web
-npm run email:worker
-npm run infra:up
-```
+| Surface                        | URL                                       | Access                                              |
+| ------------------------------ | ----------------------------------------- | --------------------------------------------------- |
+| Candidate application          | `http://localhost:3001`                   | Public pages plus authenticated candidate workspace |
+| Candidate messages             | `http://localhost:3001/messages`          | Authenticated and eligibility-gated                 |
+| Recruiter workspace            | `http://console.recruiter.localhost:3001` | Current recruiter entitlement required              |
+| Platform Administrator console | `http://console.admin.localhost:3001`     | Authorized administrator session required           |
+| Health endpoint                | `http://localhost:3001/api/health`        | Operational health                                  |
 
-### Production-like run
+Do not open recruiter or administrator routes through the candidate hostname. The proxy deliberately rejects unknown hosts and direct access to internal host-shell paths.
 
-```bash
-npm run build
-npm start
-```
+## Command reference
 
-`npm start` executes `web/server.ts` through the production `tsx` dependency. The application requires a long-lived self-hosted Node.js process because the Socket.IO WebSocket gateway cannot run in a serverless Route Handler or Edge runtime. A reverse proxy must preserve the WebSocket upgrade and route the exact configured hosts to port `3001`.
+### Daily development
 
-### Troubleshooting
+| Command                                     | Purpose                                                        |
+| ------------------------------------------- | -------------------------------------------------------------- |
+| `npm ci`                                    | Install the exact lockfile dependency graph                    |
+| `npm run env:init`                          | Generate or extend local configuration and private directories |
+| `npm run env:check`                         | Validate environment and runtime boundaries                    |
+| `npm run dev`                               | Start the complete supervised local environment                |
+| `npm run dev:web`                           | Start only the custom Next.js/Socket.IO server                 |
+| `npm run build`                             | Build the production Next.js application                       |
+| `npm start`                                 | Start an already-built production-mode custom server           |
+| `npm run lint`                              | Run ESLint for the web workspace                               |
+| `npm run typecheck`                         | Run TypeScript without emitting output                         |
+| `npm test`                                  | Run the complete Vitest suite                                  |
+| `npm run format --workspace @smarthire/web` | Check formatting with Prettier                                 |
 
-**Docker Desktop is not running** — start Docker Desktop, wait for `docker desktop status` to report `running`, then re-run `npm run infra:up` or `npm run dev`.
+### Infrastructure and database
 
-**A worker is stopped and does not restart after `docker stop`** — `restart: unless-stopped` respects an explicit operator stop; recover with `npm run dev` or `npm run infra:up`.
+| Command                                       | Purpose                                                              |
+| --------------------------------------------- | -------------------------------------------------------------------- |
+| `npm run infra:up`                            | Build and start all six Compose services                             |
+| `npm run infra:down`                          | Remove Compose containers and retain named volumes                   |
+| `npm run db:up`                               | Start and wait for PostgreSQL                                        |
+| `npm run db:down`                             | Stop PostgreSQL without deleting its volume                          |
+| `npm run db:status`                           | Show PostgreSQL Compose status                                       |
+| `npm run db:logs`                             | Follow PostgreSQL logs                                               |
+| `npm run db:validate`                         | Validate the Prisma schema                                           |
+| `npm run db:migrations:check`                 | Validate `NNN_snake_case` migration names and sequence               |
+| `npm run db:deploy`                           | Apply committed migrations                                           |
+| `npm run db:migrate`                          | Reconcile names and run Prisma development migration authoring       |
+| `npm run db:verify`                           | Rebuild and verify the full migration history in temporary databases |
+| `npm run db:seed:jobs`                        | Load or update the local demonstration job catalogue                 |
+| `npm run db:studio`                           | Open Prisma Studio                                                   |
+| `npm run db:reset:user -- <email-or-user-id>` | Remove one local user's owned data under the reset policy            |
+| `npm run db:reset:empty`                      | Recreate an empty local database                                     |
 
-**CV worker reports stale ClamAV definitions** — inspect logs with `docker compose logs --tail 100 clamav` / `cv-worker`. ClamAV remains running but unhealthy, keeps FreshClam active, and retries `clamd` every 60 seconds. Scanner-dependent workers may restart until the socket returns, while web development remains available. Do not bypass the 24-hour freshness gate; restore connectivity and wait for the mirror to update.
+The current checkout contains 75 numbered migration directories, from `001_identity_foundation` through `075_persist_employer_requested_role`.
 
-**Admin worker repeatedly exits** — check `docker compose logs --tail 100 admin-worker` and `npm run admin:worker:probe`; verify environment initialization completed and container-local storage paths are correct.
+> Reset and migration-reconciliation commands mutate data or migration metadata. Never run them against a shared or production database without an approved backup, an inspected database state, and a documented recovery plan.
 
-**Image-search worker fails configuration validation** — confirm `OPENAI_API_KEY` is present in both env files, confirm CV and image-search keys are all distinct, then run `npm run env:init` and `npm run env:check`.
+### Workers and operational probes
 
-**PostgreSQL is unavailable** — run `npm run db:status`, `npm run db:logs`, `npm run db:up`. The app connects via `localhost:55432`; Docker workers connect via `postgres:5432`.
+| Command                                  | Purpose                                                            |
+| ---------------------------------------- | ------------------------------------------------------------------ |
+| `npm run email:worker`                   | Run the email outbox worker                                        |
+| `npm run applications:intake`            | Drain currently queued application-intake work                     |
+| `npm run applications:intake:watch`      | Watch continuously for application-intake work                     |
+| `npm run candidate-match:worker`         | Drain candidate private-match work once                            |
+| `npm run candidate-match:worker:probe`   | Probe candidate-match prerequisites                                |
+| `npm run cv:worker:probe`                | Probe CV worker configuration and dependencies                     |
+| `npm run cv:scanner:check`               | Check the ClamAV boundary                                          |
+| `npm run ocr:up`                         | Build and start only the OCR engine                                |
+| `npm run ocr:check`                      | Check OCR readiness                                                |
+| `npm run image-search:worker:probe`      | Probe image-search worker dependencies                             |
+| `npm run admin:worker:probe`             | Probe administrator worker loops                                   |
+| `npm run image-search:storage:preflight` | Validate production image-storage evidence                         |
+| `npm run admin:evidence:check`           | Validate administrator evidence readiness                          |
+| `npm run admin:provision -- <email>`     | Grant Platform Administrator authority through the controlled CLI  |
+| `npm run admin:revoke -- <email>`        | Revoke Platform Administrator authority through the controlled CLI |
 
-**Migration history is inconsistent** — run `npm run db:migrations:check`, then `npm run db:migrations:reconcile-names -- --apply`, then `npm run db:deploy`.
+## Testing
 
-**Port 3001 is already in use** — stop the existing dev/start process first; Docker does not own port 3001.
+Tests are organized by concern under `web/tests/`:
 
-**Workspace module cannot be resolved** — stop the dev server and run `npm ci` from the repository root (do not install packages independently under `web/`).
+- `backend/unit`, `backend/integration`, `backend/contract`, and `backend/compatibility`.
+- `frontend/unit`, `frontend/components`, and `frontend/accessibility`.
+- `shared`, `architecture`, `security`, `performance`, `usability`, and `system/e2e`.
 
-**Browser automation cannot launch Chromium** — run `npx playwright install chromium`.
-
-## Run test
-
-### Baseline checks
+### Baseline quality gates
 
 ```bash
 npm run env:check
@@ -353,16 +445,35 @@ npm test
 npm run build
 ```
 
-Some integration and system suites require running PostgreSQL or the full Compose stack — start it with `npm run infra:up` first.
+Some integration and system suites require PostgreSQL or the complete Compose stack. Use `npm run db:up` or `npm run infra:up` as required, and never point destructive or fixture-heavy tests at a shared database.
 
-### Focused suites
+### Focused root suites
 
 ```bash
 npm run test:job-board
 npm run test:cv-import
 npm run test:ocr-image-search
+npm run test:candidate-application-private-match
+npm run test:business-verification
 npm run test:admin-management
 npm run test:messaging
+npm run test:notifications
+```
+
+### Additional workspace suites
+
+These scripts exist in the `@smarthire/web` workspace and can be run from the repository root:
+
+```bash
+npm run test:applications --workspace @smarthire/web
+npm run test:scoring --workspace @smarthire/web
+npm run test:job-post-reviews --workspace @smarthire/web
+npm run test:job-post-management --workspace @smarthire/web
+npm run test:recruitment-analytics --workspace @smarthire/web
+npm run test:recruiter-header --workspace @smarthire/web
+npm run test:profile-discovery --workspace @smarthire/web
+npm run test:connections --workspace @smarthire/web
+npm run test:support --workspace @smarthire/web
 ```
 
 ### Browser end-to-end suites
@@ -373,96 +484,194 @@ npm run test:cv-import:e2e
 npm run test:ocr-image-search:e2e
 npm run test:admin-management:e2e
 npm run test:messaging:e2e
+npm run test:connections:e2e --workspace @smarthire/web
+npm run test:recruiter-header:e2e --workspace @smarthire/web
 ```
 
-Playwright tests may create isolated PostgreSQL fixtures — do not point browser tests at a shared database.
+Install Chromium with `npx playwright install chromium` if the local Playwright browser is missing.
 
-### Performance and operational checks
+### Migration and operational verification
 
 ```bash
-npm run perf:profile-account
-npm run perf:job-board
-npm run perf:image-search
-npm run perf:admin-management
-npm run perf:messaging
-npm run smoke:messaging:server
+npm run db:migrations:check
+npm run db:verify
 npm run ocr:supply-chain
+npm run perf:image-search:self-test
+npm run smoke:messaging:server
 ```
 
-### Test organization
+Feature-specific migration verifiers are available for business verification, candidate matching, notifications, job review/management, applications, profile discovery, professional connections, and recruitment analytics. Inspect `package.json` and `web/package.json` for the complete current command list.
 
-Tests are separated by concern under `web/tests/`: `backend/unit`, `backend/integration`, `backend/contract`, `frontend/components`, `frontend/accessibility`, `architecture`, `security`, `performance`, `system/e2e`, and `usability`.
+## Documentation map
 
-## Document
+### Governing architecture and feature design
 
-### Project structure
+- [Project constitution](spec-kit/.specify/memory/constitution.md) — human authority, privacy, data integrity, AI, performance, and architecture rules.
+- [Feature specifications](spec-kit/specs/) — numbered feature specs, plans, contracts, tasks, and quickstarts.
+- [AI project overview and OCR roadmap](docs/architecture/AI_PROJECT_OVERVIEW_AND_OCR_ROADMAP.md).
+- [System context diagram](<docs/diagrams/system context diagram/System_Context.md>).
+- [Container diagram](<docs/diagrams/container component diagrams/container_diagram.md>).
+- [Frontend component diagram](<docs/diagrams/container component diagrams/Frontend_Component.md>).
+- [Backend component diagram](<docs/diagrams/container component diagrams/backend_component_diagram.md>).
+- [Deployment diagram](<docs/diagrams/deployment diagram/deployment_diagram.md>).
 
-```text
-.
-|-- compose.yaml                         # Local PostgreSQL/scanner/OCR/workers
-|-- Dockerfile.admin-worker
-|-- Dockerfile.image-search-worker
-|-- Dockerfile.ocr-engine
-|-- package.json                         # Root npm workspace commands
-|-- package-lock.json                    # Single authoritative lockfile
-|-- scripts/                             # Setup, dev supervisor, DB and checks
-|-- infra/clamav/                        # clamd/FreshClam configuration
-|-- ocr-engine/                          # Isolated Python OCR service and models
-|-- deploy/                              # Reviewed deployment policies/evidence
-|-- docs/                                # Supporting project documentation
-|-- spec-kit/
-|   |-- .specify/                        # Spec Kit templates, memory, scripts
-|   `-- specs/                           # Feature specs/plans/contracts/tasks
-`-- web/
-    |-- server.ts                        # Next.js + Socket.IO custom entrypoint
-    |-- Dockerfile.cv-worker
-    |-- prisma/
-    |   |-- schema.prisma
-    |   `-- migrations/
-    |-- scripts/                         # Worker, seed, probe, perf, smoke tools
-    |-- src/
-    |   |-- app/                         # Pages and thin Route Handlers
-    |   |-- frontend/features/           # Feature UI and client adapters
-    |   |-- backend/                     # Services, repositories, providers
-    |   `-- shared/                      # Transport-neutral contracts/types
-    |-- tests/
-    `-- *.config.*                       # Next, Prisma, lint, test, CSS configs
+### Operations and security
+
+- [Authentication security](docs/operations/authentication-security.md).
+- [Profile and account security](docs/operations/profile-account-security.md).
+- [Profile and account data lifecycle](docs/operations/profile-account-data-lifecycle.md).
+- [Job-board data lifecycle](docs/operations/job-board-data-lifecycle.md).
+- [Database migration operations](docs/operations/database-migrations.md).
+- [Transactional email operations](docs/operations/transactional-email.md).
+- [Platform Administrator grants runbook](docs/runbooks/platform-administrator-grants.md).
+
+### Testing and review
+
+- [PA5 test plan](docs/testing/PA5_Testing.md).
+- [OCR image-search inspector guide](docs/testing/feature-005-image-search-inspector.md).
+- [OCR image-search usability guide](docs/testing/feature-005-image-search-usability.md).
+- [Recruiter workspace UI regression guide](docs/testing/recruiter-workspace-ui-regression.md).
+- [Business verification plan](spec-kit/specs/014-business-verification-enrichment/plan.md).
+- [Candidate profile discovery plan](spec-kit/specs/027-candidate-profile-discovery/plan.md).
+
+Operational documents may preserve historical version snapshots. Before executing a command, confirm the current script and dependency versions in the root and web package files.
+
+## Security privacy and AI boundaries
+
+### Authentication and authorization
+
+- Browser authentication uses server-controlled, database-backed Better Auth sessions; credentials are not stored in browser local or session storage.
+- State-changing routes enforce authentication, authorization, origin/CSRF validation, input schemas, and rate limits appropriate to their trust boundary.
+- Recruiter operations revalidate current company membership and resource authority on the server.
+- Candidate document and profile access is application-scoped or visibility-projected; knowing an identifier does not grant access.
+- Administrator access is isolated by exact host and strengthened by TOTP, recent-auth/step-up, session, rationale, and audit controls where required.
+
+### Personal and sensitive data
+
+- Never log or commit CV content, image-search input, messages, reports, evidence, secrets, provider payloads, local mail, or database dumps.
+- Local CV and image-search artifacts use purpose-separated encryption keys and private directories.
+- Production artifact storage requires approved private S3/KMS configuration and role credentials.
+- Image-search source artifacts are ephemeral and default to a 15-minute retention window.
+- Backup runs create encrypted PostgreSQL dumps before upload to the configured Google Drive destination.
+- Retention, deletion, legal-hold, and audit behavior must remain aligned with the project constitution and applicable personal-data obligations.
+
+### AI and recruitment authority
+
+- SmartHire is AI-assisted, not autonomous.
+- The approved hybrid score is 40% deterministic matching and 60% AI analysis, with human-readable explanations and deterministic-only fallback.
+- AI analysis requires the relevant candidate consent and approved provider configuration.
+- AI must not automatically reject, hire, advance, or irreversibly disadvantage a candidate.
+- Recruiters retain control of pipeline transitions and recruitment decisions.
+- Candidates review CV-derived profile changes before they are saved.
+- Image-query AI proposes search criteria only; deterministic job discovery applies visibility, availability, filtering, sorting, and pagination.
+- Provider failures must fail closed or degrade to an explicitly supported deterministic state, never silently bypass privacy or authorization controls.
+
+Report suspected authentication bypass, tenant leakage, exposed credentials, or personal-data disclosure privately to the maintainers. Do not place sensitive reproduction data in a public issue.
+
+## Troubleshooting
+
+### `NEXT_OUTPUT_IN_USE` or `web/.next` is locked
+
+Another SmartHire development server owns the Next.js output directory. Use the PID reported in the error:
+
+```powershell
+Get-Process -Id <PID>
+Stop-Process -Id <PID>
+npm run dev
 ```
 
-### Environment configuration
+If that process no longer exists, verify no Node process is using this checkout before removing the stale `web/.local/next-output.lock` file. Do not delete the lock while a valid server is running.
 
-Templates: `.env.example` (Docker, PostgreSQL, CV, OCR, image-search) and `web/.env.example` (application, auth, origin, email, storage, provider, admin, messaging). Local generated files are `.env` and `web/.env.local` — never commit either. The environment parser fails closed when required fixed values, key separation, storage paths, production approvals, or exact origins are invalid.
+### Port 3001 is already in use
 
-Feature 014 business-registry lookup is enabled in the environment template with `BUSINESS_REGISTRY_PROVIDER=vietqr` and uses VietQR's public business endpoint; set it to `disabled` to test fail-closed provider handling. `BUSINESS_REGISTRY_TIMEOUT_MS` and `BUSINESS_REGISTRY_RESPONSE_LIMIT_BYTES` bound server-side requests and responses. Only a matched or partial exact-identifier result unlocks later preparation steps, and it never auto-approves an employer.
+Stop the existing SmartHire `dev` or `start` process. Docker does not own port `3001`.
 
-### Specification workflow
+### Docker or a worker is unavailable
 
-Feature artifacts live under `spec-kit/specs/<number>-<feature>/` and typically include `spec.md`, `plan.md`, `research.md`, `data-model.md`, `contracts/`, `tasks.md`, and `quickstart.md`. Documented functional groups include identity, candidate profile, job-board/search, CV import, OCR/image search, platform administration, and realtime messaging. `spec-kit/.specify/memory/constitution.md` is authoritative for security, privacy, human control, data integrity, quality, and architecture boundaries.
+```bash
+docker compose ps
+npm run infra:up
+```
 
-### Realtime messaging reference
+If an explicitly stopped worker does not restart, `restart: unless-stopped` is respecting the operator stop; recover it with `npm run dev` or `npm run infra:up`.
 
-Messaging REST endpoints live under `/api/messaging/**`; Socket.IO uses the single `/chat` namespace attached by `web/server.ts`. The existing HttpOnly Better Auth cookie authenticates both HTTP and socket handshakes. Feature contracts and verification evidence are in `spec-kit/specs/008-realtime-messaging/`.
+### ClamAV is unhealthy or signatures are stale
 
-### Security and privacy notes
+```bash
+docker compose logs --tail 100 clamav
+docker compose logs --tail 100 cv-worker
+npm run cv:scanner:check
+```
 
-- Never commit `.env`, `web/.env.local`, local email capture, private evidence, uploaded CVs, image-search inputs, database dumps, or provider credentials.
-- Authentication credentials exist only in server-controlled cookies — no browser JWTs or local/session storage credentials.
-- Every company-scoped operation must revalidate current membership and tenant authority on the server.
-- Logs and audit events must not contain CV/message/report text, secrets, or unnecessary personal data.
-- Production traffic requires HTTPS and an exact-host reverse proxy.
-- AI never owns job retrieval, hiring decisions, application state transitions, or profile writes — candidates review CV-derived profile changes, and humans retain recruitment authority.
-- Security defects (authentication bypass, tenant leakage, exposed secrets, personal data) should not be reported in a public issue with reproduction data — contact the maintainers privately.
+Restore network access and allow FreshClam to update. Do not bypass the signature-freshness gate.
 
-### Contributing
+### Environment validation reports a provider error
 
-1. Create or select the appropriate feature branch and Spec Kit artifacts.
-2. Keep unrelated user changes intact; do not rewrite existing migration history or generated secrets.
-3. Preserve Route Handler → service → repository layering.
-4. Add contract, authorization, integration, accessibility, and architecture tests in proportion to the change.
-5. Run the focused suite plus baseline typecheck/build gates.
-6. Update the relevant spec/plan/tasks/quickstart and this README when commands, setup, topology, or user-visible capabilities change.
-7. Commit only reviewed source and documentation — never commit local artifacts or environment files.
+- Confirm `OPENAI_API_KEY` is non-empty in both `.env` and `web/.env.local`.
+- Keep CV, image-search encryption, rate, and capability keys distinct.
+- Run `npm run env:init`, then `npm run env:check`.
+- For production, satisfy the explicit storage and privacy approvals rather than copying local-development values.
+
+### PostgreSQL is unavailable
+
+```bash
+npm run db:status
+npm run db:logs
+npm run db:up
+```
+
+The host application uses `localhost:55432`; Docker workers use `postgres:5432`.
+
+### A migration name or sequence is rejected
+
+Migration directories must follow `NNN_snake_case` and form the checked sequence:
+
+```bash
+npm run db:migrations:check
+npm run db:migrations:reconcile-names
+```
+
+Review reconciliation output before applying it. Use `npm run db:migrations:reconcile-names -- --apply` only when the database history is known and backed up.
+
+### Prisma reports `P3018`, `P3009`, or an existing relation
+
+Do not reset the database, delete migration folders, edit an applied migration, or blindly mark it applied. First inspect:
+
+```bash
+npm run db:migrations:check
+npm run db:status
+npm run db:verify
+```
+
+Compare `_prisma_migrations`, the actual schema object, and the migration SQL. Use `prisma migrate resolve` only after determining whether the failed migration was rolled back or manually completed. See [Database migration operations](docs/operations/database-migrations.md).
+
+### An exact-host surface does not open
+
+Use `localhost`, not an arbitrary loopback alias:
+
+- Candidate: `http://localhost:3001`.
+- Recruiter: `http://console.recruiter.localhost:3001`.
+- Administrator: `http://console.admin.localhost:3001`.
+
+Check origin variables if a reverse proxy or non-default environment is involved.
+
+### A workspace module cannot be resolved
+
+Stop the development server and run `npm ci` from the repository root. Do not create an independent lockfile or dependency installation under `web/`.
+
+## Contributing
+
+1. Read the root [`AGENTS.md`](AGENTS.md), the applicable nested instructions, the project constitution, and the current feature plan before editing.
+2. Preserve unrelated working-tree changes and keep each change scoped to its stated feature.
+3. Maintain the Route Handler → application service → repository/provider layering.
+4. Enforce authorization and tenant boundaries on the server, not only in UI visibility.
+5. Treat generated Prisma output as generated; change the schema or migrations and regenerate it.
+6. Never rewrite an applied migration. Add a forward migration and verify the complete sequence.
+7. Add contract, unit, integration, security, accessibility, architecture, performance, and E2E coverage in proportion to the risk.
+8. Run the focused suite plus `lint`, `typecheck`, and `build` before opening a pull request.
+9. Update specs, operational documentation, and this README when commands, topology, environment requirements, or user-visible behavior changes.
+10. Never commit environment files, local artifacts, credentials, personal data, captured email, or database dumps.
 
 ## License
 
-This repository currently has no root `LICENSE` file and is not licensed for public reuse. Third-party dependencies and referenced examples retain their own licenses. Add an approved root license before publishing or redistributing the project.
+This repository currently has no root `LICENSE` file and is not licensed for public reuse. Third-party dependencies and referenced materials retain their own licenses. Add an approved root license before publishing, redistributing, or inviting external reuse.

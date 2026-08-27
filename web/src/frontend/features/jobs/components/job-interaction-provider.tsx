@@ -16,6 +16,8 @@ import {
   userJobStateViewSchema,
   type UserJobState,
 } from "@/shared/contracts/jobs/catalog";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { jobCopy } from "./job-copy";
 
 export type JobInteractionSeed = {
   saved: boolean;
@@ -83,6 +85,8 @@ export function JobInteractionProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = useMemo(() => jobCopy(locale), [locale]);
   const csrfProof = useCsrfProof();
   const [records, setRecords] = useState<Record<string, JobInteractionRecord>>(
     {},
@@ -153,12 +157,7 @@ export function JobInteractionProvider({
       );
       const body: unknown = await response.json();
       if (!response.ok) {
-        const problem = body as { message?: unknown };
-        throw new Error(
-          typeof problem.message === "string"
-            ? problem.message
-            : "Could not update this saved job. Try again.",
-        );
+        throw new Error(copy.updateFailed);
       }
       const outcome = savedJobOutcomeSchema.parse(body);
       setRecords((state) => ({
@@ -169,10 +168,16 @@ export function JobInteractionProvider({
           hidden: state[jobId]?.hidden ?? false,
         },
       }));
-      toast(outcome.saved ? "Saved to Saved Jobs" : "Removed from Saved Jobs");
+      toast(outcome.saved ? copy.savedSuccess : copy.removedSuccess);
       return outcome.saved;
     },
-    [csrfProof, records],
+    [
+      copy.removedSuccess,
+      copy.savedSuccess,
+      copy.updateFailed,
+      csrfProof,
+      records,
+    ],
   );
 
   const markApplied = useCallback((jobId: string) => {
@@ -230,16 +235,16 @@ export function JobInteractionProvider({
       void syncUserJobState(csrfProof, { action: "hide", jobId }).catch(
         () => undefined,
       );
-      toast("Job hidden from your list", {
-        description: "You can undo this for the next 5 seconds.",
+      toast(copy.jobHidden, {
+        description: copy.jobHiddenDescription,
         duration: 5000,
         action: {
-          label: "Undo",
+          label: copy.undo,
           onClick: () => undoHide(jobId),
         },
       });
     },
-    [csrfProof, undoHide],
+    [copy.jobHidden, copy.jobHiddenDescription, copy.undo, csrfProof, undoHide],
   );
 
   const saveFilterPreset = useCallback(
@@ -252,11 +257,11 @@ export function JobInteractionProvider({
         filters,
       };
       setSavedFilterPresets((current) => [preset, ...current].slice(0, 100));
-      toast("Filter saved", {
-        description: "\u201c" + preset.name + "\u201d is ready to reuse.",
+      toast(copy.filterSaved, {
+        description: copy.filterSavedDescription(preset.name),
       });
     },
-    [],
+    [copy],
   );
 
   const value = useMemo(

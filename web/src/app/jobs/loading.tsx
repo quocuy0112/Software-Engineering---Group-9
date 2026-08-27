@@ -1,4 +1,9 @@
-export default function JobsLoading() {
+import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
+import { jobCopy } from "@/frontend/features/jobs/components/job-copy";
+
+export default async function JobsLoading() {
+  const context = await getWorkspaceContext();
+  const copy = jobCopy(context?.initialLocale ?? "en");
   return (
     <div className="jobs-page job-redesign-page">
       <div
@@ -10,8 +15,8 @@ export default function JobsLoading() {
       >
         <span className="job-loading-bar" aria-hidden="true" />
         <span>
-          <strong>Loading job opportunities…</strong>
-          <small>Preparing verified listings and your selected filters.</small>
+          <strong>{copy.loadingJobs}</strong>
+          <small>{copy.loadingJobsDescription}</small>
         </span>
       </div>
       <div className="job-loading-cards" aria-hidden="true">

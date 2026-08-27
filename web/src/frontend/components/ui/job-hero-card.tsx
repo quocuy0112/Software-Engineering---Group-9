@@ -21,6 +21,10 @@ export type JobHeroCardProps = {
   backHref?: string;
   backLabel?: string;
   eyebrow?: string;
+  verifiedLabel?: string;
+  statusLabelPrefix?: string;
+  keyInformationLabel?: string;
+  actionsLabel?: string;
   className?: string;
 };
 
@@ -42,6 +46,10 @@ export function JobHeroCard({
   backHref = "/jobs",
   backLabel = "Back to jobs",
   eyebrow = "A role worth your next move",
+  verifiedLabel = "Verified SmartHire employer",
+  statusLabelPrefix = "Job status",
+  keyInformationLabel = "Key job information",
+  actionsLabel = "Job actions",
   className = "",
 }: JobHeroCardProps) {
   return (
@@ -57,7 +65,7 @@ export function JobHeroCard({
         <span
           className="job-state"
           data-state={status.toLowerCase()}
-          aria-label={`Job status: ${status}`}
+          aria-label={`${statusLabelPrefix}: ${status}`}
         >
           <span className="job-state__dot" aria-hidden="true" />
           {status}
@@ -70,7 +78,7 @@ export function JobHeroCard({
           <p className="job-company-name">{company.displayName}</p>
           {verified ? (
             <span className="job-verified-inline">
-              <span aria-hidden="true">✓</span> Verified SmartHire employer
+              <span aria-hidden="true">✓</span> {verifiedLabel}
             </span>
           ) : null}
         </div>
@@ -79,7 +87,10 @@ export function JobHeroCard({
       <p className="job-detail-eyebrow">{eyebrow}</p>
       <h1>{title}</h1>
 
-      <div className="job-detail-quick-info" aria-label="Key job information">
+      <div
+        className="job-detail-quick-info"
+        aria-label={keyInformationLabel}
+      >
         {stats.map((stat) => (
           <StatChip
             key={stat.label}
@@ -98,7 +109,7 @@ export function JobHeroCard({
         </div>
       ) : null}
 
-      <div className="job-detail-action-row" aria-label="Job actions">
+      <div className="job-detail-action-row" aria-label={actionsLabel}>
         {actions ?? (
           <div className="job-detail-primary-actions">
             {applyAction ??

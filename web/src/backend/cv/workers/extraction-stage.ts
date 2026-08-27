@@ -15,7 +15,10 @@ import { mergeHybridCvSegments } from "@/backend/cv/extraction/hybrid-segments";
 import { PrivateRasterWorkspace } from "@/backend/cv/extraction/private-raster-workspace";
 import type { PrivateCvStorage } from "@/backend/cv/storage/private-cv-storage";
 import { prisma } from "@/backend/database/prisma";
-import { OCR_EXPECTED_MODEL_MANIFEST_SHA256 } from "@/backend/image-search/config";
+import {
+  OCR_EXPECTED_ENGINE_VERSION,
+  OCR_EXPECTED_MODEL_MANIFEST_SHA256,
+} from "@/backend/image-search/config";
 import type { OcrEngine } from "@/backend/ocr/ocr-engine";
 import { UnixOcrEngine } from "@/backend/ocr/unix-ocr-engine";
 import { PrismaOcrProcessingRepository } from "@/backend/repositories/cv-import/prisma-ocr-processing-repository";
@@ -60,7 +63,7 @@ function defaults(): Dependencies {
     ocr: new UnixOcrEngine({
       socketPath: "/run/smarthire-ocr/ocr.sock",
       expectedEngineName: "paddleocr-onnx",
-      expectedEngineVersion: "1.0.0",
+      expectedEngineVersion: OCR_EXPECTED_ENGINE_VERSION,
       expectedModelName: "PP-OCRv6-medium",
     }),
     ocrRepository: new PrismaOcrProcessingRepository(),
@@ -348,7 +351,7 @@ export class ExtractionStageProcessor {
           now: cvStageCurrentTime(context),
           manifest,
           engineName: "paddleocr-onnx",
-          engineVersion: "1.0.0",
+          engineVersion: OCR_EXPECTED_ENGINE_VERSION,
           modelName: "PP-OCRv6-medium",
           modelManifestSha256: OCR_EXPECTED_MODEL_MANIFEST_SHA256,
           runtimeName: "onnxruntime",
@@ -411,6 +414,7 @@ export class ExtractionStageProcessor {
                     sha256: createHash("sha256").update(bytes).digest(),
                   },
                   deadline: unitDeadline,
+                  computeDeadline: unitDeadline,
                   expectedModelManifestSha256:
                     OCR_EXPECTED_MODEL_MANIFEST_SHA256,
                   signal,

@@ -80,14 +80,18 @@ function bytes(value: number) {
   return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-async function validateLocalCv(file: File): Promise<string | null> {
+async function validateLocalCv(
+  file: File,
+  locale: "vi" | "en",
+  fallback: string,
+): Promise<string | null> {
   try {
     await validateCvFile(file);
     return null;
   } catch (error) {
-    return error instanceof CvFileValidationError
+    return locale === "en" && error instanceof CvFileValidationError
       ? error.message
-      : "Only PDF, DOC, or DOCX files are supported.";
+      : fallback;
   }
 }
 
@@ -263,7 +267,9 @@ export function PrivateMatchSetup({
           typeof body === "object" &&
           !Array.isArray(body) &&
           typeof (body as { message?: unknown }).message === "string"
-            ? (body as { message: string }).message
+            ? locale === "en"
+              ? (body as { message: string }).message
+              : setup.importFailure
             : setup.importFailure;
         throw new Error(message);
       }
@@ -290,7 +296,10 @@ export function PrivateMatchSetup({
       setLocalUploadComplete(true);
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : setup.importFailure;
+        error instanceof Error &&
+        (locale === "en" || error.message === setup.unsupportedFile)
+          ? error.message
+          : setup.importFailure;
       setLocalFile(null);
       if (fileInput.current) fileInput.current.value = "";
       showLocalCvError(message);
@@ -628,7 +637,11 @@ export function PrivateMatchSetup({
                   setLocalUploadComplete(false);
                   void (async () => {
                     if (file) {
-                      const errorMessage = await validateLocalCv(file);
+                      const errorMessage = await validateLocalCv(
+                        file,
+                        locale,
+                        setup.invalidFile,
+                      );
                       if (errorMessage) {
                         setLocalFile(null);
                         input.value = "";

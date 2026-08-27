@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { authCopy, localizedAuthMessage } from "./auth-copy";
 
 const FALLBACK_EMAIL = "candidate@example.com";
 const RESEND_COOLDOWN_SECONDS = 60;
@@ -34,6 +36,8 @@ function providerFor(email: string) {
 }
 
 export function CheckEmailView() {
+  const locale = useWorkspaceLocale();
+  const copy = authCopy(locale);
   const searchParams = useSearchParams();
   const storedEmail = useSyncExternalStore(
     () => () => undefined,
@@ -81,11 +85,11 @@ export function CheckEmailView() {
       } | null;
       if (!response.ok) throw new Error(result?.message);
       setCooldown(RESEND_COOLDOWN_SECONDS);
-      toast.success(result?.message ?? "Verification email sent.");
-    } catch {
-      toast.error(
-        "We couldn't resend the verification email. Please try again.",
+      toast.success(
+        localizedAuthMessage(locale, result?.message, copy.checkEmail.sent),
       );
+    } catch {
+      toast.error(copy.checkEmail.resendError);
     } finally {
       setIsResending(false);
     }
@@ -97,11 +101,8 @@ export function CheckEmailView() {
         <MailCheck size={28} strokeWidth={2.2} />
       </div>
       <div className="check-email-copy">
-        <h1 id="check-email-title">Check your email</h1>
-        <p>
-          If the address can be registered, a verification link has been sent
-          to:
-        </p>
+        <h1 id="check-email-title">{copy.checkEmail.title}</h1>
+        <p>{copy.checkEmail.description}</p>
         <span className="check-email-address">
           <Mail size={15} aria-hidden="true" />
           {email}
@@ -113,7 +114,9 @@ export function CheckEmailView() {
         onClick={openInbox}
       >
         <ExternalLink size={17} aria-hidden="true" />
-        {provider ? `Open ${provider.name}` : "Open email inbox"}
+        {provider
+          ? copy.checkEmail.openProvider(provider.name)
+          : copy.checkEmail.openInbox}
       </button>
       <button
         className="check-email-resend"
@@ -122,18 +125,19 @@ export function CheckEmailView() {
         disabled={cooldown > 0 || isResending}
       >
         {isResending ? (
-          "Resending verification email…"
+          copy.checkEmail.resending
         ) : cooldown > 0 ? (
-          `Resend available in ${cooldown}s`
+          copy.checkEmail.resendAvailable(cooldown)
         ) : (
           <>
-            Didn't receive an email? <span>Click to resend</span>
+            {copy.checkEmail.didNotReceive} {" "}
+            <span>{copy.checkEmail.clickToResend}</span>
           </>
         )}
       </button>
       <div className="check-email-sign-in">
-        <span>Already have an account?</span>
-        <Link href="/login">Sign in →</Link>
+        <span>{copy.checkEmail.haveAccount}</span>
+        <Link href="/login">{copy.checkEmail.signIn}</Link>
       </div>
     </section>
   );

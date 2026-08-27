@@ -50,6 +50,16 @@ describe("image-search public contracts", () => {
       failureCode: null,
     };
     expect(imageSearchStatusResponseSchema.parse(status)).toEqual(status);
+    for (const failureCode of [
+      "OCR_NO_TEXT",
+      "OCR_PARTIAL",
+      "OCR_DEADLINE_EXCEEDED",
+    ] as const) {
+      expect(
+        imageSearchStatusResponseSchema.parse({ ...status, failureCode })
+          .failureCode,
+      ).toBe(failureCode);
+    }
     expect(
       imageSearchStatusResponseSchema.safeParse({
         ...status,

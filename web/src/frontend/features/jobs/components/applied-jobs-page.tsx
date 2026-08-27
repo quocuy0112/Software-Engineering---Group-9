@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   applicationStageGroup,
-  applicationStageLabel,
-  applicationStageNextStep,
   applicationStageSchema,
   candidateApplicationListResponseSchema,
   type ApplicationStage,
@@ -15,12 +13,37 @@ import {
 import { EmptyState } from "./job-empty-state";
 import { ApplicationStageBadge } from "./application-stage-badge";
 import { CompanyAvatar } from "./company-avatar";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { applicationCopy } from "@/frontend/features/candidate-applications/i18n/application-copy";
 
 type GroupFilter = "ALL" | ApplicationStageGroup;
 
 function scoringFailureMessage(
   code: CandidateApplicationSummary["scoringFailureCode"],
+  locale: "vi" | "en",
 ) {
+  if (locale === "vi") {
+    switch (code) {
+      case "SCORING_CV_TEXT_UNAVAILABLE":
+      case "CV_TEXT_UNAVAILABLE":
+      case "CV_TEXT_TOO_SHORT":
+      case "CV_TEXT_INVALID":
+        return "Không thể đọc nội dung từ tệp này. Hãy đảm bảo đây là CV dạng văn bản, không phải ảnh quét.";
+      case "CV_NOT_RECOGNIZED_AS_CV":
+        return "Tệp đã tải lên không có vẻ là một CV hợp lệ. Hãy tải lên tệp có thông tin về kinh nghiệm, học vấn và kỹ năng.";
+      case "CV_CLASSIFICATION_TIMEOUT":
+        return "Xác minh CV mất quá nhiều thời gian. Hãy tải tệp lên lại.";
+      case "CV_CLASSIFICATION_UNAVAILABLE":
+      case "CV_CLASSIFICATION_MALFORMED":
+      case "CV_CLASSIFICATION_NOT_CONFIGURED":
+        return "Không thể xác minh CV lúc này. Hãy thử tải lên lại.";
+      case "SCORING_TIMEOUT":
+      case "SCORING_RETRY_LIMIT_REACHED":
+        return "Phân tích CV mất quá nhiều thời gian. Hãy tải CV lên lại.";
+      default:
+        return "Phân tích CV không thành công. Hãy tải CV lên lại.";
+    }
+  }
   switch (code) {
     case "SCORING_CV_TEXT_UNAVAILABLE":
     case "CV_TEXT_UNAVAILABLE":
@@ -43,16 +66,20 @@ function scoringFailureMessage(
   }
 }
 
-const groupFilters: Array<{ id: GroupFilter; label: string }> = [
-  { id: "ALL", label: "All" },
-  { id: "ACTIVE", label: "Active" },
-  { id: "ATTENTION", label: "Needs attention" },
-  { id: "PAUSED", label: "Paused" },
-  { id: "COMPLETED", label: "Completed" },
-];
+function groupFilters(
+  copy: ReturnType<typeof applicationCopy>["applicationsList"],
+): Array<{ id: GroupFilter; label: string }> {
+  return [
+    { id: "ALL", label: copy.filters.all },
+    { id: "ACTIVE", label: copy.filters.applicationSubmitted },
+    { id: "ATTENTION", label: copy.filters.outcome },
+    { id: "PAUSED", label: copy.filters.underReview },
+    { id: "COMPLETED", label: copy.filters.terminal },
+  ];
+}
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en", {
+function formatDate(value: string, locale: "vi" | "en") {
+  return new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -83,10 +110,13 @@ export function ApplicationFilters({
   onGroupChange: (group: GroupFilter) => void;
   onStageChange: (stage: "ALL" | ApplicationStage) => void;
 }) {
+  const copy = applicationCopy(useWorkspaceLocale());
+  const listCopy = copy.applicationsList;
+  const filters = groupFilters(listCopy);
   return (
     <div className="application-filters">
-      <div className="application-group-tabs" aria-label="Application group">
-        {groupFilters.map((filter) => (
+      <div className="application-group-tabs" aria-label={listCopy.groupAria}>
+        {filters.map((filter) => (
           <button
             key={filter.id}
             type="button"
@@ -100,17 +130,17 @@ export function ApplicationFilters({
         ))}
       </div>
       <label className="application-stage-filter">
-        <span>Stage</span>
+        <span>{listCopy.stage}</span>
         <select
           value={activeStage}
           onChange={(event) =>
             onStageChange(event.target.value as "ALL" | ApplicationStage)
           }
         >
-          <option value="ALL">All stages</option>
+          <option value="ALL">{listCopy.allStages}</option>
           {applicationStageSchema.options.map((stage) => (
             <option key={stage} value={stage}>
-              {applicationStageLabel[stage]}
+              {listCopy.statuses[stage]}
             </option>
           ))}
         </select>
@@ -124,6 +154,10 @@ export function ApplicationCard({
 }: {
   application: CandidateApplicationSummary;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = applicationCopy(locale);
+  const listCopy = copy.applicationsList;
+  const stageNextStep = copy.stageNextStep;
   const title =
     application.jobAvailable && application.jobSlug ? (
       <Link href={`/jobs/${application.jobSlug}`}>{application.jobTitle}</Link>
@@ -150,41 +184,47 @@ export function ApplicationCard({
           <ApplicationStageBadge stage={application.stage} />
         </div>
 
-        <div className="application-card-meta" aria-label="Application details">
+        <div
+          className="application-card-meta"
+          aria-label={listCopy.applicationDetails}
+        >
           <span>{application.location}</span>
-          <span>Applied {formatDate(application.submittedAt)}</span>
-          <span>Updated {formatDate(application.lastStageChangedAt)}</span>
+          <span>
+            {listCopy.applied(formatDate(application.submittedAt, locale))}
+          </span>
+          <span>
+            {listCopy.updated(
+              formatDate(application.lastStageChangedAt, locale),
+            )}
+          </span>
         </div>
 
         {!application.jobAvailable ? (
-          <p className="application-unavailable-note">
-            This job is no longer available, but your application record is
-            preserved.
-          </p>
+          <p className="application-unavailable-note">{listCopy.unavailable}</p>
         ) : null}
 
         <div className="application-next-step">
           <span aria-hidden="true">i</span>
-          <p>{applicationStageNextStep[application.stage]}</p>
+          <p>{stageNextStep[application.stage]}</p>
         </div>
 
         <footer>
           <div>
             {application.scoringStatus === "FAILED" ? (
               <p className="application-scoring-error" role="alert">
-                {scoringFailureMessage(application.scoringFailureCode)}{" "}
+                {scoringFailureMessage(application.scoringFailureCode, locale)}{" "}
                 {application.jobAvailable && application.jobSlug ? (
                   <Link href={"/jobs/" + application.jobSlug + "/apply"}>
-                    Re-upload your CV to try again.
+                    {listCopy.reuploadCv}
                   </Link>
                 ) : (
-                  "Please contact support if you need help."
+                  listCopy.contactSupport
                 )}
               </p>
             ) : application.scoringStatus &&
               application.scoringStatus !== "NOT_REQUESTED" ? (
               <span className="application-scoring-status">
-                CV analysis: {application.scoringStatus.toLowerCase()}
+                {listCopy.cvAnalysis}: {application.scoringStatus.toLowerCase()}
               </span>
             ) : null}
           </div>
@@ -192,7 +232,7 @@ export function ApplicationCard({
             className="application-detail-link"
             href={`/jobs/applied/${encodeURIComponent(application.applicationId)}`}
           >
-            View application
+            {listCopy.viewApplication}
             <span aria-hidden="true">→</span>
           </Link>
         </footer>
@@ -208,6 +248,9 @@ export function AppliedJobsPage({
   applications: CandidateApplicationSummary[];
   nextCursor?: string | null;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = applicationCopy(locale);
+  const listCopy = copy.applicationsList;
   const [loadedApplications, setLoadedApplications] = useState(applications);
   const [nextCursor, setNextCursor] = useState(initialNextCursor);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -252,7 +295,7 @@ export function AppliedJobsPage({
       });
       setNextCursor(result.nextCursor);
     } catch {
-      setLoadMoreError("Couldn’t load more applications. Please try again.");
+      setLoadMoreError(listCopy.loadMoreError);
     } finally {
       setLoadingMore(false);
     }
@@ -265,13 +308,13 @@ export function AppliedJobsPage({
     >
       <header className="jobs-workspace-heading applications-heading">
         <div>
-          <p className="workspace-kicker">Candidate workspace</p>
-          <h1 id="applied-jobs-heading">My applications</h1>
-          <p>Follow every application and see what happens next.</p>
+          <p className="workspace-kicker">{listCopy.eyebrow}</p>
+          <h1 id="applied-jobs-heading">{listCopy.title}</h1>
+          <p>{listCopy.subtitle}</p>
         </div>
         <span
           className="jobs-workspace-count"
-          aria-label={`${loadedApplications.length} applications loaded`}
+          aria-label={listCopy.applicationsLoaded(loadedApplications.length)}
         >
           {loadedApplications.length}
         </span>
@@ -297,7 +340,7 @@ export function AppliedJobsPage({
             </div>
           ) : (
             <div className="workspace-inline-empty application-filter-empty">
-              <p>No applications match these filters.</p>
+              <p>{listCopy.noMatchesTitle}</p>
               <button
                 type="button"
                 onClick={() => {
@@ -305,7 +348,7 @@ export function AppliedJobsPage({
                   setActiveStage("ALL");
                 }}
               >
-                Clear filters
+                {listCopy.clearFilters}
               </button>
             </div>
           )}
@@ -317,7 +360,7 @@ export function AppliedJobsPage({
                 aria-busy={loadingMore}
                 onClick={loadMore}
               >
-                {loadingMore ? "Loading…" : "Load more applications"}
+                {loadingMore ? listCopy.loading : listCopy.loadMore}
               </button>
             </div>
           ) : null}
@@ -330,9 +373,9 @@ export function AppliedJobsPage({
       ) : (
         <EmptyState
           illustration="headset"
-          title="You have not applied to any jobs yet."
-          description="Start searching for the right opportunity and your applications will appear here."
-          cta={{ href: "/jobs", label: "Find jobs" }}
+          title={listCopy.emptyTitle}
+          description={listCopy.emptyDescription}
+          cta={{ href: "/jobs", label: listCopy.browseJobs }}
         />
       )}
     </section>

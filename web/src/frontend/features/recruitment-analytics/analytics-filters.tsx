@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import {
   addCalendarDays,
   createAnalyticsDateRange,
@@ -8,6 +9,7 @@ import {
   isValidAnalyticsDateRange,
   type AnalyticsDateRange,
 } from "./analytics-date-range";
+import { recruitmentAnalyticsCopy } from "./recruitment-analytics-copy";
 
 export function AnalyticsDateRangeControls({
   range,
@@ -15,7 +17,7 @@ export function AnalyticsDateRangeControls({
   grouping,
   onGroupingChange,
   busy = false,
-  label = "Reporting window",
+  label,
 }: {
   range: AnalyticsDateRange;
   onApply: (next: AnalyticsDateRange) => void;
@@ -24,13 +26,16 @@ export function AnalyticsDateRangeControls({
   busy?: boolean;
   label?: string;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = recruitmentAnalyticsCopy(locale).filters;
+  const effectiveLabel = label ?? copy.reportingWindow;
   const [fromDate, setFromDate] = useState(range.fromDate);
   const [toDate, setToDate] = useState(range.toDate);
   const [error, setError] = useState("");
 
   function apply(nextFrom = fromDate, nextTo = toDate) {
     if (!isValidAnalyticsDateRange(nextFrom, nextTo)) {
-      setError("Choose a start date before the end date.");
+      setError(copy.invalidRange);
       return;
     }
     setError("");
@@ -48,7 +53,7 @@ export function AnalyticsDateRangeControls({
   return (
     <form
       className="analytics-filter-bar"
-      aria-label={label}
+      aria-label={effectiveLabel}
       onSubmit={(event) => {
         event.preventDefault();
         apply();
@@ -57,13 +62,16 @@ export function AnalyticsDateRangeControls({
       <div className="analytics-filter-bar__title">
         <span aria-hidden="true">◷</span>
         <div>
-          <strong>{label}</strong>
+          <strong>{effectiveLabel}</strong>
           <small>
-            {formatAnalyticsRange(range)} · {range.timeZone}
+            {formatAnalyticsRange(range, locale)} · {range.timeZone}
           </small>
         </div>
       </div>
-      <div className="analytics-filter-bar__presets" aria-label="Date presets">
+      <div
+        className="analytics-filter-bar__presets"
+        aria-label={copy.datePresets}
+      >
         {[7, 30, 90].map((days) => (
           <button
             key={days}
@@ -76,33 +84,33 @@ export function AnalyticsDateRangeControls({
             onClick={() => applyPreset(days)}
             disabled={busy}
           >
-            {days === 7 ? "7 days" : days === 30 ? "30 days" : "90 days"}
+            {copy.days(days)}
           </button>
         ))}
       </div>
       <label>
-        <span>From</span>
+        <span>{copy.from}</span>
         <input
           type="date"
           value={fromDate}
           onChange={(event) => setFromDate(event.target.value)}
-          aria-label="Start date"
+          aria-label={copy.startDate}
           disabled={busy}
         />
       </label>
       <label>
-        <span>To (inclusive)</span>
+        <span>{copy.toInclusive}</span>
         <input
           type="date"
           value={toDate}
           onChange={(event) => setToDate(event.target.value)}
-          aria-label="End date"
+          aria-label={copy.endDate}
           disabled={busy}
         />
       </label>
       {grouping && onGroupingChange ? (
         <label>
-          <span>Group by</span>
+          <span>{copy.groupBy}</span>
           <select
             value={grouping}
             onChange={(event) =>
@@ -110,9 +118,9 @@ export function AnalyticsDateRangeControls({
             }
             disabled={busy}
           >
-            <option value="DAY">Day</option>
-            <option value="WEEK">Week</option>
-            <option value="MONTH">Month</option>
+            <option value="DAY">{copy.day}</option>
+            <option value="WEEK">{copy.week}</option>
+            <option value="MONTH">{copy.month}</option>
           </select>
         </label>
       ) : null}
@@ -121,7 +129,7 @@ export function AnalyticsDateRangeControls({
         className="analytics-filter-bar__apply"
         disabled={busy}
       >
-        {busy ? "Updating…" : "Apply"}
+        {busy ? copy.updating : copy.apply}
       </button>
       {error ? (
         <p className="analytics-filter-bar__error" role="alert">

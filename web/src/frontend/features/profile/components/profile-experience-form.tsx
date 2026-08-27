@@ -79,6 +79,7 @@ export function ProfileExperienceForm({
           add: "+ Thêm kinh nghiệm",
           addOther: "Thêm kinh nghiệm khác",
           addOtherSub: "Bổ sung công việc, dự án hoặc hoạt động ngoại khoá",
+          saved: "Kinh nghiệm đã lưu",
         }
       : {
           kicker: "Experience",
@@ -101,6 +102,7 @@ export function ProfileExperienceForm({
           add: "+ Add experience",
           addOther: "Add another experience",
           addOtherSub: "Add roles, projects, or extracurricular activities",
+          saved: "Saved experience",
         };
   const editLabel =
     locale === "vi" ? "Chỉnh sửa kinh nghiệm" : "Edit experience";
@@ -141,7 +143,7 @@ export function ProfileExperienceForm({
           hasExperience ? (
             <>
               <Timeline
-                aria-label="Saved experience"
+                aria-label={copy.saved}
                 className="profile-timeline"
               >
                 {profile.experience.map((entry, idx) => (

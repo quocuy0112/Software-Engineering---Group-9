@@ -1172,7 +1172,9 @@ export function LocationPicker({
 function BeforeAfterDemo({ vi }: { vi: boolean }) {
   return (
     <div className="image-search-demo" aria-hidden="true">
-      <span className="image-search-demo-poster">POSTER</span>
+      <span className="image-search-demo-poster">
+        {vi ? "ÁP PHÍCH" : "POSTER"}
+      </span>
       <span className="image-search-demo-arrow">→</span>
       <span className="image-search-demo-chips">
         <span>{vi ? "Vai trò" : "Role"}</span>
@@ -1423,7 +1425,9 @@ export function GlobalImageSearch({
                     <path d="m12.5 12.5 4 4" />
                   </svg>
                 </span>
-                <span className="global-image-search-submit-label">Search</span>
+                <span className="global-image-search-submit-label">
+                  {vi ? "Tìm kiếm" : "Search"}
+                </span>
               </button>
             ) : null}
           </form>
@@ -1441,7 +1445,9 @@ export function GlobalImageSearch({
                 <path d="m12.5 12.5 4 4" />
               </svg>
             </span>
-            <span className="global-image-search-submit-label">Search</span>
+            <span className="global-image-search-submit-label">
+              {vi ? "Tìm kiếm" : "Search"}
+            </span>
           </button>
         ) : null}
       </div>

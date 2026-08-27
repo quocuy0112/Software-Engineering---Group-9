@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { JobCard as JobCardData } from "@/shared/contracts/jobs/discovery";
-import { MAX_APPLICATION_ATTEMPTS_MESSAGE } from "@/shared/contracts/jobs/actions";
 import {
   formatRelativeTime,
   formatSalary,
@@ -14,35 +13,25 @@ import { JobMetaIcon } from "./job-meta-icon";
 import { QuickViewPanel } from "./quick-view-panel";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 import { SaveJobAction } from "./save-job-action";
-
-const labels: Record<string, string> = {
-  FULL_TIME: "Full time",
-  PART_TIME: "Part time",
-  CONTRACT: "Contract",
-  INTERNSHIP: "Internship",
-  TEMPORARY: "Temporary",
-  ENTRY: "Entry level",
-  JUNIOR: "Junior",
-  MID: "Mid-level",
-  SENIOR: "Senior",
-  LEAD: "Lead",
-  MANAGER: "Manager",
-  ONSITE: "On-site",
-  HYBRID: "Hybrid",
-  REMOTE: "Remote",
-};
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { jobCopy } from "./job-copy";
 
 export type JobCardVariant = "grid" | "row";
 export type JobCardTimeMode = "posted" | "updated";
 
-function timeLabel(job: JobCardData, timeMode: JobCardTimeMode) {
+function timeLabel(
+  job: JobCardData,
+  timeMode: JobCardTimeMode,
+  locale: "vi" | "en",
+) {
   const value =
     timeMode === "updated"
       ? (job.updatedAt ?? job.publishedAt)
       : job.publishedAt;
+  const copy = jobCopy(locale);
   return (
-    (timeMode === "updated" ? "Updated " : "Posted ") +
-    formatRelativeTime(value)
+    (timeMode === "updated" ? `${copy.updated} ` : `${copy.posted} `) +
+    formatRelativeTime(value, locale)
   );
 }
 
@@ -139,6 +128,7 @@ export function JobCardHeader({
   job: JobCardData;
   timeMode: JobCardTimeMode;
 }) {
+  const locale = useWorkspaceLocale();
   return (
     <header className="job-card-header job-redesign-card-header">
       <CompanyAvatar
@@ -157,7 +147,7 @@ export function JobCardHeader({
             (isSalaryNegotiable(job.salary) ? " job-salary--negotiable" : "")
           }
         >
-          {formatSalary(job.salary)}
+          {formatSalary(job.salary, locale)}
         </p>
         <p className="job-card-timing">
           <span className="job-card-timing-icon" aria-hidden="true">
@@ -170,7 +160,7 @@ export function JobCardHeader({
                 : job.publishedAt
             }
           >
-            {timeLabel(job, timeMode)}
+            {timeLabel(job, timeMode, locale)}
           </time>
         </p>
       </div>
@@ -179,10 +169,12 @@ export function JobCardHeader({
 }
 
 export function JobCardBody({ job }: { job: JobCardData }) {
+  const locale = useWorkspaceLocale();
+  const copy = jobCopy(locale);
   const tagValues = visibleTagValues(job);
   const secondaryTags = [
-    labels[job.employmentType] ?? job.employmentType,
-    labels[job.experienceLevel] ?? job.experienceLevel,
+    copy.employmentTypeLabels[job.employmentType] ?? job.employmentType,
+    copy.experienceLevelLabels[job.experienceLevel] ?? job.experienceLevel,
   ];
   const skillPreview = tagValues.slice(0, 3);
   const overflowTags = tagValues.slice(3);
@@ -196,7 +188,7 @@ export function JobCardBody({ job }: { job: JobCardData }) {
         <JobMetaIcon name="location" aria-hidden="true" />
         <span>{job.location}</span>
       </p>
-      <div className="job-card-tags" aria-label="Job tags">
+      <div className="job-card-tags" aria-label={copy.jobTags}>
         {secondaryTags.map((tag, index) => (
           <span
             className="job-card-tag job-card-tag--neutral"
@@ -212,9 +204,7 @@ export function JobCardBody({ job }: { job: JobCardData }) {
         ))}
         {overflowTags.length ? (
           <details className="job-card-overflow">
-            <summary
-              aria-label={"Show " + String(overflowTags.length) + " more tags"}
-            >
+            <summary aria-label={copy.showMoreTags(overflowTags.length)}>
               +{overflowTags.length}
             </summary>
             <div role="tooltip">{overflowTags.join(" | ")}</div>
@@ -226,18 +216,21 @@ export function JobCardBody({ job }: { job: JobCardData }) {
 }
 
 function SignInApplyLink({ job }: { job: JobCardData }) {
+  const copy = jobCopy(useWorkspaceLocale());
   const returnTo = "/jobs/" + job.slug + "/apply";
   return (
     <Link
       className="sh-button job-card-apply-button"
       href={"/login?returnTo=" + encodeURIComponent(returnTo)}
     >
-      Apply
+      {copy.apply}
     </Link>
   );
 }
 
 export function ApplyButton({ job }: { job: JobCardData }) {
+  const locale = useWorkspaceLocale();
+  const copy = jobCopy(locale);
   const shared = useOptionalJobInteraction();
   const applied =
     job.actions.applied || Boolean(shared?.records[job.id]?.applied);
@@ -245,14 +238,16 @@ export function ApplyButton({ job }: { job: JobCardData }) {
   if (applied) {
     return (
       <span role="status" className="job-applied-state">
-        Applied
+        {copy.applied}
       </span>
     );
   }
 
   if (job.actions.applicationLimitReached) {
     const message =
-      job.actions.applicationLimitMessage ?? MAX_APPLICATION_ATTEMPTS_MESSAGE;
+      locale === "vi"
+        ? copy.applicationLimitReached
+        : (job.actions.applicationLimitMessage ?? copy.applicationLimitReached);
     return (
       <span role="status" aria-label={message} className="job-closed-state">
         {message}
@@ -261,7 +256,7 @@ export function ApplyButton({ job }: { job: JobCardData }) {
   }
 
   if (!job.actions.canApply) {
-    return <span className="job-closed-state">Applications closed</span>;
+    return <span className="job-closed-state">{copy.applicationsClosed}</span>;
   }
 
   if (!job.actions.authenticated) return <SignInApplyLink job={job} />;
@@ -271,12 +266,13 @@ export function ApplyButton({ job }: { job: JobCardData }) {
       className="sh-button job-card-apply-button"
       href={"/jobs/" + job.slug + "/apply"}
     >
-      Apply
+      {copy.apply}
     </Link>
   );
 }
 
 export function SaveButton({ job }: { job: JobCardData }) {
+  const copy = jobCopy(useWorkspaceLocale());
   if (job.actions.authenticated && job.actions.canSave) {
     return (
       <SaveJobAction
@@ -292,8 +288,8 @@ export function SaveButton({ job }: { job: JobCardData }) {
     <Link
       className="job-icon-button job-heart-button"
       href={"/login?returnTo=" + encodeURIComponent("/jobs/" + job.slug)}
-      aria-label="Sign in to save this job"
-      title="Sign in to save this job"
+      aria-label={copy.signInToSave}
+      title={copy.signInToSave}
     >
       <SaveIcon />
     </Link>
@@ -307,14 +303,15 @@ export function HideButton({
   jobId: string;
   onHidden?: () => void;
 }) {
+  const copy = jobCopy(useWorkspaceLocale());
   const shared = useOptionalJobInteraction();
 
   return (
     <button
       className={hoverActionClassName}
       type="button"
-      aria-label="Hide job"
-      title="Hide job"
+      aria-label={copy.hideJob}
+      title={copy.hideJob}
       onClick={() => {
         shared?.hideJob(jobId);
         onHidden?.();
@@ -326,12 +323,13 @@ export function HideButton({
 }
 
 export function QuickViewButton({ onQuickView }: { onQuickView: () => void }) {
+  const copy = jobCopy(useWorkspaceLocale());
   return (
     <button
       className={hoverActionClassName}
       type="button"
-      aria-label="Quick view"
-      title="Quick view"
+      aria-label={copy.quickView}
+      title={copy.quickView}
       onClick={onQuickView}
     >
       <QuickViewIcon />
@@ -351,6 +349,7 @@ export function JobCardActions({
   onHidden?: () => void;
 }) {
   const [localQuickViewOpen, setLocalQuickViewOpen] = useState(false);
+  const copy = jobCopy(useWorkspaceLocale());
   const openQuickView = () => {
     if (onQuickView) onQuickView();
     else setLocalQuickViewOpen(true);
@@ -364,14 +363,14 @@ export function JobCardActions({
         }
       >
         {variant === "row" ? (
-          <div className="job-card-row-actions" aria-label="Job actions">
+          <div className="job-card-row-actions" aria-label={copy.jobActions}>
             <QuickViewButton onQuickView={openQuickView} />
             <HideButton jobId={job.id} onHidden={onHidden} />
             <SaveButton job={job} />
             <ApplyButton job={job} />
           </div>
         ) : (
-          <div className="job-card-grid-actions" aria-label="Job actions">
+          <div className="job-card-grid-actions" aria-label={copy.jobActions}>
             <QuickViewButton onQuickView={openQuickView} />
             <HideButton jobId={job.id} onHidden={onHidden} />
             <SaveButton job={job} />

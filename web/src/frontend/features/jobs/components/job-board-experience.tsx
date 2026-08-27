@@ -12,6 +12,8 @@ import { JobCardView } from "./job-card";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 import { useSearchParams } from "next/navigation";
 import { QuickViewPanel } from "./quick-view-panel";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { jobCopy } from "./job-copy";
 
 function salaryValue(job: JobCard, key: "minimum" | "maximum") {
   return job.salary?.[key] ?? -1;
@@ -86,6 +88,8 @@ export function JobBoardExperience({
   nextHref: string | null;
 }) {
   const shared = useOptionalJobInteraction();
+  const locale = useWorkspaceLocale();
+  const copy = jobCopy(locale);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const sortMode: JobSortMode = sortModeFromParams(searchParams);
@@ -153,27 +157,27 @@ export function JobBoardExperience({
       <FilterBar result={displayResult}>
         {error ? (
           <div className="job-panel job-feedback" role="alert">
-            <h3>Jobs could not be loaded</h3>
-            <p>{error}</p>
+            <h3>{copy.searchLoadError}</h3>
+            <p>{copy.searchResultsDescription}</p>
             {Object.keys(fieldErrors).length ? (
               <ul className="job-error-list">{fieldErrorList(fieldErrors)}</ul>
             ) : null}
             <Link className="job-secondary-link" href="/jobs">
-              Clear filters and retry
+              {copy.clearFiltersRetry}
             </Link>
           </div>
         ) : displayJobs.length ? (
           <>
             <header className="job-results-heading">
               <div>
-                <p className="panel-kicker">Open roles, clear signal</p>
+                <p className="panel-kicker">{copy.searchResultsKicker}</p>
                 <h2 id="job-results-heading">
-                  {visibleJobs.length} matching jobs
+                  {visibleJobs.length} {copy.matchingJobs}
                 </h2>
               </div>
-              <p>Showing the strongest opportunities for this view.</p>
+              <p>{copy.searchResultsDescription}</p>
             </header>
-            <ol className="job-list" aria-label="Matching jobs">
+            <ol className="job-list" aria-label={copy.matchingJobs}>
               {displayJobs.map((job) => (
                 <li key={job.id}>
                   <JobCardView
@@ -185,7 +189,7 @@ export function JobBoardExperience({
             </ol>
             {nextHref ? (
               <div className="job-pagination">
-                <Link href={nextHref}>Load more jobs</Link>
+                <Link href={nextHref}>{copy.loadMoreJobs}</Link>
               </div>
             ) : null}
           </>
@@ -194,13 +198,14 @@ export function JobBoardExperience({
             <span className="job-empty-icon" aria-hidden="true">
               ⌕
             </span>
-            <h3>No jobs match these criteria</h3>
+            <h3>{copy.noMatchingJobs}</h3>
             <p>
-              Try widening the location, salary, or experience range to see more
-              opportunities.
+              {locale === "vi"
+                ? "Hãy thử mở rộng phạm vi địa điểm, mức lương hoặc kinh nghiệm để xem thêm cơ hội."
+                : "Try widening the location, salary, or experience range to see more opportunities."}
             </p>
             <Link className="job-secondary-link" href="/jobs">
-              Clear all filters
+              {copy.clearAllFilters}
             </Link>
           </div>
         )}

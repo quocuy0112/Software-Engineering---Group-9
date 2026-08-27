@@ -14,6 +14,7 @@ import {
 } from "@/shared/contracts/identity/two-factor";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 import { localizeAccountMessage } from "../client/localized-account-feedback";
+import { localizedAuthFieldError } from "@/frontend/features/authentication/components/auth-copy";
 
 // Must stay in sync with `rateLimitPolicies.totpEnrollment` in policies.ts.
 const MAX_TOTP_ATTEMPTS = 5;
@@ -397,7 +398,11 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
           <PasswordField
             label={copy.password}
             autoComplete="current-password"
-            error={passwordForm.formState.errors.currentPassword?.message}
+            error={localizedAuthFieldError(
+              locale,
+              "currentPassword",
+              passwordForm.formState.errors.currentPassword?.message,
+            )}
             {...passwordForm.register("currentPassword")}
           />
           <button
@@ -452,7 +457,13 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
               })}
             />
             {codeForm.formState.errors.code ? (
-              <p role="alert">{codeForm.formState.errors.code.message}</p>
+              <p role="alert">
+                {localizedAuthFieldError(
+                  locale,
+                  "code",
+                  codeForm.formState.errors.code.message,
+                )}
+              </p>
             ) : null}
           </div>
           <button

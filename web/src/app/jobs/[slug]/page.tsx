@@ -8,6 +8,8 @@ import { JobServiceError } from "@/backend/services/jobs/job-types";
 import { optionalJobActor } from "@/backend/security/job-request-boundary";
 import { QualifiedViewService } from "@/backend/analytics/qualified-view-service";
 import { JobDetailView } from "@/frontend/features/jobs/components/job-detail";
+import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
+import { jobCopy } from "@/frontend/features/jobs/components/job-copy";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -34,6 +36,8 @@ async function load(slug: string) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const context = await getWorkspaceContext();
+  const copy = jobCopy(context?.initialLocale ?? "en");
   try {
     const job = await load((await params).slug);
     return {
@@ -43,13 +47,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   } catch {
     return {
-      title: "Job unavailable · SmartHire",
+      title: `${copy.unavailableTitle} · SmartHire`,
       robots: { index: false, follow: false },
     };
   }
 }
 
 export default async function JobDetailPage({ params }: Props) {
+  const context = await getWorkspaceContext();
+  const copy = jobCopy(context?.initialLocale ?? "en");
   let job: Awaited<ReturnType<typeof load>> | null = null;
   let failed = false;
   try {
@@ -62,10 +68,10 @@ export default async function JobDetailPage({ params }: Props) {
     return (
       <div className="jobs-page jobs-detail-page">
         <div className="job-panel job-feedback" role="alert">
-          <h1>Job details could not be loaded</h1>
-          <p>Try again in a moment.</p>
+          <h1>{copy.detailsLoadError}</h1>
+          <p>{copy.tryAgainLater}</p>
           <Link className="job-secondary-link" href="/jobs">
-            Back to jobs
+            {copy.backToJobs}
           </Link>
         </div>
       </div>

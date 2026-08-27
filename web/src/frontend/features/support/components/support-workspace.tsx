@@ -33,7 +33,7 @@ function supportCopy(locale: "vi" | "en") {
         submitting: "Đang gửi…",
         create: "Tạo yêu cầu",
         disabledHint: "Điền đầy đủ Tiêu đề và Nội dung để gửi yêu cầu",
-        yourCases: "Recently cases",
+        yourCases: "Yêu cầu gần đây",
         noCases: "Chưa có yêu cầu hỗ trợ.",
         selectCase: "Chọn một yêu cầu",
         selectCaseCopy: "Chọn yêu cầu đã có hoặc tạo yêu cầu mới ở bên trái.",
@@ -44,6 +44,7 @@ function supportCopy(locale: "vi" | "en") {
         deletedContent:
           "Nội dung tin nhắn đã được xoá theo chính sách lưu trữ.",
         reply: "Trả lời đội ngũ hỗ trợ SmartHire",
+        replyPlaceholder: "Viết phản hồi…",
         sendHint: "Enter để gửi; Shift + Enter để xuống dòng",
         sending: "Đang gửi…",
         reopen: "Trả lời và mở lại",
@@ -88,7 +89,7 @@ function supportCopy(locale: "vi" | "en") {
         submitting: "Submitting…",
         create: "Create case",
         disabledHint: "Fill in Subject and Description to submit",
-        yourCases: "Recently cases",
+        yourCases: "Recent cases",
         noCases: "No support cases yet.",
         selectCase: "Select a case",
         selectCaseCopy:
@@ -100,6 +101,7 @@ function supportCopy(locale: "vi" | "en") {
         deletedContent:
           "Message content was deleted under the retention policy.",
         reply: "Reply to SmartHire Support",
+        replyPlaceholder: "Write a reply…",
         sendHint: "Enter to send; Shift+Enter for a new line",
         sending: "Sending…",
         reopen: "Reply and reopen",
@@ -201,7 +203,8 @@ export function SupportWorkspace({
       void refreshDetail(selectedId).catch((reason) => {
         if (active)
           setError(
-            reason instanceof Error &&
+            locale === "en" &&
+              reason instanceof Error &&
               reason.message !== "SUPPORT_REQUEST_FAILED"
               ? reason.message
               : copy.requestError,
@@ -212,7 +215,7 @@ export function SupportWorkspace({
       active = false;
       window.clearTimeout(loadDetail);
     };
-  }, [copy.requestError, refreshDetail, selectedId]);
+  }, [copy.requestError, locale, refreshDetail, selectedId]);
   const connection = useSupportInvalidation(
     useCallback(
       (event) => {
@@ -253,7 +256,9 @@ export function SupportWorkspace({
       await refreshCases();
     } catch (reason) {
       setError(
-        reason instanceof Error && reason.message !== "SUPPORT_REQUEST_FAILED"
+        locale === "en" &&
+          reason instanceof Error &&
+          reason.message !== "SUPPORT_REQUEST_FAILED"
           ? reason.message
           : copy.createError,
       );
@@ -284,7 +289,9 @@ export function SupportWorkspace({
       await refreshCases();
     } catch (reason) {
       setError(
-        reason instanceof Error && reason.message !== "SUPPORT_REQUEST_FAILED"
+        locale === "en" &&
+          reason instanceof Error &&
+          reason.message !== "SUPPORT_REQUEST_FAILED"
           ? reason.message
           : copy.sendError,
       );
@@ -371,7 +378,9 @@ export function SupportWorkspace({
                   <strong>{item.subject}</strong>
                   <span>
                     {copy.categories[item.category] ??
-                      item.category.replaceAll("_", " ")}
+                      (locale === "vi"
+                        ? copy.categories.OTHER
+                        : item.category.replaceAll("_", " "))}
                   </span>
                   <time dateTime={item.updatedAt}>
                     {new Date(item.updatedAt).toLocaleDateString(copy.locale)}
@@ -426,7 +435,10 @@ export function SupportWorkspace({
                 ) : (
                   detail.messages.map((message) => (
                     <article key={message.id} data-author={message.author}>
-                      <span className="support-message-avatar" aria-hidden="true">
+                      <span
+                        className="support-message-avatar"
+                        aria-hidden="true"
+                      >
                         {message.author === "YOU" ? <UserRound /> : <Headset />}
                       </span>
                       <strong>
@@ -458,16 +470,18 @@ export function SupportWorkspace({
                       })
                     }
                     maxLength={4000}
-                    placeholder="Write a reply…"
+                    placeholder={copy.replyPlaceholder}
                     required
                   />
                   <small>{copy.sendHint}</small>
                   <button type="submit" disabled={busy || !reply.trim()}>
-                    <span>{busy
-                      ? copy.sending
-                      : detail.state === "RESOLVED"
-                        ? copy.reopen
-                        : copy.send}</span>
+                    <span>
+                      {busy
+                        ? copy.sending
+                        : detail.state === "RESOLVED"
+                          ? copy.reopen
+                          : copy.send}
+                    </span>
                     {!busy ? <SendHorizontal aria-hidden="true" /> : null}
                   </button>
                 </form>

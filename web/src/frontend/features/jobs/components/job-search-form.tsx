@@ -63,8 +63,8 @@ const valueLabelsVi: Record<string, string> = {
   CONTRACT: "Hợp đồng",
   INTERNSHIP: "Thực tập",
   TEMPORARY: "Tạm thời",
-  ENTRY: "Mới bắt đầu",
-  JUNIOR: "Junior",
+  ENTRY: "Mới vào nghề",
+  JUNIOR: "Sơ cấp",
   MID: "Trung cấp",
   SENIOR: "Cao cấp",
   LEAD: "Trưởng nhóm",
@@ -288,14 +288,15 @@ export function JobSearchForm({
         mobile: "Bộ lọc",
         close: "Đóng bộ lọc",
         applied: "Bộ lọc đang áp dụng",
-        clear: "Xoá bộ lọc",
-        remove: "Xoá bộ lọc",
+        clear: "Xóa bộ lọc",
+        remove: "Xóa bộ lọc",
         refine: "Tinh chỉnh tìm kiếm",
         filters: "Bộ lọc",
         intro: "Danh sách tự cập nhật khi bạn thay đổi tiêu chí.",
         keywords: "Từ khóa",
         keywordPlaceholder: "Chức danh, kỹ năng hoặc công ty",
         location: "Địa điểm",
+        locationPlaceholder: "Thành phố Hồ Chí Minh",
         employment: "Loại công việc",
         experience: "Cấp độ kinh nghiệm",
         arrangement: "Hình thức làm việc",
@@ -323,6 +324,7 @@ export function JobSearchForm({
         keywords: "Keywords",
         keywordPlaceholder: "Title, skill, or company",
         location: "Location",
+        locationPlaceholder: "Ho Chi Minh City",
         employment: "Employment type",
         experience: "Experience level",
         arrangement: "Work arrangement",
@@ -631,7 +633,7 @@ export function JobSearchForm({
                 <input
                   name="location"
                   maxLength={160}
-                  placeholder="Ho Chi Minh City"
+                  placeholder={copy.locationPlaceholder}
                   {...valueProps("location")}
                   onChange={(event) =>
                     updateCriterion(
@@ -680,7 +682,7 @@ export function JobSearchForm({
                 >
                   <option value="">{copy.any}</option>
                   <option value="ENTRY">{optionLabel("ENTRY")}</option>
-                  <option value="JUNIOR">Junior</option>
+                  <option value="JUNIOR">{optionLabel("JUNIOR")}</option>
                   <option value="MID">{optionLabel("MID")}</option>
                   <option value="SENIOR">{optionLabel("SENIOR")}</option>
                   <option value="LEAD">{optionLabel("LEAD")}</option>
@@ -898,7 +900,7 @@ export function JobSearchForm({
                     checked={selectedSalaryPreset === "negotiable"}
                     onChange={() => setSalaryRange()}
                   />
-                  <span>{vi ? "Thoả thuận" : "Negotiable"}</span>
+                  <span>{vi ? "Thỏa thuận" : "Negotiable"}</span>
                 </label>
               </div>
               <div className="job-filter-custom-salary">

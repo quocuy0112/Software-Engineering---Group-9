@@ -2,6 +2,8 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { SendHorizontal, UserRound } from "lucide-react";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruiterWorkspaceCopy } from "@/frontend/features/recruiter-workspace/recruiter-workspace-copy";
 
 type ThreadSummary = {
   id: string;
@@ -33,6 +35,23 @@ type Detail = {
   }>;
 };
 
+function stageLabel(
+  stage: string,
+  labels: ReturnType<typeof recruiterWorkspaceCopy>["messages"]["stages"],
+) {
+  return labels[stage as keyof typeof labels] ?? stage;
+}
+
+function recruiterRoleLabel(
+  role: string,
+  copy: ReturnType<typeof recruiterWorkspaceCopy>,
+) {
+  if (role === "HR_MANAGER") return copy.role.hrManager;
+  if (role === "HIRING_MANAGER") return copy.role.hiringManager;
+  if (role === "OWNER") return copy.role.owner;
+  return copy.role.recruiter;
+}
+
 async function responseJson<T>(url: string, init?: RequestInit) {
   const response = await fetch(url, { credentials: "same-origin", ...init });
   const body = (await response.json().catch(() => ({}))) as T & {
@@ -53,6 +72,9 @@ export function RecruitmentMessagingWorkspace({
   initialThreadId?: string | null;
   ownerOversight?: boolean;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = recruiterWorkspaceCopy(locale);
+  const messagesCopy = copy.messages;
   const [items, setItems] = useState(initialItems);
   const [assignment, setAssignment] = useState<"mine" | "unassigned" | "all">(
     ownerOversight ? "all" : "mine",
@@ -133,8 +155,13 @@ export function RecruitmentMessagingWorkspace({
             : (payload.items[0]?.id ?? null),
         );
       })
-      .catch(() => setError("Could not load recruitment conversations."));
-  }, [assignment, hasInitialItems, ownerOversight]);
+      .catch(() => setError(messagesCopy.errors.loadConversations));
+  }, [
+    assignment,
+    hasInitialItems,
+    messagesCopy.errors.loadConversations,
+    ownerOversight,
+  ]);
 
   useEffect(() => {
     const refreshUnreadCounts = () =>
@@ -166,7 +193,7 @@ export function RecruitmentMessagingWorkspace({
         .catch(() => {
           if (!active || !showError) return;
           setDetail(null);
-          setError("This recruitment conversation is no longer available.");
+          setError(messagesCopy.errors.conversationUnavailable);
         });
     void refreshThread(true);
     const timer = window.setInterval(() => {
@@ -176,7 +203,7 @@ export function RecruitmentMessagingWorkspace({
       active = false;
       window.clearInterval(timer);
     };
-  }, [ownerOversight, selectedId]);
+  }, [messagesCopy.errors.conversationUnavailable, ownerOversight, selectedId]);
 
   useEffect(() => {
     if (!detail || detail.thread.id !== selectedId) return;
@@ -211,8 +238,12 @@ export function RecruitmentMessagingWorkspace({
         setAssignees(payload.items);
         setAssigneeId(assignedMembershipId ?? payload.items[0]?.id ?? "");
       })
-      .catch(() => setError("Could not load eligible assignees."));
-  }, [assignedMembershipId, assignmentThreadId]);
+      .catch(() => setError(messagesCopy.errors.loadAssignees));
+  }, [
+    assignedMembershipId,
+    assignmentThreadId,
+    messagesCopy.errors.loadAssignees,
+  ]);
 
   async function send(event: FormEvent) {
     event.preventDefault();
@@ -242,8 +273,8 @@ export function RecruitmentMessagingWorkspace({
     } catch (cause) {
       setError(
         cause instanceof Error && cause.message === "READ_ONLY"
-          ? "Messaging is read-only for this application stage."
-          : "Message could not be sent.",
+          ? messagesCopy.errors.readOnly
+          : messagesCopy.errors.sendFailed,
       );
     } finally {
       setBusy(false);
@@ -272,7 +303,7 @@ export function RecruitmentMessagingWorkspace({
       );
       setDetail(payload);
     } catch {
-      setError("Assignment could not be saved.");
+      setError(messagesCopy.errors.assignmentFailed);
     } finally {
       setBusy(false);
     }
@@ -284,15 +315,15 @@ export function RecruitmentMessagingWorkspace({
       data-thread-open={Boolean(detail)}
     >
       <header className="recruitment-messaging__header">
-        <p>{ownerOversight ? "Owner oversight" : "Recruiter workspace"}</p>
-        <h1>
+        <p>
           {ownerOversight
-            ? "Recruitment message oversight"
-            : "Recruitment messages"}
+            ? messagesCopy.ownerOversight
+            : messagesCopy.recruiterWorkspace}
+        </p>
+        <h1>
+          {ownerOversight ? messagesCopy.oversightTitle : messagesCopy.title}
         </h1>
-        <span>
-          Every conversation is scoped to one candidate application and one job.
-        </span>
+        <span>{messagesCopy.description}</span>
       </header>
       {error ? (
         <p className="recruitment-messaging__error" role="alert">
@@ -302,18 +333,18 @@ export function RecruitmentMessagingWorkspace({
       <section className="recruitment-messaging__grid">
         <aside
           className="recruitment-messaging__list"
-          aria-label="Recruitment conversations"
+          aria-label={messagesCopy.conversations}
         >
           <label>
-            <span>Search candidate or job</span>
+            <span>{messagesCopy.searchCandidateOrJob}</span>
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search messages"
+              placeholder={messagesCopy.searchPlaceholder}
             />
           </label>
           <label>
-            <span>Company</span>
+            <span>{copy.company}</span>
             <select
               value={companyId}
               onChange={(event) => {
@@ -321,7 +352,7 @@ export function RecruitmentMessagingWorkspace({
                 setJobPostingId("all");
               }}
             >
-              <option value="all">All companies</option>
+              <option value="all">{messagesCopy.allCompanies}</option>
               {companies.map((company) => (
                 <option key={company.id} value={company.id}>
                   {company.name}
@@ -330,12 +361,12 @@ export function RecruitmentMessagingWorkspace({
             </select>
           </label>
           <label>
-            <span>Job posting</span>
+            <span>{messagesCopy.jobPosting}</span>
             <select
               value={jobPostingId}
               onChange={(event) => setJobPostingId(event.target.value)}
             >
-              <option value="all">All job postings</option>
+              <option value="all">{messagesCopy.allJobPostings}</option>
               {postings.map((posting) => (
                 <option key={posting.id} value={posting.id}>
                   {posting.title}
@@ -345,16 +376,16 @@ export function RecruitmentMessagingWorkspace({
           </label>
           {!ownerOversight ? (
             <label>
-              <span>Assignment</span>
+              <span>{messagesCopy.assignment}</span>
               <select
                 value={assignment}
                 onChange={(event) =>
                   setAssignment(event.target.value as typeof assignment)
                 }
               >
-                <option value="mine">Assigned to me</option>
-                <option value="unassigned">Unassigned</option>
-                <option value="all">All company threads</option>
+                <option value="mine">{messagesCopy.assignedToMe}</option>
+                <option value="unassigned">{messagesCopy.unassigned}</option>
+                <option value="all">{messagesCopy.allCompanyThreads}</option>
               </select>
             </label>
           ) : null}
@@ -378,25 +409,25 @@ export function RecruitmentMessagingWorkspace({
                   className="recruitment-messaging__list-stage"
                   data-stage={item.applicationStage}
                 >
-                  {item.applicationStage}
+                  {stageLabel(item.applicationStage, messagesCopy.stages)}
                 </span>
                 {item.unreadCount ? (
                   <span className="recruitment-messaging__unread-count">
-                    {item.unreadCount} unread
+                    {messagesCopy.unread(item.unreadCount)}
                   </span>
                 ) : null}
               </button>
             ))
           ) : (
             <p className="recruitment-messaging__empty">
-              No conversations match this view.
+              {messagesCopy.noMatching}
             </p>
           )}
         </aside>
         <section className="recruitment-messaging__thread" aria-live="polite">
           {!detail || detail.thread.id !== selectedId ? (
             <p className="recruitment-messaging__empty">
-              Select a conversation to see its application context.
+              {messagesCopy.selectConversation}
             </p>
           ) : (
             <>
@@ -410,16 +441,21 @@ export function RecruitmentMessagingWorkspace({
                     className="recruitment-chat-stage"
                     data-stage={detail.thread.applicationStage}
                   >
-                    {detail.thread.applicationStage}
+                    {stageLabel(
+                      detail.thread.applicationStage,
+                      messagesCopy.stages,
+                    )}
                   </span>
                   <small>
                     {detail.access === "OWNER"
                       ? detail.thread.state === "READ_ONLY"
-                        ? "Read-only oversight"
+                        ? messagesCopy.readOnlyOversight
                         : detail.thread.canSend
-                          ? "Owner access · can send"
-                          : "Owner access · assign or send"
-                      : (detail.thread.assignee?.role ?? "Unassigned")}
+                          ? messagesCopy.ownerCanSend
+                          : messagesCopy.ownerAssignOrSend
+                      : detail.thread.assignee
+                        ? recruiterRoleLabel(detail.thread.assignee.role, copy)
+                        : messagesCopy.unassigned}
                   </small>
                 </div>
               </header>
@@ -429,20 +465,21 @@ export function RecruitmentMessagingWorkspace({
                   onSubmit={assign}
                 >
                   <label>
-                    <span>Assign to owner, recruiter, or HR manager</span>
+                    <span>{messagesCopy.assignToEligibleRole}</span>
                     <select
                       value={assigneeId}
                       onChange={(event) => setAssigneeId(event.target.value)}
                     >
                       {assignees.map((assignee) => (
                         <option key={assignee.id} value={assignee.id}>
-                          {assignee.user.name} · {assignee.role}
+                          {assignee.user.name} ·{" "}
+                          {recruiterRoleLabel(assignee.role, copy)}
                         </option>
                       ))}
                     </select>
                   </label>
                   <button type="submit" disabled={busy || !assigneeId}>
-                    Save assignment
+                    {messagesCopy.saveAssignment}
                   </button>
                 </form>
               ) : null}
@@ -453,7 +490,7 @@ export function RecruitmentMessagingWorkspace({
                 {detail.messages.length ? (
                   <>
                     <p className="recruitment-chat-history__start">
-                      Conversation started
+                      {messagesCopy.conversationStarted}
                     </p>
                     {detail.messages.map((message) => (
                       <div
@@ -464,14 +501,16 @@ export function RecruitmentMessagingWorkspace({
                             ? "incoming"
                             : "outgoing"
                         }
-                        aria-label={`Message from ${
+                        aria-label={messagesCopy.messageFrom(
                           message.senderUserId === detail.thread.candidate.id
                             ? detail.thread.candidate.name
                             : detail.access === "OWNER"
                               ? (detail.thread.assignee?.name ??
-                                "Recruitment team")
-                              : "you"
-                        }`}
+                                messagesCopy.recruiterWorkspace)
+                              : locale === "vi"
+                                ? "bạn"
+                                : "you",
+                        )}
                       >
                         <span
                           className="recruitment-chat-message__avatar"
@@ -494,15 +533,14 @@ export function RecruitmentMessagingWorkspace({
                   </>
                 ) : (
                   <p className="recruitment-messaging__empty">
-                    No messages yet. Keep the conversation focused on this
-                    application.
+                    {messagesCopy.noMessages}
                   </p>
                 )}
               </div>
               {detail.access !== "OWNER" || detail.thread.canSend ? (
                 <form className="recruitment-chat-composer" onSubmit={send}>
                   <label>
-                    <span className="sr-only">Message</span>
+                    <span className="sr-only">{messagesCopy.message}</span>
                     <textarea
                       value={content}
                       onChange={(event) => setContent(event.target.value)}
@@ -521,10 +559,10 @@ export function RecruitmentMessagingWorkspace({
                       disabled={!detail.thread.canSend || busy}
                       placeholder={
                         detail.thread.canSend
-                          ? "Write a message..."
+                          ? messagesCopy.writeMessage
                           : detail.access === "HR_MANAGER"
-                            ? "Only the assigned team member can send"
-                            : "This conversation is read-only"
+                            ? messagesCopy.onlyAssignedTeamMember
+                            : messagesCopy.readOnlyConversation
                       }
                     />
                     <span
@@ -535,14 +573,14 @@ export function RecruitmentMessagingWorkspace({
                     </span>
                   </label>
                   <div className="recruitment-chat-composer__actions">
-                    <span>Enter to send · Shift + Enter for a new line</span>
+                    <span>{messagesCopy.sendHint}</span>
                     <button
                       type="submit"
                       disabled={
                         !detail.thread.canSend || busy || !content.trim()
                       }
                     >
-                      {busy ? "Sending…" : "Send"}{" "}
+                      {busy ? messagesCopy.sending : messagesCopy.send}{" "}
                       <SendHorizontal aria-hidden="true" />
                     </button>
                   </div>
@@ -550,8 +588,8 @@ export function RecruitmentMessagingWorkspace({
               ) : (
                 <p className="recruitment-messaging__empty">
                   {detail.thread.state === "READ_ONLY"
-                    ? "This conversation is read-only at its current application stage."
-                    : "Owner can send once an HR Manager or Recruiter is assigned."}
+                    ? messagesCopy.readOnlyAtStage
+                    : messagesCopy.ownerCanSendAfterAssignment}
                 </p>
               )}
             </>
@@ -559,11 +597,11 @@ export function RecruitmentMessagingWorkspace({
         </section>
         <aside
           className="recruitment-messaging__context"
-          aria-label="Candidate and application context"
+          aria-label={messagesCopy.candidateApplicationContext}
         >
           {!detail || detail.thread.id !== selectedId ? (
             <p className="recruitment-messaging__empty">
-              Select a conversation to view candidate and application details.
+              {messagesCopy.selectConversation}
             </p>
           ) : (
             <>
@@ -572,36 +610,40 @@ export function RecruitmentMessagingWorkspace({
                   {detail.thread.candidate.name.slice(0, 1).toUpperCase()}
                 </span>
                 <div>
-                  <p>Candidate</p>
+                  <p>{messagesCopy.candidate}</p>
                   <h2>{detail.thread.candidate.name}</h2>
                 </div>
               </header>
               <dl className="recruitment-messaging__context-list">
                 <div>
-                  <dt>Application stage</dt>
-                  <dd>{detail.thread.applicationStage}</dd>
+                  <dt>{messagesCopy.applicationStage}</dt>
+                  <dd>
+                    {stageLabel(
+                      detail.thread.applicationStage,
+                      messagesCopy.stages,
+                    )}
+                  </dd>
                 </div>
                 <div>
-                  <dt>Job posting</dt>
+                  <dt>{messagesCopy.jobPosting}</dt>
                   <dd>{detail.thread.job.title}</dd>
                 </div>
                 <div>
-                  <dt>Company</dt>
+                  <dt>{copy.company}</dt>
                   <dd>{detail.thread.job.companyName}</dd>
                 </div>
                 <div>
-                  <dt>Conversation owner</dt>
+                  <dt>{messagesCopy.conversationOwner}</dt>
                   <dd>
-                    {detail.thread.assignee?.name ?? "Unassigned"}
+                    {detail.thread.assignee?.name ?? messagesCopy.unassigned}
                     {detail.thread.assignee
-                      ? ` · ${detail.thread.assignee.role}`
+                      ? ` · ${recruiterRoleLabel(detail.thread.assignee.role, copy)}`
                       : ""}
                   </dd>
                 </div>
               </dl>
               <p className="recruitment-messaging__context-note">
-                This conversation is scoped to this candidate&apos;s
-                application.
+                {messagesCopy.scopedNote}
               </p>
             </>
           )}

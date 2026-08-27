@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { employerVerificationCopy } from "./employer-verification-copy";
 
 type ConfirmationState =
   | "CHECKING"
@@ -13,6 +15,7 @@ type ConfirmationState =
 const tokenParameter = "company-email-token";
 
 export function CompanyEmailVerificationLanding() {
+  const copy = employerVerificationCopy(useWorkspaceLocale());
   const router = useRouter();
   const tokenRef = useRef<string | null>(null);
   const [state, setState] = useState<ConfirmationState>("CHECKING");
@@ -69,49 +72,40 @@ export function CompanyEmailVerificationLanding() {
   return (
     <section className="auth-form" aria-live="polite" aria-busy={state === "CHECKING"}>
       <div className="auth-form-heading">
-        <p className="form-kicker">COMPANY EMAIL</p>
-        <h1>Verify company mailbox</h1>
-        <p>
-          This confirms mailbox control for your employer verification request.
-        </p>
+        <p className="form-kicker">{copy.kicker}</p>
+        <h1>{copy.title}</h1>
+        <p>{copy.description}</p>
       </div>
 
-      {state === "CHECKING" ? <p>Checking your verification link…</p> : null}
+      {state === "CHECKING" ? <p>{copy.checking}</p> : null}
 
       {state === "SIGN_IN_REQUIRED" ? (
         <>
-          <p role="alert">
-            Sign in as the Candidate who requested this link, then return here
-            and retry.
-          </p>
+          <p role="alert">{copy.signInRequired}</p>
           <Link
             href="/login?returnTo=%2Fdashboard%2Femployer-verification"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Open sign in in a new tab
+            {copy.openSignIn}
           </Link>
-          <button type="button" onClick={retry}>Retry verification</button>
+          <button type="button" onClick={retry}>{copy.retry}</button>
         </>
       ) : null}
 
       {state === "INVALID" ? (
         <>
-          <p role="alert">
-            This link is invalid, expired, already used, or belongs to another
-            account. Request a new link from the employer verification page.
-          </p>
-          <Link href="/dashboard/employer-verification">Return to verification</Link>
+          <p role="alert">{copy.invalid}</p>
+          <Link href="/dashboard/employer-verification">
+            {copy.returnToVerification}
+          </Link>
         </>
       ) : null}
 
       {state === "RETRYABLE" ? (
         <>
-          <p role="alert">
-            Verification could not be completed. Check your connection and try
-            again.
-          </p>
-          <button type="button" onClick={retry}>Retry verification</button>
+          <p role="alert">{copy.retryable}</p>
+          <button type="button" onClick={retry}>{copy.retry}</button>
         </>
       ) : null}
     </section>

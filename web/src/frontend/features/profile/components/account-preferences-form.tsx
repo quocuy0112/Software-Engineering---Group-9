@@ -25,15 +25,25 @@ function timezoneSearchText(value: string) {
   return value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 }
 
+type TimezonePickerCopy = {
+  placeholder: string;
+  toggle: string;
+  options: string;
+  narrow: (count: number) => string;
+  noMatches: string;
+};
+
 function TimezonePicker({
   value,
   options,
   describedBy,
+  copy,
   onChange,
 }: {
   value: string;
   options: TimezoneOption[];
   describedBy: string;
+  copy: TimezonePickerCopy;
   onChange: (timezone: string) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -61,7 +71,7 @@ function TimezonePicker({
         role="combobox"
         autoComplete="off"
         value={open ? query : (selected?.label ?? value)}
-        placeholder="GMT+07:00 · Asia/Ho_Chi_Minh"
+        placeholder={copy.placeholder}
         aria-autocomplete="list"
         aria-haspopup="listbox"
         aria-controls="preference-timezone-options"
@@ -90,7 +100,7 @@ function TimezonePicker({
       <button
         className="account-timezone-toggle"
         type="button"
-        aria-label="Toggle timezone list"
+        aria-label={copy.toggle}
         aria-expanded={open}
         onMouseDown={(event) => event.preventDefault()}
         onClick={() => {
@@ -105,7 +115,7 @@ function TimezonePicker({
           className="account-timezone-results"
           id="preference-timezone-options"
         >
-          <ul role="listbox" aria-label="Timezone options">
+          <ul role="listbox" aria-label={copy.options}>
             {visibleOptions.map((option) => (
               <li
                 key={option.value}
@@ -123,9 +133,9 @@ function TimezonePicker({
             ))}
           </ul>
           {matches.length > visibleOptions.length ? (
-            <p>Keep typing to narrow {matches.length} timezones.</p>
+            <p>{copy.narrow(matches.length)}</p>
           ) : null}
-          {!visibleOptions.length ? <p>No matching timezone.</p> : null}
+          {!visibleOptions.length ? <p>{copy.noMatches}</p> : null}
         </div>
       ) : null}
     </div>
@@ -157,6 +167,12 @@ export function AccountPreferencesForm({
           timezoneHint: "Sử dụng mã múi giờ IANA được hỗ trợ.",
           timezoneWarning:
             "Múi giờ đã lưu không còn được hỗ trợ. Hãy giữ nguyên hoặc chọn múi giờ khác.",
+          timezonePlaceholder: "GMT+07:00 · Asia/Ho_Chi_Minh",
+          timezoneToggle: "Mở danh sách múi giờ",
+          timezoneOptions: "Các lựa chọn múi giờ",
+          timezoneNarrow: (count: number) =>
+            `Tiếp tục nhập để thu hẹp còn ${count} múi giờ.`,
+          timezoneNoMatches: "Không có múi giờ phù hợp.",
           saving: "Đang lưu tùy chọn…",
           save: "Lưu tùy chọn",
           timezoneListHint: `Tìm theo độ lệch GMT, khu vực hoặc thành phố. Thiết bị hỗ trợ ${timezoneOptions.length || "các"} múi giờ IANA; GMT phản ánh thời gian hiện tại và tự điều chỉnh theo giờ mùa hè.`,
@@ -168,6 +184,12 @@ export function AccountPreferencesForm({
           timezoneHint: "Use a supported IANA timezone identifier.",
           timezoneWarning:
             "This stored timezone is no longer supported. Keep it unchanged or choose a supported replacement.",
+          timezonePlaceholder: "GMT+07:00 · Asia/Ho_Chi_Minh",
+          timezoneToggle: "Toggle timezone list",
+          timezoneOptions: "Timezone options",
+          timezoneNarrow: (count: number) =>
+            `Keep typing to narrow ${count} timezones.`,
+          timezoneNoMatches: "No matching timezone.",
           saving: "Saving preferences…",
           save: "Save preferences",
           timezoneListHint: `Search by GMT offset, region, or city. The list includes ${timezoneOptions.length || "the"} IANA timezones supported by this device; GMT reflects the current time and adjusts for DST.`,
@@ -206,6 +228,13 @@ export function AccountPreferencesForm({
         <TimezonePicker
           value={preferences.timezone}
           options={timezoneOptions}
+          copy={{
+            placeholder: copy.timezonePlaceholder,
+            toggle: copy.timezoneToggle,
+            options: copy.timezoneOptions,
+            narrow: copy.timezoneNarrow,
+            noMatches: copy.timezoneNoMatches,
+          }}
           describedBy={
             preferences.timezoneSupported
               ? "timezone-guidance timezone-list-guidance"

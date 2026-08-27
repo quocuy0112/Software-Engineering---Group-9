@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import {
-  PASSWORD_RECOVERY_SUCCESS_RESPONSE,
-  PASSWORD_RECOVERY_REQUEST_FAILED_ERROR,
-} from "@/shared/contracts/identity/password-recovery";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { AuthStatus } from "./auth-status";
 import { useReplayableStatus } from "./use-status";
+import { authCopy, localizedAuthMessage } from "./auth-copy";
 
 export function ForgotPasswordForm() {
+  const locale = useWorkspaceLocale();
+  const copy = authCopy(locale);
   const [email, setEmail] = useState("");
   const { status, setStatus } = useReplayableStatus("");
   const [statusTone, setStatusTone] = useState<"error" | "success">("error");
@@ -33,14 +33,15 @@ export function ForgotPasswordForm() {
       } | null;
       setStatusTone(response.ok ? "success" : "error");
       setStatus(
-        result?.message ??
-          (response.ok
-            ? PASSWORD_RECOVERY_SUCCESS_RESPONSE
-            : PASSWORD_RECOVERY_REQUEST_FAILED_ERROR),
+        localizedAuthMessage(
+          locale,
+          result?.message,
+          response.ok ? copy.forgotPassword.success : copy.forgotPassword.error,
+        ),
       );
     } catch {
       setStatusTone("error");
-      setStatus(PASSWORD_RECOVERY_REQUEST_FAILED_ERROR);
+      setStatus(copy.forgotPassword.error);
     } finally {
       setBusy(false);
     }
@@ -50,15 +51,12 @@ export function ForgotPasswordForm() {
     <section className="auth-form-content">
       <form className="auth-form" onSubmit={submit} noValidate aria-busy={busy}>
         <div className="auth-form-heading">
-          <p className="form-kicker">ACCOUNT RECOVERY</p>
-          <h1>Forgot your password?</h1>
-          <p>
-            Enter your email and we’ll send reset instructions if the account is
-            eligible.
-          </p>
+          <p className="form-kicker">{copy.forgotPassword.kicker}</p>
+          <h1>{copy.forgotPassword.title}</h1>
+          <p>{copy.forgotPassword.description}</p>
         </div>
         <div className="field">
-          <label htmlFor="forgot-email">Email address</label>
+          <label htmlFor="forgot-email">{copy.common.emailAddress}</label>
           <input
             id="forgot-email"
             name="email"
@@ -67,14 +65,14 @@ export function ForgotPasswordForm() {
             inputMode="email"
             autoCapitalize="none"
             spellCheck={false}
-            placeholder="example@email.com"
+            placeholder={copy.common.emailPlaceholder}
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
           />
         </div>
         <button type="submit" disabled={busy || !hasValidEmail}>
-          {busy ? "Sending…" : "Send reset instructions"}
+          {busy ? copy.forgotPassword.sending : copy.forgotPassword.send}
         </button>
         <AuthStatus
           id="forgot-password-status"
@@ -82,7 +80,7 @@ export function ForgotPasswordForm() {
           tone={statusTone}
         />
         <Link className="auth-recovery-link" href="/account-recovery">
-          Lost your password and access to two-factor authentication?
+          {copy.forgotPassword.lostAccess}
         </Link>
       </form>
     </section>

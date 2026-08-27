@@ -2940,7 +2940,7 @@
 .job-filter-copy,
 .job-results-header > p,
 .job-summary,
-.job-empty-state > p {
+.job-search-empty-state > p {
   color: var(--sh-color-text-secondary);
   font-size: var(--sh-font-size-body-sm);
   line-height: var(--sh-line-height-body-sm);
@@ -3017,7 +3017,7 @@
 .job-filter-actions,
 .job-actions,
 .job-card-footer,
-.job-empty-actions {
+.job-search-empty-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sh-space-3);
@@ -3363,9 +3363,10 @@
 }
 
 .job-feedback h3,
-.job-empty-state h3 {
+.job-search-empty-state h2 {
   margin: 0 0 var(--sh-space-2);
   font-size: var(--sh-font-size-h3);
+  line-height: var(--sh-line-height-h3);
 }
 
 .job-error-list {
@@ -3374,18 +3375,53 @@
   color: var(--sh-color-error);
 }
 
-.job-empty-state {
+.job-search-empty-state {
   display: grid;
   justify-items: start;
-  padding-block: var(--sh-space-8);
+  min-height: 15rem;
+  padding: var(--sh-space-8);
+  border-radius: var(--sh-radius-lg);
 }
 
-.job-empty-state h3 {
-  margin-top: var(--sh-space-4);
+.job-search-empty-state .job-empty-icon {
+  border-radius: var(--sh-radius-md);
 }
 
-.job-empty-state > p {
-  margin: 0 0 var(--sh-space-5);
+.job-search-empty-state h2 {
+  margin-top: var(--sh-space-5);
+  color: var(--sh-color-text-primary);
+  font-weight: var(--sh-font-weight-bold);
+  letter-spacing: -0.01em;
+}
+
+.job-search-empty-state > p {
+  max-width: 36rem;
+  margin: 0;
+}
+
+.job-search-empty-action {
+  gap: var(--sh-space-2);
+  border-color: var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-md);
+  color: var(--sh-color-text-secondary);
+}
+
+.job-search-empty-action:hover {
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-info-bg);
+}
+
+.job-empty-action-icon {
+  width: var(--sh-icon-size-sm);
+  height: var(--sh-icon-size-sm);
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  color: var(--sh-color-text-muted);
 }
 
 .job-pagination {
@@ -3620,12 +3656,17 @@
   }
 }
 
-.job-empty-actions {
-  justify-content: center;
-  margin-top: var(--sh-space-2);
+.job-search-empty-actions {
+  justify-content: flex-start;
+  margin-top: var(--sh-space-4);
 }
 
 @media (max-width: 720px) {
+  .job-search-empty-state {
+    min-height: 14rem;
+    padding: var(--sh-space-6) var(--sh-space-5);
+  }
+
   .job-filter-mobile-trigger {
     display: flex;
     width: 100%;

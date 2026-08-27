@@ -79,6 +79,15 @@ export function messagingCopy(locale: WorkspaceLocale) {
         noEvidence: "Không chọn tin nhắn cụ thể",
         detail: "Chi tiết (không bắt buộc)",
         detailPlaceholder: "Bổ sung thông tin hỗ trợ việc xem xét…",
+        viewProfile: "Xem hồ sơ",
+        conversationDetails: "Chi tiết cuộc trò chuyện",
+        recentConversationsLabel: "Cuộc trò chuyện gần đây",
+        noRecentConversations: "Chưa có cuộc trò chuyện gần đây.",
+        context: "Ngữ cảnh",
+        messagingAccess: "Quyền nhắn tin",
+        messagingAvailable: "Có thể nhắn tin",
+        privateMessagingNotice:
+          "Tin nhắn riêng tư chỉ khả dụng trong ngữ cảnh đã được phê duyệt.",
         reportValidation: "Vui lòng nhập ít nhất 10 ký tự khi chọn Khác.",
         reportSuccess:
           "Đã nhận báo cáo và chuyển đến quy trình xem xét bảo mật.",
@@ -175,6 +184,15 @@ export function messagingCopy(locale: WorkspaceLocale) {
         noEvidence: "Do not select a specific message",
         detail: "Details (optional)",
         detailPlaceholder: "Add information that can help our review…",
+        viewProfile: "View profile",
+        conversationDetails: "Conversation details",
+        recentConversationsLabel: "Recent conversations",
+        noRecentConversations: "No recent conversations.",
+        context: "Context",
+        messagingAccess: "Messaging access",
+        messagingAvailable: "Messaging available",
+        privateMessagingNotice:
+          "Private messages are available only in this approved context.",
         reportValidation: "Enter at least 10 characters when selecting Other.",
         reportSuccess:
           "Your report was received and sent to our safety review process.",

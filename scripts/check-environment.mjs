@@ -158,10 +158,10 @@ if (await canAccess("web/.env.local")) {
   );
   check(
     appEnvironment.OCR_ENGINE_NAME === "paddleocr-onnx" &&
-      appEnvironment.OCR_ENGINE_VERSION === "1.0.0" &&
+      appEnvironment.OCR_ENGINE_VERSION === "1.1.0" &&
       appEnvironment.OCR_MODEL_NAME === "PP-OCRv6-medium" &&
       appEnvironment.OCR_MODEL_SHA256 ===
-        "4a7ec9635845d44fd6c6fb323386ee526282b8de566358fe646d711b5992e505" &&
+        "a8f8b2e10b1870bd35f1ec7a160399f5d4c6a6c6326c373abf01d7fdc9e38bba" &&
       appEnvironment.OCR_POLICY_VERSION === "ocr-confidence-v1",
     "OCR engine, model manifest, and policy pins are immutable",
   );
@@ -170,6 +170,21 @@ if (await canAccess("web/.env.local")) {
       appEnvironment.CV_HYBRID_DEADLINE_SECONDS === "180" &&
       appEnvironment.OCR_SEARCH_TIMEOUT_SECONDS === "10",
     "OCR deadlines are exactly 20-second CV, 180-second hybrid, and 10-second search",
+  );
+  check(
+    ["true", "false"].includes(
+      appEnvironment.OCR_SEARCH_ADAPTIVE_TILING_ENABLED,
+    ) &&
+      ["10", "15", "20"].includes(
+        appEnvironment.OCR_SEARCH_TILE_OVERLAP_PERCENT,
+      ) &&
+      ["1", "2", "3", "4"].includes(
+        appEnvironment.OCR_SEARCH_TILE_BATCH_SIZE,
+      ) &&
+      ["1", "2", "3", "4"].includes(appEnvironment.OCR_SEARCH_MAX_TILES) &&
+      appEnvironment.OCR_SEARCH_STRATEGY_VERSION ===
+        "search-ocr-adaptive-tiles-v1",
+    "adaptive OCR search flags are server-only and allowlisted",
   );
 
   const decode32ByteKey = (key) => {
@@ -479,6 +494,11 @@ if (await canAccess("web/.env.local")) {
     "OCR_CV_UNIT_TIMEOUT_SECONDS",
     "CV_HYBRID_DEADLINE_SECONDS",
     "OCR_SEARCH_TIMEOUT_SECONDS",
+    "OCR_SEARCH_ADAPTIVE_TILING_ENABLED",
+    "OCR_SEARCH_TILE_OVERLAP_PERCENT",
+    "OCR_SEARCH_TILE_BATCH_SIZE",
+    "OCR_SEARCH_MAX_TILES",
+    "OCR_SEARCH_STRATEGY_VERSION",
     "IMAGE_SEARCH_WORKER_ENABLED",
     "IMAGE_SEARCH_CLEANUP_ENABLED",
     "IMAGE_SEARCH_STORAGE_ADAPTER",
