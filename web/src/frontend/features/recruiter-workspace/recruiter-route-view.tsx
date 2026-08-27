@@ -11,7 +11,6 @@ import {
 } from "@/shared/contracts/recruiter-job-posting";
 import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
 import type { RecruiterJobPostingTab } from "@/shared/routing/recruiter-routes";
-import { collectRecruiterSubIndustrySuggestions } from "@/shared/contracts/jobs/industry-taxonomy";
 
 type RecruiterRouteViewProps = {
   view: "list" | "create" | "edit";
@@ -105,9 +104,7 @@ export function RecruiterRouteView({
       initialJob={job}
       companyName={job.company.name}
       autoSavePreferenceScope={initialData.recruiterUserId}
-      subIndustrySuggestions={collectRecruiterSubIndustrySuggestions(
-        initialData.jobs,
-      )}
+      jobTaxonomy={initialData.jobTaxonomy}
       awaitDraftSaveBeforeBack
       onBack={returnToJobPostings}
       onSaved={returnToJobPostings}

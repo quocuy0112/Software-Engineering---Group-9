@@ -105,7 +105,10 @@
       "viewCount": 1291,
       "applicantCount": 240
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003988-x1",
@@ -213,7 +216,10 @@
       "viewCount": 1724,
       "applicantCount": 230
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x2",
@@ -321,7 +327,10 @@
       "viewCount": 3788,
       "applicantCount": 39
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002380-x3",
@@ -429,7 +438,10 @@
       "viewCount": 5558,
       "applicantCount": 158
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x4",
@@ -537,7 +549,10 @@
       "viewCount": 3686,
       "applicantCount": 125
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x5",
@@ -645,7 +660,10 @@
       "viewCount": 1184,
       "applicantCount": 170
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001576-x6",
@@ -753,7 +771,10 @@
       "viewCount": 4099,
       "applicantCount": 179
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x7",
@@ -861,7 +882,10 @@
       "viewCount": 3166,
       "applicantCount": 235
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000370-x8",
@@ -970,7 +994,10 @@
       "viewCount": 1995,
       "applicantCount": 249
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x9",
@@ -1078,7 +1105,10 @@
       "viewCount": 3889,
       "applicantCount": 47
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001174-x10",
@@ -1187,7 +1217,10 @@
       "viewCount": 3504,
       "applicantCount": 233
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004390-x11",
@@ -1296,7 +1329,10 @@
       "viewCount": 1743,
       "applicantCount": 125
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002380-x12",
@@ -1404,7 +1440,10 @@
       "viewCount": 5010,
       "applicantCount": 226
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002380-x13",
@@ -1512,7 +1551,10 @@
       "viewCount": 2008,
       "applicantCount": 178
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x14",
@@ -1620,7 +1662,10 @@
       "viewCount": 1841,
       "applicantCount": 231
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000370-x15",
@@ -1729,7 +1774,10 @@
       "viewCount": 1220,
       "applicantCount": 135
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004390-x16",
@@ -1838,7 +1886,10 @@
       "viewCount": 719,
       "applicantCount": 163
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002380-x17",
@@ -1946,7 +1997,10 @@
       "viewCount": 2366,
       "applicantCount": 58
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001174-x18",
@@ -2055,7 +2109,10 @@
       "viewCount": 3989,
       "applicantCount": 130
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000772-x19",
@@ -2163,7 +2220,10 @@
       "viewCount": 2185,
       "applicantCount": 76
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004792-x20",
@@ -2272,7 +2332,10 @@
       "viewCount": 1200,
       "applicantCount": 190
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004792-x21",
@@ -2381,7 +2444,10 @@
       "viewCount": 3670,
       "applicantCount": 85
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004792-x22",
@@ -2490,7 +2556,10 @@
       "viewCount": 1249,
       "applicantCount": 107
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x23",
@@ -2598,7 +2667,10 @@
       "viewCount": 648,
       "applicantCount": 200
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001576-x24",
@@ -2706,7 +2778,10 @@
       "viewCount": 3881,
       "applicantCount": 122
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x25",
@@ -2814,7 +2889,10 @@
       "viewCount": 3670,
       "applicantCount": 64
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004792-x26",
@@ -2923,7 +3001,10 @@
       "viewCount": 2642,
       "applicantCount": 236
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000772-x27",
@@ -3031,7 +3112,10 @@
       "viewCount": 3314,
       "applicantCount": 86
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001978-x28",
@@ -3140,7 +3224,10 @@
       "viewCount": 5891,
       "applicantCount": 61
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x29",
@@ -3248,7 +3335,10 @@
       "viewCount": 2345,
       "applicantCount": 211
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x30",
@@ -3356,7 +3446,10 @@
       "viewCount": 2070,
       "applicantCount": 152
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001174-x31",
@@ -3465,7 +3558,10 @@
       "viewCount": 3911,
       "applicantCount": 239
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000772-x32",
@@ -3573,7 +3669,10 @@
       "viewCount": 4607,
       "applicantCount": 37
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001978-x33",
@@ -3682,7 +3781,10 @@
       "viewCount": 73,
       "applicantCount": 18
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001978-x34",
@@ -3791,7 +3893,10 @@
       "viewCount": 200,
       "applicantCount": 221
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004390-x35",
@@ -3900,7 +4005,10 @@
       "viewCount": 5000,
       "applicantCount": 235
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000370-x36",
@@ -4009,7 +4117,10 @@
       "viewCount": 359,
       "applicantCount": 29
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x37",
@@ -4117,7 +4228,10 @@
       "viewCount": 3022,
       "applicantCount": 211
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001576-x38",
@@ -4225,7 +4339,10 @@
       "viewCount": 3610,
       "applicantCount": 81
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004792-x39",
@@ -4334,7 +4451,10 @@
       "viewCount": 4058,
       "applicantCount": 156
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003988-x40",
@@ -4442,7 +4562,10 @@
       "viewCount": 1744,
       "applicantCount": 165
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x41",
@@ -4550,7 +4673,10 @@
       "viewCount": 3986,
       "applicantCount": 104
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000370-x42",
@@ -4659,7 +4785,10 @@
       "viewCount": 2513,
       "applicantCount": 81
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002380-x43",
@@ -4767,7 +4896,10 @@
       "viewCount": 5326,
       "applicantCount": 68
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002380-x44",
@@ -4875,7 +5007,10 @@
       "viewCount": 1271,
       "applicantCount": 52
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001978-x45",
@@ -4984,7 +5119,10 @@
       "viewCount": 2528,
       "applicantCount": 19
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x46",
@@ -5092,7 +5230,10 @@
       "viewCount": 5854,
       "applicantCount": 54
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001174-x47",
@@ -5201,7 +5342,10 @@
       "viewCount": 4728,
       "applicantCount": 39
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004390-x48",
@@ -5310,7 +5454,10 @@
       "viewCount": 4142,
       "applicantCount": 243
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001576-x49",
@@ -5418,7 +5565,10 @@
       "viewCount": 3597,
       "applicantCount": 112
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001174-x50",
@@ -5527,7 +5677,10 @@
       "viewCount": 2923,
       "applicantCount": 227
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x51",
@@ -5635,7 +5788,10 @@
       "viewCount": 3602,
       "applicantCount": 209
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001576-x52",
@@ -5743,7 +5899,10 @@
       "viewCount": 5532,
       "applicantCount": 104
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001576",
@@ -5851,7 +6010,10 @@
       "viewCount": 295,
       "applicantCount": 180
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004390-x53",
@@ -5960,7 +6122,10 @@
       "viewCount": 2933,
       "applicantCount": 55
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004390",
@@ -6069,7 +6234,10 @@
       "viewCount": 920,
       "applicantCount": 58
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003988-x54",
@@ -6177,7 +6345,10 @@
       "viewCount": 1428,
       "applicantCount": 88
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004390-x55",
@@ -6286,7 +6457,10 @@
       "viewCount": 3930,
       "applicantCount": 46
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004390-x56",
@@ -6395,7 +6569,10 @@
       "viewCount": 5465,
       "applicantCount": 242
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000370-x57",
@@ -6504,7 +6681,10 @@
       "viewCount": 2608,
       "applicantCount": 80
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x58",
@@ -6612,7 +6792,10 @@
       "viewCount": 2923,
       "applicantCount": 42
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001576-x59",
@@ -6720,7 +6903,10 @@
       "viewCount": 921,
       "applicantCount": 188
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002380-x60",
@@ -6828,7 +7014,10 @@
       "viewCount": 5272,
       "applicantCount": 112
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003988-x61",
@@ -6936,7 +7125,10 @@
       "viewCount": 4943,
       "applicantCount": 2
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000772-x62",
@@ -7044,7 +7236,10 @@
       "viewCount": 4323,
       "applicantCount": 212
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x63",
@@ -7152,7 +7347,10 @@
       "viewCount": 1274,
       "applicantCount": 227
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004792-x64",
@@ -7261,7 +7459,10 @@
       "viewCount": 3089,
       "applicantCount": 179
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004390-x65",
@@ -7370,7 +7571,10 @@
       "viewCount": 4336,
       "applicantCount": 11
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x66",
@@ -7478,7 +7682,10 @@
       "viewCount": 1189,
       "applicantCount": 143
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x67",
@@ -7586,7 +7793,10 @@
       "viewCount": 623,
       "applicantCount": 194
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000370-x68",
@@ -7695,7 +7905,10 @@
       "viewCount": 3694,
       "applicantCount": 2
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002380-x69",
@@ -7803,7 +8016,10 @@
       "viewCount": 4035,
       "applicantCount": 8
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004792-x70",
@@ -7912,7 +8128,10 @@
       "viewCount": 5465,
       "applicantCount": 63
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000772-x71",
@@ -8020,7 +8239,10 @@
       "viewCount": 3123,
       "applicantCount": 8
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x72",
@@ -8128,7 +8350,10 @@
       "viewCount": 5365,
       "applicantCount": 234
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000772-x73",
@@ -8236,7 +8461,10 @@
       "viewCount": 2285,
       "applicantCount": 200
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000772-x74",
@@ -8344,7 +8572,10 @@
       "viewCount": 2100,
       "applicantCount": 19
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000772",
@@ -8452,7 +8683,10 @@
       "viewCount": 4047,
       "applicantCount": 19
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004792-x75",
@@ -8561,7 +8795,10 @@
       "viewCount": 2135,
       "applicantCount": 186
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x76",
@@ -8669,7 +8906,10 @@
       "viewCount": 856,
       "applicantCount": 112
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001576-x77",
@@ -8777,7 +9017,10 @@
       "viewCount": 3769,
       "applicantCount": 78
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004792-x78",
@@ -8886,7 +9129,10 @@
       "viewCount": 3304,
       "applicantCount": 115
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x79",
@@ -8994,7 +9240,10 @@
       "viewCount": 385,
       "applicantCount": 184
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004792-x80",
@@ -9103,7 +9352,10 @@
       "viewCount": 2732,
       "applicantCount": 173
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002380-x81",
@@ -9211,7 +9463,10 @@
       "viewCount": 5984,
       "applicantCount": 139
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001174-x82",
@@ -9320,7 +9575,10 @@
       "viewCount": 125,
       "applicantCount": 8
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004390-x83",
@@ -9429,7 +9687,10 @@
       "viewCount": 5602,
       "applicantCount": 224
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002380-x84",
@@ -9537,7 +9798,10 @@
       "viewCount": 4666,
       "applicantCount": 171
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001174-x85",
@@ -9646,7 +9910,10 @@
       "viewCount": 2736,
       "applicantCount": 73
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004792-x86",
@@ -9755,7 +10022,10 @@
       "viewCount": 4417,
       "applicantCount": 80
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001576-x87",
@@ -9863,7 +10133,10 @@
       "viewCount": 468,
       "applicantCount": 124
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x88",
@@ -9971,7 +10244,10 @@
       "viewCount": 4436,
       "applicantCount": 70
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x89",
@@ -10079,7 +10355,10 @@
       "viewCount": 3942,
       "applicantCount": 216
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004792",
@@ -10188,7 +10467,10 @@
       "viewCount": 2287,
       "applicantCount": 60
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003988",
@@ -10296,7 +10578,10 @@
       "viewCount": 2897,
       "applicantCount": 208
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004390-x90",
@@ -10405,7 +10690,10 @@
       "viewCount": 4545,
       "applicantCount": 170
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003988-x91",
@@ -10513,7 +10801,10 @@
       "viewCount": 5171,
       "applicantCount": 51
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000772-x92",
@@ -10621,7 +10912,10 @@
       "viewCount": 5568,
       "applicantCount": 168
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x93",
@@ -10729,7 +11023,10 @@
       "viewCount": 428,
       "applicantCount": 91
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x94",
@@ -10837,7 +11134,10 @@
       "viewCount": 4253,
       "applicantCount": 144
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004792-x95",
@@ -10946,7 +11246,10 @@
       "viewCount": 5040,
       "applicantCount": 38
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001978",
@@ -11055,7 +11358,10 @@
       "viewCount": 480,
       "applicantCount": 129
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184",
@@ -11163,7 +11469,10 @@
       "viewCount": 5581,
       "applicantCount": 245
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001576-x96",
@@ -11271,7 +11580,10 @@
       "viewCount": 3564,
       "applicantCount": 160
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x97",
@@ -11379,7 +11691,10 @@
       "viewCount": 5925,
       "applicantCount": 216
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000772-x98",
@@ -11487,7 +11802,10 @@
       "viewCount": 803,
       "applicantCount": 131
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x99",
@@ -11595,7 +11913,10 @@
       "viewCount": 2547,
       "applicantCount": 188
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004792-x100",
@@ -11704,7 +12025,10 @@
       "viewCount": 4402,
       "applicantCount": 154
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x101",
@@ -11812,7 +12136,10 @@
       "viewCount": 3912,
       "applicantCount": 225
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000772-x102",
@@ -11920,7 +12247,10 @@
       "viewCount": 5916,
       "applicantCount": 21
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782-x103",
@@ -12028,7 +12358,10 @@
       "viewCount": 2892,
       "applicantCount": 33
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003988-x104",
@@ -12136,7 +12469,10 @@
       "viewCount": 1424,
       "applicantCount": 58
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000370-x105",
@@ -12245,7 +12581,10 @@
       "viewCount": 5401,
       "applicantCount": 189
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000370-x106",
@@ -12354,7 +12693,10 @@
       "viewCount": 202,
       "applicantCount": 75
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001978-x107",
@@ -12463,7 +12805,10 @@
       "viewCount": 5287,
       "applicantCount": 26
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003988-x108",
@@ -12571,7 +12916,10 @@
       "viewCount": 903,
       "applicantCount": 69
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003988-x109",
@@ -12679,7 +13027,10 @@
       "viewCount": 5058,
       "applicantCount": 157
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x110",
@@ -12787,7 +13138,10 @@
       "viewCount": 4791,
       "applicantCount": 241
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001978-x111",
@@ -12896,7 +13250,10 @@
       "viewCount": 3046,
       "applicantCount": 9
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003988-x112",
@@ -13004,7 +13361,10 @@
       "viewCount": 2104,
       "applicantCount": 216
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000370-x113",
@@ -13113,7 +13473,10 @@
       "viewCount": 2657,
       "applicantCount": 25
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000370",
@@ -13222,7 +13585,10 @@
       "viewCount": 3075,
       "applicantCount": 46
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002782",
@@ -13330,7 +13696,10 @@
       "viewCount": 5734,
       "applicantCount": 66
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003988-x114",
@@ -13438,7 +13807,10 @@
       "viewCount": 671,
       "applicantCount": 222
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001174-x115",
@@ -13547,7 +13919,10 @@
       "viewCount": 5284,
       "applicantCount": 227
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004390-x116",
@@ -13656,7 +14031,10 @@
       "viewCount": 3190,
       "applicantCount": 73
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001174",
@@ -13765,7 +14143,10 @@
       "viewCount": 4312,
       "applicantCount": 184
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003184-x117",
@@ -13873,7 +14254,10 @@
       "viewCount": 2121,
       "applicantCount": 113
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003586",
@@ -13981,7 +14365,10 @@
       "viewCount": 106,
       "applicantCount": 93
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003989-x118",
@@ -14090,7 +14477,10 @@
       "viewCount": 4909,
       "applicantCount": 156
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002783-x119",
@@ -14199,7 +14589,10 @@
       "viewCount": 765,
       "applicantCount": 14
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000773-x120",
@@ -14308,7 +14701,10 @@
       "viewCount": 1512,
       "applicantCount": 35
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001175-x121",
@@ -14416,7 +14812,10 @@
       "viewCount": 4832,
       "applicantCount": 45
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x122",
@@ -14525,7 +14924,10 @@
       "viewCount": 2598,
       "applicantCount": 32
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002381-x123",
@@ -14633,7 +15035,10 @@
       "viewCount": 5562,
       "applicantCount": 81
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001979-x124",
@@ -14742,7 +15147,10 @@
       "viewCount": 1065,
       "applicantCount": 48
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001175-x125",
@@ -14850,7 +15258,10 @@
       "viewCount": 3115,
       "applicantCount": 73
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004391-x126",
@@ -14958,7 +15369,10 @@
       "viewCount": 5693,
       "applicantCount": 228
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002783-x127",
@@ -15067,7 +15481,10 @@
       "viewCount": 4242,
       "applicantCount": 75
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004391-x128",
@@ -15175,7 +15592,10 @@
       "viewCount": 5911,
       "applicantCount": 205
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004391-x129",
@@ -15283,7 +15703,10 @@
       "viewCount": 1816,
       "applicantCount": 120
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004793-x130",
@@ -15392,7 +15815,10 @@
       "viewCount": 5163,
       "applicantCount": 190
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001175-x131",
@@ -15500,7 +15926,10 @@
       "viewCount": 2693,
       "applicantCount": 215
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001979-x132",
@@ -15609,7 +16038,10 @@
       "viewCount": 5259,
       "applicantCount": 43
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003587-x133",
@@ -15718,7 +16150,10 @@
       "viewCount": 2156,
       "applicantCount": 15
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000773-x134",
@@ -15827,7 +16262,10 @@
       "viewCount": 4989,
       "applicantCount": 129
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003989-x135",
@@ -15936,7 +16374,10 @@
       "viewCount": 572,
       "applicantCount": 20
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003989-x136",
@@ -16045,7 +16486,10 @@
       "viewCount": 3228,
       "applicantCount": 37
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004793-x137",
@@ -16154,7 +16598,10 @@
       "viewCount": 657,
       "applicantCount": 208
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x138",
@@ -16263,7 +16710,10 @@
       "viewCount": 3476,
       "applicantCount": 166
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001577-x139",
@@ -16372,7 +16822,10 @@
       "viewCount": 1355,
       "applicantCount": 102
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004391-x140",
@@ -16480,7 +16933,10 @@
       "viewCount": 4479,
       "applicantCount": 13
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000773",
@@ -16589,7 +17045,10 @@
       "viewCount": 1552,
       "applicantCount": 180
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002783",
@@ -16698,7 +17157,10 @@
       "viewCount": 801,
       "applicantCount": 193
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x141",
@@ -16807,7 +17269,10 @@
       "viewCount": 2905,
       "applicantCount": 3
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000371-x142",
@@ -16916,7 +17381,10 @@
       "viewCount": 629,
       "applicantCount": 237
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004793-x143",
@@ -17025,7 +17493,10 @@
       "viewCount": 4049,
       "applicantCount": 218
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000773-x144",
@@ -17134,7 +17605,10 @@
       "viewCount": 1124,
       "applicantCount": 193
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001979-x145",
@@ -17243,7 +17717,10 @@
       "viewCount": 5370,
       "applicantCount": 222
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004391-x146",
@@ -17351,7 +17828,10 @@
       "viewCount": 3268,
       "applicantCount": 7
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x147",
@@ -17460,7 +17940,10 @@
       "viewCount": 5666,
       "applicantCount": 82
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001979-x148",
@@ -17569,7 +18052,10 @@
       "viewCount": 5869,
       "applicantCount": 123
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003587-x149",
@@ -17678,7 +18164,10 @@
       "viewCount": 5920,
       "applicantCount": 100
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002381-x150",
@@ -17786,7 +18275,10 @@
       "viewCount": 1179,
       "applicantCount": 164
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x151",
@@ -17895,7 +18387,10 @@
       "viewCount": 2290,
       "applicantCount": 9
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003989-x152",
@@ -18004,7 +18499,10 @@
       "viewCount": 5432,
       "applicantCount": 104
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002783-x153",
@@ -18113,7 +18611,10 @@
       "viewCount": 3614,
       "applicantCount": 160
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x154",
@@ -18222,7 +18723,10 @@
       "viewCount": 4415,
       "applicantCount": 37
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001979-x155",
@@ -18331,7 +18835,10 @@
       "viewCount": 3320,
       "applicantCount": 173
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003587-x156",
@@ -18440,7 +18947,10 @@
       "viewCount": 208,
       "applicantCount": 45
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000371-x157",
@@ -18549,7 +19059,10 @@
       "viewCount": 2743,
       "applicantCount": 115
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003587-x158",
@@ -18658,7 +19171,10 @@
       "viewCount": 3162,
       "applicantCount": 132
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001577-x159",
@@ -18767,7 +19283,10 @@
       "viewCount": 3318,
       "applicantCount": 90
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001577-x160",
@@ -18876,7 +19395,10 @@
       "viewCount": 2949,
       "applicantCount": 100
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001979-x161",
@@ -18985,7 +19507,10 @@
       "viewCount": 5491,
       "applicantCount": 232
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002381-x162",
@@ -19093,7 +19618,10 @@
       "viewCount": 2619,
       "applicantCount": 75
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004391-x163",
@@ -19201,7 +19729,10 @@
       "viewCount": 538,
       "applicantCount": 93
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003989-x164",
@@ -19310,7 +19841,10 @@
       "viewCount": 3179,
       "applicantCount": 13
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001175-x165",
@@ -19418,7 +19952,10 @@
       "viewCount": 3562,
       "applicantCount": 28
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x166",
@@ -19527,7 +20064,10 @@
       "viewCount": 2236,
       "applicantCount": 81
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004391-x167",
@@ -19635,7 +20175,10 @@
       "viewCount": 4519,
       "applicantCount": 128
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x168",
@@ -19744,7 +20287,10 @@
       "viewCount": 111,
       "applicantCount": 250
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x169",
@@ -19853,7 +20399,10 @@
       "viewCount": 1005,
       "applicantCount": 194
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003587-x170",
@@ -19962,7 +20511,10 @@
       "viewCount": 5230,
       "applicantCount": 195
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000371-x171",
@@ -20071,7 +20623,10 @@
       "viewCount": 5465,
       "applicantCount": 78
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003587-x172",
@@ -20180,7 +20735,10 @@
       "viewCount": 1059,
       "applicantCount": 139
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001175",
@@ -20288,7 +20846,10 @@
       "viewCount": 2749,
       "applicantCount": 185
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x173",
@@ -20397,7 +20958,10 @@
       "viewCount": 4682,
       "applicantCount": 26
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002381-x174",
@@ -20505,7 +21069,10 @@
       "viewCount": 2165,
       "applicantCount": 168
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000773-x175",
@@ -20614,7 +21181,10 @@
       "viewCount": 5500,
       "applicantCount": 26
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001577",
@@ -20723,7 +21293,10 @@
       "viewCount": 1641,
       "applicantCount": 63
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001175-x176",
@@ -20831,7 +21404,10 @@
       "viewCount": 2206,
       "applicantCount": 231
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004391-x177",
@@ -20939,7 +21515,10 @@
       "viewCount": 4857,
       "applicantCount": 53
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003989-x178",
@@ -21048,7 +21627,10 @@
       "viewCount": 4207,
       "applicantCount": 220
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004793-x179",
@@ -21157,7 +21739,10 @@
       "viewCount": 1566,
       "applicantCount": 13
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004793-x180",
@@ -21266,7 +21851,10 @@
       "viewCount": 4444,
       "applicantCount": 197
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002783-x181",
@@ -21375,7 +21963,10 @@
       "viewCount": 5100,
       "applicantCount": 216
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000371-x182",
@@ -21484,7 +22075,10 @@
       "viewCount": 3590,
       "applicantCount": 62
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x183",
@@ -21593,7 +22187,10 @@
       "viewCount": 732,
       "applicantCount": 220
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003989-x184",
@@ -21702,7 +22299,10 @@
       "viewCount": 1029,
       "applicantCount": 249
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002783-x185",
@@ -21811,7 +22411,10 @@
       "viewCount": 4562,
       "applicantCount": 52
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x186",
@@ -21920,7 +22523,10 @@
       "viewCount": 1385,
       "applicantCount": 25
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000773-x187",
@@ -22029,7 +22635,10 @@
       "viewCount": 3666,
       "applicantCount": 55
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000773-x188",
@@ -22138,7 +22747,10 @@
       "viewCount": 1913,
       "applicantCount": 34
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003989-x189",
@@ -22247,7 +22859,10 @@
       "viewCount": 2298,
       "applicantCount": 223
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000371",
@@ -22356,7 +22971,10 @@
       "viewCount": 3486,
       "applicantCount": 224
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000773-x190",
@@ -22465,7 +23083,10 @@
       "viewCount": 2745,
       "applicantCount": 237
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002783-x191",
@@ -22574,7 +23195,10 @@
       "viewCount": 5152,
       "applicantCount": 146
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000371-x192",
@@ -22683,7 +23307,10 @@
       "viewCount": 4378,
       "applicantCount": 145
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000773-x193",
@@ -22792,7 +23419,10 @@
       "viewCount": 3565,
       "applicantCount": 108
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001175-x194",
@@ -22900,7 +23530,10 @@
       "viewCount": 4855,
       "applicantCount": 84
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002381-x195",
@@ -23008,7 +23641,10 @@
       "viewCount": 1829,
       "applicantCount": 218
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004391-x196",
@@ -23116,7 +23752,10 @@
       "viewCount": 2574,
       "applicantCount": 40
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000773-x197",
@@ -23225,7 +23864,10 @@
       "viewCount": 1931,
       "applicantCount": 125
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002783-x198",
@@ -23334,7 +23976,10 @@
       "viewCount": 3350,
       "applicantCount": 177
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004793-x199",
@@ -23443,7 +24088,10 @@
       "viewCount": 848,
       "applicantCount": 23
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001577-x200",
@@ -23552,7 +24200,10 @@
       "viewCount": 2082,
       "applicantCount": 234
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001979-x201",
@@ -23661,7 +24312,10 @@
       "viewCount": 4035,
       "applicantCount": 6
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x202",
@@ -23770,7 +24424,10 @@
       "viewCount": 1488,
       "applicantCount": 111
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004793-x203",
@@ -23879,7 +24536,10 @@
       "viewCount": 1414,
       "applicantCount": 127
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003587-x204",
@@ -23988,7 +24648,10 @@
       "viewCount": 869,
       "applicantCount": 102
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004793",
@@ -24097,7 +24760,10 @@
       "viewCount": 4455,
       "applicantCount": 53
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004391-x205",
@@ -24205,7 +24871,10 @@
       "viewCount": 1678,
       "applicantCount": 225
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004793-x206",
@@ -24314,7 +24983,10 @@
       "viewCount": 3499,
       "applicantCount": 188
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000773-x207",
@@ -24423,7 +25095,10 @@
       "viewCount": 2002,
       "applicantCount": 182
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x208",
@@ -24532,7 +25207,10 @@
       "viewCount": 5598,
       "applicantCount": 8
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x209",
@@ -24641,7 +25319,10 @@
       "viewCount": 5467,
       "applicantCount": 242
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x210",
@@ -24750,7 +25431,10 @@
       "viewCount": 5868,
       "applicantCount": 84
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001577-x211",
@@ -24859,7 +25543,10 @@
       "viewCount": 4783,
       "applicantCount": 160
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004793-x212",
@@ -24968,7 +25655,10 @@
       "viewCount": 1424,
       "applicantCount": 92
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x213",
@@ -25077,7 +25767,10 @@
       "viewCount": 2774,
       "applicantCount": 172
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002783-x214",
@@ -25186,7 +25879,10 @@
       "viewCount": 5211,
       "applicantCount": 235
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004793-x215",
@@ -25295,7 +25991,10 @@
       "viewCount": 635,
       "applicantCount": 8
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003989-x216",
@@ -25404,7 +26103,10 @@
       "viewCount": 366,
       "applicantCount": 69
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001175-x217",
@@ -25512,7 +26214,10 @@
       "viewCount": 4090,
       "applicantCount": 203
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003587-x218",
@@ -25621,7 +26326,10 @@
       "viewCount": 1068,
       "applicantCount": 187
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001175-x219",
@@ -25729,7 +26437,10 @@
       "viewCount": 3100,
       "applicantCount": 224
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003989-x220",
@@ -25838,7 +26549,10 @@
       "viewCount": 3799,
       "applicantCount": 88
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003989-x221",
@@ -25947,7 +26661,10 @@
       "viewCount": 1257,
       "applicantCount": 216
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185",
@@ -26056,7 +26773,10 @@
       "viewCount": 2726,
       "applicantCount": 64
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001979",
@@ -26165,7 +26885,10 @@
       "viewCount": 2360,
       "applicantCount": 123
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003989",
@@ -26274,7 +26997,10 @@
       "viewCount": 3957,
       "applicantCount": 116
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004391",
@@ -26382,7 +27108,10 @@
       "viewCount": 1239,
       "applicantCount": 221
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004793-x222",
@@ -26491,7 +27220,10 @@
       "viewCount": 3666,
       "applicantCount": 2
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004391-x223",
@@ -26599,7 +27331,10 @@
       "viewCount": 3432,
       "applicantCount": 222
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004793-x224",
@@ -26708,7 +27443,10 @@
       "viewCount": 1853,
       "applicantCount": 188
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003989-x225",
@@ -26817,7 +27555,10 @@
       "viewCount": 889,
       "applicantCount": 209
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001175-x226",
@@ -26925,7 +27666,10 @@
       "viewCount": 2031,
       "applicantCount": 143
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002381-x227",
@@ -27033,7 +27777,10 @@
       "viewCount": 3201,
       "applicantCount": 188
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001979-x228",
@@ -27142,7 +27889,10 @@
       "viewCount": 5296,
       "applicantCount": 42
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002783-x229",
@@ -27251,7 +28001,10 @@
       "viewCount": 582,
       "applicantCount": 104
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004391-x230",
@@ -27359,7 +28112,10 @@
       "viewCount": 307,
       "applicantCount": 172
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002381-x231",
@@ -27467,7 +28223,10 @@
       "viewCount": 3792,
       "applicantCount": 19
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002381",
@@ -27575,7 +28334,10 @@
       "viewCount": 2951,
       "applicantCount": 77
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003587",
@@ -27684,7 +28446,10 @@
       "viewCount": 5576,
       "applicantCount": 154
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000371-x232",
@@ -27793,7 +28558,10 @@
       "viewCount": 168,
       "applicantCount": 42
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003185-x233",
@@ -27902,7 +28670,10 @@
       "viewCount": 5017,
       "applicantCount": 187
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001176-x234",
@@ -28010,7 +28781,10 @@
       "viewCount": 1953,
       "applicantCount": 159
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003990-x235",
@@ -28119,7 +28893,10 @@
       "viewCount": 4767,
       "applicantCount": 220
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x236",
@@ -28228,7 +29005,10 @@
       "viewCount": 286,
       "applicantCount": 54
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003990-x237",
@@ -28337,7 +29117,10 @@
       "viewCount": 1371,
       "applicantCount": 59
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x238",
@@ -28446,7 +29229,10 @@
       "viewCount": 4141,
       "applicantCount": 47
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003588-x239",
@@ -28554,7 +29340,10 @@
       "viewCount": 2550,
       "applicantCount": 121
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x240",
@@ -28663,7 +29452,10 @@
       "viewCount": 3044,
       "applicantCount": 230
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003990-x241",
@@ -28772,7 +29564,10 @@
       "viewCount": 4001,
       "applicantCount": 47
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003990-x242",
@@ -28881,7 +29676,10 @@
       "viewCount": 4977,
       "applicantCount": 56
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001176-x243",
@@ -28989,7 +29787,10 @@
       "viewCount": 5006,
       "applicantCount": 120
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004794-x244",
@@ -29097,7 +29898,10 @@
       "viewCount": 851,
       "applicantCount": 72
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001176-x245",
@@ -29205,7 +30009,10 @@
       "viewCount": 2024,
       "applicantCount": 47
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001176-x246",
@@ -29313,7 +30120,10 @@
       "viewCount": 5952,
       "applicantCount": 115
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003990-x247",
@@ -29422,7 +30232,10 @@
       "viewCount": 5901,
       "applicantCount": 65
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578-x248",
@@ -29531,7 +30344,10 @@
       "viewCount": 2936,
       "applicantCount": 39
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001176-x249",
@@ -29639,7 +30455,10 @@
       "viewCount": 2011,
       "applicantCount": 125
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002382-x250",
@@ -29748,7 +30567,10 @@
       "viewCount": 1845,
       "applicantCount": 64
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000774-x251",
@@ -29856,7 +30678,10 @@
       "viewCount": 3447,
       "applicantCount": 37
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001980-x252",
@@ -29964,7 +30789,10 @@
       "viewCount": 1787,
       "applicantCount": 208
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003186-x253",
@@ -30072,7 +30900,10 @@
       "viewCount": 5621,
       "applicantCount": 107
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x254",
@@ -30181,7 +31012,10 @@
       "viewCount": 1806,
       "applicantCount": 29
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003186-x255",
@@ -30289,7 +31123,10 @@
       "viewCount": 2220,
       "applicantCount": 104
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004794-x256",
@@ -30397,7 +31234,10 @@
       "viewCount": 2838,
       "applicantCount": 16
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578-x257",
@@ -30506,7 +31346,10 @@
       "viewCount": 2573,
       "applicantCount": 73
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002382-x258",
@@ -30615,7 +31458,10 @@
       "viewCount": 3864,
       "applicantCount": 217
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000774",
@@ -30723,7 +31569,10 @@
       "viewCount": 2752,
       "applicantCount": 25
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001176-x259",
@@ -30831,7 +31680,10 @@
       "viewCount": 2808,
       "applicantCount": 196
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003990-x260",
@@ -30940,7 +31792,10 @@
       "viewCount": 3732,
       "applicantCount": 93
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001176-x261",
@@ -31048,7 +31903,10 @@
       "viewCount": 1129,
       "applicantCount": 86
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003990-x262",
@@ -31157,7 +32015,10 @@
       "viewCount": 2116,
       "applicantCount": 232
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001176-x263",
@@ -31265,7 +32126,10 @@
       "viewCount": 5325,
       "applicantCount": 94
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x264",
@@ -31374,7 +32238,10 @@
       "viewCount": 2304,
       "applicantCount": 241
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002382-x265",
@@ -31483,7 +32350,10 @@
       "viewCount": 2384,
       "applicantCount": 77
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x266",
@@ -31592,7 +32462,10 @@
       "viewCount": 1580,
       "applicantCount": 215
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003588-x267",
@@ -31700,7 +32573,10 @@
       "viewCount": 5342,
       "applicantCount": 206
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001980-x268",
@@ -31808,7 +32684,10 @@
       "viewCount": 2729,
       "applicantCount": 219
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004794-x269",
@@ -31916,7 +32795,10 @@
       "viewCount": 2213,
       "applicantCount": 218
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004794-x270",
@@ -32024,7 +32906,10 @@
       "viewCount": 2093,
       "applicantCount": 114
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x271",
@@ -32133,7 +33018,10 @@
       "viewCount": 3000,
       "applicantCount": 192
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x272",
@@ -32242,7 +33130,10 @@
       "viewCount": 2088,
       "applicantCount": 33
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001176-x273",
@@ -32350,7 +33241,10 @@
       "viewCount": 2269,
       "applicantCount": 77
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004794-x274",
@@ -32458,7 +33352,10 @@
       "viewCount": 3444,
       "applicantCount": 192
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004794-x275",
@@ -32566,7 +33463,10 @@
       "viewCount": 2054,
       "applicantCount": 13
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001980-x276",
@@ -32674,7 +33574,10 @@
       "viewCount": 1004,
       "applicantCount": 205
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000774-x277",
@@ -32782,7 +33685,10 @@
       "viewCount": 4295,
       "applicantCount": 87
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001980-x278",
@@ -32890,7 +33796,10 @@
       "viewCount": 2515,
       "applicantCount": 150
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x279",
@@ -32999,7 +33908,10 @@
       "viewCount": 5335,
       "applicantCount": 70
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578-x280",
@@ -33108,7 +34020,10 @@
       "viewCount": 1799,
       "applicantCount": 141
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000774-x281",
@@ -33216,7 +34131,10 @@
       "viewCount": 1054,
       "applicantCount": 15
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003186-x282",
@@ -33324,7 +34242,10 @@
       "viewCount": 3533,
       "applicantCount": 83
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002382-x283",
@@ -33433,7 +34354,10 @@
       "viewCount": 4008,
       "applicantCount": 21
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004392-x284",
@@ -33541,7 +34465,10 @@
       "viewCount": 4786,
       "applicantCount": 241
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000774-x285",
@@ -33649,7 +34576,10 @@
       "viewCount": 3353,
       "applicantCount": 12
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001980-x286",
@@ -33757,7 +34687,10 @@
       "viewCount": 1243,
       "applicantCount": 14
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004794",
@@ -33865,7 +34798,10 @@
       "viewCount": 3632,
       "applicantCount": 81
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004392-x287",
@@ -33973,7 +34909,10 @@
       "viewCount": 2281,
       "applicantCount": 53
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001980",
@@ -34081,7 +35020,10 @@
       "viewCount": 1618,
       "applicantCount": 33
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001980-x288",
@@ -34189,7 +35131,10 @@
       "viewCount": 4816,
       "applicantCount": 127
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001176",
@@ -34297,7 +35242,10 @@
       "viewCount": 2890,
       "applicantCount": 113
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004392-x289",
@@ -34405,7 +35353,10 @@
       "viewCount": 5174,
       "applicantCount": 228
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003990",
@@ -34514,7 +35465,10 @@
       "viewCount": 2682,
       "applicantCount": 153
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x290",
@@ -34623,7 +35577,10 @@
       "viewCount": 3397,
       "applicantCount": 70
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004392-x291",
@@ -34731,7 +35688,10 @@
       "viewCount": 4767,
       "applicantCount": 201
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578-x292",
@@ -34840,7 +35800,10 @@
       "viewCount": 4462,
       "applicantCount": 153
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578-x293",
@@ -34949,7 +35912,10 @@
       "viewCount": 2236,
       "applicantCount": 167
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003186-x294",
@@ -35057,7 +36023,10 @@
       "viewCount": 4711,
       "applicantCount": 215
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004392-x295",
@@ -35165,7 +36134,10 @@
       "viewCount": 2516,
       "applicantCount": 168
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004794-x296",
@@ -35273,7 +36245,10 @@
       "viewCount": 836,
       "applicantCount": 223
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004794-x297",
@@ -35381,7 +36356,10 @@
       "viewCount": 815,
       "applicantCount": 200
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x298",
@@ -35490,7 +36468,10 @@
       "viewCount": 1114,
       "applicantCount": 159
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003990-x299",
@@ -35599,7 +36580,10 @@
       "viewCount": 2443,
       "applicantCount": 3
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003588-x300",
@@ -35707,7 +36691,10 @@
       "viewCount": 4797,
       "applicantCount": 147
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004392-x301",
@@ -35815,7 +36802,10 @@
       "viewCount": 752,
       "applicantCount": 161
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578-x302",
@@ -35924,7 +36914,10 @@
       "viewCount": 5162,
       "applicantCount": 195
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372",
@@ -36033,7 +37026,10 @@
       "viewCount": 3230,
       "applicantCount": 99
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002382",
@@ -36142,7 +37138,10 @@
       "viewCount": 548,
       "applicantCount": 14
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003186-x303",
@@ -36250,7 +37249,10 @@
       "viewCount": 1125,
       "applicantCount": 182
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002382-x304",
@@ -36359,7 +37361,10 @@
       "viewCount": 2539,
       "applicantCount": 213
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004392",
@@ -36467,7 +37472,10 @@
       "viewCount": 5211,
       "applicantCount": 210
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003990-x305",
@@ -36576,7 +37584,10 @@
       "viewCount": 5260,
       "applicantCount": 84
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003588-x306",
@@ -36684,7 +37695,10 @@
       "viewCount": 3571,
       "applicantCount": 160
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003990-x307",
@@ -36793,7 +37807,10 @@
       "viewCount": 2266,
       "applicantCount": 87
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002382-x308",
@@ -36902,7 +37919,10 @@
       "viewCount": 5165,
       "applicantCount": 216
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003186",
@@ -37010,7 +38030,10 @@
       "viewCount": 3141,
       "applicantCount": 195
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578-x309",
@@ -37119,7 +38142,10 @@
       "viewCount": 5275,
       "applicantCount": 196
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578-x310",
@@ -37228,7 +38254,10 @@
       "viewCount": 1583,
       "applicantCount": 66
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003990-x311",
@@ -37337,7 +38366,10 @@
       "viewCount": 3195,
       "applicantCount": 148
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x312",
@@ -37446,7 +38478,10 @@
       "viewCount": 3279,
       "applicantCount": 87
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003588-x313",
@@ -37554,7 +38589,10 @@
       "viewCount": 2449,
       "applicantCount": 180
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003186-x314",
@@ -37662,7 +38700,10 @@
       "viewCount": 4450,
       "applicantCount": 2
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003588-x315",
@@ -37770,7 +38811,10 @@
       "viewCount": 3137,
       "applicantCount": 71
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x316",
@@ -37879,7 +38923,10 @@
       "viewCount": 5434,
       "applicantCount": 13
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001176-x317",
@@ -37987,7 +39034,10 @@
       "viewCount": 1094,
       "applicantCount": 171
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x318",
@@ -38096,7 +39146,10 @@
       "viewCount": 2226,
       "applicantCount": 171
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001980-x319",
@@ -38204,7 +39257,10 @@
       "viewCount": 1729,
       "applicantCount": 166
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003186-x320",
@@ -38312,7 +39368,10 @@
       "viewCount": 4846,
       "applicantCount": 227
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578-x321",
@@ -38421,7 +39480,10 @@
       "viewCount": 1051,
       "applicantCount": 138
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004794-x322",
@@ -38529,7 +39591,10 @@
       "viewCount": 357,
       "applicantCount": 84
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004794-x323",
@@ -38637,7 +39702,10 @@
       "viewCount": 5370,
       "applicantCount": 21
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003186-x324",
@@ -38745,7 +39813,10 @@
       "viewCount": 3807,
       "applicantCount": 180
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578-x325",
@@ -38854,7 +39925,10 @@
       "viewCount": 5564,
       "applicantCount": 12
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003588-x326",
@@ -38962,7 +40036,10 @@
       "viewCount": 5567,
       "applicantCount": 177
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000774-x327",
@@ -39070,7 +40147,10 @@
       "viewCount": 4974,
       "applicantCount": 122
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001980-x328",
@@ -39178,7 +40258,10 @@
       "viewCount": 1538,
       "applicantCount": 186
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004794-x329",
@@ -39286,7 +40369,10 @@
       "viewCount": 4102,
       "applicantCount": 96
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003186-x330",
@@ -39394,7 +40480,10 @@
       "viewCount": 3000,
       "applicantCount": 140
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004794-x331",
@@ -39502,7 +40591,10 @@
       "viewCount": 362,
       "applicantCount": 99
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000372-x332",
@@ -39611,7 +40703,10 @@
       "viewCount": 1148,
       "applicantCount": 125
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000774-x333",
@@ -39719,7 +40814,10 @@
       "viewCount": 4082,
       "applicantCount": 118
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003588",
@@ -39827,7 +40925,10 @@
       "viewCount": 1305,
       "applicantCount": 159
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002382-x334",
@@ -39936,7 +41037,10 @@
       "viewCount": 305,
       "applicantCount": 112
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578-x335",
@@ -40045,7 +41149,10 @@
       "viewCount": 2845,
       "applicantCount": 121
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004794-x336",
@@ -40153,7 +41260,10 @@
       "viewCount": 1055,
       "applicantCount": 42
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000774-x337",
@@ -40261,7 +41371,10 @@
       "viewCount": 3279,
       "applicantCount": 40
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003990-x338",
@@ -40370,7 +41483,10 @@
       "viewCount": 989,
       "applicantCount": 115
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000774-x339",
@@ -40478,7 +41594,10 @@
       "viewCount": 5489,
       "applicantCount": 98
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001176-x340",
@@ -40586,7 +41705,10 @@
       "viewCount": 3182,
       "applicantCount": 18
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002382-x341",
@@ -40695,7 +41817,10 @@
       "viewCount": 1269,
       "applicantCount": 12
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002382-x342",
@@ -40804,7 +41929,10 @@
       "viewCount": 272,
       "applicantCount": 119
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003588-x343",
@@ -40912,7 +42040,10 @@
       "viewCount": 3580,
       "applicantCount": 201
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-000774-x344",
@@ -41020,7 +42151,10 @@
       "viewCount": 366,
       "applicantCount": 106
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-003588-x345",
@@ -41128,7 +42262,10 @@
       "viewCount": 5864,
       "applicantCount": 218
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578-x346",
@@ -41237,7 +42374,10 @@
       "viewCount": 1393,
       "applicantCount": 33
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578",
@@ -41346,7 +42486,10 @@
       "viewCount": 1616,
       "applicantCount": 117
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578-x347",
@@ -41455,7 +42598,10 @@
       "viewCount": 5813,
       "applicantCount": 202
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-004392-x348",
@@ -41563,7 +42709,10 @@
       "viewCount": 2977,
       "applicantCount": 166
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001578-x349",
@@ -41672,7 +42821,10 @@
       "viewCount": 395,
       "applicantCount": 122
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-001176-x350",
@@ -41780,7 +42932,10 @@
       "viewCount": 3664,
       "applicantCount": 137
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   },
   {
     "id": "job-002784",
@@ -41888,6 +43043,9 @@
       "viewCount": 1264,
       "applicantCount": 32
     },
-    "approvalComment": null
+    "approvalComment": null,
+    "industryId": "r24",
+    "subIndustryId": "r24-translation-general",
+    "subIndustryCode": "r24-translation-general"
   }
 ]

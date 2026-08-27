@@ -23,10 +23,6 @@ export type NormalizedJobSearch = {
   categoryFamily?: string[];
   /** Exact role-category identifiers selected from the job taxonomy. */
   categoryIds?: string[];
-  /** Normalized industry display names used for legacy rows without review snapshots. */
-  normalizedCategoryNames?: string[];
-  /** Normalized role names used for legacy rows without review snapshots. */
-  normalizedCategoryTitleNames?: string[];
   /** Exact normalized public job titles selected from the role explorer. */
   normalizedRoleTitles?: string[];
   normalizedSkills: string[];

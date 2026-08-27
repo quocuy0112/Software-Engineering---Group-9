@@ -46,6 +46,7 @@ import {
   jobReviewSnapshotSchema,
   prepareRecruiterJobForSave,
 } from "@/shared/contracts/recruiter-job-posting";
+import { listRecruiterJobTaxonomy } from "@/backend/services/jobs/job-taxonomy-service";
 
 const jobsRepository = configuredJsonJobCatalogueRepository("jobs.json");
 const companiesRepository =
@@ -1248,10 +1249,12 @@ async function loadRecruiterJobManagementData(
   const missingProfileFields = primaryCompany
     ? missingCompanyProfileFields(primaryCompany)
     : noCompanyProfileFields;
+  const jobTaxonomy = await listRecruiterJobTaxonomy({ forceRefresh: true });
 
   return {
     jobs: recruiterJobs,
     companies: ownedCompanyViews,
+    jobTaxonomy,
     companyId: primaryCompany?.id ?? null,
     recruiterUserId: userId,
     companyProfileComplete: Boolean(
@@ -1298,8 +1301,16 @@ export async function readRecruiterJobManagementData(
     cached &&
     cached.sourceVersion === sourceVersion &&
     now - cached.createdAt < MANAGEMENT_DATA_CACHE_TTL_MS
-  )
-    return cached.value;
+  ) {
+    // The management projection is cached for catalogue performance, but its
+    // taxonomy must reflect an admin status change even when this request is
+    // served by another application instance.
+    const [value, jobTaxonomy] = await Promise.all([
+      cached.value,
+      listRecruiterJobTaxonomy({ forceRefresh: true }),
+    ]);
+    return { ...value, jobTaxonomy };
+  }
 
   const value = loadRecruiterJobManagementData(userId);
   managementDataRead.set(userId, { value, createdAt: now, sourceVersion });

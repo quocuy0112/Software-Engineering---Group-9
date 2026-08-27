@@ -91,8 +91,7 @@ export function RecruitmentMessagingWorkspace({
         new Map(
           items
             .filter(
-              (item) =>
-                companyId === "all" || item.job.companyId === companyId,
+              (item) => companyId === "all" || item.job.companyId === companyId,
             )
             .map((item) => [item.job.id, item.job.title]),
         ).entries(),
@@ -194,24 +193,26 @@ export function RecruitmentMessagingWorkspace({
     return () => window.cancelAnimationFrame(frame);
   }, [detail, selectedId]);
 
-  const managerThreadId =
-    detail?.access === "HR_MANAGER" ? detail.thread.id : null;
-  const assignedMembershipId =
-    detail?.access === "HR_MANAGER" ? detail.thread.assignee?.id : null;
+  const canAssign =
+    detail?.access === "HR_MANAGER" || detail?.access === "OWNER";
+  const assignmentThreadId = canAssign ? (detail?.thread.id ?? null) : null;
+  const assignedMembershipId = canAssign
+    ? (detail?.thread.assignee?.id ?? null)
+    : null;
 
   useEffect(() => {
-    if (!managerThreadId) return;
+    if (!assignmentThreadId) return;
     void responseJson<{
       items: Array<{ id: string; role: string; user: { name: string } }>;
     }>(
-      `/api/recruitment-threads/${encodeURIComponent(managerThreadId)}/assignees`,
+      `/api/recruitment-threads/${encodeURIComponent(assignmentThreadId)}/assignees`,
     )
       .then((payload) => {
         setAssignees(payload.items);
         setAssigneeId(assignedMembershipId ?? payload.items[0]?.id ?? "");
       })
       .catch(() => setError("Could not load eligible assignees."));
-  }, [assignedMembershipId, managerThreadId]);
+  }, [assignedMembershipId, assignmentThreadId]);
 
   async function send(event: FormEvent) {
     event.preventDefault();
@@ -413,18 +414,22 @@ export function RecruitmentMessagingWorkspace({
                   </span>
                   <small>
                     {detail.access === "OWNER"
-                      ? "Read-only oversight"
+                      ? detail.thread.state === "READ_ONLY"
+                        ? "Read-only oversight"
+                        : detail.thread.canSend
+                          ? "Owner access · can send"
+                          : "Owner access · assign or send"
                       : (detail.thread.assignee?.role ?? "Unassigned")}
                   </small>
                 </div>
               </header>
-              {detail.access === "HR_MANAGER" ? (
+              {canAssign ? (
                 <form
                   className="recruitment-messaging__assignment"
                   onSubmit={assign}
                 >
                   <label>
-                    <span>Assigned recruiter</span>
+                    <span>Assign to owner, recruiter, or HR manager</span>
                     <select
                       value={assigneeId}
                       onChange={(event) => setAssigneeId(event.target.value)}
@@ -451,40 +456,40 @@ export function RecruitmentMessagingWorkspace({
                       Conversation started
                     </p>
                     {detail.messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className="recruitment-chat-message"
-                      data-direction={
-                        message.senderUserId === detail.thread.candidate.id
-                          ? "incoming"
-                          : "outgoing"
-                      }
-                      aria-label={`Message from ${
-                        message.senderUserId === detail.thread.candidate.id
-                          ? detail.thread.candidate.name
-                          : detail.access === "OWNER"
-                            ? (detail.thread.assignee?.name ?? "Recruitment team")
-                            : "you"
-                      }`}
-                    >
-                      <span
-                        className="recruitment-chat-message__avatar"
-                        aria-hidden="true"
+                      <div
+                        key={message.id}
+                        className="recruitment-chat-message"
+                        data-direction={
+                          message.senderUserId === detail.thread.candidate.id
+                            ? "incoming"
+                            : "outgoing"
+                        }
+                        aria-label={`Message from ${
+                          message.senderUserId === detail.thread.candidate.id
+                            ? detail.thread.candidate.name
+                            : detail.access === "OWNER"
+                              ? (detail.thread.assignee?.name ??
+                                "Recruitment team")
+                              : "you"
+                        }`}
                       >
-                        <UserRound />
-                      </span>
-                      <article
-                        data-time={new Date(message.createdAt).toLocaleString()}
-                      >
-                        <div>{message.content}</div>
-                        <time
-                          dateTime={message.createdAt}
+                        <span
+                          className="recruitment-chat-message__avatar"
                           aria-hidden="true"
                         >
-                          {new Date(message.createdAt).toLocaleString()}
-                        </time>
-                      </article>
-                    </div>
+                          <UserRound />
+                        </span>
+                        <article
+                          data-time={new Date(
+                            message.createdAt,
+                          ).toLocaleString()}
+                        >
+                          <div>{message.content}</div>
+                          <time dateTime={message.createdAt} aria-hidden="true">
+                            {new Date(message.createdAt).toLocaleString()}
+                          </time>
+                        </article>
+                      </div>
                     ))}
                   </>
                 ) : (
@@ -494,7 +499,7 @@ export function RecruitmentMessagingWorkspace({
                   </p>
                 )}
               </div>
-              {detail.access !== "OWNER" ? (
+              {detail.access !== "OWNER" || detail.thread.canSend ? (
                 <form className="recruitment-chat-composer" onSubmit={send}>
                   <label>
                     <span className="sr-only">Message</span>
@@ -517,7 +522,9 @@ export function RecruitmentMessagingWorkspace({
                       placeholder={
                         detail.thread.canSend
                           ? "Write a message..."
-                          : "This conversation is read-only"
+                          : detail.access === "HR_MANAGER"
+                            ? "Only the assigned team member can send"
+                            : "This conversation is read-only"
                       }
                     />
                     <span
@@ -535,14 +542,16 @@ export function RecruitmentMessagingWorkspace({
                         !detail.thread.canSend || busy || !content.trim()
                       }
                     >
-                      {busy ? "Sending…" : "Send"} <SendHorizontal aria-hidden="true" />
+                      {busy ? "Sending…" : "Send"}{" "}
+                      <SendHorizontal aria-hidden="true" />
                     </button>
                   </div>
                 </form>
               ) : (
                 <p className="recruitment-messaging__empty">
-                  Owner oversight is read-only. Messages and read state are
-                  unchanged.
+                  {detail.thread.state === "READ_ONLY"
+                    ? "This conversation is read-only at its current application stage."
+                    : "Owner can send once an HR Manager or Recruiter is assigned."}
                 </p>
               )}
             </>
@@ -591,7 +600,8 @@ export function RecruitmentMessagingWorkspace({
                 </div>
               </dl>
               <p className="recruitment-messaging__context-note">
-                This conversation is scoped to this candidate&apos;s application.
+                This conversation is scoped to this candidate&apos;s
+                application.
               </p>
             </>
           )}

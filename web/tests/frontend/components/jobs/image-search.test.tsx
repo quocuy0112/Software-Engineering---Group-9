@@ -28,6 +28,7 @@ import {
   JobSearchForm,
   type JobSearchCriteria,
 } from "@/frontend/features/jobs/components/job-search-form";
+import { JOB_SEARCH_CRITERIA_CHANGED_EVENT } from "@/frontend/features/jobs/components/job-search-events";
 
 const toast = vi.hoisted(() => ({
   error: vi.fn(),
@@ -301,6 +302,40 @@ describe("image-assisted job-search controls", () => {
     ).toBe("/jobs?q=engineer&categoryTitle=Key+Account+Manager");
   });
 
+  it("keeps category filters visible and clears the category group together", () => {
+    const onChange = vi.fn();
+    render(
+      <LocationFilterHarness
+        taxonomy={taxonomy}
+        initialCriteria={{
+          categoryFamily: "r01",
+          categoryId: ["r01-b2b-sales"],
+          categoryTitle: ["Key Account Manager"],
+        }}
+        onChange={onChange}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: /Industry: Sales & Business Development/i,
+      }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: /Sub-industry: B2B Sales/i }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: /Role: Key Account Manager/i }),
+    ).toBeVisible();
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /Industry: Sales & Business Development/i,
+      }),
+    );
+    expect(onChange).toHaveBeenLastCalledWith({});
+  });
+
   it("clears a selected industry from the compact clear control", async () => {
     const navigate = vi.fn();
     window.history.replaceState(
@@ -442,8 +477,27 @@ describe("image-assisted job-search controls", () => {
     );
 
     expect(navigate).toHaveBeenCalledWith(
-      "/jobs?categoryTitle=Key+Account+Manager",
+      "/jobs?categoryId=r01-b2b-sales&categoryTitle=Key+Account+Manager",
     );
+  });
+
+  it("adds the selected shared sub-industry id to the URL", () => {
+    const navigate = vi.fn();
+    render(
+      <GlobalImageSearch taxonomy={taxonomy} onJobSearchNavigate={navigate} />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Job Category" }));
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /select sub-industry: b2b sales/i,
+      }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /apply filters \(1\)/i }),
+    );
+
+    expect(navigate).toHaveBeenCalledWith("/jobs?categoryId=r01-b2b-sales");
   });
 
   it("builds an industry URL without retaining a title query", () => {
@@ -453,6 +507,9 @@ describe("image-assisted job-search controls", () => {
         "r03",
       ),
     ).toBe("/jobs?location=Da+Nang&categoryFamily=r03");
+    expect(jobIndustrySearchHref("https://smarthire.test/jobs", "other")).toBe(
+      "/jobs?categoryFamily=r29",
+    );
   });
 
   it("picks a province from the dropdown and one or more districts", () => {
@@ -694,6 +751,36 @@ describe("image-assisted job-search controls", () => {
     expect(screen.queryByRole("dialog", { name: "Job categories" })).toBeNull();
   });
 
+  it("syncs the category menu when a sidebar filter chip changes the URL", async () => {
+    window.history.replaceState(
+      null,
+      "",
+      "/jobs?categoryId=r01-b2b-sales&categoryTitle=Key%20Account%20Manager",
+    );
+    render(<GlobalImageSearch taxonomy={taxonomy} />);
+    fireEvent.click(screen.getByRole("button", { name: "Job Category" }));
+
+    const subIndustrySelect = await screen.findByRole("button", {
+      name: "Clear sub-industry: B2B Sales",
+    });
+    await waitFor(() =>
+      expect(subIndustrySelect).toHaveAttribute("data-selected", "true"),
+    );
+    expect(
+      screen.getByRole("button", { name: /Key Account Manager/u }),
+    ).toHaveAttribute("data-selected", "true");
+
+    window.history.replaceState(null, "", "/jobs");
+    window.dispatchEvent(new Event(JOB_SEARCH_CRITERIA_CHANGED_EVENT));
+
+    await waitFor(() =>
+      expect(subIndustrySelect).toHaveAttribute("data-selected", "false"),
+    );
+    expect(
+      screen.getByRole("button", { name: /Key Account Manager/u }),
+    ).toHaveAttribute("data-selected", "false");
+  });
+
   it("renders every industry supplied by the precomputed taxonomy", () => {
     const allIndustries: JobSearchTaxonomy = {
       ...taxonomy,
@@ -720,7 +807,7 @@ describe("image-assisted job-search controls", () => {
           icon.querySelector("svg")?.getAttribute("class"),
         ),
       ).size,
-    ).toBe(28);
+    ).toBe(29);
   });
 
   it("keeps exactly one in-flow active row while selecting all 29 categories", () => {

@@ -153,6 +153,24 @@ export type AuditEvent = Prisma.AuditEventModel
  */
 export type Company = Prisma.CompanyModel
 /**
+ * Model JobIndustry
+ * Platform-owned job classification. These records are intentionally not
+ * scoped to a company: every verified recruiter can reuse an active value.
+ */
+export type JobIndustry = Prisma.JobIndustryModel
+/**
+ * Model JobSubIndustry
+ * 
+ */
+export type JobSubIndustry = Prisma.JobSubIndustryModel
+/**
+ * Model JobTaxonomyProposal
+ * A recruiter-entered sub-industry is held against the immutable review
+ * version. Approval either creates a new shared row or maps to an existing
+ * normalized row, so duplicate names never create duplicate public options.
+ */
+export type JobTaxonomyProposal = Prisma.JobTaxonomyProposalModel
+/**
  * Model CompanyInvitation
  * 
  */
