@@ -16,7 +16,6 @@ import {
   jobSearchQuerySchema,
   type JobCard,
 } from "@/shared/contracts/jobs/discovery";
-import { listJobSearchTaxonomy } from "./job-search-taxonomy";
 import {
   computeDiscoveryJobs,
   computeRelatedJobs,
@@ -49,6 +48,55 @@ function approvedSnapshot(row: PublicJobRow) {
 
 type CandidateSignal = JobSimilarityInput & { row: PublicJobRow };
 
+function canonicalTaxonomyCode(value: unknown) {
+  if (typeof value !== "string") return undefined;
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return undefined;
+  return normalized === "other" ? "r29" : normalized;
+}
+
+function canonicalTaxonomyValue(value: string) {
+  return canonicalTaxonomyCode(value) ?? value.trim().toLowerCase();
+}
+
+function taxonomySignals(
+  row: PublicJobRow,
+  snapshot: ReturnType<typeof approvedSnapshot>,
+) {
+  const signals = row as unknown as {
+    categoryIds?: unknown;
+    categoryFamily?: unknown;
+    industryCode?: unknown;
+    subIndustryCode?: unknown;
+  };
+  const directCategoryId = canonicalTaxonomyCode(signals.subIndustryCode);
+  const directCategoryIds = directCategoryId ? [directCategoryId] : [];
+  const snapshotCategoryIds =
+    snapshot?.categoryIds.map(canonicalTaxonomyValue) ?? [];
+  const projectedCategoryIds = Array.isArray(signals.categoryIds)
+    ? signals.categoryIds
+        .map((category) =>
+          typeof category === "string" && category.trim()
+            ? canonicalTaxonomyValue(category)
+            : undefined,
+        )
+        .filter((category): category is string => Boolean(category))
+    : [];
+  const categoryIds = [
+    ...new Set([
+      ...directCategoryIds,
+      ...snapshotCategoryIds,
+      ...projectedCategoryIds,
+    ]),
+  ];
+  const categoryFamily =
+    canonicalTaxonomyCode(signals.industryCode) ??
+    canonicalTaxonomyCode(snapshot?.industryCode) ??
+    canonicalTaxonomyCode(snapshot?.categoryFamily) ??
+    canonicalTaxonomyCode(signals.categoryFamily);
+  return { categoryIds, categoryFamily };
+}
+
 function validationError(error: z.ZodError) {
   const fieldErrors: Record<string, string[]> = {};
   for (const issue of error.issues) {
@@ -73,8 +121,8 @@ export function parseJobSearchCriteria(raw: unknown): NormalizedJobSearch {
     normalizedDistricts: parsed.district.map((district) =>
       normalizeSearchText(district, 160),
     ),
-    categoryFamily: parsed.categoryFamily,
-    categoryIds: parsed.categoryId,
+    categoryFamily: parsed.categoryFamily.map(canonicalTaxonomyValue),
+    categoryIds: parsed.categoryId.map(canonicalTaxonomyValue),
     normalizedRoleTitles: parsed.categoryTitle.map((title) =>
       normalizeSearchText(title, 160),
     ),
@@ -124,6 +172,8 @@ function similarityInput(row: PublicJobRow): JobSimilarityInput {
   const signals = row as unknown as {
     categoryIds?: unknown;
     categoryFamily?: unknown;
+    industryCode?: unknown;
+    subIndustryCode?: unknown;
     skillTags?: unknown;
     location?: unknown;
   };
@@ -141,24 +191,16 @@ function similarityInput(row: PublicJobRow): JobSimilarityInput {
       ? (signals.location as { city?: unknown }).city
       : signals.location;
 
+  const { categoryIds, categoryFamily } = taxonomySignals(row, snapshot);
+
   return {
     id: row.id,
     title: row.title,
     companyId: row.companyId,
     industry: row.company.industry ?? undefined,
     status: row.status === "ACTIVE" ? "open" : row.status.toLowerCase(),
-    categoryIds: snapshot
-      ? snapshot.categoryIds
-      : Array.isArray(signals.categoryIds)
-        ? signals.categoryIds.filter(
-            (category): category is string => typeof category === "string",
-          )
-        : undefined,
-    categoryFamily: snapshot
-      ? snapshot.categoryFamily
-      : typeof signals.categoryFamily === "string"
-        ? signals.categoryFamily
-        : undefined,
+    categoryIds,
+    categoryFamily,
     skillTags,
     city: typeof location === "string" ? location : row.location,
     salaryMin: row.salaryMin === null ? null : Number(row.salaryMin),
@@ -181,10 +223,6 @@ function card(
   now: Date,
   matchScore?: number,
 ): JobCard {
-  const signals = row as unknown as {
-    categoryIds?: unknown;
-    categoryFamily?: unknown;
-  };
   const snapshot = approvedSnapshot(row);
   const authenticated = actor.kind === "user";
   const applicationCount = authenticated
@@ -197,6 +235,7 @@ function card(
     row.applicationDeadline !== null &&
     row.applicationDeadline.getTime() - now.getTime() <= 14 * 86_400_000 &&
     row.applicationDeadline > now;
+  const { categoryIds, categoryFamily } = taxonomySignals(row, snapshot);
   return {
     id: row.id,
     slug: row.slug,
@@ -233,18 +272,8 @@ function card(
     isUrgent: snapshot?.isUrgent ?? urgent,
     workOnSaturday: snapshot?.workOnSaturday ?? false,
     isVerified: true,
-    categoryIds: snapshot
-      ? snapshot.categoryIds
-      : Array.isArray(signals.categoryIds)
-        ? signals.categoryIds.filter(
-            (category): category is string => typeof category === "string",
-          )
-        : undefined,
-    categoryFamily: snapshot
-      ? snapshot.categoryFamily
-      : typeof signals.categoryFamily === "string"
-        ? signals.categoryFamily
-        : undefined,
+    categoryIds,
+    categoryFamily,
     experienceMinYears:
       snapshot?.experience.minYears ??
       experienceYears[row.experienceLevel] ??
@@ -298,32 +327,8 @@ export class JobDiscoveryService {
       new (
         await import("@/backend/repositories/jobs/prisma-public-job-repository")
       ).PrismaPublicJobRepository();
-    const taxonomy =
-      criteria.categoryFamily?.length || criteria.categoryIds?.length
-        ? await listJobSearchTaxonomy()
-        : null;
-    const normalizedCategoryNames = taxonomy
-      ? taxonomy.industries
-          .filter((industry) =>
-            criteria.categoryFamily?.includes(industry.code),
-          )
-          .map((industry) => normalizeSearchText(industry.name, 160))
-      : undefined;
-    const normalizedCategoryTitleNames = taxonomy
-      ? taxonomy.industries
-          .flatMap((industry) => industry.subIndustries)
-          .flatMap((subIndustry) => subIndustry.titles)
-          .filter((title) =>
-            title.categoryIds.some((id) => criteria.categoryIds?.includes(id)),
-          )
-          .map((title) => normalizeSearchText(title.name, 160))
-      : undefined;
     const repositoryCriteria = {
       ...criteria,
-      ...(normalizedCategoryNames?.length ? { normalizedCategoryNames } : {}),
-      ...(normalizedCategoryTitleNames?.length
-        ? { normalizedCategoryTitleNames }
-        : {}),
       ...(criteria.normalizedRoleTitles?.length
         ? { normalizedRoleTitles: criteria.normalizedRoleTitles }
         : {}),

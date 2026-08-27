@@ -85,6 +85,17 @@ const valueLabelsVi: Record<string, string> = {
 const one = (value: JobSearchCriteria[string]) =>
   Array.isArray(value) ? (value[0] ?? "") : (value?.toString() ?? "");
 
+const categoryFilterNames = new Set([
+  "categoryFamily",
+  "categoryId",
+  "categoryTitle",
+]);
+
+function canonicalIndustryFilterCode(value: string) {
+  const normalized = value.trim().toLowerCase();
+  return normalized === "other" ? "r29" : normalized;
+}
+
 export function jobCriteriaParams(criteria: JobSearchCriteria) {
   const params = new URLSearchParams();
   for (const [name, value] of Object.entries(criteria)) {
@@ -108,6 +119,11 @@ function removeFilterHref(
   value?: string,
 ) {
   const params = jobCriteriaParams(criteria);
+  if (categoryFilterNames.has(name)) {
+    for (const categoryName of categoryFilterNames) params.delete(categoryName);
+    const query = params.toString();
+    return query ? `/jobs?${query}` : "/jobs";
+  }
   const existing = params.getAll(name);
   params.delete(name);
   if (value !== undefined) {
@@ -139,6 +155,11 @@ function removeActiveFilter(
   criteria: JobSearchCriteria,
   filter: Pick<ActiveFilter, "name" | "value">,
 ) {
+  if (categoryFilterNames.has(filter.name)) {
+    const next = { ...criteria };
+    for (const categoryName of categoryFilterNames) delete next[categoryName];
+    return next;
+  }
   const next = removeCriterion(criteria, filter.name, filter.value);
   if (filter.name === "location") delete next.district;
   return next;
@@ -147,6 +168,7 @@ function removeActiveFilter(
 function activeFilters(
   criteria: JobSearchCriteria,
   locale: "vi" | "en",
+  taxonomy?: JobSearchTaxonomy,
 ): ActiveFilter[] {
   const labels =
     locale === "vi"
@@ -178,17 +200,45 @@ function activeFilters(
           postedWithinDays: "Posted within",
           sort: "Sort",
         };
+  const labelsWithCategories = {
+    ...labels,
+    categoryFamily: locale === "vi" ? "Ngành nghề" : "Industry",
+    categoryId: locale === "vi" ? "Nhóm ngành" : "Sub-industry",
+    categoryTitle: locale === "vi" ? "Vị trí" : "Role",
+  } as const;
   const enums = locale === "vi" ? valueLabelsVi : valueLabels;
   const output: ActiveFilter[] = [];
-  const add = (name: keyof typeof labels, raw: string, value = raw) => {
+  const add = (
+    name: keyof typeof labelsWithCategories,
+    raw: string,
+    value = raw,
+  ) => {
     if (!raw || (name === "sort" && raw === "RELEVANCE")) return;
     const salary = name === "salaryMin" || name === "salaryMax";
+    const taxonomyValue =
+      name === "categoryFamily"
+        ? taxonomy?.industries.find(
+            (industry) =>
+              canonicalIndustryFilterCode(industry.code) ===
+              canonicalIndustryFilterCode(raw),
+          )?.name
+        : name === "categoryId"
+          ? taxonomy?.industries
+              .flatMap((industry) => industry.subIndustries)
+              .find(
+                (subIndustry) =>
+                  subIndustry.code === raw ||
+                  subIndustry.titles.some((title) =>
+                    title.categoryIds.includes(raw),
+                  ),
+              )?.name
+          : undefined;
     const visible = salary
       ? `${new Intl.NumberFormat(locale === "vi" ? "vi-VN" : "en-US").format(Number(raw))} VND`
-      : (enums[raw] ?? raw);
+      : (taxonomyValue ?? enums[raw] ?? raw);
     output.push({
       id: `${name}:${value}`,
-      label: `${labels[name]}: ${visible}`,
+      label: `${labelsWithCategories[name]}: ${visible}`,
       name,
       value,
       href: removeFilterHref(criteria, name, value),
@@ -204,6 +254,9 @@ function activeFilters(
     "workArrangement",
     "careerPath",
     "skills",
+    "categoryFamily",
+    "categoryId",
+    "categoryTitle",
     "salaryMin",
     "salaryMax",
     "postedWithinDays",
@@ -286,8 +339,8 @@ export function JobSearchForm({
         noMatching: "No matching jobs yet",
       };
   const filters = useMemo(
-    () => activeFilters(criteria, locale),
-    [criteria, locale],
+    () => activeFilters(criteria, locale, taxonomy),
+    [criteria, locale, taxonomy],
   );
   const [mobileOpen, setMobileOpen] = useState(false);
   const [customSalaryMin, setCustomSalaryMin] = useState("");

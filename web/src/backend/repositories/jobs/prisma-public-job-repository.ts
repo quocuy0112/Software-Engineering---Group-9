@@ -79,8 +79,19 @@ type StoredPublicJobRow = Prisma.JobPostingGetPayload<{
 
 export type PublicJobRow = Omit<
   StoredPublicJobRow,
-  "reviewAggregate" | "applicationAttemptCounters"
+  | "reviewAggregate"
+  | "applicationAttemptCounters"
+  | "industryId"
+  | "subIndustryId"
+  | "industryCode"
+  | "subIndustryCode"
 > & {
+  // Optional in the repository contract so legacy test/adaptor rows and
+  // pre-taxonomy data remain valid during the backfill window.
+  industryId?: string | null;
+  subIndustryId?: string | null;
+  industryCode?: string | null;
+  subIndustryCode?: string | null;
   reviewAggregate?: StoredPublicJobRow["reviewAggregate"];
   applicationAttemptCounters?: StoredPublicJobRow["applicationAttemptCounters"];
   score: number;
@@ -251,6 +262,8 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
       ),
     ];
     const categoryMatches: Prisma.Sql[] = [
+      Prisma.sql`j."industryCode" IN (${Prisma.join(categoryFamilyCodes)})`,
+      Prisma.sql`j."industryId" IN (${Prisma.join(categoryFamilyCodes)})`,
       Prisma.sql`EXISTS (
         SELECT 1
         FROM "JobPostReviewAggregate" aggregate
@@ -263,15 +276,12 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
           )
       )`,
     ];
-    for (const name of input.normalizedCategoryNames ?? []) {
-      categoryMatches.push(
-        Prisma.sql`j."searchDocumentNormalized" LIKE ${`%${name}%`}`,
-      );
-    }
     clauses.push(Prisma.sql`(${Prisma.join(categoryMatches, " OR ")})`);
   }
   if (input.categoryIds?.length) {
     const roleMatches: Prisma.Sql[] = [
+      Prisma.sql`j."subIndustryCode" IN (${Prisma.join(input.categoryIds)})`,
+      Prisma.sql`j."subIndustryId" IN (${Prisma.join(input.categoryIds)})`,
       Prisma.sql`EXISTS (
         SELECT 1
         FROM "JobPostReviewAggregate" aggregate
@@ -287,11 +297,6 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
           )
       )`,
     ];
-    for (const name of input.normalizedCategoryTitleNames ?? []) {
-      roleMatches.push(
-        Prisma.sql`j."searchDocumentNormalized" LIKE ${`%${name}%`}`,
-      );
-    }
     clauses.push(Prisma.sql`(${Prisma.join(roleMatches, " OR ")})`);
   }
   if (input.normalizedRoleTitles?.length) {

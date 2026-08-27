@@ -11,6 +11,7 @@ import {
   LiveJobSearchExperience,
   type JobsLiveCopy,
 } from "@/frontend/features/jobs/components/live-job-search-experience";
+import { JOB_SEARCH_CRITERIA_CHANGED_EVENT } from "@/frontend/features/jobs/components/job-search-events";
 
 vi.mock("@/frontend/features/jobs/components/job-results-list", () => ({
   JobResultsList: ({ jobs }: { jobs: unknown[] }) => (
@@ -85,6 +86,24 @@ afterEach(() => {
 });
 
 describe("live job search experience", () => {
+  it("notifies persistent search controls after changing URL-backed criteria", () => {
+    const fetchMock = vi.fn().mockResolvedValue(response(2));
+    const eventListener = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    window.addEventListener(JOB_SEARCH_CRITERIA_CHANGED_EVENT, eventListener);
+
+    try {
+      renderExperience();
+      fireEvent.click(screen.getByLabelText("Full-time"));
+      expect(eventListener).toHaveBeenCalledOnce();
+    } finally {
+      window.removeEventListener(
+        JOB_SEARCH_CRITERIA_CHANGED_EVENT,
+        eventListener,
+      );
+    }
+  });
+
   it("keeps search scope implicit and only exposes result sorting", () => {
     renderExperience();
 
