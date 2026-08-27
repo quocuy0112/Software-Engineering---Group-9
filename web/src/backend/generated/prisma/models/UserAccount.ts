@@ -363,6 +363,7 @@ export type UserAccountWhereInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateListRelationFilter
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryListRelationFilter
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteListRelationFilter
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalListRelationFilter
 }
 
 export type UserAccountOrderByWithRelationInput = {
@@ -462,6 +463,7 @@ export type UserAccountOrderByWithRelationInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateOrderByRelationAggregateInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryOrderByRelationAggregateInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteOrderByRelationAggregateInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalOrderByRelationAggregateInput
 }
 
 export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
@@ -564,6 +566,7 @@ export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateListRelationFilter
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryListRelationFilter
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteListRelationFilter
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalListRelationFilter
 }, "id" | "email" | "normalizedEmail">
 
 export type UserAccountOrderByWithAggregationInput = {
@@ -703,6 +706,7 @@ export type UserAccountCreateInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateInput = {
@@ -802,6 +806,7 @@ export type UserAccountUncheckedCreateInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUpdateInput = {
@@ -901,6 +906,7 @@ export type UserAccountUpdateInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateInput = {
@@ -1000,6 +1006,7 @@ export type UserAccountUncheckedUpdateInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateManyInput = {
@@ -1374,6 +1381,20 @@ export type UserAccountUpdateOneRequiredWithoutInAppNotificationsNestedInput = {
   upsert?: Prisma.UserAccountUpsertWithoutInAppNotificationsInput
   connect?: Prisma.UserAccountWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutInAppNotificationsInput, Prisma.UserAccountUpdateWithoutInAppNotificationsInput>, Prisma.UserAccountUncheckedUpdateWithoutInAppNotificationsInput>
+}
+
+export type UserAccountCreateNestedOneWithoutJobTaxonomyProposalsRequestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutJobTaxonomyProposalsRequestedInput, Prisma.UserAccountUncheckedCreateWithoutJobTaxonomyProposalsRequestedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutJobTaxonomyProposalsRequestedInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutJobTaxonomyProposalsRequestedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutJobTaxonomyProposalsRequestedInput, Prisma.UserAccountUncheckedCreateWithoutJobTaxonomyProposalsRequestedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutJobTaxonomyProposalsRequestedInput
+  upsert?: Prisma.UserAccountUpsertWithoutJobTaxonomyProposalsRequestedInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutJobTaxonomyProposalsRequestedInput, Prisma.UserAccountUpdateWithoutJobTaxonomyProposalsRequestedInput>, Prisma.UserAccountUncheckedUpdateWithoutJobTaxonomyProposalsRequestedInput>
 }
 
 export type UserAccountCreateNestedOneWithoutCompanyInvitationsSentInput = {
@@ -2446,6 +2467,7 @@ export type UserAccountCreateWithoutAccountsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutAccountsInput = {
@@ -2544,6 +2566,7 @@ export type UserAccountUncheckedCreateWithoutAccountsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutAccountsInput = {
@@ -2658,6 +2681,7 @@ export type UserAccountUpdateWithoutAccountsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutAccountsInput = {
@@ -2756,6 +2780,7 @@ export type UserAccountUncheckedUpdateWithoutAccountsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutSessionsInput = {
@@ -2854,6 +2879,7 @@ export type UserAccountCreateWithoutSessionsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutSessionsInput = {
@@ -2952,6 +2978,7 @@ export type UserAccountUncheckedCreateWithoutSessionsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutSessionsInput = {
@@ -3066,6 +3093,7 @@ export type UserAccountUpdateWithoutSessionsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSessionsInput = {
@@ -3164,6 +3192,7 @@ export type UserAccountUncheckedUpdateWithoutSessionsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutVerificationsInput = {
@@ -3262,6 +3291,7 @@ export type UserAccountCreateWithoutVerificationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutVerificationsInput = {
@@ -3360,6 +3390,7 @@ export type UserAccountUncheckedCreateWithoutVerificationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutVerificationsInput = {
@@ -3474,6 +3505,7 @@ export type UserAccountUpdateWithoutVerificationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
@@ -3572,6 +3604,7 @@ export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutTwoFactorInput = {
@@ -3670,6 +3703,7 @@ export type UserAccountCreateWithoutTwoFactorInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
@@ -3768,6 +3802,7 @@ export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutTwoFactorInput = {
@@ -3882,6 +3917,7 @@ export type UserAccountUpdateWithoutTwoFactorInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
@@ -3980,6 +4016,7 @@ export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutCandidateIdentityInput = {
@@ -4078,6 +4115,7 @@ export type UserAccountCreateWithoutCandidateIdentityInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
@@ -4176,6 +4214,7 @@ export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCandidateIdentityInput = {
@@ -4290,6 +4329,7 @@ export type UserAccountUpdateWithoutCandidateIdentityInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
@@ -4388,6 +4428,7 @@ export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutPreferencesInput = {
@@ -4486,6 +4527,7 @@ export type UserAccountCreateWithoutPreferencesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutPreferencesInput = {
@@ -4584,6 +4626,7 @@ export type UserAccountUncheckedCreateWithoutPreferencesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutPreferencesInput = {
@@ -4698,6 +4741,7 @@ export type UserAccountUpdateWithoutPreferencesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
@@ -4796,6 +4840,7 @@ export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutJobWorkspaceStateInput = {
@@ -4894,6 +4939,7 @@ export type UserAccountCreateWithoutJobWorkspaceStateInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutJobWorkspaceStateInput = {
@@ -4992,6 +5038,7 @@ export type UserAccountUncheckedCreateWithoutJobWorkspaceStateInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutJobWorkspaceStateInput = {
@@ -5106,6 +5153,7 @@ export type UserAccountUpdateWithoutJobWorkspaceStateInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutJobWorkspaceStateInput = {
@@ -5204,6 +5252,7 @@ export type UserAccountUncheckedUpdateWithoutJobWorkspaceStateInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutEmailChangeRequestsInput = {
@@ -5302,6 +5351,7 @@ export type UserAccountCreateWithoutEmailChangeRequestsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
@@ -5400,6 +5450,7 @@ export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutEmailChangeRequestsInput = {
@@ -5514,6 +5565,7 @@ export type UserAccountUpdateWithoutEmailChangeRequestsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
@@ -5612,6 +5664,7 @@ export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
@@ -5710,6 +5763,7 @@ export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = {
@@ -5808,6 +5862,7 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordChangeAttemptWindowInput = {
@@ -5922,6 +5977,7 @@ export type UserAccountUpdateWithoutPasswordChangeAttemptWindowInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = {
@@ -6020,6 +6076,7 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
@@ -6118,6 +6175,7 @@ export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
@@ -6216,6 +6274,7 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordChangeOperationsInput = {
@@ -6330,6 +6389,7 @@ export type UserAccountUpdateWithoutPasswordChangeOperationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
@@ -6428,6 +6488,7 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutSecurityTokensInput = {
@@ -6526,6 +6587,7 @@ export type UserAccountCreateWithoutSecurityTokensInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
@@ -6624,6 +6686,7 @@ export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutSecurityTokensInput = {
@@ -6738,6 +6801,7 @@ export type UserAccountUpdateWithoutSecurityTokensInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
@@ -6836,6 +6900,7 @@ export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordResetOperationsInput = {
@@ -6934,6 +6999,7 @@ export type UserAccountCreateWithoutPasswordResetOperationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
@@ -7032,6 +7098,7 @@ export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordResetOperationsInput = {
@@ -7146,6 +7213,7 @@ export type UserAccountUpdateWithoutPasswordResetOperationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
@@ -7244,6 +7312,7 @@ export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
@@ -7342,6 +7411,7 @@ export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput = {
@@ -7440,6 +7510,7 @@ export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutFullAccountRecoveryOperationsInput = {
@@ -7554,6 +7625,7 @@ export type UserAccountUpdateWithoutFullAccountRecoveryOperationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput = {
@@ -7652,6 +7724,7 @@ export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutChallengesInput = {
@@ -7750,6 +7823,7 @@ export type UserAccountCreateWithoutChallengesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutChallengesInput = {
@@ -7848,6 +7922,7 @@ export type UserAccountUncheckedCreateWithoutChallengesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutChallengesInput = {
@@ -7962,6 +8037,7 @@ export type UserAccountUpdateWithoutChallengesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutChallengesInput = {
@@ -8060,6 +8136,7 @@ export type UserAccountUncheckedUpdateWithoutChallengesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutOutboxInput = {
@@ -8158,6 +8235,7 @@ export type UserAccountCreateWithoutOutboxInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutOutboxInput = {
@@ -8256,6 +8334,7 @@ export type UserAccountUncheckedCreateWithoutOutboxInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutOutboxInput = {
@@ -8370,6 +8449,7 @@ export type UserAccountUpdateWithoutOutboxInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutOutboxInput = {
@@ -8468,6 +8548,7 @@ export type UserAccountUncheckedUpdateWithoutOutboxInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutInAppNotificationsInput = {
@@ -8566,6 +8647,7 @@ export type UserAccountCreateWithoutInAppNotificationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutInAppNotificationsInput = {
@@ -8664,6 +8746,7 @@ export type UserAccountUncheckedCreateWithoutInAppNotificationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutInAppNotificationsInput = {
@@ -8778,6 +8861,7 @@ export type UserAccountUpdateWithoutInAppNotificationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutInAppNotificationsInput = {
@@ -8845,6 +8929,419 @@ export type UserAccountUncheckedUpdateWithoutInAppNotificationsInput = {
   connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
   connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
   connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutCandidateNestedInput
+  applicationLegalHoldsIssued?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutIssuedByAdminNestedInput
+  scoringOperationsRequested?: Prisma.ScoringOperationUncheckedUpdateManyWithoutRequestedByNestedInput
+  manualPrioritiesSet?: Prisma.ManualApplicationPriorityUncheckedUpdateManyWithoutSetByNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  assignedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutAssignedAdminNestedInput
+  handledMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutHandledByAdminNestedInput
+  messagingReportReviewEvents?: Prisma.MessagingReportReviewEventUncheckedUpdateManyWithoutActorAdminNestedInput
+  messagingReportPrivateNotes?: Prisma.MessagingReportPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  recruitmentThreadsAsCandidate?: Prisma.RecruitmentThreadUncheckedUpdateManyWithoutCandidateNestedInput
+  recruitmentMessages?: Prisma.RecruitmentMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutSubmittedByNestedInput
+  assignedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutAssignedAdminNestedInput
+  decidedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutDecidedByAdminNestedInput
+  closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
+  jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
+  jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
+}
+
+export type UserAccountCreateWithoutJobTaxonomyProposalsRequestedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  companyInvitationsSent?: Prisma.CompanyInvitationCreateNestedManyWithoutInvitedByInput
+  companyInvitationsAccepted?: Prisma.CompanyInvitationCreateNestedManyWithoutAcceptedByInput
+  companyInvitationsDeclined?: Prisma.CompanyInvitationCreateNestedManyWithoutDeclinedByInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  jobPostingLifecycleFactsActed?: Prisma.JobPostingLifecycleFactCreateNestedManyWithoutActorUserInput
+  analyticsExportsRequested?: Prisma.ExportRequestCreateNestedManyWithoutRequesterInput
+  activityLegalHoldsAuthorized?: Prisma.ActivityLegalHoldCreateNestedManyWithoutAuthorizedByInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  employerVerificationPreparation?: Prisma.EmployerVerificationPreparationCreateNestedOneWithoutApplicantInput
+  businessRegistrySnapshots?: Prisma.BusinessRegistryLookupSnapshotCreateNestedManyWithoutApplicantInput
+  companyEmailChallenges?: Prisma.CompanyContactEmailChallengeCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  inAppNotifications?: Prisma.InAppNotificationCreateNestedManyWithoutRecipientInput
+  applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionCreateNestedManyWithoutCandidateInput
+  applicationLegalHoldsIssued?: Prisma.ApplicationDocumentLegalHoldCreateNestedManyWithoutIssuedByAdminInput
+  scoringOperationsRequested?: Prisma.ScoringOperationCreateNestedManyWithoutRequestedByInput
+  manualPrioritiesSet?: Prisma.ManualApplicationPriorityCreateNestedManyWithoutSetByInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  assignedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutAssignedAdminInput
+  handledMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutHandledByAdminInput
+  messagingReportReviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutActorAdminInput
+  messagingReportPrivateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  recruitmentThreadsAsCandidate?: Prisma.RecruitmentThreadCreateNestedManyWithoutCandidateInput
+  recruitmentMessages?: Prisma.RecruitmentMessageCreateNestedManyWithoutSenderInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionCreateNestedManyWithoutSubmittedByInput
+  assignedJobPostReviews?: Prisma.JobPostReviewVersionCreateNestedManyWithoutAssignedAdminInput
+  decidedJobPostReviews?: Prisma.JobPostReviewVersionCreateNestedManyWithoutDecidedByAdminInput
+  closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
+  jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
+  jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+}
+
+export type UserAccountUncheckedCreateWithoutJobTaxonomyProposalsRequestedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  companyInvitationsSent?: Prisma.CompanyInvitationUncheckedCreateNestedManyWithoutInvitedByInput
+  companyInvitationsAccepted?: Prisma.CompanyInvitationUncheckedCreateNestedManyWithoutAcceptedByInput
+  companyInvitationsDeclined?: Prisma.CompanyInvitationUncheckedCreateNestedManyWithoutDeclinedByInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  jobPostingLifecycleFactsActed?: Prisma.JobPostingLifecycleFactUncheckedCreateNestedManyWithoutActorUserInput
+  analyticsExportsRequested?: Prisma.ExportRequestUncheckedCreateNestedManyWithoutRequesterInput
+  activityLegalHoldsAuthorized?: Prisma.ActivityLegalHoldUncheckedCreateNestedManyWithoutAuthorizedByInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  employerVerificationPreparation?: Prisma.EmployerVerificationPreparationUncheckedCreateNestedOneWithoutApplicantInput
+  businessRegistrySnapshots?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedManyWithoutApplicantInput
+  companyEmailChallenges?: Prisma.CompanyContactEmailChallengeUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  inAppNotifications?: Prisma.InAppNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedCreateNestedManyWithoutCandidateInput
+  applicationLegalHoldsIssued?: Prisma.ApplicationDocumentLegalHoldUncheckedCreateNestedManyWithoutIssuedByAdminInput
+  scoringOperationsRequested?: Prisma.ScoringOperationUncheckedCreateNestedManyWithoutRequestedByInput
+  manualPrioritiesSet?: Prisma.ManualApplicationPriorityUncheckedCreateNestedManyWithoutSetByInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  assignedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutAssignedAdminInput
+  handledMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutHandledByAdminInput
+  messagingReportReviewEvents?: Prisma.MessagingReportReviewEventUncheckedCreateNestedManyWithoutActorAdminInput
+  messagingReportPrivateNotes?: Prisma.MessagingReportPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  recruitmentThreadsAsCandidate?: Prisma.RecruitmentThreadUncheckedCreateNestedManyWithoutCandidateInput
+  recruitmentMessages?: Prisma.RecruitmentMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutSubmittedByInput
+  assignedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutAssignedAdminInput
+  decidedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutDecidedByAdminInput
+  closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
+  jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
+  jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+}
+
+export type UserAccountCreateOrConnectWithoutJobTaxonomyProposalsRequestedInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutJobTaxonomyProposalsRequestedInput, Prisma.UserAccountUncheckedCreateWithoutJobTaxonomyProposalsRequestedInput>
+}
+
+export type UserAccountUpsertWithoutJobTaxonomyProposalsRequestedInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutJobTaxonomyProposalsRequestedInput, Prisma.UserAccountUncheckedUpdateWithoutJobTaxonomyProposalsRequestedInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutJobTaxonomyProposalsRequestedInput, Prisma.UserAccountUncheckedCreateWithoutJobTaxonomyProposalsRequestedInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutJobTaxonomyProposalsRequestedInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutJobTaxonomyProposalsRequestedInput, Prisma.UserAccountUncheckedUpdateWithoutJobTaxonomyProposalsRequestedInput>
+}
+
+export type UserAccountUpdateWithoutJobTaxonomyProposalsRequestedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  companyInvitationsSent?: Prisma.CompanyInvitationUpdateManyWithoutInvitedByNestedInput
+  companyInvitationsAccepted?: Prisma.CompanyInvitationUpdateManyWithoutAcceptedByNestedInput
+  companyInvitationsDeclined?: Prisma.CompanyInvitationUpdateManyWithoutDeclinedByNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  jobPostingLifecycleFactsActed?: Prisma.JobPostingLifecycleFactUpdateManyWithoutActorUserNestedInput
+  analyticsExportsRequested?: Prisma.ExportRequestUpdateManyWithoutRequesterNestedInput
+  activityLegalHoldsAuthorized?: Prisma.ActivityLegalHoldUpdateManyWithoutAuthorizedByNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  employerVerificationPreparation?: Prisma.EmployerVerificationPreparationUpdateOneWithoutApplicantNestedInput
+  businessRegistrySnapshots?: Prisma.BusinessRegistryLookupSnapshotUpdateManyWithoutApplicantNestedInput
+  companyEmailChallenges?: Prisma.CompanyContactEmailChallengeUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  inAppNotifications?: Prisma.InAppNotificationUpdateManyWithoutRecipientNestedInput
+  applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUpdateManyWithoutCandidateNestedInput
+  applicationLegalHoldsIssued?: Prisma.ApplicationDocumentLegalHoldUpdateManyWithoutIssuedByAdminNestedInput
+  scoringOperationsRequested?: Prisma.ScoringOperationUpdateManyWithoutRequestedByNestedInput
+  manualPrioritiesSet?: Prisma.ManualApplicationPriorityUpdateManyWithoutSetByNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  assignedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutAssignedAdminNestedInput
+  handledMessagingReports?: Prisma.MessagingReportUpdateManyWithoutHandledByAdminNestedInput
+  messagingReportReviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutActorAdminNestedInput
+  messagingReportPrivateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  recruitmentThreadsAsCandidate?: Prisma.RecruitmentThreadUpdateManyWithoutCandidateNestedInput
+  recruitmentMessages?: Prisma.RecruitmentMessageUpdateManyWithoutSenderNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+  submittedJobPostReviews?: Prisma.JobPostReviewVersionUpdateManyWithoutSubmittedByNestedInput
+  assignedJobPostReviews?: Prisma.JobPostReviewVersionUpdateManyWithoutAssignedAdminNestedInput
+  decidedJobPostReviews?: Prisma.JobPostReviewVersionUpdateManyWithoutDecidedByAdminNestedInput
+  closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
+  jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
+  jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutJobTaxonomyProposalsRequestedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  companyInvitationsSent?: Prisma.CompanyInvitationUncheckedUpdateManyWithoutInvitedByNestedInput
+  companyInvitationsAccepted?: Prisma.CompanyInvitationUncheckedUpdateManyWithoutAcceptedByNestedInput
+  companyInvitationsDeclined?: Prisma.CompanyInvitationUncheckedUpdateManyWithoutDeclinedByNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  jobPostingLifecycleFactsActed?: Prisma.JobPostingLifecycleFactUncheckedUpdateManyWithoutActorUserNestedInput
+  analyticsExportsRequested?: Prisma.ExportRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  activityLegalHoldsAuthorized?: Prisma.ActivityLegalHoldUncheckedUpdateManyWithoutAuthorizedByNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  employerVerificationPreparation?: Prisma.EmployerVerificationPreparationUncheckedUpdateOneWithoutApplicantNestedInput
+  businessRegistrySnapshots?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateManyWithoutApplicantNestedInput
+  companyEmailChallenges?: Prisma.CompanyContactEmailChallengeUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  inAppNotifications?: Prisma.InAppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   applicationArtifactPromotions?: Prisma.ApplicationArtifactPromotionUncheckedUpdateManyWithoutCandidateNestedInput
   applicationLegalHoldsIssued?: Prisma.ApplicationDocumentLegalHoldUncheckedUpdateManyWithoutIssuedByAdminNestedInput
   scoringOperationsRequested?: Prisma.ScoringOperationUncheckedUpdateManyWithoutRequestedByNestedInput
@@ -8974,6 +9471,7 @@ export type UserAccountCreateWithoutCompanyInvitationsSentInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCompanyInvitationsSentInput = {
@@ -9072,6 +9570,7 @@ export type UserAccountUncheckedCreateWithoutCompanyInvitationsSentInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCompanyInvitationsSentInput = {
@@ -9175,6 +9674,7 @@ export type UserAccountCreateWithoutCompanyInvitationsAcceptedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCompanyInvitationsAcceptedInput = {
@@ -9273,6 +9773,7 @@ export type UserAccountUncheckedCreateWithoutCompanyInvitationsAcceptedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCompanyInvitationsAcceptedInput = {
@@ -9376,6 +9877,7 @@ export type UserAccountCreateWithoutCompanyInvitationsDeclinedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCompanyInvitationsDeclinedInput = {
@@ -9474,6 +9976,7 @@ export type UserAccountUncheckedCreateWithoutCompanyInvitationsDeclinedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCompanyInvitationsDeclinedInput = {
@@ -9588,6 +10091,7 @@ export type UserAccountUpdateWithoutCompanyInvitationsSentInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCompanyInvitationsSentInput = {
@@ -9686,6 +10190,7 @@ export type UserAccountUncheckedUpdateWithoutCompanyInvitationsSentInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutCompanyInvitationsAcceptedInput = {
@@ -9795,6 +10300,7 @@ export type UserAccountUpdateWithoutCompanyInvitationsAcceptedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCompanyInvitationsAcceptedInput = {
@@ -9893,6 +10399,7 @@ export type UserAccountUncheckedUpdateWithoutCompanyInvitationsAcceptedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutCompanyInvitationsDeclinedInput = {
@@ -10002,6 +10509,7 @@ export type UserAccountUpdateWithoutCompanyInvitationsDeclinedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCompanyInvitationsDeclinedInput = {
@@ -10100,6 +10608,7 @@ export type UserAccountUncheckedUpdateWithoutCompanyInvitationsDeclinedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutCompanyMembershipsInput = {
@@ -10198,6 +10707,7 @@ export type UserAccountCreateWithoutCompanyMembershipsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCompanyMembershipsInput = {
@@ -10296,6 +10806,7 @@ export type UserAccountUncheckedCreateWithoutCompanyMembershipsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCompanyMembershipsInput = {
@@ -10410,6 +10921,7 @@ export type UserAccountUpdateWithoutCompanyMembershipsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCompanyMembershipsInput = {
@@ -10508,6 +11020,7 @@ export type UserAccountUncheckedUpdateWithoutCompanyMembershipsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutPlatformAdministratorGrantsInput = {
@@ -10606,6 +11119,7 @@ export type UserAccountCreateWithoutPlatformAdministratorGrantsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutPlatformAdministratorGrantsInput = {
@@ -10704,6 +11218,7 @@ export type UserAccountUncheckedCreateWithoutPlatformAdministratorGrantsInput = 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutPlatformAdministratorGrantsInput = {
@@ -10818,6 +11333,7 @@ export type UserAccountUpdateWithoutPlatformAdministratorGrantsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPlatformAdministratorGrantsInput = {
@@ -10916,6 +11432,7 @@ export type UserAccountUncheckedUpdateWithoutPlatformAdministratorGrantsInput = 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutRecruiterVerificationRequestsInput = {
@@ -11014,6 +11531,7 @@ export type UserAccountCreateWithoutRecruiterVerificationRequestsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutRecruiterVerificationRequestsInput = {
@@ -11112,6 +11630,7 @@ export type UserAccountUncheckedCreateWithoutRecruiterVerificationRequestsInput 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutRecruiterVerificationRequestsInput = {
@@ -11226,6 +11745,7 @@ export type UserAccountUpdateWithoutRecruiterVerificationRequestsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutRecruiterVerificationRequestsInput = {
@@ -11324,6 +11844,7 @@ export type UserAccountUncheckedUpdateWithoutRecruiterVerificationRequestsInput 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutEmployerVerificationPreparationInput = {
@@ -11422,6 +11943,7 @@ export type UserAccountCreateWithoutEmployerVerificationPreparationInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutEmployerVerificationPreparationInput = {
@@ -11520,6 +12042,7 @@ export type UserAccountUncheckedCreateWithoutEmployerVerificationPreparationInpu
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutEmployerVerificationPreparationInput = {
@@ -11634,6 +12157,7 @@ export type UserAccountUpdateWithoutEmployerVerificationPreparationInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutEmployerVerificationPreparationInput = {
@@ -11732,6 +12256,7 @@ export type UserAccountUncheckedUpdateWithoutEmployerVerificationPreparationInpu
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutBusinessRegistrySnapshotsInput = {
@@ -11830,6 +12355,7 @@ export type UserAccountCreateWithoutBusinessRegistrySnapshotsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutBusinessRegistrySnapshotsInput = {
@@ -11928,6 +12454,7 @@ export type UserAccountUncheckedCreateWithoutBusinessRegistrySnapshotsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutBusinessRegistrySnapshotsInput = {
@@ -12042,6 +12569,7 @@ export type UserAccountUpdateWithoutBusinessRegistrySnapshotsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutBusinessRegistrySnapshotsInput = {
@@ -12140,6 +12668,7 @@ export type UserAccountUncheckedUpdateWithoutBusinessRegistrySnapshotsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutCompanyEmailChallengesInput = {
@@ -12238,6 +12767,7 @@ export type UserAccountCreateWithoutCompanyEmailChallengesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCompanyEmailChallengesInput = {
@@ -12336,6 +12866,7 @@ export type UserAccountUncheckedCreateWithoutCompanyEmailChallengesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCompanyEmailChallengesInput = {
@@ -12450,6 +12981,7 @@ export type UserAccountUpdateWithoutCompanyEmailChallengesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCompanyEmailChallengesInput = {
@@ -12548,6 +13080,7 @@ export type UserAccountUncheckedUpdateWithoutCompanyEmailChallengesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutSubmittedModerationReportsInput = {
@@ -12646,6 +13179,7 @@ export type UserAccountCreateWithoutSubmittedModerationReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutSubmittedModerationReportsInput = {
@@ -12744,6 +13278,7 @@ export type UserAccountUncheckedCreateWithoutSubmittedModerationReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutSubmittedModerationReportsInput = {
@@ -12858,6 +13393,7 @@ export type UserAccountUpdateWithoutSubmittedModerationReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSubmittedModerationReportsInput = {
@@ -12956,6 +13492,7 @@ export type UserAccountUncheckedUpdateWithoutSubmittedModerationReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutClosedJobPostReviewAggregatesInput = {
@@ -13054,6 +13591,7 @@ export type UserAccountCreateWithoutClosedJobPostReviewAggregatesInput = {
   decidedJobPostReviews?: Prisma.JobPostReviewVersionCreateNestedManyWithoutDecidedByAdminInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutClosedJobPostReviewAggregatesInput = {
@@ -13152,6 +13690,7 @@ export type UserAccountUncheckedCreateWithoutClosedJobPostReviewAggregatesInput 
   decidedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutDecidedByAdminInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutClosedJobPostReviewAggregatesInput = {
@@ -13266,6 +13805,7 @@ export type UserAccountUpdateWithoutClosedJobPostReviewAggregatesInput = {
   decidedJobPostReviews?: Prisma.JobPostReviewVersionUpdateManyWithoutDecidedByAdminNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutClosedJobPostReviewAggregatesInput = {
@@ -13364,6 +13904,7 @@ export type UserAccountUncheckedUpdateWithoutClosedJobPostReviewAggregatesInput 
   decidedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutDecidedByAdminNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutSubmittedJobPostReviewsInput = {
@@ -13462,6 +14003,7 @@ export type UserAccountCreateWithoutSubmittedJobPostReviewsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutSubmittedJobPostReviewsInput = {
@@ -13560,6 +14102,7 @@ export type UserAccountUncheckedCreateWithoutSubmittedJobPostReviewsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutSubmittedJobPostReviewsInput = {
@@ -13663,6 +14206,7 @@ export type UserAccountCreateWithoutAssignedJobPostReviewsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutAssignedJobPostReviewsInput = {
@@ -13761,6 +14305,7 @@ export type UserAccountUncheckedCreateWithoutAssignedJobPostReviewsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutAssignedJobPostReviewsInput = {
@@ -13864,6 +14409,7 @@ export type UserAccountCreateWithoutDecidedJobPostReviewsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutDecidedJobPostReviewsInput = {
@@ -13962,6 +14508,7 @@ export type UserAccountUncheckedCreateWithoutDecidedJobPostReviewsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutDecidedJobPostReviewsInput = {
@@ -14076,6 +14623,7 @@ export type UserAccountUpdateWithoutSubmittedJobPostReviewsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSubmittedJobPostReviewsInput = {
@@ -14174,6 +14722,7 @@ export type UserAccountUncheckedUpdateWithoutSubmittedJobPostReviewsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutAssignedJobPostReviewsInput = {
@@ -14283,6 +14832,7 @@ export type UserAccountUpdateWithoutAssignedJobPostReviewsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutAssignedJobPostReviewsInput = {
@@ -14381,6 +14931,7 @@ export type UserAccountUncheckedUpdateWithoutAssignedJobPostReviewsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutDecidedJobPostReviewsInput = {
@@ -14490,6 +15041,7 @@ export type UserAccountUpdateWithoutDecidedJobPostReviewsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutDecidedJobPostReviewsInput = {
@@ -14588,6 +15140,7 @@ export type UserAccountUncheckedUpdateWithoutDecidedJobPostReviewsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutJobPostReviewHistoryInput = {
@@ -14686,6 +15239,7 @@ export type UserAccountCreateWithoutJobPostReviewHistoryInput = {
   decidedJobPostReviews?: Prisma.JobPostReviewVersionCreateNestedManyWithoutDecidedByAdminInput
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutJobPostReviewHistoryInput = {
@@ -14784,6 +15338,7 @@ export type UserAccountUncheckedCreateWithoutJobPostReviewHistoryInput = {
   decidedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutDecidedByAdminInput
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutJobPostReviewHistoryInput = {
@@ -14898,6 +15453,7 @@ export type UserAccountUpdateWithoutJobPostReviewHistoryInput = {
   decidedJobPostReviews?: Prisma.JobPostReviewVersionUpdateManyWithoutDecidedByAdminNestedInput
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutJobPostReviewHistoryInput = {
@@ -14996,6 +15552,7 @@ export type UserAccountUncheckedUpdateWithoutJobPostReviewHistoryInput = {
   decidedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutDecidedByAdminNestedInput
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutJobPostReviewPrivateNotesInput = {
@@ -15094,6 +15651,7 @@ export type UserAccountCreateWithoutJobPostReviewPrivateNotesInput = {
   decidedJobPostReviews?: Prisma.JobPostReviewVersionCreateNestedManyWithoutDecidedByAdminInput
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutJobPostReviewPrivateNotesInput = {
@@ -15192,6 +15750,7 @@ export type UserAccountUncheckedCreateWithoutJobPostReviewPrivateNotesInput = {
   decidedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedCreateNestedManyWithoutDecidedByAdminInput
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutJobPostReviewPrivateNotesInput = {
@@ -15306,6 +15865,7 @@ export type UserAccountUpdateWithoutJobPostReviewPrivateNotesInput = {
   decidedJobPostReviews?: Prisma.JobPostReviewVersionUpdateManyWithoutDecidedByAdminNestedInput
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutJobPostReviewPrivateNotesInput = {
@@ -15404,6 +15964,7 @@ export type UserAccountUncheckedUpdateWithoutJobPostReviewPrivateNotesInput = {
   decidedJobPostReviews?: Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutDecidedByAdminNestedInput
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutSavedJobsInput = {
@@ -15502,6 +16063,7 @@ export type UserAccountCreateWithoutSavedJobsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutSavedJobsInput = {
@@ -15600,6 +16162,7 @@ export type UserAccountUncheckedCreateWithoutSavedJobsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutSavedJobsInput = {
@@ -15714,6 +16277,7 @@ export type UserAccountUpdateWithoutSavedJobsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSavedJobsInput = {
@@ -15812,6 +16376,7 @@ export type UserAccountUncheckedUpdateWithoutSavedJobsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutJobReportsInput = {
@@ -15910,6 +16475,7 @@ export type UserAccountCreateWithoutJobReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutJobReportsInput = {
@@ -16008,6 +16574,7 @@ export type UserAccountUncheckedCreateWithoutJobReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutJobReportsInput = {
@@ -16122,6 +16689,7 @@ export type UserAccountUpdateWithoutJobReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutJobReportsInput = {
@@ -16220,6 +16788,7 @@ export type UserAccountUncheckedUpdateWithoutJobReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutApplicationArtifactPromotionsInput = {
@@ -16318,6 +16887,7 @@ export type UserAccountCreateWithoutApplicationArtifactPromotionsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutApplicationArtifactPromotionsInput = {
@@ -16416,6 +16986,7 @@ export type UserAccountUncheckedCreateWithoutApplicationArtifactPromotionsInput 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutApplicationArtifactPromotionsInput = {
@@ -16530,6 +17101,7 @@ export type UserAccountUpdateWithoutApplicationArtifactPromotionsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutApplicationArtifactPromotionsInput = {
@@ -16628,6 +17200,7 @@ export type UserAccountUncheckedUpdateWithoutApplicationArtifactPromotionsInput 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutApplicationLegalHoldsIssuedInput = {
@@ -16726,6 +17299,7 @@ export type UserAccountCreateWithoutApplicationLegalHoldsIssuedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutApplicationLegalHoldsIssuedInput = {
@@ -16824,6 +17398,7 @@ export type UserAccountUncheckedCreateWithoutApplicationLegalHoldsIssuedInput = 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutApplicationLegalHoldsIssuedInput = {
@@ -16938,6 +17513,7 @@ export type UserAccountUpdateWithoutApplicationLegalHoldsIssuedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutApplicationLegalHoldsIssuedInput = {
@@ -17036,6 +17612,7 @@ export type UserAccountUncheckedUpdateWithoutApplicationLegalHoldsIssuedInput = 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutProfessionalConnectionsLowInput = {
@@ -17134,6 +17711,7 @@ export type UserAccountCreateWithoutProfessionalConnectionsLowInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutProfessionalConnectionsLowInput = {
@@ -17232,6 +17810,7 @@ export type UserAccountUncheckedCreateWithoutProfessionalConnectionsLowInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutProfessionalConnectionsLowInput = {
@@ -17335,6 +17914,7 @@ export type UserAccountCreateWithoutProfessionalConnectionsHighInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutProfessionalConnectionsHighInput = {
@@ -17433,6 +18013,7 @@ export type UserAccountUncheckedCreateWithoutProfessionalConnectionsHighInput = 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutProfessionalConnectionsHighInput = {
@@ -17536,6 +18117,7 @@ export type UserAccountCreateWithoutProfessionalConnectionsRevokedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutProfessionalConnectionsRevokedInput = {
@@ -17634,6 +18216,7 @@ export type UserAccountUncheckedCreateWithoutProfessionalConnectionsRevokedInput
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutProfessionalConnectionsRevokedInput = {
@@ -17748,6 +18331,7 @@ export type UserAccountUpdateWithoutProfessionalConnectionsLowInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsLowInput = {
@@ -17846,6 +18430,7 @@ export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsLowInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutProfessionalConnectionsHighInput = {
@@ -17955,6 +18540,7 @@ export type UserAccountUpdateWithoutProfessionalConnectionsHighInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsHighInput = {
@@ -18053,6 +18639,7 @@ export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsHighInput = 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutProfessionalConnectionsRevokedInput = {
@@ -18162,6 +18749,7 @@ export type UserAccountUpdateWithoutProfessionalConnectionsRevokedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsRevokedInput = {
@@ -18260,6 +18848,7 @@ export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsRevokedInput
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutConnectionProposalsLowInput = {
@@ -18358,6 +18947,7 @@ export type UserAccountCreateWithoutConnectionProposalsLowInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutConnectionProposalsLowInput = {
@@ -18456,6 +19046,7 @@ export type UserAccountUncheckedCreateWithoutConnectionProposalsLowInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutConnectionProposalsLowInput = {
@@ -18559,6 +19150,7 @@ export type UserAccountCreateWithoutConnectionProposalsHighInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutConnectionProposalsHighInput = {
@@ -18657,6 +19249,7 @@ export type UserAccountUncheckedCreateWithoutConnectionProposalsHighInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutConnectionProposalsHighInput = {
@@ -18760,6 +19353,7 @@ export type UserAccountCreateWithoutConnectionProposalsCreatedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutConnectionProposalsCreatedInput = {
@@ -18858,6 +19452,7 @@ export type UserAccountUncheckedCreateWithoutConnectionProposalsCreatedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutConnectionProposalsCreatedInput = {
@@ -18972,6 +19567,7 @@ export type UserAccountUpdateWithoutConnectionProposalsLowInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutConnectionProposalsLowInput = {
@@ -19070,6 +19666,7 @@ export type UserAccountUncheckedUpdateWithoutConnectionProposalsLowInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutConnectionProposalsHighInput = {
@@ -19179,6 +19776,7 @@ export type UserAccountUpdateWithoutConnectionProposalsHighInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutConnectionProposalsHighInput = {
@@ -19277,6 +19875,7 @@ export type UserAccountUncheckedUpdateWithoutConnectionProposalsHighInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutConnectionProposalsCreatedInput = {
@@ -19386,6 +19985,7 @@ export type UserAccountUpdateWithoutConnectionProposalsCreatedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutConnectionProposalsCreatedInput = {
@@ -19484,6 +20084,7 @@ export type UserAccountUncheckedUpdateWithoutConnectionProposalsCreatedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutConnectionProposalDecisionsInput = {
@@ -19582,6 +20183,7 @@ export type UserAccountCreateWithoutConnectionProposalDecisionsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutConnectionProposalDecisionsInput = {
@@ -19680,6 +20282,7 @@ export type UserAccountUncheckedCreateWithoutConnectionProposalDecisionsInput = 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutConnectionProposalDecisionsInput = {
@@ -19794,6 +20397,7 @@ export type UserAccountUpdateWithoutConnectionProposalDecisionsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutConnectionProposalDecisionsInput = {
@@ -19892,6 +20496,7 @@ export type UserAccountUncheckedUpdateWithoutConnectionProposalDecisionsInput = 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutConnectionProposalHistoryInput = {
@@ -19990,6 +20595,7 @@ export type UserAccountCreateWithoutConnectionProposalHistoryInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutConnectionProposalHistoryInput = {
@@ -20088,6 +20694,7 @@ export type UserAccountUncheckedCreateWithoutConnectionProposalHistoryInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutConnectionProposalHistoryInput = {
@@ -20202,6 +20809,7 @@ export type UserAccountUpdateWithoutConnectionProposalHistoryInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutConnectionProposalHistoryInput = {
@@ -20300,6 +20908,7 @@ export type UserAccountUncheckedUpdateWithoutConnectionProposalHistoryInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutConnectionNotificationsInput = {
@@ -20398,6 +21007,7 @@ export type UserAccountCreateWithoutConnectionNotificationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutConnectionNotificationsInput = {
@@ -20496,6 +21106,7 @@ export type UserAccountUncheckedCreateWithoutConnectionNotificationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutConnectionNotificationsInput = {
@@ -20610,6 +21221,7 @@ export type UserAccountUpdateWithoutConnectionNotificationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutConnectionNotificationsInput = {
@@ -20708,6 +21320,7 @@ export type UserAccountUncheckedUpdateWithoutConnectionNotificationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutConnectionCommandReceiptsInput = {
@@ -20806,6 +21419,7 @@ export type UserAccountCreateWithoutConnectionCommandReceiptsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutConnectionCommandReceiptsInput = {
@@ -20904,6 +21518,7 @@ export type UserAccountUncheckedCreateWithoutConnectionCommandReceiptsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutConnectionCommandReceiptsInput = {
@@ -21018,6 +21633,7 @@ export type UserAccountUpdateWithoutConnectionCommandReceiptsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutConnectionCommandReceiptsInput = {
@@ -21116,6 +21732,7 @@ export type UserAccountUncheckedUpdateWithoutConnectionCommandReceiptsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutSupportConversationsRequestedInput = {
@@ -21214,6 +21831,7 @@ export type UserAccountCreateWithoutSupportConversationsRequestedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutSupportConversationsRequestedInput = {
@@ -21312,6 +21930,7 @@ export type UserAccountUncheckedCreateWithoutSupportConversationsRequestedInput 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutSupportConversationsRequestedInput = {
@@ -21415,6 +22034,7 @@ export type UserAccountCreateWithoutSupportConversationsAssignedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutSupportConversationsAssignedInput = {
@@ -21513,6 +22133,7 @@ export type UserAccountUncheckedCreateWithoutSupportConversationsAssignedInput =
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutSupportConversationsAssignedInput = {
@@ -21627,6 +22248,7 @@ export type UserAccountUpdateWithoutSupportConversationsRequestedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSupportConversationsRequestedInput = {
@@ -21725,6 +22347,7 @@ export type UserAccountUncheckedUpdateWithoutSupportConversationsRequestedInput 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutSupportConversationsAssignedInput = {
@@ -21834,6 +22457,7 @@ export type UserAccountUpdateWithoutSupportConversationsAssignedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSupportConversationsAssignedInput = {
@@ -21932,6 +22556,7 @@ export type UserAccountUncheckedUpdateWithoutSupportConversationsAssignedInput =
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutSupportMessagesInput = {
@@ -22030,6 +22655,7 @@ export type UserAccountCreateWithoutSupportMessagesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutSupportMessagesInput = {
@@ -22128,6 +22754,7 @@ export type UserAccountUncheckedCreateWithoutSupportMessagesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutSupportMessagesInput = {
@@ -22242,6 +22869,7 @@ export type UserAccountUpdateWithoutSupportMessagesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSupportMessagesInput = {
@@ -22340,6 +22968,7 @@ export type UserAccountUncheckedUpdateWithoutSupportMessagesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutSupportAssignmentsReceivedInput = {
@@ -22438,6 +23067,7 @@ export type UserAccountCreateWithoutSupportAssignmentsReceivedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutSupportAssignmentsReceivedInput = {
@@ -22536,6 +23166,7 @@ export type UserAccountUncheckedCreateWithoutSupportAssignmentsReceivedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutSupportAssignmentsReceivedInput = {
@@ -22639,6 +23270,7 @@ export type UserAccountCreateWithoutSupportAssignmentsMadeInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutSupportAssignmentsMadeInput = {
@@ -22737,6 +23369,7 @@ export type UserAccountUncheckedCreateWithoutSupportAssignmentsMadeInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutSupportAssignmentsMadeInput = {
@@ -22851,6 +23484,7 @@ export type UserAccountUpdateWithoutSupportAssignmentsReceivedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSupportAssignmentsReceivedInput = {
@@ -22949,6 +23583,7 @@ export type UserAccountUncheckedUpdateWithoutSupportAssignmentsReceivedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutSupportAssignmentsMadeInput = {
@@ -23058,6 +23693,7 @@ export type UserAccountUpdateWithoutSupportAssignmentsMadeInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSupportAssignmentsMadeInput = {
@@ -23156,6 +23792,7 @@ export type UserAccountUncheckedUpdateWithoutSupportAssignmentsMadeInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutSupportInternalNotesInput = {
@@ -23254,6 +23891,7 @@ export type UserAccountCreateWithoutSupportInternalNotesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutSupportInternalNotesInput = {
@@ -23352,6 +23990,7 @@ export type UserAccountUncheckedCreateWithoutSupportInternalNotesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutSupportInternalNotesInput = {
@@ -23466,6 +24105,7 @@ export type UserAccountUpdateWithoutSupportInternalNotesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSupportInternalNotesInput = {
@@ -23564,6 +24204,7 @@ export type UserAccountUncheckedUpdateWithoutSupportInternalNotesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutRecruitmentThreadsAsCandidateInput = {
@@ -23662,6 +24303,7 @@ export type UserAccountCreateWithoutRecruitmentThreadsAsCandidateInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutRecruitmentThreadsAsCandidateInput = {
@@ -23760,6 +24402,7 @@ export type UserAccountUncheckedCreateWithoutRecruitmentThreadsAsCandidateInput 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutRecruitmentThreadsAsCandidateInput = {
@@ -23874,6 +24517,7 @@ export type UserAccountUpdateWithoutRecruitmentThreadsAsCandidateInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutRecruitmentThreadsAsCandidateInput = {
@@ -23972,6 +24616,7 @@ export type UserAccountUncheckedUpdateWithoutRecruitmentThreadsAsCandidateInput 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutRecruitmentMessagesInput = {
@@ -24070,6 +24715,7 @@ export type UserAccountCreateWithoutRecruitmentMessagesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutRecruitmentMessagesInput = {
@@ -24168,6 +24814,7 @@ export type UserAccountUncheckedCreateWithoutRecruitmentMessagesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutRecruitmentMessagesInput = {
@@ -24282,6 +24929,7 @@ export type UserAccountUpdateWithoutRecruitmentMessagesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutRecruitmentMessagesInput = {
@@ -24380,6 +25028,7 @@ export type UserAccountUncheckedUpdateWithoutRecruitmentMessagesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutMessagingConversationsLowInput = {
@@ -24478,6 +25127,7 @@ export type UserAccountCreateWithoutMessagingConversationsLowInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingConversationsLowInput = {
@@ -24576,6 +25226,7 @@ export type UserAccountUncheckedCreateWithoutMessagingConversationsLowInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingConversationsLowInput = {
@@ -24679,6 +25330,7 @@ export type UserAccountCreateWithoutMessagingConversationsHighInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingConversationsHighInput = {
@@ -24777,6 +25429,7 @@ export type UserAccountUncheckedCreateWithoutMessagingConversationsHighInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingConversationsHighInput = {
@@ -24891,6 +25544,7 @@ export type UserAccountUpdateWithoutMessagingConversationsLowInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingConversationsLowInput = {
@@ -24989,6 +25643,7 @@ export type UserAccountUncheckedUpdateWithoutMessagingConversationsLowInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutMessagingConversationsHighInput = {
@@ -25098,6 +25753,7 @@ export type UserAccountUpdateWithoutMessagingConversationsHighInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingConversationsHighInput = {
@@ -25196,6 +25852,7 @@ export type UserAccountUncheckedUpdateWithoutMessagingConversationsHighInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutMessagingParticipantsInput = {
@@ -25294,6 +25951,7 @@ export type UserAccountCreateWithoutMessagingParticipantsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingParticipantsInput = {
@@ -25392,6 +26050,7 @@ export type UserAccountUncheckedCreateWithoutMessagingParticipantsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingParticipantsInput = {
@@ -25506,6 +26165,7 @@ export type UserAccountUpdateWithoutMessagingParticipantsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingParticipantsInput = {
@@ -25604,6 +26264,7 @@ export type UserAccountUncheckedUpdateWithoutMessagingParticipantsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutMessagingMessagesInput = {
@@ -25702,6 +26363,7 @@ export type UserAccountCreateWithoutMessagingMessagesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingMessagesInput = {
@@ -25800,6 +26462,7 @@ export type UserAccountUncheckedCreateWithoutMessagingMessagesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingMessagesInput = {
@@ -25914,6 +26577,7 @@ export type UserAccountUpdateWithoutMessagingMessagesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingMessagesInput = {
@@ -26012,6 +26676,7 @@ export type UserAccountUncheckedUpdateWithoutMessagingMessagesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutMessagingBlocksInitiatedInput = {
@@ -26110,6 +26775,7 @@ export type UserAccountCreateWithoutMessagingBlocksInitiatedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingBlocksInitiatedInput = {
@@ -26208,6 +26874,7 @@ export type UserAccountUncheckedCreateWithoutMessagingBlocksInitiatedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingBlocksInitiatedInput = {
@@ -26311,6 +26978,7 @@ export type UserAccountCreateWithoutMessagingBlocksReceivedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingBlocksReceivedInput = {
@@ -26409,6 +27077,7 @@ export type UserAccountUncheckedCreateWithoutMessagingBlocksReceivedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingBlocksReceivedInput = {
@@ -26523,6 +27192,7 @@ export type UserAccountUpdateWithoutMessagingBlocksInitiatedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingBlocksInitiatedInput = {
@@ -26621,6 +27291,7 @@ export type UserAccountUncheckedUpdateWithoutMessagingBlocksInitiatedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutMessagingBlocksReceivedInput = {
@@ -26730,6 +27401,7 @@ export type UserAccountUpdateWithoutMessagingBlocksReceivedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingBlocksReceivedInput = {
@@ -26828,6 +27500,7 @@ export type UserAccountUncheckedUpdateWithoutMessagingBlocksReceivedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutSubmittedMessagingReportsInput = {
@@ -26926,6 +27599,7 @@ export type UserAccountCreateWithoutSubmittedMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutSubmittedMessagingReportsInput = {
@@ -27024,6 +27698,7 @@ export type UserAccountUncheckedCreateWithoutSubmittedMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutSubmittedMessagingReportsInput = {
@@ -27127,6 +27802,7 @@ export type UserAccountCreateWithoutTargetedMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutTargetedMessagingReportsInput = {
@@ -27225,6 +27901,7 @@ export type UserAccountUncheckedCreateWithoutTargetedMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutTargetedMessagingReportsInput = {
@@ -27328,6 +28005,7 @@ export type UserAccountCreateWithoutAssignedMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutAssignedMessagingReportsInput = {
@@ -27426,6 +28104,7 @@ export type UserAccountUncheckedCreateWithoutAssignedMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutAssignedMessagingReportsInput = {
@@ -27529,6 +28208,7 @@ export type UserAccountCreateWithoutHandledMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutHandledMessagingReportsInput = {
@@ -27627,6 +28307,7 @@ export type UserAccountUncheckedCreateWithoutHandledMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutHandledMessagingReportsInput = {
@@ -27741,6 +28422,7 @@ export type UserAccountUpdateWithoutSubmittedMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSubmittedMessagingReportsInput = {
@@ -27839,6 +28521,7 @@ export type UserAccountUncheckedUpdateWithoutSubmittedMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutTargetedMessagingReportsInput = {
@@ -27948,6 +28631,7 @@ export type UserAccountUpdateWithoutTargetedMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutTargetedMessagingReportsInput = {
@@ -28046,6 +28730,7 @@ export type UserAccountUncheckedUpdateWithoutTargetedMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutAssignedMessagingReportsInput = {
@@ -28155,6 +28840,7 @@ export type UserAccountUpdateWithoutAssignedMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutAssignedMessagingReportsInput = {
@@ -28253,6 +28939,7 @@ export type UserAccountUncheckedUpdateWithoutAssignedMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUpsertWithoutHandledMessagingReportsInput = {
@@ -28362,6 +29049,7 @@ export type UserAccountUpdateWithoutHandledMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutHandledMessagingReportsInput = {
@@ -28460,6 +29148,7 @@ export type UserAccountUncheckedUpdateWithoutHandledMessagingReportsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutMessagingReportReviewEventsInput = {
@@ -28558,6 +29247,7 @@ export type UserAccountCreateWithoutMessagingReportReviewEventsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingReportReviewEventsInput = {
@@ -28656,6 +29346,7 @@ export type UserAccountUncheckedCreateWithoutMessagingReportReviewEventsInput = 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingReportReviewEventsInput = {
@@ -28770,6 +29461,7 @@ export type UserAccountUpdateWithoutMessagingReportReviewEventsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingReportReviewEventsInput = {
@@ -28868,6 +29560,7 @@ export type UserAccountUncheckedUpdateWithoutMessagingReportReviewEventsInput = 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutMessagingReportPrivateNotesInput = {
@@ -28966,6 +29659,7 @@ export type UserAccountCreateWithoutMessagingReportPrivateNotesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingReportPrivateNotesInput = {
@@ -29064,6 +29758,7 @@ export type UserAccountUncheckedCreateWithoutMessagingReportPrivateNotesInput = 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingReportPrivateNotesInput = {
@@ -29178,6 +29873,7 @@ export type UserAccountUpdateWithoutMessagingReportPrivateNotesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingReportPrivateNotesInput = {
@@ -29276,6 +29972,7 @@ export type UserAccountUncheckedUpdateWithoutMessagingReportPrivateNotesInput = 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutCvQuotaInput = {
@@ -29374,6 +30071,7 @@ export type UserAccountCreateWithoutCvQuotaInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvQuotaInput = {
@@ -29472,6 +30170,7 @@ export type UserAccountUncheckedCreateWithoutCvQuotaInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvQuotaInput = {
@@ -29586,6 +30285,7 @@ export type UserAccountUpdateWithoutCvQuotaInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvQuotaInput = {
@@ -29684,6 +30384,7 @@ export type UserAccountUncheckedUpdateWithoutCvQuotaInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutCvUploadsInput = {
@@ -29782,6 +30483,7 @@ export type UserAccountCreateWithoutCvUploadsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvUploadsInput = {
@@ -29880,6 +30582,7 @@ export type UserAccountUncheckedCreateWithoutCvUploadsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvUploadsInput = {
@@ -29994,6 +30697,7 @@ export type UserAccountUpdateWithoutCvUploadsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvUploadsInput = {
@@ -30092,6 +30796,7 @@ export type UserAccountUncheckedUpdateWithoutCvUploadsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutCvStoredArtifactsInput = {
@@ -30190,6 +30895,7 @@ export type UserAccountCreateWithoutCvStoredArtifactsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvStoredArtifactsInput = {
@@ -30288,6 +30994,7 @@ export type UserAccountUncheckedCreateWithoutCvStoredArtifactsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvStoredArtifactsInput = {
@@ -30402,6 +31109,7 @@ export type UserAccountUpdateWithoutCvStoredArtifactsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvStoredArtifactsInput = {
@@ -30500,6 +31208,7 @@ export type UserAccountUncheckedUpdateWithoutCvStoredArtifactsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutCvScanAssessmentsInput = {
@@ -30598,6 +31307,7 @@ export type UserAccountCreateWithoutCvScanAssessmentsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvScanAssessmentsInput = {
@@ -30696,6 +31406,7 @@ export type UserAccountUncheckedCreateWithoutCvScanAssessmentsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvScanAssessmentsInput = {
@@ -30810,6 +31521,7 @@ export type UserAccountUpdateWithoutCvScanAssessmentsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvScanAssessmentsInput = {
@@ -30908,6 +31620,7 @@ export type UserAccountUncheckedUpdateWithoutCvScanAssessmentsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutCvExtractionsInput = {
@@ -31006,6 +31719,7 @@ export type UserAccountCreateWithoutCvExtractionsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvExtractionsInput = {
@@ -31104,6 +31818,7 @@ export type UserAccountUncheckedCreateWithoutCvExtractionsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvExtractionsInput = {
@@ -31218,6 +31933,7 @@ export type UserAccountUpdateWithoutCvExtractionsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvExtractionsInput = {
@@ -31316,6 +32032,7 @@ export type UserAccountUncheckedUpdateWithoutCvExtractionsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutCvParseJobsInput = {
@@ -31414,6 +32131,7 @@ export type UserAccountCreateWithoutCvParseJobsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvParseJobsInput = {
@@ -31512,6 +32230,7 @@ export type UserAccountUncheckedCreateWithoutCvParseJobsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvParseJobsInput = {
@@ -31626,6 +32345,7 @@ export type UserAccountUpdateWithoutCvParseJobsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvParseJobsInput = {
@@ -31724,6 +32444,7 @@ export type UserAccountUncheckedUpdateWithoutCvParseJobsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutCvRetryRequestsInput = {
@@ -31822,6 +32543,7 @@ export type UserAccountCreateWithoutCvRetryRequestsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvRetryRequestsInput = {
@@ -31920,6 +32642,7 @@ export type UserAccountUncheckedCreateWithoutCvRetryRequestsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvRetryRequestsInput = {
@@ -32034,6 +32757,7 @@ export type UserAccountUpdateWithoutCvRetryRequestsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvRetryRequestsInput = {
@@ -32132,6 +32856,7 @@ export type UserAccountUncheckedUpdateWithoutCvRetryRequestsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutCvDraftsInput = {
@@ -32230,6 +32955,7 @@ export type UserAccountCreateWithoutCvDraftsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvDraftsInput = {
@@ -32328,6 +33054,7 @@ export type UserAccountUncheckedCreateWithoutCvDraftsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvDraftsInput = {
@@ -32442,6 +33169,7 @@ export type UserAccountUpdateWithoutCvDraftsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvDraftsInput = {
@@ -32540,6 +33268,7 @@ export type UserAccountUncheckedUpdateWithoutCvDraftsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutCvConsentEventsInput = {
@@ -32638,6 +33367,7 @@ export type UserAccountCreateWithoutCvConsentEventsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvConsentEventsInput = {
@@ -32736,6 +33466,7 @@ export type UserAccountUncheckedCreateWithoutCvConsentEventsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvConsentEventsInput = {
@@ -32850,6 +33581,7 @@ export type UserAccountUpdateWithoutCvConsentEventsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvConsentEventsInput = {
@@ -32948,6 +33680,7 @@ export type UserAccountUncheckedUpdateWithoutCvConsentEventsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutCvConfirmationsInput = {
@@ -33046,6 +33779,7 @@ export type UserAccountCreateWithoutCvConfirmationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvConfirmationsInput = {
@@ -33144,6 +33878,7 @@ export type UserAccountUncheckedCreateWithoutCvConfirmationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvConfirmationsInput = {
@@ -33258,6 +33993,7 @@ export type UserAccountUpdateWithoutCvConfirmationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvConfirmationsInput = {
@@ -33356,6 +34092,7 @@ export type UserAccountUncheckedUpdateWithoutCvConfirmationsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutImageSearchQueriesInput = {
@@ -33454,6 +34191,7 @@ export type UserAccountCreateWithoutImageSearchQueriesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutImageSearchQueriesInput = {
@@ -33552,6 +34290,7 @@ export type UserAccountUncheckedCreateWithoutImageSearchQueriesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutImageSearchQueriesInput = {
@@ -33666,6 +34405,7 @@ export type UserAccountUpdateWithoutImageSearchQueriesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutImageSearchQueriesInput = {
@@ -33764,6 +34504,7 @@ export type UserAccountUncheckedUpdateWithoutImageSearchQueriesInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutImageSearchConsentsInput = {
@@ -33862,6 +34603,7 @@ export type UserAccountCreateWithoutImageSearchConsentsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutImageSearchConsentsInput = {
@@ -33960,6 +34702,7 @@ export type UserAccountUncheckedCreateWithoutImageSearchConsentsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutImageSearchConsentsInput = {
@@ -34074,6 +34817,7 @@ export type UserAccountUpdateWithoutImageSearchConsentsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutImageSearchConsentsInput = {
@@ -34172,6 +34916,7 @@ export type UserAccountUncheckedUpdateWithoutImageSearchConsentsInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutScoringOperationsRequestedInput = {
@@ -34270,6 +35015,7 @@ export type UserAccountCreateWithoutScoringOperationsRequestedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutScoringOperationsRequestedInput = {
@@ -34368,6 +35114,7 @@ export type UserAccountUncheckedCreateWithoutScoringOperationsRequestedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutScoringOperationsRequestedInput = {
@@ -34482,6 +35229,7 @@ export type UserAccountUpdateWithoutScoringOperationsRequestedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutScoringOperationsRequestedInput = {
@@ -34580,6 +35328,7 @@ export type UserAccountUncheckedUpdateWithoutScoringOperationsRequestedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutManualPrioritiesSetInput = {
@@ -34678,6 +35427,7 @@ export type UserAccountCreateWithoutManualPrioritiesSetInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutManualPrioritiesSetInput = {
@@ -34776,6 +35526,7 @@ export type UserAccountUncheckedCreateWithoutManualPrioritiesSetInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutManualPrioritiesSetInput = {
@@ -34890,6 +35641,7 @@ export type UserAccountUpdateWithoutManualPrioritiesSetInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutManualPrioritiesSetInput = {
@@ -34988,6 +35740,7 @@ export type UserAccountUncheckedUpdateWithoutManualPrioritiesSetInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutJobPostingLifecycleFactsActedInput = {
@@ -35086,6 +35839,7 @@ export type UserAccountCreateWithoutJobPostingLifecycleFactsActedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutJobPostingLifecycleFactsActedInput = {
@@ -35184,6 +35938,7 @@ export type UserAccountUncheckedCreateWithoutJobPostingLifecycleFactsActedInput 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutJobPostingLifecycleFactsActedInput = {
@@ -35298,6 +36053,7 @@ export type UserAccountUpdateWithoutJobPostingLifecycleFactsActedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutJobPostingLifecycleFactsActedInput = {
@@ -35396,6 +36152,7 @@ export type UserAccountUncheckedUpdateWithoutJobPostingLifecycleFactsActedInput 
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutAnalyticsExportsRequestedInput = {
@@ -35494,6 +36251,7 @@ export type UserAccountCreateWithoutAnalyticsExportsRequestedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutAnalyticsExportsRequestedInput = {
@@ -35592,6 +36350,7 @@ export type UserAccountUncheckedCreateWithoutAnalyticsExportsRequestedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutAnalyticsExportsRequestedInput = {
@@ -35706,6 +36465,7 @@ export type UserAccountUpdateWithoutAnalyticsExportsRequestedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutAnalyticsExportsRequestedInput = {
@@ -35804,6 +36564,7 @@ export type UserAccountUncheckedUpdateWithoutAnalyticsExportsRequestedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountCreateWithoutActivityLegalHoldsAuthorizedInput = {
@@ -35902,6 +36663,7 @@ export type UserAccountCreateWithoutActivityLegalHoldsAuthorizedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountUncheckedCreateWithoutActivityLegalHoldsAuthorizedInput = {
@@ -36000,6 +36762,7 @@ export type UserAccountUncheckedCreateWithoutActivityLegalHoldsAuthorizedInput =
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedCreateNestedManyWithoutClosedByInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutActorInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutAuthorAdminInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedCreateNestedManyWithoutRequestedByInput
 }
 
 export type UserAccountCreateOrConnectWithoutActivityLegalHoldsAuthorizedInput = {
@@ -36114,6 +36877,7 @@ export type UserAccountUpdateWithoutActivityLegalHoldsAuthorizedInput = {
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUpdateManyWithoutRequestedByNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutActivityLegalHoldsAuthorizedInput = {
@@ -36212,6 +36976,7 @@ export type UserAccountUncheckedUpdateWithoutActivityLegalHoldsAuthorizedInput =
   closedJobPostReviewAggregates?: Prisma.JobPostReviewAggregateUncheckedUpdateManyWithoutClosedByNestedInput
   jobPostReviewHistory?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutActorNestedInput
   jobPostReviewPrivateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutAuthorAdminNestedInput
+  jobTaxonomyProposalsRequested?: Prisma.JobTaxonomyProposalUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 
@@ -36296,6 +37061,7 @@ export type UserAccountCountOutputType = {
   closedJobPostReviewAggregates: number
   jobPostReviewHistory: number
   jobPostReviewPrivateNotes: number
+  jobTaxonomyProposalsRequested: number
 }
 
 export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -36375,6 +37141,7 @@ export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   closedJobPostReviewAggregates?: boolean | UserAccountCountOutputTypeCountClosedJobPostReviewAggregatesArgs
   jobPostReviewHistory?: boolean | UserAccountCountOutputTypeCountJobPostReviewHistoryArgs
   jobPostReviewPrivateNotes?: boolean | UserAccountCountOutputTypeCountJobPostReviewPrivateNotesArgs
+  jobTaxonomyProposalsRequested?: boolean | UserAccountCountOutputTypeCountJobTaxonomyProposalsRequestedArgs
 }
 
 /**
@@ -36919,6 +37686,13 @@ export type UserAccountCountOutputTypeCountJobPostReviewPrivateNotesArgs<ExtArgs
   where?: Prisma.JobPostReviewPrivateNoteWhereInput
 }
 
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountJobTaxonomyProposalsRequestedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.JobTaxonomyProposalWhereInput
+}
+
 
 export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -37017,6 +37791,7 @@ export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   closedJobPostReviewAggregates?: boolean | Prisma.UserAccount$closedJobPostReviewAggregatesArgs<ExtArgs>
   jobPostReviewHistory?: boolean | Prisma.UserAccount$jobPostReviewHistoryArgs<ExtArgs>
   jobPostReviewPrivateNotes?: boolean | Prisma.UserAccount$jobPostReviewPrivateNotesArgs<ExtArgs>
+  jobTaxonomyProposalsRequested?: boolean | Prisma.UserAccount$jobTaxonomyProposalsRequestedArgs<ExtArgs>
   _count?: boolean | Prisma.UserAccountCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userAccount"]>
 
@@ -37153,6 +37928,7 @@ export type UserAccountInclude<ExtArgs extends runtime.Types.Extensions.Internal
   closedJobPostReviewAggregates?: boolean | Prisma.UserAccount$closedJobPostReviewAggregatesArgs<ExtArgs>
   jobPostReviewHistory?: boolean | Prisma.UserAccount$jobPostReviewHistoryArgs<ExtArgs>
   jobPostReviewPrivateNotes?: boolean | Prisma.UserAccount$jobPostReviewPrivateNotesArgs<ExtArgs>
+  jobTaxonomyProposalsRequested?: boolean | Prisma.UserAccount$jobTaxonomyProposalsRequestedArgs<ExtArgs>
   _count?: boolean | Prisma.UserAccountCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserAccountIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -37244,6 +38020,7 @@ export type $UserAccountPayload<ExtArgs extends runtime.Types.Extensions.Interna
     closedJobPostReviewAggregates: Prisma.$JobPostReviewAggregatePayload<ExtArgs>[]
     jobPostReviewHistory: Prisma.$JobPostReviewHistoryPayload<ExtArgs>[]
     jobPostReviewPrivateNotes: Prisma.$JobPostReviewPrivateNotePayload<ExtArgs>[]
+    jobTaxonomyProposalsRequested: Prisma.$JobTaxonomyProposalPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -37736,6 +38513,7 @@ export interface Prisma__UserAccountClient<T, Null = never, ExtArgs extends runt
   closedJobPostReviewAggregates<T extends Prisma.UserAccount$closedJobPostReviewAggregatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$closedJobPostReviewAggregatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostReviewAggregatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   jobPostReviewHistory<T extends Prisma.UserAccount$jobPostReviewHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$jobPostReviewHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostReviewHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   jobPostReviewPrivateNotes<T extends Prisma.UserAccount$jobPostReviewPrivateNotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$jobPostReviewPrivateNotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostReviewPrivateNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  jobTaxonomyProposalsRequested<T extends Prisma.UserAccount$jobTaxonomyProposalsRequestedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$jobTaxonomyProposalsRequestedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobTaxonomyProposalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -40125,6 +40903,30 @@ export type UserAccount$jobPostReviewPrivateNotesArgs<ExtArgs extends runtime.Ty
   take?: number
   skip?: number
   distinct?: Prisma.JobPostReviewPrivateNoteScalarFieldEnum | Prisma.JobPostReviewPrivateNoteScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.jobTaxonomyProposalsRequested
+ */
+export type UserAccount$jobTaxonomyProposalsRequestedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JobTaxonomyProposal
+   */
+  select?: Prisma.JobTaxonomyProposalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JobTaxonomyProposal
+   */
+  omit?: Prisma.JobTaxonomyProposalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JobTaxonomyProposalInclude<ExtArgs> | null
+  where?: Prisma.JobTaxonomyProposalWhereInput
+  orderBy?: Prisma.JobTaxonomyProposalOrderByWithRelationInput | Prisma.JobTaxonomyProposalOrderByWithRelationInput[]
+  cursor?: Prisma.JobTaxonomyProposalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.JobTaxonomyProposalScalarFieldEnum | Prisma.JobTaxonomyProposalScalarFieldEnum[]
 }
 
 /**

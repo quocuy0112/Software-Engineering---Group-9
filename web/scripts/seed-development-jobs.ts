@@ -107,7 +107,14 @@ const sourceJobSchema = z.object({
   numberOfHires: z.number().int().positive(),
   age: z.string().min(1).max(80),
   industry: z.string().min(1).max(160),
+  /** Shared taxonomy fields are optional for older fixture documents. */
+  industryCode: z.string().trim().min(1).max(80).optional(),
+  industryId: z.string().trim().min(1).max(80).nullable().optional(),
   subIndustry: z.string().min(1).max(160),
+  subIndustryCode: z.string().trim().min(1).max(128).nullable().optional(),
+  subIndustryId: z.string().trim().min(1).max(128).nullable().optional(),
+  categoryIds: z.array(z.string().trim().min(1).max(128)).max(20).optional(),
+  categoryFamily: z.string().trim().min(1).max(80).optional(),
   skillTags: z.array(z.string().min(1).max(80)).max(50),
   location: sourceLocationSchema,
   salary: sourceSalarySchema,
@@ -544,9 +551,16 @@ async function importJob(
       ...description.benefits.map(({ label }) => label),
     ].join(" "),
   );
+  const industryCode = job.industryCode?.trim() || job.categoryFamily?.trim();
+  const subIndustryCode =
+    job.subIndustryCode?.trim() || job.categoryIds?.[0]?.trim() || null;
 
   const data = {
     companyId: job.companyId,
+    industryId: job.industryId?.trim() || industryCode || null,
+    subIndustryId: job.subIndustryId?.trim() || subIndustryCode,
+    industryCode: industryCode || null,
+    subIndustryCode,
     slug: job.slug,
     title: job.title,
     normalizedTitle: normalize(job.title),

@@ -20,6 +20,7 @@ const endpoints: Record<string, string> = {
   notifications: "/api/admin/notifications",
   "job-post-reviews": "/api/admin/job-post-reviews",
   "job-postings": "/api/admin/job-postings",
+  "job-taxonomy": "/api/admin/job-taxonomy",
 };
 
 export function adminApiErrorDetails(body: unknown) {
@@ -376,4 +377,11 @@ export function companyModerationCommandPath(
   action: "ban" | "unban",
 ) {
   return `${endpoint("companies")}/${encodeURIComponent(String(companyId))}/${action}`;
+}
+
+export function jobTaxonomyCommandPath(
+  subIndustryId: Identifier,
+  action: "deactivate" | "reactivate" | "remove",
+) {
+  return `${endpoint("job-taxonomy")}/${encodeURIComponent(String(subIndustryId))}/${action}`;
 }

@@ -371,6 +371,7 @@ export type JobPostReviewVersionWhereInput = {
   submittedMembership?: Prisma.XOR<Prisma.CompanyMembershipNullableScalarRelationFilter, Prisma.CompanyMembershipWhereInput> | null
   assignedAdmin?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
   decidedByAdmin?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
+  taxonomyProposal?: Prisma.XOR<Prisma.JobTaxonomyProposalNullableScalarRelationFilter, Prisma.JobTaxonomyProposalWhereInput> | null
   history?: Prisma.JobPostReviewHistoryListRelationFilter
   privateNotes?: Prisma.JobPostReviewPrivateNoteListRelationFilter
 }
@@ -407,6 +408,7 @@ export type JobPostReviewVersionOrderByWithRelationInput = {
   submittedMembership?: Prisma.CompanyMembershipOrderByWithRelationInput
   assignedAdmin?: Prisma.UserAccountOrderByWithRelationInput
   decidedByAdmin?: Prisma.UserAccountOrderByWithRelationInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalOrderByWithRelationInput
   history?: Prisma.JobPostReviewHistoryOrderByRelationAggregateInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteOrderByRelationAggregateInput
 }
@@ -448,6 +450,7 @@ export type JobPostReviewVersionWhereUniqueInput = Prisma.AtLeast<{
   submittedMembership?: Prisma.XOR<Prisma.CompanyMembershipNullableScalarRelationFilter, Prisma.CompanyMembershipWhereInput> | null
   assignedAdmin?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
   decidedByAdmin?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
+  taxonomyProposal?: Prisma.XOR<Prisma.JobTaxonomyProposalNullableScalarRelationFilter, Prisma.JobTaxonomyProposalWhereInput> | null
   history?: Prisma.JobPostReviewHistoryListRelationFilter
   privateNotes?: Prisma.JobPostReviewPrivateNoteListRelationFilter
 }, "id" | "decisionCorrelationId" | "reviewAggregateId_sequence" | "submittedByUserId_submissionIdempotencyKey">
@@ -541,6 +544,7 @@ export type JobPostReviewVersionCreateInput = {
   submittedMembership?: Prisma.CompanyMembershipCreateNestedOneWithoutSubmittedJobPostReviewsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedJobPostReviewsInput
   decidedByAdmin?: Prisma.UserAccountCreateNestedOneWithoutDecidedJobPostReviewsInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutReviewVersionInput
 }
@@ -572,6 +576,7 @@ export type JobPostReviewVersionUncheckedCreateInput = {
   updatedAt?: Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutPendingVersionInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutApprovedVersionInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutReviewVersionInput
 }
@@ -603,6 +608,7 @@ export type JobPostReviewVersionUpdateInput = {
   submittedMembership?: Prisma.CompanyMembershipUpdateOneWithoutSubmittedJobPostReviewsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedJobPostReviewsNestedInput
   decidedByAdmin?: Prisma.UserAccountUpdateOneWithoutDecidedJobPostReviewsNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutReviewVersionNestedInput
 }
@@ -634,6 +640,7 @@ export type JobPostReviewVersionUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutPendingVersionNestedInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutApprovedVersionNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutReviewVersionNestedInput
 }
@@ -722,6 +729,11 @@ export type JobPostReviewVersionListRelationFilter = {
 
 export type JobPostReviewVersionOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type JobPostReviewVersionScalarRelationFilter = {
+  is?: Prisma.JobPostReviewVersionWhereInput
+  isNot?: Prisma.JobPostReviewVersionWhereInput
 }
 
 export type JobPostReviewVersionNullableScalarRelationFilter = {
@@ -824,11 +836,6 @@ export type JobPostReviewVersionMinOrderByAggregateInput = {
 
 export type JobPostReviewVersionSumOrderByAggregateInput = {
   sequence?: Prisma.SortOrder
-}
-
-export type JobPostReviewVersionScalarRelationFilter = {
-  is?: Prisma.JobPostReviewVersionWhereInput
-  isNot?: Prisma.JobPostReviewVersionWhereInput
 }
 
 export type JobPostReviewVersionCreateNestedManyWithoutSubmittedByInput = {
@@ -955,6 +962,20 @@ export type JobPostReviewVersionUncheckedUpdateManyWithoutDecidedByAdminNestedIn
   update?: Prisma.JobPostReviewVersionUpdateWithWhereUniqueWithoutDecidedByAdminInput | Prisma.JobPostReviewVersionUpdateWithWhereUniqueWithoutDecidedByAdminInput[]
   updateMany?: Prisma.JobPostReviewVersionUpdateManyWithWhereWithoutDecidedByAdminInput | Prisma.JobPostReviewVersionUpdateManyWithWhereWithoutDecidedByAdminInput[]
   deleteMany?: Prisma.JobPostReviewVersionScalarWhereInput | Prisma.JobPostReviewVersionScalarWhereInput[]
+}
+
+export type JobPostReviewVersionCreateNestedOneWithoutTaxonomyProposalInput = {
+  create?: Prisma.XOR<Prisma.JobPostReviewVersionCreateWithoutTaxonomyProposalInput, Prisma.JobPostReviewVersionUncheckedCreateWithoutTaxonomyProposalInput>
+  connectOrCreate?: Prisma.JobPostReviewVersionCreateOrConnectWithoutTaxonomyProposalInput
+  connect?: Prisma.JobPostReviewVersionWhereUniqueInput
+}
+
+export type JobPostReviewVersionUpdateOneRequiredWithoutTaxonomyProposalNestedInput = {
+  create?: Prisma.XOR<Prisma.JobPostReviewVersionCreateWithoutTaxonomyProposalInput, Prisma.JobPostReviewVersionUncheckedCreateWithoutTaxonomyProposalInput>
+  connectOrCreate?: Prisma.JobPostReviewVersionCreateOrConnectWithoutTaxonomyProposalInput
+  upsert?: Prisma.JobPostReviewVersionUpsertWithoutTaxonomyProposalInput
+  connect?: Prisma.JobPostReviewVersionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobPostReviewVersionUpdateToOneWithWhereWithoutTaxonomyProposalInput, Prisma.JobPostReviewVersionUpdateWithoutTaxonomyProposalInput>, Prisma.JobPostReviewVersionUncheckedUpdateWithoutTaxonomyProposalInput>
 }
 
 export type JobPostReviewVersionCreateNestedManyWithoutSubmittedMembershipInput = {
@@ -1135,6 +1156,7 @@ export type JobPostReviewVersionCreateWithoutSubmittedByInput = {
   submittedMembership?: Prisma.CompanyMembershipCreateNestedOneWithoutSubmittedJobPostReviewsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedJobPostReviewsInput
   decidedByAdmin?: Prisma.UserAccountCreateNestedOneWithoutDecidedJobPostReviewsInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutReviewVersionInput
 }
@@ -1165,6 +1187,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutSubmittedByInput = {
   updatedAt?: Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutPendingVersionInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutApprovedVersionInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutReviewVersionInput
 }
@@ -1205,6 +1228,7 @@ export type JobPostReviewVersionCreateWithoutAssignedAdminInput = {
   submittedBy?: Prisma.UserAccountCreateNestedOneWithoutSubmittedJobPostReviewsInput
   submittedMembership?: Prisma.CompanyMembershipCreateNestedOneWithoutSubmittedJobPostReviewsInput
   decidedByAdmin?: Prisma.UserAccountCreateNestedOneWithoutDecidedJobPostReviewsInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutReviewVersionInput
 }
@@ -1235,6 +1259,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutAssignedAdminInput = {
   updatedAt?: Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutPendingVersionInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutApprovedVersionInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutReviewVersionInput
 }
@@ -1275,6 +1300,7 @@ export type JobPostReviewVersionCreateWithoutDecidedByAdminInput = {
   submittedBy?: Prisma.UserAccountCreateNestedOneWithoutSubmittedJobPostReviewsInput
   submittedMembership?: Prisma.CompanyMembershipCreateNestedOneWithoutSubmittedJobPostReviewsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedJobPostReviewsInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutReviewVersionInput
 }
@@ -1305,6 +1331,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutDecidedByAdminInput = {
   updatedAt?: Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutPendingVersionInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutApprovedVersionInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutReviewVersionInput
 }
@@ -1397,6 +1424,146 @@ export type JobPostReviewVersionUpdateManyWithWhereWithoutDecidedByAdminInput = 
   data: Prisma.XOR<Prisma.JobPostReviewVersionUpdateManyMutationInput, Prisma.JobPostReviewVersionUncheckedUpdateManyWithoutDecidedByAdminInput>
 }
 
+export type JobPostReviewVersionCreateWithoutTaxonomyProposalInput = {
+  id?: string
+  sequence: number
+  snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
+  snapshotSchemaVersion: string
+  snapshotSha256: string
+  state?: $Enums.JobPostReviewState
+  submissionIdempotencyKey?: string | null
+  submissionRequestHash?: string | null
+  submittedAt?: Date | string
+  assignedAt?: Date | string | null
+  decidedAt?: Date | string | null
+  publishedAt?: Date | string | null
+  reasonCode?: $Enums.JobPostReviewReasonCode | null
+  publicExplanation?: string | null
+  decisionCorrelationId?: string | null
+  importedBaseline?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  aggregate: Prisma.JobPostReviewAggregateCreateNestedOneWithoutVersionsInput
+  pendingForAggregate?: Prisma.JobPostReviewAggregateCreateNestedOneWithoutPendingVersionInput
+  approvedForAggregate?: Prisma.JobPostReviewAggregateCreateNestedOneWithoutApprovedVersionInput
+  submittedBy?: Prisma.UserAccountCreateNestedOneWithoutSubmittedJobPostReviewsInput
+  submittedMembership?: Prisma.CompanyMembershipCreateNestedOneWithoutSubmittedJobPostReviewsInput
+  assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedJobPostReviewsInput
+  decidedByAdmin?: Prisma.UserAccountCreateNestedOneWithoutDecidedJobPostReviewsInput
+  history?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutReviewVersionInput
+  privateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutReviewVersionInput
+}
+
+export type JobPostReviewVersionUncheckedCreateWithoutTaxonomyProposalInput = {
+  id?: string
+  reviewAggregateId: string
+  sequence: number
+  snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: string
+  snapshotSchemaVersion: string
+  snapshotSha256: string
+  state?: $Enums.JobPostReviewState
+  submittedByUserId?: string | null
+  submittedMembershipId?: string | null
+  submissionIdempotencyKey?: string | null
+  submissionRequestHash?: string | null
+  submittedAt?: Date | string
+  assignedAdminUserId?: string | null
+  assignedAt?: Date | string | null
+  decidedByAdminUserId?: string | null
+  decidedAt?: Date | string | null
+  publishedAt?: Date | string | null
+  reasonCode?: $Enums.JobPostReviewReasonCode | null
+  publicExplanation?: string | null
+  decisionCorrelationId?: string | null
+  importedBaseline?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutPendingVersionInput
+  approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutApprovedVersionInput
+  history?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutReviewVersionInput
+  privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutReviewVersionInput
+}
+
+export type JobPostReviewVersionCreateOrConnectWithoutTaxonomyProposalInput = {
+  where: Prisma.JobPostReviewVersionWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobPostReviewVersionCreateWithoutTaxonomyProposalInput, Prisma.JobPostReviewVersionUncheckedCreateWithoutTaxonomyProposalInput>
+}
+
+export type JobPostReviewVersionUpsertWithoutTaxonomyProposalInput = {
+  update: Prisma.XOR<Prisma.JobPostReviewVersionUpdateWithoutTaxonomyProposalInput, Prisma.JobPostReviewVersionUncheckedUpdateWithoutTaxonomyProposalInput>
+  create: Prisma.XOR<Prisma.JobPostReviewVersionCreateWithoutTaxonomyProposalInput, Prisma.JobPostReviewVersionUncheckedCreateWithoutTaxonomyProposalInput>
+  where?: Prisma.JobPostReviewVersionWhereInput
+}
+
+export type JobPostReviewVersionUpdateToOneWithWhereWithoutTaxonomyProposalInput = {
+  where?: Prisma.JobPostReviewVersionWhereInput
+  data: Prisma.XOR<Prisma.JobPostReviewVersionUpdateWithoutTaxonomyProposalInput, Prisma.JobPostReviewVersionUncheckedUpdateWithoutTaxonomyProposalInput>
+}
+
+export type JobPostReviewVersionUpdateWithoutTaxonomyProposalInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sequence?: Prisma.IntFieldUpdateOperationsInput | number
+  snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
+  snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submissionRequestHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reasonCode?: Prisma.NullableEnumJobPostReviewReasonCodeFieldUpdateOperationsInput | $Enums.JobPostReviewReasonCode | null
+  publicExplanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decisionCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  importedBaseline?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  aggregate?: Prisma.JobPostReviewAggregateUpdateOneRequiredWithoutVersionsNestedInput
+  pendingForAggregate?: Prisma.JobPostReviewAggregateUpdateOneWithoutPendingVersionNestedInput
+  approvedForAggregate?: Prisma.JobPostReviewAggregateUpdateOneWithoutApprovedVersionNestedInput
+  submittedBy?: Prisma.UserAccountUpdateOneWithoutSubmittedJobPostReviewsNestedInput
+  submittedMembership?: Prisma.CompanyMembershipUpdateOneWithoutSubmittedJobPostReviewsNestedInput
+  assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedJobPostReviewsNestedInput
+  decidedByAdmin?: Prisma.UserAccountUpdateOneWithoutDecidedJobPostReviewsNestedInput
+  history?: Prisma.JobPostReviewHistoryUpdateManyWithoutReviewVersionNestedInput
+  privateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutReviewVersionNestedInput
+}
+
+export type JobPostReviewVersionUncheckedUpdateWithoutTaxonomyProposalInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reviewAggregateId?: Prisma.StringFieldUpdateOperationsInput | string
+  sequence?: Prisma.IntFieldUpdateOperationsInput | number
+  snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  normalizedTitleSearch?: Prisma.StringFieldUpdateOperationsInput | string
+  snapshotSchemaVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  snapshotSha256?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumJobPostReviewStateFieldUpdateOperationsInput | $Enums.JobPostReviewState
+  submittedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedMembershipId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submissionRequestHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  decidedByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reasonCode?: Prisma.NullableEnumJobPostReviewReasonCodeFieldUpdateOperationsInput | $Enums.JobPostReviewReasonCode | null
+  publicExplanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decisionCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  importedBaseline?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutPendingVersionNestedInput
+  approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutApprovedVersionNestedInput
+  history?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutReviewVersionNestedInput
+  privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutReviewVersionNestedInput
+}
+
 export type JobPostReviewVersionCreateWithoutSubmittedMembershipInput = {
   id?: string
   sequence: number
@@ -1423,6 +1590,7 @@ export type JobPostReviewVersionCreateWithoutSubmittedMembershipInput = {
   submittedBy?: Prisma.UserAccountCreateNestedOneWithoutSubmittedJobPostReviewsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedJobPostReviewsInput
   decidedByAdmin?: Prisma.UserAccountCreateNestedOneWithoutDecidedJobPostReviewsInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutReviewVersionInput
 }
@@ -1453,6 +1621,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutSubmittedMembershipInput =
   updatedAt?: Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutPendingVersionInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutApprovedVersionInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutReviewVersionInput
 }
@@ -1509,6 +1678,7 @@ export type JobPostReviewVersionCreateWithoutAggregateInput = {
   submittedMembership?: Prisma.CompanyMembershipCreateNestedOneWithoutSubmittedJobPostReviewsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedJobPostReviewsInput
   decidedByAdmin?: Prisma.UserAccountCreateNestedOneWithoutDecidedJobPostReviewsInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutReviewVersionInput
 }
@@ -1539,6 +1709,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutAggregateInput = {
   updatedAt?: Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutPendingVersionInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutApprovedVersionInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutReviewVersionInput
 }
@@ -1579,6 +1750,7 @@ export type JobPostReviewVersionCreateWithoutPendingForAggregateInput = {
   submittedMembership?: Prisma.CompanyMembershipCreateNestedOneWithoutSubmittedJobPostReviewsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedJobPostReviewsInput
   decidedByAdmin?: Prisma.UserAccountCreateNestedOneWithoutDecidedJobPostReviewsInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutReviewVersionInput
 }
@@ -1609,6 +1781,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutPendingForAggregateInput =
   createdAt?: Date | string
   updatedAt?: Date | string
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutApprovedVersionInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutReviewVersionInput
 }
@@ -1644,6 +1817,7 @@ export type JobPostReviewVersionCreateWithoutApprovedForAggregateInput = {
   submittedMembership?: Prisma.CompanyMembershipCreateNestedOneWithoutSubmittedJobPostReviewsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedJobPostReviewsInput
   decidedByAdmin?: Prisma.UserAccountCreateNestedOneWithoutDecidedJobPostReviewsInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutReviewVersionInput
 }
@@ -1674,6 +1848,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutApprovedForAggregateInput 
   createdAt?: Date | string
   updatedAt?: Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutPendingVersionInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutReviewVersionInput
 }
@@ -1736,6 +1911,7 @@ export type JobPostReviewVersionUpdateWithoutPendingForAggregateInput = {
   submittedMembership?: Prisma.CompanyMembershipUpdateOneWithoutSubmittedJobPostReviewsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedJobPostReviewsNestedInput
   decidedByAdmin?: Prisma.UserAccountUpdateOneWithoutDecidedJobPostReviewsNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutReviewVersionNestedInput
 }
@@ -1766,6 +1942,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutPendingForAggregateInput =
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutApprovedVersionNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutReviewVersionNestedInput
 }
@@ -1807,6 +1984,7 @@ export type JobPostReviewVersionUpdateWithoutApprovedForAggregateInput = {
   submittedMembership?: Prisma.CompanyMembershipUpdateOneWithoutSubmittedJobPostReviewsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedJobPostReviewsNestedInput
   decidedByAdmin?: Prisma.UserAccountUpdateOneWithoutDecidedJobPostReviewsNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutReviewVersionNestedInput
 }
@@ -1837,6 +2015,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutApprovedForAggregateInput 
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutPendingVersionNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutReviewVersionNestedInput
 }
@@ -1868,6 +2047,7 @@ export type JobPostReviewVersionCreateWithoutHistoryInput = {
   submittedMembership?: Prisma.CompanyMembershipCreateNestedOneWithoutSubmittedJobPostReviewsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedJobPostReviewsInput
   decidedByAdmin?: Prisma.UserAccountCreateNestedOneWithoutDecidedJobPostReviewsInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalCreateNestedOneWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteCreateNestedManyWithoutReviewVersionInput
 }
 
@@ -1898,6 +2078,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutHistoryInput = {
   updatedAt?: Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutPendingVersionInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutApprovedVersionInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedCreateNestedOneWithoutReviewVersionInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedCreateNestedManyWithoutReviewVersionInput
 }
 
@@ -1944,6 +2125,7 @@ export type JobPostReviewVersionUpdateWithoutHistoryInput = {
   submittedMembership?: Prisma.CompanyMembershipUpdateOneWithoutSubmittedJobPostReviewsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedJobPostReviewsNestedInput
   decidedByAdmin?: Prisma.UserAccountUpdateOneWithoutDecidedJobPostReviewsNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUpdateOneWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutReviewVersionNestedInput
 }
 
@@ -1974,6 +2156,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutHistoryInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutPendingVersionNestedInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutApprovedVersionNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedUpdateOneWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutReviewVersionNestedInput
 }
 
@@ -2004,6 +2187,7 @@ export type JobPostReviewVersionCreateWithoutPrivateNotesInput = {
   submittedMembership?: Prisma.CompanyMembershipCreateNestedOneWithoutSubmittedJobPostReviewsInput
   assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedJobPostReviewsInput
   decidedByAdmin?: Prisma.UserAccountCreateNestedOneWithoutDecidedJobPostReviewsInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryCreateNestedManyWithoutReviewVersionInput
 }
 
@@ -2034,6 +2218,7 @@ export type JobPostReviewVersionUncheckedCreateWithoutPrivateNotesInput = {
   updatedAt?: Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutPendingVersionInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedCreateNestedOneWithoutApprovedVersionInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedCreateNestedOneWithoutReviewVersionInput
   history?: Prisma.JobPostReviewHistoryUncheckedCreateNestedManyWithoutReviewVersionInput
 }
 
@@ -2080,6 +2265,7 @@ export type JobPostReviewVersionUpdateWithoutPrivateNotesInput = {
   submittedMembership?: Prisma.CompanyMembershipUpdateOneWithoutSubmittedJobPostReviewsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedJobPostReviewsNestedInput
   decidedByAdmin?: Prisma.UserAccountUpdateOneWithoutDecidedJobPostReviewsNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUpdateManyWithoutReviewVersionNestedInput
 }
 
@@ -2110,6 +2296,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutPrivateNotesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutPendingVersionNestedInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutApprovedVersionNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutReviewVersionNestedInput
 }
 
@@ -2217,6 +2404,7 @@ export type JobPostReviewVersionUpdateWithoutSubmittedByInput = {
   submittedMembership?: Prisma.CompanyMembershipUpdateOneWithoutSubmittedJobPostReviewsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedJobPostReviewsNestedInput
   decidedByAdmin?: Prisma.UserAccountUpdateOneWithoutDecidedJobPostReviewsNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutReviewVersionNestedInput
 }
@@ -2247,6 +2435,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutSubmittedByInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutPendingVersionNestedInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutApprovedVersionNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutReviewVersionNestedInput
 }
@@ -2303,6 +2492,7 @@ export type JobPostReviewVersionUpdateWithoutAssignedAdminInput = {
   submittedBy?: Prisma.UserAccountUpdateOneWithoutSubmittedJobPostReviewsNestedInput
   submittedMembership?: Prisma.CompanyMembershipUpdateOneWithoutSubmittedJobPostReviewsNestedInput
   decidedByAdmin?: Prisma.UserAccountUpdateOneWithoutDecidedJobPostReviewsNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutReviewVersionNestedInput
 }
@@ -2333,6 +2523,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutAssignedAdminInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutPendingVersionNestedInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutApprovedVersionNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutReviewVersionNestedInput
 }
@@ -2389,6 +2580,7 @@ export type JobPostReviewVersionUpdateWithoutDecidedByAdminInput = {
   submittedBy?: Prisma.UserAccountUpdateOneWithoutSubmittedJobPostReviewsNestedInput
   submittedMembership?: Prisma.CompanyMembershipUpdateOneWithoutSubmittedJobPostReviewsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedJobPostReviewsNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutReviewVersionNestedInput
 }
@@ -2419,6 +2611,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutDecidedByAdminInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutPendingVersionNestedInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutApprovedVersionNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutReviewVersionNestedInput
 }
@@ -2501,6 +2694,7 @@ export type JobPostReviewVersionUpdateWithoutSubmittedMembershipInput = {
   submittedBy?: Prisma.UserAccountUpdateOneWithoutSubmittedJobPostReviewsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedJobPostReviewsNestedInput
   decidedByAdmin?: Prisma.UserAccountUpdateOneWithoutDecidedJobPostReviewsNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutReviewVersionNestedInput
 }
@@ -2531,6 +2725,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutSubmittedMembershipInput =
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutPendingVersionNestedInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutApprovedVersionNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutReviewVersionNestedInput
 }
@@ -2613,6 +2808,7 @@ export type JobPostReviewVersionUpdateWithoutAggregateInput = {
   submittedMembership?: Prisma.CompanyMembershipUpdateOneWithoutSubmittedJobPostReviewsNestedInput
   assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedJobPostReviewsNestedInput
   decidedByAdmin?: Prisma.UserAccountUpdateOneWithoutDecidedJobPostReviewsNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUpdateManyWithoutReviewVersionNestedInput
 }
@@ -2643,6 +2839,7 @@ export type JobPostReviewVersionUncheckedUpdateWithoutAggregateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pendingForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutPendingVersionNestedInput
   approvedForAggregate?: Prisma.JobPostReviewAggregateUncheckedUpdateOneWithoutApprovedVersionNestedInput
+  taxonomyProposal?: Prisma.JobTaxonomyProposalUncheckedUpdateOneWithoutReviewVersionNestedInput
   history?: Prisma.JobPostReviewHistoryUncheckedUpdateManyWithoutReviewVersionNestedInput
   privateNotes?: Prisma.JobPostReviewPrivateNoteUncheckedUpdateManyWithoutReviewVersionNestedInput
 }
@@ -2745,6 +2942,7 @@ export type JobPostReviewVersionSelect<ExtArgs extends runtime.Types.Extensions.
   submittedMembership?: boolean | Prisma.JobPostReviewVersion$submittedMembershipArgs<ExtArgs>
   assignedAdmin?: boolean | Prisma.JobPostReviewVersion$assignedAdminArgs<ExtArgs>
   decidedByAdmin?: boolean | Prisma.JobPostReviewVersion$decidedByAdminArgs<ExtArgs>
+  taxonomyProposal?: boolean | Prisma.JobPostReviewVersion$taxonomyProposalArgs<ExtArgs>
   history?: boolean | Prisma.JobPostReviewVersion$historyArgs<ExtArgs>
   privateNotes?: boolean | Prisma.JobPostReviewVersion$privateNotesArgs<ExtArgs>
   _count?: boolean | Prisma.JobPostReviewVersionCountOutputTypeDefaultArgs<ExtArgs>
@@ -2850,6 +3048,7 @@ export type JobPostReviewVersionInclude<ExtArgs extends runtime.Types.Extensions
   submittedMembership?: boolean | Prisma.JobPostReviewVersion$submittedMembershipArgs<ExtArgs>
   assignedAdmin?: boolean | Prisma.JobPostReviewVersion$assignedAdminArgs<ExtArgs>
   decidedByAdmin?: boolean | Prisma.JobPostReviewVersion$decidedByAdminArgs<ExtArgs>
+  taxonomyProposal?: boolean | Prisma.JobPostReviewVersion$taxonomyProposalArgs<ExtArgs>
   history?: boolean | Prisma.JobPostReviewVersion$historyArgs<ExtArgs>
   privateNotes?: boolean | Prisma.JobPostReviewVersion$privateNotesArgs<ExtArgs>
   _count?: boolean | Prisma.JobPostReviewVersionCountOutputTypeDefaultArgs<ExtArgs>
@@ -2879,6 +3078,7 @@ export type $JobPostReviewVersionPayload<ExtArgs extends runtime.Types.Extension
     submittedMembership: Prisma.$CompanyMembershipPayload<ExtArgs> | null
     assignedAdmin: Prisma.$UserAccountPayload<ExtArgs> | null
     decidedByAdmin: Prisma.$UserAccountPayload<ExtArgs> | null
+    taxonomyProposal: Prisma.$JobTaxonomyProposalPayload<ExtArgs> | null
     history: Prisma.$JobPostReviewHistoryPayload<ExtArgs>[]
     privateNotes: Prisma.$JobPostReviewPrivateNotePayload<ExtArgs>[]
   }
@@ -3308,6 +3508,7 @@ export interface Prisma__JobPostReviewVersionClient<T, Null = never, ExtArgs ext
   submittedMembership<T extends Prisma.JobPostReviewVersion$submittedMembershipArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPostReviewVersion$submittedMembershipArgs<ExtArgs>>): Prisma.Prisma__CompanyMembershipClient<runtime.Types.Result.GetResult<Prisma.$CompanyMembershipPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   assignedAdmin<T extends Prisma.JobPostReviewVersion$assignedAdminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPostReviewVersion$assignedAdminArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   decidedByAdmin<T extends Prisma.JobPostReviewVersion$decidedByAdminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPostReviewVersion$decidedByAdminArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  taxonomyProposal<T extends Prisma.JobPostReviewVersion$taxonomyProposalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPostReviewVersion$taxonomyProposalArgs<ExtArgs>>): Prisma.Prisma__JobTaxonomyProposalClient<runtime.Types.Result.GetResult<Prisma.$JobTaxonomyProposalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   history<T extends Prisma.JobPostReviewVersion$historyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPostReviewVersion$historyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostReviewHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   privateNotes<T extends Prisma.JobPostReviewVersion$privateNotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobPostReviewVersion$privateNotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostReviewPrivateNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -3875,6 +4076,25 @@ export type JobPostReviewVersion$decidedByAdminArgs<ExtArgs extends runtime.Type
    */
   include?: Prisma.UserAccountInclude<ExtArgs> | null
   where?: Prisma.UserAccountWhereInput
+}
+
+/**
+ * JobPostReviewVersion.taxonomyProposal
+ */
+export type JobPostReviewVersion$taxonomyProposalArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JobTaxonomyProposal
+   */
+  select?: Prisma.JobTaxonomyProposalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JobTaxonomyProposal
+   */
+  omit?: Prisma.JobTaxonomyProposalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JobTaxonomyProposalInclude<ExtArgs> | null
+  where?: Prisma.JobTaxonomyProposalWhereInput
 }
 
 /**

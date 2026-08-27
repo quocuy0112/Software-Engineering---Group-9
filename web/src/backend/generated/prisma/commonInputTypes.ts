@@ -712,6 +712,40 @@ export type EnumCompanyVerificationStateNullableWithAggregatesFilter<$PrismaMode
   _max?: Prisma.NestedEnumCompanyVerificationStateNullableFilter<$PrismaModel>
 }
 
+export type EnumJobTaxonomyStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobTaxonomyStatus | Prisma.EnumJobTaxonomyStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.JobTaxonomyStatus[] | Prisma.ListEnumJobTaxonomyStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobTaxonomyStatus[] | Prisma.ListEnumJobTaxonomyStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobTaxonomyStatusFilter<$PrismaModel> | $Enums.JobTaxonomyStatus
+}
+
+export type EnumJobTaxonomyStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobTaxonomyStatus | Prisma.EnumJobTaxonomyStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.JobTaxonomyStatus[] | Prisma.ListEnumJobTaxonomyStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobTaxonomyStatus[] | Prisma.ListEnumJobTaxonomyStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobTaxonomyStatusWithAggregatesFilter<$PrismaModel> | $Enums.JobTaxonomyStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJobTaxonomyStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJobTaxonomyStatusFilter<$PrismaModel>
+}
+
+export type EnumJobTaxonomyProposalStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobTaxonomyProposalStatus | Prisma.EnumJobTaxonomyProposalStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.JobTaxonomyProposalStatus[] | Prisma.ListEnumJobTaxonomyProposalStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobTaxonomyProposalStatus[] | Prisma.ListEnumJobTaxonomyProposalStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobTaxonomyProposalStatusFilter<$PrismaModel> | $Enums.JobTaxonomyProposalStatus
+}
+
+export type EnumJobTaxonomyProposalStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobTaxonomyProposalStatus | Prisma.EnumJobTaxonomyProposalStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.JobTaxonomyProposalStatus[] | Prisma.ListEnumJobTaxonomyProposalStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobTaxonomyProposalStatus[] | Prisma.ListEnumJobTaxonomyProposalStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobTaxonomyProposalStatusWithAggregatesFilter<$PrismaModel> | $Enums.JobTaxonomyProposalStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJobTaxonomyProposalStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJobTaxonomyProposalStatusFilter<$PrismaModel>
+}
+
 export type EnumCompanyMembershipRoleFilter<$PrismaModel = never> = {
   equals?: $Enums.CompanyMembershipRole | Prisma.EnumCompanyMembershipRoleFieldRefInput<$PrismaModel>
   in?: $Enums.CompanyMembershipRole[] | Prisma.ListEnumCompanyMembershipRoleFieldRefInput<$PrismaModel>
@@ -3563,6 +3597,40 @@ export type NestedEnumCompanyVerificationStateNullableWithAggregatesFilter<$Pris
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumCompanyVerificationStateNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumCompanyVerificationStateNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumJobTaxonomyStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobTaxonomyStatus | Prisma.EnumJobTaxonomyStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.JobTaxonomyStatus[] | Prisma.ListEnumJobTaxonomyStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobTaxonomyStatus[] | Prisma.ListEnumJobTaxonomyStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobTaxonomyStatusFilter<$PrismaModel> | $Enums.JobTaxonomyStatus
+}
+
+export type NestedEnumJobTaxonomyStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobTaxonomyStatus | Prisma.EnumJobTaxonomyStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.JobTaxonomyStatus[] | Prisma.ListEnumJobTaxonomyStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobTaxonomyStatus[] | Prisma.ListEnumJobTaxonomyStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobTaxonomyStatusWithAggregatesFilter<$PrismaModel> | $Enums.JobTaxonomyStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJobTaxonomyStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJobTaxonomyStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumJobTaxonomyProposalStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobTaxonomyProposalStatus | Prisma.EnumJobTaxonomyProposalStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.JobTaxonomyProposalStatus[] | Prisma.ListEnumJobTaxonomyProposalStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobTaxonomyProposalStatus[] | Prisma.ListEnumJobTaxonomyProposalStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobTaxonomyProposalStatusFilter<$PrismaModel> | $Enums.JobTaxonomyProposalStatus
+}
+
+export type NestedEnumJobTaxonomyProposalStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobTaxonomyProposalStatus | Prisma.EnumJobTaxonomyProposalStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.JobTaxonomyProposalStatus[] | Prisma.ListEnumJobTaxonomyProposalStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobTaxonomyProposalStatus[] | Prisma.ListEnumJobTaxonomyProposalStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobTaxonomyProposalStatusWithAggregatesFilter<$PrismaModel> | $Enums.JobTaxonomyProposalStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJobTaxonomyProposalStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJobTaxonomyProposalStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumCompanyMembershipRoleFilter<$PrismaModel = never> = {

@@ -78,6 +78,9 @@ export const ModelName = {
   InAppNotification: 'InAppNotification',
   AuditEvent: 'AuditEvent',
   Company: 'Company',
+  JobIndustry: 'JobIndustry',
+  JobSubIndustry: 'JobSubIndustry',
+  JobTaxonomyProposal: 'JobTaxonomyProposal',
   CompanyInvitation: 'CompanyInvitation',
   CompanyTeamActivity: 'CompanyTeamActivity',
   CompanyMembership: 'CompanyMembership',
@@ -723,6 +726,58 @@ export const CompanyScalarFieldEnum = {
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
 
 
+export const JobIndustryScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  normalizedName: 'normalizedName',
+  status: 'status',
+  sortOrder: 'sortOrder',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobIndustryScalarFieldEnum = (typeof JobIndustryScalarFieldEnum)[keyof typeof JobIndustryScalarFieldEnum]
+
+
+export const JobSubIndustryScalarFieldEnum = {
+  id: 'id',
+  industryId: 'industryId',
+  code: 'code',
+  name: 'name',
+  normalizedName: 'normalizedName',
+  status: 'status',
+  sortOrder: 'sortOrder',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobSubIndustryScalarFieldEnum = (typeof JobSubIndustryScalarFieldEnum)[keyof typeof JobSubIndustryScalarFieldEnum]
+
+
+export const JobTaxonomyProposalScalarFieldEnum = {
+  id: 'id',
+  industryId: 'industryId',
+  companyId: 'companyId',
+  requestedByUserId: 'requestedByUserId',
+  reviewVersionId: 'reviewVersionId',
+  proposedName: 'proposedName',
+  normalizedName: 'normalizedName',
+  description: 'description',
+  status: 'status',
+  resolvedSubIndustryId: 'resolvedSubIndustryId',
+  reviewedByAdminUserId: 'reviewedByAdminUserId',
+  reviewedAt: 'reviewedAt',
+  reviewReason: 'reviewReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobTaxonomyProposalScalarFieldEnum = (typeof JobTaxonomyProposalScalarFieldEnum)[keyof typeof JobTaxonomyProposalScalarFieldEnum]
+
+
 export const CompanyInvitationScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
@@ -1212,6 +1267,10 @@ export type ModerationPrivateNoteScalarFieldEnum = (typeof ModerationPrivateNote
 export const JobPostingScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
+  industryId: 'industryId',
+  subIndustryId: 'subIndustryId',
+  industryCode: 'industryCode',
+  subIndustryCode: 'subIndustryCode',
   slug: 'slug',
   title: 'title',
   normalizedTitle: 'normalizedTitle',
