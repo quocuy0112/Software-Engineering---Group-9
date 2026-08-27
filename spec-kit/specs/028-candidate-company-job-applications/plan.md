@@ -8,7 +8,7 @@
 
 ## Summary
 
-Add a Candidate-facing Company discovery experience with public company cards, company detail pages, employee-derived size, and scoped job search by keyword and location. Add a separate Owner-only Team Applications workflow for candidates who want to join a company as HR Manager or Recruiter. Team applications retain the submitted CV, allow a human Owner decision, send an idempotent invitation, and create membership only after explicit invitation acceptance. Ordinary job applications continue using the existing job detail, application, scoring, and pipeline workflows.
+Add a Candidate-facing Company discovery experience with public company cards, keyword search, deterministic company pagination, company detail pages, employee-derived size, and scoped job search by keyword and location. Company jobs are paginated and reuse the existing Find Jobs card/status actions. Add a separate Owner-only Team Applications workflow for candidates who want to join a company as HR Manager or Recruiter. Team applications retain the submitted CV, allow a human Owner decision, send an idempotent invitation, and create membership only after explicit invitation acceptance. Ordinary job applications continue using the existing job detail, application, scoring, and pipeline workflows.
 
 ## Technical Context
 
@@ -38,17 +38,17 @@ Add a Candidate-facing Company discovery experience with public company cards, c
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Gate | Status | Evidence |
-|---|---|---|
-| Human-controlled recruitment | PASS | Owner explicitly accepts or rejects team applications; no automatic hiring, scoring, or pipeline transition. |
-| Security, privacy, tenant isolation | PASS | Public projections expose approved company/job fields only; CVs and application records require candidate/Owner authorization; membership is not granted on submission. |
-| State, audit, and integrity | PASS | Team application and invitation transitions are server-validated, transactional, auditable, and idempotent; duplicate active applications/invitations are prevented. |
-| CV and personal-data protection | PASS | PDF/DOCX and 5,000,000-byte limit, validation before persistence, least-privilege CV access, retention/deletion policy, and email privacy controls are specified. |
-| Quality and accessibility | PASS | P95 search/page targets, responsive UI, keyboard access, labels, loading/error states, and security/performance acceptance tests are planned. |
-| Maintainable boundaries | PASS | Company/job projections, team-application service, invitation service, repositories, contracts, and UI remain separated; ordinary job workflow is reused. |
-| Scope discipline | PASS | No scoring, AI recommendation, pipeline/Kanban, or ordinary job application replacement is introduced. |
+| Gate                                | Status | Evidence                                                                                                                                                                |
+| ----------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Human-controlled recruitment        | PASS   | Owner explicitly accepts or rejects team applications; no automatic hiring, scoring, or pipeline transition.                                                            |
+| Security, privacy, tenant isolation | PASS   | Public projections expose approved company/job fields only; CVs and application records require candidate/Owner authorization; membership is not granted on submission. |
+| State, audit, and integrity         | PASS   | Team application and invitation transitions are server-validated, transactional, auditable, and idempotent; duplicate active applications/invitations are prevented.    |
+| CV and personal-data protection     | PASS   | PDF/DOCX and 5,000,000-byte limit, validation before persistence, least-privilege CV access, retention/deletion policy, and email privacy controls are specified.       |
+| Quality and accessibility           | PASS   | P95 search/page targets, responsive UI, keyboard access, labels, loading/error states, and security/performance acceptance tests are planned.                           |
+| Maintainable boundaries             | PASS   | Company/job projections, team-application service, invitation service, repositories, contracts, and UI remain separated; ordinary job workflow is reused.               |
+| Scope discipline                    | PASS   | No scoring, AI recommendation, pipeline/Kanban, or ordinary job application replacement is introduced.                                                                  |
 
 ## Project Structure
 
@@ -65,6 +65,7 @@ spec-kit/specs/028-candidate-company-job-applications/
 ```
 
 ### Source Code (repository root)
+
 <!--
   ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
   for this feature. Delete unused options and expand the chosen structure with
@@ -117,11 +118,14 @@ Research decisions are recorded in [research.md](./research.md). The design reus
 
 ## Phase 1: Design Summary
 
-- Public Company pages use a safe, approved-company projection and reuse deterministic job discovery/search behavior scoped by `companyId`.
+- Public Company pages use a safe, approved-company projection with keyword/pagination controls and reuse deterministic job discovery/search behavior scoped by `companyId`; company job cards reuse Find Jobs status/action UI.
 - Team Applications are a separate entity from ordinary `JobApplication`; they capture a team role and immutable CV evidence without scoring or pipeline state.
 - Owner decisions and invitation creation are transactional and idempotent. Invitation acceptance is the only transition that grants company membership.
 - Company size is a read-time projection from active membership count and documented size ranges, with an unavailable state when source data is missing.
 - Candidate and Owner views expose only their permitted projections. CV download/preview is authorized server-side and audited.
+- Team-application availability is derived from active Owner membership: public ordinary jobs remain visible, while team-role actions and submissions are disabled when no active Owner can receive the application.
+- A successful team submission writes one deduplicated in-app notification per active Owner and resolves to the Owner Team Applications screen; notification copy is localized from the recipient preference without including CV or applicant contact data.
+- New Company, Candidate Team Applications, Owner Team Applications, and related Manage Team navigation copy is read from the shared English/Vietnamese workspace locale boundary; company and job content remains user-authored.
 
 ## Project Structure
 

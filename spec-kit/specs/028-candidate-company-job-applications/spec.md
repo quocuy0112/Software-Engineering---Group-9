@@ -7,6 +7,12 @@
 
 ## Clarifications
 
+### Session 2026-08-27
+
+- Q: What happens when a public company has no active Owner? -> A: The Company page keeps ordinary public jobs available, but hides the HR Manager/Recruiter team-application actions and the submission API rejects new team applications for that company. Existing application records are preserved for audit and require data repair by an authorized administrator or Owner before they can receive a decision.
+- Q: How does an Owner know that a candidate submitted a team application? -> A: A successful submission creates one localized in-app notification for every active company Owner. The notification contains a safe summary and opens Manage Team > Team Applications; it never includes CV contents or private applicant details.
+- Q: Which language controls the Company and Team Applications UI? -> A: The selected workspace locale controls Candidate Company, Candidate Team Applications, Owner Team Applications, and related Manage Team navigation in English and Vietnamese. Company names, job content, CV names, and other user-authored data remain unchanged.
+
 ### Session 2026-08-26
 
 - Q: Trong trang chi tiết Company, phạm vi job nào được hiển thị và cho phép ứng tuyển? → A: Hiển thị tất cả job đang hoạt động của company; trong feature này chỉ cho phép ứng tuyển vào job có role HR Manager hoặc Recruiter.
@@ -14,7 +20,7 @@
 - Q: Team Applications trong Manage Team chứa loại hồ sơ nào? → A: Chỉ chứa hồ sơ ứng tuyển HR Manager hoặc Recruiter; hồ sơ ứng tuyển các job thông thường tiếp tục nằm trong workflow application hiện có.
 - Q: Khi Owner từ chối Team Application, candidate có nhận thông báo không? → A: Hệ thống gửi email từ chối; Owner được tùy chọn nhập lý do và lý do sẽ được gửi cho candidate nếu có.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Browse companies (Priority: P1)
 
@@ -29,6 +35,8 @@ As a candidate, I can open the Company area and browse a list of companies with 
 1. **Given** approved companies are available, **When** a candidate opens Company, **Then** the page displays company cards with company name, logo or fallback, and description.
 2. **Given** no approved companies match the available data, **When** a candidate opens Company, **Then** the page displays a clear empty state without exposing private or unapproved company information.
 3. **Given** a company card is visible, **When** the candidate selects it, **Then** the candidate is taken to that company’s public detail page.
+4. **Given** multiple approved companies are available, **When** the candidate enters a company keyword and submits the search, **Then** only matching public company cards are displayed.
+5. **Given** more companies exist than fit one page, **When** the candidate changes company pages, **Then** the selected page is loaded without exposing unapproved companies and the search keyword remains applied.
 
 ### User Story 2 - View company details and jobs (Priority: P1)
 
@@ -44,6 +52,7 @@ As a candidate, I can view a company’s description, founding year, employee-ba
 2. **Given** the company has active approved job posts, **When** the candidate views the detail page, **Then** the jobs section lists all those jobs with title, role, location, and employment information.
 3. **Given** the company has no active approved jobs, **When** the candidate opens the jobs section, **Then** the page displays an empty state and does not show closed, rejected, or private job posts.
 4. **Given** a company’s employee count changes, **When** the company detail is viewed, **Then** the displayed size is calculated from the company’s current active employee count using the product’s published size ranges.
+5. **Given** a company has more active jobs than the configured page size, **When** the candidate opens or changes the jobs page, **Then** only that page of jobs is displayed and the result count/page controls remain visible.
 
 ### User Story 3 - Search and filter company jobs (Priority: P1)
 
@@ -60,6 +69,8 @@ As a candidate, I can search jobs within a company by keyword and filter them by
 3. **Given** the candidate uses both keyword and location filters, **When** the search is applied, **Then** results satisfy both filters.
 4. **Given** no jobs match the search or location, **When** the candidate views the results, **Then** a clear no-results state is displayed with an option to clear filters.
 5. **Given** the candidate clears the search and location filters, **When** the reset completes, **Then** all currently active public jobs for that company are shown again.
+6. **Given** filtered company jobs span multiple pages, **When** the candidate changes the jobs page, **Then** the keyword and location filters remain applied and only the selected company’s jobs are returned.
+7. **Given** a company job is shown, **When** the candidate views its card, **Then** it uses the same card layout and application/status actions as Find Jobs.
 
 ### User Story 4 - Apply for an HR Manager or Recruiter team role (Priority: P1)
 
@@ -114,6 +125,7 @@ As an invited candidate, I can open the invitation from my email, review the com
 ### Edge Cases
 
 - A company becomes unapproved, suspended, or deleted after appearing in the Company list; future public views and new applications must follow the company-state policy and must not expose private information.
+- A public company has no active Owner because its membership data is incomplete or all Owners are inactive; ordinary jobs remain visible, team application actions are unavailable, and no new orphan Team Application may be created.
 - A candidate selects an ordinary company job instead of joining as HR Manager or Recruiter; the product opens the existing job detail page and keeps that application in the existing ordinary job-application workflow, separate from Team Applications.
 - A job closes after a candidate opens its detail page but before submission; the submission must be rejected and the candidate must be told that the job is no longer available.
 - A job is edited or its role changes after an application is submitted; the application must retain the applied company, job, role, and submitted CV evidence as an immutable record.
@@ -124,7 +136,7 @@ As an invited candidate, I can open the invitation from my email, review the com
 - The same candidate applies to HR Manager and Recruiter roles for one company; each role application must be handled independently, while duplicate submissions for the same role are prevented.
 - The company has no founding year, industry, location, or employee count; the detail page must show an explicit unavailable value rather than inventing information.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -159,6 +171,12 @@ As an invited candidate, I can open the invitation from my email, review the com
 - **FR-029**: Public company and job pages, application forms, Candidate Team Applications status views, Owner review screens, and invitation actions MUST provide keyboard-accessible controls, readable labels, loading feedback, validation feedback, and non-sensitive error states.
 - **FR-030**: Company discovery, company detail, company job search, and Candidate Team Applications status views MUST remain usable on supported mobile and desktop screen sizes.
 - **FR-031**: The feature MUST NOT add scoring, AI recommendations, recruitment pipeline/Kanban stages, or automatic hiring decisions to Team Applications; ordinary job applications MUST continue using their existing workflow.
+- **FR-032**: The Company area MUST provide a keyword search over safe public company discovery fields and deterministic pagination, while preserving the active keyword when the candidate changes pages.
+- **FR-033**: The company jobs section MUST use deterministic pagination with a default page size of 20, preserve keyword/location filters across page changes, and expose total results and current page information.
+- **FR-034**: Ordinary job cards rendered on the company detail page MUST reuse the existing Find Jobs card/status component and MUST retain ordinary job navigation and application behavior.
+- **FR-035**: The system MUST expose HR Manager and Recruiter team-application actions only for an approved public company with at least one active Owner; the submission API MUST enforce the same rule transactionally. Ordinary public jobs MUST remain discoverable when a company has no active Owner.
+- **FR-036**: A successful new Team Application MUST create one deduplicated in-app notification for each active company Owner, localized using that Owner's language preference and linked to the Owner Team Applications screen. The notification MUST exclude CV contents, applicant email, and other unnecessary private data.
+- **FR-037**: Candidate Company, Candidate Team Applications, Owner Team Applications, and related Manage Team navigation MUST source user-facing labels, statuses, errors, and dates from the English/Vietnamese locale boundary; user-authored company and job content MUST NOT be machine-translated by this feature.
 
 ### Key Entities
 
@@ -171,7 +189,7 @@ As an invited candidate, I can open the invitation from my email, review the com
 - **Company membership**: The active access relationship created only after invitation acceptance, with the confirmed HR Manager or Recruiter role.
 - **Application access audit event**: A minimal record of submission, CV access, decision, invitation, and membership events.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
@@ -195,3 +213,4 @@ As an invited candidate, I can open the invitation from my email, review the com
 - A team application may be withdrawn by its candidate before Owner acceptance; the retention and deletion policy for submitted CV evidence applies.
 - Founding year, industry, location, description, and logo may be unavailable; the UI will show an explicit unavailable state instead of fabricated values.
 - Standard platform CV retention, privacy, consent, and Vietnamese personal-data requirements apply to submitted team applications and CV documents.
+- A Team Application can be received and reviewed only while the target company has at least one active Owner; Owner notification language follows the recipient's saved workspace preference.

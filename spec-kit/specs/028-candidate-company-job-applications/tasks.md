@@ -10,25 +10,25 @@
 
 **Purpose**: Prepare feature boundaries and shared test fixtures without changing ordinary job application behavior.
 
-- [ ] T001 Create the feature directory structure and register `spec-kit/specs/028-candidate-company-job-applications/tasks.md` as the implementation task source.
-- [ ] T002 [P] Add shared Team Application role/status labels and display helpers in `web/src/shared/contracts/company-members/team-applications.ts`.
-- [ ] T003 [P] Add feature test fixtures for approved companies, active public jobs, Owner accounts, Candidate accounts, team roles, invitations, and CV files in `web/tests/helpers/company-team-applications-fixture.ts`.
-- [ ] T004 [P] Add localized copy keys for Company discovery, Team Applications, invitation decisions, rejection email, and unavailable/empty/error states in the existing locale resource files under `web/src/shared/i18n/`.
+- [x] T001 Create the feature directory structure and register `spec-kit/specs/028-candidate-company-job-applications/tasks.md` as the implementation task source.
+- [x] T002 [P] Add shared Team Application role/status labels and display helpers in `web/src/shared/contracts/company-members/team-applications.ts`.
+- [x] T003 [P] Add feature test fixtures for approved companies, active public jobs, Owner accounts, Candidate accounts, team roles, invitations, and CV files in `web/tests/helpers/company-team-applications-fixture.ts`.
+- [x] T004 [P] Add localized copy keys for Company discovery, Team Applications, invitation decisions, rejection email, and unavailable/empty/error states in the existing feature locale boundary under `web/src/frontend/features/candidate-company/i18n/`.
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
 **Purpose**: Establish persistence, authorization, file, notification, audit, and projection boundaries required by all stories.
 
-- [ ] T005 Define `TeamApplication` and `TeamOpportunity` schema entities, supported role/status enums, relations, indexes, and duplicate constraints in `web/prisma/schema.prisma`.
-- [ ] T006 Create a safe PostgreSQL migration for Team Application, Team Opportunity, CV evidence linkage, rejection reason, and invitation linkage in `web/prisma/migrations/`.
-- [ ] T007 [P] Add repository interfaces for company public projections, company-scoped jobs, Team Opportunities, Team Applications, and decision updates under `web/src/backend/repositories/companies/` and `web/src/backend/repositories/company-members/`.
-- [ ] T008 [P] Implement server-side company visibility and tenant authorization for approved public companies/jobs and verified Owner Team Applications in `web/src/backend/services/companies/company-discovery-authorization.ts` and `web/src/backend/services/company-members/team-application-authorization.ts`.
-- [ ] T009 [P] Define Zod request/response contracts matching `spec-kit/specs/028-candidate-company-job-applications/contracts/company-team-applications.openapi.yaml` in `web/src/shared/contracts/company/` and `web/src/shared/contracts/company-members/team-applications.ts`.
-- [ ] T010 Implement validated CV promotion/access helpers that enforce PDF/DOCX and exactly 5,000,000-byte maximum, immutable evidence, retention, and Owner-only authorization in `web/src/backend/services/company-members/team-application-cv-service.ts`.
-- [ ] T011 Implement transactional Team Application state transitions, duplicate prevention, optimistic concurrency, candidate withdrawal, and audit event creation in `web/src/backend/services/company-members/team-application-service.ts`.
-- [ ] T012 Extend the existing CompanyInvitation service to support originating Team Applications, confirmed HR Manager/Recruiter role binding, idempotent creation, expiration/revocation, and acceptance handoff in `web/src/backend/company-members/company-team-service.ts`.
-- [ ] T013 Define team-application email templates and notification payloads for acceptance/invitation, rejection with optional reason, delivery failure, and retry under `web/src/backend/notifications/` or the existing notification template boundary.
-- [ ] T014 Add foundational contract, repository, authorization, migration, CV-validation, idempotency, and audit tests under `web/tests/backend/{contract,integration,security,unit}/company-team-applications/`.
+- [x] T005 Define `TeamApplication` and `TeamOpportunity` schema entities, supported role/status enums, relations, indexes, and duplicate constraints in `web/prisma/schema.prisma`.
+- [x] T006 Create a safe PostgreSQL migration for Team Application, Team Opportunity, CV evidence linkage, rejection reason, and invitation linkage in `web/prisma/migrations/`.
+- [x] T007 [P] Add repository interfaces for company public projections, company-scoped jobs, Team Opportunities, Team Applications, and decision updates under `web/src/backend/repositories/companies/` and `web/src/backend/repositories/company-members/`.
+- [x] T008 [P] Implement server-side company visibility and tenant authorization for approved public companies/jobs and verified Owner Team Applications in `web/src/backend/services/companies/company-discovery-authorization.ts` and `web/src/backend/services/company-members/team-application-authorization.ts`.
+- [x] T009 [P] Define Zod request/response contracts matching `spec-kit/specs/028-candidate-company-job-applications/contracts/company-team-applications.openapi.yaml` in `web/src/shared/contracts/company/` and `web/src/shared/contracts/company-members/team-applications.ts`.
+- [x] T010 Implement validated CV promotion/access helpers that enforce PDF/DOCX and exactly 5,000,000-byte maximum, immutable evidence, retention, and Owner-only authorization in `web/src/backend/services/company-members/team-application-cv-service.ts`.
+- [x] T011 Implement transactional Team Application state transitions, duplicate prevention, optimistic concurrency, candidate withdrawal, and audit event creation in `web/src/backend/services/company-members/team-application-service.ts`.
+- [x] T012 Extend the existing CompanyInvitation service to support originating Team Applications, confirmed HR Manager/Recruiter role binding, idempotent creation, expiration/revocation, and acceptance handoff in `web/src/backend/company-members/company-team-service.ts`.
+- [x] T013 Define team-application email templates and notification payloads for acceptance/invitation, rejection with optional reason, delivery failure, and retry under the existing email/notification outbox boundaries.
+- [x] T014 Add foundational contract, repository, authorization, migration, CV-validation, idempotency, and audit tests under `web/tests/backend/{contract,integration,security,unit}/company-team-applications/`.
 
 **Checkpoint**: Database, contracts, authorization, CV protection, lifecycle, invitation, and notification foundations are ready; no user story should bypass them.
 
@@ -40,16 +40,16 @@
 
 ### Tests for User Story 1
 
-- [ ] T015 [P] [US1] Add contract tests for approved public company list projection in `web/tests/backend/contract/company-discovery.contract.test.ts`.
-- [ ] T016 [P] [US1] Add authorization tests proving unapproved, private, suspended, and cross-tenant company data is excluded in `web/tests/security/company-discovery/company-public-privacy.test.ts`.
-- [ ] T017 [P] [US1] Add frontend tests for company cards, fallback logo, empty state, keyboard navigation, and detail-link behavior in `web/tests/frontend/company-discovery/company-list.test.tsx`.
+- [x] T015 [P] [US1] Add contract tests for approved public company list projection in `web/tests/backend/contract/company-discovery.contract.test.ts`.
+- [x] T016 [P] [US1] Add authorization tests proving unapproved, private, suspended, and cross-tenant company data is excluded in `web/tests/security/company-discovery/company-public-privacy.test.ts`.
+- [x] T017 [P] [US1] Add frontend tests for company cards, fallback logo, empty state, keyboard navigation, and detail-link behavior in `web/tests/frontend/company-discovery/company-list.test.tsx`.
 
 ### Implementation for User Story 1
 
-- [ ] T018 [P] [US1] Implement approved public company list projection and pagination in `web/src/backend/services/companies/company-discovery-service.ts` and `web/src/backend/repositories/companies/prisma-company-discovery-repository.ts`.
-- [ ] T019 [US1] Implement the Candidate Company route and data loading in `web/src/app/company/page.tsx` and `web/src/app/api/companies/route.ts`.
-- [ ] T020 [US1] Build responsive company cards, description truncation, fallback logo, loading, error, empty, and keyboard-accessible states in `web/src/frontend/features/candidate-company/company-list-screen.tsx` and its stylesheet.
-- [ ] T021 [US1] Add Candidate navigation entry and route link to Company in the existing Candidate workspace navigation files under `web/src/frontend/`.
+- [x] T018 [P] [US1] Implement approved public company list projection and pagination in `web/src/backend/services/companies/company-discovery-service.ts` and `web/src/backend/repositories/companies/prisma-company-discovery-repository.ts`.
+- [x] T019 [US1] Implement the Candidate Company route and data loading in `web/src/app/(workspace)/company/page.tsx` and `web/src/app/api/companies/route.ts`.
+- [x] T020 [US1] Build responsive company cards, description truncation, fallback logo, loading, error, empty, and keyboard-accessible states in `web/src/frontend/features/candidate-company/company-list-screen.tsx` and its stylesheet.
+- [x] T021 [US1] Add Candidate navigation entry and route link to Company in the existing Candidate workspace navigation files under `web/src/frontend/`.
 
 **Checkpoint**: US1 is independently usable: candidates can discover only approved public companies and open a company detail target.
 
@@ -61,17 +61,17 @@
 
 ### Tests for User Story 2
 
-- [ ] T022 [P] [US2] Add contract tests for company detail and active public job projections in `web/tests/backend/contract/company-detail.contract.test.ts`.
-- [ ] T023 [P] [US2] Add integration tests for employee-derived size, missing fields, closed/rejected job exclusion, and cross-company job exclusion in `web/tests/backend/integration/company-discovery/company-detail.test.ts`.
-- [ ] T024 [P] [US2] Add frontend tests for company metadata, size range, team-role actions, job cards, and ordinary-job detail navigation in `web/tests/frontend/company-discovery/company-detail.test.tsx`.
+- [x] T022 [P] [US2] Add contract tests for company detail and active public job projections in `web/tests/backend/contract/company-detail.contract.test.ts`.
+- [x] T023 [P] [US2] Add integration tests for employee-derived size, missing fields, closed/rejected job exclusion, and cross-company job exclusion in `web/tests/backend/integration/company-discovery/company-detail.test.ts`.
+- [x] T024 [P] [US2] Add frontend tests for company metadata, size range, team-role actions, job cards, and ordinary-job detail navigation in `web/tests/frontend/company-discovery/company-detail.test.tsx`.
 
 ### Implementation for User Story 2
 
-- [ ] T025 [P] [US2] Implement company detail projection with founding year, industry, location, active employee count-to-size-range mapping, and safe unavailable values in `web/src/backend/services/companies/company-discovery-service.ts`.
-- [ ] T026 [P] [US2] Implement company-scoped active approved job projection by reusing existing job discovery rules in `web/src/backend/repositories/companies/prisma-company-job-repository.ts`.
-- [ ] T027 [US2] Implement company detail route and public API in `web/src/app/company/[companyId]/page.tsx` and `web/src/app/api/companies/[companyId]/route.ts`.
-- [ ] T028 [US2] Build the company header, metadata panel, team-role entry points, jobs section, and responsive detail layout in `web/src/frontend/features/candidate-company/company-detail-screen.tsx` and its stylesheet.
-- [ ] T029 [US2] Link ordinary company jobs to the existing job detail route without routing them into Team Applications in `web/src/frontend/features/candidate-company/company-job-card.tsx`.
+- [x] T025 [P] [US2] Implement company detail projection with founding year, industry, location, active employee count-to-size-range mapping, and safe unavailable values in `web/src/backend/services/companies/company-discovery-service.ts`.
+- [x] T026 [P] [US2] Implement company-scoped active approved job projection by reusing existing job discovery rules in `web/src/backend/repositories/companies/prisma-company-job-repository.ts`.
+- [x] T027 [US2] Implement company detail route and public API in `web/src/app/(workspace)/company/[companyId]/page.tsx` and `web/src/app/api/companies/[companyId]/route.ts`.
+- [x] T028 [US2] Build the company header, metadata panel, team-role entry points, jobs section, and responsive detail layout in `web/src/frontend/features/candidate-company/company-detail-screen.tsx` and its stylesheet.
+- [x] T029 [US2] Link ordinary company jobs to the existing job detail route without routing them into Team Applications in `web/src/frontend/features/candidate-company/company-job-card.tsx`.
 
 **Checkpoint**: US2 is independently usable: candidates can understand a company and distinguish team applications from ordinary job applications.
 
@@ -83,16 +83,16 @@
 
 ### Tests for User Story 3
 
-- [ ] T030 [P] [US3] Add contract tests for keyword/location query parameters and company-scoped result envelopes in `web/tests/backend/contract/company-jobs-search.contract.test.ts`.
-- [ ] T031 [P] [US3] Add integration tests for case-insensitive, Vietnamese-diacritic-insensitive, location, combined, reset, and no-result behavior in `web/tests/backend/integration/company-discovery/company-job-search.test.ts`.
-- [ ] T032 [P] [US3] Add frontend tests for search input, location selector, loading, no-results, clear filters, and keyboard-accessible interaction in `web/tests/frontend/company-discovery/company-job-search.test.tsx`.
+- [x] T030 [P] [US3] Add contract tests for keyword/location query parameters and company-scoped result envelopes in `web/tests/backend/contract/company-jobs-search.contract.test.ts`.
+- [x] T031 [P] [US3] Add integration tests for case-insensitive, Vietnamese-diacritic-insensitive, location, combined, reset, and no-result behavior in `web/tests/backend/integration/company-discovery/company-job-search.test.ts`.
+- [x] T032 [P] [US3] Add frontend tests for search input, location selector, loading, no-results, clear filters, and keyboard-accessible interaction in `web/tests/frontend/company-discovery/company-job-search.test.tsx`.
 
 ### Implementation for User Story 3
 
-- [ ] T033 [US3] Implement company-scoped query normalization, deterministic keyword matching, location filtering, pagination, and no-result projection in `web/src/backend/services/companies/company-job-search-service.ts`.
-- [ ] T034 [US3] Implement `GET /api/companies/[companyId]/jobs` with validated query parameters in `web/src/app/api/companies/[companyId]/jobs/route.ts`.
-- [ ] T035 [US3] Add search bar, location filter, combined query state, clear action, and result-count/empty feedback to `web/src/frontend/features/candidate-company/company-detail-screen.tsx`.
-- [ ] T036 [US3] Add representative P95 company job-search performance coverage in `web/tests/performance/company-discovery/company-job-search-performance.test.ts`.
+- [x] T033 [US3] Implement company-scoped query normalization, deterministic keyword matching, location filtering, pagination, and no-result projection in `web/src/backend/services/companies/company-job-search-service.ts`.
+- [x] T034 [US3] Implement `GET /api/companies/[companyId]/jobs` with validated query parameters in `web/src/app/api/companies/[companyId]/jobs/route.ts`.
+- [x] T035 [US3] Add search bar, location filter, combined query state, clear action, and result-count/empty feedback to `web/src/frontend/features/candidate-company/company-detail-screen.tsx`.
+- [x] T036 [US3] Add representative P95 company job-search performance coverage in `web/tests/performance/company-discovery/company-job-search-performance.test.ts`.
 
 **Checkpoint**: US3 is independently usable: candidates can find ordinary jobs within one company and open their existing detail flow.
 
@@ -104,17 +104,17 @@
 
 ### Tests for User Story 4
 
-- [ ] T037 [P] [US4] Add contract tests for multipart team-application submission and candidate status responses in `web/tests/backend/contract/team-application-candidate.contract.test.ts`.
-- [ ] T038 [P] [US4] Add integration tests for valid submission, role validation, file limits, closed opportunity, duplicate prevention, withdrawal, and no-membership/no-invitation behavior in `web/tests/backend/integration/company-team-applications/candidate-submission.test.ts`.
-- [ ] T039 [P] [US4] Add frontend tests for role selection, CV validation, submit confirmation, duplicate status, withdrawal, and accessible error/loading states in `web/tests/frontend/company-team-applications/candidate-team-application.test.tsx`.
+- [x] T037 [P] [US4] Add contract tests for multipart team-application submission and candidate status responses in `web/tests/backend/contract/team-application-candidate.contract.test.ts`.
+- [x] T038 [P] [US4] Add integration tests for valid submission, role validation, file limits, closed opportunity, duplicate prevention, withdrawal, and no-membership/no-invitation behavior in `web/tests/backend/integration/company-team-applications/candidate-submission.test.ts`.
+- [x] T039 [P] [US4] Add frontend tests for role selection, CV validation, submit confirmation, duplicate status, withdrawal, and accessible error/loading states in `web/tests/frontend/company-team-applications/candidate-team-application.test.tsx`.
 
 ### Implementation for User Story 4
 
-- [ ] T040 [US4] Implement Candidate Team Opportunity projection and candidate-owned application/status repository methods in `web/src/backend/repositories/company-members/prisma-team-application-repository.ts`.
-- [ ] T041 [US4] Implement multipart submission, CV validation/promotion, duplicate handling, candidate withdrawal, and application status service calls in `web/src/backend/services/company-members/team-application-service.ts`.
-- [ ] T042 [US4] Implement Candidate Team Application endpoints in `web/src/app/api/candidate/team-applications/route.ts` and `web/src/app/api/candidate/team-applications/[applicationId]/route.ts`.
-- [ ] T043 [US4] Build the Company team-application form with HR Manager/Recruiter selection, CV upload, confirmation, existing-status state, and accessible validation feedback in `web/src/frontend/features/candidate-company/team-application-form.tsx`.
-- [ ] T044 [US4] Add candidate Team Application status/invitation display to the existing Candidate application/status area in `web/src/frontend/features/candidate-company/team-application-status.tsx`.
+- [x] T040 [US4] Implement Candidate Team Opportunity projection and candidate-owned application/status repository methods in `web/src/backend/repositories/company-members/prisma-team-application-repository.ts`.
+- [x] T041 [US4] Implement multipart submission, CV validation/promotion, duplicate handling, candidate withdrawal, and application status service calls in `web/src/backend/services/company-members/team-application-service.ts`.
+- [x] T042 [US4] Implement Candidate Team Application endpoints in `web/src/app/api/candidate/team-applications/route.ts` and `web/src/app/api/candidate/team-applications/[applicationId]/route.ts`.
+- [x] T043 [US4] Build the Company team-application form with HR Manager/Recruiter selection, CV upload, confirmation, existing-status state, and accessible validation feedback in `web/src/frontend/features/candidate-company/team-application-form.tsx`.
+- [x] T044 [US4] Add candidate Team Application status/invitation display to the existing Candidate application/status area in `web/src/frontend/features/candidate-company/team-application-status.tsx`.
 
 **Checkpoint**: US4 is independently usable: a Candidate can apply to join a company team without entering ordinary job scoring or pipeline behavior.
 
@@ -126,18 +126,18 @@
 
 ### Tests for User Story 5
 
-- [ ] T045 [P] [US5] Add contract tests for Owner list/detail/accept/reject endpoints in `web/tests/backend/contract/team-application-owner.contract.test.ts`.
-- [ ] T046 [P] [US5] Add security tests for Owner-only access, verified-company membership, cross-company isolation, CV download authorization, and private rejection-reason handling in `web/tests/security/company-team-applications/owner-authorization.test.ts`.
-- [ ] T047 [P] [US5] Add integration tests for viewed/rejected/accepted transitions, optional reason email, invitation creation, retry idempotency, and audit events in `web/tests/backend/integration/company-team-applications/owner-decisions.test.ts`.
-- [ ] T048 [P] [US5] Add frontend tests for Team Applications list/detail, CV action, accept role confirmation, reject reason field, email failure/retry, and accessibility states in `web/tests/frontend/company-team-applications/owner-review.test.tsx`.
+- [x] T045 [P] [US5] Add contract tests for Owner list/detail/accept/reject endpoints in `web/tests/backend/contract/team-application-owner.contract.test.ts`.
+- [x] T046 [P] [US5] Add security tests for Owner-only access, verified-company membership, cross-company isolation, CV download authorization, and private rejection-reason handling in `web/tests/security/company-team-applications/owner-authorization.test.ts`.
+- [x] T047 [P] [US5] Add integration tests for viewed/rejected/accepted transitions, optional reason email, invitation creation, retry idempotency, and audit events in `web/tests/backend/integration/company-team-applications/owner-decisions.test.ts`.
+- [x] T048 [P] [US5] Add frontend tests for Team Applications list/detail, CV action, accept role confirmation, reject reason field, email failure/retry, and accessibility states in `web/tests/frontend/company-team-applications/owner-review.test.tsx`.
 
 ### Implementation for User Story 5
 
-- [ ] T049 [US5] Implement Owner Team Application list/detail projections and CV access authorization in `web/src/backend/services/company-members/team-application-owner-service.ts`.
-- [ ] T050 [US5] Implement Owner list/detail/accept/reject Route Handlers in `web/src/app/api/recruiter/company/team/applications/route.ts`, `web/src/app/api/recruiter/company/team/applications/[applicationId]/route.ts`, `web/src/app/api/recruiter/company/team/applications/[applicationId]/accept/route.ts`, and `web/src/app/api/recruiter/company/team/applications/[applicationId]/reject/route.ts`.
-- [ ] T051 [US5] Implement accept/reject transaction orchestration, optional rejection reason, notification enqueue, audit, and retry-safe outcomes in `web/src/backend/services/company-members/team-application-owner-service.ts`.
-- [ ] T052 [US5] Build the Owner Team Applications list, detail drawer/page, CV preview/download action, status labels, and decision controls in `web/src/frontend/features/recruiter-workspace/company-team-applications-screen.tsx`.
-- [ ] T053 [US5] Add Team Applications navigation, unread-count/status badge, and Owner-only visibility to `web/src/frontend/features/recruiter-workspace/company-settings-screen.tsx` and `web/src/app/recruiter/company-settings/team/applications/page.tsx`.
+- [x] T049 [US5] Implement Owner Team Application list/detail projections and CV access authorization in `web/src/backend/services/company-members/team-application-owner-service.ts`.
+- [x] T050 [US5] Implement Owner list/detail/accept/reject Route Handlers in `web/src/app/api/recruiter/company/team/applications/route.ts`, `web/src/app/api/recruiter/company/team/applications/[applicationId]/route.ts`, `web/src/app/api/recruiter/company/team/applications/[applicationId]/accept/route.ts`, and `web/src/app/api/recruiter/company/team/applications/[applicationId]/reject/route.ts`.
+- [x] T051 [US5] Implement accept/reject transaction orchestration, optional rejection reason, notification enqueue, audit, and retry-safe outcomes in `web/src/backend/services/company-members/team-application-owner-service.ts`.
+- [x] T052 [US5] Build the Owner Team Applications list, detail drawer/page, CV preview/download action, status labels, and decision controls in `web/src/frontend/features/recruiter-workspace/company-team-applications-screen.tsx`.
+- [x] T053 [US5] Add Team Applications navigation, unread-count/status badge, and Owner-only visibility to `web/src/frontend/features/recruiter-workspace/company-settings-screen.tsx` and `web/src/app/recruiter/company-settings/team/applications/page.tsx`.
 
 **Checkpoint**: US5 is independently usable: Owner decisions are human-controlled, authorized, auditable, and produce at most one invitation.
 
@@ -149,16 +149,16 @@
 
 ### Tests for User Story 6
 
-- [ ] T054 [P] [US6] Add contract tests for invitation preview/acceptance and membership outcome in `web/tests/backend/contract/team-invitation.contract.test.ts`.
-- [ ] T055 [P] [US6] Add security and integration tests for email binding, expiration, revocation, one-time use, duplicate membership prevention, and audit behavior in `web/tests/security/company-team-applications/invitation-acceptance.test.ts`.
-- [ ] T056 [P] [US6] Add frontend/system tests for invitation review, signed-in account mismatch, acceptance confirmation, and failure states in `web/tests/system/e2e/company-team-applications/team-invitation.spec.ts`.
+- [x] T054 [P] [US6] Add contract tests for invitation preview/acceptance and membership outcome in `web/tests/backend/contract/team-invitation.contract.test.ts`.
+- [x] T055 [P] [US6] Add security and integration tests for email binding, expiration, revocation, one-time use, duplicate membership prevention, and audit behavior in `web/tests/security/company-team-applications/invitation-acceptance.test.ts`.
+- [x] T056 [P] [US6] Add frontend/system tests for invitation review, signed-in account mismatch, acceptance confirmation, and failure states in `web/tests/system/e2e/company-team-applications/company-team-applications.spec.ts`.
 
 ### Implementation for User Story 6
 
-- [ ] T057 [US6] Extend invitation acceptance service logic to validate token, recipient account, company state, role, expiration, revocation, and membership uniqueness in `web/src/backend/company-members/company-team-service.ts`.
-- [ ] T058 [US6] Implement invitation preview/acceptance route behavior in `web/src/app/recruiter/company-invitation/page.tsx` and the existing invitation API routes under `web/src/app/api/recruiter/company/team/invitations/`.
-- [ ] T059 [US6] Update invitation UI to show company, confirmed role, candidate account confirmation, acceptance result, and non-sensitive invalid-invitation errors in `web/src/frontend/features/recruiter-workspace/company-invitation-screen.tsx`.
-- [ ] T060 [US6] Verify accepted invitation creates/activates exactly one HR Manager or Recruiter membership and updates Team Application status to JOINED in `web/tests/backend/integration/company-team-applications/membership-creation.test.ts`.
+- [x] T057 [US6] Extend invitation acceptance service logic to validate token, recipient account, company state, role, expiration, revocation, and membership uniqueness in `web/src/backend/company-members/company-team-service.ts`.
+- [x] T058 [US6] Implement invitation preview/acceptance route behavior in `web/src/app/recruiter/company-invitation/page.tsx` and the existing invitation API routes under `web/src/app/api/recruiter/company/team/invitations/`.
+- [x] T059 [US6] Update invitation UI to show company, confirmed role, candidate account confirmation, acceptance result, and non-sensitive invalid-invitation errors in `web/src/app/recruiter/company-invitation/page.tsx`.
+- [x] T060 [US6] Verify accepted invitation creates/activates exactly one HR Manager or Recruiter membership and updates Team Application status to JOINED in `web/tests/backend/integration/company-team-applications/membership-creation.test.ts`.
 
 **Checkpoint**: US6 is independently usable: explicit invitation acceptance is the only path from Team Application to company membership.
 
@@ -166,14 +166,28 @@
 
 **Purpose**: Complete quality, privacy, reliability, accessibility, and documentation verification across all stories.
 
-- [ ] T061 [P] Add retention/deletion worker handling for Team Application CV evidence and minimum audit retention in `web/src/backend/jobs/` and `web/tests/backend/integration/company-team-applications/retention.test.ts`.
-- [ ] T062 [P] Add notification delivery failure, retry, and duplicate suppression coverage in `web/tests/backend/integration/company-team-applications/notification-reliability.test.ts`.
-- [ ] T063 [P] Add cross-tenant privacy regression tests covering public company projections, ordinary jobs, Team Applications, CVs, invitations, and membership data in `web/tests/security/company-team-applications/tenant-isolation.test.ts`.
-- [ ] T064 [P] Add responsive and keyboard accessibility coverage for Candidate Company and Owner Team Applications in `web/tests/frontend/company-team-applications/accessibility.test.tsx`.
-- [ ] T065 [P] Add end-to-end coverage for the full quickstart flow in `web/tests/system/e2e/company-team-applications/company-team-applications.spec.ts`.
-- [ ] T066 Run the scenarios in `spec-kit/specs/028-candidate-company-job-applications/quickstart.md` and record any deviations or required updates in that document.
-- [ ] T067 Re-run contract, unit, integration, security, frontend, system, accessibility, and P95 performance checks; resolve regressions without changing the ordinary job application workflow.
-- [ ] T068 Review all changed user-facing copy, audit payloads, CV access paths, and error states for Vietnamese personal-data minimization and non-sensitive disclosure in the relevant `web/src/` and `web/tests/` files.
+- [x] T061 [P] Add retention/deletion worker handling for Team Application CV evidence and minimum audit retention in `web/src/backend/jobs/` and `web/tests/backend/integration/company-team-applications/retention.test.ts`.
+- [x] T062 [P] Add notification delivery failure, retry, and duplicate suppression coverage in `web/tests/backend/integration/company-team-applications/notification-reliability.test.ts`.
+- [x] T063 [P] Add cross-tenant privacy regression tests covering public company projections, ordinary jobs, Team Applications, CVs, invitations, and membership data in `web/tests/security/company-team-applications/tenant-isolation.test.ts`.
+- [x] T064 [P] Add responsive and keyboard accessibility coverage for Candidate Company and Owner Team Applications in `web/tests/frontend/company-team-applications/accessibility.test.tsx`.
+- [x] T065 [P] Add end-to-end coverage for the full quickstart flow in `web/tests/system/e2e/company-team-applications/company-team-applications.spec.ts`.
+- [x] T066 Run the scenarios in `spec-kit/specs/028-candidate-company-job-applications/quickstart.md` and record any deviations or required updates in that document.
+- [x] T067 Re-run contract, unit, integration, security, frontend, system, accessibility, and P95 performance checks; resolve regressions without changing the ordinary job application workflow.
+- [x] T068 Review all changed user-facing copy, audit payloads, CV access paths, and error states for Vietnamese personal-data minimization and non-sensitive disclosure in the relevant `web/src/` and `web/tests/` files.
+
+## Incremental refinement - Company discovery and paginated job cards
+
+- [x] T069 [P] Add contract, unit, and frontend coverage for Company keyword search, preserved search pagination, and company result counts in `web/tests/backend/contract/company-discovery.contract.test.ts`, `web/tests/backend/unit/company-team-applications/company-discovery-service.test.ts`, and `web/tests/frontend/company-discovery/company-list.test.tsx`.
+- [x] T070 Implement Company list keyword filtering, query parsing, URL-preserving search controls, and deterministic pagination in `web/src/shared/contracts/company/index.ts`, `web/src/backend/repositories/companies/prisma-company-discovery-repository.ts`, `web/src/backend/services/companies/company-discovery-service.ts`, `web/src/app/(workspace)/company/page.tsx`, `web/src/app/api/companies/route.ts`, and the Candidate Company UI.
+- [x] T071 [P] Add contract and frontend coverage for company-job page metadata, filter-preserving page changes, and reuse of the Find Jobs card/status treatment in `web/tests/backend/contract/company-detail.contract.test.ts`, `web/tests/backend/contract/company-jobs-search.contract.test.ts`, and `web/tests/frontend/company-discovery/company-detail.test.tsx`.
+- [x] T072 Implement company-job page metadata, interactive pagination, default 20-item pages, and Find Jobs card/status reuse in `web/src/shared/contracts/company/index.ts`, `web/src/backend/services/companies/company-discovery-service.ts`, `web/src/app/(workspace)/company/[companyId]/page.tsx`, `web/src/frontend/features/candidate-company/company-detail-screen.tsx`, and the workspace styling boundary.
+
+## Incremental refinement - Owner delivery and bilingual UI
+
+- [x] T073 Add active-Owner projection and a transactional submission guard so a public company without an active Owner cannot receive a new Team Application while ordinary jobs remain discoverable; cover the no-recipient path in `web/src/backend/repositories/companies/prisma-company-discovery-repository.ts`, `web/src/backend/services/companies/company-discovery-service.ts`, `web/src/backend/services/company-members/team-application-service.ts`, and `web/tests/backend/unit/company-team-applications/`.
+- [x] T074 Add the `TEAM_APPLICATION_RECEIVED` notification kind, migration, localized event policy, Owner Team Applications destination, and per-Owner deduplication; cover policy and destination behavior in `web/tests/backend/unit/notifications/`.
+- [x] T075 Synchronize English/Vietnamese copy, date/status labels, validation errors, and related navigation for Candidate Company, Candidate Team Applications, Owner Team Applications, and Manage Team in `web/src/frontend/features/candidate-company/`, `web/src/frontend/features/recruiter-workspace/`, and `web/src/frontend/features/candidate-applications/`.
+- [x] T076 Run source typecheck, targeted lint/format, feature unit/contract/integration/security/frontend checks, and update the feature quickstart with Owner availability and locale verification results.
 
 ## Dependencies & Execution Order
 
