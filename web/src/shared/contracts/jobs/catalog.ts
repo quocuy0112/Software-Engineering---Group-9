@@ -28,6 +28,14 @@ export const recruiterCompanySettingsInputSchema = z
     address: z.string().trim().min(1).max(300),
     website: z.string().url().max(2_000).nullable(),
     description: z.string().trim().max(3_000).nullable(),
+    foundedYear: z
+      .number()
+      .int()
+      .min(1_800)
+      .max(2_200)
+      .nullable()
+      .optional()
+      .default(null),
   })
   .strict();
 
@@ -180,6 +188,7 @@ export const companyCatalogSchema = z
     address: z.string().min(1).max(300),
     website: z.string().url().nullable(),
     description: z.string().max(3_000).nullable(),
+    foundedYear: z.number().int().min(1_800).max(2_200).nullable().optional(),
     rating: z
       .object({
         score: z.number().nonnegative(),
@@ -247,6 +256,7 @@ export type RecruiterCompanySettings = {
   address: string;
   website: string | null;
   description: string | null;
+  foundedYear?: number | null;
   ownerUserId: string | null;
   memberUserIds: string[];
   taxCode: string;
@@ -258,7 +268,7 @@ export type RecruiterCompanySettings = {
   >;
 };
 
-export type RecruiterCompanySettingsInput = z.infer<
+export type RecruiterCompanySettingsInput = z.input<
   typeof recruiterCompanySettingsInputSchema
 >;
 export type { JobPreferences };

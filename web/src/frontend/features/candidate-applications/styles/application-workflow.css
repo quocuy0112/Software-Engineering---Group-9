@@ -543,11 +543,7 @@
   animation: application-ui-spin 1s linear infinite;
 }
 .application-ui-processing-hero.is-complete {
-  border-color: color-mix(
-    in srgb,
-    var(--app-green) 36%,
-    var(--app-line)
-  );
+  border-color: color-mix(in srgb, var(--app-green) 36%, var(--app-line));
   background: var(--app-green-50);
 }
 .application-ui-processing-hero.is-complete
@@ -572,11 +568,7 @@
   color: var(--app-green);
 }
 .application-ui-processing-hero.is-attention-required {
-  border-color: color-mix(
-    in srgb,
-    var(--app-yellow) 36%,
-    var(--app-line)
-  );
+  border-color: color-mix(in srgb, var(--app-yellow) 36%, var(--app-line));
   background: var(--app-yellow-50);
 }
 .application-ui-processing-hero.is-attention-required
@@ -703,11 +695,7 @@
   display: flex;
   align-items: flex-start;
   gap: 11px;
-  border-color: color-mix(
-    in srgb,
-    var(--app-yellow) 36%,
-    var(--app-line)
-  );
+  border-color: color-mix(in srgb, var(--app-yellow) 36%, var(--app-line));
   background: var(--app-yellow-50);
 }
 .application-ui-private-note > svg {
@@ -725,8 +713,7 @@
   gap: 9px;
   margin-top: 20px;
   padding: 12px 15px;
-  border: 1px solid
-    color-mix(in srgb, var(--app-green) 36%, var(--app-line));
+  border: 1px solid color-mix(in srgb, var(--app-green) 36%, var(--app-line));
   border-radius: 9px;
   color: var(--app-green);
   background: var(--app-green-50);
@@ -966,6 +953,24 @@
   background: var(--sh-color-brand-soft);
   font-size: 15px;
   font-weight: var(--sh-font-weight-bold);
+}
+
+.candidate-application-list-page__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.candidate-application-list-page__team-link {
+  color: var(--sh-color-brand-primary);
+  font-size: 12px;
+  font-weight: var(--sh-font-weight-bold);
+  text-decoration: none;
+}
+
+.candidate-application-list-page__team-link:hover,
+.candidate-application-list-page__team-link:focus-visible {
+  text-decoration: underline;
 }
 
 .candidate-application-filter {
@@ -4876,7 +4881,8 @@
 }
 
 .application-personal-information__locked-box,
-.application-personal-information input:not([type="checkbox"]):not([type="radio"]),
+.application-personal-information
+  input:not([type="checkbox"]):not([type="radio"]),
 .application-files__textarea,
 .application-review-submit__textarea {
   min-height: 48px;
@@ -5043,67 +5049,72 @@
 /* Candidate application stages share the workspace palette. The reference
  * layout below is intentionally explicit, so it also needs explicit theme
  * values instead of inheriting light-only slate and white utilities. */
-:root[data-theme="dark"] :is(
-  .application-personal-information,
-  .application-files,
-  .application-review-submit
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-personal-information,
+    .application-files,
+    .application-review-submit
+  ) {
   color: var(--sh-color-text-primary);
 }
 
-:root[data-theme="dark"] :is(
-  .application-flow-header h1,
-  .application-personal-information__header h1,
-  .application-files__header h1,
-  .application-review-submit__header h1,
-  .application-personal-information__card h2,
-  .application-files__card h2,
-  .application-review-submit__card h2,
-  .application-review-submit__summary-grid dd
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-flow-header h1,
+    .application-personal-information__header h1,
+    .application-files__header h1,
+    .application-review-submit__header h1,
+    .application-personal-information__card h2,
+    .application-files__card h2,
+    .application-review-submit__card h2,
+    .application-review-submit__summary-grid dd
+  ) {
   color: var(--sh-color-text-primary);
 }
 
-:root[data-theme="dark"] :is(
-  .application-flow-header__subtitle,
-  .application-personal-information__header > div > p:last-child,
-  .application-files__header > div > p:last-child,
-  .application-review-submit__header > div > p:last-child,
-  .application-personal-information__card-description,
-  .application-files__description,
-  .application-personal-information__locked-note,
-  .application-personal-information__field-hint,
-  .application-personal-information__field-error,
-  .application-review-submit__summary-grid dt,
-  .application-review-submit__file-group h3,
-  .application-review-submit__cover-preview > span
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-flow-header__subtitle,
+    .application-personal-information__header > div > p:last-child,
+    .application-files__header > div > p:last-child,
+    .application-review-submit__header > div > p:last-child,
+    .application-personal-information__card-description,
+    .application-files__description,
+    .application-personal-information__locked-note,
+    .application-personal-information__field-hint,
+    .application-personal-information__field-error,
+    .application-review-submit__summary-grid dt,
+    .application-review-submit__file-group h3,
+    .application-review-submit__cover-preview > span
+  ) {
   color: var(--sh-color-text-muted);
 }
 
-:root[data-theme="dark"] :is(
-  .application-flow-header__save,
-  .application-personal-information__button--secondary,
-  .application-files__button--secondary,
-  .application-review-submit__button--secondary,
-  .application-personal-information__card,
-  .application-files__card,
-  .application-review-submit__card
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-flow-header__save,
+    .application-personal-information__button--secondary,
+    .application-files__button--secondary,
+    .application-review-submit__button--secondary,
+    .application-personal-information__card,
+    .application-files__card,
+    .application-review-submit__card
+  ) {
   border-color: var(--sh-color-border-subtle);
   color: var(--sh-color-text-secondary);
   background: var(--sh-color-surface-card);
   box-shadow: var(--sh-shadow-card);
 }
 
-:root[data-theme="dark"] :is(
-  .application-flow-header__save:hover:not(:disabled),
-  .application-personal-information__locked-box,
-  .application-files__segmented,
-  .application-files__cv-list > button,
-  .application-files__file-row,
-  .application-files__dropzone
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-flow-header__save:hover:not(:disabled),
+    .application-personal-information__locked-box,
+    .application-files__segmented,
+    .application-files__cv-list > button,
+    .application-files__file-row,
+    .application-files__dropzone
+  ) {
   border-color: var(--sh-color-border-subtle);
   background: var(--sh-color-surface-subtle);
 }
@@ -5123,11 +5134,13 @@
   color: var(--sh-color-text-muted);
 }
 
-:root[data-theme="dark"] :is(
-  .application-personal-information input:not([type="checkbox"]):not([type="radio"]),
-  .application-files__textarea,
-  .application-review-submit__textarea
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-personal-information
+      input:not([type="checkbox"]):not([type="radio"]),
+    .application-files__textarea,
+    .application-review-submit__textarea
+  ) {
   border-color: var(--sh-color-border-subtle);
   color: var(--sh-color-text-primary);
   background: var(--sh-color-surface-subtle);
@@ -5146,28 +5159,36 @@
   background: var(--sh-color-border-subtle);
 }
 
-:root[data-theme="dark"] .application-stepper__step--upcoming .application-stepper__node {
+:root[data-theme="dark"]
+  .application-stepper__step--upcoming
+  .application-stepper__node {
   border: 1px solid var(--sh-color-border-subtle);
   color: var(--sh-color-text-muted);
   background: var(--sh-color-surface-subtle);
 }
 
-:root[data-theme="dark"] .application-stepper__step--current .application-stepper__node {
+:root[data-theme="dark"]
+  .application-stepper__step--current
+  .application-stepper__node {
   color: var(--sh-color-text-inverse);
   background: var(--sh-color-brand-primary);
-  box-shadow: 0 0 0 5px color-mix(in srgb, var(--sh-color-brand-primary) 22%, transparent);
+  box-shadow: 0 0 0 5px
+    color-mix(in srgb, var(--sh-color-brand-primary) 22%, transparent);
 }
 
-:root[data-theme="dark"] .application-stepper__step--complete .application-stepper__node {
+:root[data-theme="dark"]
+  .application-stepper__step--complete
+  .application-stepper__node {
   color: var(--sh-color-text-inverse);
   background: var(--sh-color-success);
 }
 
-:root[data-theme="dark"] :is(
-  .application-stepper__step:not(:last-child)::after,
-  .application-stepper__node,
-  .application-review-submit__card-heading
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-stepper__step:not(:last-child)::after,
+    .application-stepper__node,
+    .application-review-submit__card-heading
+  ) {
   border-color: var(--sh-color-border-subtle);
   background: var(--sh-color-surface-subtle);
 }
@@ -5178,45 +5199,47 @@
   background: transparent;
 }
 
-:root[data-theme="dark"] :is(
-  .application-stepper__eyebrow,
-  .application-stepper__label strong
-) {
+:root[data-theme="dark"]
+  :is(.application-stepper__eyebrow, .application-stepper__label strong) {
   color: var(--sh-color-text-muted);
 }
 
-:root[data-theme="dark"] :is(
-  .application-stepper__step--current .application-stepper__eyebrow,
-  .application-stepper__step--complete .application-stepper__eyebrow
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-stepper__step--current .application-stepper__eyebrow,
+    .application-stepper__step--complete .application-stepper__eyebrow
+  ) {
   color: var(--sh-color-brand-primary);
 }
 
-:root[data-theme="dark"] :is(
-  .application-stepper__step--current .application-stepper__label strong,
-  .application-stepper__step--complete .application-stepper__label strong,
-  .application-personal-information__field-label
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-stepper__step--current .application-stepper__label strong,
+    .application-stepper__step--complete .application-stepper__label strong,
+    .application-personal-information__field-label
+  ) {
   color: var(--sh-color-text-primary);
 }
 
-:root[data-theme="dark"] :is(
-  .application-personal-information__callout,
-  .application-review-submit__callout,
-  .application-review-submit__after-submit,
-  .application-personal-information__info-card,
-  .application-files__info-card,
-  .application-files__cv-list > button.is-selected
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-personal-information__callout,
+    .application-review-submit__callout,
+    .application-review-submit__after-submit,
+    .application-personal-information__info-card,
+    .application-files__info-card,
+    .application-files__cv-list > button.is-selected
+  ) {
   border-color: var(--sh-color-border-subtle);
   background: var(--sh-color-info-bg);
 }
 
-:root[data-theme="dark"] :is(
-  .application-personal-information__tags span,
-  .application-files__tags span,
-  .application-review-submit__tags span
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-personal-information__tags span,
+    .application-files__tags span,
+    .application-review-submit__tags span
+  ) {
   color: var(--sh-color-text-secondary);
   background: var(--sh-color-surface-subtle);
 }
@@ -5237,26 +5260,28 @@
   box-shadow: inset 0 0 0 1px var(--sh-color-brand-primary);
 }
 
-:root[data-theme="dark"] :is(
-  .application-files__cv-list strong,
-  .application-files__file-copy strong,
-  .application-files__dropzone strong,
-  .application-files__job-card > strong,
-  .application-files__checklist li.is-complete,
-  .application-files__checklist li.is-current
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-files__cv-list strong,
+    .application-files__file-copy strong,
+    .application-files__dropzone strong,
+    .application-files__job-card > strong,
+    .application-files__checklist li.is-complete,
+    .application-files__checklist li.is-current
+  ) {
   color: var(--sh-color-text-primary);
 }
 
-:root[data-theme="dark"] :is(
-  .application-files__cv-list small,
-  .application-files__file-copy small,
-  .application-files__dropzone small,
-  .application-files__job-card > p,
-  .application-files__job-card > small,
-  .application-files__checklist li,
-  .application-files__info-card li
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-files__cv-list small,
+    .application-files__file-copy small,
+    .application-files__dropzone small,
+    .application-files__job-card > p,
+    .application-files__job-card > small,
+    .application-files__checklist li,
+    .application-files__info-card li
+  ) {
   color: var(--sh-color-text-secondary);
 }
 
@@ -5275,39 +5300,42 @@
 
 /* Stage 3: prevent the review summary, file rows and explanatory blocks from
  * inheriting the light slate/white values defined by the shared stage reset. */
-:root[data-theme="dark"] :is(
-  .application-review-submit__summary-grid dd,
-  .application-review-submit__file-copy strong,
-  .application-review-submit__textarea-label,
-  .application-review-submit__callout h2,
-  .application-review-submit__job-card > strong,
-  .application-review-submit__checklist li,
-  .application-review-submit__after-submit h2
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-review-submit__summary-grid dd,
+    .application-review-submit__file-copy strong,
+    .application-review-submit__textarea-label,
+    .application-review-submit__callout h2,
+    .application-review-submit__job-card > strong,
+    .application-review-submit__checklist li,
+    .application-review-submit__after-submit h2
+  ) {
   color: var(--sh-color-text-primary);
 }
 
-:root[data-theme="dark"] :is(
-  .application-review-submit__summary-grid dd.is-muted,
-  .application-review-submit__file-copy small,
-  .application-review-submit__cover-preview p,
-  .application-review-submit__empty-state,
-  .application-review-submit__callout p,
-  .application-review-submit__callout-note,
-  .application-review-submit__job-card > p,
-  .application-review-submit__job-card > small,
-  .application-review-submit__after-submit p,
-  .application-review-submit__after-submit small
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-review-submit__summary-grid dd.is-muted,
+    .application-review-submit__file-copy small,
+    .application-review-submit__cover-preview p,
+    .application-review-submit__empty-state,
+    .application-review-submit__callout p,
+    .application-review-submit__callout-note,
+    .application-review-submit__job-card > p,
+    .application-review-submit__job-card > small,
+    .application-review-submit__after-submit p,
+    .application-review-submit__after-submit small
+  ) {
   color: var(--sh-color-text-secondary);
 }
 
-:root[data-theme="dark"] :is(
-  .application-review-submit__file-row,
-  .application-review-submit__cover-preview,
-  .application-review-submit__callout-note,
-  .application-review-submit__confirm
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-review-submit__file-row,
+    .application-review-submit__cover-preview,
+    .application-review-submit__callout-note,
+    .application-review-submit__confirm
+  ) {
   border-color: var(--sh-color-border-subtle);
   background: var(--sh-color-surface-subtle);
 }
@@ -5315,22 +5343,24 @@
 /* The summary, progress and disclosure cards carry a mix of title, value and
  * supporting copy.  Keep every tier on the same dark semantic scale so no
  * light-only slate/white rule can reduce contrast on the Apply flow. */
-:root[data-theme="dark"] :is(
-  .application-personal-information__job-card > strong,
-  .application-personal-information__checklist li.is-current,
-  .application-personal-information__callout,
-  .application-personal-information__info-card h2
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-personal-information__job-card > strong,
+    .application-personal-information__checklist li.is-current,
+    .application-personal-information__callout,
+    .application-personal-information__info-card h2
+  ) {
   color: var(--sh-color-text-primary);
 }
 
-:root[data-theme="dark"] :is(
-  .application-personal-information__job-card > p,
-  .application-personal-information__job-card > small,
-  .application-personal-information__checklist li,
-  .application-personal-information__callout p,
-  .application-personal-information__info-card p
-) {
+:root[data-theme="dark"]
+  :is(
+    .application-personal-information__job-card > p,
+    .application-personal-information__job-card > small,
+    .application-personal-information__checklist li,
+    .application-personal-information__callout p,
+    .application-personal-information__info-card p
+  ) {
   color: var(--sh-color-text-secondary);
 }
 
@@ -5353,70 +5383,84 @@
   --app-yellow-50: var(--sh-color-warning-bg);
 }
 
-:root[data-theme="dark"] :is(.application-ui, .candidate-application-flow) :is(
-  .application-ui-button--secondary,
-  .application-ui-card,
-  .candidate-application-panel,
-  .application-ui-textarea textarea,
-  .candidate-application-flow textarea,
-  .candidate-application-flow select,
-  .candidate-application-flow input:not([type="checkbox"]):not([type="radio"]),
-  .application-ui-disclosure__icon,
-  .application-ui-disclosure > svg,
-  .application-ui-disclosure__private,
-  .application-ui-processing-hero__icon,
-  .application-ui-status-hero__icon,
-  .application-ui-status-hero aside,
-  .application-ui-stage-progress li > span
-) {
+:root[data-theme="dark"]
+  :is(.application-ui, .candidate-application-flow)
+  :is(
+    .application-ui-button--secondary,
+    .application-ui-card,
+    .candidate-application-panel,
+    .application-ui-textarea textarea,
+    .candidate-application-flow textarea,
+    .candidate-application-flow select,
+    .candidate-application-flow
+      input:not([type="checkbox"]):not([type="radio"]),
+    .application-ui-disclosure__icon,
+    .application-ui-disclosure > svg,
+    .application-ui-disclosure__private,
+    .application-ui-processing-hero__icon,
+    .application-ui-status-hero__icon,
+    .application-ui-status-hero aside,
+    .application-ui-stage-progress li > span
+  ) {
   border-color: var(--sh-color-border-subtle);
   color: var(--sh-color-text-primary);
   background: var(--sh-color-surface-card);
 }
 
-:root[data-theme="dark"] .application-ui :is(
-  .application-ui-disclosure,
-  .application-ui-after-submit,
-  .application-ui-processing-hero,
-  .application-ui-status-hero
-) {
+:root[data-theme="dark"]
+  .application-ui
+  :is(
+    .application-ui-disclosure,
+    .application-ui-after-submit,
+    .application-ui-processing-hero,
+    .application-ui-status-hero
+  ) {
   border-color: var(--sh-color-border-subtle);
   background: var(--sh-color-info-bg);
 }
 
-:root[data-theme="dark"] .application-ui :is(
-  .application-ui-disclosure,
-  .application-ui-disclosure__private,
-  .application-ui-confirm,
-  .application-ui-check-list li,
-  .application-ui-icon-list li,
-  .application-ui-after-submit p,
-  .application-ui-private-note p,
-  .application-ui-processing-hero p,
-  .application-ui-status-hero p
-) {
+:root[data-theme="dark"]
+  .application-ui
+  :is(
+    .application-ui-disclosure,
+    .application-ui-disclosure__private,
+    .application-ui-confirm,
+    .application-ui-check-list li,
+    .application-ui-icon-list li,
+    .application-ui-after-submit p,
+    .application-ui-private-note p,
+    .application-ui-processing-hero p,
+    .application-ui-status-hero p
+  ) {
   color: var(--sh-color-text-secondary);
 }
 
-:root[data-theme="dark"] .application-ui :is(
-  .application-ui-file-list li,
-  .application-ui-job-card hr,
-  .application-ui-intake-list li,
-  .application-ui-toggle
-) {
+:root[data-theme="dark"]
+  .application-ui
+  :is(
+    .application-ui-file-list li,
+    .application-ui-job-card hr,
+    .application-ui-intake-list li,
+    .application-ui-toggle
+  ) {
   border-color: var(--sh-color-border-subtle);
 }
 
-:root[data-theme="dark"] .application-ui .application-ui-timeline li:not(:last-child)::before {
+:root[data-theme="dark"]
+  .application-ui
+  .application-ui-timeline
+  li:not(:last-child)::before {
   background-color: var(--sh-color-border-subtle);
 }
 
-:root[data-theme="dark"] .application-ui :is(
-  .application-ui-file-icon,
-  .application-ui-job-card code,
-  .application-ui-card code,
-  .application-ui-intake-list li > span
-) {
+:root[data-theme="dark"]
+  .application-ui
+  :is(
+    .application-ui-file-icon,
+    .application-ui-job-card code,
+    .application-ui-card code,
+    .application-ui-intake-list li > span
+  ) {
   color: var(--sh-color-text-muted);
   background: var(--sh-color-surface-subtle);
 }

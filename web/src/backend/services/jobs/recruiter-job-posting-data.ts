@@ -343,6 +343,7 @@ type DatabaseCompanyRow = {
   websiteUrl: string | null;
   publicDescription: string | null;
   publicLocation: string | null;
+  foundedYear: number | null;
   size: string | null;
   industry: string | null;
   address: string | null;
@@ -381,6 +382,7 @@ function databaseCompanyToRecruiterCompany(
     size: company.size ?? "",
     industry: company.industry ?? "",
     address: company.address ?? company.publicLocation ?? "",
+    foundedYear: company.foundedYear ?? catalogCompany?.foundedYear ?? null,
     website: company.websiteUrl ?? null,
     description: company.publicDescription ?? null,
     ownerUserId: owner?.userId ?? null,
@@ -417,6 +419,7 @@ async function readDatabaseAuthorizedCompanies(userId: string) {
         websiteUrl: true,
         publicDescription: true,
         publicLocation: true,
+        foundedYear: true,
         size: true,
         industry: true,
         address: true,
@@ -813,6 +816,7 @@ export async function syncRecruiterCompanyToCatalogue(companyId: string) {
         websiteUrl: true,
         publicDescription: true,
         publicLocation: true,
+        foundedYear: true,
         size: true,
         industry: true,
         address: true,
@@ -881,6 +885,8 @@ export async function syncRecruiterCompanyToCatalogue(companyId: string) {
         databaseCompany.publicDescription ??
         existingCatalog?.description ??
         null,
+      foundedYear:
+        databaseCompany.foundedYear ?? existingCatalog?.foundedYear ?? null,
       ...(existingCatalog?.rating ? { rating: existingCatalog.rating } : {}),
       jobCount: existingCatalog?.jobCount ?? 0,
       ownerUserId,
@@ -1866,6 +1872,7 @@ export async function ensureRecruiterCompany(
       address: input.address,
       website: null,
       description: null,
+      foundedYear: null,
       ownerUserId: userId,
       memberUserIds: [],
       taxCode: "0000000000",
@@ -1893,6 +1900,7 @@ function settingsFromCompany(
     address: company.address,
     website: company.website,
     description: company.description,
+    foundedYear: company.foundedYear ?? null,
     ownerUserId: company.ownerUserId,
     memberUserIds: company.memberUserIds,
     taxCode: company.taxCode,
@@ -1973,6 +1981,7 @@ export async function updateRecruiterCompanySettings(
       address: editable.address,
       website: editable.website,
       description: editable.description,
+      foundedYear: editable.foundedYear,
     });
     if (company.databaseBacked && company.databaseId) {
       await prisma.company.update({
@@ -1987,6 +1996,7 @@ export async function updateRecruiterCompanySettings(
           websiteUrl: updated.website,
           publicDescription: updated.description,
           publicLocation: updated.address,
+          foundedYear: updated.foundedYear,
         },
       });
     }

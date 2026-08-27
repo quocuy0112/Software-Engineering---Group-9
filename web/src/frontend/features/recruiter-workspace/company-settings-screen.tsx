@@ -11,6 +11,7 @@ import {
   type FormEvent,
 } from "react";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { CompanyAvatar } from "@/frontend/features/jobs/components/company-avatar";
 import {
   companyLogoSchema,
@@ -24,6 +25,7 @@ import {
   ALL_RECRUITER_COMPANIES,
   useRecruiterCompanyScope,
 } from "./recruiter-company-scope";
+import { getCompanyTeamCopy } from "./company-team-copy";
 
 type Props = {
   initialCompany: RecruiterCompanySettings | null;
@@ -44,6 +46,7 @@ function emptyForm(): FormState {
     address: "",
     website: null,
     description: null,
+    foundedYear: null,
   };
 }
 
@@ -67,6 +70,7 @@ function formFromCompany(company: RecruiterCompanySettings): FormState {
     address: company.address,
     website: company.website,
     description: company.description,
+    foundedYear: company.foundedYear,
   };
 }
 
@@ -332,6 +336,7 @@ export function CompanySettingsScreen({
   canManageTeam = false,
   initialCompanyId,
 }: Props) {
+  const teamCopy = getCompanyTeamCopy(useWorkspaceLocale());
   const csrfProof = useCsrfProof();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -802,6 +807,28 @@ export function CompanySettingsScreen({
             </div>
 
             <div className={styles.field}>
+              <label htmlFor="company-founded-year">Founded year</label>
+              <input
+                id="company-founded-year"
+                type="number"
+                min={1800}
+                max={2200}
+                value={form.foundedYear ?? ""}
+                onChange={(event) =>
+                  updateField(
+                    "foundedYear",
+                    event.target.value ? Number(event.target.value) : null,
+                  )
+                }
+                aria-describedby="company-founded-year-help"
+                placeholder="e.g. 2012"
+              />
+              <p id="company-founded-year-help" className={styles.formHint}>
+                Optional public information shown on the Candidate Company page.
+              </p>
+            </div>
+
+            <div className={styles.field}>
               <label htmlFor="company-website">Website</label>
               <input
                 id="company-website"
@@ -974,6 +1001,12 @@ export function CompanySettingsScreen({
                 </span>
               </div>
               <div className={styles.readonlyItem}>
+                <span className={styles.readonlyLabel}>Founded year</span>
+                <span className={styles.readonlyValue}>
+                  {company.foundedYear ?? "Not provided"}
+                </span>
+              </div>
+              <div className={styles.readonlyItem}>
                 <span className={styles.readonlyLabel}>Website</span>
                 <span className={styles.readonlyValue}>
                   {company.website || "Not provided"}
@@ -1056,12 +1089,20 @@ export function CompanySettingsScreen({
             <div className={styles.srv}>{company.memberUserIds.length}</div>
           </div>
           {managesSelectedTeam ? (
-            <Link
-              className={styles.btnOutline}
-              href={`/recruiter/company-settings/team?companyId=${encodeURIComponent(company.databaseId ?? company.id)}`}
-            >
-              Manage team
-            </Link>
+            <div className={styles.sideActions}>
+              <Link
+                className={styles.btnOutline}
+                href={`/recruiter/company-settings/team?companyId=${encodeURIComponent(company.databaseId ?? company.id)}`}
+              >
+                {teamCopy.manageTeam}
+              </Link>
+              <Link
+                className={styles.btnOutline}
+                href={`/recruiter/company-settings/team/applications?companyId=${encodeURIComponent(company.databaseId ?? company.id)}`}
+              >
+                {teamCopy.teamApplications}
+              </Link>
+            </div>
           ) : (
             <p className={styles.sideNote}>
               Only the active company owner can manage team members.

@@ -311,6 +311,15 @@ export class JobDiscoveryService {
   ) {}
 
   async search(raw: unknown, actor: JobActor, now = new Date()) {
+    return this.searchScoped(raw, actor, now);
+  }
+
+  async searchScoped(
+    raw: unknown,
+    actor: JobActor,
+    now = new Date(),
+    scope: Readonly<{ companyId?: string }> = {},
+  ) {
     let criteria: NormalizedJobSearch;
     try {
       criteria = parseJobSearchCriteria(raw);
@@ -329,6 +338,7 @@ export class JobDiscoveryService {
       ).PrismaPublicJobRepository();
     const repositoryCriteria = {
       ...criteria,
+      ...(scope.companyId ? { companyId: scope.companyId } : {}),
       ...(criteria.normalizedRoleTitles?.length
         ? { normalizedRoleTitles: criteria.normalizedRoleTitles }
         : {}),

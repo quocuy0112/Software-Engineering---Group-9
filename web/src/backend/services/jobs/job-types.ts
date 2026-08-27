@@ -16,6 +16,9 @@ export type JobActor =
 export type PublicJobState = "ACTIVE" | "CLOSED" | "EXPIRED";
 
 export type NormalizedJobSearch = {
+  /** Internal scope used by public company pages; never accepted from the
+   * unrestricted Find Jobs query string. */
+  companyId?: string;
   normalizedQuery: string;
   searchBy?: "TITLE" | "COMPANY" | "BOTH";
   normalizedLocation: string;

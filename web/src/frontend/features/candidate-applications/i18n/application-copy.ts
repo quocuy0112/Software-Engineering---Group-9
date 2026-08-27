@@ -38,6 +38,7 @@ const englishApplicationCopy = {
     emptyTitle: "No applications yet",
     emptyDescription: "Applications you submit will appear here.",
     browseJobs: "Browse jobs",
+    teamApplications: "Team Applications",
   },
   common: {
     jobs: "Jobs",
@@ -227,7 +228,9 @@ type WidenApplicationCopy<T> = T extends (...args: infer Args) => unknown
       ? { [Key in keyof T]: WidenApplicationCopy<T[Key]> }
       : T;
 
-export type ApplicationCopy = WidenApplicationCopy<typeof englishApplicationCopy>;
+export type ApplicationCopy = WidenApplicationCopy<
+  typeof englishApplicationCopy
+>;
 
 const vietnameseApplicationCopy: ApplicationCopy = {
   applicationsList: {
@@ -267,6 +270,7 @@ const vietnameseApplicationCopy: ApplicationCopy = {
     emptyTitle: "Chưa có đơn ứng tuyển",
     emptyDescription: "Các đơn bạn nộp sẽ xuất hiện tại đây.",
     browseJobs: "Xem việc làm",
+    teamApplications: "Hồ sơ ứng tuyển đội ngũ",
   },
   common: {
     jobs: "Việc làm",
@@ -286,29 +290,36 @@ const vietnameseApplicationCopy: ApplicationCopy = {
   personalInformation: {
     eyebrow: "Bước 1 trên 3",
     title: (jobTitle) => `Ứng tuyển – ${jobTitle}`,
-    subtitle: "Xác nhận thông tin cá nhân trước khi tiếp tục đến tệp ứng tuyển.",
+    subtitle:
+      "Xác nhận thông tin cá nhân trước khi tiếp tục đến tệp ứng tuyển.",
     cardTitle: "Thông tin cá nhân",
-    cardDescription: "Được lấy từ hồ sơ ứng viên. Hãy xác nhận các thông tin dưới đây trước khi gửi đơn.",
+    cardDescription:
+      "Được lấy từ hồ sơ ứng viên. Hãy xác nhận các thông tin dưới đây trước khi gửi đơn.",
     fullName: "Họ và tên",
     email: "Email",
     phone: "Số điện thoại",
     currentLocation: "Nơi ở hiện tại",
     linkedInPortfolio: "LinkedIn / Portfolio",
     optional: "Không bắt buộc",
-    lockedEmailNote: "Trường này được khóa vì đây là email đăng nhập đã xác minh của bạn.",
+    lockedEmailNote:
+      "Trường này được khóa vì đây là email đăng nhập đã xác minh của bạn.",
     contactSupport: "Liên hệ hỗ trợ để thay đổi.",
     phonePlaceholder: "Nhập số điện thoại",
     locationPlaceholder: "Nhập nơi ở hiện tại",
     linkedInPlaceholder: "https://",
     phoneHint: "Chỉ có thể chỉnh sửa cho lần ứng tuyển này.",
-    linkedInHint: "Nếu có, thông tin này sẽ được gửi cho nhà tuyển dụng cùng CV của bạn.",
+    linkedInHint:
+      "Nếu có, thông tin này sẽ được gửi cho nhà tuyển dụng cùng CV của bạn.",
     trustTitle: "Thông tin này chỉ được chia sẻ với nhà tuyển dụng.",
-    trustDescription: "Giới tính, tuổi, tình trạng hôn nhân và các thuộc tính nhạy cảm khác không được yêu cầu tại đây và bị loại trừ khỏi đánh giá tự động.",
+    trustDescription:
+      "Giới tính, tuổi, tình trạng hôn nhân và các thuộc tính nhạy cảm khác không được yêu cầu tại đây và bị loại trừ khỏi đánh giá tự động.",
     jobSummary: "Thông tin công việc",
     applicationProgress: "Tiến độ ứng tuyển",
     whyWeAsk: "Vì sao cần thông tin này",
-    whyWeAskFirst: "Nhà tuyển dụng cần một cách để liên hệ với bạn và xác nhận CV thuộc về đúng người.",
-    whyWeAskSecond: "Bạn có thể chỉnh sửa số điện thoại và nơi ở bất cứ lúc nào trong",
+    whyWeAskFirst:
+      "Nhà tuyển dụng cần một cách để liên hệ với bạn và xác nhận CV thuộc về đúng người.",
+    whyWeAskSecond:
+      "Bạn có thể chỉnh sửa số điện thoại và nơi ở bất cứ lúc nào trong",
     profileAndCv: "Hồ sơ & CV",
     whyWeAskThird: "Các thay đổi ở đây chỉ áp dụng cho lần ứng tuyển này.",
     backToJob: "Quay lại công việc",
@@ -338,14 +349,17 @@ const vietnameseApplicationCopy: ApplicationCopy = {
     uploadingCv: "Đang tải CV lên…",
     uploadedCvMeta: (size) => `${size} · Sẵn sàng cho lần ứng tuyển này`,
     cvParsingNoteTitle: "Hãy đảm bảo CV là tệp văn bản, không phải ảnh quét.",
-    cvParsingNote: "PDF quét hoặc chỉ có ảnh không thể được phân tích tự động — Smart Match có thể không đọc đúng kỹ năng của bạn.",
+    cvParsingNote:
+      "PDF quét hoặc chỉ có ảnh không thể được phân tích tự động — Smart Match có thể không đọc đúng kỹ năng của bạn.",
     coverLetterTitle: "Thư xin việc",
-    coverLetterDescription: "Đính kèm thư xin việc hoặc viết một lời nhắn ngắn trực tiếp.",
+    coverLetterDescription:
+      "Đính kèm thư xin việc hoặc viết một lời nhắn ngắn trực tiếp.",
     attachFile: "Đính kèm tệp",
     writeText: "Viết nội dung",
     coverLetterDropTitle: "Kéo thả thư xin việc hoặc duyệt tệp",
     coverLetterDropHint: "PDF, DOC hoặc DOCX — tối đa 5 MB",
-    coverLetterPlaceholder: "Cho nhà tuyển dụng biết vì sao bạn phù hợp với vị trí này…",
+    coverLetterPlaceholder:
+      "Cho nhà tuyển dụng biết vì sao bạn phù hợp với vị trí này…",
     characters: (current, maximum) => `${current} / ${maximum}`,
     noCoverLetterFile: "Chưa chọn tệp thư xin việc.",
     noParsingRequired: "Không cần phân tích",
@@ -367,7 +381,8 @@ const vietnameseApplicationCopy: ApplicationCopy = {
     coverFileSizeError: "Thư xin việc phải có dung lượng từ 1 byte đến 5 MB.",
     coverFileTypeError: "Hãy chọn thư xin việc định dạng PDF, DOC hoặc DOCX.",
     coverUploadError: "Không thể tải thư xin việc lên.",
-    coverLetterNeedsReupload: "Thư xin việc này không còn khả dụng. Hãy tải lại trước khi tiếp tục.",
+    coverLetterNeedsReupload:
+      "Thư xin việc này không còn khả dụng. Hãy tải lại trước khi tiếp tục.",
     draftSaveError: "Không thể lưu bản nháp.",
     backToJob: "Quay lại công việc",
   },
@@ -390,16 +405,31 @@ const vietnameseApplicationCopy: ApplicationCopy = {
     uploaded: "Đã tải lên",
     attachedFile: "Tệp đính kèm",
     noCoverLetter: "Chưa thêm thư xin việc",
-    pageCount: (count) => count ? `${count} trang` : "Chưa có số trang",
-    fileType: (mimeType) => mimeType === "application/pdf" ? "PDF" : mimeType.includes("word") ? "Tài liệu" : "Tệp",
-    fileSize: (bytes) => `${(bytes / 1_000_000).toFixed(bytes < 1_000_000 ? 1 : 0)} MB`,
-    parseStatus: { READY: "Đọc thành công", PARTIAL: "Đọc một phần", FAILED: "Cần chú ý", NOT_APPLICABLE: "Sẵn có" },
+    pageCount: (count) => (count ? `${count} trang` : "Chưa có số trang"),
+    fileType: (mimeType) =>
+      mimeType === "application/pdf"
+        ? "PDF"
+        : mimeType.includes("word")
+          ? "Tài liệu"
+          : "Tệp",
+    fileSize: (bytes) =>
+      `${(bytes / 1_000_000).toFixed(bytes < 1_000_000 ? 1 : 0)} MB`,
+    parseStatus: {
+      READY: "Đọc thành công",
+      PARTIAL: "Đọc một phần",
+      FAILED: "Cần chú ý",
+      NOT_APPLICABLE: "Sẵn có",
+    },
     messageToRecruiter: "Lời nhắn cho nhà tuyển dụng",
-    messagePlaceholder: "Thêm một lời nhắn ngắn cho nhà tuyển dụng (không bắt buộc)…",
+    messagePlaceholder:
+      "Thêm một lời nhắn ngắn cho nhà tuyển dụng (không bắt buộc)…",
     transparencyTitle: "Minh bạch về hỗ trợ tự động",
-    transparencyDescription: "Nhà tuyển dụng có thể dùng công cụ tự động để so sánh đơn ứng tuyển với yêu cầu công việc. Điểm số, thứ hạng và ghi chú nội bộ không hiển thị cho ứng viên và không quyết định kết quả tuyển dụng cuối cùng.",
-    transparencySensitiveAttributes: "Giới tính, tuổi, tình trạng hôn nhân và các thuộc tính nhạy cảm khác bị loại trừ khỏi đánh giá tự động.",
-    confirmation: "Tôi xác nhận thông tin là chính xác và đồng ý gửi đơn ứng tuyển này đến nhà tuyển dụng.",
+    transparencyDescription:
+      "Nhà tuyển dụng có thể dùng công cụ tự động để so sánh đơn ứng tuyển với yêu cầu công việc. Điểm số, thứ hạng và ghi chú nội bộ không hiển thị cho ứng viên và không quyết định kết quả tuyển dụng cuối cùng.",
+    transparencySensitiveAttributes:
+      "Giới tính, tuổi, tình trạng hôn nhân và các thuộc tính nhạy cảm khác bị loại trừ khỏi đánh giá tự động.",
+    confirmation:
+      "Tôi xác nhận thông tin là chính xác và đồng ý gửi đơn ứng tuyển này đến nhà tuyển dụng.",
     filesToBeSubmitted: "Nội dung sẽ được gửi",
     jobSummary: "Thông tin công việc",
     checklistPersonalInformation: "Thông tin cá nhân",
@@ -407,8 +437,10 @@ const vietnameseApplicationCopy: ApplicationCopy = {
     checklistCoverLetter: "Thư xin việc",
     checklistMessage: "Lời nhắn cho nhà tuyển dụng",
     afterSubmission: "Sau khi nộp đơn",
-    afterSubmissionDescription: "Bạn sẽ thấy trạng thái nộp đơn và tiến độ tuyển dụng. Điểm AI, điểm phù hợp và thứ hạng không hiển thị cho ứng viên.",
-    afterSubmissionWithdrawal: "Bạn có thể rút đơn trước khi nhà tuyển dụng chuyển đơn sang vòng phỏng vấn.",
+    afterSubmissionDescription:
+      "Bạn sẽ thấy trạng thái nộp đơn và tiến độ tuyển dụng. Điểm AI, điểm phù hợp và thứ hạng không hiển thị cho ứng viên.",
+    afterSubmissionWithdrawal:
+      "Bạn có thể rút đơn trước khi nhà tuyển dụng chuyển đơn sang vòng phỏng vấn.",
     backToFiles: "Quay lại tệp ứng tuyển",
     submit: "Nộp đơn ứng tuyển",
     submitting: "Đang nộp…",

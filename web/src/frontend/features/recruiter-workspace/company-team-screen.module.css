@@ -11,6 +11,11 @@
   align-items: end;
   margin-bottom: 28px;
 }
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .eyebrow {
   margin: 0 0 8px;
   color: var(--sh-color-brand-primary);
@@ -175,10 +180,17 @@
   color: var(--sh-color-text-secondary);
 }
 .secondaryButton {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
   border: 1px solid var(--sh-color-border-subtle);
   background: var(--sh-color-surface-card);
   color: var(--sh-color-brand-primary);
   white-space: nowrap;
+}
+.secondaryButton:focus-visible {
+  outline: 3px solid var(--sh-color-focus-ring-bg);
+  outline-offset: 2px;
 }
 .section {
   overflow: hidden;
@@ -360,6 +372,7 @@
     padding: 25px 16px 48px;
   }
   .header,
+  .headerActions,
   .linkCard {
     display: grid;
   }

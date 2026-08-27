@@ -19,6 +19,7 @@ export function WorkspaceNavigation({
   const copy =
     locale === "vi"
       ? {
+          company: "Công ty",
           dashboard: "Bảng điều khiển",
           jobs: "Việc làm",
           messages: "Tin nhắn",
@@ -36,8 +37,10 @@ export function WorkspaceNavigation({
           suggestedJobs: "Việc làm đề xuất",
           cvMatchCheck: "Kiểm tra độ phù hợp CV",
           recommendationSettings: "Cài đặt gợi ý việc làm",
+          teamApplications: "Ứng tuyển đội ngũ",
         }
       : {
+          company: "Company",
           dashboard: "Dashboard",
           jobs: "Jobs",
           messages: "Messages",
@@ -55,10 +58,12 @@ export function WorkspaceNavigation({
           suggestedJobs: "Suggested Jobs",
           cvMatchCheck: "CV Match Check",
           recommendationSettings: "Job Recommendation Settings",
+          teamApplications: "Team Applications",
         };
   const destinations = [
     { href: "/dashboard", label: copy.dashboard, icon: "dashboard" },
     { href: "/jobs", label: copy.jobs, icon: "jobs" },
+    { href: "/company", label: copy.company, icon: "building-2" },
     { href: "/jobs/applied", label: copy.applications, icon: "applications" },
     { href: "/cv-match-check", label: copy.cvMatchCheck, icon: "cv-match" },
     { href: "/messages", label: copy.messages, icon: "messages" },
@@ -71,6 +76,10 @@ export function WorkspaceNavigation({
     { href: "/jobs/saved", label: copy.savedJobs },
     { href: "/jobs/matches", label: copy.suggestedJobs },
     { href: "/jobs/settings", label: copy.recommendationSettings },
+  ] as const;
+  const applicationsSubnav = [
+    { href: "/jobs/applied", label: copy.applications },
+    { href: "/jobs/applied/team", label: copy.teamApplications },
   ] as const;
   const pathname = usePathname() ?? "/";
   const [menuOpen, setMenuOpen] = useState(false);
@@ -135,6 +144,7 @@ export function WorkspaceNavigation({
           {[
             ...destinations.map((destination) => destination.label),
             ...jobsSubnav.map((subnav) => subnav.label),
+            ...applicationsSubnav.map((subnav) => subnav.label),
             copy.signOut,
           ].map((label) => (
             <span key={label}>{label}</span>
@@ -170,6 +180,28 @@ export function WorkspaceNavigation({
                       const subnavActive =
                         subnav.href === "/jobs"
                           ? pathname === "/jobs"
+                          : pathname === subnav.href ||
+                            pathname.startsWith(`${subnav.href}/`);
+                      return (
+                        <Link
+                          key={subnav.href}
+                          href={subnav.href}
+                          aria-current={subnavActive ? "page" : undefined}
+                          title={collapsed ? subnav.label : undefined}
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          <span>{subnav.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : null}
+                {destination.href === "/jobs/applied" && active ? (
+                  <div className="workspace-navigation-subnav">
+                    {applicationsSubnav.map((subnav) => {
+                      const subnavActive =
+                        subnav.href === "/jobs/applied"
+                          ? pathname === "/jobs/applied"
                           : pathname === subnav.href ||
                             pathname.startsWith(`${subnav.href}/`);
                       return (

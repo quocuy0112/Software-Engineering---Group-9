@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { formatCompanyTeamDate, getCompanyTeamCopy } from "./company-team-copy";
 import styles from "./company-team-screen.module.css";
 
 type Props = {
@@ -29,14 +32,6 @@ type Props = {
     actor: { name: string; email: string } | null;
   }>;
 };
-const roleLabel = (role: string) =>
-  role === "HR_MANAGER"
-    ? "HR Manager"
-    : role === "RECRUITER"
-      ? "Recruiter"
-      : "Owner";
-const statusLabel = (status: string) =>
-  status.charAt(0) + status.slice(1).toLowerCase();
 const initials = (name: string) =>
   name
     .split(/\s+/u)
@@ -45,29 +40,6 @@ const initials = (name: string) =>
     .map((part) => part[0])
     .join("")
     .toUpperCase() || "?";
-const activityLabel = (kind: string) =>
-  ({
-    INVITED: "invited",
-    ACCEPTED: "accepted",
-    DECLINED: "declined",
-    REVOKED: "revoked",
-    ROLE_CHANGED: "changed the role of",
-    SUSPENDED: "suspended",
-    RESTORED: "restored",
-    REMOVED: "removed",
-  })[kind] ?? kind.toLowerCase();
-const invitationErrorMessage = (code?: string) => {
-  switch (code) {
-    case "INVITATION_EXISTS":
-      return "This email already has a pending invitation. Revoke it before sending a new one.";
-    case "MEMBERSHIP_EXISTS":
-      return "This account is already a member of your company.";
-    case "RECIPIENT_UNAVAILABLE":
-      return "No active SmartHire account is available for this email.";
-    default:
-      return "Unable to send this invitation. Please try again.";
-  }
-};
 
 export function CompanyTeamScreen({
   companyId,
@@ -75,6 +47,8 @@ export function CompanyTeamScreen({
   invitations,
   activities = [],
 }: Props) {
+  const locale = useWorkspaceLocale();
+  const copy = getCompanyTeamCopy(locale);
   const csrf = useCsrfProof();
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -102,19 +76,16 @@ export function CompanyTeamScreen({
         code?: string;
         message?: string;
       };
-      if (!response.ok) throw new Error(invitationErrorMessage(payload.code));
+      if (!response.ok) throw new Error(copy.invitationError(payload.code));
       setEmail("");
-      toast.success("Invitation queued for delivery", {
-        description:
-          "The recipient can review and respond from their SmartHire email.",
+      toast.success(copy.invitationQueued, {
+        description: copy.invitationQueuedDescription,
       });
       router.refresh();
     } catch (error) {
-      toast.error("Invitation was not sent", {
+      toast.error(copy.invitationNotSent, {
         description:
-          error instanceof Error
-            ? error.message
-            : "Unable to send this invitation. Please try again.",
+          error instanceof Error ? error.message : copy.sendInvitationError,
       });
     } finally {
       setBusy(false);
@@ -136,14 +107,12 @@ export function CompanyTeamScreen({
           }),
         },
       );
-      if (!response.ok) throw new Error("Unable to update this member.");
-      setMessage("Member access updated.");
+      if (!response.ok) throw new Error(copy.updateMemberError);
+      setMessage(copy.memberUpdated);
       router.refresh();
     } catch (error) {
       setMessage(
-        error instanceof Error
-          ? error.message
-          : "Unable to update this member.",
+        error instanceof Error ? error.message : copy.updateMemberError,
       );
     } finally {
       setBusy(false);
@@ -151,26 +120,19 @@ export function CompanyTeamScreen({
   }
 
   async function revoke(id: string) {
-    if (
-      !window.confirm(
-        "Revoke this pending invitation? The recipient will no longer be able to join.",
-      )
-    )
-      return;
+    if (!window.confirm(copy.revokeConfirm)) return;
     setBusy(true);
     try {
       const response = await fetch(
         `/api/recruiter/company/team/invitations/${id}/revoke${companyQuery}`,
         { method: "POST", headers: { "x-csrf-token": csrf } },
       );
-      if (!response.ok) throw new Error("Unable to revoke this invitation.");
-      setMessage("Invitation revoked.");
+      if (!response.ok) throw new Error(copy.revokeInvitationError);
+      setMessage(copy.invitationRevoked);
       router.refresh();
     } catch (error) {
       setMessage(
-        error instanceof Error
-          ? error.message
-          : "Unable to revoke this invitation.",
+        error instanceof Error ? error.message : copy.revokeInvitationError,
       );
     } finally {
       setBusy(false);
@@ -181,15 +143,21 @@ export function CompanyTeamScreen({
     <main className={styles.page}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Company settings / Team</p>
-          <h1>Build your hiring team</h1>
-          <p>
-            Invite trusted colleagues and manage their access to this company.
-          </p>
+          <p className={styles.eyebrow}>{copy.breadcrumb}</p>
+          <h1>{copy.title}</h1>
+          <p>{copy.description}</p>
         </div>
-        <div className={styles.memberCount}>
-          <strong>{members.length}</strong>
-          <span>team members</span>
+        <div className={styles.headerActions}>
+          <Link
+            className={styles.secondaryButton}
+            href={`/recruiter/company-settings/team/applications${companyId ? `?companyId=${encodeURIComponent(companyId)}` : ""}`}
+          >
+            {copy.teamApplications}
+          </Link>
+          <div className={styles.memberCount}>
+            <strong>{members.length}</strong>
+            <span>{copy.teamMembers(members.length)}</span>
+          </div>
         </div>
       </header>
       <p className={styles.notice} role="status" aria-live="polite">
@@ -202,14 +170,14 @@ export function CompanyTeamScreen({
           </span>
           <div>
             <h2 id="invite-title">
-              <b>Invite a teammate</b>
+              <b>{copy.inviteTeammate}</b>
             </h2>
-            <p>They must already have a SmartHire account to accept.</p>
+            <p>{copy.inviteRequirement}</p>
           </div>
         </div>
         <form className={styles.inviteForm} onSubmit={invite}>
           <label className={styles.field}>
-            <span>Work email</span>
+            <span>{copy.workEmail}</span>
             <input
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -220,13 +188,13 @@ export function CompanyTeamScreen({
             />
           </label>
           <label className={styles.field}>
-            <span>Role</span>
+            <span>{copy.role}</span>
             <select
               value={role}
               onChange={(event) => setRole(event.target.value)}
             >
-              <option value="RECRUITER">Recruiter</option>
-              <option value="HR_MANAGER">HR Manager</option>
+              <option value="RECRUITER">{copy.roleLabel("RECRUITER")}</option>
+              <option value="HR_MANAGER">{copy.roleLabel("HR_MANAGER")}</option>
             </select>
           </label>
           <button
@@ -234,7 +202,7 @@ export function CompanyTeamScreen({
             disabled={busy}
             type="submit"
           >
-            {busy ? "Sending…" : "Send invitation"}
+            {busy ? copy.sending : copy.sendInvitation}
           </button>
         </form>
       </section>
@@ -242,11 +210,13 @@ export function CompanyTeamScreen({
         <div className={styles.sectionHeading}>
           <div>
             <h2 id="members-title">
-              <b>Team members</b>
+              <b>{copy.membersTitle}</b>
             </h2>
-            <p>Manage roles and access for your company.</p>
+            <p>{copy.membersDescription}</p>
           </div>
-          <span className={styles.totalColor}>{members.length} total</span>
+          <span className={styles.totalColor}>
+            {copy.total(members.length)}
+          </span>
         </div>
         <div className={styles.memberList}>
           {members.map((member) => {
@@ -263,12 +233,12 @@ export function CompanyTeamScreen({
                   <span>{member.user.email}</span>
                 </div>
                 <span className={styles.roleBadge}>
-                  {roleLabel(member.role)}
+                  {copy.roleLabel(member.role)}
                 </span>
                 <span
                   className={`${styles.statusBadge} ${member.status === "ACTIVE" ? styles.active : member.status === "SUSPENDED" ? styles.suspended : styles.removed}`}
                 >
-                  {statusLabel(member.status)}
+                  {copy.statusLabel(member.status)}
                 </span>
                 {managed ? (
                   <div className={styles.actions}>
@@ -278,7 +248,7 @@ export function CompanyTeamScreen({
                       type="button"
                       onClick={() => void command(member.id, "role", nextRole)}
                     >
-                      Make {roleLabel(nextRole)}
+                      {copy.makeRole(copy.roleLabel(nextRole))}
                     </button>
                     <button
                       className={styles.textButton}
@@ -291,7 +261,9 @@ export function CompanyTeamScreen({
                         )
                       }
                     >
-                      {member.status === "SUSPENDED" ? "Restore" : "Suspend"}
+                      {member.status === "SUSPENDED"
+                        ? copy.restore
+                        : copy.suspend}
                     </button>
                     <button
                       className={styles.removeButton}
@@ -299,18 +271,16 @@ export function CompanyTeamScreen({
                       type="button"
                       onClick={() => {
                         if (
-                          window.confirm(
-                            `Remove ${member.user.name} from the company?`,
-                          )
+                          window.confirm(copy.removeConfirm(member.user.name))
                         )
                           void command(member.id, "remove");
                       }}
                     >
-                      Remove
+                      {copy.remove}
                     </button>
                   </div>
                 ) : (
-                  <span className={styles.ownerNote}>Primary owner</span>
+                  <span className={styles.ownerNote}>{copy.primaryOwner}</span>
                 )}
               </article>
             );
@@ -324,12 +294,12 @@ export function CompanyTeamScreen({
         <div className={styles.sectionHeading}>
           <div>
             <h2 id="pending-invitations-title">
-              <b>Pending invitations</b>
+              <b>{copy.pendingInvitations}</b>
             </h2>
-            <p>People who have not yet joined your company.</p>
+            <p>{copy.pendingDescription}</p>
           </div>
           <span className={styles.pendingColor}>
-            {invitations.length} pending
+            {copy.pendingCount(invitations.length)}
           </span>
         </div>
         {invitations.length ? (
@@ -342,8 +312,10 @@ export function CompanyTeamScreen({
                 <div>
                   <strong>{invitation.normalizedEmail}</strong>
                   <span>
-                    Invited as {roleLabel(invitation.role)} · expires{" "}
-                    {new Date(invitation.expiresAt).toLocaleDateString()}
+                    {copy.invitedAs(
+                      copy.roleLabel(invitation.role),
+                      formatCompanyTeamDate(invitation.expiresAt, locale),
+                    )}
                   </span>
                 </div>
                 <button
@@ -352,7 +324,7 @@ export function CompanyTeamScreen({
                   type="button"
                   onClick={() => void revoke(invitation.id)}
                 >
-                  Revoke
+                  {copy.revoke}
                 </button>
               </article>
             ))}
@@ -361,8 +333,8 @@ export function CompanyTeamScreen({
           <div className={styles.emptyState}>
             <span aria-hidden="true">✦</span>
             <div>
-              <strong>No pending invitations</strong>
-              <p>Use the form above to invite your first teammate.</p>
+              <strong>{copy.noPendingInvitations}</strong>
+              <p>{copy.noPendingDescription}</p>
             </div>
           </div>
         )}
@@ -371,11 +343,13 @@ export function CompanyTeamScreen({
         <div className={styles.sectionHeading}>
           <div>
             <h2 id="activity-title">
-              <b>Team activity</b>
+              <b>{copy.teamActivity}</b>
             </h2>
-            <p>A recent, immutable record of team access changes.</p>
+            <p>{copy.activityDescription}</p>
           </div>
-          <span className={styles.recentColor}>{activities.length} recent</span>
+          <span className={styles.recentColor}>
+            {copy.recent(activities.length)}
+          </span>
         </div>
         {activities.length ? (
           <ol className={styles.invitationList}>
@@ -386,14 +360,17 @@ export function CompanyTeamScreen({
                 </span>
                 <div>
                   <strong>
-                    {activity.actor?.name ?? "System"}{" "}
-                    {activityLabel(activity.kind)} {activity.targetEmail}
+                    {copy.activityEntry(
+                      activity.actor?.name ?? copy.system,
+                      copy.activityLabel(activity.kind),
+                      activity.targetEmail,
+                    )}
                   </strong>
                   <span>
                     {activity.role
-                      ? `Role: ${roleLabel(activity.role)} · `
+                      ? `${copy.activityRole(copy.roleLabel(activity.role))} · `
                       : ""}
-                    {new Date(activity.occurredAt).toLocaleString()}
+                    {formatCompanyTeamDate(activity.occurredAt, locale, true)}
                   </span>
                 </div>
               </li>
@@ -403,8 +380,8 @@ export function CompanyTeamScreen({
           <div className={styles.emptyState}>
             <span aria-hidden="true">&#9940;</span>
             <div>
-              <strong>No activity yet</strong>
-              <p>Invitation and member-access actions will appear here.</p>
+              <strong>{copy.noActivity}</strong>
+              <p>{copy.noActivityDescription}</p>
             </div>
           </div>
         )}
