@@ -176,6 +176,16 @@ export type JobTaxonomyProposal = Prisma.JobTaxonomyProposalModel
  */
 export type CompanyInvitation = Prisma.CompanyInvitationModel
 /**
+ * Model TeamOpportunity
+ * 
+ */
+export type TeamOpportunity = Prisma.TeamOpportunityModel
+/**
+ * Model TeamApplication
+ * 
+ */
+export type TeamApplication = Prisma.TeamApplicationModel
+/**
  * Model CompanyTeamActivity
  * 
  */

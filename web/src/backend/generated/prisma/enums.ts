@@ -173,7 +173,8 @@ export const EmailKind = {
   PROFESSIONAL_CONNECTION_UPDATED: 'PROFESSIONAL_CONNECTION_UPDATED',
   COMPANY_EMAIL_VERIFY: 'COMPANY_EMAIL_VERIFY',
   COMPANY_INVITATION: 'COMPANY_INVITATION',
-  COMPANY_INVITATION_RESPONSE: 'COMPANY_INVITATION_RESPONSE'
+  COMPANY_INVITATION_RESPONSE: 'COMPANY_INVITATION_RESPONSE',
+  TEAM_APPLICATION_REJECTED: 'TEAM_APPLICATION_REJECTED'
 } as const
 
 export type EmailKind = (typeof EmailKind)[keyof typeof EmailKind]
@@ -258,6 +259,7 @@ export const InAppNotificationKind = {
   COMPANY_INVITATION_DECLINED: 'COMPANY_INVITATION_DECLINED',
   APPLICATION_SUBMITTED: 'APPLICATION_SUBMITTED',
   APPLICATION_RECEIVED: 'APPLICATION_RECEIVED',
+  TEAM_APPLICATION_RECEIVED: 'TEAM_APPLICATION_RECEIVED',
   APPLICATION_STAGE_CHANGED: 'APPLICATION_STAGE_CHANGED',
   VERIFICATION_RECEIVED: 'VERIFICATION_RECEIVED',
   VERIFICATION_CHANGES_REQUESTED: 'VERIFICATION_CHANGES_REQUESTED',
@@ -868,6 +870,26 @@ export const CompanyInvitationState = {
 } as const
 
 export type CompanyInvitationState = (typeof CompanyInvitationState)[keyof typeof CompanyInvitationState]
+
+
+export const TeamOpportunityState = {
+  OPEN: 'OPEN',
+  CLOSED: 'CLOSED'
+} as const
+
+export type TeamOpportunityState = (typeof TeamOpportunityState)[keyof typeof TeamOpportunityState]
+
+
+export const TeamApplicationStatus = {
+  SUBMITTED: 'SUBMITTED',
+  VIEWED: 'VIEWED',
+  REJECTED: 'REJECTED',
+  INVITATION_SENT: 'INVITATION_SENT',
+  WITHDRAWN: 'WITHDRAWN',
+  JOINED: 'JOINED'
+} as const
+
+export type TeamApplicationStatus = (typeof TeamApplicationStatus)[keyof typeof TeamApplicationStatus]
 
 
 export const CompanyTeamActivityKind = {

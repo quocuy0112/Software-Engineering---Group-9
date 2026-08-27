@@ -82,6 +82,8 @@ export const ModelName = {
   JobSubIndustry: 'JobSubIndustry',
   JobTaxonomyProposal: 'JobTaxonomyProposal',
   CompanyInvitation: 'CompanyInvitation',
+  TeamOpportunity: 'TeamOpportunity',
+  TeamApplication: 'TeamApplication',
   CompanyTeamActivity: 'CompanyTeamActivity',
   CompanyMembership: 'CompanyMembership',
   PlatformAdministratorGrant: 'PlatformAdministratorGrant',
@@ -720,7 +722,8 @@ export const CompanyScalarFieldEnum = {
   verificationStateBeforeBan: 'verificationStateBeforeBan',
   verifiedAtBeforeBan: 'verifiedAtBeforeBan',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  foundedYear: 'foundedYear'
 } as const
 
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
@@ -791,6 +794,7 @@ export const CompanyInvitationScalarFieldEnum = {
   declinedByUserId: 'declinedByUserId',
   declinedAt: 'declinedAt',
   revokedAt: 'revokedAt',
+  teamApplicationId: 'teamApplicationId',
   expiresAt: 'expiresAt',
   version: 'version',
   createdAt: 'createdAt',
@@ -798,6 +802,52 @@ export const CompanyInvitationScalarFieldEnum = {
 } as const
 
 export type CompanyInvitationScalarFieldEnum = (typeof CompanyInvitationScalarFieldEnum)[keyof typeof CompanyInvitationScalarFieldEnum]
+
+
+export const TeamOpportunityScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  role: 'role',
+  state: 'state',
+  closedAt: 'closedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TeamOpportunityScalarFieldEnum = (typeof TeamOpportunityScalarFieldEnum)[keyof typeof TeamOpportunityScalarFieldEnum]
+
+
+export const TeamApplicationScalarFieldEnum = {
+  id: 'id',
+  candidateUserId: 'candidateUserId',
+  companyId: 'companyId',
+  teamOpportunityId: 'teamOpportunityId',
+  appliedRole: 'appliedRole',
+  applicationEmail: 'applicationEmail',
+  cvDisplayName: 'cvDisplayName',
+  cvFileName: 'cvFileName',
+  cvMimeType: 'cvMimeType',
+  cvByteSize: 'cvByteSize',
+  cvStorageKey: 'cvStorageKey',
+  cvChecksumSha256: 'cvChecksumSha256',
+  activeKey: 'activeKey',
+  status: 'status',
+  rejectionReason: 'rejectionReason',
+  submittedAt: 'submittedAt',
+  ownerFirstViewedAt: 'ownerFirstViewedAt',
+  decidedAt: 'decidedAt',
+  joinedAt: 'joinedAt',
+  withdrawnAt: 'withdrawnAt',
+  cvDeleteAfter: 'cvDeleteAfter',
+  cvDeletedAt: 'cvDeletedAt',
+  cvDeletionFailureCode: 'cvDeletionFailureCode',
+  decidedByUserId: 'decidedByUserId',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TeamApplicationScalarFieldEnum = (typeof TeamApplicationScalarFieldEnum)[keyof typeof TeamApplicationScalarFieldEnum]
 
 
 export const CompanyTeamActivityScalarFieldEnum = {
