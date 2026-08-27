@@ -11,9 +11,9 @@ import {
 } from "@/shared/contracts/recruiter-job-posting";
 import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
 import type { RecruiterJobPostingTab } from "@/shared/routing/recruiter-routes";
-import { collectRecruiterSubIndustrySuggestions } from "@/shared/contracts/jobs/industry-taxonomy";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { recruiterWorkspaceCopy } from "./recruiter-workspace-copy";
+import { collectRecruiterSubIndustrySuggestions } from "@/shared/contracts/jobs/industry-taxonomy";
 
 type RecruiterRouteViewProps = {
   view: "list" | "create" | "edit";
@@ -108,6 +108,7 @@ export function RecruiterRouteView({
       initialJob={job}
       companyName={job.company.name}
       autoSavePreferenceScope={initialData.recruiterUserId}
+      jobTaxonomy={initialData.jobTaxonomy}
       subIndustrySuggestions={collectRecruiterSubIndustrySuggestions(
         initialData.jobs,
       )}

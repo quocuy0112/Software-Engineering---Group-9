@@ -35,7 +35,10 @@ type Detail = {
   }>;
 };
 
-function stageLabel(stage: string, labels: ReturnType<typeof recruiterWorkspaceCopy>["messages"]["stages"]) {
+function stageLabel(
+  stage: string,
+  labels: ReturnType<typeof recruiterWorkspaceCopy>["messages"]["stages"],
+) {
   return labels[stage as keyof typeof labels] ?? stage;
 }
 
@@ -110,8 +113,7 @@ export function RecruitmentMessagingWorkspace({
         new Map(
           items
             .filter(
-              (item) =>
-                companyId === "all" || item.job.companyId === companyId,
+              (item) => companyId === "all" || item.job.companyId === companyId,
             )
             .map((item) => [item.job.id, item.job.title]),
         ).entries(),
@@ -154,7 +156,12 @@ export function RecruitmentMessagingWorkspace({
         );
       })
       .catch(() => setError(messagesCopy.errors.loadConversations));
-  }, [assignment, hasInitialItems, messagesCopy.errors.loadConversations, ownerOversight]);
+  }, [
+    assignment,
+    hasInitialItems,
+    messagesCopy.errors.loadConversations,
+    ownerOversight,
+  ]);
 
   useEffect(() => {
     const refreshUnreadCounts = () =>
@@ -213,24 +220,30 @@ export function RecruitmentMessagingWorkspace({
     return () => window.cancelAnimationFrame(frame);
   }, [detail, selectedId]);
 
-  const managerThreadId =
-    detail?.access === "HR_MANAGER" ? detail.thread.id : null;
-  const assignedMembershipId =
-    detail?.access === "HR_MANAGER" ? detail.thread.assignee?.id : null;
+  const canAssign =
+    detail?.access === "HR_MANAGER" || detail?.access === "OWNER";
+  const assignmentThreadId = canAssign ? (detail?.thread.id ?? null) : null;
+  const assignedMembershipId = canAssign
+    ? (detail?.thread.assignee?.id ?? null)
+    : null;
 
   useEffect(() => {
-    if (!managerThreadId) return;
+    if (!assignmentThreadId) return;
     void responseJson<{
       items: Array<{ id: string; role: string; user: { name: string } }>;
     }>(
-      `/api/recruitment-threads/${encodeURIComponent(managerThreadId)}/assignees`,
+      `/api/recruitment-threads/${encodeURIComponent(assignmentThreadId)}/assignees`,
     )
       .then((payload) => {
         setAssignees(payload.items);
         setAssigneeId(assignedMembershipId ?? payload.items[0]?.id ?? "");
       })
       .catch(() => setError(messagesCopy.errors.loadAssignees));
-  }, [assignedMembershipId, managerThreadId, messagesCopy.errors.loadAssignees]);
+  }, [
+    assignedMembershipId,
+    assignmentThreadId,
+    messagesCopy.errors.loadAssignees,
+  ]);
 
   async function send(event: FormEvent) {
     event.preventDefault();
@@ -308,9 +321,7 @@ export function RecruitmentMessagingWorkspace({
             : messagesCopy.recruiterWorkspace}
         </p>
         <h1>
-          {ownerOversight
-            ? messagesCopy.oversightTitle
-            : messagesCopy.title}
+          {ownerOversight ? messagesCopy.oversightTitle : messagesCopy.title}
         </h1>
         <span>{messagesCopy.description}</span>
       </header>
@@ -430,31 +441,39 @@ export function RecruitmentMessagingWorkspace({
                     className="recruitment-chat-stage"
                     data-stage={detail.thread.applicationStage}
                   >
-                    {stageLabel(detail.thread.applicationStage, messagesCopy.stages)}
+                    {stageLabel(
+                      detail.thread.applicationStage,
+                      messagesCopy.stages,
+                    )}
                   </span>
                   <small>
                     {detail.access === "OWNER"
-                      ? messagesCopy.readOnlyOversight
-                      : (detail.thread.assignee
+                      ? detail.thread.state === "READ_ONLY"
+                        ? messagesCopy.readOnlyOversight
+                        : detail.thread.canSend
+                          ? messagesCopy.ownerCanSend
+                          : messagesCopy.ownerAssignOrSend
+                      : detail.thread.assignee
                         ? recruiterRoleLabel(detail.thread.assignee.role, copy)
-                        : messagesCopy.unassigned)}
+                        : messagesCopy.unassigned}
                   </small>
                 </div>
               </header>
-              {detail.access === "HR_MANAGER" ? (
+              {canAssign ? (
                 <form
                   className="recruitment-messaging__assignment"
                   onSubmit={assign}
                 >
                   <label>
-                    <span>{messagesCopy.assignedRecruiter}</span>
+                    <span>{messagesCopy.assignToEligibleRole}</span>
                     <select
                       value={assigneeId}
                       onChange={(event) => setAssigneeId(event.target.value)}
                     >
                       {assignees.map((assignee) => (
                         <option key={assignee.id} value={assignee.id}>
-                          {assignee.user.name} · {assignee.role}
+                          {assignee.user.name} ·{" "}
+                          {recruiterRoleLabel(assignee.role, copy)}
                         </option>
                       ))}
                     </select>
@@ -474,42 +493,42 @@ export function RecruitmentMessagingWorkspace({
                       {messagesCopy.conversationStarted}
                     </p>
                     {detail.messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className="recruitment-chat-message"
-                      data-direction={
-                        message.senderUserId === detail.thread.candidate.id
-                          ? "incoming"
-                          : "outgoing"
-                      }
-                      aria-label={messagesCopy.messageFrom(
-                        message.senderUserId === detail.thread.candidate.id
-                          ? detail.thread.candidate.name
-                          : detail.access === "OWNER"
-                          ? (detail.thread.assignee?.name ?? messagesCopy.recruiterWorkspace)
-                            : locale === "vi"
-                              ? "bạn"
-                              : "you",
-                      )}
-                    >
-                      <span
-                        className="recruitment-chat-message__avatar"
-                        aria-hidden="true"
+                      <div
+                        key={message.id}
+                        className="recruitment-chat-message"
+                        data-direction={
+                          message.senderUserId === detail.thread.candidate.id
+                            ? "incoming"
+                            : "outgoing"
+                        }
+                        aria-label={messagesCopy.messageFrom(
+                          message.senderUserId === detail.thread.candidate.id
+                            ? detail.thread.candidate.name
+                            : detail.access === "OWNER"
+                              ? (detail.thread.assignee?.name ??
+                                messagesCopy.recruiterWorkspace)
+                              : locale === "vi"
+                                ? "bạn"
+                                : "you",
+                        )}
                       >
-                        <UserRound />
-                      </span>
-                      <article
-                        data-time={new Date(message.createdAt).toLocaleString()}
-                      >
-                        <div>{message.content}</div>
-                        <time
-                          dateTime={message.createdAt}
+                        <span
+                          className="recruitment-chat-message__avatar"
                           aria-hidden="true"
                         >
-                          {new Date(message.createdAt).toLocaleString()}
-                        </time>
-                      </article>
-                    </div>
+                          <UserRound />
+                        </span>
+                        <article
+                          data-time={new Date(
+                            message.createdAt,
+                          ).toLocaleString()}
+                        >
+                          <div>{message.content}</div>
+                          <time dateTime={message.createdAt} aria-hidden="true">
+                            {new Date(message.createdAt).toLocaleString()}
+                          </time>
+                        </article>
+                      </div>
                     ))}
                   </>
                 ) : (
@@ -518,7 +537,7 @@ export function RecruitmentMessagingWorkspace({
                   </p>
                 )}
               </div>
-              {detail.access !== "OWNER" ? (
+              {detail.access !== "OWNER" || detail.thread.canSend ? (
                 <form className="recruitment-chat-composer" onSubmit={send}>
                   <label>
                     <span className="sr-only">{messagesCopy.message}</span>
@@ -541,7 +560,9 @@ export function RecruitmentMessagingWorkspace({
                       placeholder={
                         detail.thread.canSend
                           ? messagesCopy.writeMessage
-                          : messagesCopy.readOnlyConversation
+                          : detail.access === "HR_MANAGER"
+                            ? messagesCopy.onlyAssignedTeamMember
+                            : messagesCopy.readOnlyConversation
                       }
                     />
                     <span
@@ -566,7 +587,9 @@ export function RecruitmentMessagingWorkspace({
                 </form>
               ) : (
                 <p className="recruitment-messaging__empty">
-                  {messagesCopy.ownerReadOnly}
+                  {detail.thread.state === "READ_ONLY"
+                    ? messagesCopy.readOnlyAtStage
+                    : messagesCopy.ownerCanSendAfterAssignment}
                 </p>
               )}
             </>
@@ -594,7 +617,12 @@ export function RecruitmentMessagingWorkspace({
               <dl className="recruitment-messaging__context-list">
                 <div>
                   <dt>{messagesCopy.applicationStage}</dt>
-                  <dd>{stageLabel(detail.thread.applicationStage, messagesCopy.stages)}</dd>
+                  <dd>
+                    {stageLabel(
+                      detail.thread.applicationStage,
+                      messagesCopy.stages,
+                    )}
+                  </dd>
                 </div>
                 <div>
                   <dt>{messagesCopy.jobPosting}</dt>

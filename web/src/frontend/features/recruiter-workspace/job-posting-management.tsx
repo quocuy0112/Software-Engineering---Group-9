@@ -936,7 +936,6 @@ export function RecruiterJobPostingManagement({
     () => collectRecruiterSubIndustrySuggestions(current.jobs),
     [current.jobs],
   );
-
   const openCreate = () => {
     if (selectedCompanyProfileComplete === false) {
       if (onNavigate) {
@@ -1185,6 +1184,7 @@ export function RecruiterJobPostingManagement({
         autoSavePreferenceScope={
           current.recruiterUserId ?? current.companyId ?? undefined
         }
+        jobTaxonomy={current.jobTaxonomy}
         subIndustrySuggestions={subIndustrySuggestions}
         onBack={() => setView("dashboard")}
         onDraftAutoSaved={storeSavedJob}

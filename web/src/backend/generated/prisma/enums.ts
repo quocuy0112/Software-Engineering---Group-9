@@ -413,6 +413,25 @@ export const JobPostReviewState = {
 export type JobPostReviewState = (typeof JobPostReviewState)[keyof typeof JobPostReviewState]
 
 
+export const JobTaxonomyStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  REMOVED: 'REMOVED'
+} as const
+
+export type JobTaxonomyStatus = (typeof JobTaxonomyStatus)[keyof typeof JobTaxonomyStatus]
+
+
+export const JobTaxonomyProposalStatus = {
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  MAPPED: 'MAPPED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type JobTaxonomyProposalStatus = (typeof JobTaxonomyProposalStatus)[keyof typeof JobTaxonomyProposalStatus]
+
+
 export const JobPostReviewReasonCode = {
   INCOMPLETE_OR_UNCLEAR: 'INCOMPLETE_OR_UNCLEAR',
   MISLEADING_CONTENT: 'MISLEADING_CONTENT',

@@ -19,6 +19,7 @@ import { projectJobReviewSnapshot } from "./job-post-publication-projector";
 import { normalizedReviewTitleSearch } from "./job-post-review-search";
 import { JobPostReviewError } from "./job-post-review-errors";
 import { leastLoadedReviewAdministrator } from "./job-post-review-assignment";
+import { createPendingJobTaxonomyProposal } from "@/backend/services/jobs/job-taxonomy-service";
 
 const requestHash = (value: string) =>
   createHash("sha256").update(value).digest("hex");
@@ -217,6 +218,22 @@ export class JobPostSubmissionService {
         assignedAdminUserId,
         correlationId,
         historyAction: sequence === 1 ? "SUBMITTED" : "RESUBMITTED",
+      });
+      // A custom sub-industry is deliberately held with this immutable review
+      // version. It becomes a platform-wide option only if this exact version
+      // is approved by an administrator.
+      await createPendingJobTaxonomyProposal({
+        db: transaction,
+        reviewVersionId: reviewId,
+        companyId: membership.companyId,
+        requestedByUserId: input.actorUserId,
+        industryCode: snapshot.industryCode,
+        industryName: snapshot.industry,
+        subIndustryName: snapshot.subIndustry,
+        subIndustryId: snapshot.subIndustryId,
+        subIndustryCode: snapshot.subIndustryCode,
+        description: snapshot.subIndustryProposalNote,
+        now,
       });
       await new PrismaAuditRepository(transaction).append({
         occurredAt: now,

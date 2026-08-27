@@ -77,11 +77,11 @@ function ReviewStateChip({ state }: { state: JobPostReviewRecord["state"] }) {
   );
 }
 
-function JobField() {
+function JobField({ label }: { label?: string }) {
   const record = useRecordContext<JobPostReviewRecord>();
   if (!record) return null;
   return (
-    <Stack spacing={0.25} sx={{ minWidth: 220 }}>
+    <Stack spacing={0.25} sx={{ minWidth: 220 }} aria-label={label}>
       <RouterLink
         to={`/job-postings/${encodeURIComponent(record.jobId)}/show`}
         onClick={(event) => event.stopPropagation()}
@@ -105,11 +105,11 @@ function JobField() {
   );
 }
 
-function CompanyField() {
+function CompanyField({ label }: { label?: string }) {
   const record = useRecordContext<JobPostReviewRecord>();
   if (!record) return null;
   return (
-    <Stack spacing={0.25} sx={{ minWidth: 175 }}>
+    <Stack spacing={0.25} sx={{ minWidth: 175 }} aria-label={label}>
       <RouterLink
         to={`/companies/${encodeURIComponent(record.companyId)}/show`}
         onClick={(event) => event.stopPropagation()}
@@ -124,11 +124,16 @@ function CompanyField() {
   );
 }
 
-function QueueField() {
+function QueueField({ label }: { label?: string }) {
   const record = useRecordContext<JobPostReviewRecord>();
   if (!record) return null;
   return (
-    <Stack spacing={0.75} alignItems="flex-start" sx={{ minWidth: 155 }}>
+    <Stack
+      spacing={0.75}
+      alignItems="flex-start"
+      sx={{ minWidth: 155 }}
+      aria-label={label}
+    >
       <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
         <ReviewStateChip state={record.state} />
         <Chip
@@ -147,7 +152,7 @@ function QueueField() {
   );
 }
 
-function SubmissionField() {
+function SubmissionField({ label }: { label?: string }) {
   const record = useRecordContext<JobPostReviewRecord>();
   if (!record) return null;
   const ageColor =
@@ -159,7 +164,12 @@ function SubmissionField() {
           ? "warning"
           : "info";
   return (
-    <Stack spacing={0.5} alignItems="flex-start" sx={{ minWidth: 180 }}>
+    <Stack
+      spacing={0.5}
+      alignItems="flex-start"
+      sx={{ minWidth: 180 }}
+      aria-label={label}
+    >
       <Typography variant="body2">
         {formatSubmittedAt(record.submittedAt)}
       </Typography>
@@ -177,11 +187,11 @@ function SubmissionField() {
   );
 }
 
-function VersionField() {
+function VersionField({ label }: { label?: string }) {
   const record = useRecordContext<JobPostReviewRecord>();
   if (!record) return null;
   return (
-    <Stack spacing={0.5} alignItems="flex-start">
+    <Stack spacing={0.5} alignItems="flex-start" aria-label={label}>
       <Chip label={`Submission ${record.sequence}`} size="small" />
       <Typography variant="caption" color="text.secondary">
         Record revision {record.version}
@@ -190,10 +200,17 @@ function VersionField() {
   );
 }
 
-function RecordStatusField() {
+function RecordStatusField({ label }: { label?: string }) {
   const record = useRecordContext<JobPostReviewRecord>();
   if (!record?.recordStatus) return null;
-  return <Chip label={record.recordStatus === "DELETED" ? "Archived" : "Current"} size="small" variant="outlined" />;
+  return (
+    <Chip
+      aria-label={label}
+      label={record.recordStatus === "DELETED" ? "Archived" : "Current"}
+      size="small"
+      variant="outlined"
+    />
+  );
 }
 
 const filters = [

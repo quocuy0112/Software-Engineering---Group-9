@@ -2499,6 +2499,57 @@
   stroke-width: 2.25;
 }
 
+/* Keep the sub-industry action in the same decision row as its heading. */
+#job-category-flyout .job-category-subindustry-heading {
+  display: flex;
+  min-width: 0;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sh-space-3);
+  margin-bottom: var(--sh-space-3);
+}
+
+#job-category-flyout .job-category-subindustry-heading h2 {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#job-category-flyout .job-category-subindustry-select {
+  display: inline-flex;
+  min-height: 34px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid var(--sh-color-brand-primary);
+  border-radius: var(--sh-radius-full);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-surface-card);
+  font: inherit;
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-semibold);
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#job-category-flyout .job-category-subindustry-select:hover,
+#job-category-flyout .job-category-subindustry-select[data-selected="true"] {
+  color: var(--sh-color-on-brand, #fff);
+  background: var(--sh-color-brand-primary);
+}
+
+#job-category-flyout .job-category-subindustry-select:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid var(--sh-color-focus-ring-bg);
+  outline-offset: 2px;
+}
+
 /* The dialog is the only scroll owner while it is open. */
 .job-category-flyout,
 .job-category-explorer-body,

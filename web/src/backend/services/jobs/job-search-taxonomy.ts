@@ -1,12 +1,11 @@
 import "server-only";
 
-import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import { z } from "zod";
 import { jobReviewSnapshotSchema } from "@/shared/contracts/recruiter-job-posting";
 import type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
 import { recruiterIndustryTaxonomy } from "@/shared/contracts/jobs/industry-taxonomy";
-import { defaultJobIndustryFiles } from "@/backend/repositories/jobs/job-industry-files";
+import { configuredJsonJobCatalogueRepository } from "@/backend/repositories/jobs/job-catalogue-repository-factory";
+import { listActiveJobTaxonomy } from "./job-taxonomy-service";
 
 export type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
 
@@ -14,6 +13,11 @@ type TaxonomyRow = Readonly<{
   title: string;
   location: string;
   company: Readonly<{ industry: string | null }>;
+  /** Denormalized taxonomy fields keep search menus working during catalogue lag. */
+  industryCode?: string | null;
+  subIndustryCode?: string | null;
+  industry?: Readonly<{ name: string }> | null;
+  subIndustry?: Readonly<{ name: string }> | null;
   reviewAggregate: Readonly<{
     approvedVersion: Readonly<{ snapshot: unknown }> | null;
   }> | null;
@@ -31,6 +35,7 @@ type MutableTitle = {
 };
 
 type MutableSubIndustry = {
+  code?: string;
   name: string;
   count: number;
   titles: Map<string, MutableTitle>;
@@ -59,10 +64,12 @@ const taxonomyCatalogJobSchema = z.object({
   id: z.string().trim().min(1),
   industry: z.string().trim().min(1),
   industryCode: z.string().trim().min(1),
+  industryId: z.string().trim().min(1).nullable().optional(),
   categoryFamily: z.string().trim().min(1).optional(),
   // Incomplete drafts share the authoring catalogue but are filtered out
   // before taxonomy entries are built.
   subIndustry: z.string().trim(),
+  subIndustryCode: z.string().trim().min(1).nullable().optional(),
   title: z.string().trim(),
   categoryIds: z.array(z.string().trim().min(1)),
   status: z.string().trim().min(1),
@@ -104,12 +111,25 @@ export function buildJobSearchTaxonomy(
       ).data;
       return {
         industry:
-          snapshot?.industry || row.company.industry || "Other opportunities",
+          snapshot?.industry ||
+          row.industry?.name ||
+          row.company.industry ||
+          "Other opportunities",
         industryCode:
-          snapshot?.industryCode || snapshot?.categoryFamily || "r29",
-        subIndustry: snapshot?.subIndustry || "Open roles",
+          row.industryCode ||
+          snapshot?.industryCode ||
+          snapshot?.categoryFamily ||
+          "r29",
+        subIndustry:
+          snapshot?.subIndustry || row.subIndustry?.name || "Open roles",
         title: snapshot?.title || row.title,
-        categoryIds: snapshot?.categoryIds ?? [],
+        categoryIds: [
+          ...(snapshot?.categoryIds ?? []),
+          ...(row.subIndustryCode &&
+          !snapshot?.categoryIds.includes(row.subIndustryCode)
+            ? [row.subIndustryCode]
+            : []),
+        ],
         location: {
           city: snapshot?.location.city || row.location,
           district: snapshot?.location.district ?? null,
@@ -203,11 +223,15 @@ function buildTaxonomy(entries: readonly TaxonomyEntry[]): JobSearchTaxonomy {
     industry.count += 1;
 
     const subIndustry = industry.subIndustries.get(entry.subIndustry) ?? {
+      code: entry.categoryIds[0],
       name: entry.subIndustry,
       count: 0,
       titles: new Map(),
     };
     industry.subIndustries.set(entry.subIndustry, subIndustry);
+    if (!subIndustry.code && entry.categoryIds[0]) {
+      subIndustry.code = entry.categoryIds[0];
+    }
     subIndustry.count += 1;
 
     const title = subIndustry.titles.get(entry.title) ?? {
@@ -256,6 +280,7 @@ function buildTaxonomy(entries: readonly TaxonomyEntry[]): JobSearchTaxonomy {
               right.count - left.count || left.name.localeCompare(right.name),
           )
           .map((subIndustry) => ({
+            ...(subIndustry.code ? { code: subIndustry.code } : {}),
             name: subIndustry.name,
             count: subIndustry.count,
             titles: [...subIndustry.titles.values()]
@@ -296,6 +321,7 @@ function buildTaxonomy(entries: readonly TaxonomyEntry[]): JobSearchTaxonomy {
  */
 function applyCanonicalTaxonomy(
   computed: JobSearchTaxonomy,
+  activeTaxonomy?: Awaited<ReturnType<typeof listActiveJobTaxonomy>>,
 ): JobSearchTaxonomy {
   const dynamicByCode = new Map(
     computed.industries.map((industry) => [
@@ -303,20 +329,62 @@ function applyCanonicalTaxonomy(
       industry,
     ]),
   );
+  const activeIndustryCodes = activeTaxonomy
+    ? new Set(
+        activeTaxonomy.industries.map((industry) =>
+          industry.code === "other" ? "r29" : industry.code,
+        ),
+      )
+    : null;
+  const activeSubIndustriesByIndustry = new Map(
+    activeTaxonomy?.industries.map((industry) => [
+      industry.code === "other" ? "r29" : industry.code,
+      {
+        codes: new Set(
+          industry.subIndustries.map(({ code }) => code.trim().toLowerCase()),
+        ),
+        names: new Set(
+          industry.subIndustries.map(({ label }) => label.trim().toLowerCase()),
+        ),
+      },
+    ]),
+  );
+  const definitions = recruiterIndustryTaxonomy.filter(
+    (definition) =>
+      !activeIndustryCodes || activeIndustryCodes.has(definition.code),
+  );
 
   return {
     ...computed,
-    industries: recruiterIndustryTaxonomy.map((definition) => {
+    industries: definitions.map((definition) => {
       const dynamic = dynamicByCode.get(definition.code);
+      const activeSubIndustries = activeSubIndustriesByIndustry.get(
+        definition.code,
+      );
+      const isActiveSubIndustry = (subIndustry: {
+        code?: string;
+        name: string;
+      }) => {
+        if (!activeSubIndustries) return true;
+        const code = subIndustry.code?.trim().toLowerCase();
+        return Boolean(
+          (code && activeSubIndustries.codes.has(code)) ||
+          activeSubIndustries.names.has(subIndustry.name.trim().toLowerCase()),
+        );
+      };
       if (definition.subIndustries === null) {
         return {
           code: "r29",
           name: definition.label,
           count: dynamic?.count ?? 0,
-          subIndustries: dynamic?.subIndustries ?? [],
+          subIndustries:
+            dynamic?.subIndustries.filter(isActiveSubIndustry) ?? [],
         };
       }
 
+      const activeDefinitions = definition.subIndustries.filter(([, code]) =>
+        isActiveSubIndustry({ code, name: "" }),
+      );
       const dynamicBySubIndustry = new Map(
         dynamic?.subIndustries.map((subIndustry) => [
           subIndustry.name.trim().toLowerCase(),
@@ -324,18 +392,19 @@ function applyCanonicalTaxonomy(
         ]),
       );
       const canonicalNames = new Set(
-        definition.subIndustries.map(([name]) => name.trim().toLowerCase()),
+        activeDefinitions.map(([name]) => name.trim().toLowerCase()),
       );
       return {
         code: definition.code,
         name: definition.label,
         count: dynamic?.count ?? 0,
         subIndustries: [
-          ...definition.subIndustries.map(([name, categoryId]) => {
+          ...activeDefinitions.map(([name, categoryId]) => {
             const observed = dynamicBySubIndustry.get(
               name.trim().toLowerCase(),
             );
             return {
+              code: categoryId,
               name,
               count: observed?.count ?? 0,
               titles:
@@ -346,7 +415,9 @@ function applyCanonicalTaxonomy(
             };
           }),
           ...(dynamic?.subIndustries.filter(
-            ({ name }) => !canonicalNames.has(name.trim().toLowerCase()),
+            (subIndustry) =>
+              isActiveSubIndustry(subIndustry) &&
+              !canonicalNames.has(subIndustry.name.trim().toLowerCase()),
           ) ?? []),
         ],
       };
@@ -366,51 +437,18 @@ let candidateTaxonomyPromise: Promise<CachedCatalogTaxonomy> | null = null;
 
 const candidateTaxonomyMaxAgeMs = 60_000;
 
-function parseTaxonomyJson(text: string): unknown {
-  try {
-    return JSON.parse(text) as unknown;
-  } catch (error) {
-    // Accept the legacy terminal-comma fixture while it is repaired upstream.
-    // Do not make arbitrary JSON recovery part of the catalog contract.
-    const withoutTerminalComma = text.replace(/,\s*\](\s*)$/u, "]$1");
-    if (withoutTerminalComma === text) throw error;
-    if (process.env.NODE_ENV === "development") {
-      console.warn("[job-taxonomy] catalog has a terminal trailing comma");
-    }
-    return JSON.parse(withoutTerminalComma) as unknown;
-  }
+/** Clear both search projections after a review approval or catalogue write. */
+export function invalidateJobSearchTaxonomyCache() {
+  catalogTaxonomyCache = null;
+  catalogTaxonomyPromise = null;
+  candidateTaxonomyCache = null;
+  candidateTaxonomyPromise = null;
 }
 
 async function readTaxonomyCatalog(): Promise<unknown> {
-  const configuredPath = process.env.JOB_CATALOGUE_PATH?.trim();
-  const path = configuredPath
-    ? resolve(process.cwd(), configuredPath)
-    : resolve(process.cwd(), "data", "jobs", "jobs.json");
-  const useSplitFallback =
-    !configuredPath ||
-    path === resolve(process.cwd(), "data", "jobs", "jobs.json");
-  try {
-    return parseTaxonomyJson(await readFile(path, "utf8"));
-  } catch (error) {
-    if (
-      (error as NodeJS.ErrnoException).code !== "ENOENT" ||
-      !useSplitFallback
-    ) {
-      throw error;
-    }
-
-    // jobs.json is the legacy monolith. Once it is removed, the generated
-    // industry files are the complete catalogue and must all be present.
-    const splitDocuments = await Promise.all(
-      defaultJobIndustryFiles().map(async ({ filePath }) =>
-        parseTaxonomyJson(await readFile(filePath, "utf8")),
-      ),
-    );
-    return splitDocuments.flatMap((document) => {
-      if (!Array.isArray(document)) throw new Error("JOB_CATALOGUE_MALFORMED");
-      return document;
-    });
-  }
+  // File access belongs to the catalogue repository. This keeps search and
+  // recruiter reads on the same split/monolith fallback and writer boundary.
+  return configuredJsonJobCatalogueRepository("jobs.json").read();
 }
 
 function locationFromDatabaseValue(location: string) {
@@ -454,17 +492,28 @@ function buildCandidateVisibleTaxonomy(
         row.reviewAggregate?.approvedVersion?.snapshot,
       ).data;
       const industry =
-        snapshot?.industry || row.company.industry || "Other opportunities";
+        snapshot?.industry ||
+        row.industry?.name ||
+        row.company.industry ||
+        "Other opportunities";
       return {
         industry,
         industryCode:
+          row.industryCode ||
           snapshot?.industryCode ||
           snapshot?.categoryFamily ||
           industryCodes.get(industry) ||
           "other",
-        subIndustry: snapshot?.subIndustry || "Open roles",
+        subIndustry:
+          snapshot?.subIndustry || row.subIndustry?.name || "Open roles",
         title: snapshot?.title || row.title,
-        categoryIds: snapshot?.categoryIds ?? [],
+        categoryIds: [
+          ...(snapshot?.categoryIds ?? []),
+          ...(row.subIndustryCode &&
+          !snapshot?.categoryIds.includes(row.subIndustryCode)
+            ? [row.subIndustryCode]
+            : []),
+        ],
         location: snapshot?.location || locationFromDatabaseValue(row.location),
       };
     }),
@@ -485,6 +534,10 @@ async function readCandidateVisibleTaxonomyRows(
       id: true,
       title: true,
       location: true,
+      industryCode: true,
+      subIndustryCode: true,
+      industry: { select: { name: true } },
+      subIndustry: { select: { name: true } },
       company: { select: { industry: true } },
       reviewAggregate: {
         select: { approvedVersion: { select: { snapshot: true } } },
@@ -509,8 +562,12 @@ export async function listCandidateVisibleJobSearchTaxonomy(): Promise<JobSearch
       z.array(taxonomyCatalogJobSchema).parse(catalog),
     ),
     readCandidateVisibleTaxonomyRows(now),
-  ]).then(([catalog, rows]) => ({
-    taxonomy: buildCandidateVisibleTaxonomy(catalog, rows),
+    listActiveJobTaxonomy(),
+  ]).then(([catalog, rows, activeTaxonomy]) => ({
+    taxonomy: applyCanonicalTaxonomy(
+      buildCandidateVisibleTaxonomy(catalog, rows),
+      activeTaxonomy,
+    ),
     // A short cache avoids repeatedly parsing the complete catalog, while a
     // newly approved, expired, or seeded job is reflected promptly.
     refreshAt: now.getTime() + candidateTaxonomyMaxAgeMs,
@@ -529,13 +586,17 @@ export async function listJobSearchTaxonomy(): Promise<JobSearchTaxonomy> {
     return catalogTaxonomyCache.taxonomy;
   }
 
-  catalogTaxonomyPromise ??= readTaxonomyCatalog().then((catalog) => {
-    const jobs = z.array(taxonomyCatalogJobSchema).parse(catalog);
+  catalogTaxonomyPromise ??= Promise.all([
+    readTaxonomyCatalog().then((catalog) =>
+      z.array(taxonomyCatalogJobSchema).parse(catalog),
+    ),
+    listActiveJobTaxonomy(),
+  ]).then(([jobs, activeTaxonomy]) => {
     const now = new Date();
     const computedTaxonomy = jobs.length
       ? buildCatalogJobSearchTaxonomy(jobs, now)
       : emptyTaxonomy;
-    const taxonomy = applyCanonicalTaxonomy(computedTaxonomy);
+    const taxonomy = applyCanonicalTaxonomy(computedTaxonomy, activeTaxonomy);
     reportTaxonomyStage("catalog precompute", taxonomy);
     return {
       taxonomy,

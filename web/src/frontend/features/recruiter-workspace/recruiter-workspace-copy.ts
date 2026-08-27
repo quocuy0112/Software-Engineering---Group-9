@@ -397,6 +397,16 @@ export function recruiterWorkspaceCopy(locale: WorkspaceLocale) {
           selectConversation:
             "Chọn một cuộc trò chuyện để xem ngữ cảnh ứng tuyển.",
           readOnlyOversight: "Giám sát chỉ đọc",
+          ownerCanSend: "Quyền chủ sở hữu · có thể gửi",
+          ownerAssignOrSend: "Quyền chủ sở hữu · phân công hoặc gửi",
+          assignToEligibleRole:
+            "Phân công cho chủ sở hữu, nhà tuyển dụng hoặc quản lý nhân sự",
+          onlyAssignedTeamMember:
+            "Chỉ thành viên được phân công mới có thể gửi",
+          readOnlyAtStage:
+            "Cuộc trò chuyện ở chế độ chỉ đọc ở giai đoạn ứng tuyển hiện tại.",
+          ownerCanSendAfterAssignment:
+            "Chủ sở hữu có thể gửi sau khi phân công Quản lý nhân sự hoặc Nhà tuyển dụng.",
           assignedRecruiter: "Nhà tuyển dụng được phân công",
           saveAssignment: "Lưu phân công",
           conversationStarted: "Bắt đầu cuộc trò chuyện",
@@ -850,6 +860,14 @@ export function recruiterWorkspaceCopy(locale: WorkspaceLocale) {
           selectConversation:
             "Select a conversation to see its application context.",
           readOnlyOversight: "Read-only oversight",
+          ownerCanSend: "Owner access · can send",
+          ownerAssignOrSend: "Owner access · assign or send",
+          assignToEligibleRole: "Assign to owner, recruiter, or HR manager",
+          onlyAssignedTeamMember: "Only the assigned team member can send",
+          readOnlyAtStage:
+            "This conversation is read-only at its current application stage.",
+          ownerCanSendAfterAssignment:
+            "Owner can send once an HR Manager or Recruiter is assigned.",
           assignedRecruiter: "Assigned recruiter",
           saveAssignment: "Save assignment",
           conversationStarted: "Conversation started",

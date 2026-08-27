@@ -3,6 +3,7 @@ import { Admin, Resource, memoryStore } from "react-admin";
 import { createTheme, ScopedCssBaseline } from "@mui/material";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
+import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import { adminAuthProvider } from "./auth-provider";
 import { adminDataProvider } from "./data-provider";
 import { createAdminQueryClient } from "./query-client";
@@ -31,6 +32,8 @@ import { JobPostManagementShow } from "../job-post-management/job-post-managemen
 import { CompanyDetailShow } from "../companies/company-detail-show";
 import { CompanyList } from "../companies/company-list";
 import { BackupSettings } from "../backup/backup-settings";
+import { JobTaxonomyList } from "../job-taxonomy/job-taxonomy-list";
+import { JobTaxonomyShow } from "../job-taxonomy/job-taxonomy-show";
 
 const theme = createTheme({
   palette: { mode: "light", primary: { main: "#155eef" } },
@@ -96,6 +99,13 @@ export function AdminApp() {
             icon={FactCheckOutlinedIcon}
             list={JobPostManagementList}
             show={JobPostManagementShow}
+          />
+          <Resource
+            name="job-taxonomy"
+            options={{ label: "Shared Taxonomy" }}
+            icon={AccountTreeOutlinedIcon}
+            list={JobTaxonomyList}
+            show={JobTaxonomyShow}
           />
           <Resource
             name="accounts"

@@ -23,6 +23,7 @@ import {
   Palette,
   Settings,
   ShieldCheck,
+  Shapes,
   Shirt,
   ShoppingBag,
   ShoppingCart,
@@ -52,6 +53,7 @@ import { ImageSearchProposals } from "./image-search-proposals";
 import { ImageSearchRecovery } from "./image-search-recovery";
 import { ImageSearchConsent } from "./image-search-consent";
 import { ImageSearchFeedback } from "./image-search-feedback";
+import { JOB_SEARCH_CRITERIA_CHANGED_EVENT } from "../../components/job-search-events";
 
 const defaults: ManualSearchContext = {
   q: "",
@@ -68,7 +70,7 @@ const defaults: ManualSearchContext = {
   sort: "RELEVANCE",
 };
 
-/** Semantic icons for the 28 first-level groups in the bundled job taxonomy. */
+/** Semantic icons for the 29 first-level groups in the bundled job taxonomy. */
 const industryIcons: Readonly<Record<string, LucideIcon>> = {
   r01: TrendingUp,
   r02: Megaphone,
@@ -98,10 +100,11 @@ const industryIcons: Readonly<Record<string, LucideIcon>> = {
   r26: Shirt,
   r27: Sprout,
   r28: CarFront,
+  r29: Shapes,
 };
 
 function IndustryIcon({ code }: Readonly<{ code: string }>) {
-  const Icon = industryIcons[code] ?? Briefcase;
+  const Icon = industryIcons[canonicalIndustryCode(code)] ?? Briefcase;
   return <Icon aria-hidden="true" />;
 }
 
@@ -201,12 +204,14 @@ export function jobIndustrySearchHref(
   parameters.delete("categoryFamily");
   parameters.delete("categoryId");
   parameters.delete("categoryTitle");
-  parameters.set("categoryFamily", industryCode.trim().slice(0, 80));
+  const normalizedIndustryCode = canonicalIndustryCode(industryCode);
+  parameters.set("categoryFamily", normalizedIndustryCode.slice(0, 80));
   return `/jobs?${parameters.toString()}`;
 }
 
 type JobCategorySelection = Readonly<{
   industryCode?: string;
+  categoryIds?: readonly string[];
   roleTitles?: readonly string[];
 }>;
 
@@ -222,10 +227,19 @@ export function jobCategoryFilterHref(
   parameters.delete("categoryId");
   parameters.delete("categoryTitle");
 
-  const industryCode = selection.industryCode?.trim();
+  const industryCode = canonicalIndustryCode(selection.industryCode);
   if (industryCode) {
     parameters.set("categoryFamily", industryCode.slice(0, 80));
   } else {
+    for (const categoryId of [
+      ...new Set(
+        (selection.categoryIds ?? [])
+          .map((categoryId) => categoryId.trim())
+          .filter(Boolean),
+      ),
+    ].slice(0, 20)) {
+      parameters.append("categoryId", categoryId.slice(0, 128));
+    }
     for (const title of [
       ...new Set(
         (selection.roleTitles ?? [])
@@ -265,19 +279,36 @@ function roleSelectionKey(
 function roleSelectionsFromTitles(
   taxonomy: JobSearchTaxonomy,
   roleTitles: readonly string[],
+  categoryIds: readonly string[] = [],
 ) {
   const selectedTitles = new Set(roleTitles);
-  const selections: Record<string, string> = {};
+  const selectedCategoryIds = new Set(categoryIds);
+  const selections: Record<
+    string,
+    { name: string; categoryIds: readonly string[] }
+  > = {};
   for (const industry of taxonomy.industries) {
     for (const subIndustry of industry.subIndustries) {
       for (const title of subIndustry.titles) {
         if (!selectedTitles.has(title.name)) continue;
-        selections[roleSelectionKey(industry.code, subIndustry.name, title)] =
-          title.name;
+        if (
+          selectedCategoryIds.size &&
+          !title.categoryIds.some((id) => selectedCategoryIds.has(id))
+        )
+          continue;
+        selections[roleSelectionKey(industry.code, subIndustry.name, title)] = {
+          name: title.name,
+          categoryIds: title.categoryIds,
+        };
       }
     }
   }
   return selections;
+}
+
+function canonicalIndustryCode(value?: string) {
+  const normalized = value?.trim().toLowerCase() ?? "";
+  return normalized === "other" ? "r29" : normalized;
 }
 
 function JobCategoryMenu({
@@ -285,6 +316,7 @@ function JobCategoryMenu({
   onApply,
   onClear,
   selectedCode,
+  selectedCategoryIds,
   selectedRoleTitles,
   vi,
 }: Readonly<{
@@ -292,16 +324,20 @@ function JobCategoryMenu({
   onApply(selection: JobCategorySelection): void;
   onClear(): void;
   selectedCode?: string;
+  selectedCategoryIds: readonly string[];
   selectedRoleTitles: readonly string[];
   vi: boolean;
 }>) {
   const [open, setOpen] = useState(false);
   const [activeCode, setActiveCode] = useState(
-    selectedCode ?? taxonomy.industries[0]?.code ?? "",
+    canonicalIndustryCode(selectedCode) || taxonomy.industries[0]?.code || "",
   );
   const [filterQuery, setFilterQuery] = useState("");
   const [draftIndustryCode, setDraftIndustryCode] = useState<string>();
-  const [draftRoles, setDraftRoles] = useState<Record<string, string>>({});
+  const [draftCategoryIds, setDraftCategoryIds] = useState<string[]>([]);
+  const [draftRoles, setDraftRoles] = useState<
+    Record<string, { name: string; categoryIds: readonly string[] }>
+  >({});
   const menu = useRef<HTMLDivElement>(null);
   const explorer = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -310,14 +346,25 @@ function JobCategoryMenu({
     taxonomy.industries.find((industry) => industry.code === activeCode) ??
     taxonomy.industries[0];
   const resetDraft = useCallback(() => {
-    setDraftIndustryCode(selectedCode);
-    setDraftRoles(roleSelectionsFromTitles(taxonomy, selectedRoleTitles));
+    setDraftIndustryCode(canonicalIndustryCode(selectedCode) || undefined);
+    setDraftCategoryIds([...new Set(selectedCategoryIds)]);
+    setDraftRoles(
+      roleSelectionsFromTitles(
+        taxonomy,
+        selectedRoleTitles,
+        selectedCategoryIds,
+      ),
+    );
     setFilterQuery("");
-  }, [selectedCode, selectedRoleTitles, taxonomy]);
+  }, [selectedCategoryIds, selectedCode, selectedRoleTitles, taxonomy]);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() =>
-      setActiveCode(selectedCode ?? taxonomy.industries[0]?.code ?? ""),
+      setActiveCode(
+        canonicalIndustryCode(selectedCode) ||
+          taxonomy.industries[0]?.code ||
+          "",
+      ),
     );
     return () => window.cancelAnimationFrame(frame);
   }, [selectedCode, taxonomy]);
@@ -362,21 +409,26 @@ function JobCategoryMenu({
   };
 
   const roleCount = Object.keys(draftRoles).length;
-  const selectionCount = draftIndustryCode ? 1 : roleCount;
+  const categoryCount = draftCategoryIds.length;
+  const selectionCount = draftIndustryCode ? 1 : categoryCount || roleCount;
   const hasSelection = selectionCount > 0;
   const hasAppliedSelection =
-    Boolean(selectedCode) || selectedRoleTitles.length > 0;
+    Boolean(selectedCode) ||
+    selectedCategoryIds.length > 0 ||
+    selectedRoleTitles.length > 0;
   const canApply = hasSelection || hasAppliedSelection;
   const appliedRoleCount = Object.keys(
-    roleSelectionsFromTitles(taxonomy, selectedRoleTitles),
+    roleSelectionsFromTitles(taxonomy, selectedRoleTitles, selectedCategoryIds),
   ).length;
   const appliedSelectionLabel = selectedCode
     ? active?.name
-    : appliedRoleCount
-      ? vi
-        ? `${appliedRoleCount} vị trí đã chọn`
-        : `${appliedRoleCount} roles selected`
-      : undefined;
+    : selectedCategoryIds.length
+      ? `${selectedCategoryIds.length} sub-industries selected`
+      : appliedRoleCount
+        ? vi
+          ? `${appliedRoleCount} vị trí đã chọn`
+          : `${appliedRoleCount} roles selected`
+        : undefined;
   const normalizedFilter = filterQuery.trim().toLocaleLowerCase();
   const visibleSubIndustries = active?.subIndustries
     .map((subIndustry) => ({
@@ -645,6 +697,7 @@ function JobCategoryMenu({
                     setDraftIndustryCode((current) =>
                       current === active.code ? undefined : active.code,
                     );
+                    setDraftCategoryIds([]);
                     setDraftRoles({});
                   }}
                 >
@@ -674,9 +727,42 @@ function JobCategoryMenu({
                   className="job-category-subindustry"
                   key={subIndustry.name}
                 >
-                  <h2>
-                    {subIndustry.name} <span>({subIndustry.count})</span>
-                  </h2>
+                  {(() => {
+                    const categoryId =
+                      subIndustry.code ??
+                      subIndustry.titles[0]?.categoryIds[0] ??
+                      undefined;
+                    const selectedCategory = categoryId
+                      ? draftCategoryIds.includes(categoryId)
+                      : false;
+                    return (
+                      <div className="job-category-subindustry-heading">
+                        <h2>
+                          {subIndustry.name} <span>({subIndustry.count})</span>
+                        </h2>
+                        {categoryId ? (
+                          <button
+                            className="job-category-subindustry-select"
+                            type="button"
+                            data-selected={selectedCategory}
+                            aria-pressed={selectedCategory}
+                            aria-label={`${selectedCategory ? "Clear" : "Select"} sub-industry: ${subIndustry.name}`}
+                            onClick={() => {
+                              setDraftIndustryCode(undefined);
+                              setDraftRoles({});
+                              setDraftCategoryIds((current) =>
+                                selectedCategory
+                                  ? current.filter((id) => id !== categoryId)
+                                  : [...current, categoryId],
+                              );
+                            }}
+                          >
+                            {selectedCategory ? "Selected" : "Select"}
+                          </button>
+                        ) : null}
+                      </div>
+                    );
+                  })()}
                   <div>
                     {subIndustry.titles.map((title) => {
                       const key = roleSelectionKey(
@@ -695,13 +781,20 @@ function JobCategoryMenu({
                           title={title.name}
                           onClick={() => {
                             setDraftIndustryCode(undefined);
+                            setDraftCategoryIds([]);
                             setDraftRoles((current) => {
                               if (current[key]) {
                                 const next = { ...current };
                                 delete next[key];
                                 return next;
                               }
-                              return { ...current, [key]: title.name };
+                              return {
+                                ...current,
+                                [key]: {
+                                  name: title.name,
+                                  categoryIds: title.categoryIds,
+                                },
+                              };
                             });
                           }}
                         >
@@ -735,15 +828,20 @@ function JobCategoryMenu({
                   ? vi
                     ? "ngành đã chọn"
                     : "industry selected"
-                  : vi
-                    ? "vị trí đã chọn"
-                    : "roles selected"}
+                  : draftCategoryIds.length
+                    ? vi
+                      ? "nhÃ³m ngÃ nh Ä‘Ã£ chá»n"
+                      : "sub-industries selected"
+                    : vi
+                      ? "vị trí đã chọn"
+                      : "roles selected"}
               </span>
               {hasSelection ? (
                 <button
                   type="button"
                   onClick={() => {
                     setDraftIndustryCode(undefined);
+                    setDraftCategoryIds([]);
                     setDraftRoles({});
                   }}
                 >
@@ -762,9 +860,18 @@ function JobCategoryMenu({
                 onClick={() => {
                   onApply({
                     industryCode: draftIndustryCode,
+                    categoryIds: draftIndustryCode
+                      ? []
+                      : draftCategoryIds.length
+                        ? draftCategoryIds
+                        : Object.values(draftRoles).flatMap(
+                            (role) => role.categoryIds,
+                          ),
                     roleTitles: draftIndustryCode
                       ? []
-                      : Object.values(draftRoles),
+                      : draftCategoryIds.length
+                        ? []
+                        : Object.values(draftRoles).map((role) => role.name),
                   });
                   setOpen(false);
                   trigger.current?.focus();
@@ -1101,6 +1208,7 @@ export function GlobalImageSearch({
   const [panelOpen, setPanelOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedCategoryCode, setSelectedCategoryCode] = useState("");
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [selectedRoleTitles, setSelectedRoleTitles] = useState<string[]>([]);
   const [clientReady, setClientReady] = useState(false);
   const cameraButton = useRef<HTMLButtonElement>(null);
@@ -1119,33 +1227,50 @@ export function GlobalImageSearch({
       : null;
 
   useEffect(() => {
+    const syncFromLocation = () => {
+      const nextCriteria = criteriaFromLocation();
+      const params = new URL(window.location.href).searchParams;
+      setCriteria(nextCriteria);
+      setQuery(nextCriteria.q);
+      setSelectedCategoryCode(
+        canonicalIndustryCode(params.get("categoryFamily") ?? ""),
+      );
+      setSelectedCategoryIds(
+        [...new Set(params.getAll("categoryId").filter(Boolean))].slice(0, 20),
+      );
+      setSelectedRoleTitles(
+        [...new Set(params.getAll("categoryTitle").filter(Boolean))].slice(
+          0,
+          20,
+        ),
+      );
+    };
+
     // Defer both URL synchronization and portal attachment until after the
     // hydration commit. This also avoids React trying to reconcile a portal
     // whose target may be replaced by the persistent workspace shell.
     const frame = window.requestAnimationFrame(() => {
-      const nextCriteria = criteriaFromLocation();
-      setCriteria(nextCriteria);
-      setQuery(nextCriteria.q);
-      setSelectedCategoryCode(
-        new URL(window.location.href).searchParams.get("categoryFamily") ?? "",
-      );
-      setSelectedRoleTitles(
-        [
-          ...new Set(
-            new URL(window.location.href).searchParams
-              .getAll("categoryTitle")
-              .filter(Boolean),
-          ),
-        ].slice(0, 20),
-      );
+      syncFromLocation();
       setClientReady(true);
     });
-    return () => window.cancelAnimationFrame(frame);
+    window.addEventListener("popstate", syncFromLocation);
+    window.addEventListener(
+      JOB_SEARCH_CRITERIA_CHANGED_EVENT,
+      syncFromLocation,
+    );
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("popstate", syncFromLocation);
+      window.removeEventListener(
+        JOB_SEARCH_CRITERIA_CHANGED_EVENT,
+        syncFromLocation,
+      );
+    };
   }, []);
 
   useEffect(() => {
     if (!taxonomy || process.env.NODE_ENV !== "development") return;
-    const expectedIndustryCount = 28;
+    const expectedIndustryCount = 29;
     const message = `[job-taxonomy] client receipt: ${taxonomy.industries.length}/${expectedIndustryCount} industries`;
     if (taxonomy.industries.length === expectedIndustryCount)
       console.info(message);
@@ -1179,6 +1304,7 @@ export function GlobalImageSearch({
 
   const clearSelectedIndustry = () => {
     setSelectedCategoryCode("");
+    setSelectedCategoryIds([]);
     setSelectedRoleTitles([]);
     navigateJobSearch(jobIndustryClearHref(window.location.href));
   };
@@ -1205,10 +1331,16 @@ export function GlobalImageSearch({
               taxonomy={taxonomy}
               vi={vi}
               selectedCode={selectedCategoryCode || undefined}
+              selectedCategoryIds={selectedCategoryIds}
               selectedRoleTitles={selectedRoleTitles}
               onClear={clearSelectedIndustry}
               onApply={(selection) => {
-                setSelectedCategoryCode(selection.industryCode ?? "");
+                setSelectedCategoryCode(
+                  canonicalIndustryCode(selection.industryCode),
+                );
+                setSelectedCategoryIds(
+                  [...new Set(selection.categoryIds ?? [])].slice(0, 20),
+                );
                 setSelectedRoleTitles(
                   [...new Set(selection.roleTitles ?? [])].slice(0, 20),
                 );

@@ -170,6 +170,22 @@ export class JobPostReviewService {
       snapshot: snapshot.data,
       snapshotSchemaVersion: row.snapshotSchemaVersion,
       snapshotSha256: row.snapshotSha256,
+      taxonomyProposal: row.taxonomyProposal
+        ? {
+            id: row.taxonomyProposal.id,
+            proposedName: row.taxonomyProposal.proposedName,
+            description: row.taxonomyProposal.description,
+            status: row.taxonomyProposal.status,
+            industryCode: row.taxonomyProposal.industry.code,
+            industryName: row.taxonomyProposal.industry.name,
+            resolvedSubIndustryCode:
+              row.taxonomyProposal.resolvedSubIndustry?.code ?? null,
+            resolvedSubIndustryName:
+              row.taxonomyProposal.resolvedSubIndustry?.name ?? null,
+            createdAt: row.taxonomyProposal.createdAt.toISOString(),
+            reviewedAt: row.taxonomyProposal.reviewedAt?.toISOString() ?? null,
+          }
+        : null,
       company: {
         id: row.aggregate.company.id,
         displayName: row.aggregate.company.displayName,
@@ -536,14 +552,62 @@ export class JobPostReviewService {
       // the snapshot after the approval transaction has committed.
       const approvedVersion = await prisma.jobPostReviewVersion.findUnique({
         where: { id: input.reviewId },
-        select: { snapshot: true, aggregate: { select: { closedAt: true } } },
+        select: {
+          snapshot: true,
+          aggregate: {
+            select: {
+              closedAt: true,
+              publicJobPosting: {
+                select: {
+                  industryId: true,
+                  subIndustryId: true,
+                  industryCode: true,
+                  subIndustryCode: true,
+                  industry: { select: { name: true } },
+                  subIndustry: { select: { name: true } },
+                },
+              },
+            },
+          },
+        },
       });
       if (approvedVersion) {
+        // The taxonomy mutation committed with the approval transaction.
+        // Clear its read cache only now, so a concurrent reader cannot refill
+        // it with the pre-approval active-value set.
+        await import("@/backend/services/jobs/job-taxonomy-service")
+          .then(({ invalidateJobTaxonomyCache }) =>
+            invalidateJobTaxonomyCache(),
+          )
+          .catch(() => undefined);
+        await import("@/backend/services/jobs/job-search-taxonomy")
+          .then(({ invalidateJobSearchTaxonomyCache }) =>
+            invalidateJobSearchTaxonomyCache(),
+          )
+          .catch(() => undefined);
         try {
           await publishApprovedJobToCatalogue({
             snapshot: approvedVersion.snapshot,
             now,
             status: approvedVersion.aggregate.closedAt ? "closed" : "active",
+            taxonomy: approvedVersion.aggregate.publicJobPosting
+              ? {
+                  industryId:
+                    approvedVersion.aggregate.publicJobPosting.industryId,
+                  subIndustryId:
+                    approvedVersion.aggregate.publicJobPosting.subIndustryId,
+                  industryCode:
+                    approvedVersion.aggregate.publicJobPosting.industryCode,
+                  subIndustryCode:
+                    approvedVersion.aggregate.publicJobPosting.subIndustryCode,
+                  industryName:
+                    approvedVersion.aggregate.publicJobPosting.industry?.name ??
+                    null,
+                  subIndustryName:
+                    approvedVersion.aggregate.publicJobPosting.subIndustry
+                      ?.name ?? null,
+                }
+              : null,
           });
           // Avoid serving the pre-approval projection to a recruiter who is
           // already watching the management screen.

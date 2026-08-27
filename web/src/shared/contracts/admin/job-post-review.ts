@@ -105,6 +105,21 @@ const privateNoteSchema = z
   })
   .strict();
 
+const taxonomyProposalSchema = z
+  .object({
+    id: z.string().min(1).max(128),
+    proposedName: z.string().min(1).max(160),
+    description: z.string().max(1_000).nullable(),
+    status: z.enum(["PENDING_APPROVAL", "APPROVED", "MAPPED", "REJECTED"]),
+    industryCode: z.string().min(1).max(80),
+    industryName: z.string().min(1).max(160),
+    resolvedSubIndustryCode: z.string().max(128).nullable(),
+    resolvedSubIndustryName: z.string().max(160).nullable(),
+    createdAt: z.string().datetime(),
+    reviewedAt: z.string().datetime().nullable(),
+  })
+  .strict();
+
 export const jobPostReviewDetailSchema = jobPostReviewQueueItemSchema
   .omit({ jobTitle: true, companyDisplayName: true })
   .extend({
@@ -129,6 +144,7 @@ export const jobPostReviewDetailSchema = jobPostReviewQueueItemSchema
       })
       .strict(),
     priorApprovedSnapshot: jobReviewSnapshotSchema.nullable().optional(),
+    taxonomyProposal: taxonomyProposalSchema.nullable().optional(),
     decision: reviewDecisionSchema.nullable(),
     history: z.array(reviewHistoryItemSchema),
     privateNotes: z.array(privateNoteSchema),

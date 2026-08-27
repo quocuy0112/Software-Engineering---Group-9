@@ -14,6 +14,7 @@ import { JobResultsList } from "./job-results-list";
 import { JobSearchEmptyState } from "./job-search-empty-state";
 import { JobsWorkspaceNav } from "./jobs-workspace";
 import type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
+import { JOB_SEARCH_CRITERIA_CHANGED_EVENT } from "./job-search-events";
 
 const scalarCriteriaNames = [
   "q",
@@ -204,6 +205,7 @@ export function LiveJobSearchExperience({
         "",
         url,
       );
+      window.dispatchEvent(new Event(JOB_SEARCH_CRITERIA_CHANGED_EVENT));
     },
     [],
   );

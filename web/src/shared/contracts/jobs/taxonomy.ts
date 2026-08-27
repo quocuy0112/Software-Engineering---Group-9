@@ -4,6 +4,8 @@ export type JobSearchTaxonomy = Readonly<{
     name: string;
     count: number;
     subIndustries: ReadonlyArray<{
+      /** Stable shared sub-industry code when one is available. */
+      code?: string;
       name: string;
       count: number;
       titles: ReadonlyArray<{

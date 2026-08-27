@@ -97,6 +97,10 @@ export async function createJobBoardDatabaseFixture(
   const sharedSkill = skill;
   const base = {
     companyId: company.id,
+    industryId: "r03",
+    subIndustryId: "r03-software-development",
+    industryCode: "r03",
+    subIndustryCode: "r03-software-development",
     summary: "Build useful and accessible recruitment products.",
     description:
       "Create production-grade web experiences for Vietnamese users.",
