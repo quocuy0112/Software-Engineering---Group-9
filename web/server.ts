@@ -9,14 +9,21 @@ const hostname = process.env.HOSTNAME ?? "127.0.0.1";
 const port = Number.parseInt(process.env.PORT ?? "3001", 10);
 const internalShellHeader = "x-smarthire-internal-shell";
 loadEnvConfig(process.cwd(), development);
+const requestedDevBundler = process.env.NEXT_DEV_BUNDLER?.trim().toLowerCase();
+const useWebpack =
+  development &&
+  (requestedDevBundler === "webpack" ||
+    (requestedDevBundler !== "turbopack" && process.platform === "win32"));
 const app = next({
   dev: development,
   port,
-  // Turbopack is the default in Next.js 16. Keep Webpack as an opt-in
-  // development fallback for Windows environments where a loader subprocess
-  // is unexpectedly interrupted.
-  ...(development && process.env.NEXT_DEV_BUNDLER === "webpack"
-    ? { webpack: true }
+  // Turbopack is the default in Next.js 16, but the Windows development
+  // runtime currently cannot resolve its internal PostCSS bridge reliably.
+  // Keep Webpack as the safe Windows default; NEXT_DEV_BUNDLER=turbopack can
+  // still be used explicitly when that toolchain is available.
+  ...(useWebpack ? { webpack: true } : {}),
+  ...(development && requestedDevBundler === "turbopack"
+    ? { turbopack: true }
     : {}),
 });
 const handle = app.getRequestHandler();
