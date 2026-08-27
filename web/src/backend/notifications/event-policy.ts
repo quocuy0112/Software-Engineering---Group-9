@@ -197,8 +197,8 @@ const policies = {
     title: { vi: "Lời mời tham gia công ty", en: "Company team invitation" },
     summary: (locale, variables) =>
       locale === "vi"
-        ? `Bạn đã được mời tham gia đội ngũ${variables.companyName ? ` của ${variables.companyName}` : ""}. Kiểm tra email để chấp nhận lời mời.`
-        : `You were invited to join${variables.companyName ? ` ${variables.companyName}` : " a company team"}. Check your email to accept the invitation.`,
+        ? `Bạn đã được mời tham gia đội ngũ${variables.companyName ? ` của ${variables.companyName}` : ""}. Mở thông báo hoặc kiểm tra email để chấp nhận lời mời.`
+        : `You were invited to join${variables.companyName ? ` ${variables.companyName}` : " a company team"}. Open this notification or check your email to accept the invitation.`,
   },
   COMPANY_INVITATION_ACCEPTED: {
     category: "ACCOUNT",
@@ -235,6 +235,20 @@ const policies = {
       "Công ty của bạn vừa nhận một hồ sơ ứng tuyển mới.",
       "Your company received a new job application.",
     ),
+  },
+  TEAM_APPLICATION_RECEIVED: {
+    category: "APPLICATION",
+    severity: "MEDIUM",
+    title: {
+      vi: "Có hồ sơ ứng tuyển đội ngũ mới",
+      en: "New team application received",
+    },
+    summary: (locale, variables) => {
+      const role = variables.state === "HR_MANAGER" ? "HR Manager" : "Recruiter";
+      return locale === "vi"
+        ? `${variables.companyName ?? "Công ty của bạn"} vừa nhận hồ sơ ứng tuyển vị trí ${role} mới.`
+        : `${variables.companyName ?? "Your company"} received a new ${role} team application.`;
+    },
   },
   APPLICATION_STAGE_CHANGED: {
     category: "APPLICATION",

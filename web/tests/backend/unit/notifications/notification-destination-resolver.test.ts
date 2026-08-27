@@ -28,17 +28,21 @@ describe("notification destination resolver", () => {
     ).toBe("/recruiter/candidates/job%201?application=app%201");
   });
   it("opens application-scoped recruitment messages without reusing social conversation URLs", () => {
-    expect(resolveNotificationHref({
-      ...base,
-      kind: "MESSAGE_RECEIVED",
-      recipientRole: "CANDIDATE",
-    })).toBe("/jobs/applied/app%201/messages");
-    expect(resolveNotificationHref({
-      ...base,
-      kind: "MESSAGE_RECEIVED",
-      recipientRole: "RECRUITER",
-      threadId: "thread 1",
-    })).toBe("/recruiter/messages?thread=thread%201");
+    expect(
+      resolveNotificationHref({
+        ...base,
+        kind: "MESSAGE_RECEIVED",
+        recipientRole: "CANDIDATE",
+      }),
+    ).toBe("/jobs/applied/app%201/messages");
+    expect(
+      resolveNotificationHref({
+        ...base,
+        kind: "MESSAGE_RECEIVED",
+        recipientRole: "RECRUITER",
+        threadId: "thread 1",
+      }),
+    ).toBe("/recruiter/messages?thread=thread%201");
   });
   it("uses the notification inbox as the safe fallback when exact context is unavailable", () => {
     expect(
@@ -50,6 +54,19 @@ describe("notification destination resolver", () => {
         recipientRole: "RECRUITER",
       }),
     ).toBe("/notifications?notification=notification-1");
+  });
+  it("opens team-application alerts in the Owner review screen", () => {
+    expect(
+      resolveNotificationHref({
+        ...base,
+        kind: "TEAM_APPLICATION_RECEIVED",
+        contextType: "MEMBERSHIP",
+        contextId: "company 1",
+        recipientRole: "RECRUITER",
+      }),
+    ).toBe(
+      "/recruiter/company-settings/team/applications?companyId=company%201",
+    );
   });
   it("returns a safe href for every notification kind, including legacy contextless rows", () => {
     for (const kind of notificationKinds) {
@@ -149,7 +166,7 @@ describe("notification destination resolver", () => {
         contextId: "invite 1",
         recipientRole: "CANDIDATE",
       }),
-    ).toBe("/recruiter/company-invitation");
+    ).toBe("/recruiter/company-invitation?invitationId=invite%201");
     expect(
       resolveNotificationHref({
         ...base,

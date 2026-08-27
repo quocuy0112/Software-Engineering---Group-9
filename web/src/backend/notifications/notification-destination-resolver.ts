@@ -41,10 +41,16 @@ export function resolveNotificationHref(input: NotificationDestinationInput) {
   const grouped = occurrenceCount > 1;
   const since = encode(input.lastOccurredAt.toISOString());
   if (contextType === "ACCOUNT") return "/profile/security";
+  if (
+    contextType === "MEMBERSHIP" &&
+    input.kind === "TEAM_APPLICATION_RECEIVED" &&
+    recipientRole === "RECRUITER"
+  )
+    return `/recruiter/company-settings/team/applications?companyId=${id}`;
   if (contextType === "MEMBERSHIP") return "/recruiter/company-settings/team";
   if (contextType === "COMPANY_INVITATION")
     return recipientRole === "CANDIDATE"
-      ? "/recruiter/company-invitation"
+      ? `/recruiter/company-invitation?invitationId=${id}`
       : "/recruiter/company-settings/team";
   if (contextType === "CONVERSATION" && recipientRole !== "ADMIN")
     return grouped
