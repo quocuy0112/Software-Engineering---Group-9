@@ -40,11 +40,11 @@ The PA5 manual functional testing scope consists of exactly five selected use ca
 
 4. **UC-APP-01 — Apply for a Job**
 
-5. **Use Case / User Scenario — Feature 005 US2: Find Jobs from an Image Query**
+5. **UC-JOB-06 — Search Jobs from an Image (Feature 005 US2)**
 
 Each selected use case contains 10 functional test cases, giving a total of **50 planned test cases**.
 
-For PA5 testing, **Feature 005 US2 — Find Jobs from an Image Query** is treated as the fifth user-facing functional scenario/use case because it represents a complete Candidate workflow from image selection and consent through OCR/AI proposal review and job-search application. This wording is a PA5 test-document mapping and does not introduce a new official project use-case ID.
+For PA5 testing, **UC-JOB-06 — Search Jobs from an Image (Feature 005 US2)** is the fifth selected application use case. The current official Candidate Job Journey specification identifies this workflow as UC-JOB-06; Feature 005 US2 is retained here for feature/user-story traceability. The workflow runs from image selection and consent through OCR/AI proposal review and confirmed job-search application.
 
 The test set includes:
 
@@ -118,7 +118,7 @@ The following application areas are selected for PA5 functional testing.
 | UC-PROF-01      | Manage Candidate Profile        | Candidate Profile Management |                 10 |
 | UC-JOB-01       | Browse, Search, and Filter Jobs | Job Discovery                |                 10 |
 | UC-APP-01       | Apply for a Job                 | Job Application              |                 10 |
-| Feature 005 US2 | Find Jobs from an Image Query   | OCR / AI-Assisted Job Search |                 10 |
+| UC-JOB-06       | Search Jobs from an Image (Feature 005 US2) | OCR / AI-Assisted Job Search |                 10 |
 | **Total**       |                                 |                              |             **50** |
 
 ### UC-AUTH-03 — Log In
@@ -215,7 +215,7 @@ Testing covers:
 
 * Application review confirmation.
 
-### Use Case / User Scenario — Feature 005 US2: Find Jobs from an Image Query
+### UC-JOB-06 — Search Jobs from an Image (Feature 005 US2)
 
 Testing covers:
 
@@ -394,7 +394,7 @@ Tests requiring special fixtures, multiple sessions, storage, TOTP, OCR workers,
 
 * Execute and record the 10 PROF test cases for **UC-PROF-01 — Manage Candidate Profile**.
 
-* Execute and record the 10 IMG test cases for **Feature 005 US2 — Find Jobs from an Image Query**.
+* Execute and record the 10 IMG test cases for **UC-JOB-06 — Search Jobs from an Image (Feature 005 US2)**.
 
 * Determine Pass/Fail status for the cases he executed based on observed behavior.
 
@@ -420,7 +420,7 @@ Tests requiring special fixtures, multiple sessions, storage, TOTP, OCR workers,
 | UC-PROF-01 — Manage Candidate Profile | Lưu Chí Hải | Nguyễn Gia Quốc Uy | Lưu Chí Hải |
 | UC-JOB-01 — Browse, Search, and Filter Jobs | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | Nguyễn Minh Khôi |
 | UC-APP-01 — Apply for a Job | Nguyễn Minh Khôi | Lưu Chí Hải | Nguyễn Minh Khôi |
-| Feature 005 US2 — Find Jobs from an Image Query | Lưu Chí Hải | Nguyễn Gia Quốc Uy | Lưu Chí Hải |
+| UC-JOB-06 — Search Jobs from an Image (Feature 005 US2) | Lưu Chí Hải | Nguyễn Gia Quốc Uy | Lưu Chí Hải |
 
 **Feature Developers**
 
@@ -596,7 +596,7 @@ The following controlled local test-data aliases are used during execution. Temp
 
 - `[MAX_IMAGE_SIZE]` — `5,000,000` bytes (5 MB), the configured maximum accepted image upload size used for IMG-08.
 
-- `[RATE_LIMIT_THRESHOLD]` — authenticated Candidate limit of 10 image-search admissions per rolling one-hour window, used for IMG-10.
+- `[RATE_LIMIT_THRESHOLD]` — historical local authenticated-Candidate threshold used for the recorded IMG-10 execution on 2026-08-21: 10 image-search admissions per rolling one-hour window. Post-execution source review identifies the current canonical configuration as 15 authenticated admissions and 5 visitor admissions per rolling one-hour window; this does not alter the historical IMG-10 record.
 
 
 ---
@@ -619,6 +619,8 @@ Concrete refinement examples include:
 | Image-search edge and boundary coverage | The final set explicitly covers unsupported file type, upload-size boundary, cancellation, and admission/rate-limit behavior. | `IMG-07` to `IMG-10` |
 
 These refinements demonstrate that the team reviewed and understood the generated testing material before manual execution. Manual observations remain authoritative for the recorded Pass/Fail results; expected results were not rewritten merely to make failed executions pass.
+
+**Post-execution source review note:** current source review found that the browser login form locally disables further submissions after its fifth failed response, while the backend independently rejects a sixth request in its five-minute rate-limit bucket. The historical AUTH-10 execution record is retained unchanged; any later re-test should distinguish the UI lock from request-level HTTP 429 verification.
 
 ## 2.1 UC-AUTH-03 — Log In
 
@@ -2429,11 +2431,13 @@ These refinements demonstrate that the team reviewed and understood the generate
 
 ---
 
-## 2.5 Use Case / User Scenario — Feature 005 US2: Find Jobs from an Image Query
+## 2.5 UC-JOB-06 — Search Jobs from an Image (Feature 005 US2)
 
 *Performed by:* Lưu Chí Hải | *Reviewed by:* Nguyễn Gia Quốc Uy | *Edited by:* Lưu Chí Hải
 
 These test cases were executed after the required image-search test environment and controlled fixtures were prepared. During execution, the live OCR path repeatedly returned `OCR_UNAVAILABLE` for IMG-02 through IMG-06; those observations are recorded as failed test cases and linked to `BUG-IMG-02`. Pre-OCR validation, cancellation, and admission-control cases remained executable and were recorded independently.
+
+**Post-execution source review note:** the current repository contains synthetic OCR-corpus fixtures and matching PA5 image-search job data, but this report does not retain a verified fixture-to-truth-to-job mapping for the 2026-08-21 manual IMG-02 through IMG-06 executions. Their historical failures remain unchanged and must not be reinterpreted as execution of a later deterministic fixture design.
 
 Controlled synthetic fixtures with documented visible truth values were used so that OCR/AI output could be evaluated against known evidence rather than against an unrestricted or arbitrary model response.
 
@@ -2883,6 +2887,8 @@ Controlled synthetic fixtures with documented visible truth values were used so 
 
 **Actual Result:** The test began with 2 authenticated image-search admissions already used in the rolling one-hour window. Eight additional requests were admitted successfully, reaching the configured limit of 10 admissions. The next request was rejected with the `Image Search limit reached` condition, while the application remained responsive and usable.
 
+**Post-execution source review note:** this is a historical 2026-08-21 result. Current canonical source configuration specifies 15 authenticated admissions and 5 visitor admissions per rolling one-hour window. No current manual re-test is claimed by this note.
+
 **Status:** Pass
 
 **Bug ID:** —
@@ -2953,6 +2959,8 @@ After successful login, the user is redirected to `/dashboard`, and the original
 
 **Status:** Open
 
+**Post-execution source review note:** current source preserves `/profile` through the safe `returnTo` flow. This is not a manual re-test and does not change the recorded AUTH-08 failure, Actual Result, or Open status.
+
 ## 3.2 Image Search Bugs
 *Performed by:* Lưu Chí Hải | *Reviewed by:* Nguyễn Gia Quốc Uy | *Edited by:* Lưu Chí Hải
 
@@ -2981,6 +2989,8 @@ Admission, malware scanning, decoding, and normalization succeed, but the live O
 
 **Status:** Open
 
+**Post-execution source review note:** `ocr-104.jpg` exists in the current synthetic OCR corpus. The historical report also names `multi-proposal-minimal.jpg`, which is not currently traceable in the repository; that historical wording is retained because the executed fixture record cannot be reconstructed from static evidence.
+
 # 4. Test Summary
 
 *Performed by:* Lưu Chí Hải & Nguyễn Minh Khôi | *Reviewed by:* Nguyễn Gia Quốc Uy | *Edited by:* Lưu Chí Hải
@@ -2993,7 +3003,7 @@ All 50 selected manual functional test cases were executed on the local SmartHir
 | UC-PROF-01 — Manage Candidate Profile | Lưu Chí Hải | 10 | 10 | 10 | 0 | 0 |
 | UC-JOB-01 — Browse, Search, and Filter Jobs | Nguyễn Minh Khôi | 10 | 10 | 10 | 0 | 0 |
 | UC-APP-01 — Apply for a Job | Nguyễn Minh Khôi | 10 | 10 | 10 | 0 | 0 |
-| Feature 005 US2 — Find Jobs from an Image Query (User Scenario) | Lưu Chí Hải | 10 | 10 | 5 | 5 | 0 |
+| UC-JOB-06 — Search Jobs from an Image (Feature 005 US2) | Lưu Chí Hải | 10 | 10 | 5 | 5 | 0 |
 | **Total** | **Lưu Chí Hải & Nguyễn Minh Khôi** | **50** | **50** | **43** | **7** | **0** |
 
 ## 4.1 Defect Summary
