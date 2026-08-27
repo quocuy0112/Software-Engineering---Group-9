@@ -14,6 +14,8 @@ export function jobSearchRequestQuery(request: Request) {
     location: value("location"),
     district: params.getAll("district"),
     categoryFamily: params.getAll("categoryFamily"),
+    categoryId: params.getAll("categoryId"),
+    categoryTitle: params.getAll("categoryTitle"),
     employmentType: params.getAll("employmentType"),
     experienceLevel: params.getAll("experienceLevel"),
     workArrangement: params.getAll("workArrangement"),

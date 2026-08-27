@@ -38,6 +38,10 @@ export function JobPostReviewActionPanel() {
     integrityState: "VALID" | "BLOCKED";
     company?: { active?: boolean };
     submitter?: { currentlyEligible?: boolean };
+    taxonomyProposal?: {
+      proposedName: string;
+      status: "PENDING_APPROVAL" | "APPROVED" | "MAPPED" | "REJECTED";
+    } | null;
   }>();
   const dataProvider = useDataProvider<AdminDataProvider>();
   const { data: identity } = useGetIdentity();
@@ -255,6 +259,9 @@ export function JobPostReviewActionPanel() {
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
               The job becomes visible to candidates after approval.
+              {record.taxonomyProposal?.status === "PENDING_APPROVAL"
+                ? ` The proposed sub-industry "${record.taxonomyProposal.proposedName}" will also be mapped or created for all companies.`
+                : ""}
             </Typography>
             <Button
               fullWidth
@@ -407,7 +414,9 @@ export function JobPostReviewActionPanel() {
         <DialogContent>
           <DialogContentText id="job-post-review-decision-confirmation-description">
             {confirmationAction === "approve"
-              ? "The job will become visible to candidates after approval."
+              ? record.taxonomyProposal?.status === "PENDING_APPROVAL"
+                ? `The job will become visible to candidates, and "${record.taxonomyProposal.proposedName}" will be mapped or created as a shared sub-industry.`
+                : "The job will become visible to candidates after approval."
               : "The recruiter will receive the selected reason and public explanation."}
           </DialogContentText>
         </DialogContent>

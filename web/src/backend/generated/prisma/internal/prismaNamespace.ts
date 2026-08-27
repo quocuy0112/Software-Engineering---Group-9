@@ -424,6 +424,9 @@ export const ModelName = {
   InAppNotification: 'InAppNotification',
   AuditEvent: 'AuditEvent',
   Company: 'Company',
+  JobIndustry: 'JobIndustry',
+  JobSubIndustry: 'JobSubIndustry',
+  JobTaxonomyProposal: 'JobTaxonomyProposal',
   CompanyInvitation: 'CompanyInvitation',
   CompanyTeamActivity: 'CompanyTeamActivity',
   CompanyMembership: 'CompanyMembership',
@@ -561,7 +564,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "candidateProfileVisibility" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "companyInvitation" | "companyTeamActivity" | "companyMembership" | "platformAdministratorGrant" | "platformAdministratorGrantScopeAssignment" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostReviewAggregate" | "jobPostRevisionRequest" | "jobPostFeaturedPlacement" | "jobPostEnforcementAction" | "jobPostEnforcementTarget" | "moderationReportEnforcementLink" | "jobPostOperationalHistory" | "jobPostReviewVersion" | "jobPostReviewHistory" | "jobPostReviewPrivateNote" | "jobCatalogueWriteLease" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "privateCvMatchCheck" | "privateCvMatchAttempt" | "privateAutomaticMatchResult" | "privateAiEvaluationResult" | "privateMatchEvidence" | "privateCvMatchCommandReceipt" | "savedJob" | "jobReport" | "candidateApplicationDraft" | "applicationIntake" | "applicationPublicUpdate" | "applicationNotificationPreference" | "jobApplication" | "jobApplicationContactConsent" | "jobApplicationAttemptCounter" | "applicationDocument" | "applicationCoverLetterText" | "applicationArtifactPromotion" | "applicationDocumentLegalHold" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "recruitmentThread" | "recruitmentMessage" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence" | "automaticMatchResult" | "documentParseResult" | "skillEvidenceExtraction" | "cvEvidenceExcerpt" | "aiAssessment" | "aiAssessmentFinding" | "aiSuggestedInterviewQuestion" | "scoringOperation" | "scoringWorkItem" | "aiAssessmentAttempt" | "applicationScoringResult" | "manualApplicationPriority" | "rankingSnapshot" | "rankingSnapshotRow" | "jobPostingViewFact" | "jobPostingLifecycleFact" | "exportRequest" | "backupConfiguration" | "backupRun" | "activityLegalHold"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "candidateProfileVisibility" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "jobIndustry" | "jobSubIndustry" | "jobTaxonomyProposal" | "companyInvitation" | "companyTeamActivity" | "companyMembership" | "platformAdministratorGrant" | "platformAdministratorGrantScopeAssignment" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostReviewAggregate" | "jobPostRevisionRequest" | "jobPostFeaturedPlacement" | "jobPostEnforcementAction" | "jobPostEnforcementTarget" | "moderationReportEnforcementLink" | "jobPostOperationalHistory" | "jobPostReviewVersion" | "jobPostReviewHistory" | "jobPostReviewPrivateNote" | "jobCatalogueWriteLease" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "privateCvMatchCheck" | "privateCvMatchAttempt" | "privateAutomaticMatchResult" | "privateAiEvaluationResult" | "privateMatchEvidence" | "privateCvMatchCommandReceipt" | "savedJob" | "jobReport" | "candidateApplicationDraft" | "applicationIntake" | "applicationPublicUpdate" | "applicationNotificationPreference" | "jobApplication" | "jobApplicationContactConsent" | "jobApplicationAttemptCounter" | "applicationDocument" | "applicationCoverLetterText" | "applicationArtifactPromotion" | "applicationDocumentLegalHold" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "recruitmentThread" | "recruitmentMessage" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence" | "automaticMatchResult" | "documentParseResult" | "skillEvidenceExtraction" | "cvEvidenceExcerpt" | "aiAssessment" | "aiAssessmentFinding" | "aiSuggestedInterviewQuestion" | "scoringOperation" | "scoringWorkItem" | "aiAssessmentAttempt" | "applicationScoringResult" | "manualApplicationPriority" | "rankingSnapshot" | "rankingSnapshotRow" | "jobPostingViewFact" | "jobPostingLifecycleFact" | "exportRequest" | "backupConfiguration" | "backupRun" | "activityLegalHold"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2560,6 +2563,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CompanyCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CompanyCountAggregateOutputType> | number
+        }
+      }
+    }
+    JobIndustry: {
+      payload: Prisma.$JobIndustryPayload<ExtArgs>
+      fields: Prisma.JobIndustryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JobIndustryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobIndustryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JobIndustryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobIndustryPayload>
+        }
+        findFirst: {
+          args: Prisma.JobIndustryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobIndustryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JobIndustryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobIndustryPayload>
+        }
+        findMany: {
+          args: Prisma.JobIndustryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobIndustryPayload>[]
+        }
+        create: {
+          args: Prisma.JobIndustryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobIndustryPayload>
+        }
+        createMany: {
+          args: Prisma.JobIndustryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JobIndustryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobIndustryPayload>[]
+        }
+        delete: {
+          args: Prisma.JobIndustryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobIndustryPayload>
+        }
+        update: {
+          args: Prisma.JobIndustryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobIndustryPayload>
+        }
+        deleteMany: {
+          args: Prisma.JobIndustryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JobIndustryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JobIndustryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobIndustryPayload>[]
+        }
+        upsert: {
+          args: Prisma.JobIndustryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobIndustryPayload>
+        }
+        aggregate: {
+          args: Prisma.JobIndustryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJobIndustry>
+        }
+        groupBy: {
+          args: Prisma.JobIndustryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobIndustryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JobIndustryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobIndustryCountAggregateOutputType> | number
+        }
+      }
+    }
+    JobSubIndustry: {
+      payload: Prisma.$JobSubIndustryPayload<ExtArgs>
+      fields: Prisma.JobSubIndustryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JobSubIndustryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobSubIndustryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JobSubIndustryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobSubIndustryPayload>
+        }
+        findFirst: {
+          args: Prisma.JobSubIndustryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobSubIndustryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JobSubIndustryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobSubIndustryPayload>
+        }
+        findMany: {
+          args: Prisma.JobSubIndustryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobSubIndustryPayload>[]
+        }
+        create: {
+          args: Prisma.JobSubIndustryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobSubIndustryPayload>
+        }
+        createMany: {
+          args: Prisma.JobSubIndustryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JobSubIndustryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobSubIndustryPayload>[]
+        }
+        delete: {
+          args: Prisma.JobSubIndustryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobSubIndustryPayload>
+        }
+        update: {
+          args: Prisma.JobSubIndustryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobSubIndustryPayload>
+        }
+        deleteMany: {
+          args: Prisma.JobSubIndustryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JobSubIndustryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JobSubIndustryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobSubIndustryPayload>[]
+        }
+        upsert: {
+          args: Prisma.JobSubIndustryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobSubIndustryPayload>
+        }
+        aggregate: {
+          args: Prisma.JobSubIndustryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJobSubIndustry>
+        }
+        groupBy: {
+          args: Prisma.JobSubIndustryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobSubIndustryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JobSubIndustryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobSubIndustryCountAggregateOutputType> | number
+        }
+      }
+    }
+    JobTaxonomyProposal: {
+      payload: Prisma.$JobTaxonomyProposalPayload<ExtArgs>
+      fields: Prisma.JobTaxonomyProposalFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JobTaxonomyProposalFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTaxonomyProposalPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JobTaxonomyProposalFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTaxonomyProposalPayload>
+        }
+        findFirst: {
+          args: Prisma.JobTaxonomyProposalFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTaxonomyProposalPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JobTaxonomyProposalFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTaxonomyProposalPayload>
+        }
+        findMany: {
+          args: Prisma.JobTaxonomyProposalFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTaxonomyProposalPayload>[]
+        }
+        create: {
+          args: Prisma.JobTaxonomyProposalCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTaxonomyProposalPayload>
+        }
+        createMany: {
+          args: Prisma.JobTaxonomyProposalCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JobTaxonomyProposalCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTaxonomyProposalPayload>[]
+        }
+        delete: {
+          args: Prisma.JobTaxonomyProposalDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTaxonomyProposalPayload>
+        }
+        update: {
+          args: Prisma.JobTaxonomyProposalUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTaxonomyProposalPayload>
+        }
+        deleteMany: {
+          args: Prisma.JobTaxonomyProposalDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JobTaxonomyProposalUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JobTaxonomyProposalUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTaxonomyProposalPayload>[]
+        }
+        upsert: {
+          args: Prisma.JobTaxonomyProposalUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTaxonomyProposalPayload>
+        }
+        aggregate: {
+          args: Prisma.JobTaxonomyProposalAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJobTaxonomyProposal>
+        }
+        groupBy: {
+          args: Prisma.JobTaxonomyProposalGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobTaxonomyProposalGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JobTaxonomyProposalCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobTaxonomyProposalCountAggregateOutputType> | number
         }
       }
     }
@@ -12135,6 +12360,58 @@ export const CompanyScalarFieldEnum = {
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
 
 
+export const JobIndustryScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  normalizedName: 'normalizedName',
+  status: 'status',
+  sortOrder: 'sortOrder',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobIndustryScalarFieldEnum = (typeof JobIndustryScalarFieldEnum)[keyof typeof JobIndustryScalarFieldEnum]
+
+
+export const JobSubIndustryScalarFieldEnum = {
+  id: 'id',
+  industryId: 'industryId',
+  code: 'code',
+  name: 'name',
+  normalizedName: 'normalizedName',
+  status: 'status',
+  sortOrder: 'sortOrder',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobSubIndustryScalarFieldEnum = (typeof JobSubIndustryScalarFieldEnum)[keyof typeof JobSubIndustryScalarFieldEnum]
+
+
+export const JobTaxonomyProposalScalarFieldEnum = {
+  id: 'id',
+  industryId: 'industryId',
+  companyId: 'companyId',
+  requestedByUserId: 'requestedByUserId',
+  reviewVersionId: 'reviewVersionId',
+  proposedName: 'proposedName',
+  normalizedName: 'normalizedName',
+  description: 'description',
+  status: 'status',
+  resolvedSubIndustryId: 'resolvedSubIndustryId',
+  reviewedByAdminUserId: 'reviewedByAdminUserId',
+  reviewedAt: 'reviewedAt',
+  reviewReason: 'reviewReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobTaxonomyProposalScalarFieldEnum = (typeof JobTaxonomyProposalScalarFieldEnum)[keyof typeof JobTaxonomyProposalScalarFieldEnum]
+
+
 export const CompanyInvitationScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
@@ -12624,6 +12901,10 @@ export type ModerationPrivateNoteScalarFieldEnum = (typeof ModerationPrivateNote
 export const JobPostingScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
+  industryId: 'industryId',
+  subIndustryId: 'subIndustryId',
+  industryCode: 'industryCode',
+  subIndustryCode: 'subIndustryCode',
   slug: 'slug',
   title: 'title',
   normalizedTitle: 'normalizedTitle',
@@ -14988,6 +15269,34 @@ export type ListEnumCompanyModerationStateFieldRefInput<$PrismaModel> = FieldRef
 
 
 /**
+ * Reference to a field of type 'JobTaxonomyStatus'
+ */
+export type EnumJobTaxonomyStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobTaxonomyStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'JobTaxonomyStatus[]'
+ */
+export type ListEnumJobTaxonomyStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobTaxonomyStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'JobTaxonomyProposalStatus'
+ */
+export type EnumJobTaxonomyProposalStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobTaxonomyProposalStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'JobTaxonomyProposalStatus[]'
+ */
+export type ListEnumJobTaxonomyProposalStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobTaxonomyProposalStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'CompanyMembershipRole'
  */
 export type EnumCompanyMembershipRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanyMembershipRole'>
@@ -16788,6 +17097,9 @@ export type GlobalOmitConfig = {
   inAppNotification?: Prisma.InAppNotificationOmit
   auditEvent?: Prisma.AuditEventOmit
   company?: Prisma.CompanyOmit
+  jobIndustry?: Prisma.JobIndustryOmit
+  jobSubIndustry?: Prisma.JobSubIndustryOmit
+  jobTaxonomyProposal?: Prisma.JobTaxonomyProposalOmit
   companyInvitation?: Prisma.CompanyInvitationOmit
   companyTeamActivity?: Prisma.CompanyTeamActivityOmit
   companyMembership?: Prisma.CompanyMembershipOmit

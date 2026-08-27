@@ -317,6 +317,19 @@ enum JobPostReviewState {
   WITHDRAWN
 }
 
+enum JobTaxonomyStatus {
+  ACTIVE
+  INACTIVE
+  REMOVED
+}
+
+enum JobTaxonomyProposalStatus {
+  PENDING_APPROVAL
+  APPROVED
+  MAPPED
+  REJECTED
+}
+
 enum JobPostReviewReasonCode {
   INCOMPLETE_OR_UNCLEAR
   MISLEADING_CONTENT
@@ -1194,6 +1207,7 @@ model UserAccount {
   closedJobPostReviewAggregates  JobPostReviewAggregate[]               @relation("JobPostReviewCloser")
   jobPostReviewHistory           JobPostReviewHistory[]                 @relation("JobPostReviewHistoryActor")
   jobPostReviewPrivateNotes      JobPostReviewPrivateNote[]             @relation("JobPostReviewNoteAuthor")
+  jobTaxonomyProposalsRequested  JobTaxonomyProposal[]                   @relation("JobTaxonomyProposalRequester")
 
   @@index([state, id])
   @@index([state, createdAt(sort: Desc), id])
@@ -1761,8 +1775,77 @@ model Company {
   messagingConversations        MessagingConversation[]
   recruitmentThreads            RecruitmentThread[]
   jobPostReviewAggregates       JobPostReviewAggregate[]
+  jobTaxonomyProposals           JobTaxonomyProposal[]
 
   @@index([verifiedAt, id])
+}
+
+/// Platform-owned job classification. These records are intentionally not
+/// scoped to a company: every verified recruiter can reuse an active value.
+model JobIndustry {
+  id                String                @id @db.VarChar(80)
+  code              String                @unique @db.VarChar(80)
+  name              String                @db.VarChar(160)
+  normalizedName    String                @unique @db.VarChar(160)
+  status            JobTaxonomyStatus     @default(ACTIVE)
+  sortOrder         Int                   @default(0)
+  version           Int                   @default(1)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  subIndustries     JobSubIndustry[]
+  jobPostings       JobPosting[]
+  taxonomyProposals JobTaxonomyProposal[]
+
+  @@index([status, sortOrder, id])
+}
+
+model JobSubIndustry {
+  id                String                @id @db.VarChar(128)
+  industryId        String                @db.VarChar(80)
+  code              String                @unique @db.VarChar(128)
+  name              String                @db.VarChar(160)
+  normalizedName    String                @db.VarChar(160)
+  status            JobTaxonomyStatus     @default(ACTIVE)
+  sortOrder         Int                   @default(0)
+  version           Int                   @default(1)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  industry          JobIndustry           @relation(fields: [industryId], references: [id], onDelete: Restrict)
+  jobPostings       JobPosting[]
+  resolvedProposals JobTaxonomyProposal[] @relation("ResolvedTaxonomyProposals")
+
+  @@unique([industryId, normalizedName])
+  @@index([industryId, status, sortOrder, id])
+}
+
+/// A recruiter-entered sub-industry is held against the immutable review
+/// version. Approval either creates a new shared row or maps to an existing
+/// normalized row, so duplicate names never create duplicate public options.
+model JobTaxonomyProposal {
+  id                    String                     @id @default(cuid())
+  industryId            String                     @db.VarChar(80)
+  companyId             String
+  requestedByUserId     String
+  reviewVersionId       String                     @unique
+  proposedName          String                     @db.VarChar(160)
+  normalizedName        String                     @db.VarChar(160)
+  description           String?                    @db.VarChar(1000)
+  status                JobTaxonomyProposalStatus @default(PENDING_APPROVAL)
+  resolvedSubIndustryId String?                    @db.VarChar(128)
+  reviewedByAdminUserId String?
+  reviewedAt           DateTime?
+  reviewReason         String?                    @db.VarChar(1000)
+  createdAt             DateTime                   @default(now())
+  updatedAt             DateTime                   @updatedAt
+  industry              JobIndustry                @relation(fields: [industryId], references: [id], onDelete: Restrict)
+  company               Company                    @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  requestedBy           UserAccount                @relation("JobTaxonomyProposalRequester", fields: [requestedByUserId], references: [id], onDelete: Restrict)
+  reviewVersion         JobPostReviewVersion       @relation(fields: [reviewVersionId], references: [id], onDelete: Restrict)
+  resolvedSubIndustry   JobSubIndustry?            @relation("ResolvedTaxonomyProposals", fields: [resolvedSubIndustryId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt, id])
+  @@index([industryId, normalizedName, status])
+  @@index([companyId, createdAt])
 }
 
 model CompanyInvitation {
@@ -2308,6 +2391,10 @@ model ModerationPrivateNote {
 model JobPosting {
   id                       String                  @id @default(cuid())
   companyId                String
+  industryId               String?                 @db.VarChar(80)
+  subIndustryId            String?                 @db.VarChar(128)
+  industryCode             String?                 @db.VarChar(80)
+  subIndustryCode          String?                 @db.VarChar(128)
   slug                     String                  @unique
   title                    String
   normalizedTitle          String
@@ -2354,8 +2441,12 @@ model JobPosting {
   analyticsViewFacts       JobPostingViewFact[]
   analyticsLifecycleFacts  JobPostingLifecycleFact[]
   analyticsExports         ExportRequest[]
+  industry                 JobIndustry?             @relation(fields: [industryId], references: [id], onDelete: Restrict)
+  subIndustry              JobSubIndustry?          @relation(fields: [subIndustryId], references: [id], onDelete: Restrict)
 
   @@index([status, publishedAt(sort: Desc), id])
+  @@index([industryId, subIndustryId, status, publishedAt(sort: Desc), id])
+  @@index([industryCode, subIndustryCode])
   @@index([status, applicationDeadline, id])
   @@index([employmentType, experienceLevel, workArrangement])
   @@index([salaryCurrency, salaryPeriod, salaryMax(sort: Desc), id])
@@ -2534,6 +2625,7 @@ model JobPostReviewVersion {
   submittedMembership      CompanyMembership?         @relation(fields: [submittedMembershipId], references: [id], onDelete: Restrict)
   assignedAdmin            UserAccount?               @relation("JobPostReviewAssignee", fields: [assignedAdminUserId], references: [id], onDelete: Restrict)
   decidedByAdmin           UserAccount?               @relation("JobPostReviewDecider", fields: [decidedByAdminUserId], references: [id], onDelete: Restrict)
+  taxonomyProposal          JobTaxonomyProposal?
   history                  JobPostReviewHistory[]
   privateNotes             JobPostReviewPrivateNote[]
 

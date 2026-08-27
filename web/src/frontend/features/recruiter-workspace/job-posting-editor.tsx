@@ -51,8 +51,11 @@ import {
   recruiterIndustryOptionFor,
   recruiterIndustryTaxonomy,
   type RecruiterIndustryCode,
-  type RecruiterSubIndustrySuggestions,
 } from "@/shared/contracts/jobs/industry-taxonomy";
+import {
+  recruiterJobTaxonomySchema,
+  type RecruiterJobTaxonomy,
+} from "@/shared/contracts/jobs/job-taxonomy";
 import type {
   JobCatalogItem,
   JobPostingStatus,
@@ -96,6 +99,7 @@ const recruiterDraftAutoSaveStoragePrefix =
 const recruiterDraftAutoSaveChangedEvent =
   "smarthire:recruiter-draft-autosave-changed";
 const recruiterDraftAutoSaveDelayMs = 300;
+const RECRUITER_TAXONOMY_REFRESH_INTERVAL_MS = 15_000;
 
 function useRecruiterDraftAutoSave(storageKey: string) {
   const subscribe = useCallback(
@@ -123,19 +127,18 @@ function normalizedOption(value: string) {
   return value.trim().toLowerCase();
 }
 
-function subIndustryLabels(
+function subIndustryOptions(
   industry: ReturnType<typeof recruiterIndustryOptionFor>,
-  suggestions: RecruiterSubIndustrySuggestions,
+  taxonomy?: RecruiterJobTaxonomy,
 ) {
-  const labels = new Map<string, string>();
-  for (const [label] of industry.subIndustries ?? []) {
-    labels.set(normalizedOption(label), label);
-  }
-  for (const label of suggestions[industry.code] ?? []) {
-    const trimmed = label.trim();
-    if (trimmed) labels.set(normalizedOption(trimmed), trimmed);
-  }
-  return [...labels.values()];
+  const shared = taxonomy?.industries.find(
+    (candidate) => candidate.code === industry.code,
+  );
+  if (shared) return shared.subIndustries;
+  return (industry.subIndustries ?? []).map(([label, code]) => ({
+    label,
+    code,
+  }));
 }
 
 function toJobCatalogPayload(job: RecruiterJob): JobCatalogItem {
@@ -347,7 +350,7 @@ export function JobPostingEditor({
   initialJob,
   companyName,
   autoSavePreferenceScope,
-  subIndustrySuggestions = {},
+  jobTaxonomy,
   awaitDraftSaveBeforeBack = false,
   onBack,
   onDraftAutoSaved,
@@ -356,7 +359,8 @@ export function JobPostingEditor({
   initialJob: RecruiterJob;
   companyName: string;
   autoSavePreferenceScope?: string;
-  subIndustrySuggestions?: RecruiterSubIndustrySuggestions;
+  /** Active platform taxonomy; static values remain a boot-time fallback. */
+  jobTaxonomy?: RecruiterJobTaxonomy;
   /** Routed editors refresh the list page after the draft response arrives. */
   awaitDraftSaveBeforeBack?: boolean;
   onBack: () => void;
@@ -368,6 +372,9 @@ export function JobPostingEditor({
     ...prepareRecruiterJobForSave(initialJob),
   };
   const [job, setJob] = useState<RecruiterJob>(normalizedInitialJob);
+  const [refreshedJobTaxonomy, setRefreshedJobTaxonomy] = useState<
+    RecruiterJobTaxonomy | undefined
+  >();
   const catalogueUpdatedAt = useRef(
     initialJob.id === "new-job" ? null : initialJob.updatedAt,
   );
@@ -397,6 +404,50 @@ export function JobPostingEditor({
   const autoSaveEnabled = useRecruiterDraftAutoSave(autoSaveStorageKey);
   const locale = useWorkspaceLocale();
   const copy = recruiterJobPostingCopy(locale);
+
+  useEffect(() => {
+    let cancelled = false;
+    let requestInFlight = false;
+
+    const refreshTaxonomy = async () => {
+      if (cancelled || requestInFlight) return;
+      requestInFlight = true;
+      try {
+        const response = await fetch("/api/recruiter/job-taxonomy?refresh=1", {
+          cache: "no-store",
+        });
+        if (!response.ok) return;
+        const parsed = recruiterJobTaxonomySchema.safeParse(
+          await response.json(),
+        );
+        if (parsed.success && !cancelled) setRefreshedJobTaxonomy(parsed.data);
+      } catch {
+        // Keep the server-provided taxonomy when a background refresh fails.
+      } finally {
+        requestInFlight = false;
+      }
+    };
+
+    const refreshWhenVisible = () => {
+      if (document.visibilityState !== "hidden") void refreshTaxonomy();
+    };
+    const intervalId = window.setInterval(
+      refreshWhenVisible,
+      RECRUITER_TAXONOMY_REFRESH_INTERVAL_MS,
+    );
+    window.addEventListener("focus", refreshWhenVisible);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", refreshWhenVisible);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, []);
+
+  const currentJobTaxonomy = refreshedJobTaxonomy ?? jobTaxonomy;
+
   const readOnly = job.status === "pending_approval" || job.status === "closed";
   const canSubmitForApproval =
     job.id === "new-job" || job.status === "draft" || job.status === "rejected";
@@ -419,23 +470,31 @@ export function JobPostingEditor({
     label: job.industry,
   });
   const availableSubIndustries = useMemo(
-    () => subIndustryLabels(selectedIndustry, subIndustrySuggestions),
-    [selectedIndustry, subIndustrySuggestions],
+    () => subIndustryOptions(selectedIndustry, currentJobTaxonomy),
+    [currentJobTaxonomy, selectedIndustry],
   );
   const initialIndustry = recruiterIndustryOptionFor(initialJob);
-  const initialSubIndustryOptions = subIndustryLabels(
+  const initialSubIndustryOptions = subIndustryOptions(
     initialIndustry,
-    subIndustrySuggestions,
+    currentJobTaxonomy,
   );
   const [usesCustomSubIndustry, setUsesCustomSubIndustry] = useState(
     () =>
       initialSubIndustryOptions.length === 0 ||
       (Boolean(initialJob.subIndustry) &&
         !initialSubIndustryOptions.some(
-          (label) =>
-            normalizedOption(label) ===
-            normalizedOption(initialJob.subIndustry),
+          (option) =>
+            option.code === initialJob.subIndustryId ||
+            option.code === initialJob.subIndustryCode ||
+            normalizedOption(option.label) ===
+              normalizedOption(initialJob.subIndustry),
         )),
+  );
+  const selectedSubIndustry = availableSubIndustries.find(
+    (option) =>
+      option.code === job.subIndustryId ||
+      option.code === job.subIndustryCode ||
+      normalizedOption(option.label) === normalizedOption(job.subIndustry),
   );
 
   const clearFieldErrors = (...fields: string[]) => {
@@ -486,14 +545,18 @@ export function JobPostingEditor({
     );
     if (!nextIndustry) return;
     setUsesCustomSubIndustry(
-      subIndustryLabels(nextIndustry, subIndustrySuggestions).length === 0,
+      subIndustryOptions(nextIndustry, currentJobTaxonomy).length === 0,
     );
     changeJob(
       (current) => ({
         ...current,
         industry: nextIndustry.label,
         industryCode: nextIndustry.code,
+        industryId: nextIndustry.code,
         subIndustry: "",
+        subIndustryId: null,
+        subIndustryCode: null,
+        subIndustryProposalNote: null,
         categoryFamily: nextIndustry.code,
         categoryIds: [],
         description: {
@@ -513,6 +576,39 @@ export function JobPostingEditor({
   };
 
   const updateSubIndustry = (value: string) => {
+    const sharedOption = availableSubIndustries.find(
+      (option) =>
+        option.code === value ||
+        normalizedOption(option.label) === normalizedOption(value),
+    );
+    if (sharedOption) {
+      changeJob(
+        (current) => ({
+          ...current,
+          industry: selectedIndustry.label,
+          industryCode: selectedIndustry.code,
+          industryId: selectedIndustry.code,
+          subIndustry: sharedOption.label,
+          subIndustryId: sharedOption.code,
+          subIndustryCode: sharedOption.code,
+          categoryFamily: selectedIndustry.code,
+          categoryIds: [sharedOption.code],
+          subIndustryProposalNote: null,
+          description: {
+            ...current.description,
+            generalInfo: {
+              ...current.description.generalInfo,
+              department: sharedOption.label,
+            },
+          },
+        }),
+        "subIndustry",
+        "categoryFamily",
+        "categoryIds",
+        "description.generalInfo.department",
+      );
+      return;
+    }
     const classification = deriveRecruiterClassification({
       industry: selectedIndustry.label,
       industryCode: selectedIndustry.code,
@@ -523,7 +619,10 @@ export function JobPostingEditor({
         ...current,
         industry: classification.industry,
         industryCode: classification.industryCode,
+        industryId: classification.industryId,
         subIndustry: classification.subIndustry,
+        subIndustryId: null,
+        subIndustryCode: null,
         categoryFamily: classification.categoryFamily,
         categoryIds: classification.categoryIds,
         description: {
@@ -1217,7 +1316,7 @@ export function JobPostingEditor({
                       value={
                         usesCustomSubIndustry
                           ? customSubIndustryValue
-                          : job.subIndustry
+                          : (selectedSubIndustry?.code ?? "")
                       }
                       onChange={(event) => {
                         const value = event.currentTarget.value;
@@ -1234,13 +1333,13 @@ export function JobPostingEditor({
                       <option value="" disabled>
                         Choose a sub-industry
                       </option>
-                      {availableSubIndustries.map((label) => (
-                        <option key={label} value={label}>
-                          {label}
+                      {availableSubIndustries.map((option) => (
+                        <option key={option.code} value={option.code}>
+                          {option.label}
                         </option>
                       ))}
                       <option value={customSubIndustryValue}>
-                        Add a new sub-industry…
+                        Add a new sub-industry...
                       </option>
                     </select>
                   </>
@@ -1263,6 +1362,29 @@ export function JobPostingEditor({
                       placeholder="e.g. Aerospace Engineering"
                       {...fieldA11y("subIndustry")}
                     />
+                  </label>
+                ) : null}
+                {usesCustomSubIndustry ? (
+                  <label htmlFor="recruiter-sub-industry-proposal-note">
+                    Note for administrator (optional)
+                    <textarea
+                      id="recruiter-sub-industry-proposal-note"
+                      disabled={readOnly}
+                      maxLength={1_000}
+                      rows={3}
+                      value={job.subIndustryProposalNote ?? ""}
+                      onChange={(event) =>
+                        update(
+                          "subIndustryProposalNote",
+                          event.currentTarget.value || null,
+                        )
+                      }
+                      placeholder="Explain why this new sub-industry should be shared across companies"
+                    />
+                    <small>
+                      The new sub-industry becomes shared only after this job is
+                      approved.
+                    </small>
                   </label>
                 ) : null}
                 <FieldError field="subIndustry" errors={displayedErrors} />

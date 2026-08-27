@@ -162,4 +162,31 @@ describe.skipIf(!databaseAvailable)("PostgreSQL public job search", () => {
     );
     expect(fixtureRows.map((row) => row.id)).toEqual([fixture.jobs.active.id]);
   });
+
+  it("matches the denormalized shared taxonomy fields on a public job", async () => {
+    const result = await repository.search(
+      {
+        normalizedQuery: "",
+        normalizedLocation: "",
+        normalizedSkills: [],
+        categoryFamily: ["r03"],
+        categoryIds: ["r03-software-development"],
+        employmentType: [],
+        experienceLevel: [],
+        workArrangement: [],
+        salaryCurrency: "VND",
+        salaryPeriod: "MONTH",
+        sort: "NEWEST",
+        limit: 20,
+      },
+      null,
+      fixture.now,
+    );
+    const fixtureRows = result.rows.filter(
+      (row) => row.companyId === fixture.company.id,
+    );
+    expect(fixtureRows.map((row) => row.id).sort()).toEqual(
+      [fixture.jobs.active.id, fixture.jobs.activeSecond.id].sort(),
+    );
+  });
 });

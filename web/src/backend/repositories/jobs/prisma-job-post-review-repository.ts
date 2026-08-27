@@ -10,6 +10,11 @@ import { projectJobReviewSnapshot } from "@/backend/jobs/review/job-post-publica
 import { promoteWaitlistedApplicationsInTransaction } from "@/backend/services/jobs/application-stage-service";
 import { reviewSearchTokens } from "@/backend/jobs/review/job-post-review-search";
 import { appendJobPostingLifecycleFact } from "@/backend/repositories/analytics/prisma-analytics-repository";
+import {
+  rejectJobTaxonomyProposal,
+  resolveApprovedJobTaxonomy,
+} from "@/backend/services/jobs/job-taxonomy-service";
+import type { TaxonomyResolution } from "@/backend/services/jobs/job-taxonomy-service";
 
 type ReviewDb = typeof prisma | Prisma.TransactionClient;
 
@@ -30,6 +35,12 @@ const reviewDetailInclude = {
   },
   submittedBy: { select: { id: true, name: true, state: true } },
   submittedMembership: { select: { id: true, status: true, role: true } },
+  taxonomyProposal: {
+    include: {
+      industry: { select: { code: true, name: true } },
+      resolvedSubIndustry: { select: { code: true, name: true } },
+    },
+  },
   history: { orderBy: [{ occurredAt: "asc" }, { id: "asc" }] },
   privateNotes: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
 } satisfies Prisma.JobPostReviewVersionInclude;
@@ -276,9 +287,40 @@ export class PrismaJobPostReviewRepository {
     let publishedAt: Date | null = null;
     let previousCapacity: number | null;
 
+    let taxonomy: TaxonomyResolution | null = null;
+    if (input.command.command === "APPROVE") {
+      taxonomy = await resolveApprovedJobTaxonomy({
+        db: this.db,
+        reviewVersionId: input.reviewId,
+        industryCode: input.snapshot.industryCode,
+        industryName: input.snapshot.industry,
+        subIndustryName: input.snapshot.subIndustry,
+        subIndustryId: input.snapshot.subIndustryId,
+        subIndustryCode: input.snapshot.subIndustryCode,
+        adminUserId: input.actorUserId,
+        now: input.now,
+      });
+    } else {
+      await rejectJobTaxonomyProposal({
+        db: this.db,
+        reviewVersionId: input.reviewId,
+        adminUserId: input.actorUserId,
+        reason: input.command.publicExplanation,
+        now: input.now,
+      });
+    }
+
     if (input.command.command === "APPROVE") {
       const projected = projectJobReviewSnapshot(input.snapshot);
       const { skills, ...jobData } = projected;
+      const projectedJobData = {
+        ...jobData,
+        industryId: taxonomy?.industryId ?? null,
+        subIndustryId: taxonomy?.subIndustryId ?? null,
+        industryCode: taxonomy?.industryCode ?? input.snapshot.industryCode,
+        subIndustryCode:
+          taxonomy?.subIndustryCode ?? input.snapshot.subIndustryCode ?? null,
+      };
       const previousPublicJob = publicJobPostingId
         ? await this.db.jobPosting.findUnique({
             where: { id: publicJobPostingId },
@@ -309,14 +351,14 @@ export class PrismaJobPostReviewRepository {
       const publicJob = await this.db.jobPosting.upsert({
         where: { slug: projected.slug },
         create: {
-          ...jobData,
+          ...projectedJobData,
           status: input.closedAt ? "CLOSED" : "ACTIVE",
           approvedAt: input.now,
           publishedAt: input.now,
           closedAt: input.closedAt,
         },
         update: {
-          ...jobData,
+          ...projectedJobData,
           status: input.closedAt ? "CLOSED" : "ACTIVE",
           approvedAt: input.now,
           publishedAt: input.now,

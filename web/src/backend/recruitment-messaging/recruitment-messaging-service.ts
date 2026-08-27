@@ -13,6 +13,7 @@ import type {
 } from "@/shared/contracts/recruitment-messaging";
 
 const staffRoles = ["HR_MANAGER", "RECRUITER"] as const;
+const assignableRoles = ["OWNER", ...staffRoles] as const;
 const terminalStages = new Set([
   "HIRED",
   "OFFER_DECLINED",
@@ -71,22 +72,49 @@ type ThreadRow = Prisma.RecruitmentThreadGetPayload<{
   include: typeof threadInclude;
 }>;
 
+type ThreadAccessKind =
+  | "CANDIDATE"
+  | "ASSIGNEE"
+  | "HR_MANAGER"
+  | "STAFF_OBSERVER"
+  | "OWNER";
+
 function isTerminal(stage: string) {
   return terminalStages.has(stage);
 }
 
-function visibleThread(thread: ThreadRow, actorId: string) {
+function hasActiveAssignee(thread: ThreadRow) {
+  const assigned = thread.assignedMembership;
+  return Boolean(
+    assigned &&
+    assigned.status === "ACTIVE" &&
+    assigned.user.state === "ACTIVE" &&
+    !assigned.user.deletedAt &&
+    assignableRoles.includes(assigned.role as (typeof assignableRoles)[number]),
+  );
+}
+
+function visibleThread(
+  thread: ThreadRow,
+  actorId: string,
+  accessKind?: ThreadAccessKind,
+) {
   const assigned = thread.assignedMembership;
   const effectiveState = isTerminal(thread.application.stage)
     ? "READ_ONLY"
     : thread.state;
+  const assignedUserCanSend =
+    hasActiveAssignee(thread) && assigned?.userId === actorId;
+  const ownerCanSend = accessKind === "OWNER" && hasActiveAssignee(thread);
   return {
     id: thread.id,
     applicationId: thread.applicationId,
     state: effectiveState,
     canSend:
       effectiveState === "OPEN" &&
-      (thread.candidateUserId === actorId || assigned?.userId === actorId),
+      (thread.candidateUserId === actorId ||
+        assignedUserCanSend ||
+        ownerCanSend),
     candidate: thread.application.candidate.user,
     job: {
       id: thread.application.jobPosting.id,
@@ -123,6 +151,43 @@ function visibleThread(thread: ThreadRow, actorId: string) {
 export class RecruitmentMessagingService {
   constructor(private readonly db: typeof prisma = prisma) {}
 
+  private async ensureApplicationThreads(
+    companyIds: string[],
+    query: Pick<RecruitmentThreadQuery, "jobId" | "stage">,
+  ) {
+    if (!companyIds.length) return;
+    const unthreaded = await this.db.jobApplication.findMany({
+      where: {
+        jobPosting: { companyId: { in: companyIds } },
+        ...(query.jobId ? { jobPostingId: query.jobId } : {}),
+        ...(query.stage ? { stage: query.stage } : {}),
+        recruitmentThread: null,
+      },
+      select: {
+        id: true,
+        candidateUserId: true,
+        jobPostingId: true,
+        jobPosting: { select: { companyId: true } },
+      },
+      take: 100,
+    });
+    if (!unthreaded.length) return;
+    await this.db.$transaction(
+      unthreaded.map((application) =>
+        this.db.recruitmentThread.upsert({
+          where: { applicationId: application.id },
+          create: {
+            applicationId: application.id,
+            companyId: application.jobPosting.companyId,
+            jobPostingId: application.jobPostingId,
+            candidateUserId: application.candidateUserId,
+          },
+          update: {},
+        }),
+      ),
+    );
+  }
+
   private async membership(userId: string, companyId: string) {
     return this.db.companyMembership.findFirst({
       where: {
@@ -141,7 +206,7 @@ export class RecruitmentMessagingService {
     userId: string,
   ): Promise<{
     thread: ThreadRow;
-    kind: "CANDIDATE" | "ASSIGNEE" | "HR_MANAGER" | "STAFF_OBSERVER" | "OWNER";
+    kind: ThreadAccessKind;
     membershipId?: string;
   }> {
     const thread = await this.db.recruitmentThread.findUnique({
@@ -204,42 +269,13 @@ export class RecruitmentMessagingService {
     const oversightCompanyIds = [
       ...new Set([...ownerCompanyIds, ...hrManagerCompanyIds]),
     ];
-    // An HR Manager's inbox is also the assignment queue. Materialize the
-    // application-owned thread lazily here; it remains inaccessible to the
-    // candidate until a staff member is assigned.
-    if (hrManagerCompanyIds.length) {
-      const unthreaded = await this.db.jobApplication.findMany({
-        where: {
-          jobPosting: { companyId: { in: hrManagerCompanyIds } },
-          ...(query.jobId ? { jobPostingId: query.jobId } : {}),
-          ...(query.stage ? { stage: query.stage } : {}),
-          recruitmentThread: null,
-        },
-        select: {
-          id: true,
-          candidateUserId: true,
-          jobPostingId: true,
-          jobPosting: { select: { companyId: true } },
-        },
-        take: 100,
-      });
-      if (unthreaded.length) {
-        await this.db.$transaction(
-          unthreaded.map((application) =>
-            this.db.recruitmentThread.upsert({
-              where: { applicationId: application.id },
-              create: {
-                applicationId: application.id,
-                companyId: application.jobPosting.companyId,
-                jobPostingId: application.jobPostingId,
-                candidateUserId: application.candidateUserId,
-              },
-              update: {},
-            }),
-          ),
-        );
-      }
-    }
+    // An HR Manager's or Owner's inbox is also the assignment queue.
+    // Materialize application-owned threads lazily here; they remain
+    // inaccessible to the candidate until a member is assigned.
+    await this.ensureApplicationThreads(
+      [...new Set([...ownerCompanyIds, ...hrManagerCompanyIds])],
+      query,
+    );
     const common: Prisma.RecruitmentThreadWhereInput = {
       companyId: { in: scopedCompanyIds },
       ...(query.jobId ? { jobPostingId: query.jobId } : {}),
@@ -284,7 +320,13 @@ export class RecruitmentMessagingService {
       orderBy: [{ lastMessageAt: "desc" }, { id: "desc" }],
       take: 100,
     });
-    return rows.map((thread) => visibleThread(thread, userId));
+    return rows.map((thread) =>
+      visibleThread(
+        thread,
+        userId,
+        ownerCompanyIds.includes(thread.companyId) ? "OWNER" : undefined,
+      ),
+    );
   }
 
   async detail(threadId: string, userId: string) {
@@ -320,7 +362,7 @@ export class RecruitmentMessagingService {
       },
     });
     return {
-      thread: visibleThread(thread, userId),
+      thread: visibleThread(thread, userId, kind),
       access: kind,
       messages: messages.map((message) => ({
         ...message,
@@ -358,17 +400,23 @@ export class RecruitmentMessagingService {
       actorId,
       application.jobPosting.companyId,
     );
-    if (actorMembership?.role !== "HR_MANAGER")
+    if (
+      !actorMembership ||
+      (actorMembership.role !== "HR_MANAGER" &&
+        actorMembership.role !== "OWNER")
+    )
       throw new RecruitmentMessagingError("ASSIGNMENT_FORBIDDEN", 403);
     if (isTerminal(application.stage))
       throw new RecruitmentMessagingError("READ_ONLY", 409);
+    const targetRoles =
+      actorMembership.role === "OWNER" ? assignableRoles : staffRoles;
     const assignee = await this.db.companyMembership.findFirst({
       where: {
         id: input.membershipId,
         companyId: application.jobPosting.companyId,
         status: "ACTIVE",
         removedAt: null,
-        role: { in: [...staffRoles] },
+        role: { in: [...targetRoles] },
         user: { state: "ACTIVE", deletedAt: null },
       },
       select: { id: true },
@@ -413,7 +461,11 @@ export class RecruitmentMessagingService {
       });
       return next;
     });
-    return visibleThread(thread, actorId);
+    return visibleThread(
+      thread,
+      actorId,
+      actorMembership.role === "OWNER" ? "OWNER" : undefined,
+    );
   }
 
   async openForStaff(applicationId: string, actorId: string) {
@@ -496,14 +548,15 @@ export class RecruitmentMessagingService {
 
   async eligibleAssignees(threadId: string, actorId: string) {
     const { thread, kind } = await this.access(threadId, actorId);
-    if (kind !== "HR_MANAGER")
+    if (kind !== "HR_MANAGER" && kind !== "OWNER")
       throw new RecruitmentMessagingError("ASSIGNMENT_FORBIDDEN", 403);
+    const targetRoles = kind === "OWNER" ? assignableRoles : staffRoles;
     return this.db.companyMembership.findMany({
       where: {
         companyId: thread.companyId,
         status: "ACTIVE",
         removedAt: null,
-        role: { in: [...staffRoles] },
+        role: { in: [...targetRoles] },
         user: { state: "ACTIVE", deletedAt: null },
       },
       select: { id: true, role: true, user: { select: { name: true } } },
@@ -532,6 +585,7 @@ export class RecruitmentMessagingService {
     // staff role at another company must not gain owner oversight there.
     if (query.companyId && !ownerCompanyIds.includes(query.companyId))
       return [];
+    await this.ensureApplicationThreads(ownerCompanyIds, query);
     const rows = await this.db.recruitmentThread.findMany({
       where: {
         companyId: query.companyId ?? { in: ownerCompanyIds },
@@ -542,7 +596,13 @@ export class RecruitmentMessagingService {
       orderBy: [{ lastMessageAt: "desc" }, { id: "desc" }],
       take: 100,
     });
-    return rows.map((thread) => visibleThread(thread, userId));
+    return rows.map((thread) =>
+      visibleThread(
+        thread,
+        userId,
+        ownerCompanyIds.includes(thread.companyId) ? "OWNER" : undefined,
+      ),
+    );
   }
 
   async ownerDetail(threadId: string, userId: string) {
@@ -554,7 +614,8 @@ export class RecruitmentMessagingService {
 
   async send(threadId: string, userId: string, input: RecruitmentMessageInput) {
     const { thread, kind, membershipId } = await this.access(threadId, userId);
-    if (kind === "OWNER") throw new RecruitmentMessagingError("READ_ONLY", 403);
+    if (kind === "OWNER" && !hasActiveAssignee(thread))
+      throw new RecruitmentMessagingError("NOT_ASSIGNED", 403);
     if (
       kind === "STAFF_OBSERVER" ||
       (kind === "HR_MANAGER" && thread.assignedMembershipId !== membershipId)
@@ -563,7 +624,9 @@ export class RecruitmentMessagingService {
     if (isTerminal(thread.application.stage) || thread.state === "READ_ONLY")
       throw new RecruitmentMessagingError("READ_ONLY", 409);
     const senderMembershipId =
-      kind === "CANDIDATE" ? null : thread.assignedMembershipId;
+      kind === "CANDIDATE"
+        ? null
+        : (membershipId ?? thread.assignedMembershipId ?? null);
     const existing = await this.db.recruitmentMessage.findUnique({
       where: {
         senderUserId_clientOperationId: {

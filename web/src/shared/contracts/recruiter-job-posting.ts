@@ -14,6 +14,7 @@ import {
 } from "./jobs/industry-taxonomy";
 import { z } from "zod";
 import type { RecruiterReviewProjection } from "./admin/job-post-review";
+import type { RecruiterJobTaxonomy } from "./jobs/job-taxonomy";
 
 export {
   companyCatalogSchema,
@@ -121,6 +122,8 @@ export type RecruiterJob = JobCatalogItem & {
 export type RecruiterJobManagementData = {
   jobs: RecruiterJob[];
   companies: RecruiterCompanyView[];
+  /** Active platform taxonomy used by every recruiter company. */
+  jobTaxonomy?: RecruiterJobTaxonomy;
   companyId: string | null;
   recruiterUserId?: string;
   companyProfileComplete?: boolean;
@@ -214,14 +217,31 @@ export function prepareRecruiterJobForSave(
   job: JobCatalogItem,
 ): JobCatalogItem {
   const classification = deriveRecruiterClassification(job);
+  const sharedSubIndustryCode =
+    job.subIndustryCode?.trim() || job.subIndustryId?.trim() || null;
+  const hasSharedSubIndustry = Boolean(
+    job.subIndustryId && sharedSubIndustryCode,
+  );
+  const subIndustry = hasSharedSubIndustry
+    ? job.subIndustry.trim()
+    : classification.subIndustry;
   return {
     ...job,
     title: job.title.trim(),
     shortPitch: job.shortPitch.trim(),
     industry: classification.industry,
     industryCode: classification.industryCode,
-    subIndustry: classification.subIndustry,
-    categoryIds: classification.categoryIds,
+    industryId: job.industryId?.trim() || classification.industryId,
+    subIndustry,
+    subIndustryId: hasSharedSubIndustry
+      ? job.subIndustryId
+      : classification.subIndustryId,
+    subIndustryCode: hasSharedSubIndustry
+      ? sharedSubIndustryCode
+      : classification.subIndustryCode,
+    categoryIds: hasSharedSubIndustry
+      ? [sharedSubIndustryCode!]
+      : classification.categoryIds,
     categoryFamily: classification.categoryFamily,
     skillTags: uniqueTrimmed(job.skillTags),
     location: {
@@ -252,7 +272,9 @@ export function prepareRecruiterJobForSave(
         .filter((benefit) => benefit.icon && benefit.label),
       generalInfo: {
         reportsTo: nullableTrimmed(job.description.generalInfo.reportsTo),
-        department: classification.department,
+        department: hasSharedSubIndustry
+          ? subIndustry || null
+          : classification.department,
         workingHours: nullableTrimmed(job.description.generalInfo.workingHours),
         workAddress: nullableTrimmed(job.description.generalInfo.workAddress),
       },

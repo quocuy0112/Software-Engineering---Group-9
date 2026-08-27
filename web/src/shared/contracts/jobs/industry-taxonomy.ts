@@ -370,7 +370,10 @@ export function collectRecruiterSubIndustrySuggestions(
 export type RecruiterClassification = {
   industry: string;
   industryCode: RecruiterIndustryCode;
+  industryId: string;
   subIndustry: string;
+  subIndustryId: string | null;
+  subIndustryCode: string | null;
   categoryFamily: RecruiterIndustryCode;
   categoryIds: string[];
   department: string | null;
@@ -380,7 +383,10 @@ export type RecruiterClassification = {
 export function deriveRecruiterClassification(input: {
   industry?: string | null;
   industryCode?: string | null;
+  industryId?: string | null;
   subIndustry?: string | null;
+  subIndustryId?: string | null;
+  subIndustryCode?: string | null;
 }): RecruiterClassification {
   const industry = recruiterIndustryOptionFor({
     code: input.industryCode,
@@ -397,7 +403,10 @@ export function deriveRecruiterClassification(input: {
     return {
       industry: industry.label,
       industryCode: industry.code,
+      industryId: industry.code,
       subIndustry: selected[0],
+      subIndustryId: selected[1],
+      subIndustryCode: selected[1],
       categoryFamily: industry.code,
       categoryIds: [selected[1]],
       department: selected[0],
@@ -409,7 +418,10 @@ export function deriveRecruiterClassification(input: {
   return {
     industry: industry.label,
     industryCode: industry.code,
+    industryId: industry.code,
     subIndustry: rawSubIndustry,
+    subIndustryId: null,
+    subIndustryCode: null,
     categoryFamily: industry.code,
     // Other has no curated children, so its typed label is the stable child
     // identity. Custom labels under a curated industry retain the generic
