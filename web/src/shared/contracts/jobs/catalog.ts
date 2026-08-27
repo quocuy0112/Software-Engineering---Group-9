@@ -49,7 +49,13 @@ export const jobCatalogSchema = z
     createdByUserId: z.string().min(1).max(128).nullable().optional(),
     industry: z.string().min(1).max(160),
     industryCode: z.string().max(80),
+    /** Stable platform taxonomy identifiers. Optional for legacy catalogue rows. */
+    industryId: z.string().trim().min(1).max(80).nullable().optional(),
     subIndustry: z.string().min(1).max(160),
+    subIndustryId: z.string().trim().min(1).max(128).nullable().optional(),
+    subIndustryCode: z.string().trim().min(1).max(128).nullable().optional(),
+    /** Recruiter context shown to administrators for a new taxonomy proposal. */
+    subIndustryProposalNote: nullableString(1_000).optional(),
     title: z.string().min(1).max(200),
     shortPitch: z.string().min(1).max(500),
     categoryIds: z.array(z.string().min(1).max(128)).max(20),

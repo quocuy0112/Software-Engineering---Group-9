@@ -57,6 +57,14 @@ export async function publishApprovedJobToCatalogue(input: {
   snapshot: unknown;
   now: Date;
   status?: "active" | "closed";
+  taxonomy?: {
+    industryId: string | null;
+    subIndustryId: string | null;
+    industryCode: string | null;
+    subIndustryCode: string | null;
+    industryName?: string | null;
+    subIndustryName?: string | null;
+  } | null;
 }) {
   const snapshot = jobReviewSnapshotSchema.parse(input.snapshot);
   const rawJobs = await jobsRepository.readIndustryPartition(
@@ -73,8 +81,21 @@ export async function publishApprovedJobToCatalogue(input: {
   const existingJob = existing?.success ? existing.data : undefined;
   const companyId = await catalogueCompanyId(snapshot, existingJob);
   const timestamp = nowIso(input.now);
+  const industryCode = input.taxonomy?.industryCode || snapshot.industryCode;
+  const subIndustryCode =
+    input.taxonomy?.subIndustryCode || snapshot.subIndustryCode || null;
   const approved = jobCatalogSchema.parse({
     ...snapshot,
+    industry: input.taxonomy?.industryName || snapshot.industry,
+    industryId: input.taxonomy?.industryId || snapshot.industryId || null,
+    subIndustry: input.taxonomy?.subIndustryName || snapshot.subIndustry,
+    subIndustryId:
+      input.taxonomy?.subIndustryId || snapshot.subIndustryId || null,
+    industryCode,
+    subIndustryCode,
+    categoryIds: subIndustryCode ? [subIndustryCode] : snapshot.categoryIds,
+    // Proposal context belongs to the review record, not the public catalogue.
+    subIndustryProposalNote: undefined,
     companyId,
     status: input.status ?? "active",
     approvalComment: null,

@@ -42,6 +42,17 @@ type ReviewDetailRecord = {
   integrityState?: "VALID" | "BLOCKED";
   snapshot: JobReviewSnapshot;
   priorApprovedSnapshot?: JobReviewSnapshot | null;
+  taxonomyProposal?: {
+    proposedName: string;
+    description: string | null;
+    status: "PENDING_APPROVAL" | "APPROVED" | "MAPPED" | "REJECTED";
+    industryCode: string;
+    industryName: string;
+    resolvedSubIndustryCode: string | null;
+    resolvedSubIndustryName: string | null;
+    createdAt: string;
+    reviewedAt: string | null;
+  } | null;
   company: {
     displayName: string;
     verificationState: string;
@@ -284,6 +295,36 @@ function ReviewDetail() {
             This recruiter draft was deleted {dateTime(record.deletedAt)}. Its
             review history is archived and retained according to the deleted
             draft retention policy.
+          </Alert>
+        ) : null}
+
+        {record.taxonomyProposal ? (
+          <Alert
+            severity={
+              record.taxonomyProposal.status === "PENDING_APPROVAL"
+                ? "warning"
+                : record.taxonomyProposal.status === "REJECTED"
+                  ? "error"
+                  : "success"
+            }
+          >
+            <Typography variant="body2" fontWeight={700}>
+              New shared sub-industry proposal:{" "}
+              {record.taxonomyProposal.proposedName}
+            </Typography>
+            <Typography variant="body2">
+              Industry: {record.taxonomyProposal.industryName} - Status:{" "}
+              {sentenceCase(record.taxonomyProposal.status)}
+            </Typography>
+            {record.taxonomyProposal.description ? (
+              <Typography variant="body2" sx={{ mt: 0.5 }}>
+                Recruiter note: {record.taxonomyProposal.description}
+              </Typography>
+            ) : null}
+            <Typography variant="body2" sx={{ mt: 0.5 }}>
+              On approval, the platform maps this name to an existing shared
+              value when possible; otherwise it creates one for all companies.
+            </Typography>
           </Alert>
         ) : null}
 

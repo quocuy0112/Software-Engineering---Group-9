@@ -23,7 +23,6 @@ import {
   type RecruiterJobStatus,
 } from "@/shared/contracts/recruiter-job-posting";
 import type { JobCatalogItem } from "@/shared/contracts/jobs/catalog";
-import { collectRecruiterSubIndustrySuggestions } from "@/shared/contracts/jobs/industry-taxonomy";
 import {
   recruiterRoutes,
   type RecruiterJobPostingTab,
@@ -930,11 +929,6 @@ export function RecruiterJobPostingManagement({
       )
       .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
   }, [activeTab, department, scopedJobs, search]);
-  const subIndustrySuggestions = useMemo(
-    () => collectRecruiterSubIndustrySuggestions(current.jobs),
-    [current.jobs],
-  );
-
   const openCreate = () => {
     if (selectedCompanyProfileComplete === false) {
       if (onNavigate) {
@@ -1199,7 +1193,7 @@ export function RecruiterJobPostingManagement({
         autoSavePreferenceScope={
           current.recruiterUserId ?? current.companyId ?? undefined
         }
-        subIndustrySuggestions={subIndustrySuggestions}
+        jobTaxonomy={current.jobTaxonomy}
         onBack={() => setView("dashboard")}
         onDraftAutoSaved={storeSavedJob}
         onSaved={receiveSavedJob}
