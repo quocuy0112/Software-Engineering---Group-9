@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChecklistItem } from "@/frontend/components/ui/checklist-item";
 import { ContentTabs } from "@/frontend/components/ui/content-tabs";
 import { StatChip } from "@/frontend/components/ui/stat-chip";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
 import {
   jobCategories,
@@ -15,6 +16,7 @@ import {
   jobSkills,
 } from "./job-detail-data";
 import { JobMetaIcon } from "./job-meta-icon";
+import { jobCopy } from "./job-copy";
 
 export type JobDetailSectionId =
   | "description"
@@ -42,12 +44,9 @@ const benefitIcon: Record<string, string> = {
 };
 
 function BulletList({ items }: { items: string[] }) {
+  const copy = jobCopy(useWorkspaceLocale());
   if (!items.length) {
-    return (
-      <p className="job-section-muted">
-        More details will be shared by the hiring team.
-      </p>
-    );
+    return <p className="job-section-muted">{copy.moreDetailsHiringTeam}</p>;
   }
 
   return (
@@ -118,19 +117,21 @@ function SectionHeading({
 }
 
 export function JobDetailOverview({ job }: { job: JobDetail }) {
+  const locale = useWorkspaceLocale();
+  const copy = jobCopy(locale);
   const facts = [
     {
       icon: <JobMetaIcon name="person" />,
-      label: "Age",
-      value: job.age?.trim() || "Not listed",
+      label: copy.age,
+      value: job.age?.trim() || copy.notListed,
     },
     {
       icon: <JobMetaIcon name="education" />,
-      label: "Education level",
-      value: job.education?.trim() || "Not listed",
+      label: copy.educationLevel,
+      value: job.education?.trim() || copy.notListed,
     },
   ];
-  const specialization = jobCategories(job);
+  const specialization = jobCategories(job, locale);
 
   return (
     <section
@@ -141,15 +142,15 @@ export function JobDetailOverview({ job }: { job: JobDetail }) {
       <div className="job-detail-overview-header">
         <SectionHeading
           headingId="overview-heading"
-          eyebrow="Overview"
-          title="Overview"
-          copy="The essentials at a glance before you dive into the role."
+          eyebrow={copy.overview}
+          title={copy.overview}
+          copy={copy.overviewDescription}
         />
       </div>
 
       <div
         className="job-overview-facts"
-        aria-label="Job requirements at a glance"
+        aria-label={copy.jobRequirementsAtAGlance}
       >
         {facts.map((fact) => (
           <StatChip
@@ -165,13 +166,13 @@ export function JobDetailOverview({ job }: { job: JobDetail }) {
       <div className="job-overview-specialization">
         <InlineChips
           items={specialization.slice(0, 10)}
-          label="Specialization"
-          ariaLabel="Job specialization"
+          label={copy.specialization}
+          ariaLabel={copy.jobSpecialization}
         />
         <InlineChips
           items={jobSkills(job).slice(0, 14)}
-          label="Required skills"
-          ariaLabel="Required skills"
+          label={copy.requiredSkills}
+          ariaLabel={copy.requiredSkills}
         />
       </div>
     </section>
@@ -180,31 +181,32 @@ export function JobDetailOverview({ job }: { job: JobDetail }) {
 
 type TabId = "description" | "requirements" | "benefits";
 
-const detailTabs: readonly {
+function detailTabs(copy: ReturnType<typeof jobCopy>): readonly {
   id: TabId;
   label: string;
   description: string;
-}[] = [
-  {
-    id: "description",
-    label: "Job description",
-    description:
-      "A clear view of the work, expectations, and impact you can make.",
-  },
-  {
-    id: "requirements",
-    label: "Requirements",
-    description: "The signals that will help you do well in this role.",
-  },
-  {
-    id: "benefits",
-    label: "Benefits",
-    description:
-      "The full package, kept together so you can compare with confidence.",
-  },
-];
+}[] {
+  return [
+    {
+      id: "description",
+      label: copy.jobDescription,
+      description: copy.jobDescriptionDescription,
+    },
+    {
+      id: "requirements",
+      label: copy.requirements,
+      description: copy.requirementsDescription,
+    },
+    {
+      id: "benefits",
+      label: copy.benefits,
+      description: copy.benefitsDescription,
+    },
+  ];
+}
 
 function DescriptionContent({ job }: { job: JobDetail }) {
+  const copy = jobCopy(useWorkspaceLocale());
   return (
     <>
       <div className="job-detail-section-copy">
@@ -212,11 +214,11 @@ function DescriptionContent({ job }: { job: JobDetail }) {
       </div>
       <InlineChips
         items={jobSkills(job).slice(0, 8)}
-        label="Role focus"
-        ariaLabel="Role focus skills"
+        label={copy.roleFocus}
+        ariaLabel={copy.roleFocusSkills}
       />
       <div className="job-detail-section-subblock">
-        <h3 id="responsibilities-heading">Key responsibilities</h3>
+        <h3 id="responsibilities-heading">{copy.keyResponsibilities}</h3>
         <BulletList items={jobResponsibilities(job)} />
       </div>
     </>
@@ -224,6 +226,7 @@ function DescriptionContent({ job }: { job: JobDetail }) {
 }
 
 function RequirementsContent({ job }: { job: JobDetail }) {
+  const copy = jobCopy(useWorkspaceLocale());
   const mustHave = jobMustHaveRequirements(job);
   const niceToHave = jobNiceToHaveRequirements(job);
 
@@ -231,22 +234,20 @@ function RequirementsContent({ job }: { job: JobDetail }) {
     <>
       <InlineChips
         items={jobSkills(job)}
-        label="Required skills"
-        ariaLabel="Required skills"
+        label={copy.requiredSkills}
+        ariaLabel={copy.requiredSkills}
       />
       <div className="job-requirement-columns">
         <div>
-          <h3>Must-have requirements</h3>
+          <h3>{copy.mustHaveRequirements}</h3>
           <BulletList items={mustHave} />
         </div>
         <div className="job-requirement-nice">
-          <h3>Nice-to-have</h3>
+          <h3>{copy.niceToHave}</h3>
           {niceToHave.length ? (
             <BulletList items={niceToHave} />
           ) : (
-            <p className="job-section-muted">
-              No additional nice-to-have requirements were provided.
-            </p>
+            <p className="job-section-muted">{copy.noNiceToHave}</p>
           )}
         </div>
       </div>
@@ -255,10 +256,11 @@ function RequirementsContent({ job }: { job: JobDetail }) {
 }
 
 function BenefitsContent({ job }: { job: JobDetail }) {
+  const copy = jobCopy(useWorkspaceLocale());
   const benefits = jobBenefits(job);
 
   return benefits.length ? (
-    <ul className="job-benefit-grid" aria-label="Job benefits">
+    <ul className="job-benefit-grid" aria-label={copy.benefits}>
       {benefits.map((benefit, index) => (
         <li key={benefit.label + "-" + index}>
           <span className="job-benefit-icon" aria-hidden="true">
@@ -269,9 +271,7 @@ function BenefitsContent({ job }: { job: JobDetail }) {
       ))}
     </ul>
   ) : (
-    <p className="job-section-muted">
-      Benefits details will be shared during the interview process.
-    </p>
+    <p className="job-section-muted">{copy.benefitsInterview}</p>
   );
 }
 
@@ -290,11 +290,12 @@ export function JobDetailSections({
   includeOverview?: boolean;
 }) {
   const [activeTab, setActiveTab] = useState<TabId>("description");
-  const activeTabConfig =
-    detailTabs.find((tab) => tab.id === activeTab) ?? detailTabs[0];
+  const copy = jobCopy(useWorkspaceLocale());
+  const tabs = detailTabs(copy);
+  const activeTabConfig = tabs.find((tab) => tab.id === activeTab) ?? tabs[0];
 
   return (
-    <div className="job-detail-sections" aria-label="Job details">
+    <div className="job-detail-sections" aria-label={copy.jobDetails}>
       {includeOverview ? <JobDetailOverview job={job} /> : null}
       <section
         id="job-details-tabs"
@@ -302,18 +303,16 @@ export function JobDetailSections({
         aria-labelledby="job-details-tabs-heading"
       >
         <h2 id="job-details-tabs-heading" className="sr-only">
-          Job details
+          {copy.jobDetails}
         </h2>
         <ContentTabs
-          tabs={detailTabs.map((tab) => ({
+          tabs={tabs.map((tab) => ({
             id: "job-detail-tab-" + tab.id,
             label: tab.label,
           }))}
-          activeIndex={detailTabs.findIndex((tab) => tab.id === activeTab)}
-          onChange={(index) =>
-            setActiveTab(detailTabs[index]?.id ?? "description")
-          }
-          ariaLabel="Job detail sections"
+          activeIndex={tabs.findIndex((tab) => tab.id === activeTab)}
+          onChange={(index) => setActiveTab(tabs[index]?.id ?? "description")}
+          ariaLabel={copy.jobDetailSections}
           panelId="job-detail-tab-panel"
         />
         <p className="job-detail-tab-description">

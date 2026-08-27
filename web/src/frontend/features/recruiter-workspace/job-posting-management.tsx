@@ -33,6 +33,11 @@ import {
   companyMatchesScope,
   useRecruiterCompanyScope,
 } from "./recruiter-company-scope";
+import {
+  recruiterWorkspaceCopy,
+  type RecruiterWorkspaceCopy,
+} from "./recruiter-workspace-copy";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 
 const tabs: Array<{
   value: RecruiterJobPostingTab;
@@ -160,27 +165,38 @@ function Icon({
   );
 }
 
-function formatRelative(value: string) {
+function formatRelative(
+  value: string,
+  copy: RecruiterWorkspaceCopy["jobManagement"],
+) {
   const delta = Math.max(0, Date.now() - new Date(value).getTime());
   const days = Math.floor(delta / 86_400_000);
-  if (days === 0) return "today";
-  if (days === 1) return "1 day ago";
-  if (days < 30) return `${days} days ago`;
+  if (days === 0) return copy.today;
+  if (days === 1) return copy.dayAgo;
+  if (days < 30) return copy.daysAgo(days);
   const months = Math.floor(days / 30);
-  return `${months} ${months === 1 ? "month" : "months"} ago`;
+  return months === 1 ? copy.monthAgo : copy.monthsAgo(months);
 }
 
-function locationLabel(job: RecruiterJob) {
+function locationLabel(
+  job: RecruiterJob,
+  copy: RecruiterWorkspaceCopy["jobManagement"],
+) {
   return (
     [job.location.city, job.location.district].filter(Boolean).join(", ") ||
-    "Location not set"
+    copy.locationNotSet
   );
 }
 
-function arrangementLabel(job: RecruiterJob) {
-  return job.workArrangement
-    .replace(/_/gu, " ")
-    .replace(/\b\w/gu, (letter) => letter.toUpperCase());
+function arrangementLabel(
+  job: RecruiterJob,
+  copy: RecruiterWorkspaceCopy["jobManagement"],
+) {
+  const key = job.workArrangement.toUpperCase().replace("-", "_");
+  return (
+    copy.arrangements[key as keyof typeof copy.arrangements] ??
+    job.workArrangement
+  );
 }
 
 function isClosingSoon(job: RecruiterJob) {
@@ -189,19 +205,14 @@ function isClosingSoon(job: RecruiterJob) {
   return remaining >= 0 && remaining <= 7 * 86_400_000;
 }
 
-function formatReasonCode(code: string): string {
-  const reasonLabels: Record<string, string> = {
-    INCOMPLETE_OR_UNCLEAR: "Incomplete or unclear information",
-    MISLEADING_CONTENT: "Misleading content",
-    INAPPROPRIATE_LANGUAGE: "Inappropriate language",
-    DUPLICATE_POSTING: "Duplicate posting",
-    INVALID_REQUIREMENTS: "Invalid requirements",
-    INSUFFICIENT_COMPENSATION: "Insufficient compensation details",
-    VERIFICATION_MISMATCH: "Verification mismatch",
-    PROHIBITED_CONTENT: "Prohibited content",
-    OTHER: "Other reason",
-  };
-  return reasonLabels[code] || code.replace(/_/g, " ");
+function formatReasonCode(
+  code: string,
+  copy: RecruiterWorkspaceCopy["jobManagement"],
+): string {
+  return (
+    copy.reasonLabels[code as keyof typeof copy.reasonLabels] ||
+    code.replace(/_/g, " ")
+  );
 }
 
 function statusForTab(job: RecruiterJob, tab: (typeof tabs)[number]["value"]) {
@@ -235,8 +246,13 @@ function StatCard({
 }
 
 function StatusPill({ status }: { status: RecruiterJobStatus }) {
+  const copy = recruiterWorkspaceCopy(useWorkspaceLocale()).jobManagement;
   const meta = recruiterJobStatusMeta[status];
-  return <Badge tone={meta.tone}>{meta.label}</Badge>;
+  return (
+    <Badge tone={meta.tone}>
+      {copy.statuses[status as keyof typeof copy.statuses] ?? meta.label}
+    </Badge>
+  );
 }
 
 type JobActionConfirmation = {
@@ -257,37 +273,38 @@ function JobActionConfirmationDialog({
   onCancel: () => void;
   onConfirm: () => void;
 }) {
+  const copy = recruiterWorkspaceCopy(useWorkspaceLocale()).jobManagement;
   const { job, kind } = confirmation;
   const closing = kind === "close";
   const reactivating = kind === "reactivate";
   const activeDelete = kind === "delete" && job.status === "active";
   const title = closing
-    ? "Close job early?"
+    ? copy.confirm.closeTitle
     : reactivating
-      ? "Reactivate job?"
+      ? copy.confirm.reactivateTitle
       : kind === "withdraw"
-        ? "Withdraw submission?"
+        ? copy.confirm.withdrawTitle
         : activeDelete
-          ? "Delete active job?"
-          : "Delete draft?";
+          ? copy.confirm.deleteActiveTitle
+          : copy.confirm.deleteDraftTitle;
   const confirmLabel = closing
-    ? "Close job"
+    ? copy.confirm.closeLabel
     : reactivating
-      ? "Reactivate job"
+      ? copy.confirm.reactivateLabel
       : kind === "withdraw"
-        ? "Withdraw to Drafts"
+        ? copy.confirm.withdrawLabel
         : activeDelete
-          ? "Delete active job"
-          : "Delete draft";
+          ? copy.confirm.deleteActiveLabel
+          : copy.confirm.deleteDraftLabel;
   const description = closing
-    ? "This posting will stop accepting new applications and move to Closed. Existing applications will remain available in your recruitment pipeline."
+    ? copy.confirm.closeDescription
     : reactivating
-      ? "This posting will start accepting new applications again and move back to Active."
+      ? copy.confirm.reactivateDescription
       : kind === "withdraw"
-        ? "The submission will leave the administrator review queue and return to Drafts. You can edit and submit it again later."
+        ? copy.confirm.withdrawDescription
         : activeDelete
-          ? "This job will be removed from the public job data and candidate search immediately. Existing applications and audit history will be preserved."
-          : "This draft will be permanently removed from the draft data. This action cannot be undone.";
+          ? copy.confirm.deleteActiveDescription
+          : copy.confirm.deleteDraftDescription;
 
   return (
     <Modal
@@ -313,7 +330,7 @@ function JobActionConfirmationDialog({
       onClose={onCancel}
     >
       <strong className="recruiter-confirm-dialog__job">
-        {job.title || "Untitled job posting"}
+        {job.title || copy.untitled}
       </strong>
       {error ? (
         <p className="recruiter-confirm-dialog__error" role="alert">
@@ -328,7 +345,7 @@ function JobActionConfirmationDialog({
           onClick={onCancel}
           data-autofocus
         >
-          Cancel
+          {copy.confirm.cancel}
         </button>
         <button
           type="button"
@@ -340,7 +357,7 @@ function JobActionConfirmationDialog({
           disabled={busy}
           onClick={onConfirm}
         >
-          {busy ? "Processing..." : confirmLabel}
+          {busy ? copy.confirm.processing : confirmLabel}
         </button>
       </div>
     </Modal>
@@ -368,7 +385,8 @@ function JobPostingCard({
   onWithdraw: () => void;
   actionPending: boolean;
 }) {
-  const title = job.title || "Untitled job posting";
+  const copy = recruiterWorkspaceCopy(useWorkspaceLocale()).jobManagement;
+  const title = job.title || copy.untitled;
   return (
     <article
       className="recruiter-job-card"
@@ -383,7 +401,7 @@ function JobPostingCard({
           />
           <div>
             <strong>{job.company.name}</strong>
-            <span>Updated {formatRelative(job.updatedAt)}</span>
+            <span>{copy.updated(formatRelative(job.updatedAt, copy))}</span>
           </div>
         </div>
         <StatusPill status={job.status} />
@@ -393,11 +411,11 @@ function JobPostingCard({
         <p className="recruiter-job-card__meta">
           {job.description.generalInfo.department ||
             job.categoryFamily ||
-            "No department"}
+            copy.noDepartment}
           <span aria-hidden="true">|</span>
-          {locationLabel(job)}
+          {locationLabel(job, copy)}
           <span aria-hidden="true">|</span>
-          {arrangementLabel(job)}
+          {arrangementLabel(job, copy)}
         </p>
         {job.review ? (
           <>
@@ -417,21 +435,25 @@ function JobPostingCard({
                 aria-hidden="true"
               />
               <strong>
-                Review version {job.review.sequence}:{" "}
-                {job.review.state.replace("_", " ")}
+                {copy.reviewVersion(
+                  job.review.sequence,
+                  copy.reviewStates[
+                    job.review.state as keyof typeof copy.reviewStates
+                  ] ?? job.review.state.replace("_", " "),
+                )}
               </strong>
-              {job.review.readOnly
-                ? " — This submitted version is locked while an Administrator reviews it."
-                : null}
+              {job.review.readOnly ? copy.reviewLocked : null}
             </p>
             {job.review.state === "REJECTED" && job.review.reasonCode ? (
               <div
                 className="recruiter-review-feedback"
                 role="region"
-                aria-label="Rejection feedback"
+                aria-label={copy.rejectionFeedback}
               >
                 <p className="recruiter-review-feedback__reason">
-                  <strong>{formatReasonCode(job.review.reasonCode)}</strong>
+                  <strong>
+                    {formatReasonCode(job.review.reasonCode, copy)}
+                  </strong>
                 </p>
                 {job.review.publicExplanation ? (
                   <p className="recruiter-review-feedback__explanation">
@@ -439,15 +461,15 @@ function JobPostingCard({
                   </p>
                 ) : null}
                 <p className="recruiter-review-feedback__guidance">
-                  Revise the posting and submit again to request a new review.
+                  {copy.reviseAndResubmit}
                 </p>
               </div>
             ) : null}
             {job.review.state === "APPROVED" ? (
               <p className="recruiter-review-approved-note" role="status">
                 {job.status === "closed"
-                  ? "This approved job post is closed and no longer accepting applications."
-                  : "This job post has been approved and is visible to candidates."}
+                  ? copy.approvedClosed
+                  : copy.approvedVisible}
               </p>
             ) : null}
           </>
@@ -456,21 +478,20 @@ function JobPostingCard({
           <div
             className="recruiter-review-feedback"
             role="region"
-            aria-label="Administrator correction request"
+            aria-label={copy.correctionRequest}
           >
             <p className="recruiter-review-feedback__reason">
-              <strong>Administrator requested changes</strong>
+              <strong>{copy.correctionRequest}</strong>
             </p>
             <p className="recruiter-review-feedback__explanation">
               {job.correctionRequest.publicExplanation}
             </p>
             <p className="recruiter-review-feedback__guidance">
-              Your approved version remains live while you revise and submit a
-              new version for review.
+              {copy.correctionGuidance}
             </p>
           </div>
         ) : null}
-        <div className="recruiter-job-card__chips" aria-label="Skills">
+        <div className="recruiter-job-card__chips" aria-label={copy.skills}>
           {job.skillTags.slice(0, 6).map((skill) => (
             <span className="recruiter-skill-chip" key={skill}>
               {skill}
@@ -482,21 +503,21 @@ function JobPostingCard({
         <button
           type="button"
           className="recruiter-applicant-link"
-          aria-label={`${job.stats.applicantCount} Applicants for ${title}`}
+          aria-label={copy.applicantsFor(job.stats.applicantCount, title)}
           onClick={onApplicants}
         >
           <Icon name="users" />
           <strong>{job.stats.applicantCount.toLocaleString("en-US")}</strong>
-          <span>Applicants</span>
+          <span>{copy.applicants}</span>
           <Icon name="arrow" />
         </button>
         <Link
           href={recruiterRoutes.pipelineForJob(job.id)}
           className="recruiter-applicant-link recruiter-applicant-link--pipeline"
-          aria-label={`View pipeline for ${title}`}
+          aria-label={copy.viewPipelineFor(title)}
         >
           <WorkspaceNavIcon name="pipeline" />
-          <span>View pipeline</span>
+          <span>{copy.viewPipeline}</span>
           <Icon name="arrow" />
         </Link>
         <div className="recruiter-job-card__actions">
@@ -506,22 +527,22 @@ function JobPostingCard({
             onClick={onEdit}
             aria-label={
               job.status === "rejected"
-                ? `Revise rejected job posting: ${title}`
+                ? copy.reviseRejectedFor(title)
                 : job.status === "pending_approval"
-                  ? `View job posting under review: ${title}`
+                  ? copy.viewUnderReviewFor(title)
                   : job.status === "closed"
-                    ? `View closed job posting: ${title}`
-                    : `Edit job posting: ${title}`
+                    ? copy.viewClosedFor(title)
+                    : copy.editFor(title)
             }
           >
             <Icon name="edit" />
             {job.status === "rejected"
-              ? "Revise posting"
+              ? copy.revisePosting
               : job.status === "pending_approval"
-                ? "View posting"
+                ? copy.viewPosting
                 : job.status === "closed"
-                  ? "View posting"
-                  : "Edit posting"}
+                  ? copy.viewPosting
+                  : copy.editPosting}
           </button>
           {job.status === "active" ? (
             <>
@@ -532,7 +553,7 @@ function JobPostingCard({
                 disabled={actionPending}
               >
                 <Icon name="trash" />
-                Delete job
+                {copy.deleteJob}
               </button>
               <button
                 type="button"
@@ -540,7 +561,7 @@ function JobPostingCard({
                 onClick={isClosingSoon(job) ? onExtend : onClose}
                 disabled={actionPending}
               >
-                {isClosingSoon(job) ? "Extend deadline" : "Close early"}
+                {isClosingSoon(job) ? copy.extendDeadline : copy.closeEarly}
               </button>
             </>
           ) : null}
@@ -552,7 +573,7 @@ function JobPostingCard({
               disabled={actionPending}
             >
               <Icon name="trash" />
-              Delete draft
+              {copy.deleteDraft}
             </button>
           ) : null}
           {job.status === "pending_approval" ? (
@@ -563,7 +584,7 @@ function JobPostingCard({
               disabled={actionPending}
             >
               <Icon name="undo" />
-              Withdraw to draft
+              {copy.withdrawToDraft}
             </button>
           ) : null}
           {job.status === "closed" ? (
@@ -574,7 +595,7 @@ function JobPostingCard({
               disabled={actionPending}
             >
               <Icon name="undo" />
-              Reactivate job
+              {copy.reactivate}
             </button>
           ) : null}
         </div>
@@ -584,11 +605,12 @@ function JobPostingCard({
 }
 
 function JobListSkeleton() {
+  const copy = recruiterWorkspaceCopy(useWorkspaceLocale()).jobManagement;
   return (
     <div
       className="recruiter-job-list recruiter-job-list--skeleton"
       role="status"
-      aria-label="Loading job postings"
+      aria-label={copy.jobPostings}
     >
       {[1, 2, 3].map((item) => (
         <div className="recruiter-skeleton-card" key={item}>
@@ -611,37 +633,16 @@ function EmptyState({
   tab: (typeof tabs)[number]["value"];
   onCreate: () => void;
 }) {
-  const copy = hasAnyJobs
-    ? {
-        active: [
-          "No active job postings",
-          "Approved roles will appear here once they are ready for candidates.",
-        ],
-        draft: [
-          "No drafts yet",
-          "Start with a structured posting and save it when you are ready to continue.",
-        ],
-        pending_approval: [
-          "Nothing waiting for review",
-          "Submitted postings stay here until an admin approves or requests changes.",
-        ],
-        closed: [
-          "No closed postings",
-          "Roles closed manually or after their application window remain here for reference.",
-        ],
-      }[tab]
-    : [
-        "Create your first job posting",
-        "Turn your next hiring need into a structured, candidate-ready opportunity.",
-      ];
+  const copy = recruiterWorkspaceCopy(useWorkspaceLocale()).jobManagement;
+  const empty = hasAnyJobs ? copy.empty[tab] : copy.empty.first;
   return (
     <section className="recruiter-empty-state">
       <span className="recruiter-empty-state__icon">
         <Icon name="briefcase" />
       </span>
       <div>
-        <h2>{copy[0]}</h2>
-        <p>{copy[1]}</p>
+        <h2>{empty[0]}</h2>
+        <p>{empty[1]}</p>
       </div>
       <button
         type="button"
@@ -649,30 +650,28 @@ function EmptyState({
         onClick={onCreate}
       >
         <Icon name="plus" />
-        {hasAnyJobs ? "Create a job posting" : "Create your first job posting"}
+        {hasAnyJobs ? copy.createNext : copy.createFirst}
       </button>
     </section>
   );
 }
 
 function CompanyRequiredState() {
+  const copy = recruiterWorkspaceCopy(useWorkspaceLocale()).jobManagement;
   return (
     <section className="recruiter-empty-state recruiter-company-required">
       <span className="recruiter-empty-state__icon">
         <Icon name="briefcase" />
       </span>
       <div>
-        <h2>Company setup required</h2>
-        <p>
-          Link a recruiter-owned company before creating job postings. For local
-          mock data, the company ownerUserId must match the signed-in user ID.
-        </p>
+        <h2>{copy.companySetupRequired}</h2>
+        <p>{copy.companySetupDescription}</p>
       </div>
       <a
         className="recruiter-primary-button"
         href="/dashboard/employer-verification"
       >
-        Set up company
+        {copy.setupCompany}
       </a>
     </section>
   );
@@ -683,12 +682,14 @@ function CompanyProfileRequiredState({
 }: {
   missingFields: Array<"name" | "industry" | "size" | "address" | "logo">;
 }) {
+  const workspaceCopy = recruiterWorkspaceCopy(useWorkspaceLocale());
+  const copy = workspaceCopy.jobManagement;
   const labels: Record<(typeof missingFields)[number], string> = {
-    name: "Company name",
-    industry: "Industry",
-    size: "Company size",
-    address: "Address",
-    logo: "Company logo",
+    name: workspaceCopy.companyName,
+    industry: workspaceCopy.industry,
+    size: workspaceCopy.companySize,
+    address: workspaceCopy.address,
+    logo: workspaceCopy.logo,
   };
   return (
     <section className="recruiter-company-required">
@@ -703,12 +704,10 @@ function CompanyProfileRequiredState({
       </span>
       <div className="recruiter-company-required__content">
         <span className="recruiter-company-required__eyebrow">
-          Action required
+          {copy.profileActionRequired}
         </span>
-        <h2>Complete company profile before posting</h2>
-        <p>
-          Create job posting is locked until the following fields are complete.
-        </p>
+        <h2>{copy.completeProfile}</h2>
+        <p>{copy.profileLocked}</p>
         <ul className="recruiter-company-required__list">
           {missingFields.map((field) => (
             <li key={field}>
@@ -722,7 +721,7 @@ function CompanyProfileRequiredState({
         className="recruiter-company-required__action"
         href="/recruiter/company-settings?required=profile"
       >
-        Open company settings
+        {copy.openCompanySettings}
         <Icon name="arrow" />
       </Link>
     </section>
@@ -772,6 +771,9 @@ export function RecruiterJobPostingManagement({
   onNavigate?: (href: string) => void;
   onTabChange?: (tab: RecruiterJobPostingTab) => void;
 } = {}) {
+  const locale = useWorkspaceLocale();
+  const workspaceCopy = recruiterWorkspaceCopy(locale);
+  const copy = workspaceCopy.jobManagement;
   const [data, setData] = useState<RecruiterJobManagementData | null>(
     initialData ?? null,
   );
@@ -1022,11 +1024,7 @@ export function RecruiterJobPostingManagement({
         | (JobCatalogItem & { message?: string })
         | null;
       if (!response.ok || !payload) {
-        setActionError(
-          payload?.message === "Try again in a moment."
-            ? "Unable to close this posting right now. Please try again."
-            : (payload?.message ?? "Unable to close this posting."),
-        );
+        setActionError(copy.errors.close);
         return false;
       }
       receiveSavedJob(
@@ -1034,7 +1032,7 @@ export function RecruiterJobPostingManagement({
       );
       return true;
     } catch {
-      setActionError("Unable to close this posting right now.");
+      setActionError(copy.errors.close);
       return false;
     } finally {
       setActionPendingJobId(null);
@@ -1057,11 +1055,7 @@ export function RecruiterJobPostingManagement({
         | (JobCatalogItem & { message?: string })
         | null;
       if (!response.ok || !payload) {
-        setActionError(
-          payload?.message === "Try again in a moment."
-            ? "Unable to reactivate this posting right now. Please try again."
-            : (payload?.message ?? "Unable to reactivate this posting."),
-        );
+        setActionError(copy.errors.reactivate);
         return false;
       }
       receiveSavedJob(
@@ -1069,7 +1063,7 @@ export function RecruiterJobPostingManagement({
       );
       return true;
     } catch {
-      setActionError("Unable to reactivate this posting right now.");
+      setActionError(copy.errors.reactivate);
       return false;
     } finally {
       setActionPendingJobId(null);
@@ -1096,11 +1090,7 @@ export function RecruiterJobPostingManagement({
         message?: string;
       } | null;
       if (!response.ok || !payload?.deleted) {
-        setActionError(
-          payload?.message === "Try again in a moment."
-            ? "Unable to delete this posting right now. Please try again."
-            : (payload?.message ?? "Unable to delete this posting."),
-        );
+        setActionError(copy.errors.delete);
         return false;
       }
       mutationEpoch.current += 1;
@@ -1113,7 +1103,7 @@ export function RecruiterJobPostingManagement({
       });
       return true;
     } catch {
-      setActionError("Unable to delete this posting right now.");
+      setActionError(copy.errors.delete);
       return false;
     } finally {
       setActionPendingJobId(null);
@@ -1136,11 +1126,7 @@ export function RecruiterJobPostingManagement({
         | (JobCatalogItem & { message?: string })
         | null;
       if (!response.ok || !payload) {
-        setActionError(
-          payload?.message === "Try again in a moment."
-            ? "Unable to withdraw this posting right now. Please try again."
-            : (payload?.message ?? "Unable to withdraw this posting."),
-        );
+        setActionError(copy.errors.withdraw);
         return false;
       }
       const normalizedJob = withCompanyFromState(
@@ -1162,7 +1148,7 @@ export function RecruiterJobPostingManagement({
       selectTab("draft");
       return true;
     } catch {
-      setActionError("Unable to withdraw this posting right now.");
+      setActionError(copy.errors.withdraw);
       return false;
     } finally {
       setActionPendingJobId(null);
@@ -1195,7 +1181,7 @@ export function RecruiterJobPostingManagement({
     return (
       <JobPostingEditor
         initialJob={editorJob}
-        companyName={targetCompany?.name ?? "Your company"}
+        companyName={targetCompany?.name ?? workspaceCopy.company}
         autoSavePreferenceScope={
           current.recruiterUserId ?? current.companyId ?? undefined
         }
@@ -1220,9 +1206,9 @@ export function RecruiterJobPostingManagement({
       <div className="recruiter-management">
         <PageHeader
           className="recruiter-management__page-header"
-          eyebrow="Recruiter workspace"
-          title="Job postings"
-          subtitle="Complete the company identity before opening a new role."
+          eyebrow={workspaceCopy.navigation.workspace}
+          title={copy.jobPostings}
+          subtitle={workspaceCopy.jobManagement.profileLocked}
           rightSlot={
             <button
               type="button"
@@ -1230,7 +1216,7 @@ export function RecruiterJobPostingManagement({
               onClick={openCreate}
             >
               <Icon name="plus" />
-              Create job posting
+              {copy.create}
             </button>
           }
         />
@@ -1263,18 +1249,18 @@ export function RecruiterJobPostingManagement({
       <div className="recruiter-management">
         <PageHeader
           className="recruiter-management__page-header"
-          eyebrow="Recruiter workspace"
-          title="Job postings"
-          subtitle="Manage every opening from first draft to a confident close."
+          eyebrow={workspaceCopy.navigation.workspace}
+          title={copy.jobPostings}
+          subtitle={copy.subtitle}
           rightSlot={
             <button
               type="button"
               className="recruiter-primary-button"
               disabled
-              title="Link a recruiter-owned company first"
+              title={copy.companySetupRequired}
             >
               <Icon name="plus" />
-              Create job posting
+              {copy.create}
             </button>
           }
         />
@@ -1286,9 +1272,9 @@ export function RecruiterJobPostingManagement({
     <div className="recruiter-management">
       <PageHeader
         className="recruiter-management__page-header"
-        eyebrow="Recruiter workspace"
-        title="Job postings"
-        subtitle="Manage every opening from first draft to a confident close."
+        eyebrow={workspaceCopy.navigation.workspace}
+        title={copy.jobPostings}
+        subtitle={copy.subtitle}
         rightSlot={
           <button
             type="button"
@@ -1296,34 +1282,31 @@ export function RecruiterJobPostingManagement({
             onClick={openCreate}
           >
             <Icon name="plus" />
-            Create job posting
+            {copy.create}
           </button>
         }
       />
-      <section
-        className="recruiter-stat-strip"
-        aria-label="Job posting overview"
-      >
+      <section className="recruiter-stat-strip" aria-label={copy.overview}>
         <StatCard
-          label="Active jobs"
+          label={copy.stats.active}
           value={counts.active}
           icon="briefcase"
           tone="blue"
         />
         <StatCard
-          label="Total applicants"
+          label={copy.stats.applicants}
           value={counts.applicants}
           icon="users"
           tone="teal"
         />
         <StatCard
-          label="Pending approval"
+          label={copy.stats.pending}
           value={counts.pending}
           icon="clock"
           tone="amber"
         />
         <StatCard
-          label="Closing soon"
+          label={copy.stats.closing}
           value={counts.closing}
           icon="calendar"
           tone="violet"
@@ -1332,18 +1315,18 @@ export function RecruiterJobPostingManagement({
       <section className="recruiter-list-section">
         <div className="recruiter-section-heading">
           <div>
-            <p className="recruiter-eyebrow">YOUR OPENINGS</p>
-            <h2>Track your hiring pipeline</h2>
+            <p className="recruiter-eyebrow">{copy.yourOpenings}</p>
+            <h2>{copy.trackPipeline}</h2>
           </div>
           <span className="recruiter-live-status">
             <span />
-            Live applicant counts
+            {copy.liveApplicantCounts}
           </span>
         </div>
         <nav
           className="recruiter-tabs"
           role="tablist"
-          aria-label="Job posting status"
+          aria-label={copy.overview}
         >
           {tabs.map((tab) => (
             <button
@@ -1356,7 +1339,7 @@ export function RecruiterJobPostingManagement({
               className={activeTab === tab.value ? "is-active" : ""}
               onClick={() => selectTab(tab.value)}
             >
-              {tab.label}
+              {copy.tabs[tab.value]}
               <span>
                 {
                   scopedJobs.filter((job) => statusForTab(job, tab.value))
@@ -1370,7 +1353,7 @@ export function RecruiterJobPostingManagement({
           className={`recruiter-filter-panel recruiter-surface-card${current.companies.length > 1 ? "recruiter-filter-panel--with-company" : ""}`}
         >
           <label htmlFor="recruiter-job-postings-search">
-            <span>Search postings</span>
+            <span>{copy.searchPostings}</span>
             <div className="recruiter-input-with-icon">
               <Icon name="search" />
               <input
@@ -1378,12 +1361,12 @@ export function RecruiterJobPostingManagement({
                 name="search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search by title or department"
+                placeholder={copy.searchPlaceholder}
               />
             </div>
           </label>
           <label htmlFor="recruiter-job-postings-department">
-            <span>Department</span>
+            <span>{copy.department}</span>
             <div className="recruiter-select-with-icon">
               <select
                 id="recruiter-job-postings-department"
@@ -1391,7 +1374,7 @@ export function RecruiterJobPostingManagement({
                 value={department}
                 onChange={(event) => setDepartment(event.target.value)}
               >
-                <option value="all">All departments</option>
+                <option value="all">{copy.allDepartments}</option>
                 {departments.map((item) => (
                   <option key={item} value={item}>
                     {item}
@@ -1505,6 +1488,8 @@ export function RecruiterWorkspaceNavigation({
   onSignOut: () => void;
 }) {
   const pathname = usePathname();
+  const workspaceCopy = recruiterWorkspaceCopy(useWorkspaceLocale());
+  const copy = workspaceCopy.navigation;
   const destinations: Array<{
     label: string;
     icon: Exclude<RecruiterNavIconName, "signout">;
@@ -1512,7 +1497,7 @@ export function RecruiterWorkspaceNavigation({
     active: boolean;
   }> = [
     {
-      label: "Overview",
+      label: copy.overview,
       icon: "dashboard",
       href: recruiterRoutes.analytics,
       active:
@@ -1520,7 +1505,7 @@ export function RecruiterWorkspaceNavigation({
         pathname.startsWith(recruiterRoutes.analytics + "/"),
     },
     {
-      label: "Job postings",
+      label: copy.jobs,
       icon: "jobs",
       href: recruiterRoutes.jobPostings,
       active:
@@ -1530,7 +1515,7 @@ export function RecruiterWorkspaceNavigation({
         pathname.startsWith(`${recruiterRoutes.jobPostings}/`),
     },
     {
-      label: "Candidates",
+      label: copy.candidates,
       icon: "user-check",
       href: recruiterRoutes.candidates,
       active:
@@ -1538,7 +1523,7 @@ export function RecruiterWorkspaceNavigation({
         pathname.startsWith(`${recruiterRoutes.candidates}/`),
     },
     {
-      label: "Pipeline",
+      label: copy.pipeline,
       icon: "kanban",
       href: recruiterRoutes.pipeline,
       active:
@@ -1546,7 +1531,7 @@ export function RecruiterWorkspaceNavigation({
         pathname.startsWith(`${recruiterRoutes.pipeline}/`),
     },
     {
-      label: "Recruitment messages",
+      label: copy.messages,
       icon: "messages",
       href: recruiterRoutes.messages,
       active:
@@ -1554,7 +1539,7 @@ export function RecruiterWorkspaceNavigation({
         pathname.startsWith(`${recruiterRoutes.messages}/`),
     },
     {
-      label: "Company settings",
+      label: copy.settings,
       icon: "building-2",
       href: "/recruiter/company-settings",
       active: pathname === "/recruiter/company-settings",
@@ -1564,14 +1549,14 @@ export function RecruiterWorkspaceNavigation({
     <nav
       className="workspace-navigation recruiter-workspace-navigation"
       id="recruiter-workspace-navigation"
-      aria-label="Recruiter workspace"
+      aria-label={copy.workspace}
     >
       <span className="workspace-sidebar-width-sizer" aria-hidden="true">
         {destinations.map((item) => (
           <span key={item.label}>{item.label}</span>
         ))}
       </span>
-      <p className="workspace-nav-label">Recruiter workspace</p>
+      <p className="workspace-nav-label">{copy.workspace}</p>
       <div className="workspace-navigation-scroll">
         {destinations.map((item) => {
           const content = (
@@ -1579,7 +1564,7 @@ export function RecruiterWorkspaceNavigation({
               <WorkspaceNavIcon name={item.icon} />
               <span className="workspace-navigation-label">{item.label}</span>
               {!item.href ? (
-                <span className="recruiter-nav-soon">Soon</span>
+                <span className="recruiter-nav-soon">{copy.soon}</span>
               ) : null}
             </>
           );
@@ -1613,7 +1598,7 @@ export function RecruiterWorkspaceNavigation({
         >
           <WorkspaceNavIcon name="signout" />
           <span className="workspace-navigation-label">
-            {busy ? "Signing out..." : "Sign out"}
+            {busy ? copy.signingOut : copy.signOut}
           </span>
         </button>
       </div>

@@ -860,6 +860,9 @@ describe("image-assisted job-search controls", () => {
     fireEvent.click(
       screen.getByRole("button", { name: "Cancel image search" }),
     );
+    expect(
+      screen.getByRole("button", { name: "Cancel image search" }),
+    ).toHaveClass("image-search-progress-cancel");
     expect(cancel).toHaveBeenCalledOnce();
     fireEvent.click(screen.getByRole("button", { name: "Search manually" }));
     expect(manual).toHaveBeenCalledWith();

@@ -1,6 +1,7 @@
 "use client";
 
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { XCircle } from "lucide-react";
 
 export function ImageSearchProgress({
   progress,
@@ -42,7 +43,15 @@ export function ImageSearchProgress({
       <progress id="image-search-progress" max={100} value={progress}>
         {progress}%
       </progress>
-      <button type="button" onClick={onCancel}>
+      <button
+        className="image-search-progress-cancel"
+        type="button"
+        onClick={onCancel}
+      >
+        <XCircle
+          aria-hidden="true"
+          className="image-search-progress-cancel-icon"
+        />
         {vi ? "Hủy tìm kiếm bằng hình ảnh" : "Cancel image search"}
       </button>
     </div>

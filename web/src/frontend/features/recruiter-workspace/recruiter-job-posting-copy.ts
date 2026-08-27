@@ -39,6 +39,215 @@ export function recruiterJobPostingCopy(locale: WorkspaceLocale) {
         experienceDetail: (label: string, minYears: number) =>
           `${label} (tối thiểu ${minYears} năm)`,
         openPositions: (count: number) => `${count} vị trí`,
+        editor: {
+          intro:
+            "Xây dựng tin tuyển dụng đầy đủ, có cấu trúc và xem trước chính xác những gì ứng viên sẽ thấy.",
+          revisionNeeded: "Cần chỉnh sửa",
+          revisionInstruction:
+            "Hãy thực hiện các thay đổi bắt buộc rồi gửi lại để được xem xét.",
+          administratorRequested: "Quản trị viên yêu cầu thay đổi",
+          approvedVersionLive:
+            "Phiên bản đã duyệt hiện vẫn được hiển thị cho đến khi phiên bản chỉnh sửa được xem xét.",
+          completionAria: "Mức độ hoàn thiện tin tuyển dụng",
+          requiredNote:
+            "Các trường có dấu * là bắt buộc trước khi gửi. Bạn có thể lưu bản nháp bất cứ lúc nào.",
+          sections: {
+            basicInfo: "Thông tin cơ bản",
+            basicInfoDescription:
+              "Xác định cách ứng viên tìm thấy và hiểu vai trò này.",
+            location: "Địa điểm & hình thức làm việc",
+            locationDescription:
+              "Thiết lập nơi làm việc và cách đội ngũ phối hợp.",
+            requirements: "Yêu cầu ứng viên",
+            requirementsDescription:
+              "Mô tả kinh nghiệm và năng lực cần thiết để hoàn thành tốt vai trò.",
+            salary: "Mức lương & quyền lợi",
+            salaryDescription:
+              "Nhập mức VND dễ đọc và làm nổi bật đầy đủ gói quyền lợi.",
+            description: "Mô tả công việc",
+            descriptionDescription:
+              "Giải thích tác động, công việc hằng ngày và lý do nổi bật để gia nhập.",
+            hiring: "Thiết lập tuyển dụng",
+            hiringDescription:
+              "Thiết lập số lượng, mức độ ưu tiên và thời gian nhận hồ sơ.",
+          },
+          fields: {
+            jobTitle: "Chức danh công việc",
+            shortPitch: "Giới thiệu ngắn",
+            industry: "Ngành nghề",
+            subIndustry: "Nhóm ngành chuyên sâu",
+            chooseSubIndustry: "Chọn nhóm ngành chuyên sâu",
+            addSubIndustry: "Thêm nhóm ngành chuyên sâu…",
+            newSubIndustry: "Nhóm ngành chuyên sâu mới",
+            city: "Thành phố",
+            district: "Quận/Huyện",
+            workArrangement: "Hình thức làm việc",
+            employmentType: "Loại hình công việc",
+            nationwideRemote: "Làm việc từ xa trên toàn quốc",
+            nationwideRemoteHelp:
+              "Ứng viên có thể làm việc từ xa ở bất cứ đâu tại Việt Nam.",
+            workSaturday: "Làm việc thứ Bảy",
+            workSaturdayHelp:
+              "Cho ứng viên thấy lịch làm thứ Bảy trước khi họ ứng tuyển.",
+            workingHours: "Giờ làm việc",
+            workAddress: "Địa chỉ làm việc",
+            minimumYears: "Số năm kinh nghiệm tối thiểu",
+            experienceLabel: "Nhãn kinh nghiệm",
+            jobLevel: "Cấp độ công việc",
+            education: "Học vấn",
+            ageRange: "Độ tuổi",
+            skills: "Kỹ năng",
+            skillsHelp:
+              "Ngăn cách kỹ năng bằng dấu phẩy; có thể dùng khoảng trắng trong một kỹ năng.",
+            requirements: "Yêu cầu",
+            requirementsHelp: "Nhập mỗi yêu cầu trên một dòng.",
+            minimumSalary: "Mức lương tối thiểu",
+            maximumSalary: "Mức lương tối đa",
+            salaryHelp:
+              "Nhập đầy đủ số tiền hoặc dạng rút gọn như 29tr. Giá trị được lưu dưới dạng số trong jobs.json.",
+            negotiable: "Có thể thương lượng",
+            negotiableHelp:
+              "Ứng viên sẽ biết khoảng lương này có thể trao đổi.",
+            benefits: "Quyền lợi",
+            benefitsHelp:
+              "Chọn quyền lợi có sẵn rồi tùy chỉnh nhãn hiển thị cho ứng viên nếu cần.",
+            overview: "Tổng quan",
+            topReasons: "Lý do nổi bật để gia nhập",
+            topReasonsHelp:
+              "Thêm tối đa ba điểm nổi bật ngắn hiển thị ở đầu tin.",
+            topReason: (index: number) => `Lý do ${index + 1}`,
+            responsibilities: "Trách nhiệm",
+            responsibilitiesHelp: "Nhập mỗi trách nhiệm trên một dòng.",
+            reportsTo: "Báo cáo cho",
+            numberOfHires: "Số lượng tuyển",
+            applicationDeadline: "Hạn ứng tuyển",
+            deadlineHelp:
+              "Bắt buộc khi gửi duyệt; không bắt buộc với bản nháp.",
+            urgentHiring: "Tuyển gấp",
+            urgentHelp: "Đánh dấu vị trí này là ưu tiên để ứng viên chú ý.",
+          },
+          placeholders: {
+            jobTitle: "ví dụ: Chuyên viên thiết kế sản phẩm cấp cao",
+            shortPitch: "Lý do ngắn gọn để ứng viên quan tâm đến vai trò này",
+            subIndustry: "ví dụ: Kỹ thuật hàng không vũ trụ",
+            workingHours: "Thứ Hai–Thứ Sáu, 8:30–17:30",
+            workAddress: "Địa chỉ văn phòng cụ thể",
+            ageRange: "ví dụ: 23–26 (không bắt buộc)",
+            skills: "React, TypeScript, Thiết kế sản phẩm",
+            requirements:
+              "Từ 3 năm kinh nghiệm ở vai trò tương tự\nKỹ năng giao tiếp tốt\nCó sản phẩm phù hợp để tham khảo",
+            minimumSalary: "29.000.000 hoặc 29tr",
+            maximumSalary: "33.000.000 hoặc 33tr",
+            overview: "Người đảm nhiệm vai trò này sẽ tạo ra điều gì?",
+            firstReason: "ví dụ: Làm việc trực tiếp với khách hàng quốc tế",
+            otherReason: "Một lý do khác để ứng viên gia nhập",
+            responsibilities:
+              "Làm chủ lộ trình sản phẩm của lĩnh vực\nPhối hợp với đội ngũ sản phẩm và kỹ thuật\nChia sẻ tiến độ với các bên liên quan",
+            reportsTo: "ví dụ: Trưởng bộ phận kỹ thuật",
+          },
+          options: {
+            workArrangement: {
+              onsite: "Tại văn phòng",
+              hybrid: "Kết hợp",
+              remote: "Từ xa",
+            },
+            employment: {
+              full_time: "Toàn thời gian",
+              part_time: "Bán thời gian",
+              internship: "Thực tập",
+              contract: "Hợp đồng",
+              temporary: "Tạm thời",
+            },
+            experience: {
+              "0": "Không yêu cầu kinh nghiệm",
+              "1": "1–3 năm",
+              "3": "Từ 3 năm",
+              "4": "Từ 4 năm",
+              "5": "Từ 5 năm",
+              "6": "Từ 6 năm",
+              "10": "Từ 10 năm",
+              "12": "Từ 12 năm",
+            },
+            level: {
+              intern: "Thực tập sinh",
+              staff: "Nhân viên",
+              senior: "Cấp cao",
+              team_lead: "Trưởng nhóm",
+              manager: "Quản lý",
+              executive: "Điều hành",
+              director: "Giám đốc",
+            },
+            education: {
+              "Currently studying (Bachelor's program)":
+                "Đang học chương trình cử nhân",
+              "College degree or above": "Cao đẳng trở lên",
+              "Bachelor's degree": "Bằng cử nhân",
+              "Bachelor's degree or above": "Cử nhân trở lên",
+              "Master's degree or above preferred": "Ưu tiên thạc sĩ trở lên",
+              "Bachelor's/Master's degree preferred": "Ưu tiên cử nhân/thạc sĩ",
+            },
+            benefits: {
+              award: "Chương trình ghi nhận và khen thưởng theo quý",
+              gift: "Thưởng lễ, Tết",
+              coffee: "Bữa trưa, cà phê và đồ ăn nhẹ miễn phí tại văn phòng",
+              car: "Hỗ trợ gửi xe / xe đưa đón",
+              "trending-up": "Lộ trình phát triển và thăng tiến rõ ràng",
+              briefcase: "Cung cấp máy tính và thiết bị làm việc",
+              calendar: "16–18 ngày phép năm có lương",
+              "dollar-sign": "Lương tháng 13 và thưởng hiệu suất",
+              globe: "Cơ hội làm việc với đối tác quốc tế",
+              users: "Hoạt động gắn kết đội ngũ và du lịch công ty",
+              "book-open": "Ngân sách đào tạo và hỗ trợ chứng chỉ",
+              activity: "Tài trợ thẻ phòng gym và câu lạc bộ thể thao",
+              heart:
+                "Gói chăm sóc sức khỏe cao cấp cho nhân viên và người phụ thuộc",
+              shield: "Bảo hiểm xã hội, y tế và thất nghiệp theo Luật Lao động",
+              smile: "Giờ làm việc linh hoạt và lựa chọn làm việc kết hợp",
+            },
+          },
+          reasonLabels: {
+            INCOMPLETE_OR_UNCLEAR: "Thông tin chưa đầy đủ hoặc chưa rõ",
+            MISLEADING_CONTENT: "Nội dung gây hiểu lầm",
+            INAPPROPRIATE_LANGUAGE: "Ngôn ngữ không phù hợp",
+            DUPLICATE_POSTING: "Tin đăng trùng lặp",
+            INVALID_REQUIREMENTS: "Yêu cầu không hợp lệ",
+            INSUFFICIENT_COMPENSATION: "Thông tin đãi ngộ chưa đầy đủ",
+            VERIFICATION_MISMATCH: "Thông tin xác minh không khớp",
+            PROHIBITED_CONTENT: "Nội dung bị cấm",
+            OTHER: "Lý do khác",
+          },
+          errors: {
+            maxSalary:
+              "Mức lương tối đa phải lớn hơn hoặc bằng mức lương tối thiểu.",
+            deadlineInvalid: "Nhập hạn ứng tuyển hợp lệ.",
+            unableToSaveDraft: "Không thể lưu bản nháp.",
+            unableToSubmit: "Không thể gửi tin tuyển dụng để xem xét.",
+            unableToSave: "Không thể lưu tin tuyển dụng.",
+            invalidResponse: "Máy chủ trả về phản hồi không hợp lệ.",
+            serverUnavailable:
+              "Không thể kết nối máy chủ. Thay đổi của bạn vẫn còn trong biểu mẫu này.",
+          },
+          actions: {
+            autoSave: "Tự động lưu",
+            cancel: "Hủy",
+            closedViewOnly: "Tin đã đóng — chỉ xem",
+            editingLocked: "Đã khóa chỉnh sửa trong thời gian xem xét",
+            saveDraft: "Lưu bản nháp",
+            submitting: "Đang gửi…",
+            reviseResubmit: "Chỉnh sửa và gửi lại",
+            submitApproval: "Gửi để xem xét",
+            saveChanges: "Lưu thay đổi",
+          },
+          submitDialog: {
+            title: "Gửi tin tuyển dụng để xem xét?",
+            description: "Gửi tin này đến Quản trị viên để xem xét.",
+            lead: "Sau khi gửi, phiên bản này sẽ bị khóa và không thể chỉnh sửa cho đến khi hoàn tất xem xét.",
+            beforeSubmit: "Trước khi gửi",
+            checklist:
+              "Hãy đảm bảo chức danh, mức lương, hạn ứng tuyển và kỹ năng yêu cầu đều chính xác.",
+          },
+          benefitLabel: (label: string) => `Nhãn quyền lợi cho ${label}`,
+        },
       }
     : {
         back: "Back to all job postings",
@@ -77,5 +286,216 @@ export function recruiterJobPostingCopy(locale: WorkspaceLocale) {
           `${label} (min ${minYears} yrs)`,
         openPositions: (count: number) =>
           `${count} ${count === 1 ? "position" : "positions"}`,
+        editor: {
+          intro:
+            "Build a complete, structured listing and review exactly what candidates will see.",
+          revisionNeeded: "Revision needed",
+          revisionInstruction:
+            "Make the required changes and submit again for a new review.",
+          administratorRequested: "Administrator requested changes",
+          approvedVersionLive:
+            "The current approved version remains live until your revised version is reviewed.",
+          completionAria: "Job posting completion",
+          requiredNote:
+            "Fields marked * are required before submission. Drafts can be saved at any time.",
+          sections: {
+            basicInfo: "Basic info",
+            basicInfoDescription:
+              "Define how candidates discover and understand the role.",
+            location: "Location & work arrangement",
+            locationDescription: "Set where and how the team works.",
+            requirements: "Candidate requirements",
+            requirementsDescription:
+              "Describe the experience and qualifications needed to succeed.",
+            salary: "Salary & benefits",
+            salaryDescription:
+              "Use readable VND amounts and highlight the complete rewards package.",
+            description: "Job description",
+            descriptionDescription:
+              "Explain the impact, day-to-day work, and strongest reasons to join.",
+            hiring: "Hiring settings",
+            hiringDescription:
+              "Set headcount, urgency, and the application window.",
+          },
+          fields: {
+            jobTitle: "Job title",
+            shortPitch: "Short pitch",
+            industry: "Industry",
+            subIndustry: "Sub-industry",
+            chooseSubIndustry: "Choose a sub-industry",
+            addSubIndustry: "Add a new sub-industry…",
+            newSubIndustry: "New sub-industry",
+            city: "City",
+            district: "District",
+            workArrangement: "Work arrangement",
+            employmentType: "Employment type",
+            nationwideRemote: "Nationwide remote",
+            nationwideRemoteHelp:
+              "Candidates can work remotely from anywhere in Vietnam.",
+            workSaturday: "Work on Saturday",
+            workSaturdayHelp:
+              "Make the Saturday schedule visible before candidates apply.",
+            workingHours: "Working hours",
+            workAddress: "Work address",
+            minimumYears: "Minimum years",
+            experienceLabel: "Experience label",
+            jobLevel: "Job level",
+            education: "Education",
+            ageRange: "Age range",
+            skills: "Skills",
+            skillsHelp:
+              "Separate skills with commas; spaces are allowed inside a skill.",
+            requirements: "Requirements",
+            requirementsHelp: "Enter one requirement per line.",
+            minimumSalary: "Minimum salary",
+            maximumSalary: "Maximum salary",
+            salaryHelp:
+              "Type the full amount or shorthand such as 29tr. Values are saved as plain numbers in jobs.json.",
+            negotiable: "Negotiable",
+            negotiableHelp:
+              "Candidates will see that the salary range is open to discussion.",
+            benefits: "Benefits",
+            benefitsHelp:
+              "Select predefined benefits, then customize the candidate-facing label if needed.",
+            overview: "Overview",
+            topReasons: "Top reasons to join",
+            topReasonsHelp:
+              "Add up to three short highlights shown near the top of the listing.",
+            topReason: (index: number) => `Top reason ${index + 1}`,
+            responsibilities: "Responsibilities",
+            responsibilitiesHelp: "Enter one responsibility per line.",
+            reportsTo: "Reports to",
+            numberOfHires: "Number of hires",
+            applicationDeadline: "Application deadline",
+            deadlineHelp:
+              "Required when submitting for approval; optional for drafts.",
+            urgentHiring: "Urgent hiring",
+            urgentHelp:
+              "Highlight this opening as a priority role for candidates.",
+          },
+          placeholders: {
+            jobTitle: "e.g. Senior Product Designer",
+            shortPitch: "A concise reason candidates should explore this role",
+            subIndustry: "e.g. Aerospace Engineering",
+            workingHours: "Monday-Friday, 8:30-17:30",
+            workAddress: "Specific office address",
+            ageRange: "e.g. 23-26 (optional)",
+            skills: "React, TypeScript, Product design",
+            requirements:
+              "3+ years in a similar role\nStrong communication skills\nPortfolio of relevant work",
+            minimumSalary: "29.000.000 or 29tr",
+            maximumSalary: "33.000.000 or 33tr",
+            overview: "What will this person make possible?",
+            firstReason: "e.g. Work directly with international clients",
+            otherReason: "Another reason candidates should join",
+            responsibilities:
+              "Own the roadmap for your domain\nCollaborate with product and engineering\nShare progress with stakeholders",
+            reportsTo: "e.g. Head of Engineering",
+          },
+          options: {
+            workArrangement: {
+              onsite: "On-site",
+              hybrid: "Hybrid",
+              remote: "Remote",
+            },
+            employment: {
+              full_time: "Full-time",
+              part_time: "Part-time",
+              internship: "Internship",
+              contract: "Contract",
+              temporary: "Temporary",
+            },
+            experience: {
+              "0": "No experience required",
+              "1": "1-3 years",
+              "3": "3+ years",
+              "4": "4+ years",
+              "5": "5+ years",
+              "6": "6+ years",
+              "10": "10+ years",
+              "12": "12+ years",
+            },
+            level: {
+              intern: "Intern",
+              staff: "Staff",
+              senior: "Senior",
+              team_lead: "Team lead",
+              manager: "Manager",
+              executive: "Executive",
+              director: "Director",
+            },
+            education: {
+              "Currently studying (Bachelor's program)":
+                "Currently studying (Bachelor's program)",
+              "College degree or above": "College degree or above",
+              "Bachelor's degree": "Bachelor's degree",
+              "Bachelor's degree or above": "Bachelor's degree or above",
+              "Master's degree or above preferred":
+                "Master's degree or above preferred",
+              "Bachelor's/Master's degree preferred":
+                "Bachelor's/Master's degree preferred",
+            },
+            benefits: {
+              award: "Recognition programs and quarterly awards",
+              gift: "Holiday and Tet bonus",
+              coffee: "Free lunch, coffee and snacks at the office",
+              car: "Parking allowance / shuttle bus support",
+              "trending-up": "Clear career development and promotion path",
+              briefcase: "Laptop and equipment provided",
+              calendar: "16-18 days of paid annual leave",
+              "dollar-sign": "13th month salary and performance bonus",
+              globe: "Opportunity to work with international partners",
+              users: "Team building activities and company trips",
+              "book-open": "Training budget and certification sponsorship",
+              activity: "Sponsored gym membership and sport clubs",
+              heart: "Premium healthcare package for employee and dependents",
+              shield:
+                "Social, health & unemployment insurance as per Labor Law",
+              smile: "Flexible working hours and hybrid option",
+            },
+          },
+          reasonLabels: {
+            INCOMPLETE_OR_UNCLEAR: "Incomplete or unclear information",
+            MISLEADING_CONTENT: "Misleading content",
+            INAPPROPRIATE_LANGUAGE: "Inappropriate language",
+            DUPLICATE_POSTING: "Duplicate posting",
+            INVALID_REQUIREMENTS: "Invalid requirements",
+            INSUFFICIENT_COMPENSATION: "Insufficient compensation details",
+            VERIFICATION_MISMATCH: "Verification mismatch",
+            PROHIBITED_CONTENT: "Prohibited content",
+            OTHER: "Other reason",
+          },
+          errors: {
+            maxSalary:
+              "Maximum salary must be greater than or equal to minimum salary.",
+            deadlineInvalid: "Enter a valid application deadline.",
+            unableToSaveDraft: "Unable to save the draft.",
+            unableToSubmit: "Unable to submit this posting for review.",
+            unableToSave: "Unable to save posting.",
+            invalidResponse: "The server returned an invalid response.",
+            serverUnavailable:
+              "Unable to reach the server. Your changes are still available in this form.",
+          },
+          actions: {
+            autoSave: "AutoSave",
+            cancel: "Cancel",
+            closedViewOnly: "Closed posting — view only",
+            editingLocked: "Editing locked during review",
+            saveDraft: "Save draft",
+            submitting: "Submitting…",
+            reviseResubmit: "Revise & resubmit",
+            submitApproval: "Submit for approval",
+            saveChanges: "Save changes",
+          },
+          submitDialog: {
+            title: "Submit job for approval?",
+            description: "Send this posting to an Administrator for review.",
+            lead: "Once submitted, this version is locked and cannot be edited until the review is complete.",
+            beforeSubmit: "Before you submit",
+            checklist:
+              "Make sure the title, salary, deadline, and required skills are correct.",
+          },
+          benefitLabel: (label: string) => `Benefit label for ${label}`,
+        },
       };
 }

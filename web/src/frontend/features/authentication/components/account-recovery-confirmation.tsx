@@ -3,9 +3,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useAccountRecoveryCapability } from "@/frontend/features/authentication/client/use-account-recovery-capability";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { AuthStatus } from "./auth-status";
+import { authCopy, localizedAuthMessage } from "./auth-copy";
 
 export function AccountRecoveryConfirmation() {
+  const locale = useWorkspaceLocale();
+  const copy = authCopy(locale);
   const capability = useAccountRecoveryCapability("confirmation");
   const [status, setStatus] = useState("");
   const [statusTone, setStatusTone] = useState<"error" | "success">("error");
@@ -29,12 +33,16 @@ export function AccountRecoveryConfirmation() {
       } | null;
       setStatusTone(response.ok ? "success" : "error");
       setStatus(
-        result?.message ?? "The recovery request could not be confirmed.",
+        localizedAuthMessage(
+          locale,
+          result?.message,
+          copy.recovery.confirmationError,
+        ),
       );
       if (response.ok && result?.holdEndsAt) setHoldEndsAt(result.holdEndsAt);
     } catch {
       setStatusTone("error");
-      setStatus("The recovery request could not be confirmed.");
+      setStatus(copy.recovery.confirmationError);
     } finally {
       setBusy(false);
     }
@@ -44,22 +52,19 @@ export function AccountRecoveryConfirmation() {
     <section className="auth-form-content">
       <div className="auth-form">
         <div className="auth-form-heading">
-          <p className="form-kicker">SECURITY HOLD</p>
-          <h1>Recovery request received</h1>
-          <p>
-            We revoke existing access and start a 24-hour hold before any
-            password or factor change.
-          </p>
+          <p className="form-kicker">{copy.recovery.confirmationKicker}</p>
+          <h1>{copy.recovery.confirmationTitle}</h1>
+          <p>{copy.recovery.confirmationDescription}</p>
         </div>
         {capability === "authorizing" ? (
           <AuthStatus
             id="account-recovery-confirmation-status"
-            status="Verifying this secure recovery link…"
+            status={copy.recovery.verifying}
           />
         ) : null}
         {capability === "authorized" && !holdEndsAt ? (
           <button type="button" onClick={confirm} disabled={busy}>
-            {busy ? "Starting security hold…" : "Start 24-hour security hold"}
+            {busy ? copy.recovery.startingHold : copy.recovery.startHold}
           </button>
         ) : null}
         <AuthStatus
@@ -69,15 +74,13 @@ export function AccountRecoveryConfirmation() {
         />
         {holdEndsAt ? (
           <p>
-            Hold ends at <time dateTime={holdEndsAt}>{holdEndsAt}</time>. Check
-            your email for one-time cancellation and completion links.
+            {copy.recovery.holdEndsPrefix}{" "}
+            <time dateTime={holdEndsAt}>{holdEndsAt}</time>. {" "}
+            {copy.recovery.holdEndsDescription}
           </p>
         ) : null}
-        <p>
-          Email-only recovery is lower assurance than using your password and
-          second factor.
-        </p>
-        <Link href="/login">Return to sign in</Link>
+        <p>{copy.recovery.lowerAssurance}</p>
+        <Link href="/login">{copy.common.returnToSignIn}</Link>
       </div>
     </section>
   );

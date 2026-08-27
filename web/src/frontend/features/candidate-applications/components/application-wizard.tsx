@@ -12,7 +12,10 @@ import {
   isValidApplicationUrl,
   type ApplicationWizardJob,
 } from "@/frontend/features/candidate-applications/components/application-personal-information";
-import { applicationCopy } from "@/frontend/features/candidate-applications/i18n/application-copy";
+import {
+  applicationCopy,
+  applicationErrorMessage,
+} from "@/frontend/features/candidate-applications/i18n/application-copy";
 import {
   parseApplicationDraftResponse,
   type ApplicationDraft,
@@ -28,12 +31,14 @@ import {
 
 type WizardStep = 1 | 2;
 
-function messageFrom(body: unknown, fallback: string) {
+function messageFrom(body: unknown, fallback: string, locale: "en" | "vi") {
   return body &&
     typeof body === "object" &&
     !Array.isArray(body) &&
     typeof (body as { message?: unknown }).message === "string"
-    ? (body as { message: string }).message
+    ? locale === "en"
+      ? (body as { message: string }).message
+      : fallback
     : fallback;
 }
 
@@ -55,7 +60,8 @@ export function ApplicationWizard({
   coverLetterNeedsReupload?: boolean;
 }) {
   const router = useRouter();
-  const copy = applicationCopy(useWorkspaceLocale());
+  const locale = useWorkspaceLocale();
+  const copy = applicationCopy(locale);
   const [draft, setDraft] = useState(initialDraft);
   const [cvs, setCvs] = useState(() => [...initialCvs]);
   const [step, setStep] = useState<WizardStep>(initialStep);
@@ -132,7 +138,9 @@ export function ApplicationWizard({
     );
     const body: unknown = await response.json().catch(() => null);
     if (!response.ok)
-      throw new Error(messageFrom(body, copy.applicationFiles.draftSaveError));
+      throw new Error(
+        messageFrom(body, copy.applicationFiles.draftSaveError, locale),
+      );
     const updated = parseApplicationDraftResponse(body);
     setDraft(updated);
     setSelectedCvId(updated.cv?.versionId ?? "");
@@ -155,9 +163,17 @@ export function ApplicationWizard({
       setStep(2);
     } catch (caught) {
       setError(
-        caught instanceof Error
-          ? caught.message
-          : copy.personalInformation.draftSaveError,
+        applicationErrorMessage(
+          locale,
+          caught,
+          copy.personalInformation.draftSaveError,
+          [
+            copy.personalInformation.phoneRequired,
+            copy.personalInformation.phoneInvalid,
+            copy.personalInformation.locationRequired,
+            copy.personalInformation.urlInvalid,
+          ],
+        ),
       );
     } finally {
       setPending(null);
@@ -178,9 +194,11 @@ export function ApplicationWizard({
       );
     } catch (caught) {
       setError(
-        caught instanceof Error
-          ? caught.message
-          : copy.applicationFiles.draftSaveError,
+        applicationErrorMessage(
+          locale,
+          caught,
+          copy.applicationFiles.draftSaveError,
+        ),
       );
     } finally {
       setPending(null);
@@ -193,10 +211,11 @@ export function ApplicationWizard({
     } catch (caught) {
       const validation = caught as CvFileValidationError;
       showFileUploadError(
-        validation?.message ??
-          (file.size > 5_000_000
+        locale === "en" && validation?.message
+          ? validation.message
+          : file.size > 5_000_000
             ? copy.applicationFiles.cvFileSizeError
-            : copy.applicationFiles.cvFileTypeError),
+            : copy.applicationFiles.cvFileTypeError,
       );
       return;
     }
@@ -217,7 +236,9 @@ export function ApplicationWizard({
       );
       const body: unknown = await response.json().catch(() => null);
       if (!response.ok)
-        throw new Error(messageFrom(body, copy.applicationFiles.cvUploadError));
+        throw new Error(
+          messageFrom(body, copy.applicationFiles.cvUploadError, locale),
+        );
       const saved = candidateCvSummarySchema.parse(body);
       setCvs((current) => [
         saved,
@@ -227,9 +248,11 @@ export function ApplicationWizard({
       setCvMode("UPLOAD");
     } catch (caught) {
       showFileUploadError(
-        caught instanceof Error
-          ? caught.message
-          : copy.applicationFiles.cvUploadError,
+        applicationErrorMessage(
+          locale,
+          caught,
+          copy.applicationFiles.cvUploadError,
+        ),
       );
     } finally {
       setPending(null);
@@ -242,10 +265,11 @@ export function ApplicationWizard({
     } catch (caught) {
       const validation = caught as CvFileValidationError;
       showFileUploadError(
-        validation?.message ??
-          (file.size > 5_000_000
+        locale === "en" && validation?.message
+          ? validation.message
+          : file.size > 5_000_000
             ? copy.applicationFiles.coverFileSizeError
-            : copy.applicationFiles.coverFileTypeError),
+            : copy.applicationFiles.coverFileTypeError,
       );
       return;
     }
@@ -264,7 +288,7 @@ export function ApplicationWizard({
       const body: unknown = await response.json().catch(() => null);
       if (!response.ok)
         throw new Error(
-          messageFrom(body, copy.applicationFiles.coverUploadError),
+          messageFrom(body, copy.applicationFiles.coverUploadError, locale),
         );
       const updated = parseApplicationDraftResponse(body);
       setDraft(updated);
@@ -273,9 +297,11 @@ export function ApplicationWizard({
       setCoverText("");
     } catch (caught) {
       showFileUploadError(
-        caught instanceof Error
-          ? caught.message
-          : copy.applicationFiles.coverUploadError,
+        applicationErrorMessage(
+          locale,
+          caught,
+          copy.applicationFiles.coverUploadError,
+        ),
       );
     } finally {
       setPending(null);
@@ -289,9 +315,11 @@ export function ApplicationWizard({
       await saveDraft();
     } catch (caught) {
       setError(
-        caught instanceof Error
-          ? caught.message
-          : copy.applicationFiles.draftSaveError,
+        applicationErrorMessage(
+          locale,
+          caught,
+          copy.applicationFiles.draftSaveError,
+        ),
       );
     } finally {
       setPending(null);

@@ -1188,6 +1188,31 @@
     box-shadow 150ms ease;
 }
 
+.totp-code-caret {
+  color: var(--sh-color-brand-primary);
+  font-size: 0.95em;
+  font-weight: var(--sh-font-weight-medium);
+  line-height: 1;
+  animation: totp-code-caret-blink 1s steps(1, end) infinite;
+}
+
+@keyframes totp-code-caret-blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+
+  46%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.totp-code-inputs:not(:focus-within) .totp-code-caret {
+  opacity: 0;
+  animation: none;
+}
+
 .totp-code-inputs:hover .totp-code-cell {
   border-color: color-mix(
     in srgb,
@@ -1215,5 +1240,12 @@
     height: 48px;
     border-radius: 10px;
     font-size: 21px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .totp-code-caret {
+    opacity: 1;
+    animation: none;
   }
 }

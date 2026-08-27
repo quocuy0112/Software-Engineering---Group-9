@@ -10,23 +10,31 @@ import {
 } from "lucide-react";
 import type { JobPerformanceReport } from "@/shared/contracts/analytics/employer";
 import type { RecruiterJob } from "@/shared/contracts/recruiter-job-posting";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { CandidateExportPanel } from "./candidate-export-panel";
 import { HiringFunnel } from "./hiring-funnel";
+import { recruitmentAnalyticsCopy } from "./recruitment-analytics-copy";
 
-function formatNumber(value: number) {
-  return value.toLocaleString("en-US");
+function formatNumber(value: number, locale: string) {
+  return value.toLocaleString(locale);
 }
 
-function formatRate(value: JobPerformanceReport["conversionRate"]) {
+function formatRate(
+  value: JobPerformanceReport["conversionRate"],
+  notAvailable: string,
+) {
   return value.availability === "AVAILABLE" && value.value !== null
     ? value.value.toFixed(2) + "%"
-    : "N/A";
+    : notAvailable;
 }
 
-function conversionDescription(value: JobPerformanceReport["conversionRate"]) {
+function conversionDescription(
+  value: JobPerformanceReport["conversionRate"],
+  copy: ReturnType<typeof recruitmentAnalyticsCopy>["report"],
+) {
   return value.availability === "NOT_APPLICABLE"
-    ? "No qualified views in the selected window"
-    : "Applications divided by qualified views";
+    ? copy.conversionDefinition
+    : copy.qualifiedViewsDescription;
 }
 
 function MetricCard({
@@ -67,7 +75,10 @@ export function JobPerformanceReport({
   selectedJobId: string;
   onSelectJob: (jobId: string) => void;
 }) {
-  const jobTitle = report.job.title || "Untitled job posting";
+  const locale = useWorkspaceLocale();
+  const analyticsCopy = recruitmentAnalyticsCopy(locale);
+  const copy = analyticsCopy.report;
+  const jobTitle = report.job.title || analyticsCopy.untitledJob;
   return (
     <section
       className="recruiter-analytics-report"
@@ -75,24 +86,21 @@ export function JobPerformanceReport({
     >
       <header className="recruiter-analytics-report__header">
         <div>
-          <p className="recruiter-analytics-eyebrow">Selected posting</p>
+          <p className="recruiter-analytics-eyebrow">{copy.selectedPosting}</p>
           <h2 id="selected-posting-title">{jobTitle}</h2>
-          <p>
-            Compare acquisition and pipeline health for one posting within the
-            selected reporting window.
-          </p>
+          <p>{copy.description}</p>
         </div>
         <div className="recruiter-analytics-report__controls">
           <label>
-            <span>Posting</span>
+            <span>{copy.posting}</span>
             <select
               value={selectedJobId}
               onChange={(event) => onSelectJob(event.target.value)}
-              aria-label="Select job posting for funnel"
+              aria-label={copy.selectPosting}
             >
               {jobs.map((job) => (
                 <option key={job.id} value={job.id}>
-                  {job.title || "Untitled job posting"}
+                  {job.title || analyticsCopy.untitledJob}
                 </option>
               ))}
             </select>
@@ -102,48 +110,57 @@ export function JobPerformanceReport({
       </header>
       <div className="recruiter-analytics-report__meta" role="note">
         <span>
-          Snapshot cutoff:{" "}
+          {copy.snapshotCutoff}:{" "}
           <strong>
-            {new Date(report.metadata.dataCutoff).toLocaleString("en-US")}
+            {new Date(report.metadata.dataCutoff).toLocaleString(
+              analyticsCopy.locale,
+            )}
           </strong>
         </span>
-        <span>Definition {report.metadata.definitionVersion}</span>
+        <span>{copy.definition(report.metadata.definitionVersion)}</span>
       </div>
       <div className="recruiter-analytics-metric-grid">
         <MetricCard
-          label="Qualified views"
-          value={formatNumber(report.qualifiedViews)}
-          description="Deduplicated visitor-posting-day views"
+          label={copy.qualifiedViews}
+          value={formatNumber(report.qualifiedViews, analyticsCopy.locale)}
+          description={copy.qualifiedViewsDescription}
           tone="blue"
           icon={<Eye />}
         />
         <MetricCard
-          label="Applications"
-          value={formatNumber(report.submittedApplications)}
-          description="Submitted applications in the window"
+          label={copy.applications}
+          value={formatNumber(
+            report.submittedApplications,
+            analyticsCopy.locale,
+          )}
+          description={copy.applicationsDescription}
           tone="teal"
           icon={<UsersRound />}
         />
         <MetricCard
-          label="Withdrawn"
-          value={formatNumber(report.withdrawnApplications)}
-          description="Excluded from the current funnel snapshot"
+          label={copy.withdrawn}
+          value={formatNumber(
+            report.withdrawnApplications,
+            analyticsCopy.locale,
+          )}
+          description={copy.withdrawnDescription}
           tone="amber"
           icon={<UserRoundX />}
         />
         <MetricCard
-          label="View-to-application"
-          value={formatRate(report.conversionRate)}
-          description={conversionDescription(report.conversionRate)}
+          label={copy.conversion}
+          value={formatRate(report.conversionRate, analyticsCopy.notAvailable)}
+          description={conversionDescription(report.conversionRate, copy)}
           tone="violet"
           icon={<Percent />}
         />
         <MetricCard
-          label="Funnel candidates"
+          label={copy.funnelCandidates}
           value={formatNumber(
             report.funnel.reduce((sum, stage) => sum + stage.count, 0),
+            analyticsCopy.locale,
           )}
-          description="Current canonical stage snapshot"
+          description={copy.funnelCandidatesDescription}
           tone="amber"
           icon={<BarChart3 />}
         />
@@ -152,30 +169,18 @@ export function JobPerformanceReport({
       <details className="recruiter-analytics-definitions">
         <summary>
           <FileText aria-hidden="true" />
-          Metric definitions and data notes
+          {copy.definitionsSummary}
         </summary>
         <div>
+          <p>{copy.qualifiedViewsDefinition}</p>
+          <p>{copy.conversionDefinition}</p>
+          <p>{copy.funnelDefinition}</p>
           <p>
-            Qualified views exclude owner previews, automated traffic, and
-            duplicate visits from the same visitor on the same platform day.
-          </p>
-          <p>
-            Conversion is shown as N/A until the selected window contains at
-            least one qualified view. To collect one, open the public posting as
-            a candidate or anonymous visitor; recruiter previews, bots, and
-            same-day repeat visits are excluded.
-          </p>
-          <p>
-            The funnel is a current snapshot at the cutoff. Each application
-            appears in one canonical stage, so stage counts are mutually
-            exclusive.
-          </p>
-          <p>
-            Historical reporting is available from{" "}
-            {new Date(
-              report.metadata.analyticsAvailableFrom,
-            ).toLocaleDateString("en-US")}
-            .
+            {copy.historicalDefinition(
+              new Date(
+                report.metadata.analyticsAvailableFrom,
+              ).toLocaleDateString(analyticsCopy.locale),
+            )}
           </p>
         </div>
       </details>

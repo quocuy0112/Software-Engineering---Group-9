@@ -1,17 +1,21 @@
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { jobWhyHighlights } from "./job-detail-data";
+import { jobCopy } from "./job-copy";
 
 const icons = ["✦", "↗", "♡"];
 
 export function WhyJoinUsSection({ job }: { job: JobDetail }) {
-  const highlights = jobWhyHighlights(job);
+  const locale = useWorkspaceLocale();
+  const copy = jobCopy(locale);
+  const highlights = jobWhyHighlights(job, locale);
 
   return (
     <section className="job-why-join" aria-labelledby="why-join-heading">
       <div className="job-section-heading-row">
         <div>
-          <p className="panel-kicker">The Smart Hire signal</p>
-          <h2 id="why-join-heading">Why you&apos;ll love working here</h2>
+          <p className="panel-kicker">{copy.whySignal}</p>
+          <h2 id="why-join-heading">{copy.whyWorkingHere}</h2>
         </div>
         <span className="job-section-heading-mark" aria-hidden="true">
           ✦

@@ -534,7 +534,7 @@ export function useCvImport(input: { csrfProof: string }) {
                 ? "Đã hủy tải CV."
                 : "CV upload cancelled."
               : error instanceof Error && !error.message.startsWith("CV_")
-                ? error.message
+                ? cvKnownError(locale, error.message)
                 : locale === "vi"
                   ? "Không thể hoàn tất tải CV."
                   : "CV upload could not be completed.",

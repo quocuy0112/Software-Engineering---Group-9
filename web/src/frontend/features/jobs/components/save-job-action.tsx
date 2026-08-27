@@ -5,6 +5,8 @@ import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-pro
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { savedJobOutcomeSchema } from "@/shared/contracts/jobs/actions";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { jobCopy } from "./job-copy";
 
 export function SaveBookmarkIcon({ filled = false }: { filled?: boolean }) {
   return (
@@ -33,6 +35,7 @@ export function SaveJobAction({
   variant?: "text" | "icon" | "button";
 }) {
   const csrfProof = useCsrfProof();
+  const copy = jobCopy(useWorkspaceLocale());
   const shared = useOptionalJobInteraction();
   const [localSaved, setLocalSaved] = useState(initialSaved);
   const [pending, setPending] = useState(false);
@@ -64,25 +67,16 @@ export function SaveJobAction({
         );
         const body: unknown = await response.json();
         if (!response.ok) {
-          const problem = body as { message?: unknown };
-          throw new Error(
-            typeof problem.message === "string"
-              ? problem.message
-              : "Could not update this saved job. Try again.",
-          );
+          throw new Error("SAVED_JOB_UPDATE_FAILED");
         }
         const outcome = savedJobOutcomeSchema.parse(body);
         setLocalSaved(outcome.saved);
-        setMessage(outcome.message);
+        setMessage(outcome.saved ? copy.savedSuccess : copy.removedSuccess);
       }
       setPulsing(true);
       window.setTimeout(() => setPulsing(false), 380);
-    } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "Could not update this saved job. Try again.",
-      );
+    } catch {
+      setError(copy.updateFailed);
     } finally {
       setPending(false);
     }
@@ -90,18 +84,18 @@ export function SaveJobAction({
 
   const compactLabel = pending
     ? saved
-      ? "Removing..."
-      : "Saving..."
+      ? copy.removing
+      : copy.saving
     : saved
-      ? "Saved"
-      : "Save";
+      ? copy.saved
+      : copy.save;
   const textLabel = pending
     ? saved
-      ? "Removing saved job..."
-      : "Saving job..."
+      ? copy.removingJob
+      : copy.savingJob
     : saved
-      ? "Remove saved job"
-      : "Save job";
+      ? copy.removeSavedJob
+      : copy.saveJob;
 
   if (variant === "icon") {
     return (
@@ -112,7 +106,7 @@ export function SaveJobAction({
             (pulsing ? " job-heart-pop" : "")
           }
           type="button"
-          aria-label={saved ? "Remove saved job" : "Save job"}
+          aria-label={saved ? copy.removeSavedJob : copy.saveJob}
           aria-pressed={saved}
           aria-busy={pending}
           disabled={pending}

@@ -519,12 +519,46 @@
   background: var(--sh-color-brand-primary);
 }
 
-.image-search-progress button {
+.global-image-search .image-search-progress-cancel {
+  display: inline-flex;
+  min-height: var(--sh-control-height-sm);
+  align-items: center;
+  justify-content: center;
+  gap: var(--sh-space-2);
   justify-self: start;
-  min-height: 36px;
-  color: var(--sh-color-text-secondary);
-  background: transparent;
-  box-shadow: none;
+  max-width: 100%;
+  padding: 0 var(--sh-space-4);
+  border: 1px solid var(--sh-color-error);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-error);
+  background: var(--sh-color-error-bg);
+  font-size: var(--sh-font-size-button);
+  font-weight: var(--sh-font-weight-semibold);
+  line-height: 20px;
+  text-align: center;
+  box-shadow: var(--sh-shadow-control);
+}
+
+.global-image-search .image-search-progress-cancel:hover:not(:disabled) {
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-error);
+  transform: translateY(-1px);
+}
+
+.global-image-search .image-search-progress-cancel:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.global-image-search .image-search-progress-cancel:disabled {
+  color: var(--sh-color-disabled-text);
+  border-color: var(--sh-color-border-subtle);
+  background: var(--sh-color-disabled-bg);
+}
+
+.image-search-progress-cancel-icon {
+  width: var(--sh-icon-size-sm);
+  height: var(--sh-icon-size-sm);
+  flex: 0 0 auto;
 }
 
 .image-search-recovery {

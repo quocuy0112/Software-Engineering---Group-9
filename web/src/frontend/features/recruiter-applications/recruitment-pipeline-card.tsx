@@ -5,7 +5,6 @@ import { ChevronDown, GripVertical, LockKeyhole } from "lucide-react";
 import { useState, type KeyboardEvent } from "react";
 import {
   isTerminalPipelineStage,
-  pipelineStageLabels,
   type ApplicationStage,
   type PipelineApplicationCard,
 } from "@/shared/contracts/applications";
@@ -13,14 +12,11 @@ import {
   pipelineScoreForCard,
   pipelineTierForCard,
 } from "./recruitment-pipeline-ui";
-
-const quickActionLabels: Partial<Record<ApplicationStage, string>> = {
-  SHORTLISTED: "Move to shortlist",
-  INTERVIEWING: "Move to interview",
-  OFFERED: "Send offer",
-  REJECTED: "Reject",
-  WAITLISTED: "Waitlist",
-};
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import {
+  recruiterApplicationsCopy,
+  type RecruiterApplicationsCopy,
+} from "./recruiter-applications-copy";
 
 const collapsibleStages = new Set<ApplicationStage>([
   "APPLIED",
@@ -41,21 +37,18 @@ const lockedStages = new Set<ApplicationStage>([
   "REJECTED",
 ]);
 
-const tierLabels = {
-  strong: "Strong match",
-  review: "Review needed",
-  low: "Low match",
-  pending: "Not yet scored",
-} as const;
+type PipelineTier = "strong" | "review" | "low" | "pending";
 
 function ScoreRing({
   score,
   tier,
   candidateName,
+  copy,
 }: {
   score: number | null;
-  tier: keyof typeof tierLabels;
+  tier: PipelineTier;
   candidateName: string;
+  copy: RecruiterApplicationsCopy["pipeline"];
 }) {
   const dashOffset =
     score === null
@@ -68,8 +61,8 @@ function ScoreRing({
       role={score === null ? undefined : "progressbar"}
       aria-label={
         score === null
-          ? "Final score not yet available"
-          : `Final score ${Math.round(score)} percent for ${candidateName}`
+          ? copy.finalScoreUnavailable
+          : copy.finalScoreFor(Math.round(score), candidateName)
       }
       aria-valuemin={score === null ? undefined : 0}
       aria-valuemax={score === null ? undefined : 100}
@@ -111,6 +104,7 @@ export function RecruitmentPipelineCard({
   onChangeStage,
   onViewAssessment,
   dragOverlay = false,
+  copy: copyProp,
 }: {
   card: PipelineApplicationCard;
   jobId: string;
@@ -120,7 +114,10 @@ export function RecruitmentPipelineCard({
   ) => void;
   onViewAssessment?: (card: PipelineApplicationCard) => void;
   dragOverlay?: boolean;
+  copy?: RecruiterApplicationsCopy["pipeline"];
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = copyProp ?? recruiterApplicationsCopy(locale).pipeline;
   const withdrawn = card.withdrawalOutcome === "CANDIDATE_WITHDRAWN";
   const terminal = isTerminalPipelineStage(card.stage) || withdrawn;
   const outcomeStatus =
@@ -143,6 +140,19 @@ export function RecruitmentPipelineCard({
   const score = pipelineScoreForCard(card);
   const tier = pipelineTierForCard(card);
   const isExpanded = !collapsible || expanded;
+  const quickActionLabels: Partial<Record<ApplicationStage, string>> = {
+    SHORTLISTED: copy.moveToShortlist,
+    INTERVIEWING: copy.moveToInterview,
+    OFFERED: copy.sendOffer,
+    REJECTED: copy.reject,
+    WAITLISTED: copy.waitlist,
+  };
+  const localizedTierLabels = {
+    strong: copy.strong,
+    review: copy.review,
+    low: copy.low,
+    pending: copy.pending,
+  } as const;
   const quickActions = locked
     ? []
     : allowedDestinations
@@ -186,8 +196,8 @@ export function RecruitmentPipelineCard({
         event.stopPropagation();
         listeners?.onKeyDown?.(event);
       }}
-      aria-label={`Drag ${card.candidate.displayName} to another stage`}
-      title="Drag card"
+      aria-label={copy.dragToStage(card.candidate.displayName)}
+      title={copy.dragCard}
     >
       <GripVertical aria-hidden="true" />
     </button>
@@ -206,7 +216,7 @@ export function RecruitmentPipelineCard({
             rel="noreferrer"
             onClick={(event) => event.stopPropagation()}
           >
-            Open CV
+            {copy.openCv}
           </a>
         ) : null}
         {card.documents.coverLetterAvailable ? (
@@ -216,7 +226,7 @@ export function RecruitmentPipelineCard({
             rel="noreferrer"
             onClick={(event) => event.stopPropagation()}
           >
-            Cover letter
+            {copy.coverLetter}
           </a>
         ) : null}
       </div>
@@ -229,7 +239,7 @@ export function RecruitmentPipelineCard({
             onViewAssessment(card);
           }}
         >
-          View AI assessment
+          {copy.viewAiAssessment}
         </button>
       ) : null}
       {quickActions.length > 0 ? (
@@ -253,13 +263,13 @@ export function RecruitmentPipelineCard({
         <button
           type="button"
           className="change-stage-link pipeline-card__change-stage"
-          aria-label="Change Stage"
+          aria-label={copy.changeStage}
           onClick={(event) => {
             event.stopPropagation();
             onChangeStage(card);
           }}
         >
-          {"Change Stage\u2026"}
+          {copy.changeStage}
         </button>
       ) : null}
     </div>
@@ -307,8 +317,8 @@ export function RecruitmentPipelineCard({
               className={`status-pill ${withdrawn ? "status-withdrawn" : card.stage === "HIRED" ? "status-hired" : "status-rejected"} pipeline-card__status-pill`}
             >
               {withdrawn
-                ? "WITHDRAWN"
-                : pipelineStageLabels[card.stage].toUpperCase()}
+                ? copy.stageLabels.WITHDRAWN.toUpperCase()
+                : copy.stageLabels[card.stage].toUpperCase()}
             </span>
             {dragHandle}
           </>
@@ -317,18 +327,22 @@ export function RecruitmentPipelineCard({
         ) : locked ? (
           <LockKeyhole
             className="pipeline-card__locked-icon"
-            aria-label="Stage is locked"
+            aria-label={copy.stageLocked}
           />
         ) : null}
       </div>
       <div className="submitted-date pipeline-card__submitted-date">
         <time dateTime={card.submittedAt}>
-          Submitted{" "}
-          {new Date(card.submittedAt).toLocaleDateString("en-US", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })}
+          {copy.submitted(
+            new Date(card.submittedAt).toLocaleDateString(
+              locale === "vi" ? "vi-VN" : "en-US",
+              {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              },
+            ),
+          )}
         </time>
       </div>
       <div
@@ -338,19 +352,20 @@ export function RecruitmentPipelineCard({
           score={score}
           tier={tier}
           candidateName={card.candidate.displayName}
+          copy={copy}
         />
         <div className="score-meta pipeline-card__score-meta">
-          <span className="score-meta-label">Final score</span>
+          <span className="score-meta-label">{copy.finalScore}</span>
           <span className={`tier-badge tier-${tier}`}>
             <span className="dot" aria-hidden="true" />
-            {tierLabels[tier]}
+            {localizedTierLabels[tier]}
           </span>
         </div>
       </div>
       {collapsible ? (
         <div className="card-hint pipeline-card__hint" aria-hidden="true">
-          <span className="hint-collapsed">{"Click to view actions"}</span>
-          <span className="hint-expanded">{"Click to collapse"}</span>
+          <span className="hint-collapsed">{copy.clickActions}</span>
+          <span className="hint-expanded">{copy.clickCollapse}</span>
           <ChevronDown aria-hidden="true" />
         </div>
       ) : null}

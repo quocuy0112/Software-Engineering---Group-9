@@ -13,14 +13,19 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import {
   applicationTrackerSchema,
   type ApplicationTracker,
 } from "@/shared/contracts/candidate-applications";
+import {
+  applicationCopy,
+  applicationErrorMessage,
+} from "../i18n/application-copy";
 
-function date(value: string | null) {
+function date(value: string | null, locale: "vi" | "en") {
   return value
-    ? new Intl.DateTimeFormat("en", {
+    ? new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-US", {
         hour: "2-digit",
         minute: "2-digit",
       }).format(new Date(value))
@@ -31,12 +36,15 @@ function size(bytes: number) {
   return `${Math.max(1, Math.round(bytes / 1024))} KB`;
 }
 
-function stepDetail(code: string) {
+function stepDetail(
+  code: string,
+  copy: ReturnType<typeof applicationCopy>["processing"],
+) {
   return code === "APPLICATION_RECEIVED"
-    ? "Your application has been received."
+    ? copy.applicationReceived
     : code === "CHECKING_FILES"
-      ? "We are checking readability and standardizing your files."
-      : "Your application will be available to the recruiter.";
+      ? copy.checkingFiles
+      : copy.sendToRecruiter;
 }
 
 function isIntakeProcessing(state: ApplicationTracker["intake"]["state"]) {
@@ -54,6 +62,8 @@ export function ApplicationProcessing({
   const [retrying, setRetrying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const applicationId = tracker.applicationId;
+  const locale = useWorkspaceLocale();
+  const copy = applicationCopy(locale).processing;
   const isComplete = tracker.intake.state === "SENT_TO_RECRUITER";
   const needsAttention = tracker.intake.state === "ATTENTION_REQUIRED";
   const isProcessing = isIntakeProcessing(tracker.intake.state);
@@ -128,15 +138,10 @@ export function ApplicationProcessing({
         { method: "POST" },
         csrfProof,
       );
-      if (!response.ok)
-        throw new Error("The intake check could not be retried.");
+      if (!response.ok) throw new Error(copy.retryError);
       setTracker(applicationTrackerSchema.parse(await response.json()));
     } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "The intake check could not be retried.",
-      );
+      setError(applicationErrorMessage(locale, caught, copy.retryError));
     } finally {
       setRetrying(false);
     }
@@ -154,26 +159,29 @@ export function ApplicationProcessing({
     <main className="application-ui" aria-labelledby="processing-title">
       <header className="application-ui__header">
         <div>
-          <nav className="application-ui__breadcrumb" aria-label="Breadcrumb">
-            <Link href="/jobs/applied">Applications</Link>
+          <nav
+            className="application-ui__breadcrumb"
+            aria-label={copy.breadcrumb}
+          >
+            <Link href="/jobs/applied">{copy.applications}</Link>
             <span>/</span>
             <span>{tracker.job.title}</span>
             <span>/</span>
-            <span>Processing status</span>
+            <span>{copy.processingStatus}</span>
           </nav>
           <h1 id="processing-title">
             {isComplete
-              ? "Your application is ready for review"
+              ? copy.readyTitle
               : needsAttention
-                ? "Your application needs attention"
-                : "Your application is being processed"}
+                ? copy.attentionTitle
+                : copy.processingTitle}
           </h1>
           <p>
             {isComplete
-              ? "Your files have been checked and your application is available to the recruiter."
+              ? copy.readyDescription
               : needsAttention
-                ? "We could not finish checking the submitted files. You can retry the file check below."
-                : "Your application has been received. You can leave this page and return later."}
+                ? copy.attentionDescription
+                : copy.processingDescription}
           </p>
         </div>
       </header>
@@ -191,42 +199,44 @@ export function ApplicationProcessing({
         <div>
           <span>
             {isComplete
-              ? "COMPLETE"
+              ? copy.complete
               : needsAttention
-                ? "ACTION REQUIRED"
-                : "PROCESSING"}
+                ? copy.actionRequired
+                : copy.processing}
           </span>
           <h2>
             {isComplete
-              ? "Your application has been sent to the recruiter"
+              ? copy.sentTitle
               : needsAttention
-                ? "The system needs another file check"
-                : "The system is checking the submitted files"}
+                ? copy.retryCheckTitle
+                : copy.checkingTitle}
           </h2>
           <p>
             {isComplete
-              ? "All submitted files passed the readability and standardization check."
+              ? copy.sentDescription
               : needsAttention
-                ? "The application is safe, but the file check needs to be retried."
-                : "This is a file-readability and standardization check, not a self-scoring step."}
+                ? copy.retryCheckDescription
+                : copy.checkingDescription}
           </p>
           <div
             className="application-ui-progress"
             role="progressbar"
-            aria-label="Application intake progress"
+            aria-label={copy.progressAria}
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={tracker.intake.progressPercent}
           >
             <i style={{ width: `${tracker.intake.progressPercent}%` }} />
           </div>
-          <strong>{tracker.intake.progressPercent}% complete</strong>
+          <strong>
+            {copy.completePercent(tracker.intake.progressPercent)}
+          </strong>
           <small>
             {isComplete
-              ? "File checks completed"
+              ? copy.fileChecksCompleted
               : needsAttention
-                ? "Retry the check to continue"
-                : "Usually completed in under 1 minute"}
+                ? copy.retryToContinue
+                : copy.usuallyUnderMinute}
           </small>
         </div>
       </section>
@@ -243,7 +253,7 @@ export function ApplicationProcessing({
       <div className="application-ui__columns">
         <div className="application-ui__main">
           <section className="application-ui-card">
-            <h2>Application intake progress</h2>
+            <h2>{copy.intakeProgress}</h2>
             <ol className="application-ui-intake-list">
               {tracker.intake.steps.map((step) => {
                 const icon =
@@ -258,12 +268,12 @@ export function ApplicationProcessing({
                   );
                 const statusLabel =
                   step.status === "ACTIVE"
-                    ? "Processing"
+                    ? copy.stepProcessing
                     : step.status === "PENDING"
-                      ? "Next"
+                      ? copy.stepNext
                       : step.status === "ATTENTION_REQUIRED"
-                        ? "Needs attention"
-                        : (date(step.timestamp) ?? "Complete");
+                        ? copy.needsAttention
+                        : (date(step.timestamp, locale) ?? copy.stepComplete);
                 return (
                   <li
                     key={step.code}
@@ -273,12 +283,12 @@ export function ApplicationProcessing({
                     <div>
                       <strong>
                         {step.code === "APPLICATION_RECEIVED"
-                          ? "Application received"
+                          ? copy.applicationReceived
                           : step.code === "CHECKING_FILES"
-                            ? "Checking files"
-                            : "Send to recruiter"}
+                            ? copy.checkingFiles
+                            : copy.sendToRecruiter}
                       </strong>
-                      <p>{stepDetail(step.code)}</p>
+                      <p>{stepDetail(step.code, copy)}</p>
                     </div>
                     <small>{statusLabel}</small>
                   </li>
@@ -293,13 +303,13 @@ export function ApplicationProcessing({
                 disabled={retrying}
               >
                 <TriangleAlert aria-hidden="true" />
-                {retrying ? "Retrying…" : "Retry file checks"}
+                {retrying ? copy.retrying : copy.retryFileChecks}
               </button>
             ) : null}
           </section>
 
           <section className="application-ui-card">
-            <h2>Received files</h2>
+            <h2>{copy.receivedFiles}</h2>
             <ul className="application-ui-file-list">
               {tracker.files.map((file) => (
                 <li key={file.versionId}>
@@ -310,7 +320,7 @@ export function ApplicationProcessing({
                     <strong>{file.displayName}</strong>
                     <small>{size(file.byteSize)}</small>
                   </span>
-                  <em>Received</em>
+                  <em>{copy.received}</em>
                 </li>
               ))}
             </ul>
@@ -319,46 +329,45 @@ export function ApplicationProcessing({
 
         <aside className="application-ui__sidebar">
           <section className="application-ui-card">
-            <span className="application-ui-eyebrow">APPLICATION</span>
+            <span className="application-ui-eyebrow">
+              {copy.applicationEyebrow}
+            </span>
             <h2>{tracker.job.title}</h2>
             <p>{tracker.job.companyName}</p>
-            <code>Application ID: {tracker.applicationId}</code>
+            <code>
+              {copy.applicationId}: {tracker.applicationId}
+            </code>
             <small>
-              Submitted{" "}
-              {new Intl.DateTimeFormat("en", {
+              {copy.submitted}{" "}
+              {new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-US", {
                 dateStyle: "medium",
                 timeStyle: "short",
               }).format(new Date(tracker.submittedAt))}
             </small>
           </section>
           <section className="application-ui-card">
-            <h2>What you will see</h2>
+            <h2>{copy.whatYouWillSee}</h2>
             <ul className="application-ui-icon-list">
               <li>
                 <Eye aria-hidden="true" />
-                Application receipt status
+                {copy.receiptStatus}
               </li>
               <li>
                 <Eye aria-hidden="true" />
-                Main stages of the recruitment process
+                {copy.recruitmentStages}
               </li>
               <li>
                 <Eye aria-hidden="true" />
-                Requests for more information from the recruiter
+                {copy.recruiterRequests}
               </li>
             </ul>
           </section>
           <section className="application-ui-private-note">
             <TriangleAlert aria-hidden="true" />
             <div>
-              <strong>Internal information is not shown</strong>
-              <p>
-                Match scores, AI scores, rankings, and recruiter notes are not
-                shown in the candidate portal.
-              </p>
-              <small>
-                The recruiter always makes the final hiring decision.
-              </small>
+              <strong>{copy.internalNotShown}</strong>
+              <p>{copy.privateDescription}</p>
+              <small>{copy.finalDecision}</small>
             </div>
           </section>
         </aside>
@@ -367,16 +376,16 @@ export function ApplicationProcessing({
       <div className="application-ui-confirm-strip">
         <CheckCircle2 aria-hidden="true" />
         {isComplete
-          ? "Your application is now available to the recruiter."
+          ? copy.completeNotice
           : needsAttention
-            ? "Your application is saved while the file check is retried."
-            : "You do not need to keep this page open. We will notify you when the status changes."}
+            ? copy.attentionNotice
+            : copy.processingNotice}
       </div>
       <Link
         className="application-ui-button application-ui-button--primary application-ui-button--wide"
         href={`/jobs/applied/${encodeURIComponent(applicationId)}`}
       >
-        View application status <ArrowRight aria-hidden="true" />
+        {copy.viewApplicationStatus} <ArrowRight aria-hidden="true" />
       </Link>
     </main>
   );

@@ -7,6 +7,8 @@ import { EmptyState } from "./job-empty-state";
 import { JobCardView } from "./job-card";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 import { QuickViewPanel } from "./quick-view-panel";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { jobCopy } from "./job-copy";
 
 export function SuggestedJobsPage({
   jobs,
@@ -15,6 +17,7 @@ export function SuggestedJobsPage({
   jobs: SuggestedWorkspaceJob[];
   preferencesConfigured: boolean;
 }) {
+  const copy = jobCopy(useWorkspaceLocale());
   const shared = useOptionalJobInteraction();
   const [showAll, setShowAll] = useState(false);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
@@ -36,11 +39,11 @@ export function SuggestedJobsPage({
     return (
       <EmptyState
         illustration="preferences"
-        title="Complete your job preferences"
-        description="Share your target position, skills, experience, and location so SmartHire can recommend better opportunities."
+        title={copy.completePreferences}
+        description={copy.completePreferencesDescription}
         cta={{
           href: "/jobs/settings",
-          label: "Update preferences",
+          label: copy.updatePreferences,
         }}
       />
     );
@@ -53,23 +56,20 @@ export function SuggestedJobsPage({
     >
       <header className="jobs-workspace-heading jobs-workspace-heading--wide">
         <div>
-          <p className="workspace-kicker">Candidate workspace</p>
-          <h1 id="matches-heading">Suggested Jobs</h1>
-          <p>
-            Recommendations are based on the preferences, skills, and experience
-            you have shared.
-          </p>
+          <p className="workspace-kicker">{copy.candidateWorkspace}</p>
+          <h1 id="matches-heading">{copy.suggestedJobsTitle}</h1>
+          <p>{copy.suggestedJobsDescription}</p>
         </div>
       </header>
       <p className="jobs-match-count">
-        Found <strong>{visibleJobs.length}</strong> jobs that match your
-        preferences
+        {copy.foundPrefix} <strong>{visibleJobs.length}</strong>{" "}
+        {copy.foundSuffix}
       </p>
       {displayedJobs.length ? (
         <>
           <ol
             className="job-list suggested-job-list"
-            aria-label="Suggested jobs"
+            aria-label={copy.suggestedJobsAria}
           >
             {displayedJobs.map((job) => (
               <li key={job.id}>
@@ -88,22 +88,21 @@ export function SuggestedJobsPage({
               type="button"
               onClick={() => setShowAll(true)}
             >
-              See more
+              {copy.seeMore}
             </button>
           ) : null}
         </>
       ) : (
         <div className="workspace-inline-empty">
-          No matching jobs are available right now. Try broadening your
-          preferences.
+          {copy.noMatchingJobs}
         </div>
       )}
       <div className="jobs-preferences-prompt">
         <div>
-          <strong>Not quite right?</strong>
-          <p>Update your preferences to improve future recommendations.</p>
+          <strong>{copy.notQuiteRight}</strong>
+          <p>{copy.recommendationsImprove}</p>
         </div>
-        <Link href="/jobs/settings">Update preferences</Link>
+        <Link href="/jobs/settings">{copy.updatePreferences}</Link>
       </div>
       <QuickViewPanel
         jobs={visibleJobs}

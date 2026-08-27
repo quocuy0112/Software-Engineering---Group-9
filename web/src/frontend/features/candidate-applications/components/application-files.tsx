@@ -14,6 +14,7 @@ import {
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { applicationCopy } from "@/frontend/features/candidate-applications/i18n/application-copy";
+import { jobAttributeLabel } from "@/frontend/features/jobs/components/job-copy";
 import {
   ApplicationProgressChecklist,
   ApplicationStepper,
@@ -28,13 +29,6 @@ import type { ApplicationDraft } from "@/shared/contracts/candidate-applications
 import type { CandidateCvSummary } from "@/shared/contracts/cv-import/candidate-cv";
 
 const MAX_COVER_LETTER_CHARACTERS = 2_000;
-
-function displayJobLabel(value: string) {
-  return value
-    .toLowerCase()
-    .replaceAll("_", " ")
-    .replace(/\b\w/g, (character) => character.toUpperCase());
-}
 
 function formatFileSize(byteSize: number, locale: "en" | "vi") {
   if (byteSize < 1_000) {
@@ -74,8 +68,8 @@ function jobTags(job: ApplicationWizardJob, locale: "en" | "vi") {
     : null;
   const copy = applicationCopy(locale);
   return [
-    job.employmentType ? displayJobLabel(job.employmentType) : null,
-    job.experienceLevel ? displayJobLabel(job.experienceLevel) : null,
+    job.employmentType ? jobAttributeLabel(job.employmentType, locale) : null,
+    job.experienceLevel ? jobAttributeLabel(job.experienceLevel, locale) : null,
     dueDate ? copy.stepper.dueDate(dueDate) : null,
   ].filter((tag): tag is string => Boolean(tag));
 }
@@ -141,7 +135,7 @@ export function ApplicationFiles({
   const selectedCv = cvs.find((cv) => cv.id === selectedCvId) ?? null;
   const tags = jobTags(job, locale);
   const jobLocation = job.workArrangement
-    ? `${job.location} · ${displayJobLabel(job.workArrangement)}`
+    ? `${job.location} · ${jobAttributeLabel(job.workArrangement, locale)}`
     : job.location;
   const canContinue = pending === null && Boolean(selectedCvId);
   const coverLetterFile =

@@ -10,9 +10,10 @@ import {
   XCircle,
 } from "lucide-react";
 import {
-  applicationStageLabel,
   type ApplicationStage,
 } from "@/shared/contracts/jobs/applications";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { applicationCopy } from "@/frontend/features/candidate-applications/i18n/application-copy";
 
 const stageIcons = {
   APPLIED: FileCheck2,
@@ -27,6 +28,7 @@ const stageIcons = {
 } satisfies Record<ApplicationStage, typeof FileCheck2>;
 
 export function ApplicationStageBadge({ stage }: { stage: ApplicationStage }) {
+  const copy = applicationCopy(useWorkspaceLocale());
   const Icon = stageIcons[stage];
   return (
     <span
@@ -34,7 +36,7 @@ export function ApplicationStageBadge({ stage }: { stage: ApplicationStage }) {
       data-stage={stage.toLowerCase().replaceAll("_", "-")}
     >
       <Icon className="application-stage-icon" aria-hidden="true" />
-      {applicationStageLabel[stage]}
+      {copy.applicationsList.statuses[stage]}
     </span>
   );
 }

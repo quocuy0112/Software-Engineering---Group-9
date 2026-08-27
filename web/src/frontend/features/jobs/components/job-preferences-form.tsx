@@ -215,14 +215,20 @@ export function JobPreferencesForm({
           message?: unknown;
         } | null;
         throw new Error(
-          typeof body?.message === "string" ? body.message : copy.updateFailed,
+          locale === "en" && typeof body?.message === "string"
+            ? body.message
+            : copy.updateFailed,
         );
       }
       setStatus(copy.updated);
       router.push("/jobs/matches");
       router.refresh();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.updateFailed);
+      setError(
+        locale === "en" && caught instanceof Error
+          ? caught.message
+          : copy.updateFailed,
+      );
     } finally {
       setPending(false);
     }
@@ -261,8 +267,14 @@ export function JobPreferencesForm({
           </div>
         ) : null}
 
-        <section className="job-preferences-card" aria-labelledby="personal-information-heading">
-          <h2 id="personal-information-heading" className="job-preferences-card-title">
+        <section
+          className="job-preferences-card"
+          aria-labelledby="personal-information-heading"
+        >
+          <h2
+            id="personal-information-heading"
+            className="job-preferences-card-title"
+          >
             <UserRound aria-hidden="true" />
             {copy.personal}
           </h2>
@@ -294,7 +306,10 @@ export function JobPreferencesForm({
           </div>
         </section>
 
-        <section className="job-preferences-card job-preferences-card--needs" aria-labelledby="job-needs-heading">
+        <section
+          className="job-preferences-card job-preferences-card--needs"
+          aria-labelledby="job-needs-heading"
+        >
           <h2 id="job-needs-heading" className="job-preferences-card-title">
             <Briefcase aria-hidden="true" />
             {copy.jobNeeds}
@@ -433,7 +448,10 @@ export function JobPreferencesForm({
           </label>
         </section>
 
-        <section className="job-preferences-card job-preferences-card--consent" aria-labelledby="consent-heading">
+        <section
+          className="job-preferences-card job-preferences-card--consent"
+          aria-labelledby="consent-heading"
+        >
           <h2 id="consent-heading" className="job-preferences-card-title">
             <ShieldCheck aria-hidden="true" />
             {copy.consent}

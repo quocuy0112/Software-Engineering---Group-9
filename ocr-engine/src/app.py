@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import logging
 import os
 import socket
 from contextlib import asynccontextmanager
@@ -26,6 +28,74 @@ ALLOWED_REQUEST_HEADERS = {
     "x-ocr-model-manifest-sha256",
 }
 
+LOGGER = logging.getLogger("smarthire.ocr")
+
+_TELEMETRY_BUCKETS = {
+    "LT_100MS",
+    "LT_1S",
+    "LT_6S",
+    "LT_20S",
+    "GTE_20S",
+    "ZERO",
+    "ONE",
+    "TWO_TO_TEN",
+    "ELEVEN_TO_100",
+    "GT_100",
+}
+_TELEMETRY_DIMENSION_BUCKETS = {"LT_512", "LT_1024", "LT_2048", "GTE_2048"}
+_TELEMETRY_PATHS = {"FULL_ONLY", "TILED_RECOVERY", "PREPROCESS_RECOVERY"}
+_TELEMETRY_EXIT_STAGES = {"NONE", "TILE_DETECTION", "RECOGNITION"}
+_TELEMETRY_BUCKET_KEYS = {
+    "normalizedDimensionBucket",
+    "fullDetectedRegionBucket",
+    "mergedRegionBucket",
+    "selectedRegionBucket",
+    "skippedRegionBucket",
+    "duplicateCountBucket",
+    "boundaryFragmentBucket",
+    "detectMsBucket",
+    "recognizeMsBucket",
+    "mergeMsBucket",
+    "queueMsBucket",
+}
+
+
+def _safe_search_telemetry(value: object) -> dict[str, object] | None:
+    """Keep operational OCR metrics bounded and content-free before logging."""
+
+    if not isinstance(value, dict):
+        return None
+    safe: dict[str, object] = {}
+    strategy = value.get("strategyVersion")
+    if strategy == "search-ocr-adaptive-tiles-v1":
+        safe["strategyVersion"] = strategy
+    path = value.get("path")
+    if path in _TELEMETRY_PATHS:
+        safe["path"] = path
+    for key in _TELEMETRY_BUCKET_KEYS:
+        bucket = value.get(key)
+        allowed = (
+            _TELEMETRY_DIMENSION_BUCKETS
+            if key == "normalizedDimensionBucket"
+            else _TELEMETRY_BUCKETS
+        )
+        if isinstance(bucket, str) and bucket in allowed:
+            safe[key] = bucket
+    for key, lower, upper in (
+        ("tileCount", 0, 4),
+        ("tileBatchSize", 1, 4),
+    ):
+        count = value.get(key)
+        if isinstance(count, int) and lower <= count <= upper:
+            safe[key] = count
+    partial = value.get("partial")
+    if isinstance(partial, bool):
+        safe["partial"] = partial
+    exit_stage = value.get("deadlineExitStage")
+    if exit_stage in _TELEMETRY_EXIT_STAGES:
+        safe["deadlineExitStage"] = exit_stage
+    return safe or None
+
 
 def _error(code: str, status: int, *, retryable: bool = False) -> JSONResponse:
     payload = SafeError.model_validate(
@@ -51,7 +121,7 @@ def _deadline(raw: str | None) -> datetime | None:
 def create_app(engine: RecognitionEngine) -> FastAPI:
     app = FastAPI(
         title="SmartHire Private OCR Engine",
-        version="1.0.0",
+        version="1.1.0",
         docs_url=None,
         redoc_url=None,
         openapi_url=None,
@@ -103,8 +173,10 @@ def create_app(engine: RecognitionEngine) -> FastAPI:
         ):
             return _error("INVALID_REQUEST", 400)
         deadline = _deadline(request.headers.get("x-ocr-deadline"))
-        if deadline is None or deadline <= datetime.now(UTC):
+        if deadline is None:
             return _error("INVALID_REQUEST", 400)
+        if deadline <= datetime.now(UTC):
+            return _error("DEADLINE_EXCEEDED", 422, retryable=True)
         try:
             manifest = engine.assert_ready()
         except RuntimeError:
@@ -125,6 +197,14 @@ def create_app(engine: RecognitionEngine) -> FastAPI:
                 deadline=deadline,
                 purpose=purpose,
             )
+            telemetry = _safe_search_telemetry(outcome.get("_telemetry"))
+            if purpose == "JOB_IMAGE_SEARCH" and telemetry:
+                # The engine deliberately exposes only bounded buckets/counts
+                # here. Never log image bytes, OCR text, filenames or polygons.
+                LOGGER.info(
+                    "ocr_search_metrics %s",
+                    json.dumps(telemetry, sort_keys=True, separators=(",", ":")),
+                )
             lines = normalize_engine_lines(
                 outcome["lines"],
                 width=outcome["width"],

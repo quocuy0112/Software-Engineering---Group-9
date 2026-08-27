@@ -16,6 +16,11 @@ import type {
   FinalScore,
   ScoringState,
 } from "@/shared/contracts/scoring";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import {
+  applicationDetailCopy,
+  type ApplicationDetailCopy,
+} from "./application-detail-copy";
 import { ScoreBadgeFromLabel } from "./candidate-ranking-ui";
 import { ScoringLineage } from "./automatic-match-tab";
 
@@ -28,8 +33,9 @@ export function AiAssessmentTab({
   onScore: () => void;
   canScore?: boolean;
 }) {
+  const copy = applicationDetailCopy(useWorkspaceLocale()).assessment;
   if (state.kind === "PENDING")
-    return <RetryingAssessment automatic={state.automaticMatch} />;
+    return <RetryingAssessment automatic={state.automaticMatch} copy={copy} />;
   if (state.kind === "PROCESSING") {
     return (
       <div className="ranking-empty-panel" role="status">
@@ -37,18 +43,15 @@ export function AiAssessmentTab({
           aria-hidden="true"
           className="ranking-empty-panel__icon is-spinning"
         />
-        <h3>AI assessment is processing</h3>
-        <p>
-          The deterministic result will stay visible while the initial scoring
-          operation runs in the background.
-        </p>
+        <h3>{copy.processingTitle}</h3>
+        <p>{copy.processingDescription}</p>
         <button
           type="button"
           className="ai-ranking-button ai-ranking-button--loading"
           disabled
         >
           <LoaderCircle aria-hidden="true" className="is-spinning" />{" "}
-          Processing…
+          {copy.processing}
         </button>
       </div>
     );
@@ -57,23 +60,18 @@ export function AiAssessmentTab({
     return (
       <div className="ranking-empty-panel">
         <CircleHelp aria-hidden="true" className="ranking-empty-panel__icon" />
-        <h3>AI assessment is not calculated</h3>
-        <p>
-          There is no published deterministic result to send for AI assessment
-          yet.
-        </p>
+        <h3>{copy.notCalculatedTitle}</h3>
+        <p>{copy.notCalculatedDescription}</p>
         {canScore ? (
           <button
             type="button"
             className="ai-ranking-button ai-ranking-button--primary"
             onClick={onScore}
           >
-            <BrainCircuit aria-hidden="true" /> Score this candidate
+            <BrainCircuit aria-hidden="true" /> {copy.scoreCandidate}
           </button>
         ) : (
-          <p className="ranking-muted-text">
-            AI scoring is available from the candidate ranking actions.
-          </p>
+          <p className="ranking-muted-text">{copy.rankingActions}</p>
         )}
       </div>
     );
@@ -85,19 +83,15 @@ export function AiAssessmentTab({
           aria-hidden="true"
           className="ranking-empty-panel__icon"
         />
-        <h3>CV scoring failed</h3>
-        <p>
-          The scoring job ended safely without publishing a score
-          {state.safeFailureCode ? ` (${state.safeFailureCode})` : ""}. You can
-          retry it now; the candidate application is still available.
-        </p>
+        <h3>{copy.failedTitle}</h3>
+        <p>{copy.failedDescription(state.safeFailureCode ?? "")}</p>
         {canScore && state.retryAllowed ? (
           <button
             type="button"
             className="ai-ranking-button ai-ranking-button--primary"
             onClick={onScore}
           >
-            <BrainCircuit aria-hidden="true" /> Retry scoring
+            <BrainCircuit aria-hidden="true" /> {copy.retryScoring}
           </button>
         ) : null}
       </div>
@@ -109,6 +103,7 @@ export function AiAssessmentTab({
         automatic={state.automaticMatch}
         failures={state.consecutiveFailures}
         safeFailureCode={state.aiAssessment.safeFailureCode}
+        copy={copy}
       />
     );
   return (
@@ -116,62 +111,62 @@ export function AiAssessmentTab({
       automatic={state.automaticMatch}
       ai={state.aiAssessment}
       finalScore={state.finalScore}
+      copy={copy}
     />
   );
 }
 
 function RetryingAssessment({
   automatic,
+  copy,
 }: {
   automatic: AutomaticMatch | null;
+  copy: ApplicationDetailCopy["assessment"];
 }) {
   return (
     <div className="ranking-tab-content">
       <div className="ai-retry-banner" role="status">
         <LoaderCircle aria-hidden="true" className="is-spinning" />
         <div>
-          <strong>Retrying AI evaluation</strong>
-          <p>
-            The {automatic?.score ?? "deterministic"}/100 deterministic result
-            stays visible while AI runs in the background.
-          </p>
+          <strong>{copy.retryingTitle}</strong>
+          <p>{copy.retryingDescription(automatic?.score ?? "deterministic")}</p>
         </div>
         <button
           type="button"
           className="ai-ranking-button ai-ranking-button--loading"
           disabled
         >
-          <LoaderCircle aria-hidden="true" className="is-spinning" /> Retrying…
+          <LoaderCircle aria-hidden="true" className="is-spinning" />{" "}
+          {copy.retrying}
         </button>
       </div>
       <div className="automatic-score-cards">
         <AssessmentMetric
-          title="Automatic match"
+          title={copy.automaticMatch}
           value={automatic ? `${automatic.score}/100` : "Ready"}
-          meta="Deterministic result preserved"
+          meta={copy.deterministicPreserved}
           tone="blue"
         />
         <AssessmentMetric
-          title="AI assessment"
-          value="Processing"
-          meta="Retry in progress"
+          title={copy.aiAssessment}
+          value={copy.processing}
+          meta={copy.retryInProgress}
           tone="purple"
+          muted
         />
         <AssessmentMetric
-          title="Final score"
-          value="Pending"
-          meta="Will update when AI succeeds"
+          title={copy.finalScore}
+          value={copy.pending}
+          meta={copy.willUpdate}
           tone="green"
+          muted
         />
       </div>
       <div className="automatic-formula-row">
         <span className="automatic-formula-row__icon">
           <BrainCircuit aria-hidden="true" />
         </span>
-        <strong>
-          Deterministic {automatic?.score ?? "match"} ready · AI retry in
-          progress
-        </strong>
+        <strong>{copy.formulaRetry(automatic?.score ?? "match")}</strong>
         <ScoringLineage automatic={automatic} />
       </div>
     </div>
@@ -182,52 +177,50 @@ function UnavailableAssessment({
   automatic,
   failures,
   safeFailureCode,
+  copy,
 }: {
   automatic: AutomaticMatch;
   failures: number;
   safeFailureCode: string;
+  copy: ApplicationDetailCopy["assessment"];
 }) {
   return (
     <div className="ranking-tab-content">
       <div className="automatic-score-cards">
         <AssessmentMetric
-          title="Automatic match"
+          title={copy.automaticMatch}
           value={`${automatic.score}/100`}
-          meta="Ready"
+          meta={copy.ready}
           tone="blue"
         />
         <AssessmentMetric
-          title="AI assessment"
-          value="Unavailable"
-          meta="Retryable state"
+          title={copy.aiAssessment}
+          value={copy.aiUnavailable}
+          meta={copy.retryable}
           tone="purple"
+          muted
         />
         <AssessmentMetric
-          title="Final score"
-          value="Not calculated"
-          meta="AI is not substituted with zero"
+          title={copy.finalScore}
+          value={copy.notCalculated}
+          meta={copy.willNotUseZero}
           tone="green"
+          muted
         />
       </div>
       <div className="automatic-formula-row">
         <span className="automatic-formula-row__icon">
           <BrainCircuit aria-hidden="true" />
         </span>
-        <strong>
-          Deterministic match: {automatic.score}/100 · AI unavailable
-        </strong>
+        <strong>{copy.formulaUnavailable(automatic.score)}</strong>
         <ScoringLineage automatic={automatic} />
       </div>
       {failures >= 3 ? (
         <div className="ranking-support-callout" role="status">
-          Repeated AI failure ({safeFailureCode}) · try later or contact
-          support.
+          {copy.repeatedFailure(safeFailureCode)}
         </div>
       ) : null}
-      <p className="ranking-method-note">
-        The Automatic match tab remains available, including required skills,
-        experience, and CV evidence.
-      </p>
+      <p className="ranking-method-note">{copy.methodNote}</p>
     </div>
   );
 }
@@ -236,10 +229,12 @@ function ReadyAssessment({
   automatic,
   ai,
   finalScore,
+  copy,
 }: {
   automatic: AutomaticMatch;
   ai: AiAssessment;
   finalScore: FinalScore;
+  copy: ApplicationDetailCopy["assessment"];
 }) {
   const strengths = ai.strengths;
   const verify = ai.pointsToVerify;
@@ -250,7 +245,7 @@ function ReadyAssessment({
           <BrainCircuit />
         </span>
         <div>
-          <h3>Overall assessment</h3>
+          <h3>{copy.overall}</h3>
           <p>{ai.overallSummary}</p>
         </div>
       </section>
@@ -258,23 +253,24 @@ function ReadyAssessment({
         <div className="ranking-warning" role="alert">
           <AlertTriangle aria-hidden="true" />
           <span>
-            <strong>Human review required.</strong>{" "}
+            <strong>{copy.humanReview}</strong>{" "}
             {ai.assessmentLimitedByDataQuality
-              ? "CV data quality is low, so this assessment is limited. Review the parsing notes before relying on this score."
-              : (ai.humanReviewGuidance ??
-                "Review the extraction and evidence before making a recruitment decision.")}
+              ? copy.lowQuality
+              : (ai.humanReviewGuidance ?? copy.defaultHumanGuidance)}
           </span>
         </div>
       ) : null}
       <div className="ai-finding-grid">
         <FindingColumn
-          title="Evidence-based strengths"
+          title={copy.strengths}
+          emptyMessage={copy.noStrengths}
           icon={CheckCircle2}
           items={strengths}
           tone="green"
         />
         <FindingColumn
-          title="Points to verify"
+          title={copy.pointsToVerify}
+          emptyMessage={copy.noGaps}
           icon={CircleAlert}
           items={verify}
           tone="amber"
@@ -284,11 +280,11 @@ function ReadyAssessment({
       <section className="ai-score-reasoning">
         <div className="ai-score-reasoning__score">
           <strong>{ai.score}</strong>
-          <span>/ 100 AI points</span>
+          <span>{copy.aiPoints}</span>
         </div>
         {ai.aiScoreBand ? (
           <div className="ai-score-reasoning__tier">
-            <span>AI score tier</span>
+            <span>{copy.scoreTier}</span>
             <ScoreBadgeFromLabel
               code={ai.aiScoreBand.code}
               label={ai.aiScoreBand.label}
@@ -297,7 +293,7 @@ function ReadyAssessment({
           </div>
         ) : null}
         <div>
-          <h3>Why did the AI give a score of {ai.score}?</h3>
+          <h3>{copy.whyScore(ai.score)}</h3>
           <ul>
             {ai.scoreReasoning.breakdown.slice(0, 4).map((line) => (
               <li key={line.category}>
@@ -315,8 +311,8 @@ function ReadyAssessment({
         <section className="ai-confidence-card">
           <div>
             <span>
-              Confidence &middot; Model {ai.modelVersion} &middot; Prompt{" "}
-              {ai.promptVersion}
+              {copy.confidence} &middot; {copy.model} {ai.modelVersion} &middot;{" "}
+              {copy.prompt} {ai.promptVersion}
             </span>
             <strong>
               {ai.confidencePercent}% &middot;{" "}
@@ -333,9 +329,7 @@ function ReadyAssessment({
             <span style={{ width: `${ai.confidencePercent}%` }} />
           </div>
           {ai.requiresHumanReview ? (
-            <p role="alert">
-              Review required — assess the evidence carefully yourself.
-            </p>
+            <p role="alert">{copy.reviewRequired}</p>
           ) : null}
           {ai.scoreReasoning.confidence.cappedReason ? (
             <p>{ai.scoreReasoning.confidence.cappedReason}</p>
@@ -349,8 +343,7 @@ function ReadyAssessment({
 
       <section className="ai-questions-card">
         <h3>
-          <MessageCircleQuestion aria-hidden="true" /> Suggested interview
-          questions
+          <MessageCircleQuestion aria-hidden="true" /> {copy.suggestedQuestions}
         </h3>
         {ai.suggestedQuestions.length > 0 ? (
           <ol>
@@ -363,16 +356,16 @@ function ReadyAssessment({
           </ol>
         ) : (
           <p className="ranking-muted-text">
-            {ai.questionsUnavailableReason ??
-              "There is not enough job-relevant evidence to generate candidate-specific questions."}
+            {ai.questionsUnavailableReason ?? copy.noQuestions}
           </p>
         )}
       </section>
       <details className="ai-score-formula">
-        <summary>How this score is calculated</summary>
+        <summary>{copy.scoreFormula}</summary>
         <p>
-          {finalScore.formulaText} &middot; Automatic {automatic.score} &times;
-          40% + AI {ai.score} &times; 60%
+          {finalScore.formulaText} &middot;{" "}
+          {copy.automaticFormula(automatic.score)}
+          &times; 40% + AI {ai.score} &times; 60%
         </p>
       </details>
     </div>
@@ -384,11 +377,13 @@ function FindingColumn({
   icon: Icon,
   items,
   tone,
+  emptyMessage,
 }: {
   title: string;
   icon: typeof CheckCircle2;
   items: AiAssessment["strengths"] | AiAssessment["pointsToVerify"];
   tone: "green" | "amber";
+  emptyMessage: string;
 }) {
   return (
     <section className={`ai-finding-column ai-finding-column--${tone}`}>
@@ -407,11 +402,7 @@ function FindingColumn({
           ))}
         </ul>
       ) : (
-        <p className="ranking-muted-text">
-          {title === "Points to verify"
-            ? "No significant gaps identified."
-            : "No reliable strengths could be synthesized."}
-        </p>
+        <p className="ranking-muted-text">{emptyMessage}</p>
       )}
     </section>
   );
@@ -422,11 +413,13 @@ function AssessmentMetric({
   value,
   meta,
   tone,
+  muted = false,
 }: {
   title: string;
   value: string;
   meta: string;
   tone: "blue" | "purple" | "green";
+  muted?: boolean;
 }) {
   return (
     <article className={`automatic-score-card automatic-score-card--${tone}`}>
@@ -438,13 +431,7 @@ function AssessmentMetric({
       <span className="automatic-score-card__track">
         <span
           style={{
-            width:
-              value === "Unavailable" ||
-              value === "Not calculated" ||
-              value === "Pending" ||
-              value === "Processing"
-                ? "60%"
-                : "90%",
+            width: muted ? "60%" : "90%",
           }}
         />
       </span>

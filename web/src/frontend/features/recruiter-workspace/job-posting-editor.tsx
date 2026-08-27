@@ -154,18 +154,10 @@ function formLevelError(
   return Object.keys(fieldErrors).length === 0 ? (message ?? fallback) : "";
 }
 
-function formatReasonCode(code: string): string {
-  const reasonLabels: Record<string, string> = {
-    INCOMPLETE_OR_UNCLEAR: "Incomplete or unclear information",
-    MISLEADING_CONTENT: "Misleading content",
-    INAPPROPRIATE_LANGUAGE: "Inappropriate language",
-    DUPLICATE_POSTING: "Duplicate posting",
-    INVALID_REQUIREMENTS: "Invalid requirements",
-    INSUFFICIENT_COMPENSATION: "Insufficient compensation details",
-    VERIFICATION_MISMATCH: "Verification mismatch",
-    PROHIBITED_CONTENT: "Prohibited content",
-    OTHER: "Other reason",
-  };
+function formatReasonCode(
+  code: string,
+  reasonLabels: Readonly<Record<string, string>>,
+): string {
   return reasonLabels[code] || code.replace(/_/g, " ");
 }
 
@@ -396,7 +388,8 @@ export function JobPostingEditor({
   const autoSaveStorageKey = `${recruiterDraftAutoSaveStoragePrefix}:${autoSavePreferenceScope ?? initialJob.companyId}`;
   const autoSaveEnabled = useRecruiterDraftAutoSave(autoSaveStorageKey);
   const locale = useWorkspaceLocale();
-  const copy = recruiterJobPostingCopy(locale);
+  const copy = useMemo(() => recruiterJobPostingCopy(locale), [locale]);
+  const editor = copy.editor;
   const readOnly = job.status === "pending_approval" || job.status === "closed";
   const canSubmitForApproval =
     job.id === "new-job" || job.status === "draft" || job.status === "rejected";
@@ -409,8 +402,7 @@ export function JobPostingEditor({
   const displayedErrors = salaryRangeInvalid
     ? {
         ...fieldErrors,
-        "salary.max":
-          "Maximum salary must be greater than or equal to minimum salary.",
+        "salary.max": editor.errors.maxSalary,
       }
     : fieldErrors;
 
@@ -669,8 +661,8 @@ export function JobPostingEditor({
               setFieldErrors(nextFieldErrors);
               setError(
                 formLevelError(
-                  draftPayload?.message,
-                  "Unable to save the draft.",
+                  undefined,
+                  editor.errors.unableToSaveDraft,
                   nextFieldErrors,
                 ),
               );
@@ -723,8 +715,8 @@ export function JobPostingEditor({
             setFieldErrors(nextFieldErrors);
             setError(
               formLevelError(
-                review && "message" in review ? review.message : undefined,
-                "Unable to submit this posting for review.",
+                undefined,
+                editor.errors.unableToSubmit,
                 nextFieldErrors,
               ),
             );
@@ -780,15 +772,15 @@ export function JobPostingEditor({
           setFieldErrors(nextFieldErrors);
           setError(
             formLevelError(
-              payload?.message,
-              "Unable to save posting.",
+              undefined,
+              editor.errors.unableToSave,
               nextFieldErrors,
             ),
           );
           return false;
         }
         if (!payload) {
-          setError("The server returned an invalid response.");
+          setError(editor.errors.invalidResponse);
           return false;
         }
         catalogueUpdatedAt.current = payload.updatedAt;
@@ -820,15 +812,13 @@ export function JobPostingEditor({
         }
         return true;
       } catch {
-        setError(
-          "Unable to reach the server. Your changes are still available in this form.",
-        );
+        setError(editor.errors.serverUnavailable);
         return false;
       } finally {
         setSaving(false);
       }
     },
-    [csrfProof, hasUnsavedChanges, onDraftAutoSaved, onSaved],
+    [csrfProof, editor, hasUnsavedChanges, onDraftAutoSaved, onSaved],
   );
 
   const save = async (targetStatus: JobPostingStatus) => {
@@ -1064,7 +1054,9 @@ export function JobPostingEditor({
             aria-label={`${copy.automaticSave}: ${autoSaveEnabled ? copy.on : copy.off}`}
             onClick={toggleAutomaticDraftSave}
           >
-            <span className="recruiter-editor-auto-save__label">AutoSave</span>
+            <span className="recruiter-editor-auto-save__label">
+              {editor.actions.autoSave}
+            </span>
             <span
               className="recruiter-editor-auto-save__track"
               aria-hidden="true"
@@ -1076,24 +1068,23 @@ export function JobPostingEditor({
             </span>
           </button>
         </div>
-        <p>
-          Build a complete, structured listing and review exactly what
-          candidates will see.
-        </p>
+        <p>{editor.intro}</p>
         {job.review?.state === "REJECTED" && job.review.reasonCode ? (
           <div
             className="recruiter-editor-rejection-notice"
             role="alert"
             aria-live="polite"
           >
-            <strong>Revision needed</strong>
+            <strong>{editor.revisionNeeded}</strong>
             <p>
-              <strong>{formatReasonCode(job.review.reasonCode)}</strong>
+              <strong>
+                {formatReasonCode(job.review.reasonCode, editor.reasonLabels)}
+              </strong>
               {job.review.publicExplanation
                 ? `: ${job.review.publicExplanation}`
                 : null}
             </p>
-            <p>Make the required changes and submit again for a new review.</p>
+            <p>{editor.revisionInstruction}</p>
           </div>
         ) : null}
         {job.correctionRequest ? (
@@ -1102,12 +1093,9 @@ export function JobPostingEditor({
             role="status"
             aria-live="polite"
           >
-            <strong>Administrator requested changes</strong>
+            <strong>{editor.administratorRequested}</strong>
             <p>{job.correctionRequest.publicExplanation}</p>
-            <p>
-              The current approved version remains live until your revised
-              version is reviewed.
-            </p>
+            <p>{editor.approvedVersionLive}</p>
           </div>
         ) : null}
       </div>
@@ -1128,7 +1116,7 @@ export function JobPostingEditor({
         <div
           className="recruiter-editor-progress__track"
           role="progressbar"
-          aria-label="Job posting completion"
+          aria-label={editor.completionAria}
           aria-valuemin={0}
           aria-valuemax={6}
           aria-valuenow={completedSections}
@@ -1143,15 +1131,12 @@ export function JobPostingEditor({
           onSubmit={(event) => event.preventDefault()}
           noValidate
         >
-          <p className="recruiter-required-note">
-            Fields marked * are required before submission. Drafts can be saved
-            at any time.
-          </p>
+          <p className="recruiter-required-note">{editor.requiredNote}</p>
 
           <EditorSection
             number={1}
-            title="Basic info"
-            description="Define how candidates discover and understand the role."
+            title={editor.sections.basicInfo}
+            description={editor.sections.basicInfoDescription}
             readyLabel={copy.ready}
             inProgressLabel={copy.inProgress}
             complete={sectionCompletion[0]}
@@ -1159,34 +1144,34 @@ export function JobPostingEditor({
             onToggle={(open) => setSectionOpen(0, open)}
           >
             <label>
-              Job title *
+              {editor.fields.jobTitle} *
               <input
                 disabled={readOnly}
                 required
                 maxLength={200}
                 value={job.title}
                 onChange={(event) => update("title", event.target.value)}
-                placeholder="e.g. Senior Product Designer"
+                placeholder={editor.placeholders.jobTitle}
                 {...fieldA11y("title")}
               />
               <FieldError field="title" errors={displayedErrors} />
             </label>
             <label>
-              Short pitch *
+              {editor.fields.shortPitch} *
               <input
                 disabled={readOnly}
                 required
                 maxLength={500}
                 value={job.shortPitch}
                 onChange={(event) => update("shortPitch", event.target.value)}
-                placeholder="A concise reason candidates should explore this role"
+                placeholder={editor.placeholders.shortPitch}
                 {...fieldA11y("shortPitch")}
               />
               <FieldError field="shortPitch" errors={displayedErrors} />
             </label>
             <div className="recruiter-form-grid">
               <label>
-                Industry *
+                {editor.fields.industry} *
                 <select
                   disabled={readOnly}
                   required
@@ -1208,7 +1193,7 @@ export function JobPostingEditor({
                 {availableSubIndustries.length > 0 ? (
                   <>
                     <label htmlFor="recruiter-sub-industry">
-                      Sub-industry *
+                      {editor.fields.subIndustry} *
                     </label>
                     <select
                       id="recruiter-sub-industry"
@@ -1232,7 +1217,7 @@ export function JobPostingEditor({
                       {...fieldA11y("subIndustry")}
                     >
                       <option value="" disabled>
-                        Choose a sub-industry
+                        {editor.fields.chooseSubIndustry}
                       </option>
                       {availableSubIndustries.map((label) => (
                         <option key={label} value={label}>
@@ -1240,7 +1225,7 @@ export function JobPostingEditor({
                         </option>
                       ))}
                       <option value={customSubIndustryValue}>
-                        Add a new sub-industry…
+                        {editor.fields.addSubIndustry}
                       </option>
                     </select>
                   </>
@@ -1249,8 +1234,8 @@ export function JobPostingEditor({
                 availableSubIndustries.length === 0 ? (
                   <label htmlFor="recruiter-custom-sub-industry">
                     {availableSubIndustries.length > 0
-                      ? "New sub-industry *"
-                      : "Sub-industry *"}
+                      ? `${editor.fields.newSubIndustry} *`
+                      : `${editor.fields.subIndustry} *`}
                     <input
                       id="recruiter-custom-sub-industry"
                       disabled={readOnly}
@@ -1260,7 +1245,7 @@ export function JobPostingEditor({
                       onChange={(event) =>
                         updateSubIndustry(event.currentTarget.value)
                       }
-                      placeholder="e.g. Aerospace Engineering"
+                      placeholder={editor.placeholders.subIndustry}
                       {...fieldA11y("subIndustry")}
                     />
                   </label>
@@ -1272,8 +1257,8 @@ export function JobPostingEditor({
 
           <EditorSection
             number={2}
-            title="Location & work arrangement"
-            description="Set where and how the team works."
+            title={editor.sections.location}
+            description={editor.sections.locationDescription}
             readyLabel={copy.ready}
             inProgressLabel={copy.inProgress}
             complete={sectionCompletion[1]}
@@ -1282,7 +1267,7 @@ export function JobPostingEditor({
           >
             <div className="recruiter-form-grid">
               <label>
-                City *
+                {editor.fields.city} *
                 <input
                   disabled={readOnly}
                   required
@@ -1305,7 +1290,7 @@ export function JobPostingEditor({
                 <FieldError field="location.city" errors={displayedErrors} />
               </label>
               <label>
-                District
+                {editor.fields.district}
                 <input
                   disabled={readOnly}
                   maxLength={160}
@@ -1324,7 +1309,7 @@ export function JobPostingEditor({
             </div>
             <div className="recruiter-form-grid">
               <label>
-                Work arrangement *
+                {editor.fields.workArrangement} *
                 <select
                   disabled={readOnly}
                   required
@@ -1333,13 +1318,19 @@ export function JobPostingEditor({
                     update("workArrangement", event.target.value)
                   }
                 >
-                  <option value="onsite">On-site</option>
-                  <option value="hybrid">Hybrid</option>
-                  <option value="remote">Remote</option>
+                  <option value="onsite">
+                    {editor.options.workArrangement.onsite}
+                  </option>
+                  <option value="hybrid">
+                    {editor.options.workArrangement.hybrid}
+                  </option>
+                  <option value="remote">
+                    {editor.options.workArrangement.remote}
+                  </option>
                 </select>
               </label>
               <label>
-                Employment type *
+                {editor.fields.employmentType} *
                 <select
                   disabled={readOnly}
                   required
@@ -1348,9 +1339,9 @@ export function JobPostingEditor({
                     update("employmentType", event.target.value)
                   }
                 >
-                  {employmentOptions.map(([value, label]) => (
+                  {employmentOptions.map(([value]) => (
                     <option value={value} key={value}>
-                      {label}
+                      {editor.options.employment[value]}
                     </option>
                   ))}
                 </select>
@@ -1358,8 +1349,8 @@ export function JobPostingEditor({
             </div>
             <div className="recruiter-toggle-grid">
               <ToggleField
-                label="Nationwide remote"
-                help="Candidates can work remotely from anywhere in Vietnam."
+                label={editor.fields.nationwideRemote}
+                help={editor.fields.nationwideRemoteHelp}
                 checked={job.location.isNationwideRemote}
                 disabled={readOnly}
                 onChange={(checked) =>
@@ -1376,8 +1367,8 @@ export function JobPostingEditor({
                 }
               />
               <ToggleField
-                label="Work on Saturday"
-                help="Make the Saturday schedule visible before candidates apply."
+                label={editor.fields.workSaturday}
+                help={editor.fields.workSaturdayHelp}
                 checked={job.workOnSaturday}
                 disabled={readOnly}
                 onChange={(checked) => update("workOnSaturday", checked)}
@@ -1385,7 +1376,7 @@ export function JobPostingEditor({
             </div>
             <div className="recruiter-form-grid">
               <label>
-                Working hours
+                {editor.fields.workingHours}
                 <input
                   disabled={readOnly}
                   maxLength={300}
@@ -1402,11 +1393,11 @@ export function JobPostingEditor({
                       },
                     }))
                   }
-                  placeholder="Monday-Friday, 8:30-17:30"
+                  placeholder={editor.placeholders.workingHours}
                 />
               </label>
               <label>
-                Work address
+                {editor.fields.workAddress}
                 <input
                   disabled={readOnly}
                   maxLength={300}
@@ -1423,15 +1414,15 @@ export function JobPostingEditor({
                       },
                     }))
                   }
-                  placeholder="Specific office address"
+                  placeholder={editor.placeholders.workAddress}
                 />
               </label>
             </div>
           </EditorSection>
           <EditorSection
             number={3}
-            title="Candidate requirements"
-            description="Describe the experience and qualifications needed to succeed."
+            title={editor.sections.requirements}
+            description={editor.sections.requirementsDescription}
             readyLabel={copy.ready}
             inProgressLabel={copy.inProgress}
             complete={sectionCompletion[2]}
@@ -1440,7 +1431,7 @@ export function JobPostingEditor({
           >
             <div className="recruiter-form-grid recruiter-form-grid--three">
               <label>
-                Minimum years *
+                {editor.fields.minimumYears} *
                 <input
                   disabled={readOnly}
                   type="number"
@@ -1470,7 +1461,7 @@ export function JobPostingEditor({
                 />
               </label>
               <label>
-                Experience label *
+                {editor.fields.experienceLabel} *
                 <select
                   disabled={readOnly}
                   value={job.experience.label}
@@ -1501,14 +1492,18 @@ export function JobPostingEditor({
                   ) : null}
                   {experienceOptions.map((option) => (
                     <option value={option.label} key={option.label}>
-                      {option.label}
+                      {
+                        (editor.options.experience as Record<string, string>)[
+                          String(option.minYears)
+                        ]
+                      }
                     </option>
                   ))}
                 </select>
                 <FieldError field="experience.label" errors={displayedErrors} />
               </label>
               <label>
-                Job level *
+                {editor.fields.jobLevel} *
                 <select
                   disabled={readOnly}
                   value={job.level}
@@ -1518,9 +1513,9 @@ export function JobPostingEditor({
                   {!levelOptions.some(([value]) => value === job.level) ? (
                     <option value={job.level}>{titleCase(job.level)}</option>
                   ) : null}
-                  {levelOptions.map(([value, label]) => (
+                  {levelOptions.map(([value]) => (
                     <option value={value} key={value}>
-                      {label}
+                      {editor.options.level[value]}
                     </option>
                   ))}
                 </select>
@@ -1529,7 +1524,7 @@ export function JobPostingEditor({
             </div>
             <div className="recruiter-form-grid">
               <label>
-                Education *
+                {editor.fields.education} *
                 <select
                   disabled={readOnly}
                   value={job.education}
@@ -1543,27 +1538,27 @@ export function JobPostingEditor({
                   ) : null}
                   {educationOptions.map((option) => (
                     <option value={option} key={option}>
-                      {option}
+                      {editor.options.education[option]}
                     </option>
                   ))}
                 </select>
                 <FieldError field="education" errors={displayedErrors} />
               </label>
               <label>
-                Age range
+                {editor.fields.ageRange}
                 <input
                   disabled={readOnly}
                   maxLength={80}
                   value={job.age}
                   onChange={(event) => update("age", event.target.value)}
-                  placeholder="e.g. 23-26 (optional)"
+                  placeholder={editor.placeholders.ageRange}
                 />
               </label>
             </div>
             <label>
-              Skills
+              {editor.fields.skills}
               <span className="recruiter-field-help">
-                Separate skills with commas; spaces are allowed inside a skill.
+                {editor.fields.skillsHelp}
               </span>
               <input
                 disabled={readOnly}
@@ -1573,13 +1568,13 @@ export function JobPostingEditor({
                   setSkillInput(value);
                   update("skillTags", skillInputToTags(value));
                 }}
-                placeholder="React, TypeScript, Product design"
+                placeholder={editor.placeholders.skills}
               />
             </label>
             <label>
-              Requirements
+              {editor.fields.requirements}
               <span className="recruiter-field-help">
-                Enter one requirement per line.
+                {editor.fields.requirementsHelp}
               </span>
               <textarea
                 disabled={readOnly}
@@ -1594,9 +1589,7 @@ export function JobPostingEditor({
                     },
                   }))
                 }
-                placeholder={
-                  "3+ years in a similar role\nStrong communication skills\nPortfolio of relevant work"
-                }
+                placeholder={editor.placeholders.requirements}
               />
               <FieldError
                 field="description.requirements"
@@ -1607,8 +1600,8 @@ export function JobPostingEditor({
 
           <EditorSection
             number={4}
-            title="Salary & benefits"
-            description="Use readable VND amounts and highlight the complete rewards package."
+            title={editor.sections.salary}
+            description={editor.sections.salaryDescription}
             readyLabel={copy.ready}
             inProgressLabel={copy.inProgress}
             complete={sectionCompletion[3]}
@@ -1617,7 +1610,7 @@ export function JobPostingEditor({
           >
             <div className="recruiter-form-grid">
               <label>
-                Minimum salary
+                {editor.fields.minimumSalary}
                 <div className="recruiter-salary-input">
                   <input
                     disabled={readOnly}
@@ -1628,7 +1621,7 @@ export function JobPostingEditor({
                       updateSalary("min", event.target.value)
                     }
                     onBlur={() => finishSalaryInput("min")}
-                    placeholder="29.000.000 or 29tr"
+                    placeholder={editor.placeholders.minimumSalary}
                     {...fieldA11y("salary.min")}
                   />
                   <span>VND</span>
@@ -1636,7 +1629,7 @@ export function JobPostingEditor({
                 <FieldError field="salary.min" errors={displayedErrors} />
               </label>
               <label>
-                Maximum salary
+                {editor.fields.maximumSalary}
                 <div className="recruiter-salary-input">
                   <input
                     disabled={readOnly}
@@ -1647,7 +1640,7 @@ export function JobPostingEditor({
                       updateSalary("max", event.target.value)
                     }
                     onBlur={() => finishSalaryInput("max")}
-                    placeholder="33.000.000 or 33tr"
+                    placeholder={editor.placeholders.maximumSalary}
                     {...fieldA11y("salary.max")}
                   />
                   <span>VND</span>
@@ -1656,12 +1649,11 @@ export function JobPostingEditor({
               </label>
             </div>
             <p className="recruiter-field-help recruiter-salary-help">
-              Type the full amount or shorthand such as 29tr. Values are saved
-              as plain numbers in jobs.json.
+              {editor.fields.salaryHelp}
             </p>
             <ToggleField
-              label="Negotiable"
-              help="Candidates will see that the salary range is open to discussion."
+              label={editor.fields.negotiable}
+              help={editor.fields.negotiableHelp}
               checked={job.salary.isNegotiable}
               disabled={readOnly}
               onChange={(checked) =>
@@ -1673,10 +1665,9 @@ export function JobPostingEditor({
             />
 
             <fieldset className="recruiter-benefits-fieldset">
-              <legend>Benefits</legend>
+              <legend>{editor.fields.benefits}</legend>
               <p className="recruiter-field-help">
-                Select predefined benefits, then customize the candidate-facing
-                label if needed.
+                {editor.fields.benefitsHelp}
               </p>
               <div className="recruiter-benefit-grid">
                 {benefitOptions.map((option) => {
@@ -1697,7 +1688,9 @@ export function JobPostingEditor({
                       <label className="recruiter-benefit-card">
                         <input
                           type="checkbox"
-                          aria-label={option.label}
+                          aria-label={
+                            editor.options.benefits[option.icon] ?? option.label
+                          }
                           disabled={readOnly}
                           checked={Boolean(selected)}
                           onChange={(event) =>
@@ -1715,7 +1708,7 @@ export function JobPostingEditor({
                           <Icon />
                         </span>
                         <span className="recruiter-benefit-card__label">
-                          {option.label}
+                          {editor.options.benefits[option.icon] ?? option.label}
                         </span>
                         <span
                           className="recruiter-benefit-card__check"
@@ -1731,11 +1724,21 @@ export function JobPostingEditor({
                       >
                         <div>
                           <input
-                            aria-label={`Benefit label for ${option.label}`}
+                            aria-label={editor.benefitLabel(
+                              editor.options.benefits[option.icon] ??
+                                option.label,
+                            )}
                             disabled={readOnly || !selected}
                             tabIndex={selected ? undefined : -1}
                             maxLength={300}
-                            value={selected?.label ?? option.label}
+                            value={
+                              selected?.label === option.label
+                                ? (editor.options.benefits[option.icon] ??
+                                  option.label)
+                                : (selected?.label ??
+                                  editor.options.benefits[option.icon] ??
+                                  option.label)
+                            }
                             onChange={(event) =>
                               updateBenefitLabel(
                                 option.icon,
@@ -1753,8 +1756,8 @@ export function JobPostingEditor({
           </EditorSection>
           <EditorSection
             number={5}
-            title="Job description"
-            description="Explain the impact, day-to-day work, and strongest reasons to join."
+            title={editor.sections.description}
+            description={editor.sections.descriptionDescription}
             readyLabel={copy.ready}
             inProgressLabel={copy.inProgress}
             complete={sectionCompletion[4]}
@@ -1762,7 +1765,7 @@ export function JobPostingEditor({
             onToggle={(open) => setSectionOpen(4, open)}
           >
             <label>
-              Overview *
+              {editor.fields.overview} *
               <textarea
                 disabled={readOnly}
                 required
@@ -1781,7 +1784,7 @@ export function JobPostingEditor({
                     "description.overview",
                   )
                 }
-                placeholder="What will this person make possible?"
+                placeholder={editor.placeholders.overview}
                 {...fieldA11y("description.overview")}
               />
               <FieldError
@@ -1790,14 +1793,13 @@ export function JobPostingEditor({
               />
             </label>
             <fieldset className="recruiter-top-reasons">
-              <legend>Top reasons to join</legend>
+              <legend>{editor.fields.topReasons}</legend>
               <p className="recruiter-field-help">
-                Add up to three short highlights shown near the top of the
-                listing.
+                {editor.fields.topReasonsHelp}
               </p>
               {[0, 1, 2].map((index) => (
                 <label key={index}>
-                  Top reason {index + 1}
+                  {editor.fields.topReason(index)}
                   <input
                     disabled={readOnly}
                     maxLength={2_000}
@@ -1807,17 +1809,17 @@ export function JobPostingEditor({
                     }
                     placeholder={
                       index === 0
-                        ? "e.g. Work directly with international clients"
-                        : "Another reason candidates should join"
+                        ? editor.placeholders.firstReason
+                        : editor.placeholders.otherReason
                     }
                   />
                 </label>
               ))}
             </fieldset>
             <label>
-              Responsibilities
+              {editor.fields.responsibilities}
               <span className="recruiter-field-help">
-                Enter one responsibility per line.
+                {editor.fields.responsibilitiesHelp}
               </span>
               <textarea
                 disabled={readOnly}
@@ -1832,9 +1834,7 @@ export function JobPostingEditor({
                     },
                   }))
                 }
-                placeholder={
-                  "Own the roadmap for your domain\nCollaborate with product and engineering\nShare progress with stakeholders"
-                }
+                placeholder={editor.placeholders.responsibilities}
               />
               <FieldError
                 field="description.responsibilities"
@@ -1842,7 +1842,7 @@ export function JobPostingEditor({
               />
             </label>
             <label>
-              Reports to
+              {editor.fields.reportsTo}
               <input
                 disabled={readOnly}
                 maxLength={160}
@@ -1859,15 +1859,15 @@ export function JobPostingEditor({
                     },
                   }))
                 }
-                placeholder="e.g. Head of Engineering"
+                placeholder={editor.placeholders.reportsTo}
               />
             </label>
           </EditorSection>
 
           <EditorSection
             number={6}
-            title="Hiring settings"
-            description="Set headcount, urgency, and the application window."
+            title={editor.sections.hiring}
+            description={editor.sections.hiringDescription}
             readyLabel={copy.ready}
             inProgressLabel={copy.inProgress}
             complete={sectionCompletion[5]}
@@ -1876,7 +1876,7 @@ export function JobPostingEditor({
           >
             <div className="recruiter-form-grid">
               <label>
-                Number of hires *
+                {editor.fields.numberOfHires} *
                 <input
                   disabled={readOnly}
                   type="number"
@@ -1894,7 +1894,8 @@ export function JobPostingEditor({
                 <FieldError field="numberOfHires" errors={displayedErrors} />
               </label>
               <label>
-                Application deadline{canSubmitForApproval ? " *" : ""}
+                {editor.fields.applicationDeadline}
+                {canSubmitForApproval ? " *" : ""}
                 <input
                   disabled={readOnly}
                   type="date"
@@ -1923,7 +1924,7 @@ export function JobPostingEditor({
                     if (rawValue && !dateInputToIso(rawValue)) {
                       setFieldErrors((current) => ({
                         ...current,
-                        applyDeadline: "Enter a valid application deadline.",
+                        applyDeadline: editor.errors.deadlineInvalid,
                       }));
                       setError("");
                     }
@@ -1932,13 +1933,13 @@ export function JobPostingEditor({
                 />
                 <FieldError field="applyDeadline" errors={displayedErrors} />
                 <span className="recruiter-field-help">
-                  Required when submitting for approval; optional for drafts.
+                  {editor.fields.deadlineHelp}
                 </span>
               </label>
             </div>
             <ToggleField
-              label="Urgent hiring"
-              help="Highlight this opening as a priority role for candidates."
+              label={editor.fields.urgentHiring}
+              help={editor.fields.urgentHelp}
               checked={job.isUrgent}
               disabled={readOnly}
               onChange={(checked) => update("isUrgent", checked)}
@@ -1961,13 +1962,13 @@ export function JobPostingEditor({
               disabled={awaitDraftSaveBeforeBack && saving}
               onClick={() => void leaveEditor()}
             >
-              Cancel
+              {editor.actions.cancel}
             </button>
             {readOnly ? (
               <Badge tone={job.status === "closed" ? "neutral" : "warning"}>
                 {job.status === "closed"
-                  ? "Closed posting — view only"
-                  : "Editing locked during review"}
+                  ? editor.actions.closedViewOnly
+                  : editor.actions.editingLocked}
               </Badge>
             ) : canSubmitForApproval ? (
               <>
@@ -1977,7 +1978,7 @@ export function JobPostingEditor({
                   disabled={saving}
                   onClick={() => void save("draft")}
                 >
-                  {saving ? "Saving…" : "Save draft"}
+                  {saving ? copy.saving : editor.actions.saveDraft}
                 </button>
                 <button
                   type="button"
@@ -1986,10 +1987,10 @@ export function JobPostingEditor({
                   onClick={() => void save("pending_approval")}
                 >
                   {saving
-                    ? "Submitting…"
+                    ? editor.actions.submitting
                     : job.status === "rejected"
-                      ? "Revise & resubmit"
-                      : "Submit for approval"}
+                      ? editor.actions.reviseResubmit
+                      : editor.actions.submitApproval}
                 </button>
               </>
             ) : (
@@ -1999,7 +2000,7 @@ export function JobPostingEditor({
                 disabled={saving}
                 onClick={() => void save(defaultSaveStatus)}
               >
-                {saving ? "Saving…" : "Save changes"}
+                {saving ? copy.saving : editor.actions.saveChanges}
               </button>
             )}
           </div>
@@ -2011,22 +2012,18 @@ export function JobPostingEditor({
       {/* The accessible Modal is the confirmation equivalent of window.confirm. */}
       <Modal
         open={Boolean(pendingSubmission)}
-        title="Submit job for approval?"
-        description="Send this posting to an Administrator for review."
+        title={editor.submitDialog.title}
+        description={editor.submitDialog.description}
         icon="✓"
         onClose={() => setPendingSubmission(null)}
       >
         <div className="recruiter-submit-confirmation">
           <p className="recruiter-submit-confirmation__lead">
-            Once submitted, this version is locked and cannot be edited until
-            the review is complete.
+            {editor.submitDialog.lead}
           </p>
           <div className="recruiter-submit-confirmation__notice">
-            <strong>Before you submit</strong>
-            <span>
-              Make sure the title, salary, deadline, and required skills are
-              correct.
-            </span>
+            <strong>{editor.submitDialog.beforeSubmit}</strong>
+            <span>{editor.submitDialog.checklist}</span>
           </div>
           <div className="sh-modal-actions">
             <button
@@ -2035,14 +2032,14 @@ export function JobPostingEditor({
               data-autofocus
               onClick={() => setPendingSubmission(null)}
             >
-              Cancel
+              {editor.actions.cancel}
             </button>
             <button
               type="button"
               className="recruiter-primary-button"
               onClick={confirmSubmission}
             >
-              Submit for approval
+              {editor.actions.submitApproval}
             </button>
           </div>
         </div>

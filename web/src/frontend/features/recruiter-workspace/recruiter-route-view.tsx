@@ -12,6 +12,8 @@ import {
 import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
 import type { RecruiterJobPostingTab } from "@/shared/routing/recruiter-routes";
 import { collectRecruiterSubIndustrySuggestions } from "@/shared/contracts/jobs/industry-taxonomy";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruiterWorkspaceCopy } from "./recruiter-workspace-copy";
 
 type RecruiterRouteViewProps = {
   view: "list" | "create" | "edit";
@@ -29,6 +31,7 @@ export function RecruiterRouteView({
   initialCompanyId,
 }: RecruiterRouteViewProps) {
   const router = useRouter();
+  const copy = recruiterWorkspaceCopy(useWorkspaceLocale());
   const selectedCompany =
     initialData.companies.find((item) => item.id === initialCompanyId) ??
     initialData.companies.find((item) => item.id === initialData.companyId);
@@ -78,14 +81,14 @@ export function RecruiterRouteView({
   if (!job) {
     return (
       <section className="recruiter-empty-state recruiter-surface-card">
-        <h1>Job posting not found</h1>
-        <p>This posting may have been removed or is no longer available.</p>
+        <h1>{copy.route.jobNotFound}</h1>
+        <p>{copy.route.jobNotFoundDescription}</p>
         <button
           className="recruiter-primary-button"
           type="button"
           onClick={() => router.replace(recruiterRoutes.jobPostings)}
         >
-          Back to job postings
+          {copy.route.backToPostings}
         </button>
       </section>
     );

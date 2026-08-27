@@ -9,14 +9,19 @@ import {
   registrationSchema,
   type RegistrationInput,
 } from "@/shared/contracts/identity/registration";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { PasswordField } from "./password-field";
 import { PasswordRequirementChecklist } from "./password-requirement-checklist";
-
-const GENERIC_REGISTRATION_ERROR =
-  "Registration is temporarily unavailable. Please try again.";
+import {
+  authCopy,
+  localizedAuthFieldError,
+  localizedAuthMessage,
+} from "./auth-copy";
 
 export function RegisterForm() {
   const router = useRouter();
+  const locale = useWorkspaceLocale();
+  const copy = authCopy(locale);
   const [serverStatus, setServerStatus] = useState("");
   const {
     register,
@@ -52,19 +57,23 @@ export function RegisterForm() {
           setError(field as keyof RegistrationInput, { message: messages[0] });
         setServerStatus(
           fieldEntries.length === 0
-            ? (body?.message ?? GENERIC_REGISTRATION_ERROR)
+            ? localizedAuthMessage(
+                locale,
+                body?.message,
+                copy.register.registrationError,
+              )
             : "",
         );
-        toast.error("Registration needs attention.");
+        toast.error(copy.register.registrationAttention);
         return;
       }
       const email = values.email.trim().toLowerCase();
       sessionStorage.setItem("pending_verification_email", email);
-      toast.success("Check your email.");
+      toast.success(copy.register.checkEmail);
       router.push(`/check-email?email=${encodeURIComponent(email)}`);
     } catch {
-      setServerStatus(GENERIC_REGISTRATION_ERROR);
-      toast.error("Registration needs attention.");
+      setServerStatus(copy.register.registrationError);
+      toast.error(copy.register.registrationAttention);
     }
   });
   return (
@@ -75,43 +84,61 @@ export function RegisterForm() {
       aria-busy={isSubmitting}
     >
       <div className="auth-form-heading">
-        <p className="form-kicker">START YOUR JOURNEY</p>
-        <h1>Create your SmartHire account</h1>
-        <p>All accounts begin with a Candidate identity.</p>
+        <p className="form-kicker">{copy.register.kicker}</p>
+        <h1>{copy.register.title}</h1>
+        <p>{copy.register.description}</p>
       </div>
-      <Field label="Full name" error={errors.name?.message}>
+      <Field
+        label={copy.register.fullName}
+        error={localizedAuthFieldError(locale, "name", errors.name?.message)}
+      >
         <input autoComplete="name" {...register("name")} />
       </Field>
-      <Field label="Email address" error={errors.email?.message}>
+      <Field
+        label={copy.common.emailAddress}
+        error={localizedAuthFieldError(
+          locale,
+          "email",
+          errors.email?.message,
+        )}
+      >
         <input
           type="email"
           autoComplete="email"
           inputMode="email"
           autoCapitalize="none"
           spellCheck={false}
-          placeholder="example@email.com"
+          placeholder={copy.common.emailPlaceholder}
           {...register("email")}
         />
       </Field>
       <PasswordField
-        label="Password"
-        error={errors.password?.message}
+        label={copy.register.password}
+        error={localizedAuthFieldError(
+          locale,
+          "password",
+          errors.password?.message,
+        )}
         autoComplete="new-password"
         {...register("password")}
       />
       <PasswordRequirementChecklist value={password} />
       <PasswordField
-        label="Confirm password"
-        error={errors.passwordConfirmation?.message}
+        label={copy.register.confirmPassword}
+        error={localizedAuthFieldError(
+          locale,
+          "passwordConfirmation",
+          errors.passwordConfirmation?.message,
+        )}
         autoComplete="new-password"
         {...register("passwordConfirmation")}
       />
       <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Creating account…" : "Create account"}
+        {isSubmitting ? copy.register.creating : copy.register.create}
       </button>
       {serverStatus && <p role="alert">{serverStatus}</p>}
       <div role="status" aria-live="polite">
-        {isSubmitting ? "Submitting securely." : ""}
+        {isSubmitting ? copy.register.submitting : ""}
       </div>
     </form>
   );

@@ -12,7 +12,6 @@ import {
   UsersRound,
   UserRoundPlus,
 } from "lucide-react";
-import { Badge } from "@/frontend/components/ui/badge";
 import { Panel } from "@/frontend/components/ui/design-system";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { WorkspacePageHeader } from "@/frontend/features/dashboard/components/page-header";
@@ -75,6 +74,30 @@ function connectionCopy(locale: "vi" | "en") {
         title: "Kết nối chuyên nghiệp",
         description:
           "Xem xét từng đề xuất độc lập. Tin nhắn chỉ mở khi cả hai bên chấp nhận.",
+        discoveryEyebrow: "KHÁM PHÁ HỒ SƠ",
+        discoveryTitle: "Tìm chuyên gia theo ID",
+        discoveryDescription:
+          "Chỉ những hồ sơ cho phép tìm kiếm bằng ID chính xác mới xuất hiện ở đây.",
+        discoveryLabel: "ID ứng viên",
+        searching: "Đang tìm…",
+        search: "Tìm kiếm",
+        viewProfile: "Xem hồ sơ",
+        viewProfileAria: (name: string) => `Xem hồ sơ của ${name}`,
+        overview: "Tổng quan kết nối",
+        activeConnections: "Kết nối đang hoạt động",
+        awaitingResponse: "Đang chờ phản hồi",
+        privateByDesign: "Riêng tư theo thiết kế",
+        messagingConsent: "Nhắn tin chỉ mở khi có sự đồng thuận",
+        recentSearchesEyebrow: "KHÁM PHÁ HỒ SƠ",
+        recentSearchesTitle: "Tìm kiếm hồ sơ gần đây",
+        savedCount: (count: number) => `${count} đã lưu`,
+        noRecentSearches: "Chưa có tìm kiếm gần đây",
+        noRecentSearchesCopy:
+          "Những hồ sơ bạn tìm bằng ID ứng viên chính xác sẽ xuất hiện ở đây để truy cập nhanh trên trình duyệt này.",
+        ownAccount:
+          "Đây là ID tài khoản của bạn. Hãy quản lý hồ sơ từ phần cài đặt hồ sơ.",
+        searchFailed: "Không thể hoàn tất tìm kiếm.",
+        noVisibleProfile: "Không tìm thấy hồ sơ công khai.",
         connected: "Đang kết nối trực tuyến",
         offline: "Ngoại tuyến",
         connecting: "Đang kết nối",
@@ -132,6 +155,30 @@ function connectionCopy(locale: "vi" | "en") {
         title: "Professional Connections",
         description:
           "Review proposals independently. Messaging opens only after both people accept.",
+        discoveryEyebrow: "PROFILE DISCOVERY",
+        discoveryTitle: "Find a professional by ID",
+        discoveryDescription:
+          "Only profiles that allow exact-ID discovery appear here.",
+        discoveryLabel: "Candidate ID",
+        searching: "Searching…",
+        search: "Search",
+        viewProfile: "View profile",
+        viewProfileAria: (name: string) => `View ${name}'s profile`,
+        overview: "Connection overview",
+        activeConnections: "Active connections",
+        awaitingResponse: "Awaiting your response",
+        privateByDesign: "Private by design",
+        messagingConsent: "Messaging opens only with consent",
+        recentSearchesEyebrow: "PROFILE DISCOVERY",
+        recentSearchesTitle: "Recent profile searches",
+        savedCount: (count: number) => `${count} saved`,
+        noRecentSearches: "No recent searches",
+        noRecentSearchesCopy:
+          "Profiles you find by exact candidate ID will appear here for quick access on this browser.",
+        ownAccount:
+          "This is your account ID. Manage your profile from Profile settings.",
+        searchFailed: "Unable to complete this search.",
+        noVisibleProfile: "No visible profile found.",
         connected: "Realtime connected",
         offline: "Offline",
         connecting: "Connecting",
@@ -305,9 +352,7 @@ export function ConnectionsWorkspace({
     setLookupMessage(null);
     if (!target) return;
     if (target === currentUserId) {
-      setLookupMessage(
-        "This is your account ID. Manage your profile from Profile settings.",
-      );
+      setLookupMessage(copy.ownAccount);
       return;
     }
     setLookupBusy(true);
@@ -318,15 +363,19 @@ export function ConnectionsWorkspace({
       );
       const body = await response.json().catch(() => ({}));
       if (!response.ok) {
-        setLookupMessage(body.message ?? "Unable to complete this search.");
+        setLookupMessage(
+          locale === "en" && typeof body.message === "string"
+            ? body.message
+            : copy.searchFailed,
+        );
         return;
       }
       const result = body.result ?? null;
       setLookupResult(result);
       if (result) rememberProfile(result);
-      else setLookupMessage("No visible profile found.");
+      else setLookupMessage(copy.noVisibleProfile);
     } catch {
-      setLookupMessage("Unable to complete this search.");
+      setLookupMessage(copy.searchFailed);
     } finally {
       setLookupBusy(false);
     }
@@ -353,7 +402,8 @@ export function ConnectionsWorkspace({
       await refresh();
     } catch (reason) {
       setError(
-        reason instanceof Error &&
+        locale === "en" &&
+          reason instanceof Error &&
           reason.message !== "CONNECTION_REQUEST_FAILED"
           ? reason.message
           : copy.saveError,
@@ -409,17 +459,17 @@ export function ConnectionsWorkspace({
           </span>
           <div>
             <p className="connections-profile-lookup__eyebrow">
-              PROFILE DISCOVERY
+              {copy.discoveryEyebrow}
             </p>
-            <h2 id="profile-lookup-title">Find a professional by ID</h2>
-            <p>Only profiles that allow exact-ID discovery appear here.</p>
+            <h2 id="profile-lookup-title">{copy.discoveryTitle}</h2>
+            <p>{copy.discoveryDescription}</p>
           </div>
         </div>
         <form
           onSubmit={findProfile}
           className="connections-profile-lookup__form"
         >
-          <label htmlFor="candidate-profile-id">Candidate ID</label>
+          <label htmlFor="candidate-profile-id">{copy.discoveryLabel}</label>
           <div>
             <input
               id="candidate-profile-id"
@@ -430,7 +480,7 @@ export function ConnectionsWorkspace({
               required
             />
             <button type="submit" className="primary" disabled={lookupBusy}>
-              {lookupBusy ? "Searching…" : "Search"}
+              {lookupBusy ? copy.searching : copy.search}
             </button>
           </div>
         </form>
@@ -455,9 +505,9 @@ export function ConnectionsWorkspace({
             <Link
               className="connections-profile-result__action"
               href={`/people/${encodeURIComponent(lookupResult.userId)}`}
-              aria-label={`View ${lookupResult.displayName}'s profile`}
+              aria-label={copy.viewProfileAria(lookupResult.displayName)}
             >
-              <span>View profile</span>
+              <span>{copy.viewProfile}</span>
               <ArrowUpRight aria-hidden="true" />
             </Link>
           </article>
@@ -468,7 +518,7 @@ export function ConnectionsWorkspace({
           {error}
         </p>
       ) : null}
-      <section className="connections-summary" aria-label="Connection overview">
+      <section className="connections-summary" aria-label={copy.overview}>
         <article>
           <span>
             <UsersRound aria-hidden="true" />
@@ -477,7 +527,7 @@ export function ConnectionsWorkspace({
             <strong>
               {connections.filter((item) => item.state === "ACCEPTED").length}
             </strong>
-            <small>Active connections</small>
+            <small>{copy.activeConnections}</small>
           </div>
         </article>
         <article>
@@ -486,7 +536,7 @@ export function ConnectionsWorkspace({
           </span>
           <div>
             <strong>{activeProposals.length}</strong>
-            <small>Awaiting your response</small>
+            <small>{copy.awaitingResponse}</small>
           </div>
         </article>
         <article>
@@ -494,8 +544,8 @@ export function ConnectionsWorkspace({
             <ShieldCheck aria-hidden="true" />
           </span>
           <div>
-            <strong>Private by design</strong>
-            <small>Messaging opens only with consent</small>
+            <strong>{copy.privateByDesign}</strong>
+            <small>{copy.messagingConsent}</small>
           </div>
         </article>
       </section>
@@ -586,18 +636,18 @@ export function ConnectionsWorkspace({
         <Panel
           as="article"
           className="connections-panel connections-panel--mini"
-          eyebrow="PROFILE DISCOVERY"
-          title="Recent profile searches"
+          eyebrow={copy.recentSearchesEyebrow}
+          title={copy.recentSearchesTitle}
           rightSlot={
             <span className="count-pill connections-count connections-count--saved">
-              {recentSearches.length} saved
+              {copy.savedCount(recentSearches.length)}
             </span>
           }
         >
           {recentSearches.length === 0 ? (
             <CompactEmpty
-              title="No recent searches"
-              description="Profiles you find by exact candidate ID will appear here for quick access on this browser."
+              title={copy.noRecentSearches}
+              description={copy.noRecentSearchesCopy}
             />
           ) : (
             <div className="recent-profile-searches">

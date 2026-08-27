@@ -128,7 +128,7 @@ describe.sequential("image-search worker pipeline", () => {
           purpose: "JOB_IMAGE_SEARCH",
           engine: {
             name: "paddleocr-onnx",
-            version: "1.0.0",
+            version: "1.1.0",
             runtimeName: "onnxruntime",
             runtimeVersion: "1.27.0",
             modelName: "PP-OCRv6-medium",

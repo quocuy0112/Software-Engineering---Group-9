@@ -15,6 +15,8 @@ import {
   companyMatchesScope,
   useRecruiterCompanyScope,
 } from "@/frontend/features/recruiter-workspace/recruiter-company-scope";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruiterApplicationsCopy } from "./recruiter-applications-copy";
 
 const emptyCompanies: RecruiterCompanyView[] = [];
 
@@ -36,6 +38,7 @@ export function RecruiterPipelinePage({
   companies?: RecruiterCompanyView[];
   initialJobId?: string;
 }) {
+  const copy = recruiterApplicationsCopy(useWorkspaceLocale()).pipeline;
   const companyOptions = companies ?? emptyCompanies;
   const { companyId, selectedCompanyId, setCompanyId } =
     useRecruiterCompanyScope(companyOptions);
@@ -88,23 +91,21 @@ export function RecruiterPipelinePage({
   return (
     <section
       className="page recruiter-management recruiter-pipeline-page"
-      aria-label="Recruiter pipeline"
+      aria-label={copy.title}
     >
       <PageHeader
         className="pipeline-page-heading"
-        eyebrow="Recruiter workspace"
-        title="Candidate pipeline"
-        subtitle="Review candidate progress across each stage of your hiring workflow."
+        eyebrow={copy.workspace}
+        title={copy.title}
+        subtitle={copy.subtitle}
       />
       <div className="job-bar pipeline-job-selector recruiter-surface-card">
         <div className="pipeline-job-selector__copy">
           <div className="job-bar-label">
             <BriefcaseBusiness aria-hidden="true" />
-            Job posting
+            {copy.jobPosting}
           </div>
-          <div className="job-bar-sub">
-            Select one managed job to view its candidate pipeline.
-          </div>
+          <div className="job-bar-sub">{copy.selectDescription}</div>
         </div>
         <div className="pipeline-job-selector__controls">
           <RecruiterCompanyFilter
@@ -119,7 +120,7 @@ export function RecruiterPipelinePage({
             htmlFor="pipeline-job-select"
           >
             <span className="pipeline-job-selector__field-label">
-              Job posting
+              {copy.jobPosting}
             </span>
             <span className="dot" aria-hidden="true" />
             <select
@@ -128,7 +129,7 @@ export function RecruiterPipelinePage({
               onChange={(event) => selectJob(event.target.value)}
               aria-describedby="pipeline-job-select-help"
             >
-              <option value="">Choose a job posting</option>
+              <option value="">{copy.chooseJob}</option>
               {/*
             {managedJobs.map((job) => (
               <option value={job.id} key={job.id}>
@@ -138,8 +139,8 @@ export function RecruiterPipelinePage({
             */}
               {managedJobs.map((job) => (
                 <option value={job.id} key={job.id}>
-                  {job.title || "Untitled job posting"} {"\u00b7"}{" "}
-                  {job.status === "active" ? "Active" : "Closed"}
+                  {job.title || copy.untitledJob} {"\u00b7"}{" "}
+                  {job.status === "active" ? copy.active : copy.closed}
                 </option>
               ))}
             </select>
@@ -148,8 +149,8 @@ export function RecruiterPipelinePage({
         </div>
         <span id="pipeline-job-select-help" className="sr-only">
           {selectedJob
-            ? `Showing the pipeline for ${selectedJob.title}.`
-            : "Select a job to load its pipeline."}
+            ? copy.showingPipeline(selectedJob.title)
+            : copy.selectJob}
         </span>
       </div>
 
@@ -167,11 +168,8 @@ export function RecruiterPipelinePage({
             <Inbox />
           </span>
           <div className="pipeline-page-empty__content">
-            <h2>No job postings available</h2>
-            <p>
-              Create or publish a job posting before opening its candidate
-              evaluation pipeline.
-            </p>
+            <h2>{copy.noJobsTitle}</h2>
+            <p>{copy.noJobsDescription}</p>
           </div>
           <Link
             className="pipeline-page-empty__action"
@@ -182,7 +180,7 @@ export function RecruiterPipelinePage({
             }
           >
             <Plus aria-hidden="true" />
-            Create a job posting
+            {copy.createJob}
           </Link>
         </div>
       ) : !selectedJob ? (
@@ -199,8 +197,8 @@ export function RecruiterPipelinePage({
             <Inbox />
           </span>
           <div className="pipeline-page-empty__content">
-            <h2>Select a job posting</h2>
-            <p>Choose a job above to see its candidates grouped by stage.</p>
+            <h2>{copy.selectJobTitle}</h2>
+            <p>{copy.selectJobDescription}</p>
           </div>
         </div>
       ) : (

@@ -8,7 +8,9 @@ import {
   RefreshCw,
   ShieldCheck,
 } from "lucide-react";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { RankingModalFrame } from "./ranking-modal-frame";
+import { applicationDetailCopy } from "./application-detail-copy";
 
 export function RescoreConfirmModal({
   jobId,
@@ -23,6 +25,8 @@ export function RescoreConfirmModal({
   onCancel: () => void;
   onCompleted: () => void;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = applicationDetailCopy(locale).rescore;
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const start = async () => {
@@ -45,51 +49,38 @@ export function RescoreConfirmModal({
           }),
         },
       );
-      const payload = (await response.json().catch(() => null)) as {
-        message?: string;
-      } | null;
-      if (!response.ok)
-        throw new Error(
-          payload?.message ?? "The background rescore could not be started.",
-        );
+      if (!response.ok) throw new Error(copy.error);
       onCompleted();
     } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "The background rescore could not be started.",
-      );
+      setError(cause instanceof Error ? cause.message : copy.error);
     } finally {
       setSaving(false);
     }
   };
   return (
     <RankingModalFrame
-      title="Rescore candidates?"
-      subtitle={`${jobTitle} · Campaign-wide scoring refresh`}
+      title={copy.title}
+      subtitle={copy.subtitle(jobTitle)}
       icon="↻"
-      info={
-        <>
-          <strong>Current results stay visible during rescoring.</strong> Manual
-          priorities are preserved. If AI is unavailable, the deterministic
-          fallback remains visible for each candidate.
-        </>
-      }
-      confirmLabel={saving ? "Starting…" : "Start background rescore"}
+      info={<>{copy.currentVisible}</>}
+      confirmLabel={saving ? copy.starting : copy.start}
+      cancelLabel={copy.cancel}
       onCancel={onCancel}
       onConfirm={() => void start()}
       confirmDisabled={saving}
     >
       <p className="ai-ranking-modal__lead">
-        This will rescore{" "}
-        <strong>{totalCount.toLocaleString("en-US")} applications</strong> using
-        the 40/60 hybrid method (40% automatic matching and 60% AI evaluation).
+        {copy.lead(
+          `${totalCount.toLocaleString(locale === "vi" ? "vi-VN" : "en-US")} ${
+            locale === "vi" ? "đơn ứng tuyển" : "applications"
+          }`,
+        )}
       </p>
       <dl className="ai-ranking-modal__facts">
         <div>
           <dt>
             <span>
-              <CheckCircle2 aria-hidden="true" /> Job description
+              <CheckCircle2 aria-hidden="true" /> {copy.jobDescription}
             </span>
           </dt>
           <dd>JD v3</dd>
@@ -97,26 +88,24 @@ export function RescoreConfirmModal({
         <div>
           <dt>
             <ShieldCheck aria-hidden="true" />
-            <span>Scoring config</span>
+            <span>{copy.scoringConfig}</span>
           </dt>
           <dd>HS-40/60-v1</dd>
         </div>
         <div>
           <dt>
             <Clock3 aria-hidden="true" />
-            <span>Execution mode</span>
+            <span>{copy.executionMode}</span>
           </dt>
-          <dd>Background job</dd>
+          <dd>{copy.backgroundJob}</dd>
         </div>
       </dl>
       <div className="rescore-modal-notes">
         <span>
-          <RefreshCw aria-hidden="true" /> Existing scores stay visible until
-          replacement results are ready.
+          <RefreshCw aria-hidden="true" /> {copy.existingVisible}
         </span>
         <span>
-          <AlertCircle aria-hidden="true" /> AI failures do not overwrite
-          deterministic evidence.
+          <AlertCircle aria-hidden="true" /> {copy.aiFailureSafe}
         </span>
       </div>
       {error ? (

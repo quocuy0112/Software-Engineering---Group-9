@@ -3,10 +3,12 @@
 import { useRef, useState } from "react";
 import { currentCsrfProof } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { Modal } from "@/frontend/components/ui/modal";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import {
   jobReportInputSchema,
   jobReportOutcomeSchema,
 } from "@/shared/contracts/jobs/actions";
+import { jobCopy } from "./job-copy";
 
 const reasons = [
   ["FRAUD", "Fraud or scam"],
@@ -26,6 +28,7 @@ export function ReportJobDialog({
   jobId: string;
   className?: string;
 }) {
+  const copy = jobCopy(useWorkspaceLocale());
   const trigger = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
@@ -49,7 +52,7 @@ export function ReportJobDialog({
       details: details || null,
     });
     if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? "Review the report fields.");
+      setError(copy.reviewReportFields);
       return;
     }
     setPending(true);
@@ -68,24 +71,15 @@ export function ReportJobDialog({
       );
       const body: unknown = await response.json();
       if (!response.ok) {
-        const problem = body as { message?: unknown };
-        throw new Error(
-          typeof problem.message === "string"
-            ? problem.message
-            : "Could not submit this report. Try again.",
-        );
+        throw new Error("JOB_REPORT_REQUEST_FAILED");
       }
-      const outcome = jobReportOutcomeSchema.parse(body);
-      setMessage(outcome.message);
+      jobReportOutcomeSchema.parse(body);
+      setMessage(copy.reportSubmitted);
       setReason("");
       setDetails("");
       close();
-    } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "Could not submit this report. Try again.",
-      );
+    } catch {
+      setError(copy.reportFailed);
       setPending(false);
     }
   }
@@ -102,23 +96,23 @@ export function ReportJobDialog({
           setOpen(true);
         }}
       >
-        Report job
+        {copy.reportJob}
       </button>
       {message ? <span role="status">{message}</span> : null}
       <Modal
         open={open}
-        title="Report this job"
-        description="Your report is private and reviewed by authorized moderators. It does not automatically remove the job."
+        title={copy.reportJob}
+        description={copy.reportDescription}
         busy={pending}
         onClose={close}
       >
         <form
           className="job-form-grid"
-          aria-label="Report this job"
+          aria-label={copy.reportJob}
           onSubmit={submit}
         >
           <label>
-            Reason
+            {copy.reason}
             <select
               data-autofocus
               required
@@ -126,19 +120,19 @@ export function ReportJobDialog({
               onChange={(event) => setReason(event.target.value)}
             >
               <option value="" disabled>
-                Select a reason
+                {copy.selectReason}
               </option>
-              {reasons.map(([value, label]) => (
+              {reasons.map(([value]) => (
                 <option key={value} value={value}>
-                  {label}
+                  {copy.reportReasons[value]}
                 </option>
               ))}
             </select>
           </label>
           {reason ? (
             <label>
-              Details{" "}
-              {detailsRequired.has(reason) ? "(required)" : "(optional)"}
+              {copy.details}{" "}
+              {detailsRequired.has(reason) ? copy.required : copy.optional}
               <textarea
                 aria-describedby="report-detail-help"
                 required={detailsRequired.has(reason)}
@@ -149,18 +143,17 @@ export function ReportJobDialog({
                 onChange={(event) => setDetails(event.target.value)}
               />
               <span id="report-detail-help">
-                Do not include passwords, CV content, or unnecessary personal
-                data.
+                {copy.reportPrivacyHint}
               </span>
             </label>
           ) : null}
           {error ? <div role="alert">{error}</div> : null}
           <div className="job-actions">
             <button type="submit" disabled={pending}>
-              {pending ? "Submitting report…" : "Submit report"}
+              {pending ? copy.submittingReport : copy.submitReport}
             </button>
             <button type="button" disabled={pending} onClick={close}>
-              Cancel
+              {copy.cancel}
             </button>
           </div>
         </form>

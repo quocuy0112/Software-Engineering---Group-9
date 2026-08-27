@@ -88,8 +88,10 @@ function failureCode(error: unknown) {
     error instanceof Error && "code" in error
       ? String(error.code)
       : (error as Error).message;
-  if (code === "OCR_DEADLINE_EXCEEDED") return "OCR_UNAVAILABLE";
+  if (code === "OCR_DEADLINE_EXCEEDED") return "OCR_DEADLINE_EXCEEDED";
   if (code === "OCR_MODEL_MISMATCH") return "OCR_UNAVAILABLE";
+  if (code === "OCR_NO_TEXT") return "OCR_NO_TEXT";
+  if (code === "OCR_PARTIAL") return "OCR_PARTIAL";
   if (code === "SEARCH_OCR_OUTPUT_TOO_LARGE") return "OCR_OUTPUT_TOO_LARGE";
   return "OCR_UNAVAILABLE";
 }
@@ -170,8 +172,17 @@ export class ImageSearchOcrStage {
       (row.startedAt ?? now).getTime() +
         OCR_PURPOSE_PROFILES.JOB_IMAGE_SEARCH.unitDeadlineMs,
     );
+    const transportDeadline = new Date(
+      Math.min(deadline.getTime(), searchQuery.deleteBy.getTime()),
+    );
+    const computeDeadline = new Date(
+      transportDeadline.getTime() -
+        OCR_PURPOSE_PROFILES.JOB_IMAGE_SEARCH.computeGraceMs,
+    );
     let unattachedLocator: SearchArtifactLocator | null = null;
     try {
+      if (computeDeadline.getTime() <= Date.now())
+        throw new Error("OCR_DEADLINE_EXCEEDED");
       await this.dependencies.ocr.assertReady(
         OCR_EXPECTED_MODEL_MANIFEST_SHA256,
       );
@@ -189,8 +200,7 @@ export class ImageSearchOcrStage {
         maximumBytes: 25 * 1024 * 1024,
       });
       const recognition = await withDeadline({
-        deadline:
-          deadline < searchQuery.deleteBy ? deadline : searchQuery.deleteBy,
+        deadline: transportDeadline,
         parentSignal: signal,
         run: (childSignal) =>
           this.dependencies.ocr.recognize({
@@ -203,7 +213,8 @@ export class ImageSearchOcrStage {
               decodedPixels: decode.decodedPixels!,
               sha256: createHash("sha256").update(bytes).digest(),
             },
-            deadline,
+            deadline: transportDeadline,
+            computeDeadline,
             expectedModelManifestSha256: OCR_EXPECTED_MODEL_MANIFEST_SHA256,
             signal: childSignal,
           }),
@@ -214,7 +225,10 @@ export class ImageSearchOcrStage {
         .map((line) => line.text.normalize("NFKC").trim())
         .filter(Boolean)
         .join("\n");
-      if (!text) throw new Error("OCR_LOW_CONFIDENCE");
+      if (!text)
+        throw new Error(
+          recognition.summary.partial ? "OCR_PARTIAL" : "OCR_NO_TEXT",
+        );
       const lowConfidence = (recognition.summary.averageConfidence ?? 0) < 0.6;
       const reviewRequired = searchOcrRequiresReview(recognition.summary);
       const payload: SearchOcrText = {

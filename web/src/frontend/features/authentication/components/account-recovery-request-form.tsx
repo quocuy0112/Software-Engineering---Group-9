@@ -2,16 +2,23 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ACCOUNT_RECOVERY_REQUEST_FAILED_ERROR } from "@/shared/contracts/identity/password-recovery";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { AuthStatus } from "./auth-status";
+import { authCopy, localizedAuthMessage } from "./auth-copy";
 
 export function AccountRecoveryRequestForm({
-  initialStatus = "",
+  initialStatus,
 }: {
-  initialStatus?: string;
+  initialStatus?: "invalid-link";
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = authCopy(locale);
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState(initialStatus);
+  const [status, setStatus] = useState(() =>
+    initialStatus
+      ? copy.recovery.invalidLink
+      : "",
+  );
   const [statusTone, setStatusTone] = useState<"error" | "success">("error");
   const [busy, setBusy] = useState(false);
 
@@ -30,10 +37,16 @@ export function AccountRecoveryRequestForm({
         message?: string;
       } | null;
       setStatusTone(response.ok ? "success" : "error");
-      setStatus(result?.message ?? ACCOUNT_RECOVERY_REQUEST_FAILED_ERROR);
+      setStatus(
+        localizedAuthMessage(
+          locale,
+          result?.message,
+          response.ok ? copy.recovery.requestSuccess : copy.recovery.requestError,
+        ),
+      );
     } catch {
       setStatusTone("error");
-      setStatus(ACCOUNT_RECOVERY_REQUEST_FAILED_ERROR);
+      setStatus(copy.recovery.requestError);
     } finally {
       setBusy(false);
     }
@@ -43,14 +56,13 @@ export function AccountRecoveryRequestForm({
     <section className="auth-form-content">
       <form className="auth-form" onSubmit={submit} noValidate aria-busy={busy}>
         <div className="auth-form-heading">
-          <p className="form-kicker">ACCOUNT RECOVERY</p>
-          <h1>Lost access to every factor?</h1>
-          <p>
-            Use this separate, lower-assurance process only if you lost your
-            password, TOTP access, and every backup code.
-          </p>
+          <p className="form-kicker">{copy.recovery.requestKicker}</p>
+          <h1>{copy.recovery.requestTitle}</h1>
+          <p>{copy.recovery.requestDescription}</p>
         </div>
-        <label htmlFor="account-recovery-email">Email address</label>
+        <label htmlFor="account-recovery-email">
+          {copy.common.emailAddress}
+        </label>
         <input
           id="account-recovery-email"
           type="email"
@@ -58,13 +70,13 @@ export function AccountRecoveryRequestForm({
           inputMode="email"
           autoCapitalize="none"
           spellCheck={false}
-          placeholder="example@email.com"
+          placeholder={copy.common.emailPlaceholder}
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           required
         />
         <button type="submit" disabled={busy || !email.trim()}>
-          {busy ? "Sending…" : "Send recovery instructions"}
+          {busy ? copy.recovery.sending : copy.recovery.sendInstructions}
         </button>
         <AuthStatus
           id="account-recovery-status"
@@ -72,10 +84,9 @@ export function AccountRecoveryRequestForm({
           tone={statusTone}
         />
         <p>
-          Email-only recovery is lower assurance than using your password and
-          second factor.
+          {copy.recovery.lowerAssurance}
         </p>
-        <Link href="/login">Back to sign in</Link>
+        <Link href="/login">{copy.common.backToSignIn}</Link>
       </form>
     </section>
   );

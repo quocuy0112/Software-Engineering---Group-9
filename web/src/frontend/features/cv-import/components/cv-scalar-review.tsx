@@ -37,7 +37,7 @@ export function CvScalarReview({
   );
   return (
     <section className={styles.root} aria-labelledby="cv-scalar-heading">
-      <h2 id="cv-scalar-heading">Profile details</h2>
+      <h2 id="cv-scalar-heading">{copy.details}</h2>
       {proposals.map((proposal: ScalarProposal, index) => {
         const currentValue = currentProfile[proposal.field];
         const hasCurrentValue = currentValue !== null;

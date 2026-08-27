@@ -14,6 +14,7 @@ const STAGES: readonly ImageSearchWorkStage[] = [
   "OCR",
   "INTERPRET",
 ];
+export const IMAGE_SEARCH_OCR_LEASE_MS = 30_000;
 
 function delay(milliseconds: number, signal: AbortSignal) {
   return new Promise<void>((resolve) => {
@@ -47,6 +48,10 @@ export class ImageSearchWorkerRuntime {
       processStages?: boolean;
     }> = {},
   ) {
+    const leaseMs = options.leaseMs ?? IMAGE_SEARCH_OCR_LEASE_MS;
+    if (!Number.isFinite(leaseMs) || leaseMs < IMAGE_SEARCH_OCR_LEASE_MS) {
+      throw new Error("IMAGE_SEARCH_OCR_LEASE_TOO_SHORT");
+    }
     this.pipeline = new ImageSearchWorkerPipeline(resources);
   }
 
@@ -86,7 +91,7 @@ export class ImageSearchWorkerRuntime {
         stage,
         owner: this.resources.owner,
         now,
-        leaseMs: this.options.leaseMs ?? 30_000,
+        leaseMs: this.options.leaseMs ?? IMAGE_SEARCH_OCR_LEASE_MS,
         limit: capacity,
       });
       claimed += rows.length;

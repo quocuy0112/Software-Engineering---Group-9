@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import {
   isTerminalPipelineStage,
@@ -16,6 +16,8 @@ import {
   type StageTransitionCommand,
   stageTransitionOutcomeSchema,
 } from "@/shared/contracts/applications";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruiterApplicationsCopy } from "./recruiter-applications-copy";
 
 type ColumnState = Readonly<{ page: PipelineBoardPage | null; loading: boolean; loadingMore: boolean; error: string | null }>;
 type StageMoveExtras = Omit<StageTransitionCommand, "targetStage" | "expectedStageVersion">;
@@ -57,6 +59,11 @@ class StageMoveRequestError extends Error {
 }
 
 export function useRecruitmentPipeline(jobId: string) {
+  const locale = useWorkspaceLocale();
+  const copy = useMemo(
+    () => recruiterApplicationsCopy(locale).pipeline,
+    [locale],
+  );
   const csrfProof = useCsrfProof();
   const [metadata, setMetadata] = useState<PipelineBoardMetadata | null>(null);
   const [columns, setColumns] = useState<Partial<Record<PipelineBoardColumnStage, ColumnState>>>({});
@@ -82,7 +89,7 @@ export function useRecruitmentPipeline(jobId: string) {
       const path = stage === "WITHDRAWN" ? "withdrawn" : stage;
       const response = await fetch(`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/pipeline/${path}?${params}`, { cache: "no-store" });
       const json = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(json?.message ?? "Unable to load this pipeline stage.");
+      if (!response.ok) throw new Error(copy.unavailable);
       const page = stage === "WITHDRAWN"
         ? pipelineWithdrawnPageSchema.parse(json)
         : pipelineStagePageSchema.parse(json);
@@ -93,11 +100,11 @@ export function useRecruitmentPipeline(jobId: string) {
         const unique = [...new Map(items.map((item) => [item.applicationId, item])).values()];
         return { ...current, [stage]: { page: { ...page, items: unique }, loading: false, loadingMore: false, error: null } };
       });
-    } catch (cause) {
+    } catch {
       if (generation.current !== currentGeneration) return;
-      setColumns((current) => ({ ...current, [stage]: { ...(current[stage] ?? emptyColumn()), loading: false, loadingMore: false, error: cause instanceof Error ? cause.message : "Unable to load this pipeline stage." } }));
+      setColumns((current) => ({ ...current, [stage]: { ...(current[stage] ?? emptyColumn()), loading: false, loadingMore: false, error: copy.unavailable } }));
     }
-  }, [jobId]);
+  }, [copy.unavailable, jobId]);
 
   const load = useCallback(async (options: PipelineLoadOptions = {}) => {
     const preserve = options.preserve === true;
@@ -114,7 +121,7 @@ export function useRecruitmentPipeline(jobId: string) {
     try {
       const response = await fetch(`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/pipeline`, { cache: "no-store" });
       const json = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(json?.message ?? "The recruitment pipeline is unavailable.");
+      if (!response.ok) throw new Error(copy.unavailable);
       const next = pipelineBoardMetadataSchema.parse(json);
       if (generation.current !== currentGeneration) return;
       metadataRef.current = next;
@@ -124,13 +131,13 @@ export function useRecruitmentPipeline(jobId: string) {
           loadStage(stage, undefined, { background: preserve }),
         ),
       );
-    } catch (cause) {
+    } catch {
       if (generation.current !== currentGeneration) return;
       if (!preserve) {
         metadataRef.current = null;
         setMetadata(null);
         setColumns({});
-        setError(cause instanceof Error ? cause.message : "The recruitment pipeline is unavailable.");
+        setError(copy.unavailable);
       }
     } finally {
       if (generation.current === currentGeneration) {
@@ -138,7 +145,7 @@ export function useRecruitmentPipeline(jobId: string) {
         if (!preserve) setLoading(false);
       }
     }
-  }, [jobId, loadStage]);
+  }, [copy.unavailable, jobId, loadStage]);
 
   useEffect(() => { void load(); return () => { generation.current += 1; }; }, [load]);
 
@@ -187,7 +194,10 @@ export function useRecruitmentPipeline(jobId: string) {
     retryOperation.current = operation;
     pendingApplicationIdRef.current = card.applicationId;
     setPendingApplicationId(card.applicationId);
-    setAnnouncement(`Moving ${card.candidate.displayName} to ${targetStage.replaceAll("_", " ")}.`);
+    const targetLabel = copy.stageLabels[targetStage] ?? targetStage;
+    setAnnouncement(
+      copy.movingToStage(card.candidate.displayName, targetLabel),
+    );
     if (optimistic) {
       setColumns((current) => {
         const source = current[card.stage];
@@ -204,15 +214,15 @@ export function useRecruitmentPipeline(jobId: string) {
     try {
       const response = await fetch(`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(card.applicationId)}/stage`, { method: "PATCH", headers: { "content-type": "application/json", "x-csrf-token": csrfProof, "idempotency-key": idempotencyKey }, body: JSON.stringify({ targetStage, expectedStageVersion: card.stageVersion, ...extras }) });
       const json = await response.json().catch(() => null);
-      if (!response.ok) throw new StageMoveRequestError(json?.message ?? "The stage change was not saved.", response.status);
+      if (!response.ok) throw new StageMoveRequestError(copy.stageChangeFailed, response.status);
       stageTransitionOutcomeSchema.parse(json);
-      setAnnouncement(`${card.candidate.displayName} moved successfully.`);
+      setAnnouncement(copy.movedSuccessfully(card.candidate.displayName));
       retryOperation.current = null;
       setCanRetryStageMove(false);
       await Promise.all([loadStage(card.stage), loadStage(targetStage), load()]);
       return true;
     } catch (cause) {
-      setAnnouncement(cause instanceof Error ? cause.message : "The stage change was not saved.");
+      setAnnouncement(copy.stageChangeFailed);
       const commandCannotBeRetried =
         cause instanceof StageMoveRequestError &&
         [401, 403, 404, 409].includes(cause.status);
@@ -224,7 +234,7 @@ export function useRecruitmentPipeline(jobId: string) {
       pendingApplicationIdRef.current = null;
       setPendingApplicationId(null);
     }
-  }, [csrfProof, jobId, load, loadStage]);
+  }, [copy, csrfProof, jobId, load, loadStage]);
 
   const move = useCallback(async (card: PipelineApplicationCard, targetStage: ApplicationStage, extras: StageMoveExtras = {}) => {
     const destinations =

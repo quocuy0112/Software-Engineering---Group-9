@@ -64,6 +64,11 @@ export function ProfileBasicsForm({
           phoneHint:
             "Dùng 7–15 chữ số; có thể thêm khoảng trắng, dấu chấm, gạch nối, ngoặc hoặc một dấu cộng ở đầu.",
           location: "Địa điểm",
+          summaryFallback: "Thông tin hồ sơ nghề nghiệp",
+          contactFallback: "Đã thêm thông tin liên hệ",
+          emptyTitle: "Bạn chưa thêm thông tin nghề nghiệp cơ bản.",
+          emptyDescription:
+            "Thêm tiêu đề, giới thiệu, số điện thoại hoặc địa điểm.",
         }
       : {
           kicker: "INTRODUCTION",
@@ -76,6 +81,10 @@ export function ProfileBasicsForm({
           phoneHint:
             "Use 7–15 digits with optional spaces, periods, hyphens, parentheses, or one leading plus.",
           location: "Location",
+          summaryFallback: "Professional profile details",
+          contactFallback: "Contact details added",
+          emptyTitle: "Your professional basics are not added yet.",
+          emptyDescription: "Add a headline, summary, phone, or location.",
         };
   const editLabel = locale === "vi" ? "Chỉnh sửa thông tin" : "Edit basics";
   const cancelLabel = locale === "vi" ? "Hủy" : "Cancel";
@@ -110,18 +119,18 @@ export function ProfileBasicsForm({
           hasBasics ? (
             <>
               <strong className="profile-compact-primary profile-basics-preview-primary">
-                {profile.basics.summary || "Professional profile details"}
+                {profile.basics.summary || copy.summaryFallback}
               </strong>
               <span className="profile-compact-secondary profile-basics-preview-secondary">
                 {[profile.basics.location, profile.basics.phone]
                   .filter(Boolean)
-                  .join(" · ") || "Contact details added"}
+                  .join(" · ") || copy.contactFallback}
               </span>
             </>
           ) : (
             <div className="profile-compact-empty-text">
-              <strong>Your professional basics are not added yet.</strong>
-              <span>Add a headline, summary, phone, or location.</span>
+              <strong>{copy.emptyTitle}</strong>
+              <span>{copy.emptyDescription}</span>
             </div>
           )
         }

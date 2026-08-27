@@ -19,7 +19,7 @@ import {
 type Options = Readonly<{
   socketPath: "/run/smarthire-ocr/ocr.sock";
   expectedEngineName: "paddleocr-onnx";
-  expectedEngineVersion: "1.0.0";
+  expectedEngineVersion: "1.1.0";
   expectedModelName: "PP-OCRv6-medium";
   maximumResponseBytes?: number;
 }>;
@@ -53,10 +53,17 @@ function boundedRequest(input: {
       timeout: remaining,
       agent: false,
     });
+    const hardDeadlineTimer = setTimeout(
+      () => request.destroy(new Error("OCR_TIMEOUT")),
+      remaining,
+    );
+    hardDeadlineTimer.unref();
+    const clearHardDeadline = () => clearTimeout(hardDeadlineTimer);
     const abort = () => request.destroy(new Error("OCR_ABORTED"));
     input.signal?.addEventListener("abort", abort, { once: true });
     request.once("timeout", () => request.destroy(new Error("OCR_TIMEOUT")));
     request.once("error", (error) => {
+      clearHardDeadline();
       input.signal?.removeEventListener("abort", abort);
       reject(
         new OcrEngineFailure(
@@ -78,10 +85,13 @@ function boundedRequest(input: {
         }
         chunks.push(Buffer.from(chunk));
       });
-      response.once("error", () =>
-        reject(new OcrEngineFailure("OCR_OUTPUT_REJECTED", false)),
-      );
+      response.once("error", () => {
+        clearHardDeadline();
+        input.signal?.removeEventListener("abort", abort);
+        reject(new OcrEngineFailure("OCR_OUTPUT_REJECTED", false));
+      });
       response.once("end", () => {
+        clearHardDeadline();
         input.signal?.removeEventListener("abort", abort);
         resolve({
           statusCode: response.statusCode ?? 500,
@@ -98,6 +108,17 @@ function parseJson(body: Uint8Array): unknown {
     return JSON.parse(Buffer.from(body).toString("utf8"));
   } catch {
     throw new OcrEngineFailure("OCR_OUTPUT_REJECTED", false);
+  }
+}
+
+function safeEngineErrorCode(body: Uint8Array): string | null {
+  try {
+    const payload = JSON.parse(Buffer.from(body).toString("utf8")) as {
+      error?: { code?: unknown };
+    };
+    return typeof payload.error?.code === "string" ? payload.error.code : null;
+  } catch {
+    return null;
   }
 }
 
@@ -134,6 +155,18 @@ export class UnixOcrEngine implements OcrEngine {
   }
 
   async recognize(input: OcrRecognitionRequest): Promise<OcrRecognitionResult> {
+    const computeDeadline = input.computeDeadline.getTime();
+    const transportDeadline = input.deadline.getTime();
+    if (
+      !Number.isFinite(computeDeadline) ||
+      !Number.isFinite(transportDeadline) ||
+      computeDeadline > transportDeadline
+    ) {
+      throw new OcrEngineFailure("OCR_INPUT_REJECTED", false);
+    }
+    if (computeDeadline <= Date.now() || transportDeadline <= Date.now()) {
+      throw new OcrEngineFailure("OCR_DEADLINE_EXCEEDED", true);
+    }
     if (
       input.image.bytes.byteLength > OCR_MAXIMUM_INPUT_BYTES ||
       input.image.width < 1 ||
@@ -159,12 +192,25 @@ export class UnixOcrEngine implements OcrEngine {
         "Content-Length": input.image.bytes.byteLength,
         "X-OCR-Attempt-Id": input.attemptId,
         "X-OCR-Purpose": input.purpose,
-        "X-OCR-Deadline": input.deadline.toISOString(),
+        "X-OCR-Deadline": input.computeDeadline.toISOString(),
         "X-OCR-Model-Manifest-SHA256": input.expectedModelManifestSha256,
       },
     });
+    const engineErrorCode = safeEngineErrorCode(result.body);
+    if (result.statusCode === 503 && engineErrorCode === "MODEL_MISMATCH") {
+      throw new OcrEngineFailure("OCR_MODEL_MISMATCH", false);
+    }
     if (result.statusCode === 503) {
       throw new OcrEngineFailure("OCR_ENGINE_NOT_READY", true);
+    }
+    if (engineErrorCode === "DEADLINE_EXCEEDED") {
+      throw new OcrEngineFailure("OCR_DEADLINE_EXCEEDED", true);
+    }
+    if (
+      engineErrorCode === "INVALID_REQUEST" ||
+      engineErrorCode === "INPUT_TOO_LARGE"
+    ) {
+      throw new OcrEngineFailure("OCR_INPUT_REJECTED", false);
     }
     if (result.statusCode !== 200) {
       throw new OcrEngineFailure("OCR_RECOGNITION_FAILED", false);

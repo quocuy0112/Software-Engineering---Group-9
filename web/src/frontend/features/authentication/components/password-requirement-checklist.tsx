@@ -1,3 +1,6 @@
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { authCopy } from "./auth-copy";
+
 type PasswordRequirementChecklistProps = {
   value: string;
 };
@@ -6,6 +9,7 @@ type PasswordRequirementChecklistProps = {
 export function PasswordRequirementChecklist({
   value,
 }: PasswordRequirementChecklistProps) {
+  const copy = authCopy(useWorkspaceLocale()).passwordRequirements;
   const length = [...value].length;
   const hasUppercase = /\p{Lu}/u.test(value);
   const hasDigit = /\p{N}/u.test(value);
@@ -15,15 +19,15 @@ export function PasswordRequirementChecklist({
     return code <= 0x1f || code === 0x7f;
   });
   const requirements = [
-    { label: "At least 12 characters", met: length >= 12 },
-    { label: "No more than 128 characters", met: length <= 128 },
-    { label: "1 uppercase letter", met: hasUppercase },
-    { label: "1 number", met: hasDigit },
+    { label: copy.atLeast, met: length >= 12 },
+    { label: copy.atMost, met: length <= 128 },
+    { label: copy.uppercase, met: hasUppercase },
+    { label: copy.number, met: hasDigit },
     {
-      label: "1 special character",
+      label: copy.special,
       met: hasSpecialCharacter,
     },
-    { label: "No control characters", met: hasNoControlCharacters },
+    { label: copy.control, met: hasNoControlCharacters },
   ];
 
   return (

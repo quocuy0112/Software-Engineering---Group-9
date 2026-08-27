@@ -22,7 +22,7 @@ describe("Candidate OCR evidence", () => {
     fireEvent.click(screen.getByText("Data source details"));
     expect(screen.getByText("Source: PDF page 2")).toBeVisible();
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "material native ocr conflict",
+      "Native/OCR text conflict",
     );
   });
 });

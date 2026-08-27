@@ -3,9 +3,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useAccountRecoveryCapability } from "@/frontend/features/authentication/client/use-account-recovery-capability";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { AuthStatus } from "./auth-status";
+import { authCopy, localizedAuthMessage } from "./auth-copy";
 
 export function AccountRecoveryCancellation() {
+  const locale = useWorkspaceLocale();
+  const copy = authCopy(locale);
   const capability = useAccountRecoveryCapability("cancellation");
   const [status, setStatus] = useState("");
   const [statusTone, setStatusTone] = useState<"error" | "success">("error");
@@ -28,17 +32,16 @@ export function AccountRecoveryCancellation() {
       } | null;
       setStatusTone(response.ok ? "success" : "error");
       setStatus(
-        result?.message ??
-          (response.ok
-            ? "Recovery was cancelled. Sign in with your existing password and second factor."
-            : "The account-recovery link is invalid, expired, or already used."),
+        localizedAuthMessage(
+          locale,
+          result?.message,
+          response.ok ? copy.recovery.cancelled : copy.recovery.cancellationError,
+        ),
       );
       if (response.ok) setCancelled(true);
     } catch {
       setStatusTone("error");
-      setStatus(
-        "The account-recovery link is invalid, expired, or already used.",
-      );
+      setStatus(copy.recovery.cancellationError);
     } finally {
       setBusy(false);
     }
@@ -48,22 +51,19 @@ export function AccountRecoveryCancellation() {
     <section className="auth-form-content">
       <div className="auth-form">
         <div className="auth-form-heading">
-          <p className="form-kicker">RECOVERY CANCELLATION</p>
-          <h1>Cancel account recovery</h1>
-          <p>
-            Cancelling keeps your existing password and second factor, while
-            previously revoked sessions remain signed out.
-          </p>
+          <p className="form-kicker">{copy.recovery.cancellationKicker}</p>
+          <h1>{copy.recovery.cancellationTitle}</h1>
+          <p>{copy.recovery.cancellationDescription}</p>
         </div>
         {capability === "authorizing" ? (
           <AuthStatus
             id="account-recovery-cancellation-status"
-            status="Verifying this secure recovery link…"
+            status={copy.recovery.verifying}
           />
         ) : null}
         {capability === "authorized" && !cancelled ? (
           <button type="button" onClick={cancel} disabled={busy}>
-            {busy ? "Cancelling recovery…" : "Cancel account recovery"}
+            {busy ? copy.recovery.cancelling : copy.recovery.cancel}
           </button>
         ) : null}
         <AuthStatus
@@ -71,7 +71,7 @@ export function AccountRecoveryCancellation() {
           status={status}
           tone={statusTone}
         />
-        <Link href="/login">Return to sign in</Link>
+        <Link href="/login">{copy.common.returnToSignIn}</Link>
       </div>
     </section>
   );

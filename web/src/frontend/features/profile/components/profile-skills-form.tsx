@@ -52,6 +52,7 @@ export function ProfileSkillsForm({
           suggestion: "Dùng gợi ý",
           add: "+ Thêm kỹ năng",
           suggestions: "Gợi ý kỹ năng",
+          saved: "Các kỹ năng đã lưu",
         }
       : {
           kicker: "Skills",
@@ -68,6 +69,7 @@ export function ProfileSkillsForm({
           suggestion: "Use suggestion",
           add: "+ Add skill",
           suggestions: "Skill suggestions",
+          saved: "Saved skills",
         };
   const editLabel = locale === "vi" ? "Chỉnh sửa kỹ năng" : "Edit skills";
   const cancelLabel = locale === "vi" ? "Hủy" : "Cancel";
@@ -146,7 +148,7 @@ export function ProfileSkillsForm({
         content={
           hasSkills ? (
             <>
-              <div className="sh-chips" aria-label="Saved skills">
+              <div className="sh-chips" aria-label={copy.saved}>
                 {profile.skills.map((skill) => (
                   <Chip label={skill.label} key={skill.id} />
                 ))}

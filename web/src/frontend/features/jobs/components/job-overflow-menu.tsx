@@ -5,6 +5,8 @@ import {
   useJobInteraction,
   type JobInteractionSeed,
 } from "./job-interaction-provider";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { jobCopy } from "./job-copy";
 
 export function JobOverflowMenu({
   jobId,
@@ -15,6 +17,7 @@ export function JobOverflowMenu({
   seed: JobInteractionSeed;
   onQuickView: () => void;
 }) {
+  const copy = jobCopy(useWorkspaceLocale());
   const interaction = useJobInteraction(jobId, seed);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -33,7 +36,7 @@ export function JobOverflowMenu({
       <button
         className="job-icon-button"
         type="button"
-        aria-label="More job actions"
+        aria-label={copy.jobActions}
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => setOpen((current) => !current)}
@@ -51,7 +54,7 @@ export function JobOverflowMenu({
             }}
           >
             <span aria-hidden="true">◫</span>
-            Quick view
+            {copy.quickView}
           </button>
           <button
             type="button"
@@ -62,7 +65,7 @@ export function JobOverflowMenu({
             }}
           >
             <span aria-hidden="true">◌</span>
-            Hide job
+            {copy.hideJob}
           </button>
         </div>
       ) : null}

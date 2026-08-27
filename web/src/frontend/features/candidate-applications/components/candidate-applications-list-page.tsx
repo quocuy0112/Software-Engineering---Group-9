@@ -13,7 +13,10 @@ import { BriefcaseBusiness, Check, ChevronDown } from "lucide-react";
 import { EmptyState } from "@/frontend/components/ui/empty-state";
 import { PageHeader } from "@/frontend/components/layout/page-header";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
-import { applicationCopy } from "@/frontend/features/candidate-applications/i18n/application-copy";
+import {
+  applicationCopy,
+  applicationErrorMessage,
+} from "@/frontend/features/candidate-applications/i18n/application-copy";
 import { NOTIFICATION_CHANGED_EVENT } from "@/frontend/features/notifications/client/use-notification-context-read";
 import { CompanyAvatar } from "@/frontend/features/jobs/components/company-avatar";
 import {
@@ -74,19 +77,17 @@ function applicationFilterCounts(
   return counts;
 }
 
-function applicationCountLabel(count: number) {
-  return `${count} ${count === 1 ? "application" : "applications"}`;
-}
-
 function ApplicationFilterDropdown({
   label,
   terminalLabel,
+  countLabel,
   options,
   value,
   onChange,
 }: {
   label: string;
   terminalLabel: string;
+  countLabel: (count: number) => string;
   options: readonly ApplicationFilterOption[];
   value: ApplicationFilterValue;
   onChange: (value: ApplicationFilterValue) => void;
@@ -178,7 +179,7 @@ function ApplicationFilterDropdown({
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-controls={menuId}
-        aria-label={`${label}: ${selectedOption.label}, ${applicationCountLabel(selectedOption.count)}`}
+        aria-label={`${label}: ${selectedOption.label}, ${countLabel(selectedOption.count)}`}
         onClick={() => {
           if (isOpen) {
             setIsOpen(false);
@@ -232,7 +233,7 @@ function ApplicationFilterDropdown({
                 role="option"
                 tabIndex={-1}
                 aria-selected={option.value === value}
-                aria-label={`${option.label}, ${applicationCountLabel(option.count)}`}
+                aria-label={`${option.label}, ${countLabel(option.count)}`}
                 className={[
                   "candidate-application-filter__option",
                   option.isTerminal
@@ -477,7 +478,7 @@ export function CandidateApplicationsListPage({
       });
       setNextCursor(next.nextCursor);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.loadMoreError);
+      setError(applicationErrorMessage(locale, caught, copy.loadMoreError));
     } finally {
       setLoading(false);
     }
@@ -507,6 +508,7 @@ export function CandidateApplicationsListPage({
         <ApplicationFilterDropdown
           label={copy.filterLabel}
           terminalLabel={copy.filters.terminal}
+          countLabel={copy.countLabel}
           options={filters}
           value={filter}
           onChange={setFilter}

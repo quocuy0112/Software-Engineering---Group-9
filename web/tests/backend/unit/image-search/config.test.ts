@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { loadImageSearchConfiguration } from "@/backend/image-search/config";
 
 const modelSha =
-  "4a7ec9635845d44fd6c6fb323386ee526282b8de566358fe646d711b5992e505";
+  "a8f8b2e10b1870bd35f1ec7a160399f5d4c6a6c6326c373abf01d7fdc9e38bba";
 
 function localEnvironment(
   overrides: Record<string, string | undefined> = {},
@@ -14,7 +14,7 @@ function localEnvironment(
     OCR_ENGINE_ENABLED: "true",
     OCR_ENGINE_SOCKET_PATH: "/run/smarthire-ocr/ocr.sock",
     OCR_ENGINE_NAME: "paddleocr-onnx",
-    OCR_ENGINE_VERSION: "1.0.0",
+    OCR_ENGINE_VERSION: "1.1.0",
     OCR_MODEL_NAME: "PP-OCRv6-medium",
     OCR_MODEL_SHA256: modelSha,
     OCR_POLICY_VERSION: "ocr-confidence-v1",
@@ -57,7 +57,7 @@ describe("Feature 005 configuration", () => {
       enabled: true,
       socketPath: "/run/smarthire-ocr/ocr.sock",
       engineName: "paddleocr-onnx",
-      engineVersion: "1.0.0",
+      engineVersion: "1.1.0",
       modelName: "PP-OCRv6-medium",
       modelManifestSha256: modelSha,
       cvUnitTimeoutMs: 20_000,
@@ -95,6 +95,35 @@ describe("Feature 005 configuration", () => {
         localEnvironment({ NEXT_PUBLIC_OCR_MODEL_SHA256: modelSha }),
       ),
     ).toThrow("IMAGE_SEARCH_PUBLIC_CONFIGURATION_FORBIDDEN");
+  });
+
+  it("loads the server-only adaptive tiling flags and validates their allowlist", () => {
+    const configuration = loadImageSearchConfiguration(
+      localEnvironment({
+        OCR_SEARCH_ADAPTIVE_TILING_ENABLED: "true",
+        OCR_SEARCH_TILE_OVERLAP_PERCENT: "20",
+        OCR_SEARCH_TILE_BATCH_SIZE: "4",
+        OCR_SEARCH_MAX_TILES: "3",
+        OCR_SEARCH_STRATEGY_VERSION: "search-ocr-adaptive-tiles-v1",
+      }),
+    );
+    expect(configuration.ocr).toMatchObject({
+      adaptiveTilingEnabled: true,
+      tileOverlapPercent: 20,
+      tileBatchSize: 4,
+      maxTiles: 3,
+      strategyVersion: "search-ocr-adaptive-tiles-v1",
+    });
+    for (const [key, value] of [
+      ["OCR_SEARCH_TILE_OVERLAP_PERCENT", "11"],
+      ["OCR_SEARCH_TILE_BATCH_SIZE", "5"],
+      ["OCR_SEARCH_MAX_TILES", "0"],
+      ["OCR_SEARCH_STRATEGY_VERSION", "search-ocr-adaptive-tiles-v2"],
+    ] as const) {
+      expect(() =>
+        loadImageSearchConfiguration(localEnvironment({ [key]: value })),
+      ).toThrow("IMAGE_SEARCH_CONFIGURATION_INVALID");
+    }
   });
 
   it("rejects deterministic mode, a disabled AI gate, or a missing shared API key", () => {

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { emailChangeVerificationOutcomeSchema } from "@/shared/contracts/account/email-change";
 import { accountErrorSchema } from "@/shared/contracts/account/common";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { localizeAccountMessage } from "../client/localized-account-feedback";
 
 type VerificationState =
   | { kind: "ready" }
@@ -12,6 +14,27 @@ type VerificationState =
   | { kind: "error"; message: string };
 
 export function VerifyEmailChangeForm() {
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          eyebrow: "THAY ĐỔI EMAIL AN TOÀN",
+          title: "Xác nhận thay đổi email",
+          description:
+            "Việc xác nhận được thực hiện rõ ràng. Giá trị liên kết riêng tư đã được xóa khỏi thanh địa chỉ trước khi trang hiển thị thao tác.",
+          confirming: "Đang xác nhận thay đổi email...",
+          confirm: "Xác nhận thay đổi email",
+          requestNew: "Yêu cầu email xác minh mới",
+        }
+      : {
+          eyebrow: "SECURE EMAIL CHANGE",
+          title: "Confirm email change",
+          description:
+            "Confirmation is explicit. The private link value was removed from the address bar before this page rendered its action.",
+          confirming: "Confirming email change...",
+          confirm: "Confirm email change",
+          requestNew: "Request a new verification email",
+        };
   const [state, setState] = useState<VerificationState>({ kind: "ready" });
   const proof = useRef<string | null>(null);
   const fragmentRead = useRef(false);
@@ -47,7 +70,11 @@ export function VerifyEmailChangeForm() {
     if (!proof.current) {
       setState({
         kind: "error",
-        message: "This verification link cannot be used.",
+        message: localizeAccountMessage(
+          locale,
+          "This verification link cannot be used.",
+          "EMAIL_CHANGE_PROOF_INVALID",
+        ),
       });
       return;
     }
@@ -65,18 +92,33 @@ export function VerifyEmailChangeForm() {
         setState({
           kind: "error",
           message: parsed.success
-            ? parsed.data.message
-            : "This verification link cannot be used.",
+            ? localizeAccountMessage(
+                locale,
+                parsed.data.message,
+                parsed.data.code,
+              )
+            : localizeAccountMessage(
+                locale,
+                "This verification link cannot be used.",
+                "EMAIL_CHANGE_PROOF_INVALID",
+              ),
         });
         return;
       }
       const parsed = emailChangeVerificationOutcomeSchema.safeParse(body);
       if (!parsed.success) throw new Error("EMAIL_CHANGE_RESPONSE_INVALID");
-      setState({ kind: "success", message: parsed.data.message });
+      setState({
+        kind: "success",
+        message: localizeAccountMessage(locale, parsed.data.message),
+      });
     } catch {
       setState({
         kind: "error",
-        message: "This verification link cannot be used.",
+        message: localizeAccountMessage(
+          locale,
+          "This verification link cannot be used.",
+          "EMAIL_CHANGE_PROOF_INVALID",
+        ),
       });
     } finally {
       submitted.current = false;
@@ -86,12 +128,9 @@ export function VerifyEmailChangeForm() {
   return (
     <div className="verify-email-change">
       <header className="auth-form-heading">
-        <p className="auth-eyebrow">SECURE EMAIL CHANGE</p>
-        <h1>Confirm email change</h1>
-        <p>
-          Confirmation is explicit. The private link value was removed from the
-          address bar before this page rendered its action.
-        </p>
+        <p className="auth-eyebrow">{copy.eyebrow}</p>
+        <h1>{copy.title}</h1>
+        <p>{copy.description}</p>
       </header>
       {state.kind === "success" ? (
         <p role="status" className="verify-email-change-success">
@@ -114,14 +153,10 @@ export function VerifyEmailChangeForm() {
             disabled={state.kind === "submitting"}
             onClick={verify}
           >
-            {state.kind === "submitting"
-              ? "Confirming email change..."
-              : "Confirm email change"}
+            {state.kind === "submitting" ? copy.confirming : copy.confirm}
           </button>
           {state.kind === "error" ? (
-            <Link href="/profile/account">
-              Request a new verification email
-            </Link>
+            <Link href="/profile/account">{copy.requestNew}</Link>
           ) : null}
         </>
       )}

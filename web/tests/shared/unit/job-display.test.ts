@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  formatRelativeTime,
   formatSalary,
   isSalaryNegotiable,
 } from "@/shared/utils/jobs/job-display";
@@ -47,5 +48,35 @@ describe("formatSalary", () => {
       }),
     ).toBe(false);
     expect(isSalaryNegotiable(null)).toBe(true);
+  });
+
+  it("formats salary in Vietnamese", () => {
+    expect(
+      formatSalary({ minimum: 35.5, maximum: 63.5, period: "MONTH" }, "vi"),
+    ).toBe("35,5 - 63,5 triệu/tháng");
+    expect(formatSalary({ minimum: null, maximum: null }, "vi")).toBe(
+      "Thỏa thuận",
+    );
+  });
+});
+
+describe("formatRelativeTime", () => {
+  const now = new Date("2026-08-27T00:00:00.000Z");
+
+  it("formats relative time in the selected locale", () => {
+    const publishedAt = new Date("2026-08-06T00:00:00.000Z");
+
+    expect(formatRelativeTime(publishedAt, "vi", now)).toBe("3 tuần trước");
+    expect(formatRelativeTime(publishedAt, "en", now)).toBe("3 weeks ago");
+  });
+
+  it("keeps the legacy Date argument compatible", () => {
+    const publishedAt = new Date("2026-08-06T00:00:00.000Z");
+
+    expect(formatRelativeTime(publishedAt, now)).toBe("3 weeks ago");
+  });
+
+  it("uses a localized fallback for invalid dates", () => {
+    expect(formatRelativeTime("not-a-date", "vi", now)).toBe("gần đây");
   });
 });

@@ -3,18 +3,17 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import {
-  PASSWORD_CONFIRMATION_MISMATCH_ERROR,
-  PASSWORD_RESET_GENERIC_ERROR,
-  PASSWORD_RESET_SUCCESS_RESPONSE,
-} from "@/shared/contracts/identity/password-recovery";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { AuthStatus } from "./auth-status";
 import { PasswordField } from "./password-field";
 import { PasswordRequirementChecklist } from "./password-requirement-checklist";
 import { useReplayableStatus } from "./use-status";
+import { authCopy, localizedAuthMessage } from "./auth-copy";
 
 export function ResetPasswordForm() {
   const router = useRouter();
+  const locale = useWorkspaceLocale();
+  const copy = authCopy(locale);
   const [token, setToken] = useState(() => {
     if (typeof window === "undefined") return "";
     const hash = window.location.hash.replace(/^#/, "");
@@ -44,7 +43,7 @@ export function ResetPasswordForm() {
     if (busy || completed) return;
     if (password !== confirmation) {
       setStatusTone("error");
-      setStatus(PASSWORD_CONFIRMATION_MISMATCH_ERROR);
+      setStatus(copy.resetPassword.mismatch);
       return;
     }
 
@@ -66,19 +65,23 @@ export function ResetPasswordForm() {
       } | null;
       if (!response.ok) {
         setStatusTone("error");
-        setStatus(result?.message ?? PASSWORD_RESET_GENERIC_ERROR);
+        setStatus(
+          localizedAuthMessage(locale, result?.message, copy.resetPassword.error),
+        );
         return;
       }
 
       setStatusTone("success");
-      setStatus(result?.message ?? PASSWORD_RESET_SUCCESS_RESPONSE);
+      setStatus(
+        localizedAuthMessage(locale, result?.message, copy.resetPassword.success),
+      );
       setToken("");
       setPassword("");
       setConfirmation("");
       setCompleted(true);
     } catch {
       setStatusTone("error");
-      setStatus(PASSWORD_RESET_GENERIC_ERROR);
+      setStatus(copy.resetPassword.error);
     } finally {
       setBusy(false);
     }
@@ -88,12 +91,12 @@ export function ResetPasswordForm() {
     <section className="auth-form-content">
       <form className="auth-form" onSubmit={submit} noValidate aria-busy={busy}>
         <div className="auth-form-heading">
-          <p className="form-kicker">SECURE YOUR ACCOUNT</p>
-          <h1>Choose a new password</h1>
-          <p>Use a strong, unique password you do not use anywhere else.</p>
+          <p className="form-kicker">{copy.resetPassword.kicker}</p>
+          <h1>{copy.resetPassword.title}</h1>
+          <p>{copy.resetPassword.description}</p>
         </div>
         <PasswordField
-          label="New password"
+          label={copy.resetPassword.newPassword}
           id="reset-password"
           autoComplete="new-password"
           value={password}
@@ -102,7 +105,7 @@ export function ResetPasswordForm() {
         />
         <PasswordRequirementChecklist value={password} />
         <PasswordField
-          label="Confirm new password"
+          label={copy.resetPassword.confirmPassword}
           id="reset-confirm-password"
           autoComplete="new-password"
           value={confirmation}
@@ -114,17 +117,17 @@ export function ResetPasswordForm() {
           disabled={busy || completed || !token || password.length < 12}
         >
           {completed
-            ? "Redirecting to sign in…"
+            ? copy.resetPassword.redirecting
             : busy
-              ? "Resetting…"
-              : "Reset password"}
+              ? copy.resetPassword.resetting
+              : copy.resetPassword.reset}
         </button>
         <AuthStatus
           id="reset-password-status"
           status={status}
           tone={statusTone}
         />
-        <Link href="/login">Back to sign in</Link>
+        <Link href="/login">{copy.common.backToSignIn}</Link>
       </form>
     </section>
   );

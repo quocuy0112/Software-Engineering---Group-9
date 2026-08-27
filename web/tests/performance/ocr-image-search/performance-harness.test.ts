@@ -13,15 +13,25 @@ describe("Feature 005 performance harnesses", () => {
     ]);
     const report = JSON.parse(stdout.slice(stdout.indexOf("{")).trim());
     expect(report).toMatchObject({
+      schemaVersion: "image-search-performance-v2",
       mode: "SELF_TEST",
       releaseEvidenceEligible: false,
       passed: true,
-      environment: { concurrency: 4, ocrDeadlineMs: 10_000 },
-      warm: { ocr: { samples: 100 } },
+      environment: {
+        concurrency: 4,
+        concurrencyMatrix: [1, 2, 4],
+        ocrDeadlineMs: 10_000,
+      },
+      warm: {
+        queueToActionable: { samples: 100 },
+        ocr: { samples: 100 },
+        cropBytesPeak: { samples: 100 },
+      },
       gates: {
         actionableWithin10s: 1,
         searchWithin2s: 1,
         hardDeadlineMet: true,
+        resourceLimitsMet: true,
       },
     });
   });

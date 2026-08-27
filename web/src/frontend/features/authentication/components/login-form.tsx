@@ -11,6 +11,13 @@ import { PasswordField } from "./password-field";
 import { FormFeedback } from "./form-feedback";
 import { useReplayableStatus } from "./use-status";
 import Link from "next/link";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import {
+  authCopy,
+  localizedAuthFieldError,
+  localizedAuthMessage,
+  type AuthCopy,
+} from "./auth-copy";
 
 // Must stay in sync with `rateLimitPolicies.login` in policies.ts (5 minutes).
 const LOGIN_LOCKOUT_WINDOW_MS = 5 * 60 * 1000;
@@ -52,14 +59,16 @@ function writeAttemptState(email: string, count: number, lockedUntil?: number) {
   window.localStorage.setItem(key, JSON.stringify({ count, lockedUntil }));
 }
 
-function getLoginLockedMessage(lockedUntil: number) {
+function getLoginLockedMessage(
+  lockedUntil: number,
+  copy: AuthCopy["login"],
+) {
   const minutes = Math.max(1, Math.ceil((lockedUntil - Date.now()) / 60000));
-  return `Your account has been temporarily locked after too many failed sign-in attempts. Please try again in ${minutes} minute${minutes === 1 ? "" : "s"}.`;
+  return copy.locked(minutes);
 }
 
 const MAX_FAILED_LOGIN_ATTEMPTS = 5;
 const LOGIN_FAILURE_STORAGE_KEY_PREFIX = "smarthire-login-failed-attempts:";
-const GENERIC_LOGIN_ERROR = "Email or password is incorrect.";
 
 function currentTimestamp() {
   return Date.now();
@@ -67,6 +76,8 @@ function currentTimestamp() {
 
 export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
   const router = useRouter();
+  const locale = useWorkspaceLocale();
+  const copy = authCopy(locale);
   const { status, setStatus } = useReplayableStatus("");
   const [isLocked, setIsLocked] = useState(false);
   const [suspended, setSuspended] = useState(false);
@@ -87,7 +98,7 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
     const state = readAttemptState(values.email);
     if (state.lockedUntil && state.lockedUntil > currentTimestamp()) {
       setIsLocked(true);
-      setStatus(getLoginLockedMessage(state.lockedUntil));
+      setStatus(getLoginLockedMessage(state.lockedUntil, copy.login));
       return;
     }
 
@@ -106,20 +117,30 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
     } | null;
     const message =
       response.status === 401
-        ? GENERIC_LOGIN_ERROR
-        : (body?.message ?? "Something went wrong. Please try again.");
+        ? copy.login.genericError
+        : localizedAuthMessage(
+            locale,
+            body?.message,
+            copy.login.unexpectedError,
+          );
     if (!response.ok) {
       if (response.status === 423 && body?.code === "ACCOUNT_SUSPENDED") {
         setSuspended(true);
         setSuspendedSupportPath(
           body.supportPath ?? "/support/account-security",
         );
-        setStatus(body.message ?? "This account is suspended.");
+        setStatus(
+          localizedAuthMessage(locale, body.message, copy.login.suspended),
+        );
         return;
       }
       setSuspended(false);
       for (const [field, messages] of Object.entries(body?.fields ?? {}))
-        setError(field as keyof LoginInput, { message: messages[0] });
+        setError(field as keyof LoginInput, {
+          message:
+            localizedAuthFieldError(locale, field, messages[0]) ??
+            copy.login.unexpectedError,
+        });
 
       const nextFailures = state.count + 1;
       const remaining = MAX_FAILED_LOGIN_ATTEMPTS - nextFailures;
@@ -131,13 +152,11 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
 
       if (lockedUntil) {
         setIsLocked(true);
-        setStatus(getLoginLockedMessage(lockedUntil));
+        setStatus(getLoginLockedMessage(lockedUntil, copy.login));
         return;
       }
 
-      setStatus(
-        `${message} (${remaining} attempt${remaining === 1 ? "" : "s"} remaining)`,
-      );
+      setStatus(copy.login.attemptsRemaining(message, remaining));
       return;
     }
 
@@ -157,12 +176,12 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
       aria-busy={isSubmitting || isNavigating}
     >
       <div className="auth-form-heading">
-        <p className="form-kicker">WELCOME BACK</p>
-        <h1 id="page-title">Sign in to SmartHire</h1>
-        <p>Continue to your secure talent workspace.</p>
+        <p className="form-kicker">{copy.login.kicker}</p>
+        <h1 id="page-title">{copy.login.title}</h1>
+        <p>{copy.login.description}</p>
       </div>
       <div className="field">
-        <label htmlFor="login-email">Email address</label>
+        <label htmlFor="login-email">{copy.common.emailAddress}</label>
         <input
           id="login-email"
           type="email"
@@ -170,29 +189,37 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
           inputMode="email"
           autoCapitalize="none"
           spellCheck={false}
-          placeholder="example@email.com"
+          placeholder={copy.common.emailPlaceholder}
           aria-invalid={Boolean(errors.email)}
           {...register("email")}
         />
-        {errors.email ? <p role="alert">{errors.email.message}</p> : null}
+        {errors.email ? (
+          <p role="alert">
+            {localizedAuthFieldError(locale, "email", errors.email.message)}
+          </p>
+        ) : null}
       </div>
       <PasswordField
-        label="Password"
+        label={copy.login.password}
         autoComplete="current-password"
-        hint="Use 12–128 characters, including an uppercase letter, a number, and a special character."
-        error={errors.password?.message}
+        hint={copy.login.passwordHint}
+        error={localizedAuthFieldError(
+          locale,
+          "password",
+          errors.password?.message,
+        )}
         {...register("password")}
       />
       <Link className="auth-forgot-link" href="/forgot-password">
-        Forgot password?
+        {copy.login.forgotPassword}
       </Link>
       <button type="submit" disabled={isSubmitting || isNavigating || isLocked}>
-        {isSubmitting || isNavigating ? "Signing in…" : "Sign in"}
+        {isSubmitting || isNavigating ? copy.login.signingIn : copy.login.signIn}
       </button>
       <FormFeedback status={status} />
       {suspended && (
         <p role="status">
-          <a href={suspendedSupportPath}>Contact support or submit a dispute</a>
+          <a href={suspendedSupportPath}>{copy.login.contactSupport}</a>
         </p>
       )}
     </form>
