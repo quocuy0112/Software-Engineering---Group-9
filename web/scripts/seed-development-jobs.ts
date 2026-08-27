@@ -15,6 +15,7 @@ import {
 const webRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaultCompaniesPath = resolve(webRoot, "data/companies/companies.json");
 const defaultJobsPath = resolve(webRoot, "data/jobs/jobs.json");
+const bindingQueryBatchSize = 1_000;
 const jobBatchSize = 50;
 const jobImportConcurrency = 4;
 const importTransactionOptions = {
@@ -52,7 +53,20 @@ const sourceCompanySchema = z.object({
   address: z.string().min(1).max(300),
   website: z.string().url().nullable(),
   description: z.string().max(3_000).nullable(),
+  ownerUserId: z.string().min(1).max(128).nullable().optional(),
+  memberUserIds: z.array(z.string().min(1).max(128)).max(10_000).default([]),
+  taxCode: z
+    .string()
+    .regex(/^\d{10}$/u)
+    .optional(),
+  verificationStatus: z.enum(["pending", "approved", "rejected"]).optional(),
 });
+
+function usableCompanyTaxCode(taxCode: string | undefined): string | undefined {
+  // This is the placeholder written for an unverified company. It is not a
+  // stable business identity and must not merge two unrelated local rows.
+  return taxCode && taxCode !== "0000000000" ? taxCode : undefined;
+}
 
 const sourceLocationSchema = z.object({
   city: z.string().min(1).max(160),
@@ -166,6 +180,50 @@ type JobPostingStatus =
   | "CLOSED"
   | "EXPIRED"
   | "REJECTED";
+
+type SeedCompanyMembership = {
+  userId: string;
+  role: "OWNER" | "RECRUITER";
+};
+
+type SeedBindings = {
+  companyIdBySourceId: ReadonlyMap<string, string>;
+  jobIdBySourceId: ReadonlyMap<string, string>;
+  remappedCompanyCount: number;
+  remappedJobCount: number;
+};
+
+function sourceCompanyMemberships(
+  company: SourceCompany,
+): SeedCompanyMembership[] {
+  const userIds = new Set([
+    ...company.memberUserIds,
+    ...(company.ownerUserId ? [company.ownerUserId] : []),
+  ]);
+  return [...userIds].map((userId) => ({
+    userId,
+    // Legacy fixtures do not retain a role for memberUserIds. RECRUITER is
+    // the compatible database role for a legacy job-catalogue member; the
+    // explicit owner always wins when the same user appears in both lists.
+    role: userId === company.ownerUserId ? "OWNER" : "RECRUITER",
+  }));
+}
+
+function sourceCompanyVerification(
+  company: SourceCompany,
+  verifiedCompanyIds: ReadonlySet<string>,
+) {
+  const isVerified = company.verificationStatus
+    ? company.verificationStatus === "approved"
+    : verifiedCompanyIds.has(company.id);
+  return {
+    verifiedAt: isVerified ? new Date(splitFixtureVerificationDate) : null,
+    verificationState: isVerified
+      ? CompanyVerificationState.ACTIVE
+      : CompanyVerificationState.UNVERIFIED,
+    verificationInactiveAt: null,
+  };
+}
 
 function argumentPath(flag: string, fallback: string): string {
   const argumentIndex = process.argv.indexOf(flag);
@@ -399,47 +457,186 @@ function joinLines(values: string[]): string {
     .join("\n");
 }
 
-async function validateExistingBindings(
+type ExistingJobBinding = {
+  id: string;
+  slug: string;
+  companyId: string;
+};
+
+async function findExistingJobsForBindings(
+  prisma: PrismaClient,
+  jobIds: string[],
+  jobSlugs: string[],
+): Promise<ExistingJobBinding[]> {
+  const rowsById = new Map<string, ExistingJobBinding>();
+  const rowsBySlug = new Map<string, ExistingJobBinding>();
+  const select = { id: true, slug: true, companyId: true } as const;
+
+  for (let index = 0; index < jobIds.length; index += bindingQueryBatchSize) {
+    const idBatch = jobIds.slice(index, index + bindingQueryBatchSize);
+    const slugBatch = jobSlugs.slice(index, index + bindingQueryBatchSize);
+    const [idRows, slugRows] = await Promise.all([
+      prisma.jobPosting.findMany({
+        where: { id: { in: idBatch } },
+        select,
+      }),
+      prisma.jobPosting.findMany({
+        where: { slug: { in: slugBatch } },
+        select,
+      }),
+    ]);
+    for (const row of idRows) rowsById.set(row.id, row);
+    for (const row of slugRows) rowsBySlug.set(row.slug, row);
+  }
+
+  return [
+    ...new Map(
+      [...rowsById.values(), ...rowsBySlug.values()].map((row) => [
+        row.id,
+        row,
+      ]),
+    ).values(),
+  ];
+}
+
+async function resolveExistingBindings(
   prisma: PrismaClient,
   companies: SourceCompany[],
   jobs: SourceJob[],
-): Promise<void> {
-  const expectedCompanyIdBySlug = new Map(
-    companies.map(({ id, slug }) => [slug, id] as const),
-  );
-  const expectedJobIdBySlug = new Map(
-    jobs.map(({ id, slug }) => [slug, id] as const),
-  );
+): Promise<SeedBindings> {
+  const companyIds = companies.map(({ id }) => id);
+  const companySlugs = companies.map(({ slug }) => slug);
+  const companyTaxCodes = companies
+    .map(({ taxCode }) => usableCompanyTaxCode(taxCode))
+    .filter((taxCode): taxCode is string => Boolean(taxCode));
+  const jobIds = jobs.map(({ id }) => id);
+  const jobSlugs = jobs.map(({ slug }) => slug);
   const [existingCompanies, existingJobs] = await Promise.all([
     prisma.company.findMany({
-      where: { slug: { in: [...expectedCompanyIdBySlug.keys()] } },
-      select: { id: true, slug: true },
+      where: {
+        OR: [
+          { id: { in: companyIds } },
+          { slug: { in: companySlugs } },
+          ...(companyTaxCodes.length
+            ? [{ normalizedTaxIdentifier: { in: companyTaxCodes } }]
+            : []),
+        ],
+      },
+      select: { id: true, slug: true, normalizedTaxIdentifier: true },
     }),
-    prisma.jobPosting.findMany({
-      where: { slug: { in: [...expectedJobIdBySlug.keys()] } },
-      select: { id: true, slug: true },
-    }),
+    findExistingJobsForBindings(prisma, jobIds, jobSlugs),
   ]);
 
-  for (const company of existingCompanies) {
-    if (expectedCompanyIdBySlug.get(company.slug) !== company.id) {
+  const existingCompanyById = new Map(
+    existingCompanies.map((company) => [company.id, company]),
+  );
+  const existingCompanyBySlug = new Map(
+    existingCompanies.map((company) => [company.slug, company]),
+  );
+  const existingCompanyByTaxCode = new Map(
+    existingCompanies
+      .filter(
+        (
+          company,
+        ): company is typeof company & {
+          normalizedTaxIdentifier: string;
+        } => Boolean(company.normalizedTaxIdentifier),
+      )
+      .map((company) => [company.normalizedTaxIdentifier, company]),
+  );
+  const companyIdBySourceId = new Map<string, string>();
+  const databaseCompanyIdToSourceId = new Map<string, string>();
+  for (const sourceCompany of companies) {
+    const taxCode = usableCompanyTaxCode(sourceCompany.taxCode);
+    const taxMatch = taxCode
+      ? existingCompanyByTaxCode.get(taxCode)
+      : undefined;
+    const matches = [
+      existingCompanyById.get(sourceCompany.id),
+      existingCompanyBySlug.get(sourceCompany.slug),
+      taxMatch,
+    ].filter(
+      (company): company is (typeof existingCompanies)[number] =>
+        company !== undefined,
+    );
+    const matchedIds = [...new Set(matches.map(({ id }) => id))];
+    // A tax identifier is the strongest identity available here. If an old
+    // seed created a duplicate row under the catalogue id, prefer the
+    // verified database row carrying the tax identifier and repair jobs to
+    // point at it instead of creating/using another tenant.
+    if (matchedIds.length > 1 && !taxMatch) {
       throw new Error(
-        "Company slug already belongs to another row: " + company.slug,
+        "Company fixture identity is ambiguous: " + sourceCompany.slug,
       );
     }
-  }
-  for (const job of existingJobs) {
-    if (expectedJobIdBySlug.get(job.slug) !== job.id) {
-      throw new Error("Job slug already belongs to another row: " + job.slug);
+    const databaseCompanyId = taxMatch?.id ?? matchedIds[0] ?? sourceCompany.id;
+    const previousSourceId = databaseCompanyIdToSourceId.get(databaseCompanyId);
+    if (previousSourceId && previousSourceId !== sourceCompany.id) {
+      throw new Error(
+        "Multiple company fixtures resolve to database row: " +
+          databaseCompanyId,
+      );
     }
+    companyIdBySourceId.set(sourceCompany.id, databaseCompanyId);
+    databaseCompanyIdToSourceId.set(databaseCompanyId, sourceCompany.id);
   }
+
+  const existingJobById = new Map(existingJobs.map((job) => [job.id, job]));
+  const existingJobBySlug = new Map(existingJobs.map((job) => [job.slug, job]));
+  const jobIdBySourceId = new Map<string, string>();
+  const databaseJobIdToSourceId = new Map<string, string>();
+  for (const sourceJob of jobs) {
+    const expectedCompanyId =
+      companyIdBySourceId.get(sourceJob.companyId) ?? sourceJob.companyId;
+    const matches = [
+      existingJobById.get(sourceJob.id),
+      existingJobBySlug.get(sourceJob.slug),
+    ].filter((job): job is (typeof existingJobs)[number] => job !== undefined);
+    const matchedIds = [...new Set(matches.map(({ id }) => id))];
+    if (matchedIds.length > 1) {
+      throw new Error("Job fixture identity is ambiguous: " + sourceJob.slug);
+    }
+    const matchedJob = matches[0];
+    const matchedJobCompanyId = matchedJob
+      ? (companyIdBySourceId.get(matchedJob.companyId) ?? matchedJob.companyId)
+      : null;
+    if (matchedJob && matchedJobCompanyId !== expectedCompanyId) {
+      throw new Error(
+        "Job fixture belongs to another company: " + sourceJob.slug,
+      );
+    }
+    const databaseJobId = matchedIds[0] ?? sourceJob.id;
+    const previousSourceId = databaseJobIdToSourceId.get(databaseJobId);
+    if (previousSourceId && previousSourceId !== sourceJob.id) {
+      throw new Error(
+        "Multiple job fixtures resolve to database row: " + databaseJobId,
+      );
+    }
+    jobIdBySourceId.set(sourceJob.id, databaseJobId);
+    databaseJobIdToSourceId.set(databaseJobId, sourceJob.id);
+  }
+
+  return {
+    companyIdBySourceId,
+    jobIdBySourceId,
+    remappedCompanyCount: [...companyIdBySourceId].filter(
+      ([sourceId, databaseId]) => sourceId !== databaseId,
+    ).length,
+    remappedJobCount: [...jobIdBySourceId].filter(
+      ([sourceId, databaseId]) => sourceId !== databaseId,
+    ).length,
+  };
 }
 
 async function importReferenceData(
   prisma: PrismaClient,
   companies: SourceCompany[],
   jobs: SourceJob[],
-): Promise<Map<string, { id: string; name: string }>> {
+  bindings: SeedBindings,
+): Promise<{
+  skillByName: Map<string, { id: string; name: string }>;
+  missingMembershipUserIds: string[];
+}> {
   const verifiedCompanyIds = new Set(
     jobs
       .filter(({ isVerified }) => isVerified)
@@ -447,10 +644,46 @@ async function importReferenceData(
   );
 
   return prisma.$transaction(async (transaction) => {
+    const databaseCompanyIds = companies.map(
+      ({ id }) => bindings.companyIdBySourceId.get(id) ?? id,
+    );
+    const existingCompanies = await transaction.company.findMany({
+      where: { id: { in: databaseCompanyIds } },
+      select: {
+        id: true,
+        verificationState: true,
+        verifiedAt: true,
+        verificationInactiveAt: true,
+      },
+    });
+    const existingCompanyById = new Map(
+      existingCompanies.map((company) => [company.id, company]),
+    );
+    const membershipSeeds = companies.flatMap(sourceCompanyMemberships);
+    const membershipUserIds = [
+      ...new Set(membershipSeeds.map(({ userId }) => userId)),
+    ];
+    const existingUsers = membershipUserIds.length
+      ? await transaction.userAccount.findMany({
+          where: { id: { in: membershipUserIds } },
+          select: { id: true },
+        })
+      : [];
+    const existingUserIds = new Set(existingUsers.map(({ id }) => id));
+    const missingMembershipUserIds = membershipUserIds.filter(
+      (userId) => !existingUserIds.has(userId),
+    );
+
     for (const company of companies) {
-      const isVerified = verifiedCompanyIds.has(company.id);
+      const databaseCompanyId =
+        bindings.companyIdBySourceId.get(company.id) ?? company.id;
+      const verification = sourceCompanyVerification(
+        company,
+        verifiedCompanyIds,
+      );
+      const existingCompany = existingCompanyById.get(databaseCompanyId);
+      const normalizedTaxIdentifier = usableCompanyTaxCode(company.taxCode);
       const data = {
-        slug: company.slug,
         legalName: company.name,
         displayName: company.name,
         logoUrl: company.logo,
@@ -460,17 +693,61 @@ async function importReferenceData(
         size: company.size,
         industry: company.industry,
         address: company.address,
-        verifiedAt: isVerified ? new Date(splitFixtureVerificationDate) : null,
-        verificationState: isVerified
-          ? CompanyVerificationState.ACTIVE
-          : CompanyVerificationState.UNVERIFIED,
-        verificationInactiveAt: null,
+        ...(normalizedTaxIdentifier ? { normalizedTaxIdentifier } : {}),
       };
       await transaction.company.upsert({
-        where: { id: company.id },
-        update: data,
-        create: { id: company.id, ...data },
+        where: { id: databaseCompanyId },
+        update: {
+          ...data,
+          // Keep an existing database slug stable. A legacy catalogue-id row
+          // may still own the fixture slug while this row is matched by tax
+          // identifier.
+          // A job fixture must never revoke an existing company's verified
+          // access. It may repair an old local seed that left an approved
+          // company unverified, but an explicitly inactive company remains
+          // inactive until an administrator changes it.
+          ...(existingCompany &&
+          verification.verificationState === CompanyVerificationState.ACTIVE &&
+          existingCompany.verificationState !==
+            CompanyVerificationState.INACTIVE &&
+          !existingCompany.verificationInactiveAt
+            ? {
+                verificationState: CompanyVerificationState.ACTIVE,
+                verifiedAt:
+                  existingCompany.verifiedAt ?? verification.verifiedAt,
+              }
+            : {}),
+        },
+        create: {
+          id: databaseCompanyId,
+          slug: company.slug,
+          ...data,
+          ...verification,
+        },
       });
+
+      for (const membership of sourceCompanyMemberships(company)) {
+        if (!existingUserIds.has(membership.userId)) continue;
+        await transaction.companyMembership.upsert({
+          where: {
+            companyId_userId: {
+              companyId: databaseCompanyId,
+              userId: membership.userId,
+            },
+          },
+          // Existing roles, suspensions and removals are authoritative. The
+          // fixture only fills a missing membership and never overrides an
+          // administrator's later decision.
+          update: {},
+          create: {
+            companyId: databaseCompanyId,
+            userId: membership.userId,
+            role: membership.role,
+            priorApprovedRole: membership.role,
+            status: "ACTIVE",
+          },
+        });
+      }
     }
 
     const skillByName = new Map<string, { id: string; name: string }>();
@@ -494,21 +771,27 @@ async function importReferenceData(
       }
     }
 
-    return skillByName;
+    return { skillByName, missingMembershipUserIds };
   }, importTransactionOptions);
 }
 
 async function importJob(
   transaction: Prisma.TransactionClient,
   job: SourceJob,
-  companyById: ReadonlyMap<string, SourceCompany>,
+  companyById: ReadonlyMap<
+    string,
+    { source: SourceCompany; databaseId: string }
+  >,
+  jobIdBySourceId: ReadonlyMap<string, string>,
   skillByName: ReadonlyMap<string, { id: string; name: string }>,
   now: Date,
 ): Promise<void> {
-  const company = companyById.get(job.companyId);
-  if (!company) {
+  const companyBinding = companyById.get(job.companyId);
+  if (!companyBinding) {
     throw new Error("Unknown company for job " + job.id + ".");
   }
+  const company = companyBinding.source;
+  const databaseJobId = jobIdBySourceId.get(job.id) ?? job.id;
 
   const desiredSkills = job.skillTags.map((skillName, position) => {
     const saved = skillByName.get(normalize(skillName));
@@ -516,7 +799,7 @@ async function importJob(
       throw new Error("Missing imported skill " + skillName + ".");
     }
     return {
-      jobPostingId: job.id,
+      jobPostingId: databaseJobId,
       skillId: saved.id,
       displayName: skillName,
       required: true,
@@ -556,7 +839,7 @@ async function importJob(
     job.subIndustryCode?.trim() || job.categoryIds?.[0]?.trim() || null;
 
   const data = {
-    companyId: job.companyId,
+    companyId: companyBinding.databaseId,
     industryId: job.industryId?.trim() || industryCode || null,
     subIndustryId: job.subIndustryId?.trim() || subIndustryCode,
     industryCode: industryCode || null,
@@ -594,20 +877,20 @@ async function importJob(
   };
 
   await transaction.jobPosting.upsert({
-    where: { id: job.id },
+    where: { id: databaseJobId },
     update: data,
-    create: { id: job.id, ...data },
+    create: { id: databaseJobId, ...data },
   });
 
   await transaction.jobPostingSkill.deleteMany({
-    where: { jobPostingId: job.id },
+    where: { jobPostingId: databaseJobId },
   });
   if (desiredSkills.length > 0) {
     await transaction.jobPostingSkill.createMany({ data: desiredSkills });
   }
 
   await transaction.applicationQuestion.updateMany({
-    where: { jobPostingId: job.id, active: true },
+    where: { jobPostingId: databaseJobId, active: true },
     data: { active: false },
   });
 }
@@ -616,11 +899,22 @@ async function importJobs(
   prisma: PrismaClient,
   companies: SourceCompany[],
   jobs: SourceJob[],
+  bindings: SeedBindings,
   skillByName: ReadonlyMap<string, { id: string; name: string }>,
   now: Date,
 ): Promise<void> {
   const companyById = new Map(
-    companies.map((company) => [company.id, company] as const),
+    companies.map(
+      (company) =>
+        [
+          company.id,
+          {
+            source: company,
+            databaseId:
+              bindings.companyIdBySourceId.get(company.id) ?? company.id,
+          },
+        ] as const,
+    ),
   );
   const batches: Array<typeof jobs> = [];
   for (let index = 0; index < jobs.length; index += jobBatchSize) {
@@ -637,7 +931,14 @@ async function importJobs(
 
       await prisma.$transaction(async (transaction) => {
         for (const job of batch) {
-          await importJob(transaction, job, companyById, skillByName, now);
+          await importJob(
+            transaction,
+            job,
+            companyById,
+            bindings.jobIdBySourceId,
+            skillByName,
+            now,
+          );
         }
       }, importTransactionOptions);
 
@@ -664,14 +965,27 @@ async function importSplitFixtures(
   jobs: SourceJob[],
   now: Date,
 ) {
-  await validateExistingBindings(prisma, companies, jobs);
-  const skillByName = await importReferenceData(prisma, companies, jobs);
-  await importJobs(prisma, companies, jobs, skillByName, now);
+  const bindings = await resolveExistingBindings(prisma, companies, jobs);
+  const { skillByName, missingMembershipUserIds } = await importReferenceData(
+    prisma,
+    companies,
+    jobs,
+    bindings,
+  );
+  if (missingMembershipUserIds.length) {
+    console.warn(
+      "Skipped fixture memberships for missing users: " +
+        missingMembershipUserIds.join(", "),
+    );
+  }
+  await importJobs(prisma, companies, jobs, bindings, skillByName, now);
 
   return {
     companies: companies.length,
     jobs: jobs.length,
     skills: skillByName.size,
+    remappedCompanies: bindings.remappedCompanyCount,
+    remappedJobs: bindings.remappedJobCount,
   };
 }
 
@@ -724,7 +1038,14 @@ async function main() {
         result.jobs +
         " jobs and " +
         result.skills +
-        " skills.",
+        " skills" +
+        (result.remappedCompanies || result.remappedJobs
+          ? " (reused " +
+            result.remappedCompanies +
+            " existing company rows and " +
+            result.remappedJobs +
+            " existing job rows)."
+          : "."),
     );
   } finally {
     await prisma.$disconnect();
