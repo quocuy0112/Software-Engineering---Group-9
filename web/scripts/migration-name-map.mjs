@@ -117,6 +117,7 @@ export const migrationNameMap = Object.freeze([
   ["068_update_cv_scoring_weights", "072_update_cv_scoring_weights"],
   ["069_recruiter_job_reactivation", "073_recruiter_job_reactivation"],
   ["20260826085731_smarthire", "074_prisma_index_name_alignment"],
+  ["20260827122931_smarthire", "079_team_application_rejected_email"],
 ]);
 
 // These groups represent equivalent history shapes. The first two timestamp

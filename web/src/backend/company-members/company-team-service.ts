@@ -6,6 +6,7 @@ import { createInAppNotification } from "@/backend/notifications/notification-se
 import { PrismaOutboxRepository } from "@/backend/repositories/email/outbox-repository";
 import { TokenProtector } from "@/backend/security/security-token/security-tokens";
 import { requireActiveCompanyOwner } from "./company-team-authorization";
+import { teamApplicationCvDeleteAfter } from "@/backend/services/company-members/team-application-retention-policy";
 
 const digest = (value: string) =>
   createHash("sha256").update(value).digest("hex");
@@ -14,6 +15,15 @@ const tokenProtector = new TokenProtector();
 type ManagedRole = "HR_MANAGER" | "RECRUITER";
 type MemberAction = "role" | "suspend" | "restore" | "remove";
 type InvitationOutcome = "ACCEPTED" | "DECLINED";
+type InvitationReference =
+  | { token: string }
+  | { invitationId: string };
+
+function invitationWhere(reference: InvitationReference) {
+  return "token" in reference
+    ? { tokenDigest: digest(reference.token) }
+    : { id: reference.invitationId };
+}
 
 export class CompanyTeamCommandError extends Error {
   constructor(readonly code: string) {
@@ -32,6 +42,15 @@ export class CompanyTeamService {
         expiresAt: { lte: now },
       },
       data: { state: "EXPIRED", version: { increment: 1 } },
+    });
+    await prisma.teamApplication.updateMany({
+      where: {
+        companyId: owner.companyId,
+        status: "INVITATION_SENT",
+        cvDeleteAfter: null,
+        invitation: { is: { state: "EXPIRED" } },
+      },
+      data: { cvDeleteAfter: teamApplicationCvDeleteAfter(now) },
     });
     const [members, invitations, activities] = await Promise.all([
       prisma.companyMembership.findMany({
@@ -190,14 +209,34 @@ export class CompanyTeamService {
   }
 
   async preview(userId: string, token: string) {
+    return this.previewReference(userId, { token });
+  }
+
+  async previewById(userId: string, invitationId: string) {
+    return this.previewReference(userId, { invitationId });
+  }
+
+  private async previewReference(
+    userId: string,
+    reference: InvitationReference,
+  ) {
     const now = new Date();
     const account = await prisma.userAccount.findUnique({
       where: { id: userId },
       select: { email: true, state: true },
     });
     const invitation = await prisma.companyInvitation.findUnique({
-      where: { tokenDigest: digest(token) },
-      include: { company: { select: { displayName: true } } },
+      where: invitationWhere(reference),
+      include: {
+        company: {
+          select: {
+            displayName: true,
+            verificationState: true,
+            verificationInactiveAt: true,
+            moderationState: true,
+          },
+        },
+      },
     });
     if (
       !account ||
@@ -205,7 +244,10 @@ export class CompanyTeamService {
       !invitation ||
       invitation.state !== "PENDING" ||
       invitation.expiresAt <= now ||
-      invitation.normalizedEmail !== account.email.trim().toLowerCase()
+      invitation.normalizedEmail !== account.email.trim().toLowerCase() ||
+      invitation.company.verificationState !== "ACTIVE" ||
+      invitation.company.verificationInactiveAt !== null ||
+      invitation.company.moderationState !== "ACTIVE"
     )
       throw new CompanyTeamCommandError("INVITATION_UNAVAILABLE");
     return {
@@ -216,16 +258,24 @@ export class CompanyTeamService {
   }
 
   async accept(userId: string, token: string) {
-    await this.decide(userId, token, "ACCEPTED");
+    await this.decide(userId, { token }, "ACCEPTED");
+  }
+
+  async acceptById(userId: string, invitationId: string) {
+    await this.decide(userId, { invitationId }, "ACCEPTED");
   }
 
   async decline(userId: string, token: string) {
-    await this.decide(userId, token, "DECLINED");
+    await this.decide(userId, { token }, "DECLINED");
+  }
+
+  async declineById(userId: string, invitationId: string) {
+    await this.decide(userId, { invitationId }, "DECLINED");
   }
 
   private async decide(
     userId: string,
-    token: string,
+    reference: InvitationReference,
     outcome: InvitationOutcome,
   ) {
     const now = new Date();
@@ -238,14 +288,27 @@ export class CompanyTeamService {
         throw new CompanyTeamCommandError("INVITATION_UNAVAILABLE");
       const normalizedEmail = account.email.trim().toLowerCase();
       const invitation = await tx.companyInvitation.findUnique({
-        where: { tokenDigest: digest(token) },
-        include: { company: { select: { displayName: true } } },
+        where: invitationWhere(reference),
+        include: {
+          company: {
+            select: {
+              displayName: true,
+              verificationState: true,
+              verificationInactiveAt: true,
+              moderationState: true,
+            },
+          },
+          teamApplication: { select: { id: true, status: true } },
+        },
       });
       if (
         !invitation ||
         invitation.state !== "PENDING" ||
         invitation.expiresAt <= now ||
-        invitation.normalizedEmail !== normalizedEmail
+        invitation.normalizedEmail !== normalizedEmail ||
+        invitation.company.verificationState !== "ACTIVE" ||
+        invitation.company.verificationInactiveAt !== null ||
+        invitation.company.moderationState !== "ACTIVE"
       )
         throw new CompanyTeamCommandError("INVITATION_UNAVAILABLE");
       const claimed = await tx.companyInvitation.updateMany({
@@ -271,6 +334,26 @@ export class CompanyTeamService {
       });
       if (claimed.count !== 1)
         throw new CompanyTeamCommandError("INVITATION_UNAVAILABLE");
+      await tx.auditEvent.create({
+        data: {
+          actorType: "user",
+          actorUserId: userId,
+          action:
+            outcome === "ACCEPTED"
+              ? "company_invitation.accepted"
+              : "company_invitation.declined",
+          targetType: "company_invitation",
+          targetId: invitation.id,
+          result: "SUCCESS",
+          correlationId: invitation.id,
+          occurredAt: now,
+          context: {
+            companyId: invitation.companyId,
+            role: invitation.role,
+            teamApplicationId: invitation.teamApplication?.id ?? null,
+          },
+        },
+      });
       await this.recordInvitationResponse(
         tx,
         invitation,
@@ -279,6 +362,17 @@ export class CompanyTeamService {
         outcome,
         now,
       );
+      if (invitation.teamApplication?.id && outcome === "DECLINED") {
+        await tx.teamApplication.updateMany({
+          where: {
+            id: invitation.teamApplication.id,
+            status: "INVITATION_SENT",
+            cvDeleteAfter: null,
+          },
+          data: { cvDeleteAfter: teamApplicationCvDeleteAfter(now) },
+        });
+        return;
+      }
       if (outcome === "DECLINED") return;
       const existing = await tx.companyMembership.findUnique({
         where: {
@@ -320,6 +414,58 @@ export class CompanyTeamService {
           occurredAt: now,
         },
       });
+      if (invitation.teamApplication?.id) {
+        await tx.auditEvent.create({
+          data: {
+            actorType: "user",
+            actorUserId: userId,
+            action: "team_application.membership_created",
+            targetType: "team_application",
+            targetId: invitation.teamApplication.id,
+            result: "SUCCESS",
+            correlationId: invitation.id,
+            occurredAt: now,
+            context: {
+              companyId: invitation.companyId,
+              role: invitation.role,
+              membershipId: membership.id,
+            },
+          },
+        });
+      }
+      if (invitation.teamApplication?.id) {
+        const joined = await tx.teamApplication.updateMany({
+          where: {
+            id: invitation.teamApplication.id,
+            status: "INVITATION_SENT",
+          },
+          data: {
+            status: "JOINED",
+            joinedAt: now,
+            cvDeleteAfter: teamApplicationCvDeleteAfter(now),
+            version: { increment: 1 },
+          },
+        });
+        if (joined.count === 1) {
+          await tx.auditEvent.create({
+            data: {
+              actorType: "user",
+              actorUserId: userId,
+              action: "team_application.joined",
+              targetType: "team_application",
+              targetId: invitation.teamApplication.id,
+              result: "SUCCESS",
+              correlationId: invitation.id,
+              occurredAt: now,
+              context: {
+                companyId: invitation.companyId,
+                role: invitation.role,
+                invitationId: invitation.id,
+              },
+            },
+          });
+        }
+      }
     });
   }
 
@@ -413,6 +559,33 @@ export class CompanyTeamService {
           occurredAt: now,
         },
       });
+      if (invitation.teamApplicationId) {
+        await tx.teamApplication.updateMany({
+          where: {
+            id: invitation.teamApplicationId,
+            status: "INVITATION_SENT",
+            cvDeleteAfter: null,
+          },
+          data: { cvDeleteAfter: teamApplicationCvDeleteAfter(now) },
+        });
+        await tx.auditEvent.create({
+          data: {
+            actorType: "user",
+            actorUserId: userId,
+            action: "team_application.invitation_revoked",
+            targetType: "team_application",
+            targetId: invitation.teamApplicationId,
+            result: "SUCCESS",
+            correlationId: invitation.id,
+            occurredAt: now,
+            context: {
+              companyId: owner.companyId,
+              invitationId: invitation.id,
+              role: invitation.role,
+            },
+          },
+        });
+      }
     });
   }
 

@@ -77,6 +77,29 @@ describe("in-app notification event policy", () => {
     );
   });
 
+  it("localizes team-application alerts for the company Owner", () => {
+    const input = {
+      ...base,
+      kind: "TEAM_APPLICATION_RECEIVED" as const,
+      variables: {
+        companyName: "Northstar Labs",
+        recipientRole: "RECRUITER" as const,
+        state: "HR_MANAGER",
+      },
+      contextType: "MEMBERSHIP" as const,
+      contextId: "company-1",
+    };
+    const vi = buildNotification(input, "VI");
+    const en = buildNotification(input, "EN");
+
+    expect(vi.title).toBe("Có hồ sơ ứng tuyển đội ngũ mới");
+    expect(vi.summary).toContain("Northstar Labs");
+    expect(vi.summary).toContain("HR Manager");
+    expect(en.title).toBe("New team application received");
+    expect(en.summary).toContain("HR Manager team application");
+    expect(en.recipientRole).toBe("RECRUITER");
+  });
+
   it("assigns actionable administrator alerts safe severity and generic copy", () => {
     const expected = {
       SUPPORT_CASE_RECEIVED: "MEDIUM",
