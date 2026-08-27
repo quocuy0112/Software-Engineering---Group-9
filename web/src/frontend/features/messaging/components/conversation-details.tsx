@@ -6,6 +6,7 @@ import {
   getConversationContextLabel,
   getJobContextLabel,
 } from "../messaging-context";
+import { messagingCopy } from "../messaging-copy";
 import { MessagingAvatar } from "./messaging-avatar";
 
 function formatConversationDate(value: string, locale: WorkspaceLocale) {
@@ -33,25 +34,26 @@ export function ConversationDetails({
   onSelect: (conversationId: string) => void;
   onBack: () => void;
 }) {
+  const copy = messagingCopy(locale);
   if (!showDetails || !page) {
     return (
       <aside
         className="messaging-details messaging-details--recent"
-        aria-label="Recent conversations"
+        aria-label={copy.recentConversationsLabel}
       >
         <header>
           <div>
-            <p>Conversations</p>
-            <h2>Recent conversations</h2>
+            <p>{copy.conversations}</p>
+            <h2>{copy.recentConversations}</h2>
           </div>
           <span className="messaging-details__count">{items.length}</span>
         </header>
         <nav
           className="messaging-details__recent-list"
-          aria-label="Recent conversations"
+          aria-label={copy.recentConversationsLabel}
         >
           {items.length === 0 ? (
-            <p>No recent conversations.</p>
+            <p>{copy.noRecentConversations}</p>
           ) : (
             items.slice(0, 8).map((conversation) => (
               <button
@@ -93,7 +95,7 @@ export function ConversationDetails({
   return (
     <aside
       className="messaging-details messaging-details--profile"
-      aria-label="Conversation details"
+      aria-label={copy.conversationDetails}
     >
       <header>
         <button
@@ -104,7 +106,7 @@ export function ConversationDetails({
           <svg aria-hidden="true" viewBox="0 0 24 24">
             <path d="m15 18-6-6 6-6" />
           </svg>
-          Recent conversations
+          {copy.recentConversationsLabel}
         </button>
         <MessagingAvatar
           name={conversation.otherParticipant.name}
@@ -113,25 +115,25 @@ export function ConversationDetails({
           presence={conversation.presence}
         />
         <div>
-          <p>Conversation details</p>
+          <p>{copy.conversationDetails}</p>
           <h2>{conversation.otherParticipant.name}</h2>
         </div>
       </header>
       <section>
-        <p className="messaging-details__label">Context</p>
+        <p className="messaging-details__label">{copy.context}</p>
         <strong>{jobContextLabel ?? contextLabel}</strong>
         {jobContextLabel ? <span>{contextLabel}</span> : null}
       </section>
       <section>
-        <p className="messaging-details__label">Messaging access</p>
-        <strong>Messaging available</strong>
-        <span>Private messages are available only in this approved context.</span>
+        <p className="messaging-details__label">{copy.messagingAccess}</p>
+        <strong>{copy.messagingAvailable}</strong>
+        <span>{copy.privateMessagingNotice}</span>
       </section>
       <Link
         className="messaging-details__profile-link"
         href={`/people/${encodeURIComponent(conversation.otherParticipant.id)}`}
       >
-        View profile
+        {copy.viewProfile}
       </Link>
     </aside>
   );

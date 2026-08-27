@@ -124,6 +124,17 @@ export const cvCopy = (locale: CvLocale) =>
           current: "Hiện tại",
           failed: "Thất bại",
           processingTimeline: "Tiến trình xử lý",
+          savedCvs: "CV đã lưu",
+          applicationCvs: "CV ỨNG TUYỂN",
+          cvFilename: "Tên tệp CV",
+          save: "Lưu",
+          cancel: "Hủy",
+          rename: "Đổi tên",
+          delete: "Xóa",
+          noConfirmedCvs: "Chưa có CV đã xác nhận trong hồ sơ.",
+          renameError: "Không thể đổi tên CV.",
+          deleteError: "Không thể xóa CV.",
+          genericError: "Không thể hoàn tất thao tác CV. Hãy thử lại.",
         },
         upload: {
           ready: "Sẵn sàng tải CV lên.",
@@ -246,8 +257,7 @@ export const cvCopy = (locale: CvLocale) =>
           grantAction: "Cấp quyền và tiếp tục",
           granting: "Đang cấp quyền…",
           granted: "Đã cấp quyền. Yêu cầu xử lý CV đang tiếp tục.",
-          grantError:
-            "Không thể cấp quyền. Xử lý bên ngoài vẫn đang bị chặn.",
+          grantError: "Không thể cấp quyền. Xử lý bên ngoài vẫn đang bị chặn.",
           sessionExpired:
             "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại trước khi cấp quyền.",
           replacementTitle: "Tải CV thay thế",
@@ -317,6 +327,22 @@ export const cvCopy = (locale: CvLocale) =>
           confidence: "Độ tin cậy",
           verifiedLocation: "Vị trí đã xác minh",
           sourceContextUnavailable: "Ngữ cảnh nguồn không khả dụng.",
+          sourceDetails: "Chi tiết nguồn dữ liệu",
+          source: "Nguồn",
+          extractionMethod: "Phương thức trích xuất",
+          warningLabels: {
+            LOW_CONFIDENCE: "Độ tin cậy thấp",
+            MATERIAL_NATIVE_OCR_CONFLICT: "Xung đột giữa văn bản gốc và OCR",
+            APPROXIMATE_ANCHOR: "Vị trí tham chiếu gần đúng",
+            PARTIAL_UNIT_TEXT: "Văn bản đơn vị chưa đầy đủ",
+            DEDUPLICATED_WITH_NATIVE: "Đã loại trùng với văn bản gốc",
+          },
+          sourceMethodLabels: {
+            NATIVE: "Văn bản gốc",
+            OCR: "OCR",
+            NATIVE_AND_OCR: "Văn bản gốc và OCR",
+          },
+          unknownWarning: "Cảnh báo cần xem xét",
           conflict: "Xung đột xem xét cần bạn lựa chọn",
           unsavedKept:
             "Các giá trị chưa lưu được giữ trong bộ nhớ trình duyệt này",
@@ -345,6 +371,18 @@ export const cvCopy = (locale: CvLocale) =>
           current: "Current",
           failed: "Failed",
           processingTimeline: "Processing timeline",
+          savedCvs: "Saved CVs",
+          applicationCvs: "APPLICATION CVs",
+          cvFilename: "CV filename",
+          save: "Save",
+          cancel: "Cancel",
+          rename: "Rename",
+          delete: "Delete",
+          noConfirmedCvs: "No confirmed CVs are available in your Profile yet.",
+          renameError: "Unable to rename this CV.",
+          deleteError: "Unable to delete this CV.",
+          genericError:
+            "The CV action could not be completed. Please try again.",
         },
         upload: {
           ready: "Ready to upload a CV.",
@@ -538,6 +576,22 @@ export const cvCopy = (locale: CvLocale) =>
           confidence: "Confidence",
           verifiedLocation: "Verified location",
           sourceContextUnavailable: "Source context unavailable.",
+          sourceDetails: "Data source details",
+          source: "Source",
+          extractionMethod: "Extraction method",
+          warningLabels: {
+            LOW_CONFIDENCE: "Low confidence",
+            MATERIAL_NATIVE_OCR_CONFLICT: "Native/OCR text conflict",
+            APPROXIMATE_ANCHOR: "Approximate source anchor",
+            PARTIAL_UNIT_TEXT: "Partial unit text",
+            DEDUPLICATED_WITH_NATIVE: "Deduplicated with native text",
+          },
+          sourceMethodLabels: {
+            NATIVE: "Native text",
+            OCR: "OCR",
+            NATIVE_AND_OCR: "Native and OCR",
+          },
+          unknownWarning: "Review warning",
           conflict: "Review conflict needs your choice",
           unsavedKept: "Unsaved values kept in this browser memory",
           compare: "Compare with latest saved review",
@@ -639,6 +693,12 @@ export function cvRetentionDaysLeft(locale: CvLocale, days: number) {
 export function cvKnownError(locale: CvLocale, message: string, code?: string) {
   if (locale === "en") return message;
   const byCode: Record<string, string> = {
+    FILE_REQUIRED: "Hãy đính kèm tệp CV.",
+    FILE_EMPTY: "Tệp CV đang trống.",
+    FILE_SIZE_EXCEEDED: "Tệp CV không được vượt quá 5 MB.",
+    UNSUPPORTED_FILE_TYPE: "Chỉ hỗ trợ tệp PDF, DOC hoặc DOCX.",
+    INVALID_FILE_SIGNATURE:
+      "Nội dung tệp không khớp với tài liệu PDF, DOC hoặc DOCX được hỗ trợ.",
     AUTHENTICATION_REQUIRED: "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.",
     FORBIDDEN: "Tài khoản không được phép thực hiện thao tác này.",
     CSRF_REJECTED: "Phiên bảo mật đã hết hạn. Hãy tải lại trang và thử lại.",
@@ -652,5 +712,5 @@ export function cvKnownError(locale: CvLocale, message: string, code?: string) {
     DRAFT_REVISION_CONFLICT: "Bản xem xét đã thay đổi trong một phiên khác.",
     PROFILE_REVISION_CONFLICT: "Hồ sơ đã thay đổi trong một phiên khác.",
   };
-  return byCode[code ?? ""] ?? message;
+  return byCode[code ?? ""] ?? cvCopy(locale).common.genericError;
 }

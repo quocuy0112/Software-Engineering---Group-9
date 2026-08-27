@@ -3,6 +3,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import { cvConfiguration } from "@/backend/cv/config";
+import { OCR_EXPECTED_ENGINE_VERSION } from "@/backend/image-search/config";
 import { ClamAvScanner } from "@/backend/cv/scanning/clamav";
 import { createSearchStorageResource } from "@/backend/image-search/storage/factory";
 import { OpenAiSearchIntentInterpreter } from "@/backend/image-search/interpretation/openai";
@@ -45,7 +46,7 @@ export function createImageSearchWorkerResources() {
   const ocr = new UnixOcrEngine({
     socketPath: "/run/smarthire-ocr/ocr.sock",
     expectedEngineName: "paddleocr-onnx",
-    expectedEngineVersion: "1.0.0",
+    expectedEngineVersion: OCR_EXPECTED_ENGINE_VERSION,
     expectedModelName: "PP-OCRv6-medium",
   });
   const selectionPolicy = new SearchIntentSelectionPolicy();

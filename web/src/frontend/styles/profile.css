@@ -1,6 +1,9 @@
 /* Profile, security, and sessions */
 .profile-navigation {
   display: flex;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   align-items: center;
   gap: var(--sh-space-4);
   margin: 0 0 var(--sh-space-6);
@@ -13,6 +16,15 @@
 }
 
 .profile-navigation .sh-topbar__tabs {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  flex: 1 1 0%;
+  align-items: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
   padding: 4px;
   border: 1px solid var(--sh-profile-border);
   border-radius: 999px;
@@ -33,6 +45,7 @@
   font-size: 13.5px;
   font-weight: 500;
   text-decoration: none;
+  white-space: nowrap;
   transition: all 0.15s ease;
 }
 
@@ -55,27 +68,26 @@
   background: var(--sh-profile-primary);
 }
 
-/* Profile and account pages share one centred reading column. The segmented
-   navigation intentionally hugs its items rather than filling unused space. */
+/* Profile and account pages share one centred reading column. The tab rail
+   always fills the same available width; only its inner tabs scroll when the
+   labels cannot fit. */
 .profile-page:not(.candidate-profile-page) {
   width: min(1040px, 100%);
   margin-inline: auto;
 }
 
-.profile-navigation .sh-topbar__tabs {
-  flex: 0 1 auto;
-  max-width: 100%;
-}
-
-@media (max-width: 479px) {
+@media (max-width: 760px) {
   .profile-navigation {
+    flex-wrap: wrap;
     gap: var(--sh-space-1);
-    overflow-x: auto;
-    scrollbar-width: thin;
+    overflow: visible;
   }
 
   .profile-navigation .sh-topbar__tabs {
-    min-width: max-content;
+    order: 3;
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: none;
   }
 
   .profile-navigation a {

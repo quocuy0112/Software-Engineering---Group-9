@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { applicationCopy } from "@/frontend/features/candidate-applications/i18n/application-copy";
+import { jobAttributeLabel } from "@/frontend/features/jobs/components/job-copy";
 import {
   ApplicationProgressChecklist,
   ApplicationStepper,
@@ -53,13 +54,6 @@ export function isValidApplicationUrl(value: string) {
   } catch {
     return false;
   }
-}
-
-function displayJobLabel(value: string) {
-  return value
-    .toLowerCase()
-    .replaceAll("_", " ")
-    .replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
 function dueDateLabel(value: string | null | undefined, locale: "en" | "vi") {
@@ -119,14 +113,14 @@ export function ApplicationPersonalInformation({
   const canContinue = !phoneError && !locationError && !linkedInPortfolioError;
   const dueDate = dueDateLabel(job.applicationDeadline, locale);
   const arrangement = job.workArrangement
-    ? displayJobLabel(job.workArrangement)
+    ? jobAttributeLabel(job.workArrangement, locale)
     : null;
   const location = arrangement
     ? `${job.location} · ${arrangement}`
     : job.location;
   const tags = [
-    job.employmentType ? displayJobLabel(job.employmentType) : null,
-    job.experienceLevel ? displayJobLabel(job.experienceLevel) : null,
+    job.employmentType ? jobAttributeLabel(job.employmentType, locale) : null,
+    job.experienceLevel ? jobAttributeLabel(job.experienceLevel, locale) : null,
     dueDate ? copy.stepper.dueDate(dueDate) : null,
   ].filter((tag): tag is string => Boolean(tag));
 

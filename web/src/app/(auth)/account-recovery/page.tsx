@@ -8,11 +8,7 @@ export default async function AccountRecoveryPage({
   const { invalidLink } = await searchParams;
   return (
     <AccountRecoveryRequestForm
-      initialStatus={
-        invalidLink === "1"
-          ? "This account-recovery link is invalid, expired, or already used."
-          : undefined
-      }
+      initialStatus={invalidLink === "1" ? "invalid-link" : undefined}
     />
   );
 }

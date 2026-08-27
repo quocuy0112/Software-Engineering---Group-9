@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   ArrowRight,
@@ -27,6 +27,8 @@ import { AiAssessmentTab } from "./ai-assessment-tab";
 import { DocumentsTab } from "./documents-tab";
 import { RankingModalFrame } from "./ranking-modal-frame";
 import { ScoreBadgeFromLabel, formatScore } from "./candidate-ranking-ui";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { applicationDetailCopy } from "./application-detail-copy";
 
 type Tab = "automatic" | "ai" | "documents" | "profile";
 type CandidateScoreDrawerCandidate =
@@ -60,6 +62,9 @@ export function CandidateScoreDrawer({
   onOpenRecruitmentChat: () => Promise<void>;
   onScoringChanged: () => void;
 }) {
+  const locale = useWorkspaceLocale();
+  const detailCopy = useMemo(() => applicationDetailCopy(locale), [locale]);
+  const copy = detailCopy.drawer;
   const [activeTab, setActiveTab] = useState<Tab>("automatic");
   const [detail, setDetail] = useState<ScoringDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +78,8 @@ export function CandidateScoreDrawer({
     "cv" | "cover-letter" | null
   >(null);
   const [openDocumentRequest, setOpenDocumentRequest] = useState(0);
-  const [profileReview, setProfileReview] = useState<RecruiterCandidateProfile | null>(null);
+  const [profileReview, setProfileReview] =
+    useState<RecruiterCandidateProfile | null>(null);
   const acknowledgedApplicationId = useRef<string | null>(null);
 
   useEffect(() => {
@@ -89,12 +95,11 @@ export function CandidateScoreDrawer({
         { cache: "no-store", signal },
       );
       const payload = await response.json();
-      if (!response.ok)
-        throw new Error(payload.message ?? "Unable to load score explanation.");
+      if (!response.ok) throw new Error(copy.loadError);
       const next = scoringDetailSchema.parse(payload);
       return next;
     },
-    [candidate.applicationId],
+    [candidate.applicationId, copy.loadError],
   );
 
   useEffect(() => {
@@ -109,13 +114,13 @@ export function CandidateScoreDrawer({
       .catch((cause) => {
         if (!controller.signal.aborted)
           setError(
-            cause instanceof Error
+            locale === "en" && cause instanceof Error
               ? cause.message
-              : "Unable to load score explanation.",
+              : copy.loadError,
           );
       });
     return () => controller.abort();
-  }, [loadDetail]);
+  }, [copy.loadError, loadDetail, locale]);
 
   useEffect(() => {
     if (
@@ -186,21 +191,21 @@ export function CandidateScoreDrawer({
         : scoreSummary.band;
   const headerScore =
     scoring.kind === "PENDING"
-      ? "Pending"
+      ? copy.pending
       : scoreValue === null
         ? "—/100"
         : `${formatScore(scoreValue)}/100`;
   const headerLabel =
     badge?.label ??
     (scoring.kind === "PROCESSING"
-      ? "Processing"
+      ? copy.processing
       : scoring.kind === "PENDING"
-        ? "Retrying AI"
+        ? copy.retryingAi
         : scoring.kind === "UNAVAILABLE"
-          ? "Rule-based only"
+          ? copy.ruleBasedOnly
           : scoring.kind === "FAILED"
-            ? "Scoring failed"
-            : "Not calculated");
+            ? copy.scoringFailedLabel
+            : copy.notCalculated);
   const headerCode =
     badge?.code ??
     (scoring.kind === "UNAVAILABLE" ? "RULE_BASED" : scoring.kind);
@@ -243,9 +248,9 @@ export function CandidateScoreDrawer({
       await onShortlist();
     } catch (cause) {
       setShortlistError(
-        cause instanceof Error
+        locale === "en" && cause instanceof Error
           ? cause.message
-          : "The candidate could not be shortlisted.",
+          : copy.scoreError,
       );
     } finally {
       setShortlisting(false);
@@ -259,9 +264,9 @@ export function CandidateScoreDrawer({
       await onOpenRecruitmentChat();
     } catch (cause) {
       setError(
-        cause instanceof Error
+        locale === "en" && cause instanceof Error
           ? cause.message
-          : "The recruitment conversation could not be opened.",
+          : copy.loadError,
       );
       setOpeningRecruitmentChat(false);
     }
@@ -290,11 +295,9 @@ export function CandidateScoreDrawer({
         // Keep the outer ranking in sync immediately, then the polling effect
         // refreshes it again when the replacement score is published.
         onScoringChanged();
-      } else setError(payload?.message ?? "AI retry could not be started.");
+      } else setError(copy.retryError);
     } catch {
-      setError(
-        "AI retry could not be started. Check your connection and try again.",
-      );
+      setError(copy.retryError);
     }
   };
   const scoreCandidate = async () => {
@@ -314,18 +317,14 @@ export function CandidateScoreDrawer({
           body: JSON.stringify({ confirmed: true }),
         },
       );
-      const payload = await response.json().catch(() => null);
-      if (!response.ok)
-        throw new Error(
-          payload?.message ?? "Candidate scoring could not be started.",
-        );
+      if (!response.ok) throw new Error(copy.scoreError);
       setDetail(await loadDetail());
       onScoringChanged();
     } catch (cause) {
       setError(
-        cause instanceof Error
+        locale === "en" && cause instanceof Error
           ? cause.message
-          : "Candidate scoring could not be started. Check your connection and try again.",
+          : copy.scoreError,
       );
     } finally {
       setScoringActionLoading(false);
@@ -345,12 +344,19 @@ export function CandidateScoreDrawer({
     setActiveTab("profile");
     setError(null);
     try {
-      const response = await fetch(`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(candidate.applicationId)}/profile`, { cache: "no-store" });
+      const response = await fetch(
+        `/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(candidate.applicationId)}/profile`,
+        { cache: "no-store" },
+      );
       const body = await response.json();
-      if (!response.ok) throw new Error(body.message ?? "Candidate profile is not available.");
+      if (!response.ok) throw new Error(copy.profileError);
       setProfileReview(body as RecruiterCandidateProfile);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Candidate profile is not available.");
+      setError(
+        locale === "en" && cause instanceof Error
+          ? cause.message
+          : copy.profileError,
+      );
     }
   };
 
@@ -380,14 +386,14 @@ export function CandidateScoreDrawer({
               <h2 id="ai-ranking-drawer-title">
                 {candidate.candidate.displayName}
               </h2>
-              <p>Applying for {jobTitle}</p>
+              <p>{copy.applyingFor(jobTitle)}</p>
             </div>
           </div>
           <button
             type="button"
             className="ranking-icon-button"
             onClick={onClose}
-            aria-label="Close candidate details"
+            aria-label={copy.close}
           >
             <X aria-hidden="true" />
           </button>
@@ -399,19 +405,19 @@ export function CandidateScoreDrawer({
               <strong>{headerScore}</strong>
               <span>
                 {scoring.kind === "UNAVAILABLE"
-                  ? "Hybrid score unavailable"
+                  ? copy.hybridUnavailable
                   : scoring.kind === "FAILED"
-                    ? "Scoring job failed"
+                    ? copy.scoringJobFailed
                     : scoring.kind === "PENDING"
-                      ? "Hybrid score pending"
-                      : "Final score"}
+                      ? copy.hybridPending
+                      : copy.finalScore}
               </span>
             </div>
             <ScoreBadgeFromLabel code={headerCode} label={headerLabel} />
             {aiBand ? (
               <ScoreBadgeFromLabel
                 code={aiBand.code}
-                label={`AI: ${aiBand.label}`}
+                label={copy.aiLabel(aiBand.label)}
                 compact
               />
             ) : null}
@@ -420,7 +426,7 @@ export function CandidateScoreDrawer({
             <div
               className="ranking-drawer__action-group"
               role="group"
-              aria-label="Review candidate information"
+              aria-label={copy.reviewInfo}
             >
               <div className="ranking-drawer__action-buttons">
                 <button
@@ -428,28 +434,28 @@ export function CandidateScoreDrawer({
                   className="ai-ranking-button ai-ranking-button--secondary"
                   onClick={() => requestDocument("cv")}
                 >
-                  <FileText aria-hidden="true" /> View CV
+                  <FileText aria-hidden="true" /> {copy.viewCv}
                 </button>
                 <button
                   type="button"
                   className="ai-ranking-button ai-ranking-button--secondary"
                   onClick={() => requestDocument("cover-letter")}
                 >
-                  <Mail aria-hidden="true" /> View cover letter
+                  <Mail aria-hidden="true" /> {copy.viewCoverLetter}
                 </button>
                 <button
                   type="button"
                   className="ai-ranking-button ai-ranking-button--secondary"
                   onClick={() => void openProfileReview()}
                 >
-                  <UserRoundCheck aria-hidden="true" /> View profile
+                  <UserRoundCheck aria-hidden="true" /> {copy.viewProfile}
                 </button>
               </div>
             </div>
             <div
               className="ranking-drawer__action-group"
               role="group"
-              aria-label="Candidate recruitment actions"
+              aria-label={copy.recruitmentActions}
             >
               <div className="ranking-drawer__action-buttons">
                 {canShortlist ? (
@@ -467,7 +473,7 @@ export function CandidateScoreDrawer({
                     ) : (
                       <ListChecks aria-hidden="true" />
                     )}{" "}
-                    {shortlisting ? "Shortlisting…" : "Shortlist"}
+                    {shortlisting ? copy.shortlisting : copy.shortlist}
                   </button>
                 ) : null}
                 {canOpenRecruitmentChat ? (
@@ -486,8 +492,8 @@ export function CandidateScoreDrawer({
                       <MessageSquare aria-hidden="true" />
                     )}{" "}
                     {openingRecruitmentChat
-                      ? "Opening chat…"
-                      : "Message candidate"}
+                      ? copy.openingChat
+                      : copy.messageCandidate}
                   </button>
                 ) : null}
                 {!readOnly ? (
@@ -497,7 +503,7 @@ export function CandidateScoreDrawer({
                     onClick={onMoveToInterview}
                     disabled={!canMoveToInterview}
                   >
-                    <ArrowRight aria-hidden="true" /> Move to interview
+                    <ArrowRight aria-hidden="true" /> {copy.moveToInterview}
                   </button>
                 ) : null}
               </div>
@@ -508,7 +514,7 @@ export function CandidateScoreDrawer({
         <nav
           className="ranking-drawer__tabs"
           role="tablist"
-          aria-label="Candidate score details"
+          aria-label={copy.tabsLabel}
         >
           <button
             type="button"
@@ -517,7 +523,7 @@ export function CandidateScoreDrawer({
             className={activeTab === "automatic" ? "is-active" : ""}
             onClick={() => changeTab("automatic")}
           >
-            <span>Automatic match</span>
+            <span>{copy.automatic}</span>
           </button>
           <button
             type="button"
@@ -526,7 +532,7 @@ export function CandidateScoreDrawer({
             className={activeTab === "ai" ? "is-active" : ""}
             onClick={() => changeTab("ai")}
           >
-            <span>AI assessment</span>
+            <span>{copy.assessment}</span>
           </button>
           <button
             type="button"
@@ -535,10 +541,16 @@ export function CandidateScoreDrawer({
             className={activeTab === "documents" ? "is-active" : ""}
             onClick={() => changeTab("documents")}
           >
-            <span>CV &amp; Cover letter</span>
+            <span>{copy.documents}</span>
           </button>
-          <button type="button" role="tab" aria-selected={activeTab === "profile"} className={activeTab === "profile" ? "is-active" : ""} onClick={() => void openProfileReview()}>
-            <span>Profile</span>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "profile"}
+            className={activeTab === "profile" ? "is-active" : ""}
+            onClick={() => void openProfileReview()}
+          >
+            <span>{copy.profile}</span>
           </button>
         </nav>
 
@@ -558,17 +570,17 @@ export function CandidateScoreDrawer({
                   setError(null);
                   void loadDetail().catch((cause) =>
                     setError(
-                      cause instanceof Error
+                      locale === "en" && cause instanceof Error
                         ? cause.message
-                        : "Unable to load score explanation.",
+                        : copy.loadError,
                     ),
                   );
                 }}
               >
-                Retry
+                {copy.retry}
               </button>
               <button type="button" onClick={() => setError(null)}>
-                Dismiss
+                {copy.dismiss}
               </button>
             </div>
           ) : null}
@@ -579,18 +591,14 @@ export function CandidateScoreDrawer({
             >
               <AlertTriangle aria-hidden="true" />
               <div>
-                <strong>CV scoring failed</strong>
+                <strong>{copy.scoringFailed}</strong>
                 <span>
-                  The job stopped safely
-                  {scoring.safeFailureCode
-                    ? ` (${scoring.safeFailureCode})`
-                    : ""}
-                  . Retry scoring after correcting the CV or provider issue.
+                  {copy.scoringStopped(scoring.safeFailureCode ?? "")}
                 </span>
               </div>
               {!readOnly && scoring.retryAllowed ? (
                 <button type="button" onClick={() => setScoreConfirm(true)}>
-                  <RefreshCw aria-hidden="true" /> Retry scoring
+                  <RefreshCw aria-hidden="true" /> {copy.retryScoring}
                 </button>
               ) : null}
             </div>
@@ -601,14 +609,16 @@ export function CandidateScoreDrawer({
             >
               <AlertTriangle aria-hidden="true" />
               <div>
-                <strong>AI evaluation unavailable</strong>
+                <strong>{copy.aiUnavailable}</strong>
                 <span>
-                  {aiUnavailableMessage(scoring.aiAssessment.safeFailureCode)}
+                  {copy.aiUnavailableMessage(
+                    scoring.aiAssessment.safeFailureCode,
+                  )}
                 </span>
               </div>
               {!readOnly ? (
                 <button type="button" onClick={() => setRetryConfirm(true)}>
-                  <RefreshCw aria-hidden="true" /> Retry AI evaluation
+                  <RefreshCw aria-hidden="true" /> {copy.retryAi}
                 </button>
               ) : null}
             </div>
@@ -619,10 +629,11 @@ export function CandidateScoreDrawer({
             >
               <RefreshCw aria-hidden="true" className="is-spinning" />
               <div>
-                <strong>Deterministic ready · AI retry in progress</strong>
+                <strong>{copy.aiRetrying}</strong>
                 <span>
-                  The {automatic?.score ?? "deterministic"}/100 result stays
-                  visible while AI runs in the background.
+                  {copy.aiRetryingDescription(
+                    automatic?.score ?? "deterministic",
+                  )}
                 </span>
               </div>
             </div>
@@ -633,18 +644,15 @@ export function CandidateScoreDrawer({
             >
               <RefreshCw aria-hidden="true" className="is-spinning" />
               <div>
-                <strong>Scoring in progress</strong>
-                <span>
-                  Partial results will appear here without blocking the rest of
-                  the candidate list.
-                </span>
+                <strong>{copy.scoringInProgress}</strong>
+                <span>{copy.scoringInProgressDescription}</span>
               </div>
             </div>
           ) : null}
           {detail?.rescoreInProgress ? (
             <div className="drawer-rescore-note" role="status">
-              <RefreshCw aria-hidden="true" className="is-spinning" /> Rescoring
-              in progress · the current result stays visible.
+              <RefreshCw aria-hidden="true" className="is-spinning" />{" "}
+              {copy.rescoring}
             </div>
           ) : null}
           {activeTab === "automatic" ? (
@@ -674,18 +682,15 @@ export function CandidateScoreDrawer({
           ) : (
             <section
               className="candidate-profile-review"
-              aria-label="Candidate profile review"
+              aria-label={copy.profileReview}
             >
               <header className="candidate-profile-review__intro">
                 <span aria-hidden="true">
                   <UserRoundCheck />
                 </span>
                 <div>
-                  <h3>Current candidate profile</h3>
-                  <p>
-                    Profile details reflect the candidate&apos;s active sharing
-                    choices.
-                  </p>
+                  <h3>{copy.currentProfile}</h3>
+                  <p>{copy.profileDescription}</p>
                 </div>
               </header>
 
@@ -697,16 +702,16 @@ export function CandidateScoreDrawer({
                   <>
                     <h4>
                       {profileReview.liveProfile.sections.headline ??
-                        "No headline shared"}
+                        copy.noHeadline}
                     </h4>
                     <p>
                       {profileReview.liveProfile.sections.summary ??
-                        "No summary shared"}
+                        copy.noSummary}
                     </p>
                     {profileReview.liveProfile.sections.skills?.length ? (
                       <div
                         className="candidate-profile-card__skills"
-                        aria-label="Shared skills"
+                        aria-label={copy.sharedSkills}
                       >
                         {profileReview.liveProfile.sections.skills.map(
                           (skill) => (
@@ -718,7 +723,7 @@ export function CandidateScoreDrawer({
                   </>
                 ) : (
                   <p className="candidate-profile-card__empty">
-                    Current profile has no sections shared with recruiters.
+                    {copy.noSharedSections}
                   </p>
                 )}
               </section>
@@ -730,8 +735,8 @@ export function CandidateScoreDrawer({
               >
                 <ShieldCheck aria-hidden="true" />
                 {profileReview?.contactShared
-                  ? "Candidate has shared contact details for this application."
-                  : "Contact details are not shared for this application."}
+                  ? copy.contactShared
+                  : copy.contactNotShared}
               </p>
             </section>
           )}
@@ -741,8 +746,8 @@ export function CandidateScoreDrawer({
           <div className="ranking-drawer__human-note">
             <UserRoundCheck aria-hidden="true" />
             <span>
-              <strong>Human decision</strong>
-              <small>Score unchanged</small>
+              <strong>{copy.humanDecision}</strong>
+              <small>{copy.scoreUnchanged}</small>
             </span>
           </div>
           <div className="ranking-drawer__actions">
@@ -772,7 +777,7 @@ export function CandidateScoreDrawer({
                   onClick={onSetPriority}
                 >
                   <ShieldCheck aria-hidden="true" />{" "}
-                  {manuallyPrioritized ? "Edit priority" : "Set priority"}
+                  {manuallyPrioritized ? copy.editPriority : copy.setPriority}
                 </button>
                 <button
                   type="button"
@@ -780,12 +785,12 @@ export function CandidateScoreDrawer({
                   onClick={onReject}
                   disabled={!canReject}
                 >
-                  <UserRoundCheck aria-hidden="true" /> Reject
+                  <UserRoundCheck aria-hidden="true" /> {copy.reject}
                 </button>
               </>
             ) : (
               <span className="ranking-drawer__read-only-note">
-                Assessment view
+                {copy.assessmentView}
               </span>
             )}
           </div>
@@ -793,21 +798,23 @@ export function CandidateScoreDrawer({
       </aside>
       {retryConfirm ? (
         <RankingModalFrame
-          title="Retry AI evaluation?"
-          subtitle={`${candidate.candidate.displayName} · AI-only retry`}
+          title={copy.retryDialogTitle}
+          subtitle={copy.retryDialogSubtitle(candidate.candidate.displayName)}
           icon="AI"
-          info="The deterministic result stays visible and is not recomputed. This retry is recorded as a recruiter action."
-          confirmLabel="Retry AI evaluation"
+          info={copy.retryDialogInfo}
+          confirmLabel={copy.retryAi}
+          cancelLabel={locale === "vi" ? "Hủy" : "Cancel"}
           onCancel={() => setRetryConfirm(false)}
           onConfirm={() => void retry()}
         />
       ) : null}
       {scoreConfirm ? (
         <RankingModalFrame
-          title={`${scoreActionLabel}?`}
-          subtitle={`${candidate.candidate.displayName} · one application`}
+          title={copy.scoreDialogTitle(scoreActionLabel)}
+          subtitle={copy.scoreDialogSubtitle(candidate.candidate.displayName)}
           icon="AI"
-          info="Only this candidate will be queued. The score and assessment will update here when the background worker finishes."
+          info={copy.scoreDialogInfo}
+          cancelLabel={locale === "vi" ? "Hủy" : "Cancel"}
           confirmLabel={scoreActionLabel}
           confirmDisabled={scoringActionLoading}
           onCancel={() => setScoreConfirm(false)}
@@ -878,20 +885,4 @@ function rowToScoring(candidate: CandidateScoreDrawerCandidate): ScoringState {
       automaticMatch: null,
     };
   return { kind: "NOT_CALCULATED", label: "Not calculated" };
-}
-
-function aiUnavailableMessage(code: string) {
-  if (code === "AI_PROVIDER_INVALID_REQUEST")
-    return "The AI provider rejected the assessment request. Check the provider/model configuration before retrying.";
-  if (code === "AI_PROVIDER_MODEL_NOT_FOUND")
-    return "The configured AI model is unavailable. Update the model configuration before retrying.";
-  if (code === "AI_PROVIDER_AUTHENTICATION")
-    return "The AI provider authentication failed. Check the server API key before retrying.";
-  if (code === "AI_PROVIDER_POLICY_NOT_APPROVED")
-    return "AI scoring is disabled by the current privacy or local-development configuration.";
-  if (code === "AI_PROVIDER_NOT_CONFIGURED")
-    return "The AI provider is not configured. Add the approved provider settings before retrying.";
-  if (code === "AI_PROVIDER_MALFORMED")
-    return "The AI provider returned an invalid assessment after automatic retries. Retry AI evaluation once; a worker restart is not required.";
-  return "Deterministic matching is complete. The rule-based score and CV evidence remain visible while the AI provider is unavailable.";
 }

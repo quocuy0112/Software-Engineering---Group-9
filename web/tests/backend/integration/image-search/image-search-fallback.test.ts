@@ -110,7 +110,7 @@ describe.sequential("image-search interpretation fallback", () => {
         searchQueryId: queryId,
         status: "SUCCEEDED",
         engineName: "paddleocr-onnx",
-        engineVersion: "1.0.0",
+        engineVersion: "1.1.0",
         modelName: "PP-OCRv6-medium",
         modelSha256: Buffer.alloc(32, 87),
         runtimeName: "onnxruntime",

@@ -19,7 +19,11 @@ import {
   ReviewSummaryCard,
 } from "@/frontend/features/candidate-applications/components/application-wizard-primitives";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
-import { applicationCopy } from "@/frontend/features/candidate-applications/i18n/application-copy";
+import {
+  applicationCopy,
+  applicationErrorMessage,
+} from "@/frontend/features/candidate-applications/i18n/application-copy";
+import { jobAttributeLabel } from "@/frontend/features/jobs/components/job-copy";
 import {
   applicationReceiptSchema,
   parseApplicationDraftResponse,
@@ -27,20 +31,15 @@ import {
   type ApplicationReview,
 } from "@/shared/contracts/candidate-applications";
 
-function messageFrom(body: unknown, fallback: string) {
+function messageFrom(body: unknown, fallback: string, locale: "en" | "vi") {
   return body &&
     typeof body === "object" &&
     !Array.isArray(body) &&
     typeof (body as { message?: unknown }).message === "string"
-    ? (body as { message: string }).message
+    ? locale === "en"
+      ? (body as { message: string }).message
+      : fallback
     : fallback;
-}
-
-function displayJobLabel(value: string) {
-  return value
-    .toLowerCase()
-    .replaceAll("_", " ")
-    .replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
 export function ApplicationReviewSubmit({
@@ -63,7 +62,8 @@ export function ApplicationReviewSubmit({
     initialReview.draft.confirmationAccepted,
   );
   const [message, setMessage] = useState(initialReview.draft.message ?? "");
-  const [shareContactWithRecruiter, setShareContactWithRecruiter] = useState(false);
+  const [shareContactWithRecruiter, setShareContactWithRecruiter] =
+    useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const errorRef = useRef<HTMLParagraphElement>(null);
@@ -81,8 +81,8 @@ export function ApplicationReviewSubmit({
       )
     : null;
   const jobTags = [
-    displayJobLabel(review.job.employmentType),
-    displayJobLabel(review.job.experienceLevel),
+    jobAttributeLabel(review.job.employmentType, locale),
+    jobAttributeLabel(review.job.experienceLevel, locale),
     dueDate ? stepperCopy.dueDate(dueDate) : null,
   ].filter((tag): tag is string => Boolean(tag));
 
@@ -106,7 +106,8 @@ export function ApplicationReviewSubmit({
       csrfProof,
     );
     const body: unknown = await response.json().catch(() => null);
-    if (!response.ok) throw new Error(messageFrom(body, copy.draftSaveError));
+    if (!response.ok)
+      throw new Error(messageFrom(body, copy.draftSaveError, locale));
     const updated = parseApplicationDraftResponse(body);
     setReview((current) => ({ ...current, draft: updated }));
     return updated;
@@ -118,7 +119,7 @@ export function ApplicationReviewSubmit({
     try {
       await save();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.draftSaveError);
+      setError(applicationErrorMessage(locale, caught, copy.draftSaveError));
     } finally {
       setPending(false);
     }
@@ -170,14 +171,14 @@ export function ApplicationReviewSubmit({
           router.push(`${filesHref}&recover=cover-letter`);
           return;
         }
-        throw new Error(messageFrom(body, copy.submitError));
+        throw new Error(messageFrom(body, copy.submitError, locale));
       }
       const receipt = applicationReceiptSchema.parse(body);
       router.push(
         `/jobs/applied/${encodeURIComponent(receipt.applicationId)}/processing`,
       );
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.submitError);
+      setError(applicationErrorMessage(locale, caught, copy.submitError));
     } finally {
       setPending(false);
     }
@@ -267,7 +268,6 @@ export function ApplicationReviewSubmit({
             title={copy.applicationFiles}
             edit={<Link href={filesHref}>{copy.edit}</Link>}
           >
-
             <div className="application-review-submit__file-group">
               <h3>{copy.cvResume}</h3>
               {draft.cv ? (
@@ -353,8 +353,14 @@ export function ApplicationReviewSubmit({
               <span>{copy.confirmation}</span>
             </label>
             <label className="application-review-submit__confirm">
-              <input type="checkbox" checked={shareContactWithRecruiter} onChange={(event) => setShareContactWithRecruiter(event.target.checked)} />
-              <span>Share my email and phone with this recruiter for this application. You can withdraw this later.</span>
+              <input
+                type="checkbox"
+                checked={shareContactWithRecruiter}
+                onChange={(event) =>
+                  setShareContactWithRecruiter(event.target.checked)
+                }
+              />
+              <span>{copy.shareContact}</span>
             </label>
           </section>
         </div>
@@ -369,7 +375,7 @@ export function ApplicationReviewSubmit({
             <p>{review.job.companyName}</p>
             <small>
               {review.job.location} ·{" "}
-              {displayJobLabel(review.job.workArrangement)}
+              {jobAttributeLabel(review.job.workArrangement, locale)}
             </small>
             {jobTags.length ? (
               <div className="application-review-submit__tags">

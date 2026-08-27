@@ -14,7 +14,12 @@ import {
 import type { StructuredDocumentPreview } from "@/shared/contracts/applications/document-preview";
 import { structuredDocumentPreviewSchema } from "@/shared/contracts/applications/document-preview";
 import type { AutomaticMatch } from "@/shared/contracts/scoring";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { ApplicationDocumentViewer } from "./application-document-viewer";
+import {
+  applicationDetailCopy,
+  type ApplicationDetailCopy,
+} from "./application-detail-copy";
 
 type DocumentKind = "cv" | "cover-letter";
 
@@ -70,21 +75,22 @@ function previewCacheKey(
 function documentSourceLabel(
   document: StructuredDocumentPreview,
   kind: DocumentKind,
+  copy: ApplicationDetailCopy["documents"],
 ) {
   if (kind === "cover-letter" && document.mediaType === "text/plain") {
-    return "Written text";
+    return copy.writtenText;
   }
-  if (document.mediaType === "application/pdf") return "PDF attachment";
+  if (document.mediaType === "application/pdf") return copy.pdfAttachment;
   if (
     document.mediaType ===
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
   ) {
-    return "DOCX attachment";
+    return copy.docxAttachment;
   }
-  if (document.mediaType === "application/msword") return "DOC attachment";
+  if (document.mediaType === "application/msword") return copy.docAttachment;
   return document.previewStatus === "LIMITED"
-    ? "Limited preview"
-    : "Parsed preview";
+    ? copy.limitedPreview
+    : copy.parsedPreview;
 }
 
 async function loadPreview(
@@ -92,6 +98,7 @@ async function loadPreview(
   applicationId: string,
   kind: DocumentKind,
   signal: AbortSignal,
+  copy: ApplicationDetailCopy["documents"],
   retryToken = 0,
 ): Promise<PreviewState> {
   const controller = new AbortController();
@@ -119,10 +126,7 @@ async function loadPreview(
     if (!response.ok) {
       return {
         status: "error",
-        message:
-          typeof payload?.message === "string"
-            ? payload.message
-            : "Couldn't load document — try downloading the original.",
+        message: copy.documentLoadFailed,
         retryable: true,
       };
     }
@@ -130,7 +134,7 @@ async function loadPreview(
     if (!parsed.success) {
       return {
         status: "error",
-        message: "Couldn't load document — try downloading the original.",
+        message: copy.documentLoadFailed,
         retryable: true,
       };
     }
@@ -140,8 +144,7 @@ async function loadPreview(
       if (timedOut) {
         return {
           status: "error",
-          message:
-            "Parsing is taking longer than 7.5 seconds. Try again or open the original file.",
+          message: copy.parseTimeout,
           retryable: true,
         };
       }
@@ -149,7 +152,7 @@ async function loadPreview(
     }
     return {
       status: "error",
-      message: "Couldn't load document — try downloading the original.",
+      message: copy.documentLoadFailed,
       retryable: true,
     };
   } finally {
@@ -171,6 +174,8 @@ export function DocumentsTab({
   openKind?: DocumentKind | null;
   openRequest?: number;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = useMemo(() => applicationDetailCopy(locale).documents, [locale]);
   const [previews, setPreviews] = useState(initialPreviewState);
   const [retryTokens, setRetryTokens] = useState<Record<DocumentKind, number>>({
     cv: 0,
@@ -193,6 +198,7 @@ export function DocumentsTab({
             applicationId,
             kind,
             controller.signal,
+            copy,
             retryToken,
           );
       void request
@@ -208,7 +214,7 @@ export function DocumentsTab({
         .catch(() => undefined);
     }
     return () => controller.abort();
-  }, [applicationId, jobId, cvRetryToken, coverLetterRetryToken]);
+  }, [applicationId, copy, cvRetryToken, coverLetterRetryToken, jobId, locale]);
 
   useEffect(() => {
     if (!openKind || openRequest < 1) return;
@@ -267,31 +273,31 @@ export function DocumentsTab({
     .filter(([, state]) => state.status === "error")
     .map(([kind]) => kind);
   const statusLabel = isLoading
-    ? "Loading previews…"
+    ? copy.loadingPreviews
     : hasError
       ? failedKinds.length === 1
         ? failedKinds[0] === "cv"
-          ? "CV preview failed"
-          : "Cover letter preview failed"
-        : "Preview failed"
+          ? copy.cvPreviewFailed
+          : copy.coverPreviewFailed
+        : copy.previewFailed
       : hasOriginalPdfPreview
         ? originalPdfKinds.length === 1
           ? originalPdfKinds[0] === "cv"
-            ? "Original CV PDF preview ready"
-            : "Original cover letter PDF preview ready"
-          : "Original PDF previews ready"
+            ? copy.cvPdfReady
+            : copy.coverPdfReady
+          : copy.pdfReady
         : hasLimitedPreview
           ? limitedKinds.length === 1
             ? limitedKinds[0] === "cv"
-              ? "CV preview is limited"
-              : "Cover letter preview is limited"
-            : "Document previews are limited"
-          : "Parsed successfully";
+              ? copy.cvLimited
+              : copy.coverLimited
+            : copy.limited
+          : copy.parsedSuccessfully;
   const parserVersion =
     Object.values(previews).find(
       (state): state is Extract<PreviewState, { status: "ready" }> =>
         state.status === "ready",
-    )?.document.parserVersion ?? "Structured preview v1";
+    )?.document.parserVersion ?? copy.parserVersion;
   const processingMilliseconds = Math.max(
     0,
     ...Object.values(previews).flatMap((state) =>
@@ -299,12 +305,12 @@ export function DocumentsTab({
     ),
   );
   const processingValue = isLoading
-    ? "In progress…"
-    : (processingMilliseconds / 1000).toFixed(1) +
-      "s · CV snapshot " +
-      versionSuffix(snapshotVersion) +
-      " · JD " +
-      versionSuffix(automatic?.jdVersion ?? "—");
+    ? copy.inProgress
+    : copy.processing(
+        (processingMilliseconds / 1000).toFixed(1),
+        versionSuffix(snapshotVersion),
+        versionSuffix(automatic?.jdVersion ?? "—"),
+      );
 
   function retry(kind: DocumentKind) {
     setPreviews((current) => ({ ...current, [kind]: { status: "loading" } }));
@@ -341,18 +347,13 @@ export function DocumentsTab({
           )}
         </span>
         <div>
-          <span>Document preview status</span>
+          <span>{copy.status}</span>
           <strong>{statusLabel + " · " + parserVersion}</strong>
-          {hasLimitedPreview ? (
-            <p>
-              Original files are still available. Open or download them to
-              review content that could not be extracted.
-            </p>
-          ) : null}
+          {hasLimitedPreview ? <p>{copy.originalStillAvailable}</p> : null}
         </div>
         <div className="document-parser-status__time">
           <span>
-            <Clock3 aria-hidden="true" /> Processing time
+            <Clock3 aria-hidden="true" /> {copy.processingTime}
           </span>
           <strong>{processingValue}</strong>
         </div>
@@ -363,11 +364,11 @@ export function DocumentsTab({
           id="document-preview-cv"
           jobId={jobId}
           applicationId={applicationId}
-          title="Original CV"
+          title={copy.originalCv}
           fileName={
             previews.cv.status === "ready"
               ? previews.cv.document.fileName
-              : "Candidate CV"
+              : copy.candidateCv
           }
           kind="cv"
           state={previews.cv}
@@ -378,11 +379,11 @@ export function DocumentsTab({
           id="document-preview-cover-letter"
           jobId={jobId}
           applicationId={applicationId}
-          title="Cover letter"
+          title={copy.coverLetter}
           fileName={
             previews["cover-letter"].status === "ready"
               ? previews["cover-letter"].document.fileName
-              : "Cover letter"
+              : copy.coverLetter
           }
           kind="cover-letter"
           state={previews["cover-letter"]}
@@ -394,10 +395,7 @@ export function DocumentsTab({
 
       <div className="documents-verification-note">
         <Eye aria-hidden="true" />
-        <span>
-          Use this preview to verify evidence. Select &quot;View original
-          CV&quot; or &quot;View cover letter&quot; to open the full file.
-        </span>
+        <span>{copy.verification}</span>
       </div>
 
       {viewer ? (
@@ -435,6 +433,7 @@ function StructuredDocumentPreviewRenderer({
   originalUrl: string;
   onOpenOriginal: () => void;
 }) {
+  const copy = applicationDetailCopy(useWorkspaceLocale()).documents;
   const hasContent =
     document.content.kind === "cv"
       ? Boolean(
@@ -460,14 +459,14 @@ function StructuredDocumentPreviewRenderer({
     return (
       <div className="document-structured-paper document-structured-paper--pdf">
         <InlinePdfDocumentPreview
-          title={`${kind === "cv" ? "CV" : "Cover letter"} PDF preview`}
+          title={copy.pdfPreview(
+            kind === "cv" ? copy.originalCv : copy.coverLetter,
+          )}
           originalUrl={originalUrl}
           onOpenOriginal={onOpenOriginal}
         />
         <span className="document-structured-paper__page">
-          {document.pageCount
-            ? `${document.pageCount} page${document.pageCount === 1 ? "" : "s"}`
-            : "Original PDF · scroll to view pages"}
+          {document.pageCount ? copy.pages(document.pageCount) : copy.pdfScroll}
         </span>
       </div>
     );
@@ -479,26 +478,18 @@ function StructuredDocumentPreviewRenderer({
         <div className="document-preview-limited-empty" role="status">
           <FileText aria-hidden="true" />
           <strong>
-            {kind === "cover-letter"
-              ? "Cover letter file attached"
-              : "Original CV attached"}
+            {kind === "cover-letter" ? copy.coverAttached : copy.cvAttached}
           </strong>
-          <p>
-            The file is available, but readable text could not be extracted for
-            this preview.
-          </p>
+          <p>{copy.textUnavailable}</p>
           <button type="button" onClick={onOpenOriginal}>
-            View original file
+            {copy.viewOriginalFile}
           </button>
         </div>
       ) : null}
       {document.previewStatus === "LIMITED" && hasContent ? (
         <div className="document-preview-limited-note" role="status">
           <AlertTriangle aria-hidden="true" />
-          <span>
-            A complete text preview was unavailable. Open the original file to
-            review it.
-          </span>
+          <span>{copy.completeUnavailable}</span>
         </div>
       ) : null}
       {document.content.kind === "cv" && hasContent ? (
@@ -510,7 +501,9 @@ function StructuredDocumentPreviewRenderer({
         />
       ) : null}
       <span className="document-structured-paper__page">
-        {document.pageCount ? "1 / " + document.pageCount : "Parsed preview"}
+        {document.pageCount
+          ? copy.pageIndicator(document.pageCount)
+          : copy.parsedPreview}
       </span>
     </div>
   );
@@ -525,6 +518,7 @@ function InlinePdfDocumentPreview({
   originalUrl: string;
   onOpenOriginal: () => void;
 }) {
+  const copy = applicationDetailCopy(useWorkspaceLocale()).documents;
   const [documentResource, setDocumentResource] = useState<{
     sourceUrl: string;
     documentUrl: string;
@@ -547,17 +541,10 @@ function InlinePdfDocumentPreview({
     })
       .then(async (response) => {
         if (!response.ok) {
-          const payload = (await response.json().catch(() => null)) as {
-            message?: unknown;
-          } | null;
-          throw new Error(
-            typeof payload?.message === "string"
-              ? payload.message
-              : "Couldn't load the original PDF.",
-          );
+          throw new Error(copy.documentLoadFailed);
         }
         const blob = await response.blob();
-        if (!blob.size) throw new Error("The original PDF is empty.");
+        if (!blob.size) throw new Error(copy.originalUnavailable);
         return blob;
       })
       .then((blob) => {
@@ -586,10 +573,7 @@ function InlinePdfDocumentPreview({
           return;
         setFailure({
           sourceUrl: originalUrl,
-          message:
-            reason instanceof Error
-              ? reason.message
-              : "Couldn't load the original PDF.",
+          message: copy.documentLoadFailed,
         });
       });
 
@@ -598,7 +582,7 @@ function InlinePdfDocumentPreview({
       controller.abort();
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [originalUrl]);
+  }, [copy.documentLoadFailed, copy.originalUnavailable, originalUrl]);
 
   const documentUrl =
     documentResource?.sourceUrl === originalUrl
@@ -611,10 +595,10 @@ function InlinePdfDocumentPreview({
       {error ? (
         <div className="document-pdf-preview__state" role="alert">
           <FileText aria-hidden="true" />
-          <strong>PDF preview unavailable</strong>
+          <strong>{copy.documentUnavailable}</strong>
           <p>{error}</p>
           <button type="button" onClick={onOpenOriginal}>
-            View original file
+            {copy.viewOriginalFile}
           </button>
         </div>
       ) : documentUrl ? (
@@ -625,7 +609,7 @@ function InlinePdfDocumentPreview({
       ) : (
         <div className="document-pdf-preview__state" role="status">
           <LoaderCircle className="is-spinning" aria-hidden="true" />
-          <span>Loading original PDF…</span>
+          <span>{copy.loadingOriginalPdf}</span>
         </div>
       )}
     </div>
@@ -652,6 +636,7 @@ function StructuredCvPaper({
 }: {
   content: Extract<StructuredDocumentPreview["content"], { kind: "cv" }>;
 }) {
+  const copy = applicationDetailCopy(useWorkspaceLocale()).documents;
   const hasSections =
     Boolean(content.summary) ||
     content.experience.length > 0 ||
@@ -663,7 +648,7 @@ function StructuredCvPaper({
   return (
     <div className="document-structured-paper__content">
       <header className="document-structured-identity">
-        <h3>{content.name ?? "Candidate CV"}</h3>
+        <h3>{content.name ?? copy.candidateName}</h3>
         {content.title ? <p>{content.title}</p> : null}
         {content.contact.length ? (
           <div className="document-structured-contact">
@@ -675,13 +660,13 @@ function StructuredCvPaper({
       </header>
 
       {content.summary ? (
-        <DocumentPreviewSection title="Professional summary">
+        <DocumentPreviewSection title={copy.professionalSummary}>
           <p>{content.summary}</p>
         </DocumentPreviewSection>
       ) : null}
 
       {content.experience.length ? (
-        <DocumentPreviewSection title="Experience">
+        <DocumentPreviewSection title={copy.experience}>
           <div className="document-experience-list">
             {content.experience.map((entry, index) => (
               <article
@@ -707,7 +692,7 @@ function StructuredCvPaper({
       ) : null}
 
       {content.skills.length ? (
-        <DocumentPreviewSection title="Skills">
+        <DocumentPreviewSection title={copy.skills}>
           <div className="document-skill-tags">
             {content.skills.map((skill) => (
               <span key={skill}>{skill}</span>
@@ -717,7 +702,7 @@ function StructuredCvPaper({
       ) : null}
 
       {content.education.length ? (
-        <DocumentPreviewSection title="Education">
+        <DocumentPreviewSection title={copy.education}>
           <div className="document-structured-list">
             {content.education.map((entry, index) => (
               <div
@@ -734,7 +719,7 @@ function StructuredCvPaper({
       ) : null}
 
       {content.certifications.length ? (
-        <DocumentPreviewSection title="Certifications">
+        <DocumentPreviewSection title={copy.certifications}>
           <ul className="document-plain-list">
             {content.certifications.map((item) => (
               <li key={item}>{item}</li>
@@ -744,7 +729,7 @@ function StructuredCvPaper({
       ) : null}
 
       {content.languages.length ? (
-        <DocumentPreviewSection title="Languages">
+        <DocumentPreviewSection title={copy.languages}>
           <div className="document-skill-tags">
             {content.languages.map((item) => (
               <span key={item}>{item}</span>
@@ -756,8 +741,8 @@ function StructuredCvPaper({
       {!hasSections ? (
         <div className="document-structured-empty">
           <FileText aria-hidden="true" />
-          <p>Structured CV fields are unavailable.</p>
-          <span>Open the original file to verify the remaining content.</span>
+          <p>{copy.fieldsUnavailable}</p>
+          <span>{copy.openOriginalToVerify}</span>
         </div>
       ) : null}
     </div>
@@ -774,6 +759,7 @@ function StructuredCoverLetterPaper({
   >;
   keywords: string[];
 }) {
+  const copy = applicationDetailCopy(useWorkspaceLocale()).documents;
   return (
     <div className="document-structured-paper__content document-letter-paper">
       {content.date ? (
@@ -796,7 +782,7 @@ function StructuredCoverLetterPaper({
       {keywords.length ? (
         <div className="document-keywords">
           <strong>
-            <Tag aria-hidden="true" /> Detected keywords
+            <Tag aria-hidden="true" /> {copy.detectedKeywords}
           </strong>
           <div>
             {keywords.map((keyword) => (
@@ -812,8 +798,8 @@ function StructuredCoverLetterPaper({
       !content.signOff ? (
         <div className="document-structured-empty">
           <FileText aria-hidden="true" />
-          <p>Structured cover letter fields are unavailable.</p>
-          <span>Open the original file to verify the remaining content.</span>
+          <p>{copy.coverFieldsUnavailable}</p>
+          <span>{copy.openOriginalToVerify}</span>
         </div>
       ) : null}
     </div>
@@ -843,7 +829,9 @@ function DocumentCard({
   onRetry: () => void;
   onOpenOriginal: () => void;
 }) {
-  const label = fileName ?? (kind === "cv" ? "Candidate CV" : "Cover letter");
+  const copy = applicationDetailCopy(useWorkspaceLocale()).documents;
+  const label =
+    fileName ?? (kind === "cv" ? copy.candidateCv : copy.coverLetter);
   return (
     <article className="document-preview-card" id={id}>
       <header>
@@ -854,15 +842,15 @@ function DocumentCard({
           <small>{label}</small>
           {state.status === "ready" ? (
             <small className="document-preview-card__source">
-              {documentSourceLabel(state.document, kind)}
+              {documentSourceLabel(state.document, kind, copy)}
             </small>
           ) : null}
         </div>
         <button
           type="button"
-          aria-label={`Open original ${title}`}
+          aria-label={copy.openOriginal(title)}
           onClick={onOpenOriginal}
-          title={`Open original ${title}`}
+          title={copy.openOriginal(title)}
         >
           <Ellipsis aria-hidden="true" />
         </button>
@@ -872,7 +860,7 @@ function DocumentCard({
           <div
             className="document-preview-skeleton"
             role="status"
-            aria-label={"Loading " + title}
+            aria-label={copy.loading(title)}
           >
             <span className="document-preview-skeleton__title" />
             <span />
@@ -892,30 +880,30 @@ function DocumentCard({
         ) : state.status === "missing" && kind === "cover-letter" ? (
           <div className="document-missing-card">
             <FileText aria-hidden="true" />
-            <strong>Cover letter not provided</strong>
-            <p>This application did not include a cover letter.</p>
+            <strong>{copy.coverNotProvided}</strong>
+            <p>{copy.coverNotProvidedDescription}</p>
           </div>
         ) : (
           <div className="document-preview-error" role="alert">
             <AlertTriangle aria-hidden="true" />
             <strong>
               {state.status === "missing"
-                ? "Couldn't load document"
-                : "Document preview unavailable"}
+                ? copy.documentLoadFailed
+                : copy.documentUnavailable}
             </strong>
             <p>
               {state.status === "missing"
-                ? "The original document is not available."
+                ? copy.originalUnavailable
                 : state.message}
             </p>
             <div className="document-preview-error__actions">
               {state.status === "error" && state.retryable ? (
                 <button type="button" onClick={onRetry}>
-                  Retry preview
+                  {copy.retryPreview}
                 </button>
               ) : null}
               <button type="button" onClick={onOpenOriginal}>
-                View original
+                {copy.viewOriginalFile}
               </button>
             </div>
           </div>

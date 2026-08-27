@@ -21,7 +21,7 @@ import type {
 } from "@/shared/contracts/cv-import/consent-retention";
 import type { CvImportResource } from "@/shared/contracts/cv-import/upload";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
-import { cvCopy } from "../i18n/cv-import-copy";
+import { cvCopy, cvKnownError } from "../i18n/cv-import-copy";
 import { CvRecoveryActionError } from "./cv-failure-recovery";
 import styles from "./cv-consent-required-recovery.module.css";
 
@@ -95,7 +95,7 @@ export function CvConsentRequiredRecovery({
     } catch (error) {
       setMessage(
         error instanceof CvRecoveryActionError
-          ? error.message
+          ? cvKnownError(locale, error.message)
           : copy.deleteError,
       );
       heading.current?.focus();

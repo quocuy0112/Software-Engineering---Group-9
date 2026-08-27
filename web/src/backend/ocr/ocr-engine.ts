@@ -15,7 +15,10 @@ export type OcrRecognitionRequest = Readonly<{
   attemptId: string;
   purpose: OcrPurpose;
   image: NormalizedPng;
+  /** Absolute socket/worker deadline. The adapter must not wait past this. */
   deadline: Date;
+  /** Internal engine compute cutoff; normally 750-1000ms before deadline. */
+  computeDeadline: Date;
   expectedModelManifestSha256: string;
   signal: AbortSignal;
 }>;

@@ -1,7 +1,10 @@
 import { isAbsolute } from "node:path";
 
 export const OCR_EXPECTED_MODEL_MANIFEST_SHA256 =
-  "4a7ec9635845d44fd6c6fb323386ee526282b8de566358fe646d711b5992e505";
+  "a8f8b2e10b1870bd35f1ec7a160399f5d4c6a6c6326c373abf01d7fdc9e38bba";
+export const OCR_EXPECTED_ENGINE_VERSION = "1.1.0" as const;
+export const OCR_SEARCH_STRATEGY_VERSION =
+  "search-ocr-adaptive-tiles-v1" as const;
 
 function fail(code = "IMAGE_SEARCH_CONFIGURATION_INVALID"): never {
   throw new Error(code);
@@ -16,6 +19,41 @@ function exact(environment: Environment, key: string, value: string): void {
 function boolean(environment: Environment, key: string): boolean {
   if (!["true", "false"].includes(environment[key] ?? "")) fail();
   return environment[key] === "true";
+}
+
+function optionalBoolean(
+  environment: Environment,
+  key: string,
+  fallback: boolean,
+): boolean {
+  const value = environment[key];
+  if (value === undefined) return fallback;
+  if (!["true", "false"].includes(value)) fail();
+  return value === "true";
+}
+
+function optionalInteger(
+  environment: Environment,
+  key: string,
+  fallback: number,
+  allowed: readonly number[],
+): number {
+  const value = environment[key];
+  if (value === undefined) return fallback;
+  if (!/^[0-9]+$/u.test(value)) fail();
+  const parsed = Number(value);
+  if (!Number.isSafeInteger(parsed) || !allowed.includes(parsed)) fail();
+  return parsed;
+}
+
+function optionalExact(
+  environment: Environment,
+  key: string,
+  fallback: string,
+): string {
+  const value = environment[key] ?? fallback;
+  if (value !== fallback) fail();
+  return value;
 }
 
 function decodedKey(environment: Environment, key: string): Buffer {
@@ -37,7 +75,7 @@ export function loadImageSearchConfiguration(environment: Environment) {
   }
   exact(environment, "OCR_ENGINE_SOCKET_PATH", "/run/smarthire-ocr/ocr.sock");
   exact(environment, "OCR_ENGINE_NAME", "paddleocr-onnx");
-  exact(environment, "OCR_ENGINE_VERSION", "1.0.0");
+  exact(environment, "OCR_ENGINE_VERSION", OCR_EXPECTED_ENGINE_VERSION);
   exact(environment, "OCR_MODEL_NAME", "PP-OCRv6-medium");
   exact(environment, "OCR_MODEL_SHA256", OCR_EXPECTED_MODEL_MANIFEST_SHA256);
   exact(environment, "OCR_POLICY_VERSION", "ocr-confidence-v1");
@@ -49,6 +87,35 @@ export function loadImageSearchConfiguration(environment: Environment) {
   exact(environment, "IMAGE_SEARCH_VISITOR_LIMIT_PER_HOUR", "5");
   exact(environment, "IMAGE_SEARCH_ACCOUNT_LIMIT_PER_HOUR", "15");
   exact(environment, "IMAGE_SEARCH_RETENTION_MINUTES", "15");
+
+  const adaptiveTilingEnabled = optionalBoolean(
+    environment,
+    "OCR_SEARCH_ADAPTIVE_TILING_ENABLED",
+    false,
+  );
+  const tileOverlapPercent = optionalInteger(
+    environment,
+    "OCR_SEARCH_TILE_OVERLAP_PERCENT",
+    15,
+    [10, 15, 20],
+  );
+  const tileBatchSize = optionalInteger(
+    environment,
+    "OCR_SEARCH_TILE_BATCH_SIZE",
+    2,
+    [1, 2, 3, 4],
+  );
+  const maxTiles = optionalInteger(
+    environment,
+    "OCR_SEARCH_MAX_TILES",
+    4,
+    [1, 2, 3, 4],
+  );
+  const strategyVersion = optionalExact(
+    environment,
+    "OCR_SEARCH_STRATEGY_VERSION",
+    OCR_SEARCH_STRATEGY_VERSION,
+  );
 
   const keys = [
     decodedKey(environment, "IMAGE_SEARCH_ARTIFACT_KEY_V1"),
@@ -113,6 +180,11 @@ export function loadImageSearchConfiguration(environment: Environment) {
       cvUnitTimeoutMs: 20_000,
       cvHybridDeadlineMs: 180_000,
       searchTimeoutMs: 10_000,
+      adaptiveTilingEnabled,
+      tileOverlapPercent,
+      tileBatchSize,
+      maxTiles,
+      strategyVersion,
     },
     workerEnabled,
     cleanupEnabled: boolean(environment, "IMAGE_SEARCH_CLEANUP_ENABLED"),

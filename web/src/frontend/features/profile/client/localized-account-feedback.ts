@@ -14,6 +14,12 @@ const vietnameseMessages: Record<string, string> = {
     "Đã đổi mật khẩu và đăng xuất các phiên khác.",
   "Verification instructions were queued for the proposed address.":
     "Đã gửi hướng dẫn xác minh đến địa chỉ email mới.",
+  "This verification link cannot be used.":
+    "Không thể sử dụng liên kết xác minh này.",
+  "Open the verification page and try again.":
+    "Hãy mở trang xác minh và thử lại.",
+  "Your verified email address has been changed.":
+    "Địa chỉ email đã xác minh của bạn đã được thay đổi.",
   "Review the highlighted fields.": "Hãy kiểm tra các trường được đánh dấu.",
   "Review the complete preference set.": "Hãy kiểm tra lại toàn bộ tùy chọn.",
   "Enter a valid value.": "Hãy nhập giá trị hợp lệ.",

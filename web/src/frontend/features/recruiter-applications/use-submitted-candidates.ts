@@ -5,6 +5,8 @@ import type {
   ApplicationPage,
   SubmittedCandidate,
 } from "@/shared/contracts/applications";
+import type { WorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruiterApplicationsCopy } from "./recruiter-applications-copy";
 
 type State = Readonly<{
   items: SubmittedCandidate[];
@@ -81,7 +83,10 @@ async function requestSubmittedCandidatesPage(jobId: string, cursor?: string) {
   return request;
 }
 
-export function useSubmittedCandidates(jobId: string) {
+export function useSubmittedCandidates(
+  jobId: string,
+  locale: WorkspaceLocale = "en",
+) {
   const initialCache = readSubmittedCandidatesCache(jobId);
   const [state, setState] = useState<State>(() => ({
     items: initialCache?.items ?? [],
@@ -136,7 +141,7 @@ export function useSubmittedCandidates(jobId: string) {
             loading: false,
             loadingMore: false,
             refreshing: false,
-            error: "Submitted candidates took too long to respond.",
+            error: recruiterApplicationsCopy(locale).submitted.loadError,
           }));
           return;
         }
@@ -145,14 +150,11 @@ export function useSubmittedCandidates(jobId: string) {
           loading: false,
           loadingMore: false,
           refreshing: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "Unable to load candidates.",
+          error: recruiterApplicationsCopy(locale).submitted.loadError,
         }));
       }
     },
-    [jobId],
+    [jobId, locale],
   );
 
   useEffect(() => {

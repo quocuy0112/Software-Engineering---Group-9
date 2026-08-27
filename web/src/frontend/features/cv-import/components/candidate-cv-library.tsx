@@ -9,6 +9,7 @@ import {
   type CandidateCvSummary,
 } from "@/shared/contracts/cv-import/candidate-cv";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { cvCopy, cvKnownError } from "../i18n/cv-import-copy";
 import styles from "./candidate-cv-library.module.css";
 
 function formatBytes(bytes: number) {
@@ -27,6 +28,7 @@ export function CandidateCvLibrary({
   embedded?: boolean;
 }) {
   const locale = useWorkspaceLocale();
+  const copy = cvCopy(locale).common;
   const [items, setItems] = useState(() => [...initialItems]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftName, setDraftName] = useState("");
@@ -66,7 +68,7 @@ export function CandidateCvLibrary({
         throw new Error(
           typeof (body as { message?: unknown } | null)?.message === "string"
             ? (body as { message: string }).message
-            : "Unable to rename this CV.",
+            : copy.renameError,
         );
       const updated = candidateCvSummarySchema.parse(body);
       setItems((current) =>
@@ -77,7 +79,9 @@ export function CandidateCvLibrary({
       setEditingId(null);
     } catch (caught) {
       setError(
-        caught instanceof Error ? caught.message : "Unable to rename this CV.",
+        caught instanceof Error
+          ? cvKnownError(locale, caught.message)
+          : copy.renameError,
       );
     } finally {
       setPendingId(null);
@@ -104,7 +108,7 @@ export function CandidateCvLibrary({
         throw new Error(
           typeof (body as { message?: unknown } | null)?.message === "string"
             ? (body as { message: string }).message
-            : "Unable to delete this CV.",
+            : copy.deleteError,
         );
       const deleted = candidateCvDeleteOutcomeSchema.parse(body);
       setItems((current) =>
@@ -113,7 +117,9 @@ export function CandidateCvLibrary({
       if (editingId === deleted.id) setEditingId(null);
     } catch (caught) {
       setError(
-        caught instanceof Error ? caught.message : "Unable to delete this CV.",
+        caught instanceof Error
+          ? cvKnownError(locale, caught.message)
+          : copy.deleteError,
       );
     } finally {
       setPendingId(null);
@@ -124,15 +130,15 @@ export function CandidateCvLibrary({
     <section
       className={styles.root}
       aria-labelledby={embedded ? undefined : "candidate-cv-library-heading"}
-      aria-label={embedded ? "Saved CVs" : undefined}
+      aria-label={embedded ? copy.savedCvs : undefined}
       data-embedded={embedded ? "true" : undefined}
     >
       {embedded ? null : (
         <header className={styles.heading}>
           <div>
-            <p className={styles.kicker}>APPLICATION CVs</p>
+            <p className={styles.kicker}>{copy.applicationCvs}</p>
             <h2 id="candidate-cv-library-heading">
-              {locale === "vi" ? "CV đã lưu" : "Saved CVs"}
+              {copy.savedCvs}
             </h2>
           </div>
           <span>{items.length}</span>
@@ -153,7 +159,7 @@ export function CandidateCvLibrary({
                 <div className={styles.copy}>
                   {editing ? (
                     <label>
-                      <span className={styles.srOnly}>CV filename</span>
+                      <span className={styles.srOnly}>{copy.cvFilename}</span>
                       <input
                         value={draftName}
                         maxLength={200}
@@ -182,14 +188,14 @@ export function CandidateCvLibrary({
                         disabled={pending}
                         onClick={() => void saveRename(item)}
                       >
-                        {locale === "vi" ? "Lưu" : "Save"}
+                        {copy.save}
                       </button>
                       <button
                         type="button"
                         disabled={pending}
                         onClick={() => setEditingId(null)}
                       >
-                        {locale === "vi" ? "Hủy" : "Cancel"}
+                        {copy.cancel}
                       </button>
                     </>
                   ) : (
@@ -198,7 +204,7 @@ export function CandidateCvLibrary({
                       disabled={pending}
                       onClick={() => beginRename(item)}
                     >
-                      {locale === "vi" ? "Đổi tên" : "Rename"}
+                      {copy.rename}
                     </button>
                   )}
                   <button
@@ -207,7 +213,7 @@ export function CandidateCvLibrary({
                     disabled={pending}
                     onClick={() => void deleteCv(item)}
                   >
-                    {locale === "vi" ? "Xóa" : "Delete"}
+                    {copy.delete}
                   </button>
                 </div>
               </li>
@@ -216,9 +222,7 @@ export function CandidateCvLibrary({
         </ul>
       ) : (
         <p className={styles.empty}>
-          {locale === "vi"
-            ? "Chưa có CV đã xác nhận trong hồ sơ."
-            : "No confirmed CVs are available in your Profile yet."}
+          {copy.noConfirmedCvs}
         </p>
       )}
     </section>

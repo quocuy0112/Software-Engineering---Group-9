@@ -27,6 +27,12 @@ import {
   applicationOutcomeSchema,
 } from "@/shared/contracts/jobs/actions";
 import { validateCvFile } from "@/shared/cv-file-validation";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import {
+  jobApplicationCopy,
+  type JobApplicationCopy,
+  type JobApplicationLocale,
+} from "./job-application-copy";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 
 const MAX_CV_BYTES = 5_000_000;
@@ -67,24 +73,27 @@ function canonicalizePhone(value: string) {
   return normalized.startsWith("0") ? "+84" + normalized.slice(1) : normalized;
 }
 
-function phoneValidationError(value: string) {
+function phoneValidationError(value: string, copy: JobApplicationCopy) {
   const phone = normalizePhone(value);
-  if (!phone) return "Enter your phone number.";
+  if (!phone) return copy.errors.phoneRequired;
   if (!/^(?:0|\+84)(?:3|5|7|8|9)\d{8}$/u.test(phone)) {
-    return "Enter a valid Vietnamese phone number.";
+    return copy.errors.phoneInvalid;
   }
   return null;
 }
 
-function validateContact(contact: ApplicationContactSnapshot): FieldErrors {
+function validateContact(
+  contact: ApplicationContactSnapshot,
+  copy: JobApplicationCopy,
+): FieldErrors {
   const errors: FieldErrors = {};
-  if (!contact.fullName.trim()) errors.fullName = "Enter your full name.";
+  if (!contact.fullName.trim()) errors.fullName = copy.errors.fullNameRequired;
   if (!contact.email.trim()) {
-    errors.email = "Enter your email address.";
+    errors.email = copy.errors.emailRequired;
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(contact.email.trim())) {
-    errors.email = "Enter a valid email address.";
+    errors.email = copy.errors.emailInvalid;
   }
-  const phoneError = phoneValidationError(contact.phone);
+  const phoneError = phoneValidationError(contact.phone, copy);
   if (phoneError) errors.phone = phoneError;
   return errors;
 }
@@ -106,6 +115,8 @@ function RequiredMark() {
 
 function InlineApplicationForm({
   form,
+  copy,
+  locale,
   onProfileSaved,
   contactDraft,
   onContactChange,
@@ -113,6 +124,8 @@ function InlineApplicationForm({
   onBusyChange,
 }: {
   form: ApplicationForm;
+  copy: JobApplicationCopy;
+  locale: JobApplicationLocale;
   onProfileSaved: (profile: {
     revision: number;
     basics: ApplicationForm["profileBasics"];
@@ -194,7 +207,7 @@ function InlineApplicationForm({
       extension === "docx";
     if (!accepted) {
       clearNewCvSelection();
-      showCvUploadError("Only PDF, DOC, or DOCX files are supported.");
+      showCvUploadError(copy.errors.unsupportedFile);
       setErrors((current) => {
         const next = { ...current };
         delete next.cv;
@@ -206,8 +219,8 @@ function InlineApplicationForm({
       clearNewCvSelection();
       showCvUploadError(
         file.size > MAX_CV_BYTES
-          ? "File size must not exceed 5MB."
-          : "The uploaded file is empty.",
+          ? copy.errors.fileTooLarge
+          : copy.errors.emptyFile,
       );
       setErrors((current) => {
         const next = { ...current };
@@ -218,13 +231,9 @@ function InlineApplicationForm({
     }
     try {
       await validateCvFile(file);
-    } catch (cause) {
+    } catch {
       clearNewCvSelection();
-      showCvUploadError(
-        cause instanceof Error
-          ? cause.message
-          : "Only valid PDF, DOC, or DOCX files are supported.",
-      );
+      showCvUploadError(copy.errors.invalidFile);
       setErrors((current) => {
         const next = { ...current };
         delete next.cv;
@@ -267,8 +276,10 @@ function InlineApplicationForm({
         const problem = body as { message?: unknown } | null;
         throw new Error(
           typeof problem?.message === "string"
-            ? problem.message
-            : "Unable to save this CV to your Profile.",
+            ? locale === "en"
+              ? problem.message
+              : copy.errors.saveCv
+            : copy.errors.saveCv,
         );
       }
       const saved = candidateCvSummarySchema.parse(body);
@@ -287,8 +298,10 @@ function InlineApplicationForm({
     } catch (caught) {
       const message =
         caught instanceof Error
-          ? caught.message
-          : "Unable to save this CV to your Profile.";
+          ? locale === "en"
+            ? caught.message
+            : copy.errors.saveCv
+          : copy.errors.saveCv;
       clearNewCvSelection();
       setSelectedCvId("");
       cvUploadIdempotencyKey.current = null;
@@ -299,24 +312,25 @@ function InlineApplicationForm({
   }
 
   function validate(): boolean {
-    const next = validateContact({
-      fullName: contact.fullName.trim(),
-      email: contact.email.trim(),
-      phone: normalizePhone(contact.phone),
-    });
+    const next = validateContact(
+      {
+        fullName: contact.fullName.trim(),
+        email: contact.email.trim(),
+        phone: normalizePhone(contact.phone),
+      },
+      copy,
+    );
     if (!selectedCvId && !(newCvFile && newCvAttached)) {
       next.cv = newCvFile
-        ? "Select Import CV before applying this new CV."
-        : (cvSelectionError ??
-          "Select a saved CV or attach a valid PDF, DOC, or DOCX file.");
+        ? copy.errors.selectImportedCv
+        : (cvSelectionError ?? copy.errors.selectSavedCv);
     }
     if (!locationReady) {
       next.location = selectedLocation
-        ? "Save the selected job location before applying."
-        : "Select the job location.";
+        ? copy.errors.saveLocation
+        : copy.errors.selectLocation;
     }
-    if (!applicationConsent)
-      next.consent = "Accept the application consent before applying.";
+    if (!applicationConsent) next.consent = copy.errors.acceptConsent;
     setErrors(next);
     const firstInvalidField = Object.keys(next)[0];
     if (firstInvalidField) {
@@ -367,8 +381,10 @@ function InlineApplicationForm({
         const problem = body as { message?: unknown } | null;
         throw new Error(
           typeof problem?.message === "string"
-            ? problem.message
-            : "Unable to save your location.",
+            ? locale === "en"
+              ? problem.message
+              : copy.errors.saveLocation
+            : copy.errors.saveLocation,
         );
       }
       const result = profileMutationOutcomeSchema.parse(body);
@@ -387,8 +403,10 @@ function InlineApplicationForm({
     } catch (caught) {
       const message =
         caught instanceof Error
-          ? caught.message
-          : "Unable to save your location.";
+          ? locale === "en"
+            ? caught.message
+            : copy.errors.saveLocation
+          : copy.errors.saveLocation;
       setLocationSaveError(message);
       setErrors((current) => ({ ...current, location: message }));
     } finally {
@@ -467,9 +485,9 @@ function InlineApplicationForm({
           setErrors((current) => ({ ...current, ...serverErrors }));
         }
         setError(
-          typeof problem.message === "string"
+          typeof problem.message === "string" && locale === "en"
             ? problem.message
-            : "Unable to submit your application.",
+            : copy.errors.submit,
         );
         return;
       }
@@ -481,7 +499,7 @@ function InlineApplicationForm({
         aiMatchScore: outcome.aiMatchScore,
       });
     } catch {
-      setError("Unable to submit your application. Please try again.");
+      setError(copy.errors.submitTryAgain);
     } finally {
       setPending(false);
     }
@@ -504,7 +522,7 @@ function InlineApplicationForm({
   return (
     <form
       className="job-form-grid"
-      aria-label={"Apply for " + form.jobTitle}
+      aria-label={copy.applyFor(form.jobTitle)}
       onSubmit={submit}
       onChange={() => {
         idempotencyKey.current = null;
@@ -513,26 +531,26 @@ function InlineApplicationForm({
       noValidate
     >
       <p className="job-required-note">
-        <RequiredMark /> Required fields
+        <RequiredMark /> {copy.requiredFields}
       </p>
       {!profileReady ? (
         <div role="alert">
-          Please complete these profile fields first:{" "}
-          {missingProfileFields.join(", ")}.
+          {copy.profileIncomplete(
+            missingProfileFields
+              .map((field) => copy.profileFields[field] ?? field)
+              .join(", "),
+          )}
         </div>
       ) : null}
 
       <fieldset className="job-application-fieldset">
         <legend>
-          Application CV
+          {copy.cvSection}
           <RequiredMark />
         </legend>
-        <p className="job-form-help">
-          Select exactly one confirmed CV from your Profile, or import one new
-          PDF, DOC, or DOCX file.
-        </p>
+        <p className="job-form-help">{copy.cvHelp}</p>
         <label htmlFor="application-cv-id">
-          Select a CV from Profile
+          {copy.selectCv}
           <select
             id="application-cv-id"
             name="cvId"
@@ -553,9 +571,7 @@ function InlineApplicationForm({
             }}
           >
             <option value="">
-              {savedCvs.length
-                ? "Select one saved CV"
-                : "No confirmed CVs in Profile"}
+              {savedCvs.length ? copy.savedCvPlaceholder : copy.noConfirmedCvs}
             </option>
             {savedCvs.map((cv) => (
               <option key={cv.id} value={cv.id}>
@@ -575,11 +591,9 @@ function InlineApplicationForm({
           }}
         >
           <span className="job-cv-dropzone-title">
-            {newCvFile
-              ? "CV file selected"
-              : "Drag a CV here or click to choose"}
+            {newCvFile ? copy.fileSelected : copy.chooseFile}
           </span>
-          <span className="job-form-help">PDF, DOC, DOCX · up to 5 MB</span>
+          <span className="job-form-help">{copy.fileTypes}</span>
           <input
             ref={fileInputRef}
             id="application-cv-upload"
@@ -605,7 +619,7 @@ function InlineApplicationForm({
                 onClick={() => fileInputRef.current?.click()}
                 disabled={pending || cvSaving}
               >
-                Change file
+                {copy.changeFile}
               </button>
               <button
                 type="button"
@@ -623,7 +637,7 @@ function InlineApplicationForm({
                 }}
                 disabled={pending || cvSaving}
               >
-                Remove
+                {copy.removeFile}
               </button>
             </span>
           </div>
@@ -634,7 +648,7 @@ function InlineApplicationForm({
             onClick={() => void attachNewCv()}
             disabled={submitDisabled}
           >
-            {cvSaving ? "Saving CV..." : "Import CV"}
+            {cvSaving ? copy.savingCv : copy.importCv}
           </button>
         ) : null}
         {cvErrorMessage ? (
@@ -645,10 +659,10 @@ function InlineApplicationForm({
       </fieldset>
 
       <fieldset className="job-application-fieldset">
-        <legend>Contact information</legend>
+        <legend>{copy.contactInformation}</legend>
         <label htmlFor="application-full-name">
           <span className="job-field-label">
-            Full name
+            {copy.fullName}
             <RequiredMark />
           </span>
           <input
@@ -673,7 +687,7 @@ function InlineApplicationForm({
         </label>
         <label htmlFor="application-email">
           <span className="job-field-label">
-            Email
+            {copy.email}
             <RequiredMark />
           </span>
           <input
@@ -699,7 +713,7 @@ function InlineApplicationForm({
         </label>
         <label htmlFor="application-phone">
           <span className="job-field-label">
-            Phone number
+            {copy.phoneNumber}
             <RequiredMark />
           </span>
           <input
@@ -722,7 +736,7 @@ function InlineApplicationForm({
               });
             }}
             onBlur={() => {
-              const phoneError = phoneValidationError(contact.phone);
+              const phoneError = phoneValidationError(contact.phone, copy);
               setErrors((current) => {
                 const next = { ...current };
                 if (phoneError) next.phone = phoneError;
@@ -739,7 +753,7 @@ function InlineApplicationForm({
         </label>
         <label htmlFor="application-location">
           <span className="job-field-label">
-            Location
+            {copy.location}
             <RequiredMark />
           </span>
           <select
@@ -751,11 +765,11 @@ function InlineApplicationForm({
             {...fieldA11y("location", errors)}
             onChange={(event) => void saveLocation(event.currentTarget.value)}
           >
-            <option value="">Select the job location</option>
+            <option value="">{copy.selectJobLocation}</option>
             <option value={form.jobLocation}>{form.jobLocation}</option>
           </select>
           {locationSaving ? (
-            <span className="job-form-help">Saving location...</span>
+            <span className="job-form-help">{copy.savingLocation}</span>
           ) : null}
           {locationSaveError ? (
             <span id="location-error" className="job-field-error" role="alert">
@@ -783,10 +797,10 @@ function InlineApplicationForm({
               defaultValue=""
             >
               <option value="" disabled>
-                Choose an answer
+                {copy.chooseAnswer}
               </option>
-              <option value="true">Yes</option>
-              <option value="false">No</option>
+              <option value="true">{copy.yes}</option>
+              <option value="false">{copy.no}</option>
             </select>
           ) : question.kind === "SINGLE_CHOICE" ? (
             <select
@@ -796,7 +810,7 @@ function InlineApplicationForm({
               defaultValue=""
             >
               <option value="" disabled>
-                Choose an answer
+                {copy.chooseAnswer}
               </option>
               {question.options?.map((option) => (
                 <option key={option} value={option}>
@@ -817,7 +831,7 @@ function InlineApplicationForm({
       ))}
 
       <label htmlFor="application-cover-letter">
-        Cover letter (optional)
+        {copy.coverLetterOptional}
         <textarea
           id="application-cover-letter"
           name="coverLetter"
@@ -833,24 +847,16 @@ function InlineApplicationForm({
       ) : null}
       <section
         className="job-application-transparency"
-        aria-label="Transparency about automated support"
+        aria-label={copy.transparencyAria}
       >
         <div className="job-application-transparency-heading">
           <ShieldCheck aria-hidden="true" />
-          <strong>Transparency about automated support</strong>
+          <strong>{copy.transparencyTitle}</strong>
         </div>
-        <p>
-          Recruiters may use automated tools to compare an application with job
-          requirements. Scores, rankings, and internal notes are not shown to
-          candidates and do not make the final hiring decision.
-        </p>
+        <p>{copy.transparencyDescription}</p>
         <div className="job-application-private-note">
           <LockKeyhole aria-hidden="true" />
-          <span>
-            Your private CV Match Check is separate. It is visible only to you,
-            is not included in this application, and does not change recruiter
-            ranking.
-          </span>
+          <span>{copy.privateCvNote}</span>
         </div>
       </section>
       <div className="job-actions">
@@ -861,7 +867,7 @@ function InlineApplicationForm({
               name="consentAccepted"
               type="checkbox"
               required
-              aria-label="I consent to SmartHire sharing this application with the hiring company."
+              aria-label={copy.consentAria}
               checked={applicationConsent}
               {...fieldA11y("consent", errors)}
               onChange={(event) => {
@@ -874,8 +880,7 @@ function InlineApplicationForm({
               }}
             />
             <span>
-              I consent to SmartHire sharing this application with the hiring
-              company.
+              {copy.consentText}
               <RequiredMark />
             </span>
           </label>
@@ -894,25 +899,21 @@ function InlineApplicationForm({
               id="application-ai-consent"
               name="aiAnalysisConsent"
               type="checkbox"
-              aria-label="I agree to let SmartHire use AI to analyze how well my CV matches this role."
+              aria-label={copy.aiConsentAria}
               checked={aiConsent}
               onChange={(event) => setAiConsent(event.currentTarget.checked)}
             />
             <span>
-              I agree to let SmartHire use AI to analyze how well my CV matches
-              this role.{" "}
+              {copy.aiConsentText}{" "}
               <Link href="/legal/ai-cv-analysis-policy" target="_blank">
-                Learn more
+                {copy.learnMore}
               </Link>
             </span>
           </label>
-          <p className="job-form-help">
-            Optional. If you do not select this, your CV will be submitted
-            without an AI match score.
-          </p>
+          <p className="job-form-help">{copy.aiConsentHint}</p>
         </div>
         <button type="submit" disabled={submitDisabled}>
-          {pending ? "Submitting..." : "Submit application"}
+          {pending ? copy.submitting : copy.submitApplication}
         </button>
       </div>
     </form>
@@ -934,6 +935,8 @@ export function ApplyFormSection({
   onOpenChange: (open: boolean) => void;
   onSubmitted?: (outcome: ApplicationOutcome) => void;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = jobApplicationCopy(locale);
   const shared = useOptionalJobInteraction();
   const [form, setForm] = useState<ApplicationForm | null>(null);
   const [outcome, setOutcome] = useState<ApplicationOutcome | null>(null);
@@ -1015,12 +1018,7 @@ export function ApplyFormSection({
       .then(async (response) => {
         const body: unknown = await response.json();
         if (!response.ok) {
-          const problem = body as { message?: unknown };
-          throw new Error(
-            typeof problem.message === "string"
-              ? problem.message
-              : "Unable to load the application form.",
-          );
+          throw new Error(copy.errors.loadForm);
         }
         return body;
       })
@@ -1030,15 +1028,24 @@ export function ApplyFormSection({
       .catch((caught: unknown) => {
         if (active)
           setLoadError(
-            caught instanceof Error
+            locale === "en" && caught instanceof Error
               ? caught.message
-              : "Unable to load the application form.",
+              : copy.errors.loadForm,
           );
       });
     return () => {
       active = false;
     };
-  }, [applied, form, jobId, loadError, open, outcome]);
+  }, [
+    applied,
+    copy.errors.loadForm,
+    form,
+    jobId,
+    loadError,
+    locale,
+    open,
+    outcome,
+  ]);
 
   function handleSubmitted(submitted: ApplicationOutcome) {
     setOutcome(submitted);
@@ -1093,14 +1100,14 @@ export function ApplyFormSection({
       >
         <header className="job-apply-modal-header">
           <div>
-            <p className="panel-kicker">Apply</p>
-            <h2 id={headingId}>Apply for {jobTitle}</h2>
-            <p>Complete your application on SmartHire.</p>
+            <p className="panel-kicker">{copy.applyKicker}</p>
+            <h2 id={headingId}>{copy.applyFor(jobTitle)}</h2>
+            <p>{copy.completeApplication}</p>
           </div>
           <button
             type="button"
             className="job-icon-button"
-            aria-label="Close application form"
+            aria-label={copy.closeApplicationForm}
             disabled={closing || applicationBusy}
             aria-describedby={
               applicationBusy ? "job-apply-close-hint" : undefined
@@ -1113,41 +1120,36 @@ export function ApplyFormSection({
 
         {applicationBusy ? (
           <p id="job-apply-close-hint" className="sr-only">
-            Please wait for the current application action to finish before
-            closing.
+            {copy.closeWait}
           </p>
         ) : null}
 
         <div className="job-apply-modal-body">
           {open && !form && !outcome && !applied && !loadError ? (
             <p className="job-feedback job-feedback-info" role="status">
-              Preparing the application form...
+              {copy.preparing}
             </p>
           ) : loadError ? (
             <div className="job-feedback" role="alert">
               <p>{loadError}</p>
               <button type="button" onClick={() => setLoadError(null)}>
-                Try again
+                {copy.tryAgain}
               </button>
             </div>
           ) : outcome ? (
             <div className="job-application-confirmation" role="status">
-              <strong>
-                Application submitted successfully for{" "}
-                {form?.jobTitle ?? jobTitle}.
-              </strong>
-              <p>
-                The employer will contact you if there is a match. You can
-                follow the application status from Applications.
-              </p>
+              <strong>{copy.successTitle(form?.jobTitle ?? jobTitle)}</strong>
+              <p>{copy.successDescription}</p>
             </div>
           ) : applied ? (
             <div className="job-application-confirmation" role="status">
-              You have already applied for this role.
+              {copy.alreadyApplied}
             </div>
           ) : form ? (
             <InlineApplicationForm
               form={form}
+              copy={copy}
+              locale={locale}
               onProfileSaved={handleProfileSaved}
               contactDraft={contactDraft}
               onContactChange={handleContactChange}

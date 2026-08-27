@@ -11,6 +11,7 @@ import {
   type JobSearchCriteria,
 } from "./job-search-form";
 import { JobResultsList } from "./job-results-list";
+import { JobSearchEmptyState } from "./job-search-empty-state";
 import { JobsWorkspaceNav } from "./jobs-workspace";
 import type { JobSearchTaxonomy } from "@/shared/contracts/jobs/taxonomy";
 import { JOB_SEARCH_CRITERIA_CHANGED_EVENT } from "./job-search-events";
@@ -63,13 +64,38 @@ export type JobsLiveCopy = Readonly<{
   lastPage: string;
   page: string;
   perPage: string;
+  resultPages: string;
   empty: string;
   emptyCopy: string;
+  resetSearch: string;
+  emptyPage: string;
+  emptyPageCopy: string;
   clear: string;
 }>;
 
 function one(value: string | string[] | number | undefined) {
   return Array.isArray(value) ? value[0] : value?.toString();
+}
+
+const defaultCriteriaValues: Record<string, string> = {
+  searchBy: "BOTH",
+  sort: "RELEVANCE",
+  salaryCurrency: "VND",
+  salaryPeriod: "MONTH",
+  limit: "20",
+};
+
+function hasActiveSearchCriteria(criteria: JobSearchCriteria) {
+  return Object.entries(criteria).some(([name, rawValue]) => {
+    const values = (Array.isArray(rawValue) ? rawValue : [rawValue])
+      .filter((value): value is string | number => value !== undefined)
+      .map(String)
+      .filter(Boolean);
+    if (!values.length) return false;
+
+    const defaultValue = defaultCriteriaValues[name];
+    return values.some((value) => value !== defaultValue);
+  });
 }
 
 export function criteriaFromSearchParams(
@@ -297,6 +323,16 @@ export function LiveJobSearchExperience({
   }, [cancelPendingRequest, fetchJobs]);
 
   const hasResults = Boolean(result?.items.length);
+  const isNoMatch = Boolean(
+    result && result.total === 0 && result.items.length === 0,
+  );
+  const isEmptyPage = Boolean(
+    result && result.total > 0 && result.items.length === 0,
+  );
+  const isEmptyView = Boolean(
+    !error && !isLoading && (isNoMatch || isEmptyPage),
+  );
+  const hasResettableCriteria = hasActiveSearchCriteria(criteria);
   const total = result?.total;
   const resultSummary =
     total === undefined ? "" : `${total} ${copy.opportunities}`;
@@ -316,6 +352,10 @@ export function LiveJobSearchExperience({
   ] as const;
   const activeSort =
     sortOptions.find(([value]) => value === sort) ?? sortOptions[0];
+  const emptyPageAction =
+    page > 1
+      ? { label: copy.firstPage, onClick: () => goToPage(1) }
+      : { label: copy.retry, onClick: retry };
 
   return (
     <>
@@ -358,71 +398,77 @@ export function LiveJobSearchExperience({
           aria-labelledby="job-results-heading"
           aria-busy={isLoading}
         >
-          <div
-            className="job-results-toolbar"
-            aria-label={
-              copy.locale === "vi"
-                ? "Tùy chọn sắp xếp kết quả"
-                : "Search result sorting"
-            }
-          >
-            <div className="job-results-sort">
-              <span>{copy.locale === "vi" ? "Sắp xếp theo:" : "Sort by:"}</span>
-              <button
-                type="button"
-                aria-expanded={sortMenuOpen}
-                aria-haspopup="listbox"
-                onClick={() => setSortMenuOpen((open) => !open)}
-              >
-                {copy.locale === "vi" ? activeSort[1] : activeSort[2]}
-                <svg
-                  className="job-results-sort-chevron"
-                  viewBox="0 0 20 20"
-                  aria-hidden="true"
+          {!isEmptyView ? (
+            <div
+              className="job-results-toolbar"
+              aria-label={
+                copy.locale === "vi"
+                  ? "Tùy chọn sắp xếp kết quả"
+                  : "Search result sorting"
+              }
+            >
+              <div className="job-results-sort">
+                <span>
+                  {copy.locale === "vi" ? "Sắp xếp theo:" : "Sort by:"}
+                </span>
+                <button
+                  type="button"
+                  aria-expanded={sortMenuOpen}
+                  aria-haspopup="listbox"
+                  onClick={() => setSortMenuOpen((open) => !open)}
                 >
-                  <path d="m5.5 7.5 4.5 4.5 4.5-4.5" />
-                </svg>
-              </button>
-              {sortMenuOpen ? (
-                <div
-                  className="job-results-sort-menu"
-                  role="listbox"
-                  aria-label={
-                    copy.locale === "vi"
-                      ? "Các tùy chọn sắp xếp"
-                      : "Sort options"
-                  }
-                >
-                  {sortOptions.map(([value, vietnamese, english]) => (
-                    <button
-                      key={value}
-                      type="button"
-                      role="option"
-                      aria-selected={sort === value}
-                      onClick={() => {
-                        setSortMenuOpen(false);
-                        runCriteriaChange(
-                          { ...criteria, sort: value },
-                          "immediate",
-                        );
-                      }}
-                    >
-                      <span>{copy.locale === "vi" ? vietnamese : english}</span>
-                      {sort === value ? (
-                        <strong
-                          aria-label={
-                            copy.locale === "vi" ? "Đang chọn" : "Selected"
-                          }
-                        >
-                          ✓
-                        </strong>
-                      ) : null}
-                    </button>
-                  ))}
-                </div>
-              ) : null}
+                  {copy.locale === "vi" ? activeSort[1] : activeSort[2]}
+                  <svg
+                    className="job-results-sort-chevron"
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                  >
+                    <path d="m5.5 7.5 4.5 4.5 4.5-4.5" />
+                  </svg>
+                </button>
+                {sortMenuOpen ? (
+                  <div
+                    className="job-results-sort-menu"
+                    role="listbox"
+                    aria-label={
+                      copy.locale === "vi"
+                        ? "Các tùy chọn sắp xếp"
+                        : "Sort options"
+                    }
+                  >
+                    {sortOptions.map(([value, vietnamese, english]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        role="option"
+                        aria-selected={sort === value}
+                        onClick={() => {
+                          setSortMenuOpen(false);
+                          runCriteriaChange(
+                            { ...criteria, sort: value },
+                            "immediate",
+                          );
+                        }}
+                      >
+                        <span>
+                          {copy.locale === "vi" ? vietnamese : english}
+                        </span>
+                        {sort === value ? (
+                          <strong
+                            aria-label={
+                              copy.locale === "vi" ? "Đang chọn" : "Selected"
+                            }
+                          >
+                            ✓
+                          </strong>
+                        ) : null}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
             </div>
-          </div>
+          ) : null}
           <header className="job-results-header">
             <p className="panel-kicker" id="job-results-heading">
               {error ? copy.loadFailed : copy.results}
@@ -469,7 +515,7 @@ export function LiveJobSearchExperience({
                 {result.totalPages > 1 ? (
                   <nav
                     className="job-pagination job-pagination--compact"
-                    aria-label="Job result pages"
+                    aria-label={copy.resultPages}
                   >
                     <div className="job-pagination-summary">
                       <span>
@@ -581,25 +627,24 @@ export function LiveJobSearchExperience({
                   </nav>
                 ) : null}
               </>
-            ) : !error && !isLoading ? (
-              <div className="job-panel job-empty-state">
-                <span className="job-empty-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M4 7.5h16v11H4zM8 7.5V5.8A1.8 1.8 0 0 1 9.8 4h4.4A1.8 1.8 0 0 1 16 5.8v1.7M4 12h16" />
-                  </svg>
-                </span>
-                <h3>{copy.empty}</h3>
-                <p>{copy.emptyCopy}</p>
-                <div className="job-empty-actions">
-                  <button
-                    className="job-secondary-link"
-                    type="button"
-                    onClick={clearFilters}
-                  >
-                    {copy.clear}
-                  </button>
-                </div>
-              </div>
+            ) : isNoMatch ? (
+              <JobSearchEmptyState
+                headingId="job-search-empty-heading"
+                title={copy.empty}
+                description={copy.emptyCopy}
+                action={
+                  hasResettableCriteria
+                    ? { label: copy.resetSearch, onClick: clearFilters }
+                    : undefined
+                }
+              />
+            ) : isEmptyPage ? (
+              <JobSearchEmptyState
+                headingId="job-search-empty-heading"
+                title={copy.emptyPage}
+                description={copy.emptyPageCopy}
+                action={emptyPageAction}
+              />
             ) : null}
           </div>
         </section>

@@ -97,7 +97,7 @@ def test_rejects_unknown_headers_wrong_purpose_and_expired_deadline() -> None:
         headers=headers(**{"x-ocr-purpose": "GENERIC_OCR"}),
         content=FIXTURE_PNG,
     ).status_code == 400
-    assert client.post(
+    expired = client.post(
         "/v1/recognitions",
         headers=headers(
             **{
@@ -107,7 +107,11 @@ def test_rejects_unknown_headers_wrong_purpose_and_expired_deadline() -> None:
             }
         ),
         content=FIXTURE_PNG,
-    ).status_code == 400
+    )
+    assert expired.status_code == 422
+    assert expired.json() == {
+        "error": {"code": "DEADLINE_EXCEEDED", "retryable": True}
+    }
     assert client.post(
         "/v1/recognitions",
         headers=headers(**{"x-untrusted-owner": "candidate"}),

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import type { RankedApplicationRow } from "@/shared/contracts/scoring";
 import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import {
@@ -44,6 +45,10 @@ import {
   applicationShortlistOutcomeSchema,
   applicationViewedOutcomeSchema,
 } from "@/shared/contracts/jobs/applications";
+import {
+  recruiterApplicationsCopy,
+  type RecruiterApplicationsCopy,
+} from "./recruiter-applications-copy";
 
 const defaultQuery: RankedCandidateQuery = {
   sort: "FINAL_SCORE",
@@ -51,14 +56,19 @@ const defaultQuery: RankedCandidateQuery = {
   scoringStatus: "ALL",
 };
 
-function formatLastScoredAt(value: string | null | undefined) {
-  if (!value) return "Not yet scored";
+function formatLastScoredAt(
+  value: string | null | undefined,
+  locale: "vi" | "en",
+  copy: RecruiterApplicationsCopy["ranking"],
+) {
+  if (!value) return copy.notScored;
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Unavailable";
-  return `${date.toLocaleTimeString("en-GB", {
+  if (Number.isNaN(date.getTime())) return copy.unavailable;
+  const dateLocale = locale === "vi" ? "vi-VN" : "en-GB";
+  return `${date.toLocaleTimeString(dateLocale, {
     hour: "2-digit",
     minute: "2-digit",
-  })}, ${date.toLocaleDateString("en-GB", {
+  })}, ${date.toLocaleDateString(dateLocale, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -103,6 +113,7 @@ function Pagination({
   onPrevious,
   onNext,
   onPageSize,
+  copy,
 }: {
   pageIndex: number;
   pageSize: number;
@@ -113,17 +124,16 @@ function Pagination({
   onPrevious: () => void;
   onNext: () => void;
   onPageSize: (value: number) => void;
+  copy: RecruiterApplicationsCopy["ranking"];
 }) {
   const start = total === 0 ? 0 : pageIndex * pageSize + 1;
   const end = Math.min((pageIndex + 1) * pageSize, total);
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
   return (
     <footer className="ranking-pagination">
-      <span>
-        Showing {start}–{end} of {total} candidates
-      </span>
+      <span>{copy.pagination.showing(start, end, total)}</span>
       <label className="ranking-pagination__page-size">
-        <span className="sr-only">Candidates per page</span>
+        <span className="sr-only">{copy.pagination.perPage}</span>
         <select
           value={pageSize}
           onChange={(event) => onPageSize(Number(event.target.value))}
@@ -133,12 +143,12 @@ function Pagination({
           <option value={25}>25 / page</option>
         </select>
       </label>
-      <nav className="ranking-pager" aria-label="Pagination">
+      <nav className="ranking-pager" aria-label={copy.paginationLabel}>
         <button
           type="button"
           onClick={onPrevious}
           disabled={!hasPrevious}
-          aria-label="Previous page"
+          aria-label={copy.pagination.previous}
         >
           <ChevronLeft aria-hidden="true" />
         </button>
@@ -157,7 +167,7 @@ function Pagination({
               className={item === pageIndex ? "is-current" : undefined}
               key={item}
               onClick={() => onPage(item)}
-              aria-label={`Page ${item + 1}`}
+              aria-label={copy.pagination.page(item + 1)}
               aria-current={item === pageIndex ? "page" : undefined}
             >
               {item + 1}
@@ -168,7 +178,7 @@ function Pagination({
           type="button"
           onClick={onNext}
           disabled={!hasNext}
-          aria-label="Next page"
+          aria-label={copy.pagination.next}
         >
           <ChevronRight aria-hidden="true" />
         </button>
@@ -177,21 +187,25 @@ function Pagination({
   );
 }
 
-function RankingLoadingState() {
+function RankingLoadingState({
+  copy,
+}: {
+  copy: RecruiterApplicationsCopy["ranking"];
+}) {
   return (
     <div
       className="ranking-loading-state"
       role="status"
-      aria-label="Loading candidate ranking"
+      aria-label={copy.loading}
     >
       <div className="ranking-loading-state__stats">
         {(
           [
-            "Total candidates",
-            "Strong match",
-            "Review needed",
-            "Low match",
-            "Processing",
+            copy.stats.total,
+            copy.stats.strong,
+            copy.stats.review,
+            copy.stats.low,
+            copy.stats.processing,
           ] as const
         ).map((label) => (
           <article className="ranking-stat-card" key={label}>
@@ -213,8 +227,8 @@ function RankingLoadingState() {
         ))}
       </div>
       <span className="ranking-loading-state__label">
-        <LoaderCircle aria-hidden="true" className="is-spinning" /> Preparing
-        the current filters and score order…
+        <LoaderCircle aria-hidden="true" className="is-spinning" />{" "}
+        {copy.preparing}
       </span>
     </div>
   );
@@ -223,21 +237,23 @@ function RankingLoadingState() {
 function RankingErrorState({
   message,
   onRetry,
+  copy,
 }: {
   message: string;
   onRetry: () => void;
+  copy: RecruiterApplicationsCopy["ranking"];
 }) {
   return (
     <div className="ranking-empty-state" role="alert">
       <CircleX aria-hidden="true" />
-      <h2>Candidate ranking could not be loaded</h2>
+      <h2>{copy.loadError}</h2>
       <p>{message}</p>
       <button
         type="button"
         className="ai-ranking-button ai-ranking-button--secondary"
         onClick={onRetry}
       >
-        Retry
+        {copy.retry}
       </button>
     </div>
   );
@@ -247,12 +263,16 @@ function CandidateRow({
   row,
   rank,
   onOpen,
+  copy,
+  locale,
 }: {
   row: RankedApplicationRow;
   rank: number;
   onOpen: () => void;
+  copy: RecruiterApplicationsCopy["ranking"];
+  locale: "vi" | "en";
 }) {
-  const badge = scoreBadgeForRow(row);
+  const badge = scoreBadgeForRow(row, locale);
   const isProcessing =
     row.scoring.kind === "PROCESSING" || row.scoring.kind === "PENDING";
   const skills = row.skills.slice(0, 2);
@@ -276,14 +296,14 @@ function CandidateRow({
       <span
         className="ranking-table__cell ranking-table__rank"
         role="cell"
-        data-label="Rank"
+        data-label={copy.table.rank}
       >
         {rank}
       </span>
       <span
         className="ranking-table__cell ranking-candidate-cell"
         role="cell"
-        data-label="Candidate"
+        data-label={copy.table.candidate}
       >
         <span className="ranking-avatar" aria-hidden="true">
           {row.candidate.displayName.slice(0, 1).toUpperCase()}
@@ -293,12 +313,16 @@ function CandidateRow({
           <small>{row.candidate.verifiedEmail}</small>
           {row.manuallyPrioritized ? (
             <span className="ranking-manual-priority">
-              <Plus aria-hidden="true" /> Manually prioritized
+              <Plus aria-hidden="true" /> {copy.table.manuallyPrioritized}
             </span>
           ) : null}
         </span>
       </span>
-      <span className="ranking-table__cell" role="cell" data-label="Status">
+      <span
+        className="ranking-table__cell"
+        role="cell"
+        data-label={copy.table.status}
+      >
         <span
           className={[
             "ranking-status-pill",
@@ -308,24 +332,24 @@ function CandidateRow({
             .filter(Boolean)
             .join(" ")}
         >
-          {statusLabel(row.stage, row.withdrawalOutcome)}
+          {statusLabel(row.stage, row.withdrawalOutcome, locale)}
         </span>
       </span>
       <span
         className="ranking-table__cell ranking-table__experience"
         role="cell"
-        data-label="Experience"
+        data-label={copy.table.experience}
       >
         {isProcessing || row.experienceYears === null ? (
           <span className="ranking-muted-text">{"\u2014"}</span>
         ) : (
-          `${row.experienceYears} ${row.experienceYears === 1 ? "year" : "years"}`
+          `${row.experienceYears} ${copy.table.year}${row.experienceYears === 1 ? "" : locale === "vi" ? "" : "s"}`
         )}
       </span>
       <span
         className="ranking-table__cell ranking-skills-cell"
         role="cell"
-        data-label="Key skills"
+        data-label={copy.table.keySkills}
       >
         {skills.length ? (
           <span
@@ -334,34 +358,34 @@ function CandidateRow({
             aria-label={skillsLabel}
           >
             {skills.join(", ")}
-            {extraSkills ? ` +${extraSkills} more` : ""}
+            {extraSkills ? ` ${copy.table.more(extraSkills)}` : ""}
           </span>
         ) : (
           <span className="ranking-muted-text">
             {row.scoring.kind === "PROCESSING" || row.scoring.kind === "PENDING"
-              ? "Extracting skills"
-              : "Not detected"}
+              ? copy.table.extractingSkills
+              : copy.table.notDetected}
           </span>
         )}
       </span>
       <span
         className="ranking-table__cell ranking-score-number"
         role="cell"
-        data-label="Auto match"
+        data-label={copy.table.autoMatch}
       >
         {isProcessing ? "\u2014" : formatTableScore(row.scoreSummary.automatic)}
       </span>
       <span
         className="ranking-table__cell ranking-score-number ranking-score-number--ai"
         role="cell"
-        data-label="AI"
+        data-label={copy.table.ai}
       >
         {isProcessing ? "\u2014" : formatTableScore(row.scoreSummary.ai)}
       </span>
       <span
         className="ranking-table__cell ranking-final-score"
         role="cell"
-        data-label="Final score"
+        data-label={copy.table.finalScore}
       >
         <strong>
           {isProcessing ? "\u2014" : formatScore(row.scoreSummary.final)}
@@ -371,14 +395,17 @@ function CandidateRow({
       <span
         className="ranking-table__cell ranking-applied-date"
         role="cell"
-        data-label="Applied"
+        data-label={copy.table.applied}
       >
         <time dateTime={row.submittedAt}>
-          {new Date(row.submittedAt).toLocaleDateString("en-US", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })}
+          {new Date(row.submittedAt).toLocaleDateString(
+            locale === "vi" ? "vi-VN" : "en-US",
+            {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            },
+          )}
         </time>
       </span>
     </div>
@@ -400,6 +427,8 @@ export function CandidateRankingList({
   csrfProof?: string;
   pipelineHref?: string;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = recruiterApplicationsCopy(locale).ranking;
   const contextCsrfProof = useCsrfProof();
   const effectiveCsrfProof = csrfProof ?? contextCsrfProof;
   const [query, setQuery] = useState<RankedCandidateQuery>(defaultQuery);
@@ -412,7 +441,7 @@ export function CandidateRankingList({
     "rescore" | "priority" | "interview" | "reject" | null
   >(null);
   const [message, setMessage] = useState<string | null>(null);
-  const ranking = useRankedCandidates(jobId, query, pageSize);
+  const ranking = useRankedCandidates(jobId, query, pageSize, locale);
   const page = ranking.page;
   const {
     loading: rankingLoading,
@@ -493,8 +522,8 @@ export function CandidateRankingList({
     if (!response.ok || !payload?.id) {
       throw new Error(
         payload?.code === "APPLICATION_NOT_READY"
-          ? "Open the candidate details until the application is marked viewed before starting a conversation."
-          : "The recruitment conversation could not be opened.",
+          ? copy.actionMessages.conversationNotReady
+          : copy.actionMessages.conversationUnavailable,
       );
     }
     window.location.assign(
@@ -510,9 +539,7 @@ export function CandidateRankingList({
     );
     const payload = await response.json().catch(() => null);
     if (!response.ok) {
-      throw new Error(
-        payload?.message ?? "The candidate could not be shortlisted.",
-      );
+      throw new Error(copy.actionMessages.shortlistFailed);
     }
     const result = applicationShortlistOutcomeSchema.parse(payload);
     setSelected((current) =>
@@ -557,10 +584,10 @@ export function CandidateRankingList({
     >
       <header className="ai-ranking-page-header">
         <div>
-          <nav className="ranking-breadcrumbs" aria-label="Breadcrumb">
-            <Link href={recruiterRoutes.jobPostings}>Recruitment</Link>
+          <nav className="ranking-breadcrumbs" aria-label={copy.breadcrumb}>
+            <Link href={recruiterRoutes.jobPostings}>{copy.recruitment}</Link>
             <span aria-hidden="true">/</span>
-            <Link href={recruiterRoutes.candidates}>Campaigns</Link>
+            <Link href={recruiterRoutes.candidates}>{copy.campaigns}</Link>
             <span aria-hidden="true">/</span>
             {backHref ? (
               <Link href={backHref}>{jobTitle}</Link>
@@ -576,15 +603,17 @@ export function CandidateRankingList({
               <Link href={recruiterRoutes.candidates}>{jobTitle}</Link>
             )}
             <span aria-hidden="true">/</span>
-            <span aria-current="page">Candidates</span>
+            <span aria-current="page">{copy.candidates}</span>
           </nav>
           <h1 id="candidate-ranking-title">
             Candidates {"\u2013"} {jobTitle}
           </h1>
           <p className="ranking-last-scored">
-            {page?.totalCandidates?.toLocaleString("en-US") ?? "\u2014"}{" "}
-            applications {"\u00b7"} Last scored:{" "}
-            {formatLastScoredAt(page?.lastScoredAt)}
+            {page?.totalCandidates?.toLocaleString(
+              locale === "vi" ? "vi-VN" : "en-US",
+            ) ?? "\u2014"}{" "}
+            {copy.applications} {"\u00b7"} {copy.lastScored}:{" "}
+            {formatLastScoredAt(page?.lastScoredAt, locale, copy)}
           </p>
         </div>
         <div className="ranking-header-actions">
@@ -593,7 +622,7 @@ export function CandidateRankingList({
               href={pipelineHref}
               className="ai-ranking-button ai-ranking-button--secondary"
             >
-              View pipeline
+              {copy.viewPipeline}
             </Link>
           ) : null}
           <button
@@ -606,7 +635,7 @@ export function CandidateRankingList({
               aria-hidden="true"
               className={rankingRefreshing ? "is-spinning" : undefined}
             />
-            {rankingRefreshing ? "Refreshing…" : "Refresh"}
+            {rankingRefreshing ? copy.refreshing : copy.refresh}
           </button>
           <button
             type="button"
@@ -618,7 +647,7 @@ export function CandidateRankingList({
               aria-hidden="true"
               className={page?.rescoreInProgress ? "is-spinning" : undefined}
             />
-            {page?.rescoreInProgress ? "Rescoring…" : "Rescore candidates"}
+            {page?.rescoreInProgress ? copy.rescoring : copy.rescoreCandidates}
           </button>
         </div>
       </header>
@@ -631,7 +660,7 @@ export function CandidateRankingList({
           <button
             type="button"
             onClick={() => setMessage(null)}
-            aria-label="Dismiss message"
+            aria-label={copy.dismissMessage}
           >
             <X aria-hidden="true" />
           </button>
@@ -641,49 +670,52 @@ export function CandidateRankingList({
         <div className="ranking-progress-banner" role="status">
           <RefreshCw aria-hidden="true" className="is-spinning" />
           <span>
-            <strong>Rescoring in progress</strong> Results will update
-            automatically. Current scores stay visible until replacements are
-            ready.
+            <strong>{copy.rescoreProgress}</strong>{" "}
+            {copy.rescoreProgressDescription}
           </span>
         </div>
       ) : null}
 
       {!page ? (
         ranking.error ? (
-          <RankingErrorState message={ranking.error} onRetry={ranking.retry} />
+          <RankingErrorState
+            message={copy.loadError}
+            onRetry={ranking.retry}
+            copy={copy}
+          />
         ) : (
-          <RankingLoadingState />
+          <RankingLoadingState copy={copy} />
         )
       ) : (
         <>
           <div className="ranking-summary-grid">
             <StatCard
               icon={CircleDot}
-              label="Total candidates"
+              label={copy.stats.total}
               value={page?.summary.total}
               tone="blue"
             />
             <StatCard
               icon={CheckCircle2}
-              label="Strong match"
+              label={copy.stats.strong}
               value={page?.summary.strong}
               tone="green"
             />
             <StatCard
               icon={AlertCircle}
-              label="Review needed"
+              label={copy.stats.review}
               value={page?.summary.review}
               tone="amber"
             />
             <StatCard
               icon={CircleX}
-              label="Low match"
+              label={copy.stats.low}
               value={page?.summary.low}
               tone="red"
             />
             <StatCard
               icon={LoaderCircle}
-              label="Processing"
+              label={copy.stats.processing}
               value={page?.summary.processing}
               tone="purple"
             />
@@ -692,20 +724,20 @@ export function CandidateRankingList({
           <form className="ranking-filter-bar" onSubmit={submitSearch}>
             <div className="ranking-filter-row ranking-filter-row--primary">
               <label className="ranking-filter-field ranking-search-field">
-                <span>Search</span>
+                <span>{copy.filters.search}</span>
                 <span className="ranking-input-wrap">
                   <Search aria-hidden="true" />
                   <input
                     value={searchDraft}
                     onChange={(event) => setSearchDraft(event.target.value)}
-                    placeholder="Search by name, email, or skill"
+                    placeholder={copy.filters.searchPlaceholder}
                   />
                 </span>
               </label>
               <label className="ranking-filter-field">
-                <span>Total score</span>
+                <span>{copy.filters.totalScore}</span>
                 <select
-                  aria-label="Total score"
+                  aria-label={copy.filters.totalScore}
                   value={
                     query.minScore === undefined
                       ? ""
@@ -713,16 +745,16 @@ export function CandidateRankingList({
                   }
                   onChange={(event) => setScoreRange(event.target.value)}
                 >
-                  <option value="">Any score</option>
+                  <option value="">{copy.filters.anyScore}</option>
                   <option value="80-100">80–100</option>
                   <option value="60-79.99">60–79.99</option>
                   <option value="0-59.99">0–59.99</option>
                 </select>
               </label>
               <label className="ranking-filter-field">
-                <span>Required skills</span>
+                <span>{copy.filters.requiredSkills}</span>
                 <select
-                  aria-label="Required skills"
+                  aria-label={copy.filters.requiredSkills}
                   value={skillDraft}
                   onChange={(event) => {
                     const value = event.target.value;
@@ -730,7 +762,7 @@ export function CandidateRankingList({
                     updateQuery({ skill: value || undefined });
                   }}
                 >
-                  <option value="">Any required skill</option>
+                  <option value="">{copy.filters.anyRequiredSkill}</option>
                   {skillOptions.map((skill) => (
                     <option value={skill} key={skill}>
                       {skill}
@@ -739,7 +771,7 @@ export function CandidateRankingList({
                 </select>
               </label>
               <label className="ranking-filter-field">
-                <span>Experience</span>
+                <span>{copy.filters.experience}</span>
                 <select
                   value={
                     query.minExperience === undefined ? "" : query.minExperience
@@ -752,11 +784,11 @@ export function CandidateRankingList({
                     })
                   }
                 >
-                  <option value="">Any experience</option>
-                  <option value="1">1+ years</option>
-                  <option value="3">3+ years</option>
-                  <option value="5">5+ years</option>
-                  <option value="8">8+ years</option>
+                  <option value="">{copy.filters.anyExperience}</option>
+                  <option value="1">{copy.filters.years(1)}</option>
+                  <option value="3">{copy.filters.years(3)}</option>
+                  <option value="5">{copy.filters.years(5)}</option>
+                  <option value="8">{copy.filters.years(8)}</option>
                 </select>
               </label>
               <button
@@ -764,12 +796,12 @@ export function CandidateRankingList({
                 className="ranking-clear-filters"
                 onClick={clearFilters}
               >
-                <X aria-hidden="true" /> Clear filters
+                <X aria-hidden="true" /> {copy.filters.clearFilters}
               </button>
             </div>
             <div className="ranking-filter-row ranking-filter-row--secondary">
               <label className="ranking-filter-field">
-                <span>Recruitment status</span>
+                <span>{copy.filters.recruitmentStatus}</span>
                 <select
                   value={query.stage}
                   onChange={(event) =>
@@ -779,19 +811,27 @@ export function CandidateRankingList({
                     })
                   }
                 >
-                  <option value="ACTIVE_PIPELINE">Active pipeline</option>
-                  <option value="ALL">All statuses</option>
-                  <option value="APPLIED">New</option>
-                  <option value="VIEWED">Viewed</option>
-                  <option value="SHORTLISTED">Shortlisted</option>
-                  <option value="WAITLISTED">Needs details</option>
-                  <option value="INTERVIEWING">Interviewing</option>
-                  <option value="REJECTED">Rejected</option>
-                  <option value="WITHDRAWN">Withdrawn</option>
+                  <option value="ACTIVE_PIPELINE">
+                    {copy.filters.activePipeline}
+                  </option>
+                  <option value="ALL">{copy.filters.allStatuses}</option>
+                  <option value="APPLIED">{copy.filters.new}</option>
+                  <option value="VIEWED">{copy.filters.viewed}</option>
+                  <option value="SHORTLISTED">
+                    {copy.filters.shortlisted}
+                  </option>
+                  <option value="WAITLISTED">
+                    {copy.filters.needsDetails}
+                  </option>
+                  <option value="INTERVIEWING">
+                    {copy.filters.interviewing}
+                  </option>
+                  <option value="REJECTED">{copy.filters.rejected}</option>
+                  <option value="WITHDRAWN">{copy.filters.withdrawn}</option>
                 </select>
               </label>
               <label className="ranking-filter-field">
-                <span>Scoring status</span>
+                <span>{copy.filters.scoringStatus}</span>
                 <select
                   value={query.scoringStatus}
                   onChange={(event) =>
@@ -801,20 +841,23 @@ export function CandidateRankingList({
                     })
                   }
                 >
-                  <option value="ALL">All scoring states</option>
-                  <option value="PROCESSING">Processing</option>
-                  <option value="SCORED">Scored</option>
-                  <option value="UNAVAILABLE">AI unavailable</option>
-                  <option value="FAILED">Scoring failed</option>
-                  <option value="NOT_CALCULATED">Not calculated</option>
+                  <option value="ALL">{copy.filters.allScoringStates}</option>
+                  <option value="PROCESSING">{copy.filters.processing}</option>
+                  <option value="SCORED">{copy.filters.scored}</option>
+                  <option value="UNAVAILABLE">
+                    {copy.filters.aiUnavailable}
+                  </option>
+                  <option value="FAILED">{copy.filters.scoringFailed}</option>
+                  <option value="NOT_CALCULATED">
+                    {copy.filters.notCalculated}
+                  </option>
                 </select>
               </label>
               <p className="ranking-filter-results" role="status">
-                {resultCount.toLocaleString("en-US")} candidates match the
-                filters
+                {copy.filters.resultCount(resultCount)}
               </p>
               <label className="ranking-filter-field ranking-sort-field">
-                <span>Sort by</span>
+                <span>{copy.filters.sortBy}</span>
                 <span className="ranking-input-wrap">
                   <SlidersHorizontal aria-hidden="true" />
                   <select
@@ -826,9 +869,15 @@ export function CandidateRankingList({
                       })
                     }
                   >
-                    <option value="FINAL_SCORE">Highest final score</option>
-                    <option value="MANUAL_PRIORITY">Manual priority</option>
-                    <option value="SUBMITTED_AT">Most recently applied</option>
+                    <option value="FINAL_SCORE">
+                      {copy.filters.highestFinalScore}
+                    </option>
+                    <option value="MANUAL_PRIORITY">
+                      {copy.filters.manualPriority}
+                    </option>
+                    <option value="SUBMITTED_AT">
+                      {copy.filters.mostRecentlyApplied}
+                    </option>
                   </select>
                 </span>
               </label>
@@ -841,28 +890,28 @@ export function CandidateRankingList({
           >
             <Info aria-hidden="true" />
             <span>
-              <strong>Scores support decision-making only.</strong> The
-              recruiter makes the final decision.
+              <strong>{copy.trustTitle}</strong> {copy.trustDescription}
             </span>
           </div>
 
           {ranking.error ? (
             <RankingErrorState
-              message={ranking.error}
+              message={copy.loadError}
               onRetry={ranking.retry}
+              copy={copy}
             />
           ) : page && page.items.length === 0 ? (
             <div className="ranking-empty-state">
               <EmptyCandidatesIllustration />
               <h2>
                 {resultCount < (page?.totalCandidates ?? 0)
-                  ? "No candidates match these filters"
-                  : "No candidates have applied yet"}
+                  ? copy.empty.filteredTitle
+                  : copy.empty.noCandidatesTitle}
               </h2>
               <p>
                 {resultCount < (page?.totalCandidates ?? 0)
-                  ? "Try adjusting your score range or another filter."
-                  : "Candidates will appear here after they submit an application."}
+                  ? copy.empty.filteredDescription
+                  : copy.empty.noCandidatesDescription}
               </p>
               {resultCount < (page?.totalCandidates ?? 0) ? (
                 <button
@@ -870,7 +919,7 @@ export function CandidateRankingList({
                   className="ai-ranking-button ai-ranking-button--secondary"
                   onClick={clearFilters}
                 >
-                  Clear filters
+                  {copy.filters.clearFilters}
                 </button>
               ) : null}
             </div>
@@ -879,19 +928,19 @@ export function CandidateRankingList({
               <div
                 className="ranking-table"
                 role="table"
-                aria-label="Candidate ranking list"
+                aria-label={copy.candidates}
               >
                 <div className="ranking-table__head" role="row">
                   {[
-                    "Rank",
-                    "Candidate",
-                    "Status",
-                    "Experience",
-                    "Key skills",
-                    "Auto match",
-                    "AI",
-                    "Final score",
-                    "Applied",
+                    copy.table.rank,
+                    copy.table.candidate,
+                    copy.table.status,
+                    copy.table.experience,
+                    copy.table.keySkills,
+                    copy.table.autoMatch,
+                    copy.table.ai,
+                    copy.table.finalScore,
+                    copy.table.applied,
                   ].map((heading) => (
                     <span role="columnheader" key={heading}>
                       {heading}
@@ -903,6 +952,8 @@ export function CandidateRankingList({
                     key={row.applicationId}
                     row={row}
                     rank={index + 1 + ranking.pageIndex * pageSize}
+                    copy={copy}
+                    locale={locale}
                     onOpen={() =>
                       openRow(row, index + 1 + ranking.pageIndex * pageSize)
                     }
@@ -923,6 +974,7 @@ export function CandidateRankingList({
               onPrevious={ranking.previous}
               onNext={ranking.next}
               onPageSize={setPageSize}
+              copy={copy}
             />
           ) : null}
         </>
@@ -952,11 +1004,7 @@ export function CandidateRankingList({
           jobTitle={jobTitle}
           totalCount={page?.totalCandidates ?? 0}
           onCancel={() => setModal(null)}
-          onCompleted={() =>
-            finishAction(
-              "Background rescore started. Existing scores remain visible while results update.",
-            )
-          }
+          onCompleted={() => finishAction(copy.actionMessages.rescoreStarted)}
         />
       ) : null}
       {modal === "priority" && selected ? (
@@ -964,11 +1012,7 @@ export function CandidateRankingList({
           candidate={selected}
           suggestedRank={selectedRank ?? undefined}
           onCancel={() => setModal(null)}
-          onCompleted={() =>
-            finishAction(
-              "Manual priority saved and will be preserved during rescoring.",
-            )
-          }
+          onCompleted={() => finishAction(copy.actionMessages.prioritySaved)}
         />
       ) : null}
       {modal === "interview" && selected ? (
@@ -976,11 +1020,7 @@ export function CandidateRankingList({
           candidate={selected}
           jobId={jobId}
           onCancel={() => setModal(null)}
-          onCompleted={() =>
-            finishAction(
-              "Candidate moved to Interviewing. The stage history and notification were recorded.",
-            )
-          }
+          onCompleted={() => finishAction(copy.actionMessages.movedToInterview)}
         />
       ) : null}
       {modal === "reject" && selected ? (
@@ -989,9 +1029,7 @@ export function CandidateRankingList({
           jobId={jobId}
           onCancel={() => setModal(null)}
           onCompleted={() =>
-            finishAction(
-              "Candidate rejected. The reason was stored in stage history.",
-            )
+            finishAction(copy.actionMessages.candidateRejected)
           }
         />
       ) : null}

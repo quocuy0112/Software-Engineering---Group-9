@@ -11,7 +11,10 @@ import {
   type FormEvent,
 } from "react";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
-import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import {
+  useWorkspaceLocale,
+  type WorkspaceLocale,
+} from "@/frontend/features/dashboard/client/workspace-locale";
 import { CompanyAvatar } from "@/frontend/features/jobs/components/company-avatar";
 import {
   companyLogoSchema,
@@ -26,6 +29,10 @@ import {
   useRecruiterCompanyScope,
 } from "./recruiter-company-scope";
 import { getCompanyTeamCopy } from "./company-team-copy";
+import {
+  recruiterWorkspaceCopy,
+  type RecruiterWorkspaceCopy,
+} from "./recruiter-workspace-copy";
 
 type Props = {
   initialCompany: RecruiterCompanySettings | null;
@@ -61,6 +68,24 @@ const profileFields: Array<{ key: FieldName; label: string }> = [
   { key: "logo", label: "Company logo" },
 ];
 
+function companyProfileFieldLabel(
+  field: FieldName,
+  copy: RecruiterWorkspaceCopy,
+) {
+  switch (field) {
+    case "name":
+      return copy.companyName;
+    case "industry":
+      return copy.industry;
+    case "size":
+      return copy.companySize;
+    case "address":
+      return copy.address;
+    case "logo":
+      return copy.logo;
+  }
+}
+
 function formFromCompany(company: RecruiterCompanySettings): FormState {
   return {
     name: company.name,
@@ -85,12 +110,15 @@ function statusClass(status: RecruiterCompanySettings["verificationStatus"]) {
   return styles.badgeWarning;
 }
 
-function statusLabel(status: RecruiterCompanySettings["verificationStatus"]) {
+function statusLabel(
+  status: RecruiterCompanySettings["verificationStatus"],
+  copy: RecruiterWorkspaceCopy,
+) {
   return status === "approved"
-    ? "Approved"
+    ? copy.verificationStatus.approved
     : status === "rejected"
-      ? "Rejected"
-      : "Pending";
+      ? copy.verificationStatus.rejected
+      : copy.verificationStatus.pending;
 }
 
 function statusIcon(status: RecruiterCompanySettings["verificationStatus"]) {
@@ -104,22 +132,30 @@ type ProfileValidation = {
 
 export function getCompanyProfileValidation(
   form: FormState,
+  locale: WorkspaceLocale = "en",
 ): ProfileValidation {
+  const copy = recruiterWorkspaceCopy(locale);
   const missingFields: FieldName[] = [];
   const fieldErrors: Partial<Record<FieldName, string>> = {};
 
-  for (const { key, label } of profileFields) {
+  for (const { key } of profileFields) {
+    const label = companyProfileFieldLabel(key, copy);
     const value = form[key];
     if (typeof value !== "string" || value.trim().length === 0) {
       missingFields.push(key);
-      fieldErrors[key] = `${label} is required.`;
+      fieldErrors[key] =
+        locale === "vi"
+          ? `${label} là trường bắt buộc.`
+          : `${label} is required.`;
       continue;
     }
 
     if (key === "logo" && !companyLogoSchema.safeParse(value).success) {
       missingFields.push(key);
       fieldErrors[key] =
-        "Choose a saved PNG, JPEG, or WebP logo before posting a job.";
+        locale === "vi"
+          ? "Hãy chọn logo PNG, JPEG hoặc WebP đã lưu trước khi đăng tin tuyển dụng."
+          : "Choose a saved PNG, JPEG, or WebP logo before posting a job.";
     }
   }
 
@@ -139,42 +175,51 @@ export function getCompanyProfileValidation(
   return { missingFields, fieldErrors };
 }
 
-function validateForm(form: FormState): FieldErrors {
+function validateForm(
+  form: FormState,
+  locale: WorkspaceLocale = "en",
+): FieldErrors {
   const errors: FieldErrors = {};
-  Object.assign(errors, getCompanyProfileValidation(form).fieldErrors);
+  Object.assign(errors, getCompanyProfileValidation(form, locale).fieldErrors);
   if (form.website) {
     try {
       new URL(form.website);
     } catch {
-      errors.website = "Enter a valid website URL.";
+      errors.website =
+        locale === "vi"
+          ? "Hãy nhập URL website hợp lệ."
+          : "Enter a valid website URL.";
     }
   }
   return errors;
 }
 
-function readFileAsDataUrl(file: File) {
+function readFileAsDataUrl(file: File, copy: RecruiterWorkspaceCopy) {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === "string") resolve(reader.result);
-      else reject(new Error("The selected logo could not be read."));
+      else reject(new Error(copy.unableToSave));
     };
-    reader.onerror = () =>
-      reject(new Error("The selected logo could not be read."));
+    reader.onerror = () => reject(new Error(copy.unableToSave));
     reader.readAsDataURL(file);
   });
 }
 
-async function optimizeLogo(file: File) {
+async function optimizeLogo(file: File, locale: WorkspaceLocale) {
+  const copy = recruiterWorkspaceCopy(locale);
   if (!ACCEPTED_LOGO_TYPES.has(file.type) || file.size > MAX_LOGO_FILE_BYTES) {
-    throw new Error("Choose a PNG, JPEG, or WebP logo up to 5 MB.");
+    throw new Error(
+      locale === "vi"
+        ? "Hãy chọn logo PNG, JPEG hoặc WebP có dung lượng tối đa 5 MB."
+        : "Choose a PNG, JPEG, or WebP logo up to 5 MB.",
+    );
   }
-  const source = await readFileAsDataUrl(file);
+  const source = await readFileAsDataUrl(file, copy);
   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
     const loaded = new window.Image();
     loaded.onload = () => resolve(loaded);
-    loaded.onerror = () =>
-      reject(new Error("The selected logo could not be decoded."));
+    loaded.onerror = () => reject(new Error(copy.unableToSave));
     loaded.src = source;
   });
   const maxDimension = 512;
@@ -187,7 +232,11 @@ async function optimizeLogo(file: File) {
   canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
   const context = canvas.getContext("2d");
   if (!context)
-    throw new Error("The logo preview is unavailable in this browser.");
+    throw new Error(
+      locale === "vi"
+        ? "Không thể xem trước logo trong trình duyệt này."
+        : "The logo preview is unavailable in this browser.",
+    );
   context.drawImage(image, 0, 0, canvas.width, canvas.height);
   const webp = canvas.toDataURL("image/webp", 0.86);
   const result = webp.startsWith("data:image/webp")
@@ -195,7 +244,9 @@ async function optimizeLogo(file: File) {
     : canvas.toDataURL("image/jpeg", 0.86);
   if (result.length > 1_100_000) {
     throw new Error(
-      "Choose a simpler logo image under 800 KB after compression.",
+      locale === "vi"
+        ? "Hãy chọn ảnh logo đơn giản hơn, dưới 800 KB sau khi nén."
+        : "Choose a simpler logo image under 800 KB after compression.",
     );
   }
   return result;
@@ -240,18 +291,21 @@ function fieldClass(hasError: boolean) {
   return hasError ? `${styles.field} ${styles.error}` : styles.field;
 }
 
-function companyRoleLabel(role?: RecruiterCompanySettings["role"]) {
+function companyRoleLabel(
+  role: RecruiterCompanySettings["role"],
+  copy: RecruiterWorkspaceCopy,
+) {
   switch (role) {
     case "OWNER":
-      return "Owner";
+      return copy.role.owner;
     case "HR_MANAGER":
-      return "Authorized recruiter · HR Manager";
+      return `${copy.role.authorizedRecruiter} · ${copy.role.hrManager}`;
     case "RECRUITER":
-      return "Authorized recruiter";
+      return copy.role.authorizedRecruiter;
     case "HIRING_MANAGER":
-      return "Authorized recruiter · Hiring manager";
+      return `${copy.role.authorizedRecruiter} · ${copy.role.hiringManager}`;
     default:
-      return "Authorized recruiter/member";
+      return copy.role.member;
   }
 }
 
@@ -262,6 +316,7 @@ function CompanySwitcherGroup({
   companies,
   activeCompanyId,
   emptyMessage,
+  locale,
   onSelect,
 }: {
   title: string;
@@ -270,6 +325,7 @@ function CompanySwitcherGroup({
   companies: RecruiterCompanySettings[];
   activeCompanyId: string | null;
   emptyMessage: string;
+  locale: WorkspaceLocale;
   onSelect: (companyId: string) => void;
 }) {
   const headingId = `company-switcher-${title
@@ -296,7 +352,9 @@ function CompanySwitcherGroup({
         <div
           className={styles.companySwitcherList}
           role="list"
-          aria-label={`${title} companies`}
+          aria-label={
+            locale === "vi" ? `${title} · công ty` : `${title} companies`
+          }
         >
           {companies.map((candidate) => (
             <div role="listitem" key={candidate.id}>
@@ -316,7 +374,10 @@ function CompanySwitcherGroup({
                     {candidate.name}
                   </span>
                   <span className={styles.companySwitcherRole}>
-                    {companyRoleLabel(candidate.role)}
+                    {companyRoleLabel(
+                      candidate.role,
+                      recruiterWorkspaceCopy(locale),
+                    )}
                   </span>
                 </span>
               </button>
@@ -336,7 +397,9 @@ export function CompanySettingsScreen({
   canManageTeam = false,
   initialCompanyId,
 }: Props) {
-  const teamCopy = getCompanyTeamCopy(useWorkspaceLocale());
+  const locale = useWorkspaceLocale();
+  const copy = recruiterWorkspaceCopy(locale);
+  const teamCopy = getCompanyTeamCopy(locale);
   const csrfProof = useCsrfProof();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -424,18 +487,14 @@ export function CompanySettingsScreen({
     setError("");
     setMessage("");
     try {
-      const logo = await optimizeLogo(file);
+      const logo = await optimizeLogo(file, locale);
       updateField("logo", logo);
-      setMessage("Logo preview ready. Save the profile to upload it.");
+      setMessage(copy.logoReady);
     } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "The logo could not be uploaded.",
-      );
+      setError(caught instanceof Error ? caught.message : copy.unableToSave);
       setFieldErrors((current) => ({
         ...current,
-        logo: "Choose a valid image file.",
+        logo: copy.chooseValidImage,
       }));
     } finally {
       setLogoBusy(false);
@@ -445,12 +504,12 @@ export function CompanySettingsScreen({
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const errors = validateForm(form);
+    const errors = validateForm(form, locale);
     setFieldErrors(errors);
     setMessage("");
     setError("");
     if (Object.keys(errors).length) {
-      setError("Complete the required company profile fields before saving.");
+      setError(copy.saveRequiredFields);
       const firstField = Object.keys(errors)[0];
       document.getElementById(`company-${firstField}`)?.focus();
       return;
@@ -475,7 +534,7 @@ export function CompanySettingsScreen({
         };
       if (!response.ok || !payload.id) {
         setFieldErrors(payload.fieldErrors ?? {});
-        throw new Error(payload.message ?? "Unable to save company settings.");
+        throw new Error(copy.unableToSave);
       }
       const savedCompany = payload as RecruiterCompanySettings;
       setCompany(savedCompany);
@@ -487,14 +546,10 @@ export function CompanySettingsScreen({
           : [...current, savedCompany],
       );
       setForm(formFromCompany(savedCompany));
-      setMessage("Company profile saved.");
+      setMessage(copy.profileSaved);
       setIsEditing(false);
     } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "Unable to save company settings.",
-      );
+      setError(caught instanceof Error ? caught.message : copy.unableToSave);
     } finally {
       setBusy(false);
     }
@@ -532,7 +587,7 @@ export function CompanySettingsScreen({
         message?: string;
       };
       if (!response.ok || !payload.deleted) {
-        throw new Error(payload.message ?? "Unable to delete company.");
+        throw new Error(copy.unableToDelete);
       }
 
       window.dispatchEvent(new Event(RECRUITER_AUTHORITY_CHANGED_EVENT));
@@ -549,11 +604,9 @@ export function CompanySettingsScreen({
       setIsEditing(nextCompany ? !nextCompany.profileComplete : false);
       setDeleteDialogOpen(false);
       setDeleteConfirmation("");
-      setMessage(nextCompany ? "Company deleted." : "");
+      setMessage(nextCompany ? copy.companyDeleted : "");
     } catch (caught) {
-      setError(
-        caught instanceof Error ? caught.message : "Unable to delete company.",
-      );
+      setError(caught instanceof Error ? caught.message : copy.unableToDelete);
     } finally {
       setDeleteBusy(false);
     }
@@ -562,23 +615,20 @@ export function CompanySettingsScreen({
   if (!company) {
     return (
       <section className={styles.emptySection}>
-        <p className={styles.eyebrow}>COMPANY SETTINGS</p>
-        <h1>No company is linked yet</h1>
-        <p>
-          Complete recruiter verification first. After approval, this screen
-          will be linked to the company you are authorized to manage.
-        </p>
+        <p className={styles.eyebrow}>{copy.settings}</p>
+        <h1>{copy.noCompanyTitle}</h1>
+        <p>{copy.noCompanyDescription}</p>
         <Link
           className={styles.btnSave}
           href="/dashboard/employer-verification"
         >
-          Create a Company
+          {copy.createCompany}
         </Link>
       </section>
     );
   }
 
-  const profileValidation = getCompanyProfileValidation(form);
+  const profileValidation = getCompanyProfileValidation(form, locale);
   const missingFields = profileValidation.missingFields;
   const profileComplete = missingFields.length === 0;
   const status = company.verificationStatus;
@@ -606,43 +656,49 @@ export function CompanySettingsScreen({
         <div className={styles.companySwitcherHeader}>
           <div>
             <p className={styles.switcherLabel} id="company-switcher-title">
-              Your companies
+              {copy.yourCompanies}
             </p>
-            <p className={styles.switcherHint}>
-              Switch the company profile and team context shown below.
-            </p>
+            <p className={styles.switcherHint}>{copy.switchCompanyHint}</p>
           </div>
           <Link
             className={styles.createCompanyLink}
             href="/dashboard/employer-verification"
           >
-            Add or join a company
+            {copy.addOrJoinCompany}
           </Link>
         </div>
         <p className={styles.companySwitcherNote} role="status">
           {ownershipLimitReached
-            ? `Ownership limit reached (${MAX_OWNED_COMPANIES_PER_USER}/${MAX_OWNED_COMPANIES_PER_USER}). You can still join companies as a Recruiter or HR Manager.`
-            : `You own ${ownedCompanies.length}/${MAX_OWNED_COMPANIES_PER_USER} companies. Joining a company as a Recruiter or HR Manager does not use an ownership slot.`}
+            ? copy.ownershipLimitReached(MAX_OWNED_COMPANIES_PER_USER)
+            : copy.ownershipUsage(
+                ownedCompanies.length,
+                MAX_OWNED_COMPANIES_PER_USER,
+              )}
         </p>
         <CompanySwitcherGroup
-          title="Owned by you"
-          description="You can manage the profile, team, and company settings."
-          countLabel={`${ownedCompanies.length}/${MAX_OWNED_COMPANIES_PER_USER} slots`}
+          title={copy.ownedByYou}
+          description={copy.manageCompanyHint}
+          countLabel={copy.slots(
+            ownedCompanies.length,
+            MAX_OWNED_COMPANIES_PER_USER,
+          )}
           companies={ownedCompanies}
           activeCompanyId={company.id}
-          emptyMessage="You do not own a company yet."
+          emptyMessage={copy.noOwnedCompany}
+          locale={locale}
           onSelect={(companyId) => {
             setExplicitCompanyId(null);
             setCompanyId(companyId);
           }}
         />
         <CompanySwitcherGroup
-          title="Member access"
-          description="Companies that invited you as a recruiter or manager."
-          countLabel={`${memberCompanies.length} linked`}
+          title={copy.memberAccess}
+          description={copy.invitedCompanyHint}
+          countLabel={copy.linked(memberCompanies.length)}
           companies={memberCompanies}
           activeCompanyId={company.id}
-          emptyMessage="No other company access yet."
+          emptyMessage={copy.noOtherCompany}
+          locale={locale}
           onSelect={(companyId) => {
             setExplicitCompanyId(null);
             setCompanyId(companyId);
@@ -653,50 +709,47 @@ export function CompanySettingsScreen({
         <div>
           <p className={styles.eyebrow}>
             <span className={styles.dot} aria-hidden="true" />
-            COMPANY SETTINGS
+            {copy.settings}
           </p>
           <h1 className={styles.ptitle}>{company.name}</h1>
           {company.entityType ? (
             <span className={styles.legalType}>{company.entityType}</span>
           ) : null}
-          <p className={styles.psub}>
-            Keep the company identity used by your job postings and
-            candidate-facing cards up to date.
-          </p>
+          <p className={styles.psub}>{copy.keepIdentityUpToDate}</p>
         </div>
         <span className={statusClass(status)}>
           <span aria-hidden="true">{statusIcon(status)}</span>
-          Verification: {statusLabel(status)}
+          {copy.verification}: {statusLabel(status, copy)}
         </span>
       </div>
 
       <section className={styles.identityCard} aria-labelledby="identity-title">
         <p className={styles.identityLabel} id="identity-title">
-          Verified identity
+          {copy.verifiedIdentity}
         </p>
         <div className={styles.identityGrid}>
           <div className={styles.lockedField}>
-            <label htmlFor="company-identity-name">Company name</label>
+            <label htmlFor="company-identity-name">{copy.companyName}</label>
             <div className={styles.lockedBox} id="company-identity-name">
               <span>{company.name}</span>
-              <span className={styles.lock} aria-label="Locked">
+              <span className={styles.lock} aria-label={copy.locked}>
                 <LockIcon />
               </span>
             </div>
           </div>
           <div className={styles.lockedField}>
-            <label htmlFor="company-identity-tax-code">Tax code</label>
+            <label htmlFor="company-identity-tax-code">{copy.taxCode}</label>
             <div className={styles.lockedBox} id="company-identity-tax-code">
               <span>{company.taxCode}</span>
-              <span className={styles.lock} aria-label="Locked">
+              <span className={styles.lock} aria-label={copy.locked}>
                 <LockIcon />
               </span>
             </div>
           </div>
         </div>
         <p className={styles.identityNote}>
-          These details are locked after verification and cannot be edited here.
-          <Link href="/support">Request a change through Support →</Link>
+          {copy.lockedIdentityNote}
+          <Link href="/support">{copy.requestSupportChange}</Link>
         </p>
       </section>
 
@@ -706,23 +759,18 @@ export function CompanySettingsScreen({
           role="alert"
           aria-labelledby="profile-complete-title"
         >
-          <p className={styles.gateLabel}>Posting gate</p>
+          <p className={styles.gateLabel}>{copy.postingGate}</p>
           <h2 className={styles.gateTitle} id="profile-complete-title">
-            Complete your company profile before posting a job
+            {copy.completeProfileBeforePosting}
           </h2>
-          <p className={styles.gateSub}>
-            The Create job posting action stays locked until these fields are
-            complete.
-          </p>
+          <p className={styles.gateSub}>{copy.postingGateDescription}</p>
           <ul className={styles.gateChecklist}>
             {missingFields.map((field) => (
               <li className={styles.gateItem} key={field}>
                 <span className={styles.gi} aria-hidden="true">
                   !
                 </span>
-                <span>
-                  {profileFields.find((item) => item.key === field)?.label}
-                </span>
+                <span>{companyProfileFieldLabel(field, copy)}</span>
               </li>
             ))}
           </ul>
@@ -733,8 +781,7 @@ export function CompanySettingsScreen({
         {isEditing ? (
           <form className={styles.formCard} onSubmit={save} noValidate>
             <p className={styles.formHint}>
-              Fields marked * are required. A company logo is required before a
-              job can be posted.
+              {copy.fieldsRequired} {copy.logoRequired}
             </p>
 
             <div className={styles.formRow}>
@@ -746,7 +793,7 @@ export function CompanySettingsScreen({
                   ),
                 )}
               >
-                <label htmlFor="company-industry">Industry *</label>
+                <label htmlFor="company-industry">{copy.industry} *</label>
                 <input
                   id="company-industry"
                   value={form.industry}
@@ -763,7 +810,7 @@ export function CompanySettingsScreen({
                       ? "company-industry-error"
                       : undefined
                   }
-                  placeholder="e.g. Information Technology"
+                  placeholder={copy.industryPlaceholder}
                   maxLength={160}
                 />
                 <FieldError
@@ -781,7 +828,7 @@ export function CompanySettingsScreen({
                   ),
                 )}
               >
-                <label htmlFor="company-size">Company size *</label>
+                <label htmlFor="company-size">{copy.companySize} *</label>
                 <input
                   id="company-size"
                   value={form.size}
@@ -794,7 +841,7 @@ export function CompanySettingsScreen({
                       ? "company-size-error"
                       : undefined
                   }
-                  placeholder="e.g. 200–500 employees"
+                  placeholder={copy.sizePlaceholder}
                   maxLength={80}
                 />
                 <FieldError
@@ -829,7 +876,7 @@ export function CompanySettingsScreen({
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="company-website">Website</label>
+              <label htmlFor="company-website">{copy.website}</label>
               <input
                 id="company-website"
                 type="url"
@@ -850,22 +897,20 @@ export function CompanySettingsScreen({
             </div>
 
             <div className={styles.field}>
-              <span className={styles.logoLabel}>Company logo *</span>
-              <p className={styles.formHint}>
-                PNG, JPEG, or WebP. The image is resized before upload.
-              </p>
+              <span className={styles.logoLabel}>{copy.logo} *</span>
+              <p className={styles.formHint}>{copy.logoHint}</p>
               <div className={styles.logoUpload}>
                 <div className={styles.logoPreview}>
                   {form.logo ? (
                     <Image
                       src={form.logo}
-                      alt="Company logo preview"
+                      alt={copy.logoPreview}
                       width={128}
                       height={128}
                       unoptimized
                     />
                   ) : (
-                    <span aria-hidden="true">LOGO</span>
+                    <span aria-hidden="true">{copy.logo}</span>
                   )}
                 </div>
                 <div className={styles.logoActions}>
@@ -883,10 +928,10 @@ export function CompanySettingsScreen({
                       htmlFor="company-logo-file"
                     >
                       {logoBusy
-                        ? "Preparing logo..."
+                        ? copy.preparingLogo
                         : form.logo
-                          ? "Choose another logo"
-                          : "Choose logo"}
+                          ? copy.chooseAnotherLogo
+                          : copy.chooseLogo}
                     </label>
                     <button
                       className={`${styles.btnOutline} ${styles.muted}`}
@@ -894,7 +939,7 @@ export function CompanySettingsScreen({
                       disabled={!form.logo || logoBusy || busy}
                       onClick={() => updateField("logo", null)}
                     >
-                      Remove logo
+                      {copy.removeLogo}
                     </button>
                   </div>
                 </div>
@@ -912,7 +957,7 @@ export function CompanySettingsScreen({
                 ),
               )}
             >
-              <label htmlFor="company-address">Address *</label>
+              <label htmlFor="company-address">{copy.address} *</label>
               <input
                 id="company-address"
                 value={form.address}
@@ -925,7 +970,7 @@ export function CompanySettingsScreen({
                     ? "company-address-error"
                     : undefined
                 }
-                placeholder="Street, district, city"
+                placeholder={copy.addressPlaceholder}
                 maxLength={300}
               />
               <FieldError
@@ -937,7 +982,7 @@ export function CompanySettingsScreen({
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="company-description">Description</label>
+              <label htmlFor="company-description">{copy.description}</label>
               <textarea
                 ref={descriptionRef}
                 id="company-description"
@@ -946,7 +991,11 @@ export function CompanySettingsScreen({
                   resizeDescription(event.currentTarget);
                   updateField("description", event.target.value || null);
                 }}
-                placeholder="Introduce your company briefly..."
+                placeholder={
+                  locale === "vi"
+                    ? "Giới thiệu ngắn gọn về công ty…"
+                    : "Introduce your company briefly..."
+                }
                 maxLength={3000}
                 rows={5}
               />
@@ -965,7 +1014,7 @@ export function CompanySettingsScreen({
                 type="submit"
                 disabled={busy || logoBusy}
               >
-                {busy ? "Saving..." : "Save company profile"}
+                {busy ? copy.saving : copy.saveProfile}
               </button>
             </div>
           </form>
@@ -976,28 +1025,28 @@ export function CompanySettingsScreen({
           >
             <div className={styles.readonlyHeader}>
               <div>
-                <p className={styles.formHint}>Saved company profile</p>
+                <p className={styles.formHint}>{copy.savedProfile}</p>
                 <h2
                   className={styles.readonlyTitle}
                   id="company-profile-summary-title"
                 >
-                  Your public company information
+                  {copy.publicCompanyInfo}
                 </h2>
               </div>
-              <span className={styles.savedBadge}>Saved</span>
+              <span className={styles.savedBadge}>{copy.saved}</span>
             </div>
 
             <div className={styles.readonlyGrid}>
               <div className={styles.readonlyItem}>
-                <span className={styles.readonlyLabel}>Industry</span>
+                <span className={styles.readonlyLabel}>{copy.industry}</span>
                 <span className={styles.readonlyValue}>
-                  {company.industry || "Not provided"}
+                  {company.industry || copy.notProvided}
                 </span>
               </div>
               <div className={styles.readonlyItem}>
-                <span className={styles.readonlyLabel}>Company size</span>
+                <span className={styles.readonlyLabel}>{copy.companySize}</span>
                 <span className={styles.readonlyValue}>
-                  {company.size || "Not provided"}
+                  {company.size || copy.notProvided}
                 </span>
               </div>
               <div className={styles.readonlyItem}>
@@ -1007,37 +1056,37 @@ export function CompanySettingsScreen({
                 </span>
               </div>
               <div className={styles.readonlyItem}>
-                <span className={styles.readonlyLabel}>Website</span>
+                <span className={styles.readonlyLabel}>{copy.website}</span>
                 <span className={styles.readonlyValue}>
-                  {company.website || "Not provided"}
+                  {company.website || copy.notProvided}
                 </span>
               </div>
               <div className={styles.readonlyItem}>
-                <span className={styles.readonlyLabel}>Address</span>
+                <span className={styles.readonlyLabel}>{copy.address}</span>
                 <span className={styles.readonlyValue}>
-                  {company.address || "Not provided"}
+                  {company.address || copy.notProvided}
                 </span>
               </div>
               <div className={styles.readonlyItem}>
-                <span className={styles.readonlyLabel}>Company logo</span>
+                <span className={styles.readonlyLabel}>{copy.logo}</span>
                 <div className={styles.readonlyLogo}>
                   {company.logo ? (
                     <Image
                       src={company.logo}
-                      alt="Company logo"
+                      alt={copy.logo}
                       width={64}
                       height={64}
                       unoptimized
                     />
                   ) : (
-                    <span>LOGO</span>
+                    <span>{copy.logo}</span>
                   )}
                 </div>
               </div>
               <div className={`${styles.readonlyItem} ${styles.readonlyWide}`}>
-                <span className={styles.readonlyLabel}>Description</span>
+                <span className={styles.readonlyLabel}>{copy.description}</span>
                 <span className={styles.readonlyValue}>
-                  {company.description || "Not provided"}
+                  {company.description || copy.notProvided}
                 </span>
               </div>
             </div>
@@ -1048,9 +1097,7 @@ export function CompanySettingsScreen({
                 role={error ? "alert" : "status"}
                 aria-live="polite"
               >
-                {error ||
-                  message ||
-                  "Your saved details are currently read-only."}
+                {error || message || copy.readOnlyNote}
               </p>
               <button
                 className={styles.btnEdit}
@@ -1062,7 +1109,7 @@ export function CompanySettingsScreen({
                   setFieldErrors({});
                 }}
               >
-                Edit company profile
+                {copy.editProfile}
               </button>
             </div>
           </section>
@@ -1070,22 +1117,19 @@ export function CompanySettingsScreen({
 
         <aside className={styles.sideCard}>
           <div>
-            <p className={styles.sideLabel}>Ownership</p>
-            <h2 className={styles.sideTitle}>Authorized recruiters</h2>
-            <p className={styles.sideDesc}>
-              Only the owner and listed members can manage this company&apos;s
-              job postings.
-            </p>
+            <p className={styles.sideLabel}>{copy.ownership}</p>
+            <h2 className={styles.sideTitle}>{copy.authorizedRecruiters}</h2>
+            <p className={styles.sideDesc}>{copy.ownershipDescription}</p>
           </div>
 
           <div className={styles.sideRow}>
-            <div className={styles.srl}>Owner</div>
+            <div className={styles.srl}>{copy.role.owner}</div>
             <div className={styles.srv}>
-              {company.ownerUserId ? "Authorized owner" : "Unclaimed"}
+              {company.ownerUserId ? copy.authorizedOwner : copy.unclaimed}
             </div>
           </div>
           <div className={styles.sideRow}>
-            <div className={styles.srl}>Members</div>
+            <div className={styles.srl}>{copy.members}</div>
             <div className={styles.srv}>{company.memberUserIds.length}</div>
           </div>
           {managesSelectedTeam ? (
@@ -1104,24 +1148,19 @@ export function CompanySettingsScreen({
               </Link>
             </div>
           ) : (
-            <p className={styles.sideNote}>
-              Only the active company owner can manage team members.
-            </p>
+            <p className={styles.sideNote}>{copy.activeOwnerOnly}</p>
           )}
           {canDeleteCompany ? (
             <div className={styles.dangerZone}>
-              <p className={styles.dangerLabel}>Danger zone</p>
-              <p className={styles.dangerText}>
-                Permanently delete this company and all of its jobs,
-                applications, messages, and analytics. This cannot be undone.
-              </p>
+              <p className={styles.dangerLabel}>{copy.dangerZone}</p>
+              <p className={styles.dangerText}>{copy.dangerDescription}</p>
               <button
                 className={styles.btnDelete}
                 type="button"
                 disabled={busy || logoBusy || deleteBusy}
                 onClick={openDeleteDialog}
               >
-                Delete company
+                {copy.deleteCompany}
               </button>
             </div>
           ) : null}
@@ -1144,13 +1183,17 @@ export function CompanySettingsScreen({
           >
             <div className={styles.deleteDialogHeader}>
               <div>
-                <p className={styles.dangerLabel}>Danger zone</p>
-                <h2 id="delete-company-title">Delete {company.name}?</h2>
+                <p className={styles.dangerLabel}>{copy.dangerZone}</p>
+                <h2 id="delete-company-title">
+                  {locale === "vi"
+                    ? `Xóa ${company.name}?`
+                    : `Delete ${company.name}?`}
+                </h2>
               </div>
               <button
                 className={styles.deleteDialogClose}
                 type="button"
-                aria-label="Close delete dialog"
+                aria-label={copy.closeDeleteDialog}
                 disabled={deleteBusy}
                 onClick={closeDeleteDialog}
               >
@@ -1158,17 +1201,22 @@ export function CompanySettingsScreen({
               </button>
             </div>
             <p className={styles.deleteDialogText}>
-              This permanently removes the company and its recruiter data,
-              including job postings, applications, messages, and analytics.
+              {copy.deleteDialogDescription}
             </p>
             <label className={styles.deleteConfirmationLabel}>
-              Type <strong>{company.name}</strong> to confirm
+              {locale === "vi" ? "Nhập " : "Type "}
+              <strong>{company.name}</strong>
+              {` ${copy.typeToConfirm}`}
               <input
                 ref={deleteConfirmationRef}
                 className={styles.deleteConfirmationInput}
                 type="text"
                 value={deleteConfirmation}
-                aria-label="Type company name to confirm"
+                aria-label={
+                  locale === "vi"
+                    ? `Nhập tên công ty ${copy.typeToConfirm}`
+                    : `Type company name ${copy.typeToConfirm}`
+                }
                 autoComplete="off"
                 disabled={deleteBusy}
                 onChange={(event) => setDeleteConfirmation(event.target.value)}
@@ -1181,7 +1229,7 @@ export function CompanySettingsScreen({
                 disabled={deleteBusy}
                 onClick={closeDeleteDialog}
               >
-                Cancel
+                {copy.cancel}
               </button>
               <button
                 className={styles.btnDeleteConfirm}
@@ -1192,7 +1240,7 @@ export function CompanySettingsScreen({
                 }
                 onClick={() => void deleteCompany()}
               >
-                {deleteBusy ? "Deleting..." : "Delete company"}
+                {deleteBusy ? copy.deleting : copy.deleteCompany}
               </button>
             </div>
           </section>

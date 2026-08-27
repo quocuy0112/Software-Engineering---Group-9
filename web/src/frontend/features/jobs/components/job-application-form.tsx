@@ -9,7 +9,10 @@ import type {
   ApplicationOutcome,
 } from "@/shared/contracts/jobs/actions";
 import { applicationOutcomeSchema } from "@/shared/contracts/jobs/actions";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { jobApplicationCopy } from "./job-application-copy";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
+import { jobCopy } from "./job-copy";
 
 export function JobApplicationForm({
   form,
@@ -20,6 +23,8 @@ export function JobApplicationForm({
   onCancel: () => void;
   onSubmitted: (outcome: ApplicationOutcome) => void;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = jobApplicationCopy(locale);
   const workspaceCsrfProof = useCsrfProof();
   const [pending, setPending] = useState(false);
   const [selectedCvId, setSelectedCvId] = useState("");
@@ -66,17 +71,17 @@ export function JobApplicationForm({
       if (!response.ok) {
         const problem = body as { message?: unknown };
         setError(
-          typeof problem.message === "string"
+          typeof problem.message === "string" && locale === "en"
             ? problem.message
-            : "Application could not be submitted.",
+            : copy.errors.submit,
         );
         return;
       }
       const outcome = applicationOutcomeSchema.parse(body);
-      setMessage(outcome.message);
+      setMessage(copy.submitted);
       onSubmitted(outcome);
     } catch {
-      setError("Application could not be submitted. Try again.");
+      setError(copy.errors.submitTryAgain);
     } finally {
       setPending(false);
     }
@@ -85,7 +90,7 @@ export function JobApplicationForm({
   return (
     <form
       className="job-form-grid"
-      aria-label={`Apply for ${form.jobTitle}`}
+      aria-label={copy.applyFor(form.jobTitle)}
       onSubmit={submit}
       onChange={() => {
         // An idempotency key is bound to one exact submission. If the
@@ -97,12 +102,15 @@ export function JobApplicationForm({
     >
       {!form.profileReady ? (
         <div role="alert">
-          Complete these profile fields first:{" "}
-          {form.missingProfileFields.join(", ")}.
+          {copy.profileIncomplete(
+            form.missingProfileFields
+              .map((field) => copy.profileFields[field] ?? field)
+              .join(", "),
+          )}
         </div>
       ) : null}
       <label>
-        Select CV
+        {copy.selectCv}
         <select
           name="cvId"
           required
@@ -114,7 +122,7 @@ export function JobApplicationForm({
           onChange={(event) => setSelectedCvId(event.currentTarget.value)}
         >
           <option value="" disabled>
-            Choose a confirmed CV
+            {copy.savedCvPlaceholder}
           </option>
           {form.cvs.map((cv) => (
             <option key={cv.id} value={cv.id}>
@@ -125,9 +133,9 @@ export function JobApplicationForm({
       </label>
       {form.cvs.length === 0 ? (
         <div id="application-cv-requirement" role="alert">
-          No retained application CV is available. CV Import can update your
-          profile, but its temporary source file cannot be attached to a job
-          application.
+          {locale === "vi"
+            ? "Không có CV ứng tuyển đã lưu. Bạn có thể cập nhật Hồ sơ bằng tính năng Nhập CV, nhưng không thể đính kèm tệp tạm thời đó vào đơn ứng tuyển."
+            : "No retained application CV is available. CV Import can update your profile, but its temporary source file cannot be attached to a job application."}
         </div>
       ) : null}
       {form.questions.map((question) => (
@@ -140,10 +148,10 @@ export function JobApplicationForm({
               defaultValue=""
             >
               <option value="" disabled>
-                Choose an answer
+                {copy.chooseAnswer}
               </option>
-              <option value="true">Yes</option>
-              <option value="false">No</option>
+              <option value="true">{copy.yes}</option>
+              <option value="false">{copy.no}</option>
             </select>
           ) : question.kind === "SINGLE_CHOICE" ? (
             <select
@@ -152,7 +160,7 @@ export function JobApplicationForm({
               defaultValue=""
             >
               <option value="" disabled>
-                Choose an answer
+                {copy.chooseAnswer}
               </option>
               {question.options?.map((option) => (
                 <option key={option} value={option}>
@@ -171,12 +179,16 @@ export function JobApplicationForm({
         </label>
       ))}
       <label>
-        Cover letter (optional)
+        {copy.coverLetterOptional}
         <textarea name="coverLetter" maxLength={5000} rows={5} />
       </label>
       <label>
-        <input name="consentAccepted" type="checkbox" required /> I consent to
-        SmartHire sharing this application with the hiring company.
+        <input
+          name="consentAccepted"
+          type="checkbox"
+          required
+          aria-label={copy.consentAria}
+        /> {copy.consentText}
       </label>
       {error ? (
         <div role="alert" className="job-feedback">
@@ -198,10 +210,10 @@ export function JobApplicationForm({
             !selectedCvId
           }
         >
-          {pending ? "Submitting…" : "Submit application"}
+          {pending ? copy.submitting : copy.submitApplication}
         </button>
         <button type="button" onClick={onCancel} disabled={pending}>
-          Cancel
+          {locale === "vi" ? "Hủy" : "Cancel"}
         </button>
       </div>
     </form>
@@ -219,12 +231,13 @@ export function JobApplicationAction({
   initialApplied?: boolean;
   onActivate?: () => void;
 }) {
+  const copy = jobCopy(useWorkspaceLocale());
   const shared = useOptionalJobInteraction();
   const applied = initialApplied || Boolean(shared?.records[jobId]?.applied);
   if (applied) {
     return (
       <span role="status" className="job-applied-state">
-        ✓ Applied
+        ✓ {copy.applied}
       </span>
     );
   }
@@ -232,10 +245,10 @@ export function JobApplicationAction({
     <Link
       className="sh-button job-card-apply-button"
       href={"/jobs/" + (jobSlug ?? jobId) + "/apply"}
-      aria-label="Apply now"
+      aria-label={copy.applyNow}
       onClick={onActivate}
     >
-      Apply now
+      {copy.applyNow}
     </Link>
   );
 }

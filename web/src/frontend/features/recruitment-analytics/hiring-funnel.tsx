@@ -1,21 +1,8 @@
 "use client";
 
 import type { JobPerformanceReport } from "@/shared/contracts/analytics/employer";
-
-const stageLabels: Record<
-  JobPerformanceReport["funnel"][number]["stage"],
-  string
-> = {
-  APPLIED: "Applied",
-  VIEWED: "Viewed",
-  SHORTLISTED: "Shortlisted",
-  INTERVIEWING: "Interviewing",
-  OFFERED: "Offered",
-  HIRED: "Hired",
-  OFFER_DECLINED: "Offer declined",
-  REJECTED: "Rejected",
-  WAITLISTED: "Waitlisted",
-};
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruitmentAnalyticsCopy } from "./recruitment-analytics-copy";
 
 const stageTone: Record<string, string> = {
   APPLIED: "blue",
@@ -29,8 +16,8 @@ const stageTone: Record<string, string> = {
   WAITLISTED: "slate",
 };
 
-function formatNumber(value: number) {
-  return value.toLocaleString("en-US");
+function formatNumber(value: number, locale: string) {
+  return value.toLocaleString(locale);
 }
 
 export function HiringFunnel({
@@ -40,6 +27,9 @@ export function HiringFunnel({
   report: JobPerformanceReport;
   jobTitle: string;
 }) {
+  const locale = useWorkspaceLocale();
+  const analyticsCopy = recruitmentAnalyticsCopy(locale);
+  const copy = analyticsCopy.funnel;
   const total = report.funnel.reduce((sum, stage) => sum + stage.count, 0);
   return (
     <section
@@ -48,18 +38,17 @@ export function HiringFunnel({
     >
       <header className="recruiter-analytics-panel__heading">
         <div>
-          <p className="recruiter-analytics-eyebrow">Pipeline snapshot</p>
-          <h2 id="hiring-funnel-title">Hiring funnel</h2>
-          <p>
-            Current candidate distribution for {jobTitle}. Percentages are based
-            on the full funnel at the report cutoff.
-          </p>
+          <p className="recruiter-analytics-eyebrow">{copy.eyebrow}</p>
+          <h2 id="hiring-funnel-title">{copy.title}</h2>
+          <p>{copy.description(jobTitle)}</p>
         </div>
         <span className="recruiter-analytics-cutoff">
-          As of {new Date(report.funnelAsOf).toLocaleString("en-US")}
+          {copy.asOf(
+            new Date(report.funnelAsOf).toLocaleString(analyticsCopy.locale),
+          )}
         </span>
       </header>
-      <ol className="hiring-funnel-grid" aria-label="Hiring funnel stages">
+      <ol className="hiring-funnel-grid" aria-label={copy.stagesLabel}>
         {report.funnel.map((stage) => (
           <li
             key={stage.stage}
@@ -67,16 +56,14 @@ export function HiringFunnel({
             data-tone={stageTone[stage.stage] ?? "blue"}
           >
             <div className="hiring-funnel-stage__topline">
-              <span>{stageLabels[stage.stage]}</span>
-              <strong>{formatNumber(stage.count)}</strong>
+              <span>{copy.stageLabels[stage.stage]}</span>
+              <strong>{formatNumber(stage.count, analyticsCopy.locale)}</strong>
             </div>
-            <p>{stage.percentage.toFixed(2)}% of pipeline</p>
+            <p>{copy.pipelinePercentage(stage.percentage.toFixed(2))}</p>
             <div
               className="hiring-funnel-stage__track"
               role="progressbar"
-              aria-label={
-                stageLabels[stage.stage] + " percentage of candidate pipeline"
-              }
+              aria-label={`${copy.stageLabels[stage.stage]} — ${copy.pipelinePercentage(stage.percentage.toFixed(2))}`}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={stage.percentage}
@@ -88,36 +75,36 @@ export function HiringFunnel({
       </ol>
       <p className="hiring-funnel-withdrawn" role="status">
         <strong>
-          Withdrawn applications: {formatNumber(report.withdrawnApplications)}
+          {copy.withdrawn(
+            formatNumber(report.withdrawnApplications, analyticsCopy.locale),
+          )}
         </strong>
-        <span>Excluded from current funnel-stage percentages.</span>
+        <span>{copy.withdrawnDescription}</span>
       </p>
       {total === 0 ? (
         <p className="recruiter-analytics-empty-note">
           {report.withdrawnApplications > 0
-            ? "No active applications remain in the funnel."
-            : "No applications yet for this job posting."}
+            ? copy.noActiveApplications
+            : copy.noApplications}
         </p>
       ) : null}
       <details className="hiring-funnel-table">
-        <summary>View funnel as a table</summary>
+        <summary>{copy.tableSummary}</summary>
         <div className="recruiter-analytics-table-wrap">
           <table>
-            <caption className="sr-only">
-              Hiring funnel data for {jobTitle}
-            </caption>
+            <caption className="sr-only">{copy.tableCaption(jobTitle)}</caption>
             <thead>
               <tr>
-                <th scope="col">Stage</th>
-                <th scope="col">Candidates</th>
-                <th scope="col">Share of pipeline</th>
+                <th scope="col">{copy.stage}</th>
+                <th scope="col">{copy.candidates}</th>
+                <th scope="col">{copy.share}</th>
               </tr>
             </thead>
             <tbody>
               {report.funnel.map((stage) => (
                 <tr key={stage.stage}>
-                  <th scope="row">{stageLabels[stage.stage]}</th>
-                  <td>{formatNumber(stage.count)}</td>
+                  <th scope="row">{copy.stageLabels[stage.stage]}</th>
+                  <td>{formatNumber(stage.count, analyticsCopy.locale)}</td>
                   <td>{stage.percentage.toFixed(2)}%</td>
                 </tr>
               ))}

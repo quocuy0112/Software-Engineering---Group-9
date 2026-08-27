@@ -2,6 +2,8 @@ import "server-only";
 
 import { randomUUID } from "node:crypto";
 
+import { OCR_EXPECTED_ENGINE_VERSION } from "@/backend/image-search/config";
+
 import { prisma } from "@/backend/database/prisma";
 import {
   readSearchArtifact,
@@ -180,7 +182,7 @@ export class ImageSearchDecodeStage {
             searchQueryId: row.queryId,
             status: "QUEUED",
             engineName: "paddleocr-onnx",
-            engineVersion: "1.0.0",
+            engineVersion: OCR_EXPECTED_ENGINE_VERSION,
             modelName: "PP-OCRv6-medium",
             modelSha256: Buffer.from(process.env.OCR_MODEL_SHA256 ?? "", "hex"),
             runtimeName: "onnxruntime",

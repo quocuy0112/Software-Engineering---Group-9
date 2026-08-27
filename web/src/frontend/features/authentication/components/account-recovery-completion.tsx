@@ -3,15 +3,20 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useAccountRecoveryCapability } from "@/frontend/features/authentication/client/use-account-recovery-capability";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { AuthStatus } from "./auth-status";
 import { PasswordField } from "./password-field";
 import { PasswordRequirementChecklist } from "./password-requirement-checklist";
+import { authCopy, localizedAuthMessage } from "./auth-copy";
 
 export function AccountRecoveryCompletion() {
+  const locale = useWorkspaceLocale();
+  const copy = authCopy(locale);
   const capability = useAccountRecoveryCapability("completion");
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [status, setStatus] = useState("");
+  const [statusTone, setStatusTone] = useState<"error" | "success">("error");
   const [busy, setBusy] = useState(false);
   const [completed, setCompleted] = useState(false);
 
@@ -33,10 +38,18 @@ export function AccountRecoveryCompletion() {
       const result = (await response.json().catch(() => null)) as {
         message?: string;
       } | null;
-      setStatus(result?.message ?? "Recovery could not be completed.");
+      setStatusTone(response.ok ? "success" : "error");
+      setStatus(
+        localizedAuthMessage(
+          locale,
+          result?.message,
+          response.ok ? copy.recovery.completionSuccess : copy.recovery.completionError,
+        ),
+      );
       if (response.ok) setCompleted(true);
     } catch {
-      setStatus("Recovery could not be completed.");
+      setStatusTone("error");
+      setStatus(copy.recovery.completionError);
     } finally {
       setBusy(false);
       setPassword("");
@@ -49,12 +62,12 @@ export function AccountRecoveryCompletion() {
       <section className="auth-form-content">
         <div className="auth-form">
           <div className="auth-form-heading">
-            <p className="form-kicker">RECOVERY COMPLETE</p>
-            <h1>Sign in again</h1>
+            <p className="form-kicker">{copy.recovery.completionKicker}</p>
+            <h1>{copy.recovery.completedTitle}</h1>
           </div>
-          <AuthStatus status={status} />
-          <p>Re-enroll two-factor authentication after your next login.</p>
-          <Link href="/login">Go to sign in</Link>
+          <AuthStatus status={status} tone={statusTone} />
+          <p>{copy.recovery.completedDescription}</p>
+          <Link href="/login">{copy.recovery.goToSignIn}</Link>
         </div>
       </section>
     );
@@ -65,11 +78,11 @@ export function AccountRecoveryCompletion() {
       <section className="auth-form-content">
         <div className="auth-form">
           <div className="auth-form-heading">
-            <p className="form-kicker">COMPLETE RECOVERY</p>
-            <h1>Verifying secure link</h1>
+            <p className="form-kicker">{copy.recovery.completionKicker}</p>
+            <h1>{copy.recovery.verifyingTitle}</h1>
           </div>
-          <AuthStatus status="Verifying this secure recovery link…" />
-          <Link href="/account-recovery">Request a new recovery link</Link>
+          <AuthStatus status={copy.recovery.verifying} />
+          <Link href="/account-recovery">{copy.recovery.requestNewLink}</Link>
         </div>
       </section>
     );
@@ -79,15 +92,12 @@ export function AccountRecoveryCompletion() {
     <section className="auth-form-content">
       <form className="auth-form" onSubmit={submit} noValidate aria-busy={busy}>
         <div className="auth-form-heading">
-          <p className="form-kicker">COMPLETE RECOVERY</p>
-          <h1>Choose a new password</h1>
-          <p>
-            This step is available only after the 24-hour security hold. Your
-            old TOTP and backup codes will be disabled here.
-          </p>
+          <p className="form-kicker">{copy.recovery.completionKicker}</p>
+          <h1>{copy.recovery.completionTitle}</h1>
+          <p>{copy.recovery.completionDescription}</p>
         </div>
         <PasswordField
-          label="New password"
+          label={copy.resetPassword.newPassword}
           id="account-recovery-password"
           autoComplete="new-password"
           value={password}
@@ -96,7 +106,7 @@ export function AccountRecoveryCompletion() {
         />
         <PasswordRequirementChecklist value={password} />
         <PasswordField
-          label="Confirm new password"
+          label={copy.resetPassword.confirmPassword}
           id="account-recovery-confirm-password"
           autoComplete="new-password"
           value={confirmation}
@@ -107,13 +117,13 @@ export function AccountRecoveryCompletion() {
           type="submit"
           disabled={busy || password.length < 12 || password !== confirmation}
         >
-          {busy ? "Completing…" : "Complete recovery"}
+          {busy ? copy.recovery.completing : copy.recovery.complete}
         </button>
         <AuthStatus
           status={status}
-          tone={status.includes("could not") ? "error" : "success"}
+          tone={statusTone}
         />
-        <Link href="/login">Back to sign in</Link>
+        <Link href="/login">{copy.common.backToSignIn}</Link>
       </form>
     </section>
   );

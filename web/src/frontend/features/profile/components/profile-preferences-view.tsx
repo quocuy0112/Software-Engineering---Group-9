@@ -30,6 +30,17 @@ export function ProfilePreferencesView({
             "Giữ múi giờ và thông báo nhất quán trên mọi thiết bị đã đăng nhập.",
           panel: "MẶC ĐỊNH TÀI KHOẢN",
           panelTitle: "Tùy chọn tài khoản",
+          interfaceLanguage: "Ngôn ngữ giao diện",
+          timezone: "Múi giờ",
+          emailNotifications: "Thông báo qua email",
+          emailNotificationsHint:
+            "Chọn những cập nhật sản phẩm sẽ được gửi đến hộp thư của bạn.",
+          applicationUpdates: "Cập nhật ứng dụng",
+          jobRecommendations: "Đề xuất việc làm",
+          accountSecurity: "Bảo mật tài khoản",
+          alwaysOn: "Luôn bật",
+          on: "Bật",
+          off: "Tắt",
         }
       : {
           kicker: "YOUR EXPERIENCE",
@@ -38,6 +49,17 @@ export function ProfilePreferencesView({
             "Keep timezone and notification settings consistent across every signed-in device.",
           panel: "ACCOUNT DEFAULTS",
           panelTitle: "Account preferences",
+          interfaceLanguage: "Interface language",
+          timezone: "Timezone",
+          emailNotifications: "Email notifications",
+          emailNotificationsHint:
+            "Choose which product updates should reach your inbox.",
+          applicationUpdates: "Application updates",
+          jobRecommendations: "Job recommendations",
+          accountSecurity: "Account security",
+          alwaysOn: "Always on",
+          on: "On",
+          off: "Off",
         };
   const state = useAccountPreferences(initialPreferences, csrfProof);
   const [isEditing, setIsEditing] = useState(false);
@@ -106,18 +128,18 @@ export function ProfilePreferencesView({
           <div className="account-preferences-summary">
             <div className="account-preference-summary-grid">
               <div className="account-preference-summary-item">
-                <span>Interface language</span>
+                <span>{copy.interfaceLanguage}</span>
                 <strong>{languageLabel}</strong>
               </div>
               <div className="account-preference-summary-item">
-                <span>Timezone</span>
+                <span>{copy.timezone}</span>
                 <strong>{state.preferences.timezone}</strong>
               </div>
             </div>
             <div className="account-preference-notification-summary">
               <div>
-                <span>Email notifications</span>
-                <p>Choose which product updates should reach your inbox.</p>
+                <span>{copy.emailNotifications}</span>
+                <p>{copy.emailNotificationsHint}</p>
               </div>
               <ul>
                 <li
@@ -125,11 +147,11 @@ export function ProfilePreferencesView({
                     state.preferences.emailNotifications.application_updates
                   }
                 >
-                  Application updates
+                  {copy.applicationUpdates}
                   <strong>
                     {state.preferences.emailNotifications.application_updates
-                      ? "On"
-                      : "Off"}
+                      ? copy.on
+                      : copy.off}
                   </strong>
                 </li>
                 <li
@@ -137,16 +159,16 @@ export function ProfilePreferencesView({
                     state.preferences.emailNotifications.job_recommendations
                   }
                 >
-                  Job recommendations
+                  {copy.jobRecommendations}
                   <strong>
                     {state.preferences.emailNotifications.job_recommendations
-                      ? "On"
-                      : "Off"}
+                      ? copy.on
+                      : copy.off}
                   </strong>
                 </li>
                 <li data-enabled="true">
-                  Account security
-                  <strong>Always on</strong>
+                  {copy.accountSecurity}
+                  <strong>{copy.alwaysOn}</strong>
                 </li>
               </ul>
             </div>

@@ -3,9 +3,17 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { ResendVerificationForm } from "./resend-verification-form";
+import { authCopy } from "./auth-copy";
+
+export function VerifyEmailLoading() {
+  const copy = authCopy(useWorkspaceLocale());
+  return <p role="status">{copy.verifyEmail.wait}</p>;
+}
 
 export function VerifyEmailResult() {
+  const copy = authCopy(useWorkspaceLocale());
   const token = useSearchParams().get("token");
   const attemptedToken = useRef<string | null>(null);
   const [state, setState] = useState<"checking" | "success" | "failure">(() =>
@@ -29,8 +37,8 @@ export function VerifyEmailResult() {
   if (state === "checking") {
     return (
       <>
-        <h1>Verifying your email</h1>
-        <p role="status">Please wait…</p>
+        <h1>{copy.verifyEmail.verifying}</h1>
+        <p role="status">{copy.verifyEmail.wait}</p>
       </>
     );
   }
@@ -38,24 +46,23 @@ export function VerifyEmailResult() {
   if (state === "success") {
     return (
       <>
-        <h1>Email verified</h1>
+        <h1>{copy.verifyEmail.verified}</h1>
         <p role="status">
-          Your account is active. You can now continue to login.
+          {copy.verifyEmail.verifiedDescription}
         </p>
-        <Link href="/login">Continue to login</Link>
+        <Link href="/login">{copy.verifyEmail.continueToLogin}</Link>
       </>
     );
   }
 
   return (
     <>
-      <h1>Verification link unavailable</h1>
+      <h1>{copy.verifyEmail.unavailable}</h1>
       <p role="alert">
-        The link is invalid, expired, already used, or cannot be processed
-        safely.
+        {copy.verifyEmail.unavailableDescription}
       </p>
       <ResendVerificationForm />
-      <Link href="/login">Back to sign in</Link>
+      <Link href="/login">{copy.common.backToSignIn}</Link>
     </>
   );
 }

@@ -27,6 +27,11 @@ import {
   companyMatchesScope,
   useRecruiterCompanyScope,
 } from "@/frontend/features/recruiter-workspace/recruiter-company-scope";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import {
+  recruiterApplicationsCopy,
+  type RecruiterApplicationsCopy,
+} from "./recruiter-applications-copy";
 
 const emptyCompanies: RecruiterCompanyView[] = [];
 import {
@@ -35,12 +40,7 @@ import {
 } from "./use-campaign-scoring-stats";
 
 const visibleStatuses = new Set<RecruiterJob["status"]>(["active", "closed"]);
-const campaignRangeSeparator = "\u2013";
 const campaignPaginationEllipsis = "\u2026";
-
-function applicationLabel(count: number) {
-  return `${count.toLocaleString("en-US")} ${count === 1 ? "candidate" : "candidates"}`;
-}
 
 function departmentFor(job: RecruiterJob) {
   return (
@@ -85,6 +85,7 @@ function CampaignPagination({
   total,
   onPage,
   onPageSize,
+  copy,
 }: {
   pageIndex: number;
   pageCount: number;
@@ -92,36 +93,33 @@ function CampaignPagination({
   total: number;
   onPage: (pageIndex: number) => void;
   onPageSize: (pageSize: number) => void;
+  copy: RecruiterApplicationsCopy["campaigns"];
 }) {
   const start = pageIndex * pageSize + 1;
   const end = Math.min((pageIndex + 1) * pageSize, total);
   return (
     <footer className="ranking-pagination campaign-pagination">
-      <span>
-        Showing {start}
-        {campaignRangeSeparator}
-        {end} of {total} campaigns
-      </span>
+      <span>{copy.showing(start, end, total)}</span>
       <label>
-        <span>Campaigns per page</span>
+        <span>{copy.pagination.campaignsPerPage}</span>
         <select
           value={pageSize}
           onChange={(event) => onPageSize(Number(event.target.value))}
         >
-          <option value={12}>12 / page</option>
-          <option value={24}>24 / page</option>
-          <option value={48}>48 / page</option>
+          <option value={12}>{copy.pagination.perPage(12)}</option>
+          <option value={24}>{copy.pagination.perPage(24)}</option>
+          <option value={48}>{copy.pagination.perPage(48)}</option>
         </select>
       </label>
       <nav
         className="ranking-pager campaign-pagination__pager"
-        aria-label="Campaign pagination"
+        aria-label={copy.pagination.pagination}
       >
         <button
           type="button"
           onClick={() => onPage(pageIndex - 1)}
           disabled={pageIndex === 0}
-          aria-label="Previous page"
+          aria-label={copy.pagination.previous}
         >
           <ChevronLeft aria-hidden="true" />
         </button>
@@ -140,7 +138,7 @@ function CampaignPagination({
               className={item === pageIndex ? "is-current" : undefined}
               key={item}
               onClick={() => onPage(item)}
-              aria-label={`Page ${item + 1}`}
+              aria-label={copy.pagination.page(item + 1)}
               aria-current={item === pageIndex ? "page" : undefined}
             >
               {item + 1}
@@ -151,7 +149,7 @@ function CampaignPagination({
           type="button"
           onClick={() => onPage(pageIndex + 1)}
           disabled={pageIndex === pageCount - 1}
-          aria-label="Next page"
+          aria-label={copy.pagination.next}
         >
           <ChevronRight aria-hidden="true" />
         </button>
@@ -167,6 +165,8 @@ const CampaignCard = memo(function CampaignCard({
   statsLoading,
   statsError,
   hasUpdates,
+  copy,
+  locale,
 }: {
   job: RecruiterJob;
   view: "grid" | "list";
@@ -174,6 +174,8 @@ const CampaignCard = memo(function CampaignCard({
   statsLoading: boolean;
   statsError: boolean;
   hasUpdates: boolean;
+  copy: RecruiterApplicationsCopy["campaigns"];
+  locale: "vi" | "en";
 }) {
   const isActive = job.status === "active";
   const applicantCount = stats?.total ?? job.stats.applicantCount;
@@ -186,15 +188,15 @@ const CampaignCard = memo(function CampaignCard({
               className={`campaign-status-pill campaign-status-pill--${isActive ? "active" : "closed"}`}
             >
               <span className="campaign-status-pill__dot" aria-hidden="true" />
-              {isActive ? "Active" : "Closed"}
+              {isActive ? copy.active : copy.closed}
             </span>
             {hasUpdates ? (
               <span
                 className="campaign-card__update-badge"
-                aria-label="Campaign updated since your last view"
+                aria-label={copy.updated}
               >
                 <span aria-hidden="true" />
-                Updated
+                {copy.updated}
               </span>
             ) : null}
           </div>
@@ -209,8 +211,8 @@ const CampaignCard = memo(function CampaignCard({
           {job.company.name}
         </p>
         <div className="campaign-card__applicants">
-          <strong>{applicationLabel(applicantCount)}</strong>
-          <span>Applications received</span>
+          <strong>{copy.candidates(applicantCount)}</strong>
+          <span>{copy.applicationReceived}</span>
         </div>
       </div>
       <CampaignDistributionBar
@@ -222,27 +224,31 @@ const CampaignCard = memo(function CampaignCard({
       />
       <div className="campaign-card__footer">
         <span className="campaign-card__updated">
-          Updated{" "}
-          {new Date(job.updatedAt).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })}
+          {copy.updatedOn(
+            new Date(job.updatedAt).toLocaleDateString(
+              locale === "vi" ? "vi-VN" : "en-US",
+              {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              },
+            ),
+          )}
         </span>
         <a
           href={recruiterRoutes.candidateRanking(job.id)}
           className="campaign-card__action"
-          aria-label={`Review candidates for ${job.title || "Untitled job posting"}`}
+          aria-label={copy.reviewCandidatesFor(job.title || copy.noTitle)}
         >
-          Review candidates
+          {copy.reviewCandidates}
           <ArrowRight aria-hidden="true" />
         </a>
         <a
           href={recruiterRoutes.pipelineForJob(job.id)}
           className="campaign-card__action"
-          aria-label={`View pipeline for ${job.title || "Untitled job posting"}`}
+          aria-label={copy.viewPipelineFor(job.title || copy.noTitle)}
         >
-          View pipeline
+          {copy.viewPipeline}
           <ArrowRight aria-hidden="true" />
         </a>
       </div>
@@ -261,6 +267,8 @@ export function RecruiterCandidatesPage({
   selectedJobId?: string;
   csrfProof?: string;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = recruiterApplicationsCopy(locale).campaigns;
   const companyOptions = companies ?? emptyCompanies;
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"ALL" | "active" | "closed">("ALL");
@@ -360,16 +368,13 @@ export function RecruiterCandidatesPage({
     >
       <header className="campaign-page-header">
         <div>
-          <p className="recruiter-eyebrow">Recruiter workspace</p>
-          <h1 id="recruiter-candidates-title">Candidates</h1>
-          <p>
-            Choose a campaign to review applications, evidence, and hybrid
-            scoring in one focused workspace.
-          </p>
+          <p className="recruiter-eyebrow">{copy.workspace}</p>
+          <h1 id="recruiter-candidates-title">{copy.title}</h1>
+          <p>{copy.description}</p>
         </div>
         <div className="campaign-page-header__meta">
           <span>
-            <Users aria-hidden="true" /> {selectableJobs.length} campaigns
+            <Users aria-hidden="true" /> {copy.campaign(selectableJobs.length)}
           </span>
           <span className="campaign-insights-meta" role="status">
             <LoaderCircle
@@ -377,23 +382,23 @@ export function RecruiterCandidatesPage({
               className={statsLoading ? "is-spinning" : undefined}
             />{" "}
             {statsLoading
-              ? "Updating insights"
+              ? copy.insightsUpdating
               : statsError
-                ? "Insights unavailable"
-                : "Insights up to date"}
+                ? copy.insightsUnavailable
+                : copy.insightsUpToDate}
             {statsError ? (
               <button
                 type="button"
                 className="campaign-insights-retry"
                 onClick={handleRefresh}
               >
-                Retry
+                {copy.retry}
               </button>
             ) : null}
           </span>
           {campaignError ? (
             <span className="campaign-page-header__meta-error">
-              Campaign data unavailable
+              {copy.campaignDataUnavailable}
             </span>
           ) : null}
         </div>
@@ -407,11 +412,8 @@ export function RecruiterCandidatesPage({
           <SlidersHorizontal />
         </span>
         <div>
-          <strong>Scores support decision-making only.</strong>
-          <span>
-            Automatic and AI scores help you prioritize review; every hiring
-            decision remains with the recruiter.
-          </span>
+          <strong>{copy.trustTitle}</strong>
+          <span>{copy.trustDescription}</span>
         </div>
       </div>
 
@@ -421,7 +423,7 @@ export function RecruiterCandidatesPage({
       >
         <label className="campaign-search-field">
           <Search aria-hidden="true" />
-          <span className="sr-only">Search campaigns</span>
+          <span className="sr-only">{copy.searchCampaigns}</span>
           <input
             id="candidate-campaign-search"
             name="campaignSearch"
@@ -430,11 +432,11 @@ export function RecruiterCandidatesPage({
               setSearch(event.target.value);
               setCampaignPageIndex(0);
             }}
-            placeholder="Search by role, company, or department"
+            placeholder={copy.searchPlaceholder}
           />
         </label>
         <label className="campaign-filter-field">
-          <span>Status</span>
+          <span>{copy.status}</span>
           <select
             id="candidate-campaign-status"
             name="campaignStatus"
@@ -444,13 +446,13 @@ export function RecruiterCandidatesPage({
               setCampaignPageIndex(0);
             }}
           >
-            <option value="ALL">All statuses</option>
-            <option value="active">Active</option>
-            <option value="closed">Closed</option>
+            <option value="ALL">{copy.allStatuses}</option>
+            <option value="active">{copy.active}</option>
+            <option value="closed">{copy.closed}</option>
           </select>
         </label>
         <label className="campaign-filter-field">
-          <span>Department</span>
+          <span>{copy.department}</span>
           <select
             id="candidate-campaign-department"
             name="campaignDepartment"
@@ -460,7 +462,7 @@ export function RecruiterCandidatesPage({
               setCampaignPageIndex(0);
             }}
           >
-            <option value="ALL">All departments</option>
+            <option value="ALL">{copy.allDepartments}</option>
             {departments.map((item) => (
               <option value={item} key={item}>
                 {item}
@@ -478,12 +480,12 @@ export function RecruiterCandidatesPage({
           id="candidate-campaign-company"
           className="campaign-filter-field"
         />
-        <div className="campaign-view-toggle" aria-label="Campaign view">
+        <div className="campaign-view-toggle" aria-label={copy.campaignView}>
           <button
             type="button"
             className={view === "grid" ? "is-active" : ""}
             onClick={() => setView("grid")}
-            aria-label="Grid view"
+            aria-label={copy.gridView}
             aria-pressed={view === "grid"}
           >
             <Grid2X2 aria-hidden="true" />
@@ -492,7 +494,7 @@ export function RecruiterCandidatesPage({
             type="button"
             className={view === "list" ? "is-active" : ""}
             onClick={() => setView("list")}
-            aria-label="List view"
+            aria-label={copy.listView}
             aria-pressed={view === "list"}
           >
             <List aria-hidden="true" />
@@ -503,20 +505,27 @@ export function RecruiterCandidatesPage({
       <div className="campaign-results-toolbar">
         <div>
           <strong>
-            {filteredJobs.length
-              ? `Showing ${currentCampaignPageIndex * campaignPageSize + 1}${campaignRangeSeparator}${Math.min((currentCampaignPageIndex + 1) * campaignPageSize, filteredJobs.length)} of ${filteredJobs.length} campaigns`
-              : `Showing 0${campaignRangeSeparator}0 of 0 campaigns`}
+            {copy.showing(
+              filteredJobs.length
+                ? currentCampaignPageIndex * campaignPageSize + 1
+                : 0,
+              filteredJobs.length
+                ? Math.min(
+                    (currentCampaignPageIndex + 1) * campaignPageSize,
+                    filteredJobs.length,
+                  )
+                : 0,
+              filteredJobs.length,
+            )}
           </strong>
           <span>
-            {hasCampaignFilters
-              ? "matching your filters"
-              : "ready for candidate review"}
+            {hasCampaignFilters ? copy.matchingFilters : copy.readyForReview}
           </span>
         </div>
         <div className="campaign-results-actions">
           {lastUpdatedAt ? (
             <span className="campaign-refresh-confirmation" role="status">
-              Updated just now
+              {copy.updatedJustNow}
             </span>
           ) : null}
           <button
@@ -529,7 +538,7 @@ export function RecruiterCandidatesPage({
               aria-hidden="true"
               className={refreshing ? "is-spinning" : undefined}
             />
-            {refreshing ? "Refreshing" : "Refresh"}
+            {refreshing ? copy.refreshing : copy.refresh}
           </button>
           {hasCampaignFilters ? (
             <button
@@ -537,7 +546,7 @@ export function RecruiterCandidatesPage({
               className="ai-ranking-clear-button"
               onClick={clearCampaignFilters}
             >
-              Clear filters
+              {copy.clearFilters}
             </button>
           ) : null}
         </div>
@@ -548,25 +557,22 @@ export function RecruiterCandidatesPage({
           <span className="campaign-empty-state__icon" aria-hidden="true">
             <BriefcaseBusiness />
           </span>
-          <h2>No campaigns are ready for candidate review</h2>
-          <p>
-            Active and closed job postings will appear here after they are
-            available to candidates.
-          </p>
+          <h2>{copy.emptyReadyTitle}</h2>
+          <p>{copy.emptyReadyDescription}</p>
         </div>
       ) : filteredJobs.length === 0 ? (
         <div className="campaign-empty-state recruiter-surface-card">
           <span className="campaign-empty-state__icon" aria-hidden="true">
             <Search />
           </span>
-          <h2>No campaigns match these filters</h2>
-          <p>Try a different role, status, or department.</p>
+          <h2>{copy.emptyFilteredTitle}</h2>
+          <p>{copy.emptyFilteredDescription}</p>
           <button
             type="button"
             className="ai-ranking-button ai-ranking-button--secondary"
             onClick={clearCampaignFilters}
           >
-            Clear filters
+            {copy.clearFilters}
           </button>
         </div>
       ) : (
@@ -583,6 +589,8 @@ export function RecruiterCandidatesPage({
                 statsLoading={statsLoading}
                 statsError={Boolean(statsError)}
                 hasUpdates={changedJobIds?.has(job.id) ?? false}
+                copy={copy}
+                locale={locale}
               />
             </div>
           ))}
@@ -599,6 +607,7 @@ export function RecruiterCandidatesPage({
             setCampaignPageSize(nextPageSize);
             setCampaignPageIndex(0);
           }}
+          copy={copy}
         />
       ) : null}
     </section>

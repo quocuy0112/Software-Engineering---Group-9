@@ -320,6 +320,14 @@ describe("recruiter job posting management", () => {
         value: "Own the frontend experience from discovery to delivery.",
       },
     });
+    fireEvent.change(screen.getByLabelText(/Responsibilities/), {
+      target: {
+        value: "Own the frontend experience from discovery to delivery.",
+      },
+    });
+    fireEvent.change(screen.getByLabelText(/Requirements/), {
+      target: { value: "Strong frontend engineering experience." },
+    });
     fireEvent.change(screen.getByLabelText(/Application deadline/), {
       target: { value: "2099-12-31" },
     });

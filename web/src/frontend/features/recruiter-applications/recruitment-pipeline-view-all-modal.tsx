@@ -14,6 +14,8 @@ import {
   pipelineScoreForCard,
   pipelineTierForCard,
 } from "./recruitment-pipeline-ui";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruiterApplicationsCopy } from "./recruiter-applications-copy";
 
 export type ViewAllPipelineStage = PipelineBoardColumnStage;
 
@@ -58,15 +60,10 @@ const bulkActions: Record<ViewAllPipelineStage, readonly BulkAction[]> = {
   WITHDRAWN: [],
 };
 
-const tierLabels = {
-  strong: "Strong match",
-  review: "Review needed",
-  low: "Low match",
-  pending: "Not yet scored",
-} as const;
-
-function formatSubmissionDate(value: string) {
-  return new Date(value).toLocaleDateString("en-GB");
+function formatSubmissionDate(value: string, locale: "vi" | "en") {
+  return new Date(value).toLocaleDateString(
+    locale === "vi" ? "vi-VN" : "en-GB",
+  );
 }
 
 export function RecruitmentPipelineViewAllModal({
@@ -89,6 +86,11 @@ export function RecruitmentPipelineViewAllModal({
   ) => Promise<void>;
   onBulkReject: (cards: readonly PipelineApplicationCard[]) => void;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = useMemo(
+    () => recruiterApplicationsCopy(locale).pipeline,
+    [locale],
+  );
   const [candidates, setCandidates] = useState<PipelineApplicationCard[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [loading, setLoading] = useState(true);
@@ -101,7 +103,26 @@ export function RecruitmentPipelineViewAllModal({
   const subtitleId = useId();
   const onCloseRef = useRef(onClose);
   const busyRef = useRef(busy);
-  const stageActions = bulkActions[summary.stage];
+  const stageActions = bulkActions[summary.stage].map((action) => ({
+    ...action,
+    label:
+      action.kind === "reject"
+        ? copy.reject
+        : action.kind === "waitlist"
+          ? copy.waitlist
+          : action.target === "SHORTLISTED"
+            ? copy.moveToShortlist
+            : action.target === "INTERVIEWING"
+              ? copy.moveToInterview
+              : copy.sendOffer,
+  }));
+  const displayLabel = copy.stageLabels[summary.stage] ?? summary.label;
+  const tierLabels = {
+    strong: copy.strong,
+    review: copy.review,
+    low: copy.low,
+    pending: copy.pending,
+  } as const;
   const readOnlyList = stageActions.length === 0;
 
   useEffect(() => {
@@ -186,7 +207,9 @@ export function RecruitmentPipelineViewAllModal({
           const json = await response.json().catch(() => null);
           if (!response.ok) {
             throw new Error(
-              json?.message ?? "Unable to load the full candidate list.",
+              locale === "en" && typeof json?.message === "string"
+                ? json.message
+                : copy.unavailable,
             );
           }
 
@@ -195,7 +218,7 @@ export function RecruitmentPipelineViewAllModal({
               ? pipelineWithdrawnPageSchema.parse(json)
               : pipelineStagePageSchema.parse(json);
           if (page.stage !== summary.stage) {
-            throw new Error("The candidate list returned an unexpected stage.");
+            throw new Error(copy.unexpectedStage);
           }
           items.push(...page.items);
 
@@ -222,9 +245,9 @@ export function RecruitmentPipelineViewAllModal({
       } catch (cause) {
         if (!cancelled) {
           setError(
-            cause instanceof Error
+            locale === "en" && cause instanceof Error
               ? cause.message
-              : "Unable to load the full candidate list.",
+              : copy.unavailable,
           );
         }
       } finally {
@@ -236,7 +259,7 @@ export function RecruitmentPipelineViewAllModal({
     return () => {
       cancelled = true;
     };
-  }, [jobId, reloadToken, summary.stage]);
+  }, [copy, jobId, locale, reloadToken, summary.stage]);
 
   const selectedCandidates = useMemo(
     () =>
@@ -292,12 +315,7 @@ export function RecruitmentPipelineViewAllModal({
     const confirmed =
       typeof window === "undefined" ||
       window.confirm(
-        action.label +
-          " " +
-          selectedCount +
-          " selected candidates from " +
-          summary.label +
-          "?",
+        copy.confirmBulk(action.label, selectedCount, displayLabel),
       );
     if (!confirmed) return;
 
@@ -343,19 +361,19 @@ export function RecruitmentPipelineViewAllModal({
           <div>
             <div className="modal-eyebrow">
               <span className="dot" aria-hidden="true" />
-              {"FULL CANDIDATE LIST"}
+              {copy.fullList}
             </div>
             <div className="modal-title" id={titleId}>
-              {summary.label}
+              {displayLabel}
             </div>
             <div className="modal-subtitle" id={subtitleId}>
-              {"Total " + summary.count + " candidates in this stage."}
+              {copy.totalInStage(summary.count)}
             </div>
           </div>
           <button
             type="button"
             className="modal-close view-all-modal__close"
-            aria-label="Close full list"
+            aria-label={copy.closeFullList}
             onClick={onClose}
             disabled={busy}
           >
@@ -370,8 +388,8 @@ export function RecruitmentPipelineViewAllModal({
           >
             <div className="bulk-count" aria-live="polite">
               {selectedCount > 0
-                ? selectedCount + " candidates selected"
-                : "No candidates selected"}
+                ? copy.selected(selectedCount)
+                : copy.noneSelected}
             </div>
             <div className="bulk-actions view-all-modal__bulk-actions">
               {stageActions.map((action) =>
@@ -410,29 +428,29 @@ export function RecruitmentPipelineViewAllModal({
               disabled={loading || !selectableCandidates.length || busy}
               onChange={toggleAll}
             />
-            <span>Select all in this list</span>
+            <span>{copy.selectAll}</span>
           </label>
         )}
 
         {loading ? (
           <p className="modal-list-state view-all-modal__state" role="status">
-            Loading full candidate list...
+            {copy.loadingFullList}
           </p>
         ) : error ? (
           <div className="modal-list-state view-all-modal__state" role="alert">
-            <p>{error}</p>
+            <p>{copy.unavailable}</p>
             <button
               type="button"
               onClick={() => setReloadToken((current) => current + 1)}
             >
-              Retry
+              {copy.retry}
             </button>
           </div>
         ) : candidates.length ? (
           <div
             className="modal-list view-all-modal__rows"
             role="list"
-            aria-label={summary.label + " candidate list"}
+            aria-label={`${displayLabel} ${copy.candidates}`}
           >
             {candidates.map((candidate) => {
               const tier = pipelineTierForCard(candidate);
@@ -451,7 +469,9 @@ export function RecruitmentPipelineViewAllModal({
                       type="checkbox"
                       checked={selectedIds.has(candidate.applicationId)}
                       disabled={busy || withdrawn}
-                      aria-label={"Select " + candidate.candidate.displayName}
+                      aria-label={copy.selectCandidate(
+                        candidate.candidate.displayName,
+                      )}
                       onChange={() => toggleCandidate(candidate.applicationId)}
                     />
                   )}
@@ -460,13 +480,14 @@ export function RecruitmentPipelineViewAllModal({
                       {candidate.candidate.displayName}
                       {withdrawn ? (
                         <span className="modal-row-status status-withdrawn">
-                          Withdrawn
+                          {copy.stageLabels.WITHDRAWN}
                         </span>
                       ) : null}
                     </div>
                     <div className="modal-row-date">
-                      {"Submitted " +
-                        formatSubmissionDate(candidate.submittedAt)}
+                      {copy.submitted(
+                        formatSubmissionDate(candidate.submittedAt, locale),
+                      )}
                     </div>
                   </div>
                   <div className="modal-row-score">
@@ -487,7 +508,7 @@ export function RecruitmentPipelineViewAllModal({
           </div>
         ) : (
           <p className="modal-list-state view-all-modal__state">
-            No candidates in this stage.
+            {copy.noCandidatesInStage}
           </p>
         )}
       </section>

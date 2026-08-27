@@ -72,6 +72,7 @@ export function ProfileEducationForm({
           remove: "Xóa",
           add: "+ Thêm học vấn",
           addOther: "Thêm bằng cấp hoặc chứng chỉ",
+          saved: "Thông tin học vấn đã lưu",
         }
       : {
           kicker: "Education",
@@ -93,6 +94,7 @@ export function ProfileEducationForm({
           remove: "Remove",
           add: "+ Add education",
           addOther: "Add degree or certification",
+          saved: "Saved education",
         };
   const editLabel = locale === "vi" ? "Chỉnh sửa học vấn" : "Edit education";
   const cancelLabel = locale === "vi" ? "Hủy" : "Cancel";
@@ -131,7 +133,7 @@ export function ProfileEducationForm({
             <>
               <div
                 className="edu-row sh-education-grid"
-                aria-label="Saved education"
+                aria-label={copy.saved}
               >
                 {profile.education.map((entry, idx) => (
                   <div className="edu-card" key={entry.id || idx}>

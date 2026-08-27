@@ -13,6 +13,8 @@ import {
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { JobSearchResponse } from "@/shared/contracts/jobs/discovery";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { jobCopy } from "./job-copy";
 
 export type JobSortMode =
   | "best-match"
@@ -37,50 +39,195 @@ const sortModeFromServerValue: Record<string, JobSortMode> = {
   SALARY_DESC: "salary-high",
 };
 
-const filterLabels: Record<string, string> = {
-  q: "Keyword",
-  location: "Location",
-  employmentType: "Work type",
-  experienceLevel: "Level",
-  workArrangement: "Arrangement",
-  skills: "Skill",
-  salaryMin: "Minimum salary",
-  salaryMax: "Maximum salary",
-  postedWithinDays: "Posted within",
-  experienceMinYears: "Experience",
-  categoryFamily: "Category",
-  workOnSaturday: "Saturday work",
-};
+type FilterLocale = "vi" | "en";
 
-const valueLabels: Record<string, string> = {
-  FULL_TIME: "Full time",
-  PART_TIME: "Part time",
-  CONTRACT: "Contract",
-  INTERNSHIP: "Internship",
-  TEMPORARY: "Temporary",
-  ENTRY: "Entry",
-  JUNIOR: "Junior",
-  MID: "Mid-level",
-  SENIOR: "Senior",
-  LEAD: "Lead",
-  MANAGER: "Manager",
-  ONSITE: "On-site",
-  HYBRID: "Hybrid",
-  REMOTE: "Remote",
-  "1": "24 hours",
-  "3": "3 days",
-  "7": "7 days",
-  "14": "14 days",
-  "30": "30 days",
-};
+function filterLabelsFor(locale: FilterLocale) {
+  return locale === "vi"
+    ? {
+        q: "Từ khóa",
+        location: "Địa điểm",
+        employmentType: "Loại việc",
+        experienceLevel: "Cấp độ",
+        workArrangement: "Hình thức",
+        skills: "Kỹ năng",
+        salaryMin: "Lương tối thiểu",
+        salaryMax: "Lương tối đa",
+        postedWithinDays: "Đăng trong",
+        experienceMinYears: "Kinh nghiệm",
+        categoryFamily: "Nhóm ngành",
+        workOnSaturday: "Làm thứ Bảy",
+        searchBy: "Tìm theo",
+      }
+    : {
+        q: "Keyword",
+        location: "Location",
+        employmentType: "Work type",
+        experienceLevel: "Level",
+        workArrangement: "Arrangement",
+        skills: "Skill",
+        salaryMin: "Minimum salary",
+        salaryMax: "Maximum salary",
+        postedWithinDays: "Posted within",
+        experienceMinYears: "Experience",
+        categoryFamily: "Category",
+        workOnSaturday: "Saturday work",
+        searchBy: "Search by",
+      };
+}
 
-const quickFilters = [
-  { label: "Remote", name: "workArrangement", value: "REMOTE" },
-  { label: "Hybrid", name: "workArrangement", value: "HYBRID" },
-  { label: "Full time", name: "employmentType", value: "FULL_TIME" },
-  { label: "New this week", name: "postedWithinDays", value: "7" },
-  { label: "20M+ VND", name: "salaryMin", value: "20000000" },
-] as const;
+function filterValueLabelsFor(locale: FilterLocale): Record<string, string> {
+  const copy = jobCopy(locale);
+  return {
+    ...copy.employmentTypeLabels,
+    ...copy.experienceLevelLabels,
+    ...copy.workArrangementLabels,
+    TITLE: locale === "vi" ? "Chức danh" : "Job title",
+    COMPANY: locale === "vi" ? "Công ty" : "Company",
+    BOTH:
+      locale === "vi"
+        ? "Chức danh, kỹ năng + công ty"
+        : "Title, skills + company",
+    "1": locale === "vi" ? "24 giờ" : "24 hours",
+    "3": locale === "vi" ? "3 ngày" : "3 days",
+    "7": locale === "vi" ? "7 ngày" : "7 days",
+    "14": locale === "vi" ? "14 ngày" : "14 days",
+    "30": locale === "vi" ? "30 ngày" : "30 days",
+  };
+}
+
+function filterText(locale: FilterLocale) {
+  return locale === "vi"
+    ? {
+        sortBy: "Sắp xếp theo",
+        sortJobs: "Sắp xếp việc làm",
+        salary: "Mức lương",
+        salaryPresets: "Mức lương gợi ý",
+        salaryRange: "Khoảng lương",
+        minimumSalary: "Lương tối thiểu",
+        maximumSalary: "Lương tối đa",
+        from: "Từ",
+        to: "Đến",
+        salaryHelp: "Khoảng lương VND theo tháng, trước thuế.",
+        experience: "Kinh nghiệm",
+        minimumYears: "Số năm tối thiểu",
+        anyExperience: "Không yêu cầu cụ thể",
+        years: (count: number) => `${count}+ năm`,
+        jobLevel: "Cấp độ công việc",
+        workType: "Loại hình làm việc",
+        moreFilters: "Bộ lọc khác",
+        city: "Thành phố",
+        skill: "Kỹ năng",
+        categoryFamily: "Nhóm ngành",
+        worksSaturdays: "Làm việc thứ Bảy",
+        postedWithin: "Đăng trong",
+        anyTime: "Mọi thời điểm",
+        hours: "24 giờ",
+        days: (count: number) => `${count} ngày`,
+        activeFilters: "Bộ lọc đang áp dụng",
+        filteredBy: "Được lọc theo",
+        searchBy: "Tìm theo",
+        jobTitle: "Chức danh công việc",
+        company: "Công ty",
+        titleSkillsCompany: "Chức danh, kỹ năng + công ty",
+        searchJobs: "Tìm việc làm",
+        searchPlaceholder: "Tìm chức danh, kỹ năng, công ty",
+        quickFilters: "Bộ lọc nhanh",
+        filtersAndSort: "Bộ lọc & sắp xếp",
+        matchingJobs: "việc làm phù hợp",
+        advancedJobFilters: "Bộ lọc việc làm nâng cao",
+        refineSignal: "Tinh chỉnh kết quả",
+        advancedFilters: "Bộ lọc nâng cao",
+        clear: "Xóa",
+        keepSearch: "Lưu tìm kiếm này",
+        saveDescription: "Đặt tên cho nhóm bộ lọc và dùng lại sau.",
+        savedSearches: "Tìm kiếm đã lưu",
+        reuseSaved: "Dùng lại tìm kiếm đã lưu…",
+        personalizeList: "Cá nhân hóa danh sách",
+        closeFiltersSort: "Đóng bộ lọc và sắp xếp",
+        clearAll: "Xóa tất cả",
+        showJobs: (count: number) => `Hiển thị ${count} việc làm`,
+        saveFilter: "Lưu bộ lọc",
+        nameSearch: "Đặt tên tìm kiếm",
+        savedDescription:
+          "Tìm kiếm đã lưu độc lập với bộ lọc đang áp dụng; danh sách này đã cập nhật trực tiếp.",
+        searchName: "Tên tìm kiếm",
+        searchExample: "ví dụ: Vị trí sản phẩm cấp cao từ xa",
+        cancel: "Hủy",
+        saveFilterAction: "Lưu bộ lọc",
+      }
+    : {
+        sortBy: "Sort by",
+        sortJobs: "Sort jobs",
+        salary: "Salary",
+        salaryPresets: "Salary presets",
+        salaryRange: "Salary range",
+        minimumSalary: "Minimum salary",
+        maximumSalary: "Maximum salary",
+        from: "From",
+        to: "To",
+        salaryHelp: "Monthly VND ranges, before tax.",
+        experience: "Experience",
+        minimumYears: "Minimum years",
+        anyExperience: "Any experience",
+        years: (count: number) => `${count}+ years`,
+        jobLevel: "Job level",
+        workType: "Work type",
+        moreFilters: "More filters",
+        city: "City",
+        skill: "Skill",
+        categoryFamily: "Category family",
+        worksSaturdays: "Works Saturdays",
+        postedWithin: "Posted within",
+        anyTime: "Any time",
+        hours: "24 hours",
+        days: (count: number) => `${count} days`,
+        activeFilters: "Active filters",
+        filteredBy: "Filtered by",
+        searchBy: "Search by",
+        jobTitle: "Job title",
+        company: "Company",
+        titleSkillsCompany: "Title, skills + company",
+        searchJobs: "Search jobs",
+        searchPlaceholder: "Search job titles, skills, companies",
+        quickFilters: "Quick filters",
+        filtersAndSort: "Filters & Sort",
+        matchingJobs: "matching jobs",
+        advancedJobFilters: "Advanced job filters",
+        refineSignal: "Refine the signal",
+        advancedFilters: "Advanced filters",
+        clear: "Clear",
+        keepSearch: "Keep this search",
+        saveDescription: "Name this filter combo and reuse it later.",
+        savedSearches: "Saved searches",
+        reuseSaved: "Reuse saved search…",
+        personalizeList: "Personalize the list",
+        closeFiltersSort: "Close filters and sort",
+        clearAll: "Clear all",
+        showJobs: (count: number) => `Show ${count} jobs`,
+        saveFilter: "Save filter",
+        nameSearch: "Name this search",
+        savedDescription:
+          "Saved searches are separate from applying a filter; this list is already live.",
+        searchName: "Search name",
+        searchExample: "e.g. Senior remote product roles",
+        cancel: "Cancel",
+        saveFilterAction: "Save filter",
+      };
+}
+
+function quickFiltersFor(locale: FilterLocale) {
+  const labels =
+    locale === "vi"
+      ? ["Từ xa", "Linh hoạt", "Toàn thời gian", "Mới trong tuần", "20M+ VND"]
+      : ["Remote", "Hybrid", "Full time", "New this week", "20M+ VND"];
+  return [
+    { label: labels[0], name: "workArrangement", value: "REMOTE" },
+    { label: labels[1], name: "workArrangement", value: "HYBRID" },
+    { label: labels[2], name: "employmentType", value: "FULL_TIME" },
+    { label: labels[3], name: "postedWithinDays", value: "7" },
+    { label: labels[4], name: "salaryMin", value: "20000000" },
+  ] as const;
+}
 
 export function sortModeFromParams(params: URLSearchParams) {
   const explicit = params.get("sortBy") as JobSortMode | null;
@@ -141,12 +288,14 @@ export function SortDropdown({
   onChange: (value: JobSortMode) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const locale = useWorkspaceLocale();
+  const text = filterText(locale);
   const selected =
     sortOptions.find((option) => option.value === value) ?? sortOptions[0];
 
   return (
     <div className="job-sort-dropdown">
-      <span className="job-sort-label">Sort by</span>
+      <span className="job-sort-label">{text.sortBy}</span>
       <button
         className="job-sort-trigger"
         type="button"
@@ -158,15 +307,19 @@ export function SortDropdown({
           {selected.icon}
         </span>
         <span>
-          <strong>{selected.label}</strong>
-          <small>{selected.description}</small>
+          <strong>{sortOptionText(locale, selected.value).label}</strong>
+          <small>{sortOptionText(locale, selected.value).description}</small>
         </span>
         <span className="job-sort-chevron" aria-hidden="true">
           {open ? "⌃" : "⌄"}
         </span>
       </button>
       {open ? (
-        <div className="job-sort-menu" role="listbox" aria-label="Sort jobs">
+        <div
+          className="job-sort-menu"
+          role="listbox"
+          aria-label={text.sortJobs}
+        >
           {sortOptions.map((option) => (
             <button
               key={option.value}
@@ -182,8 +335,10 @@ export function SortDropdown({
                 {option.icon}
               </span>
               <span>
-                <strong>{option.label}</strong>
-                <small>{option.description}</small>
+                <strong>{sortOptionText(locale, option.value).label}</strong>
+                <small>
+                  {sortOptionText(locale, option.value).description}
+                </small>
               </span>
               {option.value === value ? (
                 <span className="job-sort-check" aria-hidden="true">
@@ -200,47 +355,91 @@ export function SortDropdown({
 
 const sortOptions: Array<{
   value: JobSortMode;
-  label: string;
-  description: string;
   icon: string;
 }> = [
   {
     value: "best-match",
-    label: "Best match",
-    description: "Aligned to your profile",
     icon: "✦",
   },
   {
     value: "recently-posted",
-    label: "Recently posted",
-    description: "Freshest opportunities first",
     icon: "◷",
   },
   {
     value: "recently-updated",
-    label: "Recently updated",
-    description: "Roles with new details",
     icon: "↻",
   },
   {
     value: "urgent",
-    label: "Urgent hiring",
-    description: "Closing soon and hiring now",
     icon: "♨",
   },
   {
     value: "salary-high",
-    label: "Salary: high to low",
-    description: "Highest published range first",
     icon: "↗",
   },
   {
     value: "salary-low",
-    label: "Salary: low to high",
-    description: "Lowest published range first",
     icon: "↘",
   },
 ];
+
+function sortOptionText(locale: FilterLocale, value: JobSortMode) {
+  const options =
+    locale === "vi"
+      ? {
+          "best-match": {
+            label: "Phù hợp nhất",
+            description: "Phù hợp với hồ sơ của bạn",
+          },
+          "recently-posted": {
+            label: "Mới đăng gần đây",
+            description: "Cơ hội mới nhất lên đầu",
+          },
+          "recently-updated": {
+            label: "Cập nhật gần đây",
+            description: "Vị trí có thông tin mới",
+          },
+          urgent: {
+            label: "Đang cần tuyển gấp",
+            description: "Sắp đóng và đang tuyển dụng",
+          },
+          "salary-high": {
+            label: "Lương: cao đến thấp",
+            description: "Khoảng lương công bố cao nhất lên đầu",
+          },
+          "salary-low": {
+            label: "Lương: thấp đến cao",
+            description: "Khoảng lương công bố thấp nhất lên đầu",
+          },
+        }
+      : {
+          "best-match": {
+            label: "Best match",
+            description: "Aligned to your profile",
+          },
+          "recently-posted": {
+            label: "Recently posted",
+            description: "Freshest opportunities first",
+          },
+          "recently-updated": {
+            label: "Recently updated",
+            description: "Roles with new details",
+          },
+          urgent: {
+            label: "Urgent hiring",
+            description: "Closing soon and hiring now",
+          },
+          "salary-high": {
+            label: "Salary: high to low",
+            description: "Highest published range first",
+          },
+          "salary-low": {
+            label: "Salary: low to high",
+            description: "Lowest published range first",
+          },
+        };
+  return options[value];
+}
 
 export function AdvancedFilters({
   onUpdate,
@@ -251,6 +450,9 @@ export function AdvancedFilters({
   ) => void;
 }) {
   const params = useSearchParams();
+  const locale = useWorkspaceLocale();
+  const text = filterText(locale);
+  const labels = filterValueLabelsFor(locale);
   const [location, setLocation] = useState(params.get("location") ?? "");
   const [skill, setSkill] = useState(params.get("skills") ?? "");
   const locationTimer = useRef<number | null>(null);
@@ -284,11 +486,11 @@ export function AdvancedFilters({
     <div className="job-advanced-filter-groups">
       <details open>
         <summary>
-          <span>Salary</span>
+          <span>{text.salary}</span>
           <span aria-hidden="true">⌄</span>
         </summary>
         <div className="job-filter-group-content">
-          <div className="job-salary-presets" aria-label="Salary presets">
+          <div className="job-salary-presets" aria-label={text.salaryPresets}>
             {[10000000, 20000000, 40000000].map((value) => (
               <button
                 key={value}
@@ -308,9 +510,9 @@ export function AdvancedFilters({
               </button>
             ))}
           </div>
-          <div className="job-salary-sliders" aria-label="Salary range">
+          <div className="job-salary-sliders" aria-label={text.salaryRange}>
             <label>
-              Minimum salary
+              {text.minimumSalary}
               <input
                 type="range"
                 min="0"
@@ -332,7 +534,7 @@ export function AdvancedFilters({
               </output>
             </label>
             <label>
-              Maximum salary
+              {text.maximumSalary}
               <input
                 type="range"
                 min="0"
@@ -354,7 +556,7 @@ export function AdvancedFilters({
           </div>{" "}
           <div className="job-filter-two-column">
             <label>
-              From
+              {text.from}
               <input
                 className="sh-input"
                 type="number"
@@ -371,7 +573,7 @@ export function AdvancedFilters({
               />
             </label>
             <label>
-              To
+              {text.to}
               <input
                 className="sh-input"
                 type="number"
@@ -388,18 +590,18 @@ export function AdvancedFilters({
               />
             </label>
           </div>
-          <p className="job-filter-help">Monthly VND ranges, before tax.</p>
+          <p className="job-filter-help">{text.salaryHelp}</p>
         </div>
       </details>
 
       <details open>
         <summary>
-          <span>Experience</span>
+          <span>{text.experience}</span>
           <span aria-hidden="true">⌄</span>
         </summary>
         <div className="job-filter-group-content">
           <label>
-            Minimum years
+            {text.minimumYears}
             <select
               className="sh-input"
               value={params.get("experienceMinYears") ?? ""}
@@ -411,11 +613,11 @@ export function AdvancedFilters({
                 })
               }
             >
-              <option value="">Any experience</option>
-              <option value="1">1+ years</option>
-              <option value="3">3+ years</option>
-              <option value="5">5+ years</option>
-              <option value="8">8+ years</option>
+              <option value="">{text.anyExperience}</option>
+              <option value="1">{text.years(1)}</option>
+              <option value="3">{text.years(3)}</option>
+              <option value="5">{text.years(5)}</option>
+              <option value="8">{text.years(8)}</option>
             </select>
           </label>
         </div>
@@ -423,7 +625,7 @@ export function AdvancedFilters({
 
       <details open>
         <summary>
-          <span>Job level</span>
+          <span>{text.jobLevel}</span>
           <span aria-hidden="true">⌄</span>
         </summary>
         <div className="job-filter-checks">
@@ -440,7 +642,7 @@ export function AdvancedFilters({
                   )
                 }
               />
-              <span>{valueLabels[value]}</span>
+              <span>{labels[value]}</span>
             </label>
           ))}
         </div>
@@ -448,7 +650,7 @@ export function AdvancedFilters({
 
       <details>
         <summary>
-          <span>Work type</span>
+          <span>{text.workType}</span>
           <span aria-hidden="true">⌄</span>
         </summary>
         <div className="job-filter-checks">
@@ -471,7 +673,7 @@ export function AdvancedFilters({
                   )
                 }
               />
-              <span>{valueLabels[value]}</span>
+              <span>{labels[value]}</span>
             </label>
           ))}
           {(["ONSITE", "HYBRID", "REMOTE"] as const).map((value) => (
@@ -485,7 +687,7 @@ export function AdvancedFilters({
                   )
                 }
               />
-              <span>{valueLabels[value]}</span>
+              <span>{labels[value]}</span>
             </label>
           ))}
         </div>
@@ -493,16 +695,18 @@ export function AdvancedFilters({
 
       <details>
         <summary>
-          <span>More filters</span>
+          <span>{text.moreFilters}</span>
           <span aria-hidden="true">⌄</span>
         </summary>
         <div className="job-filter-group-content">
           <label>
-            City
+            {text.city}
             <input
               className="sh-input"
               value={location}
-              placeholder="Ho Chi Minh City"
+              placeholder={
+                locale === "vi" ? "Thành phố Hồ Chí Minh" : "Ho Chi Minh City"
+              }
               onChange={(event) =>
                 scheduleText(
                   "location",
@@ -514,11 +718,11 @@ export function AdvancedFilters({
             />
           </label>
           <label>
-            Skill
+            {text.skill}
             <input
               className="sh-input"
               value={skill}
-              placeholder="TypeScript"
+              placeholder={locale === "vi" ? "TypeScript" : "TypeScript"}
               onChange={(event) =>
                 scheduleText(
                   "skills",
@@ -530,11 +734,11 @@ export function AdvancedFilters({
             />
           </label>
           <label>
-            Category family
+            {text.categoryFamily}
             <input
               className="sh-input"
               value={params.get("categoryFamily") ?? ""}
-              placeholder="e.g. r1080"
+              placeholder={locale === "vi" ? "ví dụ: r1080" : "e.g. r1080"}
               onChange={(event) =>
                 onUpdate((next) => {
                   if (event.currentTarget.value)
@@ -556,10 +760,10 @@ export function AdvancedFilters({
                 })
               }
             />
-            <span>Works Saturdays</span>
+            <span>{text.worksSaturdays}</span>
           </label>
           <label>
-            Posted within
+            {text.postedWithin}
             <select
               className="sh-input"
               value={params.get("postedWithinDays") ?? ""}
@@ -571,12 +775,12 @@ export function AdvancedFilters({
                 })
               }
             >
-              <option value="">Any time</option>
-              <option value="1">24 hours</option>
-              <option value="3">3 days</option>
-              <option value="7">7 days</option>
-              <option value="14">14 days</option>
-              <option value="30">30 days</option>
+              <option value="">{text.anyTime}</option>
+              <option value="1">{text.hours}</option>
+              <option value="3">{text.days(3)}</option>
+              <option value="7">{text.days(7)}</option>
+              <option value="14">{text.days(14)}</option>
+              <option value="30">{text.days(30)}</option>
             </select>
           </label>
         </div>
@@ -591,6 +795,10 @@ export function ActiveFilterChips({
   onRemove: (name: string, value?: string) => void;
 }) {
   const params = useSearchParams();
+  const locale = useWorkspaceLocale();
+  const text = filterText(locale);
+  const labels = filterLabelsFor(locale);
+  const values = filterValueLabelsFor(locale);
   const chips = useMemo(() => {
     const result: Array<{ name: string; value: string; label: string }> = [];
     for (const [name, value] of params.entries()) {
@@ -606,21 +814,21 @@ export function ActiveFilterChips({
       )
         continue;
       if (name === "searchBy" && value === "BOTH") continue;
-      const label = filterLabels[name] ?? name;
+      const label = labels[name as keyof typeof labels] ?? name;
       result.push({
         name,
         value,
-        label: label + ": " + (valueLabels[value] ?? value),
+        label: label + ": " + (values[value] ?? value),
       });
     }
     return result;
-  }, [params]);
+  }, [labels, params, values]);
 
   if (!chips.length) return null;
 
   return (
-    <div className="job-active-filters" aria-label="Active filters">
-      <span className="job-active-filters-label">Filtered by</span>
+    <div className="job-active-filters" aria-label={text.activeFilters}>
+      <span className="job-active-filters-label">{text.filteredBy}</span>
       {chips.map((chip) => (
         <button
           className="job-filter-chip"
@@ -650,6 +858,9 @@ export function FilterBar({
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [presetName, setPresetName] = useState("");
   const keywordTimer = useRef<number | null>(null);
+  const locale = useWorkspaceLocale();
+  const text = filterText(locale);
+  const quickFilters = quickFiltersFor(locale);
 
   useEffect(() => {
     const timer = window.setTimeout(
@@ -716,7 +927,7 @@ export function FilterBar({
       ) : null}
       <div className="job-filter-topbar">
         <div className="job-search-by">
-          <label htmlFor="job-search-by">Search by</label>
+          <label htmlFor="job-search-by">{text.searchBy}</label>
           <select
             id="job-search-by"
             className="job-search-by-select"
@@ -727,13 +938,13 @@ export function FilterBar({
               )
             }
           >
-            <option value="TITLE">Job title</option>
-            <option value="COMPANY">Company</option>
-            <option value="BOTH">Title, skills + company</option>
+            <option value="TITLE">{text.jobTitle}</option>
+            <option value="COMPANY">{text.company}</option>
+            <option value="BOTH">{text.titleSkillsCompany}</option>
           </select>
         </div>
         <label className="job-keyword-field">
-          <span className="sr-only">Search jobs</span>
+          <span className="sr-only">{text.searchJobs}</span>
           <span className="job-search-icon" aria-hidden="true">
             ⌕
           </span>
@@ -741,11 +952,11 @@ export function FilterBar({
             type="search"
             value={keyword}
             maxLength={200}
-            placeholder="Search job titles, skills, companies"
+            placeholder={text.searchPlaceholder}
             onChange={(event) => scheduleKeyword(event.currentTarget.value)}
           />
         </label>
-        <div className="job-quick-filter-row" aria-label="Quick filters">
+        <div className="job-quick-filter-row" aria-label={text.quickFilters}>
           {quickFilters.map((filter) => {
             const active = searchParams
               .getAll(filter.name)
@@ -781,11 +992,11 @@ export function FilterBar({
             onClick={() => setMobileFiltersOpen(true)}
           >
             <span aria-hidden="true">☷</span>
-            Filters &amp; Sort
+            {text.filtersAndSort}
           </button>
         </div>
         <p className="job-live-count" aria-live="polite">
-          <strong>{result?.total ?? 0}</strong> matching jobs
+          <strong>{result?.total ?? 0}</strong> {text.matchingJobs}
         </p>
       </div>
 
@@ -793,15 +1004,15 @@ export function FilterBar({
       <div className="job-discovery-grid">
         <aside
           className="job-advanced-sidebar"
-          aria-label="Advanced job filters"
+          aria-label={text.advancedJobFilters}
         >
           <div className="job-advanced-heading">
             <div>
-              <p className="panel-kicker">Refine the signal</p>
-              <h2>Advanced filters</h2>
+              <p className="panel-kicker">{text.refineSignal}</p>
+              <h2>{text.advancedFilters}</h2>
             </div>
             <button type="button" onClick={clearAll}>
-              Clear
+              {text.clear}
             </button>
           </div>
           <AdvancedFilters onUpdate={update} />
@@ -810,15 +1021,15 @@ export function FilterBar({
               ◌
             </span>
             <div>
-              <strong>Keep this search</strong>
-              <p>Name this filter combo and reuse it later.</p>
+              <strong>{text.keepSearch}</strong>
+              <p>{text.saveDescription}</p>
             </div>
             <button type="button" onClick={() => setSaveDialogOpen(true)}>
-              Save this search
+              {text.saveFilter}
             </button>
             {shared?.savedFilterPresets.length ? (
               <select
-                aria-label="Saved searches"
+                aria-label={text.savedSearches}
                 defaultValue=""
                 onChange={(event) => {
                   const preset = shared.savedFilterPresets.find(
@@ -840,7 +1051,7 @@ export function FilterBar({
                   event.currentTarget.value = "";
                 }}
               >
-                <option value="">Reuse saved search…</option>
+                <option value="">{text.reuseSaved}</option>
                 {shared.savedFilterPresets.map((preset) => (
                   <option key={preset.id} value={preset.id}>
                     {preset.name}
@@ -871,13 +1082,13 @@ export function FilterBar({
             <div className="job-bottom-sheet-handle" aria-hidden="true" />
             <header>
               <div>
-                <p className="panel-kicker">Personalize the list</p>
-                <h2 id="mobile-filters-title">Filters &amp; Sort</h2>
+                <p className="panel-kicker">{text.personalizeList}</p>
+                <h2 id="mobile-filters-title">{text.filtersAndSort}</h2>
               </div>
               <button
                 className="job-icon-button"
                 type="button"
-                aria-label="Close filters and sort"
+                aria-label={text.closeFiltersSort}
                 onClick={() => setMobileFiltersOpen(false)}
               >
                 ×
@@ -896,14 +1107,14 @@ export function FilterBar({
                 type="button"
                 onClick={clearAll}
               >
-                Clear all
+                {text.clearAll}
               </button>
               <button
                 className="sh-button"
                 type="button"
                 onClick={() => setMobileFiltersOpen(false)}
               >
-                Show {result?.total ?? 0} jobs
+                {text.showJobs(result?.total ?? 0)}
               </button>
             </footer>
           </section>
@@ -918,20 +1129,17 @@ export function FilterBar({
             aria-modal="true"
             aria-labelledby="save-filter-title"
           >
-            <p className="panel-kicker">Save filter</p>
-            <h2 id="save-filter-title">Name this search</h2>
-            <p>
-              Saved searches are separate from applying a filter; this list is
-              already live.
-            </p>
+            <p className="panel-kicker">{text.saveFilter}</p>
+            <h2 id="save-filter-title">{text.nameSearch}</h2>
+            <p>{text.savedDescription}</p>
             <label>
-              Search name
+              {text.searchName}
               <input
                 className="sh-input"
                 autoFocus
                 maxLength={160}
                 value={presetName}
-                placeholder="e.g. Senior remote product roles"
+                placeholder={text.searchExample}
                 onChange={(event) => setPresetName(event.currentTarget.value)}
               />
             </label>
@@ -941,7 +1149,7 @@ export function FilterBar({
                 type="button"
                 onClick={() => setSaveDialogOpen(false)}
               >
-                Cancel
+                {text.cancel}
               </button>
               <button
                 className="sh-button"
@@ -953,7 +1161,7 @@ export function FilterBar({
                   setSaveDialogOpen(false);
                 }}
               >
-                Save filter
+                {text.saveFilterAction}
               </button>
             </div>
           </section>

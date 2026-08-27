@@ -59,7 +59,7 @@ export function jobSkills(job: JobLike) {
   return unique(value?.length ? value : job.skills);
 }
 
-export function jobCategories(job: JobLike) {
+export function jobCategories(job: JobLike, locale: "vi" | "en" = "en") {
   const value = signals(job);
   const categories = value.categoryIds?.length
     ? value.categoryIds
@@ -67,7 +67,7 @@ export function jobCategories(job: JobLike) {
       ? [value.categoryFamily]
       : job.company.industry
         ? [job.company.industry]
-        : ["Role domain"];
+        : [locale === "vi" ? "Lĩnh vực vai trò" : "Role domain"];
 
   return unique(categories.map(humanize));
 }
@@ -126,7 +126,10 @@ export function jobBenefits(job: JobDetail): Benefit[] {
   }));
 }
 
-export function jobWhyHighlights(job: JobDetail | JobCard) {
+export function jobWhyHighlights(
+  job: JobDetail | JobCard,
+  locale: "vi" | "en" = "en",
+) {
   const value = signals(job);
   const structured = structuredDescription(job);
   const explicit = value.topReasons ?? structured?.topReasonsToJoin;
@@ -146,11 +149,17 @@ export function jobWhyHighlights(job: JobDetail | JobCard) {
 
   return highlights.slice(0, 3).length
     ? highlights.slice(0, 3)
-    : [
-        "Competitive compensation and clear role expectations",
-        "Structured learning and growth opportunities",
-        "A collaborative team culture built for momentum",
-      ];
+    : locale === "vi"
+      ? [
+          "Đãi ngộ cạnh tranh và kỳ vọng vai trò rõ ràng",
+          "Cơ hội học hỏi và phát triển có lộ trình",
+          "Văn hóa đội ngũ hợp tác và cùng tạo đà phát triển",
+        ]
+      : [
+          "Competitive compensation and clear role expectations",
+          "Structured learning and growth opportunities",
+          "A collaborative team culture built for momentum",
+        ];
 }
 
 export function formatCategory(value: string) {

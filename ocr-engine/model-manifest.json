@@ -2,7 +2,7 @@
   "schemaVersion": "smarthire-ocr-model-manifest-v1",
   "engine": {
     "name": "paddleocr-onnx",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "package": "paddleocr",
     "packageVersion": "3.7.0",
     "runtimeName": "onnxruntime",
@@ -17,6 +17,7 @@
     "sourceRelease": "PaddleOCR 3.7.0",
     "license": "Apache-2.0"
   },
+  "strategyVersion": "search-ocr-adaptive-tiles-v1",
   "policies": {
     "confidence": "ocr-confidence-v1",
     "cvEligibility": "cv-ocr-eligibility-v1",

@@ -6,8 +6,11 @@ import { EmptyState } from "./job-empty-state";
 import { JobCardView } from "./job-card";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 import { QuickViewPanel } from "./quick-view-panel";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { jobCopy } from "./job-copy";
 
 export function SavedJobsPage({ jobs }: { jobs: JobCard[] }) {
+  const copy = jobCopy(useWorkspaceLocale());
   const shared = useOptionalJobInteraction();
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
   const visibleJobs = useMemo(
@@ -27,8 +30,8 @@ export function SavedJobsPage({ jobs }: { jobs: JobCard[] }) {
     return (
       <EmptyState
         illustration="folder"
-        title="You have not saved any jobs yet."
-        cta={{ href: "/jobs", label: "Find jobs \u2192" }}
+        title={copy.savedJobsEmpty}
+        cta={{ href: "/jobs", label: copy.findJobs }}
       />
     );
   }
@@ -40,13 +43,13 @@ export function SavedJobsPage({ jobs }: { jobs: JobCard[] }) {
     >
       <header className="jobs-workspace-heading">
         <div>
-          <p className="workspace-kicker">Candidate workspace</p>
-          <h1 id="saved-jobs-heading">Saved Jobs</h1>
-          <p>Keep track of opportunities you want to revisit.</p>
+          <p className="workspace-kicker">{copy.candidateWorkspace}</p>
+          <h1 id="saved-jobs-heading">{copy.savedJobsTitle}</h1>
+          <p>{copy.savedJobsDescription}</p>
         </div>
         <span className="jobs-workspace-count">{visibleJobs.length}</span>
       </header>
-      <ol className="job-list saved-job-grid" aria-label="Saved jobs">
+      <ol className="job-list saved-job-grid" aria-label={copy.savedJobsAria}>
         {visibleJobs.map((job) => (
           <li key={job.id}>
             <JobCardView

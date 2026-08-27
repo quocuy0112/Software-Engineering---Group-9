@@ -19,6 +19,10 @@ import type {
 import type { PipelineSortDirection } from "./recruitment-pipeline-ui";
 import { canSortPipelineStage } from "./recruitment-pipeline-ui";
 import { RecruitmentPipelineCard } from "./recruitment-pipeline-card";
+import {
+  recruiterApplicationsCopy,
+  type RecruiterApplicationsCopy,
+} from "./recruiter-applications-copy";
 
 type PipelineColumnProps = {
   jobId: string;
@@ -46,6 +50,7 @@ type PipelineColumnProps = {
   ) => void;
   filterActive?: boolean;
   loadedItemCount?: number;
+  copy?: RecruiterApplicationsCopy["pipeline"];
 };
 
 const lockedStages = new Set<ApplicationStage>([
@@ -53,18 +58,6 @@ const lockedStages = new Set<ApplicationStage>([
   "HIRED",
   "OFFER_DECLINED",
 ]);
-
-const sortLabels: Record<PipelineSortDirection, string> = {
-  none: "Sort",
-  asc: "Low \u2192 High",
-  desc: "High \u2192 Low",
-};
-
-const sortOptionLabels: Record<PipelineSortDirection, string> = {
-  none: "Default",
-  asc: "Score: Low \u2192 High",
-  desc: "Score: High \u2192 Low",
-};
 
 export function RecruitmentPipelineColumn({
   jobId,
@@ -85,7 +78,20 @@ export function RecruitmentPipelineColumn({
   onSortDirectionChange,
   filterActive = false,
   loadedItemCount = page?.items.length ?? 0,
+  copy: copyProp,
 }: PipelineColumnProps) {
+  const copy = copyProp ?? recruiterApplicationsCopy("en").pipeline;
+  const displayLabel = copy.stageLabels[summary.stage] ?? summary.label;
+  const sortLabels: Record<PipelineSortDirection, string> = {
+    none: copy.sort,
+    asc: copy.lowHigh,
+    desc: copy.highLow,
+  };
+  const sortOptionLabels: Record<PipelineSortDirection, string> = {
+    none: copy.defaultSort,
+    asc: copy.scoreLowHigh,
+    desc: copy.scoreHighLow,
+  };
   const withdrawn = summary.stage === "WITHDRAWN";
   const canonicalStage = withdrawn ? null : summary.stage;
   const locked =
@@ -132,7 +138,7 @@ export function RecruitmentPipelineColumn({
             className="column-title"
             aria-describedby={`${headingId}-count`}
           >
-            {summary.label}
+            {displayLabel}
           </h2>
           <span
             className="column-count"
@@ -146,11 +152,7 @@ export function RecruitmentPipelineColumn({
           {locked ? (
             <LockKeyhole
               className="lock-icon pipeline-column__lock-icon"
-              aria-label={
-                withdrawn
-                  ? "Withdrawn applications cannot be moved"
-                  : "Stage is locked"
-              }
+              aria-label={withdrawn ? copy.withdrawnLocked : copy.stageLocked}
             />
           ) : null}
           {canSort &&
@@ -168,7 +170,7 @@ export function RecruitmentPipelineColumn({
                 data-dir={sortDirection}
                 aria-haspopup="menu"
                 aria-expanded={sortMenuOpen}
-                aria-label={`Sort ${summary.label} candidates`}
+                aria-label={copy.sortCandidates(displayLabel)}
                 onClick={(event) => {
                   event.stopPropagation();
                   onToggleSortMenu(canonicalStage);
@@ -181,7 +183,7 @@ export function RecruitmentPipelineColumn({
                 <div
                   className="column-sort-menu pipeline-sort-menu open"
                   role="menu"
-                  aria-label={`${summary.label} sort options`}
+                  aria-label={copy.sortOptions(displayLabel)}
                   onClick={(event) => event.stopPropagation()}
                 >
                   {(["none", "asc", "desc"] as const).map((direction) => (
@@ -221,21 +223,19 @@ export function RecruitmentPipelineColumn({
       </header>
       <div className="card-stack pipeline-column__cards" data-card-stack>
         {loading ? (
-          <p role="status">Loading applications...</p>
+          <p role="status">{copy.loadingApplications}</p>
         ) : error ? (
           <div role="alert">
-            <p>{error}</p>
+            <p>{copy.unavailable}</p>
             <button type="button" onClick={() => onRetry(summary.stage)}>
-              Retry
+              {copy.retry}
             </button>
           </div>
         ) : !visibleItems.length ? (
           <div className="column-empty pipeline-column__empty">
             <Inbox aria-hidden="true" />
-            <span aria-label="No applications in this stage.">
-              {noFilterMatch
-                ? "No loaded candidates match the current filter."
-                : "No candidates yet."}
+            <span aria-label={copy.noCandidates}>
+              {noFilterMatch ? copy.noFilterMatch : copy.noCandidates}
             </span>
           </div>
         ) : (
@@ -246,6 +246,7 @@ export function RecruitmentPipelineColumn({
               jobId={jobId}
               onChangeStage={onChangeStage}
               onViewAssessment={onViewAssessment}
+              copy={copy}
             />
           ))
         )}
@@ -260,8 +261,8 @@ export function RecruitmentPipelineColumn({
               className="load-more-btn pipeline-column__load-more"
             >
               {loadingMore
-                ? "Loading..."
-                : "Load more " + summary.label + " applications"}
+                ? copy.loadingApplications
+                : copy.loadMore(displayLabel)}
             </button>
           ) : null}
           {showViewAll && onViewAll ? (
@@ -271,7 +272,7 @@ export function RecruitmentPipelineColumn({
               className="view-all-btn pipeline-column__view-all"
             >
               <ListIcon aria-hidden="true" />
-              View full list
+              {copy.viewFullList}
             </button>
           ) : null}
         </footer>

@@ -10,23 +10,8 @@ import companyCatalog from "../../../../../data/companies/companies.json";
 import { CompanyAvatar } from "./company-avatar";
 import { JobMetaIcon, type JobMetaIconName } from "./job-meta-icon";
 import { ReportJobDialog } from "./report-job-dialog";
-
-const valueLabel: Record<string, string> = {
-  FULL_TIME: "Full time",
-  PART_TIME: "Part time",
-  CONTRACT: "Contract",
-  INTERNSHIP: "Internship",
-  TEMPORARY: "Temporary",
-  ENTRY: "Entry level",
-  JUNIOR: "Junior",
-  MID: "Mid-level",
-  SENIOR: "Senior",
-  LEAD: "Lead",
-  MANAGER: "Manager",
-  ONSITE: "On-site",
-  HYBRID: "Hybrid",
-  REMOTE: "Remote",
-};
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { jobCopy } from "./job-copy";
 
 export type CompanyWithMeta = JobDetail["company"] & {
   logo?: string | null;
@@ -130,8 +115,8 @@ export function CompanyLogo({
   );
 }
 
-function displayValue(value: string | null | undefined) {
-  return value?.trim() ? value : "Not listed";
+function displayValue(value: string | null | undefined, emptyLabel: string) {
+  return value?.trim() ? value : emptyLabel;
 }
 
 function SidebarCardHeading({
@@ -159,6 +144,8 @@ function SidebarCardHeading({
 }
 
 export function CompanyCard({ job }: { job: JobDetail }) {
+  const locale = useWorkspaceLocale();
+  const copy = jobCopy(locale);
   const company = resolveSidebarCompany(job.company);
   const rating = company.rating;
 
@@ -172,13 +159,13 @@ export function CompanyCard({ job }: { job: JobDetail }) {
       contentClassName="job-company-accordion-content"
       title={
         <span className="job-company-accordion-heading">
-          <span className="panel-kicker">The company</span>
+          <span className="panel-kicker">{copy.company}</span>
           <span
             className="job-company-accordion-title"
             role="heading"
             aria-level={2}
           >
-            Company info
+            {copy.companyInfo}
           </span>
         </span>
       }
@@ -189,7 +176,7 @@ export function CompanyCard({ job }: { job: JobDetail }) {
             <p className="job-company-accordion-name">{company.displayName}</p>
             {job.isVerified ? (
               <span className="job-verified-inline">
-                <span aria-hidden="true">✓</span> Verified SmartHire employer
+                <span aria-hidden="true">✓</span> {copy.verifiedEmployer}
               </span>
             ) : null}
           </div>
@@ -201,7 +188,7 @@ export function CompanyCard({ job }: { job: JobDetail }) {
       ) : null}
 
       <p className="job-sidebar-company-copy">
-        {displayValue(company.publicDescription)}
+        {displayValue(company.publicDescription, copy.notListed)}
       </p>
 
       <dl className="job-sidebar-company-facts">
@@ -210,27 +197,32 @@ export function CompanyCard({ job }: { job: JobDetail }) {
             <span className="job-sidebar-fact-icon" aria-hidden="true">
               <JobMetaIcon name="company-size" />
             </span>
-            Scale
+            {copy.scale}
           </dt>
-          <dd>{displayValue(company.size)}</dd>
+          <dd>{displayValue(company.size, copy.notListed)}</dd>
         </div>
         <div>
           <dt>
             <span className="job-sidebar-fact-icon" aria-hidden="true">
               <JobMetaIcon name="industry" />
             </span>
-            Industry
+            {copy.industry}
           </dt>
-          <dd>{displayValue(company.industry)}</dd>
+          <dd>{displayValue(company.industry, copy.notListed)}</dd>
         </div>
         <div>
           <dt>
             <span className="job-sidebar-fact-icon" aria-hidden="true">
               <JobMetaIcon name="location" />
             </span>
-            Address
+            {copy.address}
           </dt>
-          <dd>{displayValue(company.address ?? company.publicLocation)}</dd>
+          <dd>
+            {displayValue(
+              company.address ?? company.publicLocation,
+              copy.notListed,
+            )}
+          </dd>
         </div>
       </dl>
 
@@ -241,7 +233,7 @@ export function CompanyCard({ job }: { job: JobDetail }) {
           target="_blank"
           rel="noreferrer"
         >
-          Visit company website <span aria-hidden="true">→</span>
+          {copy.visitCompanyWebsite} <span aria-hidden="true">→</span>
         </a>
       ) : null}
     </CollapsibleCard>
@@ -252,10 +244,12 @@ function InfoRow({
   icon,
   label,
   value,
+  emptyLabel,
 }: {
   icon: JobMetaIconName;
   label: string;
   value: string;
+  emptyLabel: string;
 }) {
   return (
     <div className="job-general-info-row">
@@ -263,52 +257,62 @@ function InfoRow({
         <JobMetaIcon name={icon} />
       </span>
       <dt>{label}</dt>
-      <dd>{displayValue(value)}</dd>
+      <dd>{displayValue(value, emptyLabel)}</dd>
     </div>
   );
 }
 
 export function GeneralInfoCard({ job }: { job: JobDetail }) {
+  const locale = useWorkspaceLocale();
+  const copy = jobCopy(locale);
+  const experienceLabels = copy.experienceLevelLabels;
+  const workArrangementLabels = copy.workArrangementLabels;
+  const employmentTypeLabels = copy.employmentTypeLabels;
   return (
     <section
       className="job-sidebar-card job-sidebar-card--redesign"
       aria-labelledby="general-information-heading"
     >
       <SidebarCardHeading
-        eyebrow="At a glance"
-        title="General information"
+        eyebrow={copy.atAGlance}
+        title={copy.generalInformation}
         mark="◆"
         headingId="general-information-heading"
       />
       <dl className="job-general-info-list">
         <InfoRow
           icon="level"
-          label="Level"
-          value={valueLabel[job.experienceLevel] ?? "Not listed"}
+          label={copy.level}
+          value={experienceLabels[job.experienceLevel] ?? copy.notListed}
+          emptyLabel={copy.notListed}
         />
         <InfoRow
           icon="education"
-          label="Education"
-          value={job.education?.trim() || "Not listed"}
+          label={copy.education}
+          value={job.education?.trim() || copy.notListed}
+          emptyLabel={copy.notListed}
         />
         <InfoRow
           icon="hires"
-          label="Number of hires"
+          label={copy.numberOfHires}
           value={
             job.numberOfHires === undefined || job.numberOfHires === null
-              ? "Not listed"
-              : `${job.numberOfHires} position${job.numberOfHires === 1 ? "" : "s"}`
+              ? copy.notListed
+              : copy.positions(job.numberOfHires)
           }
+          emptyLabel={copy.notListed}
         />
         <InfoRow
           icon="arrangement"
-          label="Work arrangement"
-          value={valueLabel[job.workArrangement] ?? "Not listed"}
+          label={copy.workArrangement}
+          value={workArrangementLabels[job.workArrangement] ?? copy.notListed}
+          emptyLabel={copy.notListed}
         />
         <InfoRow
           icon="employment"
-          label="Employment type"
-          value={valueLabel[job.employmentType] ?? "Not listed"}
+          label={copy.employmentType}
+          value={employmentTypeLabels[job.employmentType] ?? copy.notListed}
+          emptyLabel={copy.notListed}
         />
       </dl>
     </section>
@@ -316,6 +320,7 @@ export function GeneralInfoCard({ job }: { job: JobDetail }) {
 }
 
 function SimilarJobRow({ job }: { job: JobCard }) {
+  const locale = useWorkspaceLocale();
   const company = resolveSidebarCompany(job.company);
   return (
     <RelatedJobRow
@@ -326,12 +331,13 @@ function SimilarJobRow({ job }: { job: JobCard }) {
       title={job.title}
       company={company.displayName}
       location={job.location}
-      salaryRange={formatSalary(job.salary)}
+      salaryRange={formatSalary(job.salary, locale)}
     />
   );
 }
 
 export function SimilarJobsCard({ job }: { job: JobDetail }) {
+  const copy = jobCopy(useWorkspaceLocale());
   const relatedJobIds = new Set((job.relatedJobs ?? []).map((item) => item.id));
   const similarJobs = (job.recommendedJobs ?? [])
     .filter((item) => !relatedJobIds.has(item.id))
@@ -343,8 +349,8 @@ export function SimilarJobsCard({ job }: { job: JobDetail }) {
       aria-labelledby="similar-jobs-heading"
     >
       <SidebarCardHeading
-        eyebrow="Explore more"
-        title="Similar jobs"
+        eyebrow={copy.exploreMore}
+        title={copy.similarJobs}
         mark="↗"
         headingId="similar-jobs-heading"
       />
@@ -355,18 +361,17 @@ export function SimilarJobsCard({ job }: { job: JobDetail }) {
           ))}
         </div>
       ) : (
-        <p className="job-section-muted">
-          Similar jobs will appear here as more roles become available.
-        </p>
+        <p className="job-section-muted">{copy.similarJobsEmpty}</p>
       )}
       <Link className="job-similar-more-link" href="/jobs">
-        See more <span aria-hidden="true">→</span>
+        {copy.seeMore} <span aria-hidden="true">→</span>
       </Link>
     </section>
   );
 }
 
 export function ReportJobWidget({ job }: { job: JobDetail }) {
+  const copy = jobCopy(useWorkspaceLocale());
   return (
     <section
       className="job-sidebar-card job-sidebar-card--redesign job-report-widget"
@@ -377,23 +382,22 @@ export function ReportJobWidget({ job }: { job: JobDetail }) {
           !
         </span>
         <div>
-          <p className="panel-kicker">Safety check</p>
-          <h2 id="report-this-job-heading">Report this job</h2>
+          <p className="panel-kicker">{copy.safetyCheck}</p>
+          <h2 id="report-this-job-heading">{copy.reportJob}</h2>
         </div>
       </div>
-      <p>
-        This job seems off or suspicious? Let our team know so we can review it.
-      </p>
+      <p>{copy.reportJobDescription}</p>
       <ReportJobDialog jobId={job.id} className="job-report-widget-button" />
     </section>
   );
 }
 
 export function JobDetailSidebar({ job }: { job: JobDetail }) {
+  const copy = jobCopy(useWorkspaceLocale());
   return (
     <aside
       className="job-detail-sidebar job-detail-sidebar--redesign job-detail-sidebar--board"
-      aria-label="Job context"
+      aria-label={copy.jobContext}
       data-job-detail-sidebar="true"
     >
       <CompanyCard job={job} />

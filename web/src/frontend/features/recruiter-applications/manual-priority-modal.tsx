@@ -3,14 +3,9 @@
 import { useState } from "react";
 import { ListOrdered, ShieldCheck, Trash2 } from "lucide-react";
 import type { RankedApplicationRow } from "@/shared/contracts/scoring";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { RankingModalFrame } from "./ranking-modal-frame";
-
-const options = [
-  ["HIGH", "High review priority"],
-  ["NORMAL", "Medium review priority"],
-  ["LOW", "Low review priority"],
-  ["HOLD", "Hold for later"],
-] as const;
+import { applicationDetailCopy } from "./application-detail-copy";
 
 export function ManualPriorityModal({
   candidate,
@@ -23,6 +18,7 @@ export function ManualPriorityModal({
   onCancel: () => void;
   onCompleted: () => void;
 }) {
+  const copy = applicationDetailCopy(useWorkspaceLocale()).priority;
   const [value, setValue] = useState<"HIGH" | "NORMAL" | "LOW" | "HOLD" | "">(
     candidate.manualPriority?.value ?? "",
   );
@@ -53,16 +49,10 @@ export function ManualPriorityModal({
           }),
         },
       );
-      const payload = (await response.json().catch(() => null)) as {
-        message?: string;
-      } | null;
-      if (!response.ok)
-        throw new Error(payload?.message ?? "Priority could not be saved.");
+      if (!response.ok) throw new Error(copy.saveError);
       onCompleted();
     } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "Priority could not be saved.",
-      );
+      setError(cause instanceof Error ? cause.message : copy.saveError);
     } finally {
       setSaving(false);
     }
@@ -92,69 +82,61 @@ export function ManualPriorityModal({
           }),
         },
       );
-      const payload = (await response.json().catch(() => null)) as {
-        message?: string;
-      } | null;
-      if (!response.ok)
-        throw new Error(payload?.message ?? "Priority could not be removed.");
+      if (!response.ok) throw new Error(copy.removeError);
       onCompleted();
     } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "Priority could not be removed.",
-      );
+      setError(cause instanceof Error ? cause.message : copy.removeError);
     } finally {
       setSaving(false);
     }
   };
   return (
     <RankingModalFrame
-      title="Set manual candidate priority"
-      subtitle={`${candidate.candidate.displayName} · Recruiter override`}
+      title={copy.title}
+      subtitle={copy.subtitle(candidate.candidate.displayName)}
       icon="≡"
       info={
         <>
-          <ShieldCheck aria-hidden="true" />{" "}
-          <span>
-            The AI score itself never changes. This entry is marked “Manually
-            prioritized” and is preserved during future rescoring.
-          </span>
+          <ShieldCheck aria-hidden="true" /> <span>{copy.info}</span>
         </>
       }
-      confirmLabel={saving ? "Saving…" : "Save priority"}
+      confirmLabel={saving ? copy.saving : copy.save}
+      cancelLabel={copy.cancel}
       onCancel={onCancel}
       onConfirm={() => void save()}
       confirmDisabled={!value || !reason.trim() || saving}
     >
       <div className="ai-ranking-reference-block">
         <span>
-          <ListOrdered aria-hidden="true" /> AI-suggested order · read-only
-          reference
+          <ListOrdered aria-hidden="true" /> {copy.reference}
         </span>
         <strong>
           {suggestedRank ? `#${suggestedRank} · ` : ""}
           {candidate.scoreSummary.final === null
-            ? "Not calculated"
-            : `Final score ${candidate.scoreSummary.final}`}
+            ? copy.notCalculated
+            : copy.finalScore(candidate.scoreSummary.final)}
         </strong>
         <small>
-          AI score{" "}
+          {copy.aiScore}{" "}
           {candidate.scoreSummary.ai === null
-            ? "Not calculated"
+            ? copy.notCalculated
             : `${candidate.scoreSummary.ai}/100`}
         </small>
       </div>
       <label className="ai-ranking-field">
         <span>
-          Manual priority <em>Required</em>
+          {copy.manual} <em>{copy.required}</em>
         </span>
         <select
           value={value}
           onChange={(event) => setValue(event.target.value as typeof value)}
         >
-          <option value="">Select a priority</option>
-          {options.map(([option, label]) => (
+          <option value="">{copy.select}</option>
+          {(
+            Object.entries(copy.options) as Array<
+              ["HIGH" | "NORMAL" | "LOW" | "HOLD", string]
+            >
+          ).map(([option, label]) => (
             <option key={option} value={option}>
               {label}
             </option>
@@ -163,13 +145,13 @@ export function ManualPriorityModal({
       </label>
       <label className="ai-ranking-field">
         <span>
-          Reason for manual override <em>Required</em>
+          {copy.reason} <em>{copy.required}</em>
         </span>
         <textarea
           value={reason}
           maxLength={1_000}
           onChange={(event) => setReason(event.target.value)}
-          placeholder="Explain what informed this recruiter decision."
+          placeholder={copy.placeholder}
           rows={4}
         />
       </label>
@@ -180,7 +162,7 @@ export function ManualPriorityModal({
           onClick={() => void remove()}
           disabled={saving}
         >
-          <Trash2 aria-hidden="true" /> Remove manual priority
+          <Trash2 aria-hidden="true" /> {copy.remove}
         </button>
       ) : null}
       {error ? (

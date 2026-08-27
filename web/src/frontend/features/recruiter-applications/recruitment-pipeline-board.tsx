@@ -38,6 +38,11 @@ import {
   RecruitmentPipelineViewAllModal,
   type ViewAllPipelineStage,
 } from "./recruitment-pipeline-view-all-modal";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import {
+  recruiterApplicationsCopy,
+  type RecruiterApplicationsCopy,
+} from "./recruiter-applications-copy";
 
 const activePipelineStages: ApplicationStage[] = [
   "APPLIED",
@@ -66,14 +71,6 @@ function isViewAllPipelineStage(
   return viewAllStages.has(stage);
 }
 
-const tierOptions: Array<{ value: PipelineTierFilter; label: string }> = [
-  { value: "all", label: "All" },
-  { value: "strong", label: "Strong match" },
-  { value: "review", label: "Review needed" },
-  { value: "low", label: "Low match" },
-  { value: "pending", label: "Not yet scored" },
-];
-
 const defaultSortDirections: Record<ApplicationStage, PipelineSortDirection> = {
   APPLIED: "none",
   VIEWED: "none",
@@ -86,18 +83,27 @@ const defaultSortDirections: Record<ApplicationStage, PipelineSortDirection> = {
   WAITLISTED: "none",
 };
 
-function dateFilterLabel(filter: PipelineTierFilter, query: string) {
-  const tier = tierOptions.find((option) => option.value === filter)?.label;
-  if (filter === "all" && !query) return "Showing all loaded candidates.";
-  return (
-    "Showing loaded candidates filtered by " +
-    (tier?.toLocaleLowerCase() ?? "tier") +
-    (query ? " and " + query : "") +
-    "."
-  );
+function dateFilterLabel(
+  filter: PipelineTierFilter,
+  query: string,
+  options: Array<{ value: PipelineTierFilter; label: string }>,
+  copy: RecruiterApplicationsCopy["pipeline"],
+) {
+  const tier = options.find((option) => option.value === filter)?.label;
+  if (filter === "all" && !query) return copy.showingAll;
+  return copy.showingFiltered(tier?.toLocaleLowerCase() ?? "tier", query);
 }
 
 export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
+  const locale = useWorkspaceLocale();
+  const copy = recruiterApplicationsCopy(locale).pipeline;
+  const tierOptions: Array<{ value: PipelineTierFilter; label: string }> = [
+    { value: "all", label: copy.all },
+    { value: "strong", label: copy.strong },
+    { value: "review", label: copy.review },
+    { value: "low", label: copy.low },
+    { value: "pending", label: copy.pending },
+  ];
   const state = useRecruitmentPipeline(jobId);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -311,6 +317,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
         }}
         filterActive={filterActive}
         loadedItemCount={column?.page?.items.length ?? 0}
+        copy={copy}
       />
     );
   };
@@ -318,16 +325,16 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
   if (state.loading && !state.metadata) {
     return (
       <div className="pipeline-state" role="status">
-        Loading recruitment pipeline...
+        {copy.loading}
       </div>
     );
   }
   if (state.error || !state.metadata) {
     return (
       <div className="pipeline-state" role="alert">
-        <p>{state.error ?? "The recruitment pipeline is unavailable."}</p>
+        <p>{copy.unavailable}</p>
         <button type="button" onClick={() => void state.retry()}>
-          Retry
+          {copy.retry}
         </button>
       </div>
     );
@@ -349,26 +356,34 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
   return (
     <div
       className="recruitment-pipeline"
-      aria-label={`Recruitment pipeline for ${boardMetadata.job.title}`}
+      aria-label={copy.pipelineFor(boardMetadata.job.title)}
     >
       <header className="page-header recruitment-pipeline__header">
         <div>
-          <h1>{boardMetadata.job.title} pipeline</h1>
+          <h1>{copy.pipelineFor(boardMetadata.job.title)}</h1>
           <p>
             {boardMetadata.job.status === "CLOSED"
-              ? "Closed to new applications; recruitment decisions remain available."
-              : `${total} applications across the pipeline.`}
+              ? locale === "vi"
+                ? "Đã đóng nhận hồ sơ mới; các quyết định tuyển dụng vẫn được giữ lại."
+                : "Closed to new applications; recruitment decisions remain available."
+              : locale === "vi"
+                ? `${total} đơn ứng tuyển trong quy trình.`
+                : `${total} applications across the pipeline.`}
           </p>
         </div>
         <div className="recruitment-pipeline__header-actions">
           <span className="sr-only">
-            Read-only access:{" "}
+            {copy.readOnly}:{" "}
             {boardMetadata.permissions.canMoveStages
-              ? "No, stage controls are enabled."
-              : "Yes."}
+              ? locale === "vi"
+                ? "Không, các điều khiển vòng đang bật."
+                : "No, stage controls are enabled."
+              : locale === "vi"
+                ? "Có."
+                : "Yes."}
           </span>
           {!boardMetadata.permissions.canMoveStages ? (
-            <strong>Read-only access</strong>
+            <strong>{copy.readOnly}</strong>
           ) : null}
           <button
             type="button"
@@ -376,7 +391,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
             onClick={() => void state.retry()}
           >
             <RefreshCw aria-hidden="true" />
-            Refresh
+            {copy.refresh}
           </button>
         </div>
       </header>
@@ -385,7 +400,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
       </p>
       {state.canRetryStageMove ? (
         <button type="button" onClick={() => void state.retryStageMove()}>
-          Retry stage change
+          {copy.retryStageChange}
         </button>
       ) : null}
 
@@ -399,19 +414,19 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
           htmlFor="pipeline-candidate-search"
         >
           <Search aria-hidden="true" />
-          <span className="sr-only">Search candidates by name</span>
+          <span className="sr-only">{copy.searchCandidates}</span>
           <input
             id="pipeline-candidate-search"
             type="search"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder={"Search by candidate name..."}
+            placeholder={copy.searchPlaceholder}
           />
         </label>
         <div
           className="filter-pills pipeline-tier-filters"
           role="group"
-          aria-label="Filter candidates by final-score tier"
+          aria-label={copy.tierFilter}
         >
           {tierOptions.map((option) => (
             <button
@@ -435,7 +450,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
         </div>
       </div>
       <p className="pipeline-filter-status" role="status">
-        {dateFilterLabel(tierFilter, searchQuery)}
+        {dateFilterLabel(tierFilter, searchQuery, tierOptions, copy)}
       </p>
 
       <DndContext
@@ -445,20 +460,20 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
         onDragEnd={onDragEnd}
         accessibility={{
           announcements: {
-            onDragStart: ({ active }) => `Picked up application ${active.id}.`,
+            onDragStart: ({ active }) => copy.drag.picked(String(active.id)),
             onDragOver: ({ over }) =>
-              over ? `Over ${over.id}.` : "Not over a stage.",
+              over ? copy.drag.over(String(over.id)) : copy.drag.notOver,
             onDragEnd: ({ over }) =>
-              over ? `Dropped in ${over.id}.` : "Move cancelled.",
-            onDragCancel: () => "Move cancelled.",
+              over ? copy.drag.dropped(String(over.id)) : copy.drag.cancelled,
+            onDragCancel: () => copy.drag.cancelled,
           },
         }}
       >
         <div className="recruitment-pipeline__sections">
           <section className="pipeline-section pipeline-section--active">
             <div className="section-head pipeline-section__header">
-              <h2 id="active-pipeline-heading">Active pipeline</h2>
-              <span>Applications moving through the hiring process.</span>
+              <h2 id="active-pipeline-heading">{copy.activePipeline}</h2>
+              <span>{copy.activePipelineDescription}</span>
             </div>
             <div className="board recruitment-pipeline__columns">
               {activePipelineStages.map((stage) => {
@@ -472,8 +487,8 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
           <hr className="section-divider" />
           <section className="pipeline-section pipeline-section--outcomes">
             <div className="section-head pipeline-section__header">
-              <h2 id="pipeline-outcomes-heading">Outcomes</h2>
-              <span>Closed or paused applications.</span>
+              <h2 id="pipeline-outcomes-heading">{copy.outcomes}</h2>
+              <span>{copy.outcomesDescription}</span>
             </div>
             <div className="board outcomes recruitment-pipeline__columns">
               {outcomeStages.map((stage) => {
@@ -492,6 +507,7 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
               card={activeCard}
               jobId={jobId}
               dragOverlay
+              copy={copy}
             />
           ) : null}
         </DragOverlay>
@@ -546,8 +562,8 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
           card={bulkRejectCards[0]}
           initialTarget="REJECTED"
           fixedTarget="REJECTED"
-          title={"Reject " + bulkRejectCards.length + " candidates?"}
-          description="Choose one required rejection reason for every selected candidate."
+          title={copy.bulkRejectTitle(bulkRejectCards.length)}
+          description={copy.bulkRejectDescription}
           busy={bulkRejectBusy}
           onCancel={() => {
             if (!bulkRejectBusy) {

@@ -84,9 +84,14 @@ const vietnameseCopy: JobsLiveCopy = {
   lastPage: "Trang cuối",
   page: "Trang",
   perPage: "Mỗi trang:",
+  resultPages: "Các trang kết quả việc làm",
   empty: "Không tìm thấy việc làm phù hợp",
-  emptyCopy: "Hãy nới lỏng một hoặc nhiều tiêu chí để xem thêm cơ hội.",
-  clear: "Xoá bộ lọc",
+  emptyCopy:
+    "Hãy kiểm tra từ khóa hoặc nới rộng một vài tiêu chí để xem thêm cơ hội.",
+  resetSearch: "Đặt lại tìm kiếm",
+  emptyPage: "Không có việc làm ở trang này",
+  emptyPageCopy: "Hãy quay lại trang đầu để xem các kết quả hiện có.",
+  clear: "Xóa bộ lọc",
 };
 
 const englishCopy: JobsLiveCopy = {
@@ -111,8 +116,13 @@ const englishCopy: JobsLiveCopy = {
   lastPage: "Last page",
   page: "Page",
   perPage: "Per page:",
+  resultPages: "Job result pages",
   empty: "No jobs match these criteria",
-  emptyCopy: "Try widening one or more criteria to see more opportunities.",
+  emptyCopy:
+    "Try checking your keyword or widening one or more criteria to see more opportunities.",
+  resetSearch: "Reset search",
+  emptyPage: "No jobs on this page",
+  emptyPageCopy: "Return to the first page to see the available results.",
   clear: "Clear filters",
 };
 

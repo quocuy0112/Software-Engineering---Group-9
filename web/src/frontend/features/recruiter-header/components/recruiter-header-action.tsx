@@ -11,6 +11,10 @@ import { createPortal } from "react-dom";
 import { useRecruiterHeaderNavigation } from "../client/use-recruiter-header-navigation";
 import { useRecruiterHeaderStatus } from "../client/use-recruiter-header-status";
 import {
+  useWorkspaceLocale,
+  type WorkspaceLocale,
+} from "@/frontend/features/dashboard/client/workspace-locale";
+import {
   EMPLOYER_VERIFICATION_HREF,
   type RecruiterHeaderStatus,
 } from "@/shared/contracts/recruiter-header-status";
@@ -55,12 +59,40 @@ type RecruiterHeaderNavigationState = {
   open: (href: string | null) => boolean;
 };
 
+function recruiterHeaderCopy(locale: WorkspaceLocale) {
+  return locale === "vi"
+    ? {
+        hideCreateCompany: "Ẩn Tạo công ty",
+        showCreateCompany: "Hiện Tạo công ty",
+        createCompany: "Tạo công ty",
+        checkingStatus: "Đang kiểm tra trạng thái",
+        applicationUnderReview: "Đơn đăng ký đang được xem xét",
+        updateApplication: "Cập nhật đơn đăng ký",
+        reapplyAsRecruiter: "Đăng ký lại với vai trò nhà tuyển dụng",
+        postJob: "Đăng tin tuyển dụng",
+        recruiterWorkspace: "Không gian nhà tuyển dụng",
+      }
+    : {
+        hideCreateCompany: "Hide Create a Company",
+        showCreateCompany: "Show Create a Company",
+        createCompany: "Create a Company",
+        checkingStatus: "Checking status",
+        applicationUnderReview: "Application Under Review",
+        updateApplication: "Update Application",
+        reapplyAsRecruiter: "Reapply as Recruiter",
+        postJob: "Post a Job",
+        recruiterWorkspace: "Recruiter Workspace",
+      };
+}
+
 function RecruiterHeaderCompanyActions({
   action,
   navigation,
+  copy,
 }: {
   action: ReactNode;
   navigation: RecruiterHeaderNavigationState;
+  copy: ReturnType<typeof recruiterHeaderCopy>;
 }) {
   const [showCompanyActions, setShowCompanyActions] = useState(false);
   const [dropdownPosition, setDropdownPosition] =
@@ -152,8 +184,8 @@ function RecruiterHeaderCompanyActions({
             aria-controls="recruiter-company-actions"
             aria-label={
               showCompanyActions
-                ? "Hide Create a Company"
-                : "Show Create a Company"
+                ? copy.hideCreateCompany
+                : copy.showCreateCompany
             }
             onClick={() => {
               if (showCompanyActions) setDropdownPosition(null);
@@ -186,7 +218,7 @@ function RecruiterHeaderCompanyActions({
                 <RecruiterHeaderIcon name="apply" />
               </span>
               <span className="recruiter-header-action__label">
-                Create a Company
+                {copy.createCompany}
               </span>
             </button>,
             document.body,
@@ -203,6 +235,7 @@ export function RecruiterHeaderAction({
   initialStatus?: RecruiterHeaderStatus | null;
   onOpenWorkspace?: () => void;
 }) {
+  const copy = recruiterHeaderCopy(useWorkspaceLocale());
   const { status, checking, unavailable } =
     useRecruiterHeaderStatus(initialStatus);
   const navigation = useRecruiterHeaderNavigation();
@@ -214,27 +247,29 @@ export function RecruiterHeaderAction({
         className="recruiter-header-action recruiter-header-action--placeholder"
         role="status"
         aria-live="polite"
-        aria-label="Checking status"
+        aria-label={copy.checkingStatus}
         data-recruiter-state="placeholder"
       >
         <span className="recruiter-header-action__icon" aria-hidden="true" />
-        <span className="recruiter-header-action__label">Checking status</span>
+        <span className="recruiter-header-action__label">
+          {copy.checkingStatus}
+        </span>
       </span>
     );
   }
 
   const pending = status.state === "PENDING_REVIEW";
   const label = pending
-    ? "Application Under Review"
+    ? copy.applicationUnderReview
     : status.state === "CHANGES_REQUESTED"
-      ? "Update Application"
+      ? copy.updateApplication
       : status.state === "REJECTED"
-        ? "Reapply as Recruiter"
+        ? copy.reapplyAsRecruiter
         : approved
           ? onOpenWorkspace
-            ? "Post a Job"
-            : "Recruiter Workspace"
-          : "Create a Company";
+            ? copy.postJob
+            : copy.recruiterWorkspace
+          : copy.createCompany;
   const busy = checking || navigation.busy;
   const state = unavailable
     ? "unavailable"
@@ -283,6 +318,10 @@ export function RecruiterHeaderAction({
   if (!approved || !onOpenWorkspace) return action;
 
   return (
-    <RecruiterHeaderCompanyActions action={action} navigation={navigation} />
+    <RecruiterHeaderCompanyActions
+      action={action}
+      navigation={navigation}
+      copy={copy}
+    />
   );
 }

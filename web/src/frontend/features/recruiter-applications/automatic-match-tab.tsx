@@ -14,21 +14,28 @@ import type {
   FinalScore,
   SkillEvidence,
 } from "@/shared/contracts/scoring";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { applicationDetailCopy } from "./application-detail-copy";
 
 export function ScoringLineage({
   automatic,
 }: {
   automatic: AutomaticMatch | null | undefined;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = applicationDetailCopy(locale).automatic;
   if (!automatic)
     return (
       <span className="automatic-formula-row__lineage">
-        Lineage is preserved
+        {copy.lineagePreserved}
       </span>
     );
 
   return (
-    <div className="automatic-formula-row__lineage" aria-label="Score inputs">
+    <div
+      className="automatic-formula-row__lineage"
+      aria-label={copy.scoreInputs}
+    >
       <span>
         <b>JD</b>
         <code>{automatic.jdVersion}</code>
@@ -38,7 +45,7 @@ export function ScoringLineage({
         <code>{automatic.cvVersion}</code>
       </span>
       <span>
-        <b>Config</b>
+        <b>{copy.config}</b>
         <code>{automatic.configVersion}</code>
       </span>
     </div>
@@ -56,6 +63,7 @@ function SkillChips({
   tone: "found" | "missing" | "preferred";
   icon: typeof Check;
 }) {
+  const copy = applicationDetailCopy(useWorkspaceLocale()).automatic;
   return (
     <div className={`automatic-skill-group automatic-skill-group--${tone}`}>
       <span className="automatic-skill-group__label">
@@ -73,7 +81,7 @@ function SkillChips({
           ))}
         </div>
       ) : (
-        <span className="ranking-muted-text">None detected</span>
+        <span className="ranking-muted-text">{copy.noneDetected}</span>
       )}
     </div>
   );
@@ -117,15 +125,14 @@ export function AutomaticMatchTab({
   aiScore?: number | null;
   retrying?: boolean;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = applicationDetailCopy(locale).automatic;
   if (!automatic) {
     return (
       <div className="ranking-empty-panel" role="status">
         <LoaderPlaceholder />
-        <h3>Automatic match is processing</h3>
-        <p>
-          The deterministic result will appear here when the CV and job
-          snapshots are ready.
-        </p>
+        <h3>{copy.processingTitle}</h3>
+        <p>{copy.processingDescription}</p>
       </div>
     );
   }
@@ -142,37 +149,37 @@ export function AutomaticMatchTab({
 
   return (
     <div className="ranking-tab-content automatic-match-tab">
-      <div className="automatic-score-cards" aria-label="Score components">
+      <div className="automatic-score-cards" aria-label={copy.scoreComponents}>
         <ScoreCard
-          title="Automatic match"
+          title={copy.automaticMatch}
           value={`${automatic.score}/100`}
-          meta="Weight 40%"
+          meta={copy.weightAutomatic}
           tone="blue"
           progress={automatic.score}
         />
         <ScoreCard
-          title="AI assessment"
+          title={copy.aiAssessment}
           value={
             finalScore && aiScore !== null && aiScore !== undefined
               ? `${aiScore}/100`
               : retrying
-                ? "Processing"
-                : "Unavailable"
+                ? copy.processing
+                : copy.unavailable
           }
-          meta="Weight 60%"
+          meta={copy.weightAi}
           tone="purple"
           progress={aiScore ?? 0}
         />
         <ScoreCard
-          title="Final score"
+          title={copy.finalScore}
           value={
             finalScore
               ? `${finalScore.value}/100`
               : retrying
-                ? "Pending"
+                ? copy.pending
                 : "—/100"
           }
-          meta="Result"
+          meta={copy.result}
           tone="green"
           progress={finalScore?.value ?? automatic.score}
         />
@@ -186,8 +193,8 @@ export function AutomaticMatchTab({
           {finalScore
             ? finalScore.formulaText
             : retrying
-              ? `Deterministic ${automatic.score}/100 ready · AI retry in progress`
-              : `Deterministic match: ${automatic.score}/100 · AI unavailable`}
+              ? copy.formulaRetry(automatic.score)
+              : copy.formulaUnavailable(automatic.score)}
         </strong>
         <ScoringLineage automatic={automatic} />
       </div>
@@ -195,32 +202,29 @@ export function AutomaticMatchTab({
       {automatic.mayBeIncomplete ? (
         <div className="ranking-warning" role="status">
           <CircleAlert aria-hidden="true" />
-          <span>
-            {automatic.incompletenessLabel ??
-              "Some source data may be incomplete."}
-          </span>
+          <span>{automatic.incompletenessLabel ?? copy.incomplete}</span>
         </div>
       ) : null}
 
       <div className="automatic-match-grid">
         <section className="ranking-panel automatic-skills-panel">
           <div className="ranking-section-heading">
-            <h3>Skills required for the role</h3>
+            <h3>{copy.requiredSkills}</h3>
           </div>
           <SkillChips
-            title="Found in the CV"
+            title={copy.foundInCv}
             items={automatic.foundRequiredSkills}
             tone="found"
             icon={Check}
           />
           <SkillChips
-            title="Missing required skill"
+            title={copy.missingRequired}
             items={automatic.missingRequiredSkills}
             tone="missing"
             icon={CircleX}
           />
           <SkillChips
-            title="Preferred skills"
+            title={copy.preferredSkills}
             items={automatic.preferredSkills}
             tone="preferred"
             icon={Plus}
@@ -228,22 +232,22 @@ export function AutomaticMatchTab({
         </section>
         <section className="ranking-panel automatic-experience-panel">
           <div className="ranking-section-heading">
-            <h3>Experience</h3>
+            <h3>{copy.experience}</h3>
           </div>
           <div className="experience-metric experience-metric--required">
-            <span>Minimum required</span>
+            <span>{copy.minimumRequired}</span>
             <strong>
               {automatic.minimumExperienceYears === null
-                ? "Not specified"
-                : `${automatic.minimumExperienceYears} years`}
+                ? copy.notSpecified
+                : copy.years(automatic.minimumExperienceYears)}
             </strong>
           </div>
           <div className="experience-metric experience-metric--detected">
-            <span>Detected in the CV</span>
+            <span>{copy.detectedInCv}</span>
             <strong>
               {automatic.detectedExperience.kind === "DETECTED"
-                ? `${automatic.detectedExperience.years} years`
-                : "Not detected"}
+                ? copy.years(automatic.detectedExperience.years)
+                : copy.notDetected}
             </strong>
           </div>
           <div
@@ -257,10 +261,10 @@ export function AutomaticMatchTab({
             <span>
               {automatic.minimumExperienceYears === null ||
               automatic.minimumExperienceYears <= 0
-                ? "No minimum configured"
+                ? copy.noMinimum
                 : experienceDelta !== null && experienceDelta >= 0
-                  ? `Exceeds requirement by ${experienceDelta} ${experienceDelta === 1 ? "year" : "years"}`
-                  : "Minimum experience not established"}
+                  ? copy.exceeds(experienceDelta)
+                  : copy.minimumNotEstablished}
             </span>
           </div>
         </section>
@@ -269,11 +273,9 @@ export function AutomaticMatchTab({
       <section className="ranking-panel evidence-panel">
         <div className="ranking-section-heading">
           <h3>
-            <FileSearch aria-hidden="true" /> Evidence found in the CV
+            <FileSearch aria-hidden="true" /> {copy.evidenceFound}
           </h3>
-          <span className="ranking-version-tag">
-            CV &middot; pages 1&ndash;2
-          </span>
+          <span className="ranking-version-tag">{copy.pages}</span>
         </div>
         {evidence.length ? (
           <div className="evidence-list">
@@ -286,16 +288,14 @@ export function AutomaticMatchTab({
                 <blockquote>&ldquo;{excerpt.excerpt}&rdquo;</blockquote>
                 <span className="evidence-row__page">
                   {excerpt.pageNumber
-                    ? `Page ${excerpt.pageNumber}`
-                    : (excerpt.sectionLabel ?? "CV")}
+                    ? copy.page(excerpt.pageNumber)
+                    : (excerpt.sectionLabel ?? copy.cv)}
                 </span>
               </div>
             ))}
           </div>
         ) : (
-          <p className="ranking-muted-text">
-            No evidence excerpts were detected for this scoring snapshot.
-          </p>
+          <p className="ranking-muted-text">{copy.noEvidence}</p>
         )}
       </section>
     </div>

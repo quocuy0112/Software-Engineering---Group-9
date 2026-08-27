@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { SendHorizontal, UserRound } from "lucide-react";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruiterWorkspaceCopy } from "@/frontend/features/recruiter-workspace/recruiter-workspace-copy";
 
 type Detail = {
   thread: {
@@ -21,6 +23,23 @@ type Detail = {
   }>;
 };
 
+function stageLabel(
+  stage: string,
+  labels: ReturnType<typeof recruiterWorkspaceCopy>["messages"]["stages"],
+) {
+  return labels[stage as keyof typeof labels] ?? stage;
+}
+
+function recruiterRoleLabel(
+  role: string,
+  copy: ReturnType<typeof recruiterWorkspaceCopy>,
+) {
+  if (role === "HR_MANAGER") return copy.role.hrManager;
+  if (role === "HIRING_MANAGER") return copy.role.hiringManager;
+  if (role === "OWNER") return copy.role.owner;
+  return copy.role.recruiter;
+}
+
 export function CandidateRecruitmentThread({
   applicationId,
   csrfProof,
@@ -28,6 +47,9 @@ export function CandidateRecruitmentThread({
   applicationId: string;
   csrfProof: string;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = recruiterWorkspaceCopy(locale);
+  const messagesCopy = copy.messages;
   const [detail, setDetail] = useState<Detail | null>(null);
   const [content, setContent] = useState("");
   const [state, setState] = useState<
@@ -88,40 +110,42 @@ export function CandidateRecruitmentThread({
         className="application-detail-back"
         href={`/jobs/applied/${encodeURIComponent(applicationId)}`}
       >
-        Back to application
+        {messagesCopy.backToApplication}
       </Link>
       <header className="recruitment-chat-header">
         <div>
-          <p>{detail?.thread.job.companyName ?? "Application communication"}</p>
-          <h1>{detail?.thread.job.title ?? "Recruitment messages"}</h1>
+          <p>{detail?.thread.job.companyName ?? messagesCopy.applicationCommunication}</p>
+          <h1>{detail?.thread.job.title ?? messagesCopy.recruitmentMessages}</h1>
         </div>
         <div className="recruitment-candidate-chat-status">
           {detail ? (
             <strong className="recruitment-chat-stage">
-              {detail.thread.applicationStage}
+              {stageLabel(detail.thread.applicationStage, messagesCopy.stages)}
             </strong>
           ) : null}
           <span>
             {detail?.thread.assignee
-              ? `Chatting with ${detail.thread.assignee.name} (${detail.thread.assignee.role})`
-              : "Conversation for this application"}
+              ? messagesCopy.chattingWith(
+                  detail.thread.assignee.name,
+                  recruiterRoleLabel(detail.thread.assignee.role, copy),
+                )
+              : messagesCopy.applicationConversation}
           </span>
         </div>
       </header>
       {state === "loading" ? (
         <p className="recruitment-messaging__empty">
-          Loading secure conversation...
+          {messagesCopy.loadingConversation}
         </p>
       ) : null}
       {state === "not-assigned" ? (
         <p className="recruitment-messaging__empty">
-          Messaging will be available when the company assigns a recruiter to
-          your application.
+          {messagesCopy.notAssigned}
         </p>
       ) : null}
       {state === "error" ? (
         <p className="recruitment-messaging__error">
-          This conversation is unavailable right now.
+          {messagesCopy.unavailable}
         </p>
       ) : null}
       {detail ? (
@@ -130,7 +154,7 @@ export function CandidateRecruitmentThread({
             {detail.messages.length ? (
               <>
                 <p className="recruitment-chat-history__start">
-                  Conversation started
+                  {messagesCopy.conversationStarted}
                 </p>
                 {detail.messages.map((message) => {
                   const outgoing =
@@ -140,9 +164,13 @@ export function CandidateRecruitmentThread({
                       key={message.id}
                       className="recruitment-chat-message"
                       data-direction={outgoing ? "outgoing" : "incoming"}
-                      aria-label={`Message from ${
-                        outgoing ? "you" : (detail.thread.assignee?.name ?? "recruiter")
-                      }`}
+                      aria-label={messagesCopy.messageFrom(
+                        outgoing
+                          ? locale === "vi"
+                            ? "bạn"
+                            : "you"
+                          : (detail.thread.assignee?.name ?? copy.role.recruiter),
+                      )}
                     >
                       <span
                         className="recruitment-chat-message__avatar"
@@ -163,12 +191,14 @@ export function CandidateRecruitmentThread({
                 })}
               </>
             ) : (
-              <p className="recruitment-messaging__empty">No messages yet.</p>
+              <p className="recruitment-messaging__empty">
+                {messagesCopy.noMessagesShort}
+              </p>
             )}
           </div>
           <form className="recruitment-chat-composer" onSubmit={send}>
             <label>
-              <span className="sr-only">Message</span>
+              <span className="sr-only">{messagesCopy.message}</span>
               <textarea
                 value={content}
                 onChange={(event) => setContent(event.target.value)}
@@ -186,8 +216,8 @@ export function CandidateRecruitmentThread({
                 maxLength={2000}
                 placeholder={
                   detail.thread.canSend
-                    ? "Write a message..."
-                    : "This conversation is read-only"
+                    ? messagesCopy.writeMessage
+                    : messagesCopy.readOnlyConversation
                 }
               />
               <span
@@ -199,13 +229,13 @@ export function CandidateRecruitmentThread({
             </label>
             <div className="recruitment-chat-composer__actions">
               <span>
-                Press Enter to send · Shift + Enter for a new line
+                {messagesCopy.sendHint}
               </span>
               <button
                 type="submit"
                 disabled={!detail.thread.canSend || !content.trim()}
               >
-                Send <SendHorizontal aria-hidden="true" />
+                {messagesCopy.send} <SendHorizontal aria-hidden="true" />
               </button>
             </div>
           </form>

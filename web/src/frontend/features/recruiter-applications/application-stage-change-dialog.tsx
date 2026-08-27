@@ -3,22 +3,13 @@
 import { useState } from "react";
 import { Modal } from "@/frontend/components/ui/modal";
 import {
-  pipelineStageLabels,
   rejectionReasonCodeSchema,
   type ApplicationStage,
   type PipelineApplicationCard,
   type StageTransitionCommand,
 } from "@/shared/contracts/applications";
-
-const rejectionLabels: Record<string, string> = {
-  REQUIRED_TECHNICAL_EXPERIENCE_NOT_DEMONSTRATED:
-    "Required technical experience not demonstrated",
-  INSUFFICIENT_EXPERIENCE: "Insufficient experience",
-  REQUIRED_SKILLS_NOT_DEMONSTRATED: "Required skills not demonstrated",
-  POSITION_FILLED: "Position filled",
-  APPLICATION_WITHDRAWN_BY_CANDIDATE: "Application withdrawn by candidate",
-  OTHER_JOB_RELATED_REASON: "Other job-related reason",
-};
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { recruiterApplicationsCopy } from "./recruiter-applications-copy";
 
 export function stageTransitionNeedsDialog(target: ApplicationStage) {
   return (
@@ -51,6 +42,9 @@ export function ApplicationStageChangeDialog({
     >,
   ) => void;
 }) {
+  const copy = recruiterApplicationsCopy(useWorkspaceLocale());
+  const pipelineCopy = copy.pipeline;
+  const dialogCopy = copy.stageDialog;
   // The destination list is intentionally taken verbatim from the server
   // projection. The client does not recreate or narrow transition policy.
   const allowedDestinations = card.allowedDestinations;
@@ -75,22 +69,20 @@ export function ApplicationStageChangeDialog({
   const valid =
     Boolean(target) && (!reasonRequired || Boolean(reasonCode.trim()));
   const actionLabel = rejection
-    ? "Confirm rejection"
+    ? dialogCopy.confirmRejection
     : target === "HIRED"
-      ? "Confirm hiring"
+      ? dialogCopy.confirmHiring
       : target === "OFFER_DECLINED"
-        ? "Confirm offer declined"
+        ? dialogCopy.confirmOfferDeclined
         : target
-          ? "Confirm stage change"
-          : "Change Stage";
+          ? dialogCopy.confirmStageChange
+          : dialogCopy.changeStage;
 
   return (
     <Modal
       open
-      title={title ?? `Change Stage for ${card.candidate.displayName}`}
-      description={
-        description ?? "Choose one destination returned for this application."
-      }
+      title={title ?? dialogCopy.titleFor(card.candidate.displayName)}
+      description={description ?? dialogCopy.description}
       tone={rejection ? "destructive" : "standard"}
       busy={busy}
       onClose={onCancel}
@@ -98,11 +90,12 @@ export function ApplicationStageChangeDialog({
       <div className="pipeline-stage-form">
         {fixedTarget ? (
           <p role="note">
-            Destination stage: <strong>{pipelineStageLabels[fixedTarget]}</strong>
+            {dialogCopy.destination}:{" "}
+            <strong>{pipelineCopy.stageLabels[fixedTarget]}</strong>
           </p>
         ) : (
           <label>
-            Destination stage
+            {dialogCopy.destination}
             <select
               data-autofocus
               value={target}
@@ -112,10 +105,10 @@ export function ApplicationStageChangeDialog({
                 setInternalNote("");
               }}
             >
-              <option value="">Choose a stage</option>
+              <option value="">{dialogCopy.chooseStage}</option>
               {allowedDestinations.map((stage) => (
                 <option key={stage} value={stage}>
-                  {pipelineStageLabels[stage]}
+                  {pipelineCopy.stageLabels[stage]}
                 </option>
               ))}
             </select>
@@ -124,34 +117,34 @@ export function ApplicationStageChangeDialog({
         {rejection ? (
           <>
             <label>
-              Rejection reason
+              {dialogCopy.rejectionReason}
               <select
                 required
                 value={reasonCode}
                 onChange={(event) => setReasonCode(event.target.value)}
               >
-                <option value="">Choose a reason</option>
+                <option value="">{dialogCopy.chooseReason}</option>
                 {rejectionReasonCodeSchema.options.map((reason) => (
                   <option key={reason} value={reason}>
-                    {rejectionLabels[reason]}
+                    {dialogCopy.rejectionReasons[reason]}
                   </option>
                 ))}
               </select>
             </label>
             <label>
-              Private recruiter note (optional)
+              {dialogCopy.privateNote}
               <textarea
                 maxLength={2_000}
                 value={internalNote}
                 onChange={(event) => setInternalNote(event.target.value)}
               />
-              <small>Never shared with the candidate.</small>
+              <small>{dialogCopy.neverShared}</small>
             </label>
           </>
         ) : null}
         {target === "OFFER_DECLINED" ? (
           <label>
-            Offer declined reason
+            {dialogCopy.offerDeclinedReason}
             <input
               required
               maxLength={80}
@@ -162,7 +155,7 @@ export function ApplicationStageChangeDialog({
         ) : null}
         <div className="sh-modal-actions">
           <button type="button" disabled={busy} onClick={onCancel}>
-            Cancel
+            {dialogCopy.cancel}
           </button>
           <button
             type="button"
@@ -176,7 +169,7 @@ export function ApplicationStageChangeDialog({
               })
             }
           >
-            {busy ? "Saving..." : actionLabel}
+            {busy ? dialogCopy.saving : actionLabel}
           </button>
         </div>
       </div>

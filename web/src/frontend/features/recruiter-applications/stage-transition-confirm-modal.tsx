@@ -5,13 +5,8 @@ import { ArrowRight, UserRoundCheck } from "lucide-react";
 import type { RankedApplicationRow } from "@/shared/contracts/scoring";
 import { RankingModalFrame } from "./ranking-modal-frame";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
-
-function stageLabel(value: string) {
-  return value
-    .replaceAll("_", " ")
-    .toLowerCase()
-    .replace(/\b\w/gu, (letter) => letter.toUpperCase());
-}
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { applicationDetailCopy } from "./application-detail-copy";
 
 export function StageTransitionConfirmModal({
   candidate,
@@ -24,6 +19,8 @@ export function StageTransitionConfirmModal({
   onCancel: () => void;
   onCompleted: () => void;
 }) {
+  const copy = applicationDetailCopy(useWorkspaceLocale());
+  const transitionCopy = copy.transition;
   const csrfProof = useCsrfProof();
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -33,7 +30,15 @@ export function StageTransitionConfirmModal({
     setError(null);
     try {
       const response = await fetch(
-        jobId ? "/api/recruiter/jobs/" + encodeURIComponent(jobId) + "/applications/" + encodeURIComponent(candidate.applicationId) + "/stage" : "/api/recruiter/applications/" + encodeURIComponent(candidate.applicationId) + "/decisions/interview",
+        jobId
+          ? "/api/recruiter/jobs/" +
+              encodeURIComponent(jobId) +
+              "/applications/" +
+              encodeURIComponent(candidate.applicationId) +
+              "/stage"
+          : "/api/recruiter/applications/" +
+              encodeURIComponent(candidate.applicationId) +
+              "/decisions/interview",
         {
           method: "POST",
           headers: {
@@ -48,43 +53,30 @@ export function StageTransitionConfirmModal({
           }),
         },
       );
-      const payload = (await response.json().catch(() => null)) as {
-        message?: string;
-      } | null;
-      if (!response.ok)
-        throw new Error(
-          payload?.message ??
-            "The interview transition could not be completed.",
-        );
+      if (!response.ok) throw new Error(transitionCopy.error);
       onCompleted();
     } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "The interview transition could not be completed.",
-      );
+      setError(cause instanceof Error ? cause.message : transitionCopy.error);
     } finally {
       setSaving(false);
     }
   };
   return (
     <RankingModalFrame
-      title="Move candidate to interview?"
-      subtitle="Explicit recruiter decision · Application stage update"
+      title={transitionCopy.title}
+      subtitle={transitionCopy.subtitle}
       icon="→"
       info={
         <>
           <UserRoundCheck aria-hidden="true" />
           <span>
-            This transition is made by you, not by AI. The action is recorded in
-            stage history and the candidate is notified.
-            {autoShortlist
-              ? " Because this candidate is Viewed, the action records Shortlisted before Interviewing."
-              : ""}
+            {transitionCopy.info}
+            {autoShortlist ? transitionCopy.viewedInfo : ""}
           </span>
         </>
       }
-      confirmLabel={saving ? "Moving…" : "Confirm move"}
+      confirmLabel={saving ? transitionCopy.moving : transitionCopy.confirm}
+      cancelLabel={transitionCopy.cancel}
       onCancel={onCancel}
       onConfirm={() => void confirm()}
       confirmDisabled={saving}
@@ -92,30 +84,34 @@ export function StageTransitionConfirmModal({
       {autoShortlist ? (
         <div className="ai-ranking-stage-change">
           <div>
-            <small>Current stage</small>
-            <strong>Viewed</strong>
+            <small>{transitionCopy.current}</small>
+            <strong>{copy.stageLabels.VIEWED}</strong>
           </div>
           <ArrowRight aria-hidden="true" />
           <div>
-            <small>Recorded stage</small>
-            <strong>Shortlisted</strong>
+            <small>{transitionCopy.recorded}</small>
+            <strong>{copy.stageLabels.SHORTLISTED}</strong>
           </div>
           <ArrowRight aria-hidden="true" />
           <div>
-            <small>Next stage</small>
-            <strong>Interviewing</strong>
+            <small>{transitionCopy.next}</small>
+            <strong>{copy.stageLabels.INTERVIEWING}</strong>
           </div>
         </div>
       ) : (
         <div className="ai-ranking-stage-change">
           <div>
-            <small>Current stage</small>
-            <strong>{stageLabel(candidate.stage)}</strong>
+            <small>{transitionCopy.current}</small>
+            <strong>
+              {copy.stageLabels[
+                candidate.stage as keyof typeof copy.stageLabels
+              ] ?? candidate.stage}
+            </strong>
           </div>
           <ArrowRight aria-hidden="true" />
           <div>
-            <small>Next stage</small>
-            <strong>Interviewing</strong>
+            <small>{transitionCopy.next}</small>
+            <strong>{copy.stageLabels.INTERVIEWING}</strong>
           </div>
         </div>
       )}

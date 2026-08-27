@@ -12,9 +12,12 @@ import { toast } from "sonner";
 import { Button } from "@/frontend/components/ui/button";
 import type { CvParserClass } from "@/shared/contracts/cv-import/common";
 import { CV_SOURCE_MAX_BYTES } from "@/shared/contracts/cv-import/common";
-import { validateCvFile } from "@/shared/cv-file-validation";
+import {
+  CvFileValidationError,
+  validateCvFile,
+} from "@/shared/cv-file-validation";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
-import { cvCopy } from "../i18n/cv-import-copy";
+import { cvCopy, cvKnownError } from "../i18n/cv-import-copy";
 import { CvProcessingNotice } from "./cv-processing-notice";
 import styles from "./cv-upload-form.module.css";
 
@@ -156,16 +159,18 @@ export function CvUploadForm({
       );
     } catch (cause) {
       clearSelection();
+      const errorCode =
+        cause instanceof CvFileValidationError
+          ? cause.code
+          : cause instanceof Error && cause.message.startsWith("CV_")
+            ? cause.message
+            : undefined;
       showError(
-        cause instanceof Error && !cause.message.startsWith("CV_")
-          ? cause.message
-          : cause instanceof Error && cause.message.includes("not available")
-            ? locale === "vi"
-              ? "Bộ phân tích đã chọn hiện không khả dụng. Hãy kiểm tra cấu hình rồi thử lại."
-              : cause.message
-            : locale === "vi"
-              ? "Tải CV không thành công. Hãy thử lại hoặc nhập hồ sơ thủ công."
-              : "The CV upload failed. Try again or enter your profile manually.",
+        cause instanceof Error
+          ? cvKnownError(locale, cause.message, errorCode)
+          : locale === "vi"
+            ? "Tải CV không thành công. Hãy thử lại hoặc nhập hồ sơ thủ công."
+            : "The CV upload failed. Try again or enter your profile manually.",
       );
       setMessage(
         locale === "vi" ? "Tải lên không thành công." : "Upload failed.",
