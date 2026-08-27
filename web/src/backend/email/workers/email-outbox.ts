@@ -55,6 +55,10 @@ import {
   companyInvitationResponseEmailText,
 } from "../templates/company-invitation-response";
 import {
+  TeamApplicationRejectedTemplate,
+  teamApplicationRejectedEmailText,
+} from "../templates/team-application-rejected";
+import {
   applicationStageLabel,
   applicationStageSchema,
 } from "@/shared/contracts/jobs/applications";
@@ -283,6 +287,35 @@ export async function deliverClaimedOutbox(
         createElement(CompanyInvitationResponseTemplate, templateProps),
       );
       text = companyInvitationResponseEmailText(templateProps);
+    } else if (row.templateVersion === "team-application-rejected.v1") {
+      const rejectionPayload = row.payloadRef as {
+        companyName?: string;
+        role?: "HR_MANAGER" | "RECRUITER";
+        reason?: string;
+      };
+      if (
+        !rejectionPayload.companyName ||
+        (rejectionPayload.role !== "HR_MANAGER" &&
+          rejectionPayload.role !== "RECRUITER") ||
+        (rejectionPayload.reason !== undefined &&
+          typeof rejectionPayload.reason !== "string")
+      ) {
+        throw new Error("TEAM_APPLICATION_REJECTION_EMAIL_PAYLOAD_INVALID");
+      }
+      const templateProps = {
+        companyName: rejectionPayload.companyName,
+        role: rejectionPayload.role,
+        ...(rejectionPayload.reason ? { reason: rejectionPayload.reason } : {}),
+        applicationUrl: new URL(
+          "/jobs/applied/team",
+          serverEnvironment.NEXT_PUBLIC_APP_URL,
+        ).toString(),
+      };
+      subject = `Update on your team application to ${templateProps.companyName}`;
+      html = await render(
+        createElement(TeamApplicationRejectedTemplate, templateProps),
+      );
+      text = teamApplicationRejectedEmailText(templateProps);
     } else if (row.templateVersion === "email-change-verification.v1") {
       const emailChangePayload = row.payloadRef as {
         protectedProof?: string;

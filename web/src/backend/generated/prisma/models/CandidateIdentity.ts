@@ -173,6 +173,7 @@ export type CandidateIdentityWhereInput = {
   jobApplications?: Prisma.JobApplicationListRelationFilter
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterListRelationFilter
   applicationDrafts?: Prisma.CandidateApplicationDraftListRelationFilter
+  teamApplications?: Prisma.TeamApplicationListRelationFilter
 }
 
 export type CandidateIdentityOrderByWithRelationInput = {
@@ -186,6 +187,7 @@ export type CandidateIdentityOrderByWithRelationInput = {
   jobApplications?: Prisma.JobApplicationOrderByRelationAggregateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterOrderByRelationAggregateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftOrderByRelationAggregateInput
+  teamApplications?: Prisma.TeamApplicationOrderByRelationAggregateInput
 }
 
 export type CandidateIdentityWhereUniqueInput = Prisma.AtLeast<{
@@ -202,6 +204,7 @@ export type CandidateIdentityWhereUniqueInput = Prisma.AtLeast<{
   jobApplications?: Prisma.JobApplicationListRelationFilter
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterListRelationFilter
   applicationDrafts?: Prisma.CandidateApplicationDraftListRelationFilter
+  teamApplications?: Prisma.TeamApplicationListRelationFilter
 }, "userId">
 
 export type CandidateIdentityOrderByWithAggregationInput = {
@@ -232,6 +235,7 @@ export type CandidateIdentityCreateInput = {
   jobApplications?: Prisma.JobApplicationCreateNestedManyWithoutCandidateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterCreateNestedManyWithoutCandidateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityUncheckedCreateInput = {
@@ -244,6 +248,7 @@ export type CandidateIdentityUncheckedCreateInput = {
   jobApplications?: Prisma.JobApplicationUncheckedCreateNestedManyWithoutCandidateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedCreateNestedManyWithoutCandidateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityUpdateInput = {
@@ -256,6 +261,7 @@ export type CandidateIdentityUpdateInput = {
   jobApplications?: Prisma.JobApplicationUpdateManyWithoutCandidateNestedInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUpdateManyWithoutCandidateNestedInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityUncheckedUpdateInput = {
@@ -268,6 +274,7 @@ export type CandidateIdentityUncheckedUpdateInput = {
   jobApplications?: Prisma.JobApplicationUncheckedUpdateManyWithoutCandidateNestedInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedUpdateManyWithoutCandidateNestedInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityCreateManyInput = {
@@ -375,6 +382,20 @@ export type CandidateIdentityUpdateOneRequiredWithoutProfileVisibilityNestedInpu
   update?: Prisma.XOR<Prisma.XOR<Prisma.CandidateIdentityUpdateToOneWithWhereWithoutProfileVisibilityInput, Prisma.CandidateIdentityUpdateWithoutProfileVisibilityInput>, Prisma.CandidateIdentityUncheckedUpdateWithoutProfileVisibilityInput>
 }
 
+export type CandidateIdentityCreateNestedOneWithoutTeamApplicationsInput = {
+  create?: Prisma.XOR<Prisma.CandidateIdentityCreateWithoutTeamApplicationsInput, Prisma.CandidateIdentityUncheckedCreateWithoutTeamApplicationsInput>
+  connectOrCreate?: Prisma.CandidateIdentityCreateOrConnectWithoutTeamApplicationsInput
+  connect?: Prisma.CandidateIdentityWhereUniqueInput
+}
+
+export type CandidateIdentityUpdateOneRequiredWithoutTeamApplicationsNestedInput = {
+  create?: Prisma.XOR<Prisma.CandidateIdentityCreateWithoutTeamApplicationsInput, Prisma.CandidateIdentityUncheckedCreateWithoutTeamApplicationsInput>
+  connectOrCreate?: Prisma.CandidateIdentityCreateOrConnectWithoutTeamApplicationsInput
+  upsert?: Prisma.CandidateIdentityUpsertWithoutTeamApplicationsInput
+  connect?: Prisma.CandidateIdentityWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CandidateIdentityUpdateToOneWithWhereWithoutTeamApplicationsInput, Prisma.CandidateIdentityUpdateWithoutTeamApplicationsInput>, Prisma.CandidateIdentityUncheckedUpdateWithoutTeamApplicationsInput>
+}
+
 export type CandidateIdentityCreateNestedOneWithoutCvsInput = {
   create?: Prisma.XOR<Prisma.CandidateIdentityCreateWithoutCvsInput, Prisma.CandidateIdentityUncheckedCreateWithoutCvsInput>
   connectOrCreate?: Prisma.CandidateIdentityCreateOrConnectWithoutCvsInput
@@ -440,6 +461,7 @@ export type CandidateIdentityCreateWithoutUserInput = {
   jobApplications?: Prisma.JobApplicationCreateNestedManyWithoutCandidateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterCreateNestedManyWithoutCandidateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityUncheckedCreateWithoutUserInput = {
@@ -451,6 +473,7 @@ export type CandidateIdentityUncheckedCreateWithoutUserInput = {
   jobApplications?: Prisma.JobApplicationUncheckedCreateNestedManyWithoutCandidateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedCreateNestedManyWithoutCandidateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityCreateOrConnectWithoutUserInput = {
@@ -478,6 +501,7 @@ export type CandidateIdentityUpdateWithoutUserInput = {
   jobApplications?: Prisma.JobApplicationUpdateManyWithoutCandidateNestedInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUpdateManyWithoutCandidateNestedInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityUncheckedUpdateWithoutUserInput = {
@@ -489,6 +513,7 @@ export type CandidateIdentityUncheckedUpdateWithoutUserInput = {
   jobApplications?: Prisma.JobApplicationUncheckedUpdateManyWithoutCandidateNestedInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedUpdateManyWithoutCandidateNestedInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityCreateWithoutProfileInput = {
@@ -500,6 +525,7 @@ export type CandidateIdentityCreateWithoutProfileInput = {
   jobApplications?: Prisma.JobApplicationCreateNestedManyWithoutCandidateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterCreateNestedManyWithoutCandidateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityUncheckedCreateWithoutProfileInput = {
@@ -511,6 +537,7 @@ export type CandidateIdentityUncheckedCreateWithoutProfileInput = {
   jobApplications?: Prisma.JobApplicationUncheckedCreateNestedManyWithoutCandidateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedCreateNestedManyWithoutCandidateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityCreateOrConnectWithoutProfileInput = {
@@ -538,6 +565,7 @@ export type CandidateIdentityUpdateWithoutProfileInput = {
   jobApplications?: Prisma.JobApplicationUpdateManyWithoutCandidateNestedInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUpdateManyWithoutCandidateNestedInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityUncheckedUpdateWithoutProfileInput = {
@@ -549,6 +577,7 @@ export type CandidateIdentityUncheckedUpdateWithoutProfileInput = {
   jobApplications?: Prisma.JobApplicationUncheckedUpdateManyWithoutCandidateNestedInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedUpdateManyWithoutCandidateNestedInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityCreateWithoutProfileVisibilityInput = {
@@ -560,6 +589,7 @@ export type CandidateIdentityCreateWithoutProfileVisibilityInput = {
   jobApplications?: Prisma.JobApplicationCreateNestedManyWithoutCandidateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterCreateNestedManyWithoutCandidateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityUncheckedCreateWithoutProfileVisibilityInput = {
@@ -571,6 +601,7 @@ export type CandidateIdentityUncheckedCreateWithoutProfileVisibilityInput = {
   jobApplications?: Prisma.JobApplicationUncheckedCreateNestedManyWithoutCandidateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedCreateNestedManyWithoutCandidateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityCreateOrConnectWithoutProfileVisibilityInput = {
@@ -598,6 +629,7 @@ export type CandidateIdentityUpdateWithoutProfileVisibilityInput = {
   jobApplications?: Prisma.JobApplicationUpdateManyWithoutCandidateNestedInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUpdateManyWithoutCandidateNestedInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityUncheckedUpdateWithoutProfileVisibilityInput = {
@@ -605,6 +637,71 @@ export type CandidateIdentityUncheckedUpdateWithoutProfileVisibilityInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profile?: Prisma.CandidateProfileUncheckedUpdateOneWithoutCandidateNestedInput
+  cvs?: Prisma.CandidateCvUncheckedUpdateManyWithoutCandidateNestedInput
+  jobApplications?: Prisma.JobApplicationUncheckedUpdateManyWithoutCandidateNestedInput
+  applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedUpdateManyWithoutCandidateNestedInput
+  applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUncheckedUpdateManyWithoutCandidateNestedInput
+}
+
+export type CandidateIdentityCreateWithoutTeamApplicationsInput = {
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserAccountCreateNestedOneWithoutCandidateIdentityInput
+  profile?: Prisma.CandidateProfileCreateNestedOneWithoutCandidateInput
+  profileVisibility?: Prisma.CandidateProfileVisibilityCreateNestedOneWithoutCandidateInput
+  cvs?: Prisma.CandidateCvCreateNestedManyWithoutCandidateInput
+  jobApplications?: Prisma.JobApplicationCreateNestedManyWithoutCandidateInput
+  applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterCreateNestedManyWithoutCandidateInput
+  applicationDrafts?: Prisma.CandidateApplicationDraftCreateNestedManyWithoutCandidateInput
+}
+
+export type CandidateIdentityUncheckedCreateWithoutTeamApplicationsInput = {
+  userId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.CandidateProfileUncheckedCreateNestedOneWithoutCandidateInput
+  profileVisibility?: Prisma.CandidateProfileVisibilityUncheckedCreateNestedOneWithoutCandidateInput
+  cvs?: Prisma.CandidateCvUncheckedCreateNestedManyWithoutCandidateInput
+  jobApplications?: Prisma.JobApplicationUncheckedCreateNestedManyWithoutCandidateInput
+  applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedCreateNestedManyWithoutCandidateInput
+  applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedCreateNestedManyWithoutCandidateInput
+}
+
+export type CandidateIdentityCreateOrConnectWithoutTeamApplicationsInput = {
+  where: Prisma.CandidateIdentityWhereUniqueInput
+  create: Prisma.XOR<Prisma.CandidateIdentityCreateWithoutTeamApplicationsInput, Prisma.CandidateIdentityUncheckedCreateWithoutTeamApplicationsInput>
+}
+
+export type CandidateIdentityUpsertWithoutTeamApplicationsInput = {
+  update: Prisma.XOR<Prisma.CandidateIdentityUpdateWithoutTeamApplicationsInput, Prisma.CandidateIdentityUncheckedUpdateWithoutTeamApplicationsInput>
+  create: Prisma.XOR<Prisma.CandidateIdentityCreateWithoutTeamApplicationsInput, Prisma.CandidateIdentityUncheckedCreateWithoutTeamApplicationsInput>
+  where?: Prisma.CandidateIdentityWhereInput
+}
+
+export type CandidateIdentityUpdateToOneWithWhereWithoutTeamApplicationsInput = {
+  where?: Prisma.CandidateIdentityWhereInput
+  data: Prisma.XOR<Prisma.CandidateIdentityUpdateWithoutTeamApplicationsInput, Prisma.CandidateIdentityUncheckedUpdateWithoutTeamApplicationsInput>
+}
+
+export type CandidateIdentityUpdateWithoutTeamApplicationsInput = {
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserAccountUpdateOneRequiredWithoutCandidateIdentityNestedInput
+  profile?: Prisma.CandidateProfileUpdateOneWithoutCandidateNestedInput
+  profileVisibility?: Prisma.CandidateProfileVisibilityUpdateOneWithoutCandidateNestedInput
+  cvs?: Prisma.CandidateCvUpdateManyWithoutCandidateNestedInput
+  jobApplications?: Prisma.JobApplicationUpdateManyWithoutCandidateNestedInput
+  applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUpdateManyWithoutCandidateNestedInput
+  applicationDrafts?: Prisma.CandidateApplicationDraftUpdateManyWithoutCandidateNestedInput
+}
+
+export type CandidateIdentityUncheckedUpdateWithoutTeamApplicationsInput = {
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.CandidateProfileUncheckedUpdateOneWithoutCandidateNestedInput
+  profileVisibility?: Prisma.CandidateProfileVisibilityUncheckedUpdateOneWithoutCandidateNestedInput
   cvs?: Prisma.CandidateCvUncheckedUpdateManyWithoutCandidateNestedInput
   jobApplications?: Prisma.JobApplicationUncheckedUpdateManyWithoutCandidateNestedInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedUpdateManyWithoutCandidateNestedInput
@@ -620,6 +717,7 @@ export type CandidateIdentityCreateWithoutCvsInput = {
   jobApplications?: Prisma.JobApplicationCreateNestedManyWithoutCandidateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterCreateNestedManyWithoutCandidateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityUncheckedCreateWithoutCvsInput = {
@@ -631,6 +729,7 @@ export type CandidateIdentityUncheckedCreateWithoutCvsInput = {
   jobApplications?: Prisma.JobApplicationUncheckedCreateNestedManyWithoutCandidateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedCreateNestedManyWithoutCandidateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityCreateOrConnectWithoutCvsInput = {
@@ -658,6 +757,7 @@ export type CandidateIdentityUpdateWithoutCvsInput = {
   jobApplications?: Prisma.JobApplicationUpdateManyWithoutCandidateNestedInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUpdateManyWithoutCandidateNestedInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityUncheckedUpdateWithoutCvsInput = {
@@ -669,6 +769,7 @@ export type CandidateIdentityUncheckedUpdateWithoutCvsInput = {
   jobApplications?: Prisma.JobApplicationUncheckedUpdateManyWithoutCandidateNestedInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedUpdateManyWithoutCandidateNestedInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityCreateWithoutApplicationDraftsInput = {
@@ -680,6 +781,7 @@ export type CandidateIdentityCreateWithoutApplicationDraftsInput = {
   cvs?: Prisma.CandidateCvCreateNestedManyWithoutCandidateInput
   jobApplications?: Prisma.JobApplicationCreateNestedManyWithoutCandidateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityUncheckedCreateWithoutApplicationDraftsInput = {
@@ -691,6 +793,7 @@ export type CandidateIdentityUncheckedCreateWithoutApplicationDraftsInput = {
   cvs?: Prisma.CandidateCvUncheckedCreateNestedManyWithoutCandidateInput
   jobApplications?: Prisma.JobApplicationUncheckedCreateNestedManyWithoutCandidateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityCreateOrConnectWithoutApplicationDraftsInput = {
@@ -718,6 +821,7 @@ export type CandidateIdentityUpdateWithoutApplicationDraftsInput = {
   cvs?: Prisma.CandidateCvUpdateManyWithoutCandidateNestedInput
   jobApplications?: Prisma.JobApplicationUpdateManyWithoutCandidateNestedInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityUncheckedUpdateWithoutApplicationDraftsInput = {
@@ -729,6 +833,7 @@ export type CandidateIdentityUncheckedUpdateWithoutApplicationDraftsInput = {
   cvs?: Prisma.CandidateCvUncheckedUpdateManyWithoutCandidateNestedInput
   jobApplications?: Prisma.JobApplicationUncheckedUpdateManyWithoutCandidateNestedInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityCreateWithoutJobApplicationsInput = {
@@ -740,6 +845,7 @@ export type CandidateIdentityCreateWithoutJobApplicationsInput = {
   cvs?: Prisma.CandidateCvCreateNestedManyWithoutCandidateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterCreateNestedManyWithoutCandidateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityUncheckedCreateWithoutJobApplicationsInput = {
@@ -751,6 +857,7 @@ export type CandidateIdentityUncheckedCreateWithoutJobApplicationsInput = {
   cvs?: Prisma.CandidateCvUncheckedCreateNestedManyWithoutCandidateInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedCreateNestedManyWithoutCandidateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityCreateOrConnectWithoutJobApplicationsInput = {
@@ -778,6 +885,7 @@ export type CandidateIdentityUpdateWithoutJobApplicationsInput = {
   cvs?: Prisma.CandidateCvUpdateManyWithoutCandidateNestedInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUpdateManyWithoutCandidateNestedInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityUncheckedUpdateWithoutJobApplicationsInput = {
@@ -789,6 +897,7 @@ export type CandidateIdentityUncheckedUpdateWithoutJobApplicationsInput = {
   cvs?: Prisma.CandidateCvUncheckedUpdateManyWithoutCandidateNestedInput
   applicationAttemptCounters?: Prisma.JobApplicationAttemptCounterUncheckedUpdateManyWithoutCandidateNestedInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityCreateWithoutApplicationAttemptCountersInput = {
@@ -800,6 +909,7 @@ export type CandidateIdentityCreateWithoutApplicationAttemptCountersInput = {
   cvs?: Prisma.CandidateCvCreateNestedManyWithoutCandidateInput
   jobApplications?: Prisma.JobApplicationCreateNestedManyWithoutCandidateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityUncheckedCreateWithoutApplicationAttemptCountersInput = {
@@ -811,6 +921,7 @@ export type CandidateIdentityUncheckedCreateWithoutApplicationAttemptCountersInp
   cvs?: Prisma.CandidateCvUncheckedCreateNestedManyWithoutCandidateInput
   jobApplications?: Prisma.JobApplicationUncheckedCreateNestedManyWithoutCandidateInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedCreateNestedManyWithoutCandidateInput
+  teamApplications?: Prisma.TeamApplicationUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateIdentityCreateOrConnectWithoutApplicationAttemptCountersInput = {
@@ -838,6 +949,7 @@ export type CandidateIdentityUpdateWithoutApplicationAttemptCountersInput = {
   cvs?: Prisma.CandidateCvUpdateManyWithoutCandidateNestedInput
   jobApplications?: Prisma.JobApplicationUpdateManyWithoutCandidateNestedInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityUncheckedUpdateWithoutApplicationAttemptCountersInput = {
@@ -849,6 +961,7 @@ export type CandidateIdentityUncheckedUpdateWithoutApplicationAttemptCountersInp
   cvs?: Prisma.CandidateCvUncheckedUpdateManyWithoutCandidateNestedInput
   jobApplications?: Prisma.JobApplicationUncheckedUpdateManyWithoutCandidateNestedInput
   applicationDrafts?: Prisma.CandidateApplicationDraftUncheckedUpdateManyWithoutCandidateNestedInput
+  teamApplications?: Prisma.TeamApplicationUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 
@@ -861,6 +974,7 @@ export type CandidateIdentityCountOutputType = {
   jobApplications: number
   applicationAttemptCounters: number
   applicationDrafts: number
+  teamApplications: number
 }
 
 export type CandidateIdentityCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -868,6 +982,7 @@ export type CandidateIdentityCountOutputTypeSelect<ExtArgs extends runtime.Types
   jobApplications?: boolean | CandidateIdentityCountOutputTypeCountJobApplicationsArgs
   applicationAttemptCounters?: boolean | CandidateIdentityCountOutputTypeCountApplicationAttemptCountersArgs
   applicationDrafts?: boolean | CandidateIdentityCountOutputTypeCountApplicationDraftsArgs
+  teamApplications?: boolean | CandidateIdentityCountOutputTypeCountTeamApplicationsArgs
 }
 
 /**
@@ -908,6 +1023,13 @@ export type CandidateIdentityCountOutputTypeCountApplicationDraftsArgs<ExtArgs e
   where?: Prisma.CandidateApplicationDraftWhereInput
 }
 
+/**
+ * CandidateIdentityCountOutputType without action
+ */
+export type CandidateIdentityCountOutputTypeCountTeamApplicationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TeamApplicationWhereInput
+}
+
 
 export type CandidateIdentitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   userId?: boolean
@@ -920,6 +1042,7 @@ export type CandidateIdentitySelect<ExtArgs extends runtime.Types.Extensions.Int
   jobApplications?: boolean | Prisma.CandidateIdentity$jobApplicationsArgs<ExtArgs>
   applicationAttemptCounters?: boolean | Prisma.CandidateIdentity$applicationAttemptCountersArgs<ExtArgs>
   applicationDrafts?: boolean | Prisma.CandidateIdentity$applicationDraftsArgs<ExtArgs>
+  teamApplications?: boolean | Prisma.CandidateIdentity$teamApplicationsArgs<ExtArgs>
   _count?: boolean | Prisma.CandidateIdentityCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["candidateIdentity"]>
 
@@ -952,6 +1075,7 @@ export type CandidateIdentityInclude<ExtArgs extends runtime.Types.Extensions.In
   jobApplications?: boolean | Prisma.CandidateIdentity$jobApplicationsArgs<ExtArgs>
   applicationAttemptCounters?: boolean | Prisma.CandidateIdentity$applicationAttemptCountersArgs<ExtArgs>
   applicationDrafts?: boolean | Prisma.CandidateIdentity$applicationDraftsArgs<ExtArgs>
+  teamApplications?: boolean | Prisma.CandidateIdentity$teamApplicationsArgs<ExtArgs>
   _count?: boolean | Prisma.CandidateIdentityCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CandidateIdentityIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -971,6 +1095,7 @@ export type $CandidateIdentityPayload<ExtArgs extends runtime.Types.Extensions.I
     jobApplications: Prisma.$JobApplicationPayload<ExtArgs>[]
     applicationAttemptCounters: Prisma.$JobApplicationAttemptCounterPayload<ExtArgs>[]
     applicationDrafts: Prisma.$CandidateApplicationDraftPayload<ExtArgs>[]
+    teamApplications: Prisma.$TeamApplicationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     userId: string
@@ -1377,6 +1502,7 @@ export interface Prisma__CandidateIdentityClient<T, Null = never, ExtArgs extend
   jobApplications<T extends Prisma.CandidateIdentity$jobApplicationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateIdentity$jobApplicationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   applicationAttemptCounters<T extends Prisma.CandidateIdentity$applicationAttemptCountersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateIdentity$applicationAttemptCountersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobApplicationAttemptCounterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   applicationDrafts<T extends Prisma.CandidateIdentity$applicationDraftsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateIdentity$applicationDraftsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CandidateApplicationDraftPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  teamApplications<T extends Prisma.CandidateIdentity$teamApplicationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateIdentity$teamApplicationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TeamApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1941,6 +2067,30 @@ export type CandidateIdentity$applicationDraftsArgs<ExtArgs extends runtime.Type
   take?: number
   skip?: number
   distinct?: Prisma.CandidateApplicationDraftScalarFieldEnum | Prisma.CandidateApplicationDraftScalarFieldEnum[]
+}
+
+/**
+ * CandidateIdentity.teamApplications
+ */
+export type CandidateIdentity$teamApplicationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TeamApplication
+   */
+  select?: Prisma.TeamApplicationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TeamApplication
+   */
+  omit?: Prisma.TeamApplicationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TeamApplicationInclude<ExtArgs> | null
+  where?: Prisma.TeamApplicationWhereInput
+  orderBy?: Prisma.TeamApplicationOrderByWithRelationInput | Prisma.TeamApplicationOrderByWithRelationInput[]
+  cursor?: Prisma.TeamApplicationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TeamApplicationScalarFieldEnum | Prisma.TeamApplicationScalarFieldEnum[]
 }
 
 /**

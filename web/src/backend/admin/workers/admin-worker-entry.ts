@@ -18,6 +18,7 @@ import { runNotificationRetentionCycle } from "./notification-retention-loop";
 import { runJobPostLifecycleCycle } from "./job-post-lifecycle-loop";
 import { runBackupScheduleCycle } from "./backup-schedule-loop";
 import { runDeletedJobReviewRetentionCycle } from "@/backend/jobs/review/job-post-review-retention";
+import { runTeamApplicationRetentionCycle } from "@/backend/jobs/team-application-retention";
 
 export async function startAdminWorker(options: { probe?: boolean } = {}) {
   const runtime = new AdminWorkerRuntime([
@@ -79,6 +80,11 @@ export async function startAdminWorker(options: { probe?: boolean } = {}) {
       name: "job-review-retention",
       intervalMs: 60_000,
       run: runDeletedJobReviewRetentionCycle,
+    },
+    {
+      name: "team-application-retention",
+      intervalMs: 60_000,
+      run: runTeamApplicationRetentionCycle,
     },
     { name: "backup", intervalMs: 5_000, run: runBackupScheduleCycle },
   ]);

@@ -227,6 +227,9 @@ export interface PublicJobRepository {
 
 function publicClauses(input: NormalizedJobSearch, now: Date) {
   const clauses: Prisma.Sql[] = [candidateVisibleJobSql(now)];
+  if (input.companyId) {
+    clauses.push(Prisma.sql`j."companyId" = ${input.companyId}`);
+  }
   for (const token of searchTextTokens(input.normalizedQuery)) {
     clauses.push(keywordMatches(token, input.searchBy));
   }

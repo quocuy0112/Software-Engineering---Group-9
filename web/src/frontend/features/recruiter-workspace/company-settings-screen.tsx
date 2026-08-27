@@ -28,6 +28,7 @@ import {
   ALL_RECRUITER_COMPANIES,
   useRecruiterCompanyScope,
 } from "./recruiter-company-scope";
+import { getCompanyTeamCopy } from "./company-team-copy";
 import {
   recruiterWorkspaceCopy,
   type RecruiterWorkspaceCopy,
@@ -52,6 +53,7 @@ function emptyForm(): FormState {
     address: "",
     website: null,
     description: null,
+    foundedYear: null,
   };
 }
 
@@ -93,6 +95,7 @@ function formFromCompany(company: RecruiterCompanySettings): FormState {
     address: company.address,
     website: company.website,
     description: company.description,
+    foundedYear: company.foundedYear,
   };
 }
 
@@ -141,7 +144,9 @@ export function getCompanyProfileValidation(
     if (typeof value !== "string" || value.trim().length === 0) {
       missingFields.push(key);
       fieldErrors[key] =
-        locale === "vi" ? `${label} là trường bắt buộc.` : `${label} is required.`;
+        locale === "vi"
+          ? `${label} là trường bắt buộc.`
+          : `${label} is required.`;
       continue;
     }
 
@@ -170,7 +175,10 @@ export function getCompanyProfileValidation(
   return { missingFields, fieldErrors };
 }
 
-function validateForm(form: FormState, locale: WorkspaceLocale = "en"): FieldErrors {
+function validateForm(
+  form: FormState,
+  locale: WorkspaceLocale = "en",
+): FieldErrors {
   const errors: FieldErrors = {};
   Object.assign(errors, getCompanyProfileValidation(form, locale).fieldErrors);
   if (form.website) {
@@ -178,7 +186,9 @@ function validateForm(form: FormState, locale: WorkspaceLocale = "en"): FieldErr
       new URL(form.website);
     } catch {
       errors.website =
-        locale === "vi" ? "Hãy nhập URL website hợp lệ." : "Enter a valid website URL.";
+        locale === "vi"
+          ? "Hãy nhập URL website hợp lệ."
+          : "Enter a valid website URL.";
     }
   }
   return errors;
@@ -191,8 +201,7 @@ function readFileAsDataUrl(file: File, copy: RecruiterWorkspaceCopy) {
       if (typeof reader.result === "string") resolve(reader.result);
       else reject(new Error(copy.unableToSave));
     };
-    reader.onerror = () =>
-      reject(new Error(copy.unableToSave));
+    reader.onerror = () => reject(new Error(copy.unableToSave));
     reader.readAsDataURL(file);
   });
 }
@@ -210,8 +219,7 @@ async function optimizeLogo(file: File, locale: WorkspaceLocale) {
   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
     const loaded = new window.Image();
     loaded.onload = () => resolve(loaded);
-    loaded.onerror = () =>
-      reject(new Error(copy.unableToSave));
+    loaded.onerror = () => reject(new Error(copy.unableToSave));
     loaded.src = source;
   });
   const maxDimension = 512;
@@ -366,7 +374,10 @@ function CompanySwitcherGroup({
                     {candidate.name}
                   </span>
                   <span className={styles.companySwitcherRole}>
-                    {companyRoleLabel(candidate.role, recruiterWorkspaceCopy(locale))}
+                    {companyRoleLabel(
+                      candidate.role,
+                      recruiterWorkspaceCopy(locale),
+                    )}
                   </span>
                 </span>
               </button>
@@ -388,6 +399,7 @@ export function CompanySettingsScreen({
 }: Props) {
   const locale = useWorkspaceLocale();
   const copy = recruiterWorkspaceCopy(locale);
+  const teamCopy = getCompanyTeamCopy(locale);
   const csrfProof = useCsrfProof();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -479,11 +491,7 @@ export function CompanySettingsScreen({
       updateField("logo", logo);
       setMessage(copy.logoReady);
     } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : copy.unableToSave,
-      );
+      setError(caught instanceof Error ? caught.message : copy.unableToSave);
       setFieldErrors((current) => ({
         ...current,
         logo: copy.chooseValidImage,
@@ -541,11 +549,7 @@ export function CompanySettingsScreen({
       setMessage(copy.profileSaved);
       setIsEditing(false);
     } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : copy.unableToSave,
-      );
+      setError(caught instanceof Error ? caught.message : copy.unableToSave);
     } finally {
       setBusy(false);
     }
@@ -602,9 +606,7 @@ export function CompanySettingsScreen({
       setDeleteConfirmation("");
       setMessage(nextCompany ? copy.companyDeleted : "");
     } catch (caught) {
-      setError(
-        caught instanceof Error ? caught.message : copy.unableToDelete,
-      );
+      setError(caught instanceof Error ? caught.message : copy.unableToDelete);
     } finally {
       setDeleteBusy(false);
     }
@@ -656,9 +658,7 @@ export function CompanySettingsScreen({
             <p className={styles.switcherLabel} id="company-switcher-title">
               {copy.yourCompanies}
             </p>
-            <p className={styles.switcherHint}>
-              {copy.switchCompanyHint}
-            </p>
+            <p className={styles.switcherHint}>{copy.switchCompanyHint}</p>
           </div>
           <Link
             className={styles.createCompanyLink}
@@ -715,9 +715,7 @@ export function CompanySettingsScreen({
           {company.entityType ? (
             <span className={styles.legalType}>{company.entityType}</span>
           ) : null}
-          <p className={styles.psub}>
-            {copy.keepIdentityUpToDate}
-          </p>
+          <p className={styles.psub}>{copy.keepIdentityUpToDate}</p>
         </div>
         <span className={statusClass(status)}>
           <span aria-hidden="true">{statusIcon(status)}</span>
@@ -765,18 +763,14 @@ export function CompanySettingsScreen({
           <h2 className={styles.gateTitle} id="profile-complete-title">
             {copy.completeProfileBeforePosting}
           </h2>
-          <p className={styles.gateSub}>
-            {copy.postingGateDescription}
-          </p>
+          <p className={styles.gateSub}>{copy.postingGateDescription}</p>
           <ul className={styles.gateChecklist}>
             {missingFields.map((field) => (
               <li className={styles.gateItem} key={field}>
                 <span className={styles.gi} aria-hidden="true">
                   !
                 </span>
-                <span>
-                  {companyProfileFieldLabel(field, copy)}
-                </span>
+                <span>{companyProfileFieldLabel(field, copy)}</span>
               </li>
             ))}
           </ul>
@@ -860,6 +854,28 @@ export function CompanySettingsScreen({
             </div>
 
             <div className={styles.field}>
+              <label htmlFor="company-founded-year">Founded year</label>
+              <input
+                id="company-founded-year"
+                type="number"
+                min={1800}
+                max={2200}
+                value={form.foundedYear ?? ""}
+                onChange={(event) =>
+                  updateField(
+                    "foundedYear",
+                    event.target.value ? Number(event.target.value) : null,
+                  )
+                }
+                aria-describedby="company-founded-year-help"
+                placeholder="e.g. 2012"
+              />
+              <p id="company-founded-year-help" className={styles.formHint}>
+                Optional public information shown on the Candidate Company page.
+              </p>
+            </div>
+
+            <div className={styles.field}>
               <label htmlFor="company-website">{copy.website}</label>
               <input
                 id="company-website"
@@ -882,9 +898,7 @@ export function CompanySettingsScreen({
 
             <div className={styles.field}>
               <span className={styles.logoLabel}>{copy.logo} *</span>
-              <p className={styles.formHint}>
-                {copy.logoHint}
-              </p>
+              <p className={styles.formHint}>{copy.logoHint}</p>
               <div className={styles.logoUpload}>
                 <div className={styles.logoPreview}>
                   {form.logo ? (
@@ -1019,9 +1033,7 @@ export function CompanySettingsScreen({
                   {copy.publicCompanyInfo}
                 </h2>
               </div>
-              <span className={styles.savedBadge}>
-                {copy.saved}
-              </span>
+              <span className={styles.savedBadge}>{copy.saved}</span>
             </div>
 
             <div className={styles.readonlyGrid}>
@@ -1035,6 +1047,12 @@ export function CompanySettingsScreen({
                 <span className={styles.readonlyLabel}>{copy.companySize}</span>
                 <span className={styles.readonlyValue}>
                   {company.size || copy.notProvided}
+                </span>
+              </div>
+              <div className={styles.readonlyItem}>
+                <span className={styles.readonlyLabel}>Founded year</span>
+                <span className={styles.readonlyValue}>
+                  {company.foundedYear ?? "Not provided"}
                 </span>
               </div>
               <div className={styles.readonlyItem}>
@@ -1066,9 +1084,7 @@ export function CompanySettingsScreen({
                 </div>
               </div>
               <div className={`${styles.readonlyItem} ${styles.readonlyWide}`}>
-                <span className={styles.readonlyLabel}>
-                  {copy.description}
-                </span>
+                <span className={styles.readonlyLabel}>{copy.description}</span>
                 <span className={styles.readonlyValue}>
                   {company.description || copy.notProvided}
                 </span>
@@ -1103,17 +1119,13 @@ export function CompanySettingsScreen({
           <div>
             <p className={styles.sideLabel}>{copy.ownership}</p>
             <h2 className={styles.sideTitle}>{copy.authorizedRecruiters}</h2>
-            <p className={styles.sideDesc}>
-              {copy.ownershipDescription}
-            </p>
+            <p className={styles.sideDesc}>{copy.ownershipDescription}</p>
           </div>
 
           <div className={styles.sideRow}>
             <div className={styles.srl}>{copy.role.owner}</div>
             <div className={styles.srv}>
-              {company.ownerUserId
-                ? copy.authorizedOwner
-                : copy.unclaimed}
+              {company.ownerUserId ? copy.authorizedOwner : copy.unclaimed}
             </div>
           </div>
           <div className={styles.sideRow}>
@@ -1121,25 +1133,27 @@ export function CompanySettingsScreen({
             <div className={styles.srv}>{company.memberUserIds.length}</div>
           </div>
           {managesSelectedTeam ? (
-            <Link
-              className={styles.btnOutline}
-              href={`/recruiter/company-settings/team?companyId=${encodeURIComponent(company.databaseId ?? company.id)}`}
-            >
-              {copy.manageTeam}
-            </Link>
+            <div className={styles.sideActions}>
+              <Link
+                className={styles.btnOutline}
+                href={`/recruiter/company-settings/team?companyId=${encodeURIComponent(company.databaseId ?? company.id)}`}
+              >
+                {teamCopy.manageTeam}
+              </Link>
+              <Link
+                className={styles.btnOutline}
+                href={`/recruiter/company-settings/team/applications?companyId=${encodeURIComponent(company.databaseId ?? company.id)}`}
+              >
+                {teamCopy.teamApplications}
+              </Link>
+            </div>
           ) : (
-            <p className={styles.sideNote}>
-              {copy.activeOwnerOnly}
-            </p>
+            <p className={styles.sideNote}>{copy.activeOwnerOnly}</p>
           )}
           {canDeleteCompany ? (
             <div className={styles.dangerZone}>
-              <p className={styles.dangerLabel}>
-                {copy.dangerZone}
-              </p>
-              <p className={styles.dangerText}>
-                {copy.dangerDescription}
-              </p>
+              <p className={styles.dangerLabel}>{copy.dangerZone}</p>
+              <p className={styles.dangerText}>{copy.dangerDescription}</p>
               <button
                 className={styles.btnDelete}
                 type="button"

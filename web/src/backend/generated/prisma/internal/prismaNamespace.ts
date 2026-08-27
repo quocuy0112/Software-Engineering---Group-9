@@ -428,6 +428,8 @@ export const ModelName = {
   JobSubIndustry: 'JobSubIndustry',
   JobTaxonomyProposal: 'JobTaxonomyProposal',
   CompanyInvitation: 'CompanyInvitation',
+  TeamOpportunity: 'TeamOpportunity',
+  TeamApplication: 'TeamApplication',
   CompanyTeamActivity: 'CompanyTeamActivity',
   CompanyMembership: 'CompanyMembership',
   PlatformAdministratorGrant: 'PlatformAdministratorGrant',
@@ -564,7 +566,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "candidateProfileVisibility" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "jobIndustry" | "jobSubIndustry" | "jobTaxonomyProposal" | "companyInvitation" | "companyTeamActivity" | "companyMembership" | "platformAdministratorGrant" | "platformAdministratorGrantScopeAssignment" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostReviewAggregate" | "jobPostRevisionRequest" | "jobPostFeaturedPlacement" | "jobPostEnforcementAction" | "jobPostEnforcementTarget" | "moderationReportEnforcementLink" | "jobPostOperationalHistory" | "jobPostReviewVersion" | "jobPostReviewHistory" | "jobPostReviewPrivateNote" | "jobCatalogueWriteLease" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "privateCvMatchCheck" | "privateCvMatchAttempt" | "privateAutomaticMatchResult" | "privateAiEvaluationResult" | "privateMatchEvidence" | "privateCvMatchCommandReceipt" | "savedJob" | "jobReport" | "candidateApplicationDraft" | "applicationIntake" | "applicationPublicUpdate" | "applicationNotificationPreference" | "jobApplication" | "jobApplicationContactConsent" | "jobApplicationAttemptCounter" | "applicationDocument" | "applicationCoverLetterText" | "applicationArtifactPromotion" | "applicationDocumentLegalHold" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "recruitmentThread" | "recruitmentMessage" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence" | "automaticMatchResult" | "documentParseResult" | "skillEvidenceExtraction" | "cvEvidenceExcerpt" | "aiAssessment" | "aiAssessmentFinding" | "aiSuggestedInterviewQuestion" | "scoringOperation" | "scoringWorkItem" | "aiAssessmentAttempt" | "applicationScoringResult" | "manualApplicationPriority" | "rankingSnapshot" | "rankingSnapshotRow" | "jobPostingViewFact" | "jobPostingLifecycleFact" | "exportRequest" | "backupConfiguration" | "backupRun" | "activityLegalHold"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "candidateProfileVisibility" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "jobIndustry" | "jobSubIndustry" | "jobTaxonomyProposal" | "companyInvitation" | "teamOpportunity" | "teamApplication" | "companyTeamActivity" | "companyMembership" | "platformAdministratorGrant" | "platformAdministratorGrantScopeAssignment" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostReviewAggregate" | "jobPostRevisionRequest" | "jobPostFeaturedPlacement" | "jobPostEnforcementAction" | "jobPostEnforcementTarget" | "moderationReportEnforcementLink" | "jobPostOperationalHistory" | "jobPostReviewVersion" | "jobPostReviewHistory" | "jobPostReviewPrivateNote" | "jobCatalogueWriteLease" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "privateCvMatchCheck" | "privateCvMatchAttempt" | "privateAutomaticMatchResult" | "privateAiEvaluationResult" | "privateMatchEvidence" | "privateCvMatchCommandReceipt" | "savedJob" | "jobReport" | "candidateApplicationDraft" | "applicationIntake" | "applicationPublicUpdate" | "applicationNotificationPreference" | "jobApplication" | "jobApplicationContactConsent" | "jobApplicationAttemptCounter" | "applicationDocument" | "applicationCoverLetterText" | "applicationArtifactPromotion" | "applicationDocumentLegalHold" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "recruitmentThread" | "recruitmentMessage" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence" | "automaticMatchResult" | "documentParseResult" | "skillEvidenceExtraction" | "cvEvidenceExcerpt" | "aiAssessment" | "aiAssessmentFinding" | "aiSuggestedInterviewQuestion" | "scoringOperation" | "scoringWorkItem" | "aiAssessmentAttempt" | "applicationScoringResult" | "manualApplicationPriority" | "rankingSnapshot" | "rankingSnapshotRow" | "jobPostingViewFact" | "jobPostingLifecycleFact" | "exportRequest" | "backupConfiguration" | "backupRun" | "activityLegalHold"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2859,6 +2861,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CompanyInvitationCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CompanyInvitationCountAggregateOutputType> | number
+        }
+      }
+    }
+    TeamOpportunity: {
+      payload: Prisma.$TeamOpportunityPayload<ExtArgs>
+      fields: Prisma.TeamOpportunityFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TeamOpportunityFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamOpportunityPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TeamOpportunityFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamOpportunityPayload>
+        }
+        findFirst: {
+          args: Prisma.TeamOpportunityFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamOpportunityPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TeamOpportunityFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamOpportunityPayload>
+        }
+        findMany: {
+          args: Prisma.TeamOpportunityFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamOpportunityPayload>[]
+        }
+        create: {
+          args: Prisma.TeamOpportunityCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamOpportunityPayload>
+        }
+        createMany: {
+          args: Prisma.TeamOpportunityCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TeamOpportunityCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamOpportunityPayload>[]
+        }
+        delete: {
+          args: Prisma.TeamOpportunityDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamOpportunityPayload>
+        }
+        update: {
+          args: Prisma.TeamOpportunityUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamOpportunityPayload>
+        }
+        deleteMany: {
+          args: Prisma.TeamOpportunityDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TeamOpportunityUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TeamOpportunityUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamOpportunityPayload>[]
+        }
+        upsert: {
+          args: Prisma.TeamOpportunityUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamOpportunityPayload>
+        }
+        aggregate: {
+          args: Prisma.TeamOpportunityAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTeamOpportunity>
+        }
+        groupBy: {
+          args: Prisma.TeamOpportunityGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TeamOpportunityGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TeamOpportunityCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TeamOpportunityCountAggregateOutputType> | number
+        }
+      }
+    }
+    TeamApplication: {
+      payload: Prisma.$TeamApplicationPayload<ExtArgs>
+      fields: Prisma.TeamApplicationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TeamApplicationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamApplicationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TeamApplicationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamApplicationPayload>
+        }
+        findFirst: {
+          args: Prisma.TeamApplicationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamApplicationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TeamApplicationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamApplicationPayload>
+        }
+        findMany: {
+          args: Prisma.TeamApplicationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamApplicationPayload>[]
+        }
+        create: {
+          args: Prisma.TeamApplicationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamApplicationPayload>
+        }
+        createMany: {
+          args: Prisma.TeamApplicationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TeamApplicationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamApplicationPayload>[]
+        }
+        delete: {
+          args: Prisma.TeamApplicationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamApplicationPayload>
+        }
+        update: {
+          args: Prisma.TeamApplicationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamApplicationPayload>
+        }
+        deleteMany: {
+          args: Prisma.TeamApplicationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TeamApplicationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TeamApplicationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamApplicationPayload>[]
+        }
+        upsert: {
+          args: Prisma.TeamApplicationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamApplicationPayload>
+        }
+        aggregate: {
+          args: Prisma.TeamApplicationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTeamApplication>
+        }
+        groupBy: {
+          args: Prisma.TeamApplicationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TeamApplicationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TeamApplicationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TeamApplicationCountAggregateOutputType> | number
         }
       }
     }
@@ -12354,7 +12504,8 @@ export const CompanyScalarFieldEnum = {
   verificationStateBeforeBan: 'verificationStateBeforeBan',
   verifiedAtBeforeBan: 'verifiedAtBeforeBan',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  foundedYear: 'foundedYear'
 } as const
 
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
@@ -12425,6 +12576,7 @@ export const CompanyInvitationScalarFieldEnum = {
   declinedByUserId: 'declinedByUserId',
   declinedAt: 'declinedAt',
   revokedAt: 'revokedAt',
+  teamApplicationId: 'teamApplicationId',
   expiresAt: 'expiresAt',
   version: 'version',
   createdAt: 'createdAt',
@@ -12432,6 +12584,52 @@ export const CompanyInvitationScalarFieldEnum = {
 } as const
 
 export type CompanyInvitationScalarFieldEnum = (typeof CompanyInvitationScalarFieldEnum)[keyof typeof CompanyInvitationScalarFieldEnum]
+
+
+export const TeamOpportunityScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  role: 'role',
+  state: 'state',
+  closedAt: 'closedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TeamOpportunityScalarFieldEnum = (typeof TeamOpportunityScalarFieldEnum)[keyof typeof TeamOpportunityScalarFieldEnum]
+
+
+export const TeamApplicationScalarFieldEnum = {
+  id: 'id',
+  candidateUserId: 'candidateUserId',
+  companyId: 'companyId',
+  teamOpportunityId: 'teamOpportunityId',
+  appliedRole: 'appliedRole',
+  applicationEmail: 'applicationEmail',
+  cvDisplayName: 'cvDisplayName',
+  cvFileName: 'cvFileName',
+  cvMimeType: 'cvMimeType',
+  cvByteSize: 'cvByteSize',
+  cvStorageKey: 'cvStorageKey',
+  cvChecksumSha256: 'cvChecksumSha256',
+  activeKey: 'activeKey',
+  status: 'status',
+  rejectionReason: 'rejectionReason',
+  submittedAt: 'submittedAt',
+  ownerFirstViewedAt: 'ownerFirstViewedAt',
+  decidedAt: 'decidedAt',
+  joinedAt: 'joinedAt',
+  withdrawnAt: 'withdrawnAt',
+  cvDeleteAfter: 'cvDeleteAfter',
+  cvDeletedAt: 'cvDeletedAt',
+  cvDeletionFailureCode: 'cvDeletionFailureCode',
+  decidedByUserId: 'decidedByUserId',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TeamApplicationScalarFieldEnum = (typeof TeamApplicationScalarFieldEnum)[keyof typeof TeamApplicationScalarFieldEnum]
 
 
 export const CompanyTeamActivityScalarFieldEnum = {
@@ -15325,6 +15523,34 @@ export type ListEnumCompanyInvitationStateFieldRefInput<$PrismaModel> = FieldRef
 
 
 /**
+ * Reference to a field of type 'TeamOpportunityState'
+ */
+export type EnumTeamOpportunityStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TeamOpportunityState'>
+    
+
+
+/**
+ * Reference to a field of type 'TeamOpportunityState[]'
+ */
+export type ListEnumTeamOpportunityStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TeamOpportunityState[]'>
+    
+
+
+/**
+ * Reference to a field of type 'TeamApplicationStatus'
+ */
+export type EnumTeamApplicationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TeamApplicationStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'TeamApplicationStatus[]'
+ */
+export type ListEnumTeamApplicationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TeamApplicationStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'CompanyTeamActivityKind'
  */
 export type EnumCompanyTeamActivityKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanyTeamActivityKind'>
@@ -17101,6 +17327,8 @@ export type GlobalOmitConfig = {
   jobSubIndustry?: Prisma.JobSubIndustryOmit
   jobTaxonomyProposal?: Prisma.JobTaxonomyProposalOmit
   companyInvitation?: Prisma.CompanyInvitationOmit
+  teamOpportunity?: Prisma.TeamOpportunityOmit
+  teamApplication?: Prisma.TeamApplicationOmit
   companyTeamActivity?: Prisma.CompanyTeamActivityOmit
   companyMembership?: Prisma.CompanyMembershipOmit
   platformAdministratorGrant?: Prisma.PlatformAdministratorGrantOmit

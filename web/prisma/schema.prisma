@@ -130,6 +130,7 @@ enum EmailKind {
   COMPANY_EMAIL_VERIFY
   COMPANY_INVITATION
   COMPANY_INVITATION_RESPONSE
+  TEAM_APPLICATION_REJECTED
 }
 
 enum InAppNotificationSeverity {
@@ -198,6 +199,7 @@ enum InAppNotificationKind {
   COMPANY_INVITATION_DECLINED
   APPLICATION_SUBMITTED
   APPLICATION_RECEIVED
+  TEAM_APPLICATION_RECEIVED
   APPLICATION_STAGE_CHANGED
   VERIFICATION_RECEIVED
   VERIFICATION_CHANGES_REQUESTED
@@ -640,6 +642,20 @@ enum CompanyInvitationState {
   ACCEPTED
   DECLINED
   EXPIRED
+}
+
+enum TeamOpportunityState {
+  OPEN
+  CLOSED
+}
+
+enum TeamApplicationStatus {
+  SUBMITTED
+  VIEWED
+  REJECTED
+  INVITATION_SENT
+  WITHDRAWN
+  JOINED
 }
 
 enum CompanyTeamActivityKind {
@@ -1157,6 +1173,7 @@ model UserAccount {
   companyInvitationsSent           CompanyInvitation[]                     @relation("CompanyInvitationInviter")
   companyInvitationsAccepted       CompanyInvitation[]                     @relation("CompanyInvitationAcceptor")
   companyInvitationsDeclined       CompanyInvitation[]                     @relation("CompanyInvitationDecliner")
+  teamApplicationDecisions         TeamApplication[]                        @relation("TeamApplicationDecisionMaker")
   platformAdministratorGrants     PlatformAdministratorGrant[]
   jobPostingLifecycleFactsActed   JobPostingLifecycleFact[]        @relation("JobPostingLifecycleActor")
   analyticsExportsRequested       ExportRequest[]                  @relation("ExportRequester")
@@ -1298,6 +1315,7 @@ model CandidateIdentity {
   jobApplications JobApplication[]
   applicationAttemptCounters JobApplicationAttemptCounter[]
   applicationDrafts CandidateApplicationDraft[]
+  teamApplications TeamApplication[] @relation("TeamApplicationCandidate")
 }
 
 model CandidateProfile {
@@ -1763,6 +1781,7 @@ model Company {
   verifiedAtBeforeBan           DateTime?
   createdAt                     DateTime                       @default(now())
   updatedAt                     DateTime                       @updatedAt
+  foundedYear                   Int?
   jobPostings                   JobPosting[]
   jobPostingViewFacts           JobPostingViewFact[]
   jobPostingLifecycleFacts      JobPostingLifecycleFact[]
@@ -1776,6 +1795,8 @@ model Company {
   recruitmentThreads            RecruitmentThread[]
   jobPostReviewAggregates       JobPostReviewAggregate[]
   jobTaxonomyProposals           JobTaxonomyProposal[]
+  teamOpportunities              TeamOpportunity[]
+  teamApplications               TeamApplication[]
 
   @@index([verifiedAt, id])
 }
@@ -1861,6 +1882,7 @@ model CompanyInvitation {
   declinedByUserId   String?
   declinedAt         DateTime?
   revokedAt          DateTime?
+  teamApplicationId  String?                @unique
   expiresAt          DateTime
   version            Int                    @default(1)
   createdAt          DateTime               @default(now())
@@ -1869,10 +1891,65 @@ model CompanyInvitation {
   invitedBy          UserAccount            @relation("CompanyInvitationInviter", fields: [invitedByUserId], references: [id], onDelete: Restrict)
   acceptedBy         UserAccount?           @relation("CompanyInvitationAcceptor", fields: [acceptedByUserId], references: [id], onDelete: SetNull)
   declinedBy         UserAccount?           @relation("CompanyInvitationDecliner", fields: [declinedByUserId], references: [id], onDelete: SetNull)
+  teamApplication     TeamApplication?      @relation("TeamApplicationInvitation", fields: [teamApplicationId], references: [id], onDelete: SetNull)
 
   // PostgreSQL migration enforces uniqueness only while the invitation is PENDING.
   @@index([companyId, normalizedEmail, state])
   @@index([normalizedEmail, state, expiresAt])
+}
+
+model TeamOpportunity {
+  id           String                @id @default(cuid())
+  companyId    String
+  role         CompanyMembershipRole
+  state        TeamOpportunityState  @default(OPEN)
+  closedAt     DateTime?
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  company      Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  applications TeamApplication[]
+
+  @@unique([companyId, role])
+  @@index([companyId, state, role])
+}
+
+model TeamApplication {
+  id                  String                @id @default(cuid())
+  candidateUserId     String
+  companyId           String
+  teamOpportunityId   String
+  appliedRole         CompanyMembershipRole
+  applicationEmail    String
+  cvDisplayName       String
+  cvFileName          String
+  cvMimeType          String
+  cvByteSize          Int
+  cvStorageKey        String                @unique
+  cvChecksumSha256    String                @db.Char(64)
+  activeKey           String?               @unique
+  status              TeamApplicationStatus @default(SUBMITTED)
+  rejectionReason     String?               @db.VarChar(2000)
+  submittedAt         DateTime              @default(now())
+  ownerFirstViewedAt  DateTime?
+  decidedAt           DateTime?
+  joinedAt            DateTime?
+  withdrawnAt         DateTime?
+  cvDeleteAfter       DateTime?
+  cvDeletedAt         DateTime?
+  cvDeletionFailureCode String?              @db.VarChar(80)
+  decidedByUserId     String?
+  version             Int                   @default(1)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  candidate           CandidateIdentity     @relation("TeamApplicationCandidate", fields: [candidateUserId], references: [userId], onDelete: Cascade)
+  company             Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  opportunity         TeamOpportunity       @relation(fields: [teamOpportunityId], references: [id], onDelete: Restrict)
+  invitation          CompanyInvitation?    @relation("TeamApplicationInvitation")
+  decidedBy           UserAccount?          @relation("TeamApplicationDecisionMaker", fields: [decidedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([companyId, status, submittedAt])
+  @@index([candidateUserId, status, submittedAt])
+  @@index([teamOpportunityId, status])
 }
 
 model CompanyTeamActivity {

@@ -69,26 +69,30 @@ function invitationCopy(locale: "vi" | "en") {
 export default function CompanyInvitationPage() {
   const locale = useWorkspaceLocale();
   const copy = invitationCopy(locale);
-  const token = useSearchParams().get("token") ?? "";
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") ?? "";
+  const invitationId = searchParams.get("invitationId") ?? "";
+  const reference = token ? { token } : invitationId ? { invitationId } : null;
   const csrf = useCsrfProof();
   const [invitation, setInvitation] = useState<Invitation | null>(null);
   const [state, setState] = useState<
     "loading" | "ready" | "accepted" | "declined" | "unavailable"
-  >(token ? "loading" : "unavailable");
+  >(reference ? "loading" : "unavailable");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!token) return;
-    void fetch(
-      `/api/recruiter/company/team/invitations/accept?token=${encodeURIComponent(token)}`,
-    )
+    if (!token && !invitationId) return;
+    const query = token
+      ? `token=${encodeURIComponent(token)}`
+      : `invitationId=${encodeURIComponent(invitationId)}`;
+    void fetch(`/api/recruiter/company/team/invitations/accept?${query}`)
       .then(async (response) => {
         if (!response.ok) throw new Error("unavailable");
         setInvitation((await response.json()) as Invitation);
         setState("ready");
       })
       .catch(() => setState("unavailable"));
-  }, [token]);
+  }, [invitationId, token]);
 
   async function decide(decision: "accept" | "decline") {
     if (decision === "decline" && !window.confirm(copy.declineConfirm)) return;
@@ -99,7 +103,7 @@ export default function CompanyInvitationPage() {
         {
           method: "POST",
           headers: { "content-type": "application/json", "x-csrf-token": csrf },
-          body: JSON.stringify({ token }),
+          body: JSON.stringify(reference),
         },
       );
       if (!response.ok) throw new Error("unavailable");

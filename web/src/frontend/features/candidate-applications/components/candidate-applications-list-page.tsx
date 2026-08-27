@@ -17,6 +17,7 @@ import {
   applicationCopy,
   applicationErrorMessage,
 } from "@/frontend/features/candidate-applications/i18n/application-copy";
+import { getCompanyCopy } from "@/frontend/features/candidate-company/i18n/company-copy";
 import { NOTIFICATION_CHANGED_EVENT } from "@/frontend/features/notifications/client/use-notification-context-read";
 import { CompanyAvatar } from "@/frontend/features/jobs/components/company-avatar";
 import {
@@ -347,6 +348,7 @@ export function CandidateApplicationsListPage({
 }) {
   const locale = useWorkspaceLocale();
   const copy = applicationCopy(locale).applicationsList;
+  const companyCopy = getCompanyCopy(locale);
   const [applications, setApplications] = useState(() => [
     ...initialApplications,
   ]);
@@ -496,8 +498,16 @@ export function CandidateApplicationsListPage({
         subtitle={copy.subtitle}
         titleId="candidate-applications-title"
         rightSlot={
-          <span className="candidate-application-list-page__count">
-            {applications.length}
+          <span className="candidate-application-list-page__actions">
+            <Link
+              className="candidate-application-list-page__team-link"
+              href="/jobs/applied/team"
+            >
+              {companyCopy.teamApplications}
+            </Link>
+            <span className="candidate-application-list-page__count">
+              {applications.length}
+            </span>
           </span>
         }
       />

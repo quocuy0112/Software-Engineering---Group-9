@@ -1,0 +1,590 @@
+openapi: 3.0.3
+info:
+  title: Candidate Company and Team Applications
+  version: 1.0.0
+  description: Public company discovery and Owner-controlled HR Manager/Recruiter team applications.
+paths:
+  /companies:
+    get:
+      summary: List approved public companies
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string, maxLength: 200, default: "" }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Company cards
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyListResponse"
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+  /companies/{companyId}:
+    get:
+      summary: Get public company details
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/CompanyId"
+      responses:
+        "200":
+          description: Public company detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyDetail"
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "404":
+          {
+            description: Company is unavailable without revealing private state,
+          }
+  /companies/{companyId}/jobs:
+    get:
+      summary: Search active public jobs for one company
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/CompanyId"
+        - in: query
+          name: q
+          schema: { type: string, maxLength: 200, default: "" }
+        - in: query
+          name: location
+          schema: { type: string, maxLength: 160, default: "" }
+        - $ref: "#/components/parameters/PageQuery"
+        - $ref: "#/components/parameters/LimitQuery"
+      responses:
+        "200":
+          description: Company-scoped job results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyJobSearchResponse"
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "404":
+          {
+            description: Company is unavailable without revealing private state,
+          }
+  /candidate/team-applications:
+    get:
+      summary: List the current Candidate's Team Applications
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200":
+          description: Candidate-safe team application statuses
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateTeamApplicationListResponse"
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+    post:
+      summary: Submit a CV for an HR Manager or Recruiter team opportunity
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [companyId, role, cv]
+              properties:
+                companyId: { type: string, minLength: 1, maxLength: 128 }
+                role: { $ref: "#/components/schemas/TeamRole" }
+                cv:
+                  type: string
+                  format: binary
+                  description: PDF or DOCX only, 1 to 5,000,000 bytes.
+      responses:
+        "201":
+          description: Team application created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CandidateTeamApplication" }
+        "400": { description: Invalid multipart fields or CV }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "409":
+          description: Duplicate active application, unavailable opportunity, or company without an active Owner
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CandidateTeamApplication" }
+  /candidate/team-applications/{applicationId}:
+    get:
+      summary: Get one Candidate-owned Team Application status
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/ApplicationId"
+      responses:
+        "200":
+          description: Candidate-safe application detail and status
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CandidateTeamApplication" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "404": { description: Application unavailable to this Candidate }
+    delete:
+      summary: Withdraw a pending Team Application
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/ApplicationId"
+      responses:
+        "200":
+          description: Withdrawn application status
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CandidateTeamApplication" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "409": { description: Application is already decided or withdrawn }
+  /recruiter/company/team/applications:
+    get:
+      summary: List Team Applications for the current Owner company
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/OptionalCompanyId"
+      responses:
+        "200":
+          description: Owner-authorized team applications
+          content:
+            application/json:
+              schema:
+                {
+                  $ref: "#/components/schemas/OwnerTeamApplicationListResponse",
+                }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { description: Not authorized as company Owner }
+  /recruiter/company/team/applications/{applicationId}:
+    get:
+      summary: Get an Owner-authorized Team Application
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/ApplicationId"
+      responses:
+        "200":
+          description: Owner application detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OwnerTeamApplication" }
+        "403": { description: Not authorized as company Owner }
+        "404": { description: Application is unavailable }
+  /recruiter/company/team/applications/{applicationId}/cv:
+    get:
+      summary: Stream a private Team Application CV
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/ApplicationId"
+      responses:
+        "200":
+          description: Private CV bytes
+          headers:
+            Content-Disposition: { schema: { type: string } }
+            Content-Length: { schema: { type: integer } }
+          content:
+            application/pdf: { schema: { type: string, format: binary } }
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+              schema: { type: string, format: binary }
+        "403": { description: Not authorized as company Owner }
+        "404": { description: CV is unavailable }
+  /recruiter/company/team/applications/{applicationId}/accept:
+    post:
+      summary: Accept a team application and send an invitation
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/ApplicationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              additionalProperties: false
+              properties:
+                role: { $ref: "#/components/schemas/TeamRole" }
+      responses:
+        "200":
+          description: Invitation created or existing idempotent result
+          content:
+            application/json:
+              schema:
+                { $ref: "#/components/schemas/InvitationDecisionResponse" }
+        "403": { description: Not authorized }
+        "404": { description: Application is unavailable }
+        "409":
+          { description: Application already decided or membership conflict }
+  /recruiter/company/team/applications/{applicationId}/reject:
+    post:
+      summary: Reject a team application and notify the candidate
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/ApplicationId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                reason: { type: string, maxLength: 2000 }
+      responses:
+        "200":
+          description: Rejected and notification enqueued
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RejectionDecisionResponse" }
+        "403": { description: Not authorized }
+        "404": { description: Application is unavailable }
+        "409": { description: Application already decided }
+  /recruiter/company/team/invitations/accept:
+    get:
+      summary: Preview an invitation for the signed-in recipient
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - in: query
+          name: token
+          required: false
+          schema: { type: string, minLength: 1, maxLength: 2048 }
+        - in: query
+          name: invitationId
+          required: false
+          schema: { type: string, minLength: 1, maxLength: 128 }
+      description: Provide exactly one of token or invitationId.
+      responses:
+        "200":
+          description: Invitation preview
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InvitationPreview" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "409":
+          {
+            description: Invalid,
+            expired,
+            revoked,
+            or wrong-account invitation,
+          }
+    post:
+      summary: Accept an invitation and create membership
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  required: [token]
+                  additionalProperties: false
+                  properties:
+                    token: { type: string, minLength: 1, maxLength: 2048 }
+                - type: object
+                  required: [invitationId]
+                  additionalProperties: false
+                  properties:
+                    invitationId: { type: string, minLength: 1, maxLength: 128 }
+      responses:
+        "200": { description: Invitation accepted and membership activated }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "409":
+          {
+            description: Invalid,
+            expired,
+            revoked,
+            or wrong-account invitation,
+          }
+  /recruiter/company/team/invitations/decline:
+    post:
+      summary: Decline an invitation
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  required: [token]
+                  additionalProperties: false
+                  properties:
+                    token: { type: string, minLength: 1, maxLength: 2048 }
+                - type: object
+                  required: [invitationId]
+                  additionalProperties: false
+                  properties:
+                    invitationId: { type: string, minLength: 1, maxLength: 128 }
+      responses:
+        "200": { description: Invitation declined }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "409":
+          {
+            description: Invalid,
+            expired,
+            revoked,
+            or wrong-account invitation,
+          }
+components:
+  parameters:
+    CompanyId:
+      in: path
+      name: companyId
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    OptionalCompanyId:
+      in: query
+      name: companyId
+      required: false
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    ApplicationId:
+      in: path
+      name: applicationId
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    Page:
+      in: query
+      name: page
+      schema: { type: integer, minimum: 1, maximum: 10000, default: 1 }
+    Limit:
+      in: query
+      name: limit
+      schema: { type: integer, minimum: 1, maximum: 50, default: 24 }
+    PageQuery:
+      in: query
+      name: page
+      schema: { type: integer, minimum: 1, maximum: 10000, default: 1 }
+    LimitQuery:
+      in: query
+      name: limit
+      schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+  responses:
+    AuthenticationRequired:
+      description: Sign-in required
+  schemas:
+    TeamRole:
+      type: string
+      enum: [HR_MANAGER, RECRUITER]
+    TeamApplicationStatus:
+      type: string
+      enum: [SUBMITTED, VIEWED, REJECTED, INVITATION_SENT, WITHDRAWN, JOINED]
+    TeamInvitationStatus:
+      type: string
+      nullable: true
+      enum: [PENDING, REVOKED, ACCEPTED, DECLINED, EXPIRED]
+    InvitationEmailStatus:
+      type: string
+      nullable: true
+      enum: [PENDING, PROCESSING, SENT, RETRYABLE, DEAD]
+    CandidateTeamApplication:
+      type: object
+      additionalProperties: false
+      required:
+        - applicationId
+        - companyId
+        - companyName
+        - companySlug
+        - appliedRole
+        - status
+        - invitationStatus
+        - invitationId
+        - submittedAt
+        - ownerViewed
+        - ownerFirstViewedAt
+        - decidedAt
+        - joinedAt
+        - invitationExpiresAt
+      properties:
+        applicationId: { type: string }
+        companyId: { type: string }
+        companyName: { type: string }
+        companySlug: { type: string }
+        appliedRole: { $ref: "#/components/schemas/TeamRole" }
+        status: { $ref: "#/components/schemas/TeamApplicationStatus" }
+        invitationStatus: { $ref: "#/components/schemas/TeamInvitationStatus" }
+        invitationId: { type: string, nullable: true }
+        submittedAt: { type: string, format: date-time }
+        ownerViewed: { type: boolean }
+        ownerFirstViewedAt: { type: string, format: date-time, nullable: true }
+        decidedAt: { type: string, format: date-time, nullable: true }
+        joinedAt: { type: string, format: date-time, nullable: true }
+        invitationExpiresAt: { type: string, format: date-time, nullable: true }
+    CandidateTeamApplicationListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          maxItems: 100
+          items: { $ref: "#/components/schemas/CandidateTeamApplication" }
+    OwnerTeamApplication:
+      allOf:
+        - $ref: "#/components/schemas/CandidateTeamApplication"
+        - type: object
+          additionalProperties: false
+          required:
+            - candidateName
+            - applicationEmail
+            - cvFileName
+            - cvMimeType
+            - cvByteSize
+            - rejectionReason
+            - invitationEmailStatus
+          properties:
+            candidateName: { type: string }
+            applicationEmail: { type: string, format: email }
+            cvFileName: { type: string }
+            cvMimeType: { type: string }
+            cvByteSize: { type: integer, minimum: 1, maximum: 5000000 }
+            rejectionReason: { type: string, nullable: true, maxLength: 2000 }
+            invitationEmailStatus:
+              { $ref: "#/components/schemas/InvitationEmailStatus" }
+    OwnerTeamApplicationListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          maxItems: 100
+          items: { $ref: "#/components/schemas/OwnerTeamApplication" }
+    InvitationDecisionResponse:
+      type: object
+      required: [applicationId, invitationId, role, status, idempotent]
+      properties:
+        applicationId: { type: string }
+        invitationId: { type: string }
+        role: { $ref: "#/components/schemas/TeamRole" }
+        status: { type: string, enum: [INVITATION_SENT, JOINED] }
+        idempotent: { type: boolean }
+    RejectionDecisionResponse:
+      type: object
+      required: [applicationId, status, idempotent]
+      properties:
+        applicationId: { type: string }
+        status: { type: string, enum: [REJECTED] }
+        idempotent: { type: boolean }
+    InvitationPreview:
+      type: object
+      required: [companyName, role, expiresAt]
+      properties:
+        companyName: { type: string }
+        role: { $ref: "#/components/schemas/TeamRole" }
+        expiresAt: { type: string, format: date-time }
+    CompanyCard:
+      type: object
+      additionalProperties: false
+      required: [companyId, slug, name, logoUrl, description]
+      properties:
+        companyId: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        logoUrl: { type: string, nullable: true }
+        description: { type: string }
+    CompanyListResponse:
+      type: object
+      required: [items, page, total, totalPages]
+      properties:
+        items:
+          type: array
+          maxItems: 100
+          items: { $ref: "#/components/schemas/CompanyCard" }
+        page: { type: integer, minimum: 1 }
+        total: { type: integer, minimum: 0 }
+        totalPages: { type: integer, minimum: 0 }
+    CompanyDetail:
+      allOf:
+        - $ref: "#/components/schemas/CompanyCard"
+        - type: object
+          additionalProperties: false
+          required:
+            - foundedYear
+            - sizeRange
+            - industry
+            - location
+            - activeEmployeeCount
+            - teamRoles
+            - jobs
+            - jobTotal
+            - jobPage
+            - jobTotalPages
+          properties:
+            foundedYear: { type: integer, nullable: true }
+            sizeRange: { type: string }
+            industry: { type: string, nullable: true }
+            location: { type: string, nullable: true }
+            activeEmployeeCount: { type: integer, minimum: 0 }
+            teamRoles:
+              type: array
+              maxItems: 2
+              description: Open team roles; empty when the company has no active Owner or no open team opportunity.
+              items: { $ref: "#/components/schemas/TeamRole" }
+            jobs:
+              type: array
+              maxItems: 50
+              items: { $ref: "#/components/schemas/JobCard" }
+            jobTotal: { type: integer, minimum: 0 }
+            jobPage: { type: integer, minimum: 1 }
+            jobTotalPages: { type: integer, minimum: 0 }
+    CompanyJobSearchResponse:
+      type: object
+      required: [items, total, nextCursor, page, totalPages, companyId]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items: { $ref: "#/components/schemas/JobCard" }
+        total: { type: integer, minimum: 0 }
+        nextCursor: { type: string, nullable: true }
+        page: { type: integer, minimum: 1 }
+        totalPages: { type: integer, minimum: 0 }
+        companyId: { type: string }
+    JobCard:
+      type: object
+      required:
+        - id
+        - slug
+        - title
+        - company
+        - location
+        - employmentType
+        - experienceLevel
+        - workArrangement
+        - summary
+        - skills
+        - publishedAt
+        - applicationDeadline
+        - actions
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        title: { type: string }
+        company: { $ref: "#/components/schemas/CompanyPublicJobCompany" }
+        location: { type: string }
+        employmentType: { type: string }
+        experienceLevel: { type: string }
+        workArrangement: { type: string }
+        salary: { type: object, nullable: true }
+        summary: { type: string }
+        skills: { type: array, items: { type: string } }
+        publishedAt: { type: string, format: date-time }
+        applicationDeadline: { type: string, format: date-time, nullable: true }
+        actions: { type: object }
+    CompanyPublicJobCompany:
+      type: object
+      required:
+        [
+          slug,
+          displayName,
+          logoUrl,
+          websiteUrl,
+          publicDescription,
+          publicLocation,
+        ]
+      properties:
+        slug: { type: string }
+        displayName: { type: string }
+        logoUrl: { type: string, nullable: true }
+        websiteUrl: { type: string, nullable: true }
+        publicDescription: { type: string, nullable: true }
+        publicLocation: { type: string, nullable: true }
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: session
