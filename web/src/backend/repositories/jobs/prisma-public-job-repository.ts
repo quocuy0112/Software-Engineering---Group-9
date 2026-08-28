@@ -352,6 +352,11 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
       clauses.push(Prisma.sql`j."salaryMin" <= ${input.salaryMax}`);
     }
   }
+  if (input.salaryNegotiable) {
+    // Keep search results aligned with formatSalary(): only listings without
+    // a complete public numeric range are presented as "Negotiable".
+    clauses.push(Prisma.sql`(j."salaryMin" IS NULL OR j."salaryMax" IS NULL)`);
+  }
   if (input.postedWithinDays !== undefined) {
     const cutoff = new Date(
       now.getTime() - input.postedWithinDays * 86_400_000,

@@ -39,6 +39,8 @@ export type NormalizedJobSearch = {
   careerPath?: CareerPathSlug;
   salaryMin?: number;
   salaryMax?: number;
+  /** Matches public cards without a complete numeric salary range. */
+  salaryNegotiable?: true;
   salaryCurrency: string;
   salaryPeriod: "HOUR" | "MONTH" | "YEAR";
   postedWithinDays?: number;

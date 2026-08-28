@@ -183,6 +183,7 @@ function activeFilters(
           skills: "Kỹ năng",
           salaryMin: "Lương từ",
           salaryMax: "Lương đến",
+          salaryNegotiable: "Mức lương",
           postedWithinDays: "Đăng trong",
           sort: "Sắp xếp",
         }
@@ -197,6 +198,7 @@ function activeFilters(
           skills: "Skill",
           salaryMin: "Salary from",
           salaryMax: "Salary to",
+          salaryNegotiable: "Salary",
           postedWithinDays: "Posted within",
           sort: "Sort",
         };
@@ -235,7 +237,11 @@ function activeFilters(
           : undefined;
     const visible = salary
       ? `${new Intl.NumberFormat(locale === "vi" ? "vi-VN" : "en-US").format(Number(raw))} VND`
-      : (taxonomyValue ?? enums[raw] ?? raw);
+      : name === "salaryNegotiable"
+        ? locale === "vi"
+          ? "Thỏa thuận"
+          : "Negotiable"
+        : (taxonomyValue ?? enums[raw] ?? raw);
     output.push({
       id: `${name}:${value}`,
       label: `${labelsWithCategories[name]}: ${visible}`,
@@ -259,6 +265,7 @@ function activeFilters(
     "categoryTitle",
     "salaryMin",
     "salaryMax",
+    "salaryNegotiable",
     "postedWithinDays",
     "sort",
   ] as const) {
@@ -458,10 +465,19 @@ export function JobSearchForm({
   const setSalaryRange = (minimum?: number, maximum?: number) => {
     if (!onCriteriaChange) return;
     const next = { ...criteria };
+    delete next.salaryNegotiable;
     if (minimum === undefined) delete next.salaryMin;
     else next.salaryMin = String(minimum);
     if (maximum === undefined) delete next.salaryMax;
     else next.salaryMax = String(maximum);
+    onCriteriaChange(next, "immediate");
+  };
+
+  const setNegotiableSalary = () => {
+    if (!onCriteriaChange) return;
+    const next = { ...criteria, salaryNegotiable: "true" };
+    delete next.salaryMin;
+    delete next.salaryMax;
     onCriteriaChange(next, "immediate");
   };
 
@@ -471,23 +487,25 @@ export function JobSearchForm({
   const salaryMinimum = Number(one(criteria.salaryMin) || 0);
   const salaryMaximum = Number(one(criteria.salaryMax) || 0);
   const selectedSalaryPreset: string =
-    !salaryMinimum && !salaryMaximum
-      ? "all"
-      : salaryMaximum === 10_000_000
-        ? "under-10"
-        : salaryMinimum === 10_000_000 && salaryMaximum === 15_000_000
-          ? "10-15"
-          : salaryMinimum === 15_000_000 && salaryMaximum === 20_000_000
-            ? "15-20"
-            : salaryMinimum === 20_000_000 && salaryMaximum === 25_000_000
-              ? "20-25"
-              : salaryMinimum === 25_000_000 && salaryMaximum === 30_000_000
-                ? "25-30"
-                : salaryMinimum === 30_000_000 && salaryMaximum === 50_000_000
-                  ? "30-50"
-                  : salaryMinimum === 50_000_000 && !salaryMaximum
-                    ? "over-50"
-                    : "custom";
+    one(criteria.salaryNegotiable) === "true"
+      ? "negotiable"
+      : !salaryMinimum && !salaryMaximum
+        ? "all"
+        : salaryMaximum === 10_000_000
+          ? "under-10"
+          : salaryMinimum === 10_000_000 && salaryMaximum === 15_000_000
+            ? "10-15"
+            : salaryMinimum === 15_000_000 && salaryMaximum === 20_000_000
+              ? "15-20"
+              : salaryMinimum === 20_000_000 && salaryMaximum === 25_000_000
+                ? "20-25"
+                : salaryMinimum === 25_000_000 && salaryMaximum === 30_000_000
+                  ? "25-30"
+                  : salaryMinimum === 30_000_000 && salaryMaximum === 50_000_000
+                    ? "30-50"
+                    : salaryMinimum === 50_000_000 && !salaryMaximum
+                      ? "over-50"
+                      : "custom";
 
   const countText =
     resultCount === undefined
@@ -898,7 +916,7 @@ export function JobSearchForm({
                     type="radio"
                     name="salary-preset"
                     checked={selectedSalaryPreset === "negotiable"}
-                    onChange={() => setSalaryRange()}
+                    onChange={setNegotiableSalary}
                   />
                   <span>{vi ? "Thỏa thuận" : "Negotiable"}</span>
                 </label>

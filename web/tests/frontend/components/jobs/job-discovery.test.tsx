@@ -190,6 +190,12 @@ describe("job discovery presentation", () => {
       "immediate",
     );
 
+    fireEvent.click(screen.getByLabelText("Negotiable"));
+    expect(onCriteriaChange).toHaveBeenLastCalledWith(
+      { salaryNegotiable: "true" },
+      "immediate",
+    );
+
     fireEvent.click(screen.getByLabelText("Full-time"));
     expect(onCriteriaChange).toHaveBeenLastCalledWith(
       { employmentType: "FULL_TIME" },

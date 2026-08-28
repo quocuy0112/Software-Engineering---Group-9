@@ -27,4 +27,12 @@ describe("public job search API query parsing", () => {
     expect(criteria.categoryFamily).toEqual(["r29", "r03"]);
     expect(criteria.categoryIds).toEqual(["r03-software-development"]);
   });
+
+  it("preserves the negotiable-salary filter for the discovery service", () => {
+    const query = jobSearchRequestQuery(
+      new Request("https://smarthire.example/api/jobs?salaryNegotiable=true"),
+    );
+
+    expect(parseJobSearchCriteria(query).salaryNegotiable).toBe(true);
+  });
 });

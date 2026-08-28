@@ -32,6 +32,15 @@ describe("job board transport contracts", () => {
       jobSearchQuerySchema.parse({ categoryTitle: ["Software Engineer"] })
         .categoryTitle,
     ).toEqual(["Software Engineer"]);
+    expect(
+      jobSearchQuerySchema.parse({ salaryNegotiable: "true" }).salaryNegotiable,
+    ).toBe(true);
+    expect(() =>
+      jobSearchQuerySchema.parse({
+        salaryNegotiable: "true",
+        salaryMin: "10",
+      }),
+    ).toThrow();
   });
 
   it("rejects ownership fields and unsafe report shapes", () => {
