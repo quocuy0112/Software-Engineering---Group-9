@@ -37,6 +37,12 @@ describe("Connections workspace", () => {
     expect(
       screen.getByText(/messaging opens only after both people accept/i),
     ).toBeVisible();
+    expect(screen.getByText("Exact lookup")).toBeVisible();
+    expect(screen.getByLabelText("Candidate ID")).toHaveAttribute(
+      "placeholder",
+      "Enter candidate ID…",
+    );
+    expect(screen.getByText(/Privacy protected:/i)).toBeVisible();
     expect(screen.getByRole("button", { name: "Accept" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Decline" })).toBeEnabled();
     expect(screen.getByText("20 Aug 2026")).toBeVisible();

@@ -23,6 +23,7 @@ export function jobSearchRequestQuery(request: Request) {
     skills: params.getAll("skills"),
     salaryMin: value("salaryMin"),
     salaryMax: value("salaryMax"),
+    salaryNegotiable: value("salaryNegotiable"),
     salaryCurrency: value("salaryCurrency"),
     salaryPeriod: value("salaryPeriod"),
     postedWithinDays: value("postedWithinDays"),

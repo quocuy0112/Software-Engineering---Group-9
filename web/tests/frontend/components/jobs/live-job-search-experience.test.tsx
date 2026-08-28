@@ -117,6 +117,22 @@ describe("live job search experience", () => {
     }
   });
 
+  it("keeps the negotiable-salary filter selected in the URL and API request", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response(2));
+    vi.stubGlobal("fetch", fetchMock);
+    renderExperience();
+
+    fireEvent.click(screen.getByLabelText("Negotiable"));
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/jobs?salaryNegotiable=true",
+      expect.objectContaining({ headers: { Accept: "application/json" } }),
+    );
+    expect(window.location.search).toBe("?salaryNegotiable=true");
+    expect(screen.getByLabelText("Negotiable")).toBeChecked();
+  });
+
   it("keeps search scope implicit and only exposes result sorting", () => {
     renderExperience();
 

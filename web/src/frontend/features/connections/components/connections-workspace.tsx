@@ -7,10 +7,13 @@ import {
   CircleHelp,
   ArrowUpRight,
   History,
+  Hash,
+  LockKeyhole,
   Search,
   ShieldCheck,
   UsersRound,
   UserRoundPlus,
+  UserRoundSearch,
 } from "lucide-react";
 import { Panel } from "@/frontend/components/ui/design-system";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
@@ -78,7 +81,11 @@ function connectionCopy(locale: "vi" | "en") {
         discoveryTitle: "Tìm chuyên gia theo ID",
         discoveryDescription:
           "Chỉ những hồ sơ cho phép tìm kiếm bằng ID chính xác mới xuất hiện ở đây.",
+        discoveryExactLookup: "Tra cứu chính xác",
         discoveryLabel: "ID ứng viên",
+        discoveryPlaceholder: "Nhập ID ứng viên…",
+        discoveryPrivacy:
+          "Quyền riêng tư được bảo vệ: Hồ sơ ẩn danh không hiển thị thông tin liên hệ công khai.",
         searching: "Đang tìm…",
         search: "Tìm kiếm",
         viewProfile: "Xem hồ sơ",
@@ -159,7 +166,11 @@ function connectionCopy(locale: "vi" | "en") {
         discoveryTitle: "Find a professional by ID",
         discoveryDescription:
           "Only profiles that allow exact-ID discovery appear here.",
+        discoveryExactLookup: "Exact lookup",
         discoveryLabel: "Candidate ID",
+        discoveryPlaceholder: "Enter candidate ID…",
+        discoveryPrivacy:
+          "Privacy protected: anonymous profiles never expose public contact details.",
         searching: "Searching…",
         search: "Search",
         viewProfile: "View profile",
@@ -455,12 +466,18 @@ export function ConnectionsWorkspace({
       >
         <div className="connections-profile-lookup__heading">
           <span className="connections-profile-lookup__icon">
-            <Search aria-hidden="true" />
+            <UserRoundSearch aria-hidden="true" />
           </span>
           <div>
-            <p className="connections-profile-lookup__eyebrow">
-              {copy.discoveryEyebrow}
-            </p>
+            <div className="connections-profile-lookup__meta">
+              <p className="connections-profile-lookup__eyebrow">
+                {copy.discoveryEyebrow}
+              </p>
+              <span className="connections-profile-lookup__exact-badge">
+                <LockKeyhole aria-hidden="true" />
+                {copy.discoveryExactLookup}
+              </span>
+            </div>
             <h2 id="profile-lookup-title">{copy.discoveryTitle}</h2>
             <p>{copy.discoveryDescription}</p>
           </div>
@@ -471,20 +488,34 @@ export function ConnectionsWorkspace({
         >
           <label htmlFor="candidate-profile-id">{copy.discoveryLabel}</label>
           <div>
-            <input
-              id="candidate-profile-id"
-              value={lookupId}
-              onChange={(event) => setLookupId(event.target.value)}
-              autoComplete="off"
-              maxLength={128}
-              required
-            />
-            <button type="submit" className="primary" disabled={lookupBusy}>
+            <div className="connections-profile-lookup__input-wrap">
+              <Hash aria-hidden="true" />
+              <input
+                id="candidate-profile-id"
+                value={lookupId}
+                onChange={(event) => setLookupId(event.target.value)}
+                autoComplete="off"
+                aria-describedby="profile-lookup-privacy"
+                maxLength={128}
+                placeholder={copy.discoveryPlaceholder}
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="connections-profile-lookup__submit"
+              disabled={lookupBusy}
+            >
+              <Search aria-hidden="true" />
               {lookupBusy ? copy.searching : copy.search}
             </button>
           </div>
         </form>
-        {lookupMessage ? <p role="status">{lookupMessage}</p> : null}
+        {lookupMessage ? (
+          <p className="connections-profile-lookup__message" role="status">
+            {lookupMessage}
+          </p>
+        ) : null}
         {lookupResult ? (
           <article className="connections-profile-result">
             <div className="connection-avatar" aria-hidden="true">
@@ -512,6 +543,13 @@ export function ConnectionsWorkspace({
             </Link>
           </article>
         ) : null}
+        <p
+          id="profile-lookup-privacy"
+          className="connections-profile-lookup__privacy"
+        >
+          <ShieldCheck aria-hidden="true" />
+          <span>{copy.discoveryPrivacy}</span>
+        </p>
       </section>
       {error ? (
         <p className="connections-alert" role="alert">

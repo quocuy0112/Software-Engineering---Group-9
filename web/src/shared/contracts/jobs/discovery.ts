@@ -50,6 +50,11 @@ const optionalNumber = (schema: z.ZodNumber) =>
     z.coerce.number().pipe(schema).optional(),
   );
 
+const optionalTrue = z.preprocess(
+  (value) => (value === "true" ? true : omitEmptyControlValue(value)),
+  z.literal(true).optional(),
+);
+
 export const jobSearchQuerySchema = z
   .object({
     q: z.string().trim().max(200).default(""),
@@ -73,6 +78,9 @@ export const jobSearchQuerySchema = z
     skills: stringArray(z.string().trim().min(1).max(80), 20).default([]),
     salaryMin: optionalNumber(z.number().finite().min(0)),
     salaryMax: optionalNumber(z.number().finite().min(0)),
+    // This mirrors the public card state: a job is shown as "Negotiable"
+    // when it has no complete numeric salary range.
+    salaryNegotiable: optionalTrue,
     salaryCurrency: z
       .string()
       .regex(/^[A-Z]{3}$/u)
@@ -111,6 +119,16 @@ export const jobSearchQuerySchema = z
         code: "custom",
         path: ["salaryMax"],
         message: "Maximum salary must not be below minimum salary.",
+      });
+    }
+    if (
+      value.salaryNegotiable &&
+      (value.salaryMin !== undefined || value.salaryMax !== undefined)
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["salaryNegotiable"],
+        message: "A negotiable-salary search cannot include a salary range.",
       });
     }
   });

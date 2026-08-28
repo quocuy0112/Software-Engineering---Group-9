@@ -23,6 +23,7 @@ const scalarCriteriaNames = [
   "careerPath",
   "salaryMin",
   "salaryMax",
+  "salaryNegotiable",
   "salaryCurrency",
   "salaryPeriod",
   "postedWithinDays",

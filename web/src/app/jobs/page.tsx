@@ -46,6 +46,9 @@ export function jobsPageQuery(
     salaryMax: Array.isArray(input.salaryMax)
       ? input.salaryMax[0]
       : input.salaryMax,
+    salaryNegotiable: Array.isArray(input.salaryNegotiable)
+      ? input.salaryNegotiable[0]
+      : input.salaryNegotiable,
     salaryCurrency: Array.isArray(input.salaryCurrency)
       ? input.salaryCurrency[0]
       : input.salaryCurrency,

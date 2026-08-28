@@ -135,6 +135,7 @@ export function parseJobSearchCriteria(raw: unknown): NormalizedJobSearch {
     careerPath: parsed.careerPath,
     salaryMin: parsed.salaryMin,
     salaryMax: parsed.salaryMax,
+    salaryNegotiable: parsed.salaryNegotiable,
     salaryCurrency: parsed.salaryCurrency,
     salaryPeriod: parsed.salaryPeriod,
     postedWithinDays: parsed.postedWithinDays,
