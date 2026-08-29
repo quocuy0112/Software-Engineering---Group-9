@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -11,7 +11,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { RefreshCw, Search } from "lucide-react";
+import { FileText, Pin, RefreshCw, Search, X } from "lucide-react";
 import type {
   ApplicationStage,
   PipelineBoardColumnStage,
@@ -30,6 +30,7 @@ import {
 import { useRecruitmentPipeline } from "./use-recruitment-pipeline";
 import {
   filterPipelineCards,
+  pipelineScoreForCard,
   sortPipelineCards,
   type PipelineSortDirection,
   type PipelineTierFilter,
@@ -114,6 +115,13 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
   );
   const [assessmentCard, setAssessmentCard] =
     useState<PipelineApplicationCard | null>(null);
+  const [previewCard, setPreviewCard] =
+    useState<PipelineApplicationCard | null>(null);
+  const [previewPinned, setPreviewPinned] = useState(false);
+  const [previewPosition, setPreviewPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
   const [dialog, setDialog] = useState<{
     card: PipelineApplicationCard;
     target?: ApplicationStage;
@@ -134,6 +142,8 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
   const [bulkRejectBusy, setBulkRejectBusy] = useState(false);
   const returnFocus = useRef<HTMLElement | null>(null);
   const assessmentReturnFocus = useRef<HTMLElement | null>(null);
+  const previewCloseTimer = useRef<number | null>(null);
+  const previewRef = useRef<HTMLElement | null>(null);
   const cards = useMemo(
     () =>
       Object.values(state.columns).flatMap(
@@ -149,6 +159,75 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
     document.addEventListener("click", closeMenu);
     return () => document.removeEventListener("click", closeMenu);
   }, [openSortMenu]);
+
+  useEffect(
+    () => () => {
+      if (previewCloseTimer.current !== null) {
+        window.clearTimeout(previewCloseTimer.current);
+      }
+    },
+    [],
+  );
+
+  useLayoutEffect(() => {
+    if (!previewCard || !previewPosition || !previewRef.current) return;
+
+    const popup = previewRef.current.getBoundingClientRect();
+    const viewportBottom = window.innerHeight - 5;
+    if (popup.bottom <= viewportBottom) return;
+
+    setPreviewPosition((current) =>
+      current
+        ? {
+            ...current,
+            top: Math.max(5, current.top - (popup.bottom - viewportBottom)),
+          }
+        : current,
+    );
+  }, [previewCard, previewPosition]);
+
+  const cancelPreviewClose = () => {
+    if (previewCloseTimer.current !== null) {
+      window.clearTimeout(previewCloseTimer.current);
+      previewCloseTimer.current = null;
+    }
+  };
+
+  const previewCandidate = (
+    card: PipelineApplicationCard,
+    pinned: boolean,
+    anchor: DOMRect,
+  ) => {
+    cancelPreviewClose();
+    const popupWidth = 320;
+    const viewportPadding = 16;
+    const preferredLeft = anchor.right + 12;
+    const left =
+      preferredLeft + popupWidth <= window.innerWidth - viewportPadding
+        ? preferredLeft
+        : Math.max(viewportPadding, anchor.left - popupWidth - 12);
+    setPreviewPosition({ top: anchor.top, left });
+    if (pinned) {
+      setPreviewCard(card);
+      setPreviewPinned(true);
+      return;
+    }
+    if (previewPinned) return;
+    previewCloseTimer.current = window.setTimeout(() => {
+      setPreviewCard(card);
+      previewCloseTimer.current = null;
+    }, 280);
+  };
+
+  const schedulePreviewClose = () => {
+    cancelPreviewClose();
+    if (previewPinned) return;
+    previewCloseTimer.current = window.setTimeout(() => {
+      setPreviewCard(null);
+      setPreviewPosition(null);
+      previewCloseTimer.current = null;
+    }, 250);
+  };
 
   const visiblePage = (stage: PipelineBoardColumnStage) => {
     const column = state.columns[stage];
@@ -317,10 +396,36 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
         }}
         filterActive={filterActive}
         loadedItemCount={column?.page?.items.length ?? 0}
+        onPreview={previewCandidate}
+        onPreviewLeave={schedulePreviewClose}
+        previewedApplicationId={previewCard?.applicationId}
         copy={copy}
       />
     );
   };
+
+  const previewQuickActionLabels: Partial<Record<ApplicationStage, string>> = {
+    SHORTLISTED: copy.moveToShortlist,
+    INTERVIEWING: copy.moveToInterview,
+    OFFERED: copy.sendOffer,
+    REJECTED: copy.reject,
+    WAITLISTED: copy.waitlist,
+  };
+  const previewLocked =
+    previewCard?.withdrawalOutcome === "CANDIDATE_WITHDRAWN" ||
+    previewCard?.stage === "OFFERED" ||
+    previewCard?.stage === "HIRED" ||
+    previewCard?.stage === "OFFER_DECLINED" ||
+    previewCard?.stage === "REJECTED";
+  const previewQuickActions =
+    previewCard && !previewLocked
+      ? previewCard.allowedDestinations
+          .filter((stage) => previewQuickActionLabels[stage])
+          .map((stage) => ({
+            stage,
+            label: previewQuickActionLabels[stage] as string,
+          }))
+      : [];
 
   if (state.loading && !state.metadata) {
     return (
@@ -469,37 +574,160 @@ export function RecruitmentPipelineBoard({ jobId }: { jobId: string }) {
           },
         }}
       >
-        <div className="recruitment-pipeline__sections">
-          <section className="pipeline-section pipeline-section--active">
-            <div className="section-head pipeline-section__header">
-              <h2 id="active-pipeline-heading">{copy.activePipeline}</h2>
-              <span>{copy.activePipelineDescription}</span>
-            </div>
-            <div className="board recruitment-pipeline__columns">
-              {activePipelineStages.map((stage) => {
-                const summary = boardMetadata.stages.find(
-                  (item) => item.stage === stage,
-                );
-                return summary ? renderColumn(summary) : null;
-              })}
-            </div>
-          </section>
-          <hr className="section-divider" />
-          <section className="pipeline-section pipeline-section--outcomes">
-            <div className="section-head pipeline-section__header">
-              <h2 id="pipeline-outcomes-heading">{copy.outcomes}</h2>
-              <span>{copy.outcomesDescription}</span>
-            </div>
-            <div className="board outcomes recruitment-pipeline__columns">
-              {outcomeStages.map((stage) => {
-                const summary = boardMetadata.stages.find(
-                  (item) => item.stage === stage,
-                );
-                return summary ? renderColumn(summary) : null;
-              })}
-              {renderColumn(withdrawnSummary)}
-            </div>
-          </section>
+        <div className="recruitment-pipeline__workspace">
+          <div className="recruitment-pipeline__sections">
+            <section className="pipeline-section pipeline-section--active">
+              <div className="section-head pipeline-section__header">
+                <h2 id="active-pipeline-heading">{copy.activePipeline}</h2>
+                <span>{copy.activePipelineDescription}</span>
+              </div>
+              <div className="board recruitment-pipeline__columns">
+                {activePipelineStages.map((stage) => {
+                  const summary = boardMetadata.stages.find(
+                    (item) => item.stage === stage,
+                  );
+                  return summary ? renderColumn(summary) : null;
+                })}
+              </div>
+            </section>
+            <hr className="section-divider" />
+            <section className="pipeline-section pipeline-section--outcomes">
+              <div className="section-head pipeline-section__header">
+                <h2 id="pipeline-outcomes-heading">{copy.outcomes}</h2>
+                <span>{copy.outcomesDescription}</span>
+              </div>
+              <div className="board outcomes recruitment-pipeline__columns">
+                {outcomeStages.map((stage) => {
+                  const summary = boardMetadata.stages.find(
+                    (item) => item.stage === stage,
+                  );
+                  return summary ? renderColumn(summary) : null;
+                })}
+                {renderColumn(withdrawnSummary)}
+              </div>
+            </section>
+          </div>
+          {previewCard ? (
+            <aside
+              ref={previewRef}
+              className="pipeline-candidate-preview"
+              aria-live="polite"
+              style={previewPosition ?? undefined}
+              onMouseEnter={cancelPreviewClose}
+              onMouseLeave={schedulePreviewClose}
+            >
+              <>
+                <header className="pipeline-candidate-preview__header">
+                  <div>
+                    <p>{copy.candidatePreview}</p>
+                    <h2>{previewCard.candidate.displayName}</h2>
+                  </div>
+                  <div className="pipeline-candidate-preview__actions">
+                    <button
+                      type="button"
+                      aria-pressed={previewPinned}
+                      aria-label={copy.pinPreview}
+                      title={copy.pinPreview}
+                      onClick={() => setPreviewPinned((current) => !current)}
+                    >
+                      <Pin aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={copy.closePreview}
+                      title={copy.closePreview}
+                      onClick={() => {
+                        cancelPreviewClose();
+                        setPreviewCard(null);
+                        setPreviewPinned(false);
+                        setPreviewPosition(null);
+                      }}
+                    >
+                      <X aria-hidden="true" />
+                    </button>
+                  </div>
+                </header>
+                <dl className="pipeline-candidate-preview__details">
+                  <div>
+                    <dt>{copy.stage}</dt>
+                    <dd>{copy.stageLabels[previewCard.stage]}</dd>
+                  </div>
+                  <div>
+                    <dt>{copy.finalScore}</dt>
+                    <dd>
+                      {pipelineScoreForCard(previewCard) === null
+                        ? copy.finalScoreUnavailable
+                        : `${Math.round(pipelineScoreForCard(previewCard) ?? 0)}%`}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{copy.submittedLabel}</dt>
+                    <dd>
+                      {new Date(previewCard.submittedAt).toLocaleDateString(
+                        locale === "vi" ? "vi-VN" : "en-US",
+                      )}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{copy.documents}</dt>
+                    <dd>
+                      {previewCard.documents.cvAvailable
+                        ? copy.cvAvailable
+                        : copy.cvUnavailable}
+                    </dd>
+                  </div>
+                </dl>
+                <div className="pipeline-candidate-preview__actions-list">
+                  {previewCard.documents.cvAvailable ? (
+                    <a
+                      href={`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(previewCard.applicationId)}/documents/cv`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {copy.openCv}
+                    </a>
+                  ) : null}
+                  {previewCard.documents.coverLetterAvailable ? (
+                    <a
+                      href={`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(previewCard.applicationId)}/documents/cover-letter`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {copy.coverLetter}
+                    </a>
+                  ) : null}
+                  <button
+                    type="button"
+                    className="pipeline-candidate-preview__assessment"
+                    onClick={() => openAssessment(previewCard)}
+                  >
+                    <FileText aria-hidden="true" />
+                    {copy.viewAiAssessment}
+                  </button>
+                  {previewQuickActions.map(({ stage, label }) => (
+                    <button
+                      key={stage}
+                      type="button"
+                      className="pipeline-candidate-preview__stage-action"
+                      onClick={() => requestStageChange(previewCard, stage)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                  {!previewLocked &&
+                  previewCard.allowedDestinations.length > 0 ? (
+                    <button
+                      type="button"
+                      className="pipeline-candidate-preview__stage-action pipeline-candidate-preview__stage-action--secondary"
+                      onClick={() => requestStageChange(previewCard)}
+                    >
+                      {copy.changeStage}
+                    </button>
+                  ) : null}
+                </div>
+              </>
+            </aside>
+          ) : null}
         </div>
         <DragOverlay>
           {activeCard ? (

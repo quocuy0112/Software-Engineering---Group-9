@@ -1,11 +1,9 @@
 /* Candidate profile only. This namespace intentionally does not reuse the
  * legacy professional-profile selectors, so the page has one visual system. */
 .candidate-profile-page {
-  --profile-navigation-bleed: 24px;
-
-  width: min(1040px, 100%);
-  margin: 0 auto;
-  padding: 28px 24px 70px;
+  width: 100%;
+  min-width: 0;
+  padding: 0 0 var(--sh-space-10);
   color: var(--sh-profile-text);
   font-family: var(--sh-font-family);
 }
@@ -31,17 +29,15 @@
 }
 
 .candidate-profile-page .profile-navigation {
-  width: calc(
-    100% + var(--profile-navigation-bleed) + var(--profile-navigation-bleed)
-  );
-  max-width: none;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   display: flex;
   align-items: center;
   gap: 16px;
   margin: 0;
-  margin-inline: calc(0px - var(--profile-navigation-bleed));
-  margin-bottom: 36px;
+  margin-inline: 0;
+  margin-bottom: var(--sh-page-section-gap);
   padding: 0;
   overflow: visible;
   border: 0;
@@ -1769,16 +1765,14 @@
 
 @media (max-width: 760px) {
   .candidate-profile-page {
-    --profile-navigation-bleed: 16px;
-
-    padding: 20px 16px 48px;
+    padding-bottom: var(--sh-space-8);
   }
 
   .candidate-profile-page .profile-navigation {
     align-items: flex-start;
     flex-wrap: wrap;
     gap: var(--sh-space-1);
-    margin-bottom: 24px;
+    margin-bottom: var(--sh-space-5);
   }
 
   .candidate-profile-page .profile-navigation .sh-topbar__tabs {

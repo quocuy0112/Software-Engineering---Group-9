@@ -9268,9 +9268,14 @@
 
 /* Candidate Jobs workspace */
 .jobs-workspace-page {
-  width: min(1040px, 100%);
+  width: 100%;
   min-width: 0;
-  margin-inline: auto;
+  margin-inline: 0;
+}
+
+.jobs-workspace-content {
+  width: 100%;
+  min-width: 0;
 }
 
 .jobs-workspace-nav {

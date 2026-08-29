@@ -1,7 +1,8 @@
 .page {
-  width: min(1120px, calc(100% - 32px));
-  margin: 0 auto;
-  padding: 42px 0 72px;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0 0 var(--sh-space-10);
   color: var(--sh-color-text-primary, #10142b);
 }
 
@@ -16,27 +17,28 @@
 
 .heading {
   display: flex;
-  align-items: end;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 28px;
+  gap: var(--sh-space-5);
+  margin-bottom: var(--sh-space-6);
 }
 
 .heading h1,
 .detailTitle {
   margin: 0;
-  font-size: clamp(28px, 4vw, 44px);
-  line-height: 1.12;
-  letter-spacing: -0.045em;
+  font-size: var(--sh-font-size-h1);
+  line-height: var(--sh-line-height-h1);
+  letter-spacing: -0.025em;
 }
 
-.heading p,
+.heading .sh-page-header__subtitle,
 .detailIntro,
 .muted {
-  max-width: 680px;
-  margin: 10px 0 0;
+  max-width: 600px;
+  margin: var(--sh-space-2) 0 0;
   color: var(--sh-color-text-secondary, #646b83);
-  line-height: 1.6;
+  font-size: var(--sh-font-size-body-sm);
+  line-height: var(--sh-line-height-body-sm);
 }
 
 .count {
@@ -426,10 +428,11 @@
 }
 
 .statusCard {
-  padding: 20px;
+  padding: var(--sh-space-5);
   border: 1px solid var(--sh-color-border-subtle, #e5e8f2);
-  border-radius: 16px;
-  background: #fff;
+  border-radius: var(--sh-radius-md);
+  background: var(--sh-color-surface-card, #fff);
+  box-shadow: var(--sh-shadow-control);
 }
 
 .statusCard h2 {
@@ -445,12 +448,12 @@
 
 .statusBadge {
   display: inline-flex;
-  border-radius: 999px;
+  border-radius: var(--sh-radius-full);
   padding: 6px 10px;
-  background: #eef0ff;
-  color: #3442b8;
-  font-size: 12px;
-  font-weight: 800;
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-bold);
 }
 
 .statusMeta {
@@ -514,9 +517,10 @@
 
 @media (max-width: 600px) {
   .page {
-    width: min(100% - 22px, 1120px);
-    padding-top: 26px;
+    width: 100%;
+    padding-bottom: var(--sh-space-10);
   }
+
   .heading,
   .detailHeader,
   .panelHeader {

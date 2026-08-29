@@ -41,6 +41,11 @@ type PipelineColumnProps = {
   onViewAssessment?: Parameters<
     typeof RecruitmentPipelineCard
   >[0]["onViewAssessment"];
+  onPreview?: Parameters<typeof RecruitmentPipelineCard>[0]["onPreview"];
+  onPreviewLeave?: Parameters<
+    typeof RecruitmentPipelineCard
+  >[0]["onPreviewLeave"];
+  previewedApplicationId?: string | null;
   sortDirection?: PipelineSortDirection;
   sortMenuOpen?: boolean;
   onToggleSortMenu?: (stage: ApplicationStage) => void;
@@ -72,6 +77,9 @@ export function RecruitmentPipelineColumn({
   showViewAll = false,
   onChangeStage,
   onViewAssessment,
+  onPreview,
+  onPreviewLeave,
+  previewedApplicationId,
   sortDirection = "none",
   sortMenuOpen = false,
   onToggleSortMenu,
@@ -82,11 +90,6 @@ export function RecruitmentPipelineColumn({
 }: PipelineColumnProps) {
   const copy = copyProp ?? recruiterApplicationsCopy("en").pipeline;
   const displayLabel = copy.stageLabels[summary.stage] ?? summary.label;
-  const sortLabels: Record<PipelineSortDirection, string> = {
-    none: copy.sort,
-    asc: copy.lowHigh,
-    desc: copy.highLow,
-  };
   const sortOptionLabels: Record<PipelineSortDirection, string> = {
     none: copy.defaultSort,
     asc: copy.scoreLowHigh,
@@ -177,7 +180,6 @@ export function RecruitmentPipelineColumn({
                 }}
               >
                 <SlidersHorizontal aria-hidden="true" />
-                <span className="sort-label">{sortLabels[sortDirection]}</span>
               </button>
               {sortMenuOpen ? (
                 <div
@@ -246,6 +248,9 @@ export function RecruitmentPipelineColumn({
               jobId={jobId}
               onChangeStage={onChangeStage}
               onViewAssessment={onViewAssessment}
+              onPreview={onPreview}
+              onPreviewLeave={onPreviewLeave}
+              previewed={card.applicationId === previewedApplicationId}
               copy={copy}
             />
           ))

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { PageHeader } from "@/frontend/components/layout/page-header";
 import {
   candidateTeamApplicationListSchema,
   candidateTeamApplicationSchema,
@@ -101,26 +102,30 @@ export function TeamApplicationStatus({
 
   return (
     <main className={styles.page} aria-labelledby="team-applications-title">
-      <header className={styles.heading}>
-        <div>
-          <p className={styles.eyebrow}>{copy.applicationsEyebrow}</p>
-          <h1 id="team-applications-title">{copy.teamApplications}</h1>
-          <p>{copy.trackTeamApplications}</p>
-        </div>
-        <button
-          className={`${styles.button} ${styles.secondary}`}
-          type="button"
-          onClick={() =>
-            void refresh().catch((caught) =>
-              setError(
-                caught instanceof Error ? caught.message : copy.unableToRefresh,
-              ),
-            )
-          }
-        >
-          {copy.refresh}
-        </button>
-      </header>
+      <PageHeader
+        className={styles.heading}
+        eyebrow={copy.applicationsEyebrow}
+        title={copy.teamApplications}
+        titleId="team-applications-title"
+        subtitle={copy.trackTeamApplications}
+        rightSlot={
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            type="button"
+            onClick={() =>
+              void refresh().catch((caught) =>
+                setError(
+                  caught instanceof Error
+                    ? caught.message
+                    : copy.unableToRefresh,
+                ),
+              )
+            }
+          >
+            {copy.refresh}
+          </button>
+        }
+      />
       {error ? (
         <p className={styles.error} role="alert">
           {error}

@@ -514,9 +514,12 @@
 
 .workspace-status,
 .workspace-content {
-  width: min(100%, calc(var(--sh-content-width) + 48px));
+  width: min(
+    100%,
+    calc(var(--sh-workspace-content-max) + (var(--sh-workspace-gutter) * 2))
+  );
   margin-inline: auto;
-  padding-inline: var(--sh-space-6);
+  padding-inline: var(--sh-workspace-gutter);
 }
 
 .workspace-status {
@@ -530,6 +533,34 @@
 .workspace-content {
   padding-top: var(--sh-space-8);
   padding-bottom: var(--sh-space-16);
+}
+
+/* Feature roots occupy the shared rail. This prevents a page from appearing
+ * to jump left/right when users navigate between Dashboard, Profile, and the
+ * other Candidate workspace destinations. */
+.workspace-content
+  > :where(.candidate-dashboard-page, .candidate-profile-page) {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}
+
+/* Recruiter destinations use the same workspace rail. Dense tables, Kanban
+ * boards, and forms can vary inside the page without shifting its outer edge. */
+.workspace-content[data-workspace-mode="recruiter"]
+  > :where(
+    .recruiter-management,
+    .recruiter-editor,
+    .recruiter-candidate-workspace,
+    .recruiter-pipeline-page,
+    .recruiter-analytics-overview,
+    .recruitment-messaging
+  ) {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0 0 var(--sh-space-10);
 }
 
 /*
@@ -1269,7 +1300,7 @@
 
   .workspace-status,
   .workspace-content {
-    padding-inline: var(--sh-space-4);
+    padding-inline: var(--sh-workspace-gutter-compact);
   }
 
   .workspace-content {

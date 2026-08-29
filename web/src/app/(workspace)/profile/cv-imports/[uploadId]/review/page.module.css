@@ -10,9 +10,9 @@
 
 .workspace {
   display: grid;
-  width: min(100%, 1040px);
+  width: 100%;
   gap: 26px;
-  margin: 0 auto;
+  margin: 0;
   color: var(--sh-profile-text, #101b39);
   font-family: var(--sh-profile-font-body, "Be Vietnam Pro", sans-serif);
 }

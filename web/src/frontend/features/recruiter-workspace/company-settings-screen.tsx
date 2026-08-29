@@ -291,106 +291,6 @@ function fieldClass(hasError: boolean) {
   return hasError ? `${styles.field} ${styles.error}` : styles.field;
 }
 
-function companyRoleLabel(
-  role: RecruiterCompanySettings["role"],
-  copy: RecruiterWorkspaceCopy,
-) {
-  switch (role) {
-    case "OWNER":
-      return copy.role.owner;
-    case "HR_MANAGER":
-      return `${copy.role.authorizedRecruiter} · ${copy.role.hrManager}`;
-    case "RECRUITER":
-      return copy.role.authorizedRecruiter;
-    case "HIRING_MANAGER":
-      return `${copy.role.authorizedRecruiter} · ${copy.role.hiringManager}`;
-    default:
-      return copy.role.member;
-  }
-}
-
-function CompanySwitcherGroup({
-  title,
-  description,
-  countLabel,
-  companies,
-  activeCompanyId,
-  emptyMessage,
-  locale,
-  onSelect,
-}: {
-  title: string;
-  description: string;
-  countLabel: string;
-  companies: RecruiterCompanySettings[];
-  activeCompanyId: string | null;
-  emptyMessage: string;
-  locale: WorkspaceLocale;
-  onSelect: (companyId: string) => void;
-}) {
-  const headingId = `company-switcher-${title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/gu, "-")}`;
-
-  return (
-    <section
-      className={styles.companySwitcherSection}
-      aria-labelledby={headingId}
-    >
-      <div className={styles.companySwitcherSectionHeader}>
-        <div>
-          <h2 className={styles.companySwitcherSectionTitle} id={headingId}>
-            {title}
-          </h2>
-          <p className={styles.companySwitcherSectionDescription}>
-            {description}
-          </p>
-        </div>
-        <span className={styles.companySwitcherSectionCount}>{countLabel}</span>
-      </div>
-      {companies.length ? (
-        <div
-          className={styles.companySwitcherList}
-          role="list"
-          aria-label={
-            locale === "vi" ? `${title} · công ty` : `${title} companies`
-          }
-        >
-          {companies.map((candidate) => (
-            <div role="listitem" key={candidate.id}>
-              <button
-                className={`${styles.companySwitcherItem}${candidate.id === activeCompanyId ? ` ${styles.companySwitcherItemActive}` : ""}`}
-                type="button"
-                aria-pressed={candidate.id === activeCompanyId}
-                onClick={() => onSelect(candidate.id)}
-              >
-                <CompanyAvatar
-                  name={candidate.name}
-                  imageUrl={candidate.logo}
-                  size="sm"
-                />
-                <span className={styles.companySwitcherCopy}>
-                  <span className={styles.companySwitcherName}>
-                    {candidate.name}
-                  </span>
-                  <span className={styles.companySwitcherRole}>
-                    {companyRoleLabel(
-                      candidate.role,
-                      recruiterWorkspaceCopy(locale),
-                    )}
-                  </span>
-                </span>
-              </button>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className={styles.companySwitcherEmpty}>{emptyMessage}</p>
-      )}
-    </section>
-  );
-}
-
 export function CompanySettingsScreen({
   initialCompany,
   initialCompanies,
@@ -614,16 +514,18 @@ export function CompanySettingsScreen({
 
   if (!company) {
     return (
-      <section className={styles.emptySection}>
-        <p className={styles.eyebrow}>{copy.settings}</p>
-        <h1>{copy.noCompanyTitle}</h1>
-        <p>{copy.noCompanyDescription}</p>
-        <Link
-          className={styles.btnSave}
-          href="/dashboard/employer-verification"
-        >
-          {copy.createCompany}
-        </Link>
+      <section className={styles.wrap}>
+        <section className={styles.emptySection}>
+          <p className={styles.eyebrow}>{copy.settings}</p>
+          <h1>{copy.noCompanyTitle}</h1>
+          <p>{copy.noCompanyDescription}</p>
+          <Link
+            className={styles.btnSave}
+            href="/dashboard/employer-verification"
+          >
+            {copy.createCompany}
+          </Link>
+        </section>
       </section>
     );
   }
@@ -641,70 +543,11 @@ export function CompanySettingsScreen({
   const ownedCompanies = companies.filter(
     (candidate) => candidate.role === "OWNER",
   );
-  const memberCompanies = companies.filter(
-    (candidate) => candidate.role !== "OWNER",
-  );
   const ownershipLimitReached =
     ownedCompanies.length >= MAX_OWNED_COMPANIES_PER_USER;
 
   return (
     <section className={styles.wrap}>
-      <section
-        className={styles.companySwitcher}
-        aria-labelledby="company-switcher-title"
-      >
-        <div className={styles.companySwitcherHeader}>
-          <div>
-            <p className={styles.switcherLabel} id="company-switcher-title">
-              {copy.yourCompanies}
-            </p>
-            <p className={styles.switcherHint}>{copy.switchCompanyHint}</p>
-          </div>
-          <Link
-            className={styles.createCompanyLink}
-            href="/dashboard/employer-verification"
-          >
-            {copy.addOrJoinCompany}
-          </Link>
-        </div>
-        <p className={styles.companySwitcherNote} role="status">
-          {ownershipLimitReached
-            ? copy.ownershipLimitReached(MAX_OWNED_COMPANIES_PER_USER)
-            : copy.ownershipUsage(
-                ownedCompanies.length,
-                MAX_OWNED_COMPANIES_PER_USER,
-              )}
-        </p>
-        <CompanySwitcherGroup
-          title={copy.ownedByYou}
-          description={copy.manageCompanyHint}
-          countLabel={copy.slots(
-            ownedCompanies.length,
-            MAX_OWNED_COMPANIES_PER_USER,
-          )}
-          companies={ownedCompanies}
-          activeCompanyId={company.id}
-          emptyMessage={copy.noOwnedCompany}
-          locale={locale}
-          onSelect={(companyId) => {
-            setExplicitCompanyId(null);
-            setCompanyId(companyId);
-          }}
-        />
-        <CompanySwitcherGroup
-          title={copy.memberAccess}
-          description={copy.invitedCompanyHint}
-          countLabel={copy.linked(memberCompanies.length)}
-          companies={memberCompanies}
-          activeCompanyId={company.id}
-          emptyMessage={copy.noOtherCompany}
-          locale={locale}
-          onSelect={(companyId) => {
-            setExplicitCompanyId(null);
-            setCompanyId(companyId);
-          }}
-        />
-      </section>
       <div className={styles.phead}>
         <div>
           <p className={styles.eyebrow}>
@@ -717,13 +560,73 @@ export function CompanySettingsScreen({
           ) : null}
           <p className={styles.psub}>{copy.keepIdentityUpToDate}</p>
         </div>
-        <span className={statusClass(status)}>
-          <span aria-hidden="true">{statusIcon(status)}</span>
-          {copy.verification}: {statusLabel(status, copy)}
-        </span>
+        <div className={styles.headerActions}>
+          <span className={statusClass(status)}>
+            <span aria-hidden="true">{statusIcon(status)}</span>
+            {copy.verification}: {statusLabel(status, copy)}
+          </span>
+          <Link
+            className={styles.createCompanyLink}
+            href="/dashboard/employer-verification"
+          >
+            {copy.addOrJoinCompany}
+          </Link>
+        </div>
       </div>
+      <section
+        className={styles.companySwitcher}
+        aria-labelledby="company-switcher-title"
+      >
+        <div className={styles.companySwitcherHeader}>
+          <p className={styles.switcherLabel} id="company-switcher-title">
+            {copy.yourCompanies}
+          </p>
+          <span className={styles.companySwitcherSectionCount}>
+            {copy.slots(
+              ownedCompanies.length,
+              MAX_OWNED_COMPANIES_PER_USER,
+            )}
+          </span>
+        </div>
+        <div
+          className={styles.companySwitcherList}
+          role="group"
+          aria-label={copy.yourCompanies}
+        >
+          {companies.map((candidate) => (
+            <button
+              className={`${styles.companySwitcherItem}${candidate.id === company.id ? ` ${styles.companySwitcherItemActive}` : ""}`}
+              type="button"
+              key={candidate.id}
+              aria-pressed={candidate.id === company.id}
+              onClick={() => {
+                setExplicitCompanyId(null);
+                setCompanyId(candidate.id);
+              }}
+            >
+              <CompanyAvatar
+                name={candidate.name}
+                imageUrl={candidate.logo}
+                size="sm"
+              />
+              <span className={styles.companySwitcherName}>{candidate.name}</span>
+            </button>
+          ))}
+        </div>
+        <p className={styles.companySwitcherNote} role="status">
+          {ownershipLimitReached
+            ? copy.ownershipLimitReached(MAX_OWNED_COMPANIES_PER_USER)
+            : copy.ownershipUsage(
+                ownedCompanies.length,
+                MAX_OWNED_COMPANIES_PER_USER,
+              )}
+        </p>
+      </section>
 
-      <section className={styles.identityCard} aria-labelledby="identity-title">
+      <section
+        className={styles.identityCard}
+        id="company-settings-content"
+      >
         <p className={styles.identityLabel} id="identity-title">
           {copy.verifiedIdentity}
         </p>
@@ -1118,7 +1021,7 @@ export function CompanySettingsScreen({
         <aside className={styles.sideCard}>
           <div>
             <p className={styles.sideLabel}>{copy.ownership}</p>
-            <h2 className={styles.sideTitle}>{copy.authorizedRecruiters}</h2>
+            <h2 className={styles.sideTitle}>{copy.memberAccess}</h2>
             <p className={styles.sideDesc}>{copy.ownershipDescription}</p>
           </div>
 

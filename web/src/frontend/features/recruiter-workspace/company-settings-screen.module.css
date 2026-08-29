@@ -1,24 +1,24 @@
 .wrap {
-  width: min(100%, 1080px);
-  margin: 0 auto;
-  padding: var(--sh-space-6) var(--sh-space-4) var(--sh-space-16);
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0 0 var(--sh-space-10);
 }
 
 .companySwitcher {
   margin-bottom: 24px;
-  padding: 16px;
+  padding: 4px;
   border: 1px solid var(--sh-color-border-subtle, #e5e8f2);
-  border-radius: 16px;
-  background: var(--sh-color-surface-card, #ffffff);
-  box-shadow: var(--sh-shadow-card);
+  border-radius: 14px;
+  background: var(--sh-color-surface-subtle, #f8f9fc);
 }
 
 .companySwitcherHeader {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 12px;
+  padding: 8px 10px 4px;
 }
 
 .switcherLabel {
@@ -30,55 +30,16 @@
   text-transform: uppercase;
 }
 
-.switcherHint {
-  margin: 0;
-  color: var(--sh-color-text-secondary, #6c7288);
-  font-size: 12px;
-}
-
 .companySwitcherNote {
-  margin: 0 0 14px;
-  padding: 10px 12px;
-  border: 1px solid
-    color-mix(in srgb, var(--sh-color-brand-primary, #4453e8) 18%, transparent);
-  border-radius: 10px;
-  color: var(--sh-color-text-secondary, #6c7288);
-  background: var(--sh-color-brand-soft, #edeffc);
-  font-size: 12px;
-  line-height: 1.45;
-}
-
-.companySwitcherSection + .companySwitcherSection {
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px solid var(--sh-color-border-subtle, #e5e8f2);
-}
-
-.companySwitcherSectionHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.companySwitcherSectionTitle {
-  margin: 0;
-  color: var(--sh-color-text-primary, #10142b);
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.companySwitcherSectionDescription {
-  margin: 3px 0 0;
-  color: var(--sh-color-text-secondary, #6c7288);
+  margin: 6px 10px 4px;
+  color: var(--sh-color-text-muted, #9aa0b4);
   font-size: 11px;
   line-height: 1.4;
 }
 
 .companySwitcherSectionCount {
   flex-shrink: 0;
-  color: var(--sh-color-text-muted, #9aa0b4);
+  color: var(--sh-color-text-secondary, #6c7288);
   font-size: 11px;
   font-weight: 800;
   white-space: nowrap;
@@ -115,13 +76,11 @@
 }
 
 .companySwitcherList {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px;
-}
-
-.companySwitcherList > div {
+  display: flex;
   min-width: 0;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 0;
 }
 
 .companySwitcherItem {
@@ -129,31 +88,29 @@
   width: 100%;
   min-width: 0;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid var(--sh-color-border-subtle, #e5e8f2);
-  border-radius: 12px;
+  width: auto;
+  flex: 0 0 auto;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
   color: var(--sh-color-text-primary, #10142b);
-  background: var(--sh-color-surface-subtle, #f8f9fc);
+  background: transparent;
   cursor: pointer;
   text-align: left;
 }
 
 .companySwitcherItem:hover {
-  border-color: var(--sh-color-brand-primary, #4453e8);
+  color: var(--sh-color-brand-primary, #4453e8);
+  background: var(--sh-color-surface-card, #ffffff);
 }
 
 .companySwitcherItemActive {
   border-color: var(--sh-color-brand-primary, #4453e8);
-  background: var(--sh-color-brand-soft, #edeffc);
-  box-shadow: 0 0 0 2px
-    color-mix(in srgb, var(--sh-color-brand-primary, #4453e8) 12%, transparent);
-}
-
-.companySwitcherCopy {
-  display: grid;
-  min-width: 0;
-  gap: 2px;
+  color: var(--sh-color-brand-primary, #4453e8);
+  background: var(--sh-color-surface-card, #ffffff);
+  box-shadow: 0 1px 2px
+    color-mix(in srgb, var(--sh-color-brand-primary, #4453e8) 14%, transparent);
 }
 
 .companySwitcherName {
@@ -162,12 +119,6 @@
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.companySwitcherRole {
-  color: var(--sh-color-text-secondary, #6c7288);
-  font-size: 11px;
-  font-weight: 700;
 }
 
 .emptySection {
@@ -202,6 +153,15 @@
   margin-bottom: 24px;
   gap: 16px;
   flex-wrap: wrap;
+}
+
+.headerActions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .eyebrow {
@@ -444,7 +404,7 @@
 /* main grid */
 .grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
   align-items: start;
 }
@@ -474,7 +434,12 @@
 }
 
 .readonlyHeader .formHint {
+  color: var(--sh-color-brand-primary, #4453e8);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
   margin-bottom: 4px;
+  text-transform: uppercase;
 }
 
 .readonlyTitle {
@@ -1001,7 +966,7 @@
   background: var(--sh-color-surface-card, #ffffff);
   border: 1px solid var(--sh-color-border-subtle, #e5e8f2);
   border-radius: 16px;
-  padding: 22px;
+  padding: 24px;
   box-shadow: var(--sh-shadow-card);
   position: sticky;
   top: var(--sh-space-5);
@@ -1017,7 +982,7 @@
 }
 
 .sideTitle {
-  font-size: 15.5px;
+  font-size: 16px;
   font-weight: 800;
   color: var(--sh-color-text-primary, #10142b);
   margin-bottom: 6px;
@@ -1069,6 +1034,7 @@
 
 .sideActions {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin-top: 12px;
 }
@@ -1088,11 +1054,16 @@
 
 @media (max-width: 600px) {
   .companySwitcherHeader {
-    flex-direction: column;
+    align-items: flex-start;
   }
 
+  .headerActions,
   .createCompanyLink {
     width: 100%;
+  }
+
+  .headerActions {
+    justify-content: flex-start;
   }
 
   .identityGrid,
@@ -1125,6 +1096,10 @@
 }
 
 @media (max-width: 560px) {
+  .sideActions {
+    grid-template-columns: 1fr;
+  }
+
   .formRow {
     grid-template-columns: 1fr;
   }

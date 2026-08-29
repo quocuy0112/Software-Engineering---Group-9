@@ -1,7 +1,8 @@
 .page {
-  width: min(100%, 1120px);
-  margin: 0 auto;
-  padding: 38px 28px 72px;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0 0 var(--sh-space-10);
   color: var(--sh-color-text-primary);
 }
 

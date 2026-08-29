@@ -69,7 +69,7 @@ export function JobsWorkspace({
   return (
     <div className="jobs-workspace-page">
       {activeTab ? <JobsWorkspaceNav activeTab={activeTab} /> : null}
-      {children}
+      <div className="jobs-workspace-content">{children}</div>
     </div>
   );
 }

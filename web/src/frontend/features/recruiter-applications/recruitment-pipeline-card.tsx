@@ -1,8 +1,8 @@
 "use client";
 
 import { useDraggable } from "@dnd-kit/core";
-import { ChevronDown, GripVertical, LockKeyhole } from "lucide-react";
-import { useState, type KeyboardEvent } from "react";
+import { GripVertical, LockKeyhole } from "lucide-react";
+import { type KeyboardEvent } from "react";
 import {
   isTerminalPipelineStage,
   type ApplicationStage,
@@ -17,18 +17,6 @@ import {
   recruiterApplicationsCopy,
   type RecruiterApplicationsCopy,
 } from "./recruiter-applications-copy";
-
-const collapsibleStages = new Set<ApplicationStage>([
-  "APPLIED",
-  "VIEWED",
-  "SHORTLISTED",
-  "INTERVIEWING",
-  "OFFERED",
-  "HIRED",
-  "OFFER_DECLINED",
-  "REJECTED",
-  "WAITLISTED",
-]);
 
 const lockedStages = new Set<ApplicationStage>([
   "OFFERED",
@@ -100,9 +88,9 @@ function stopInteractiveEvent(event: {
 }
 export function RecruitmentPipelineCard({
   card,
-  jobId,
-  onChangeStage,
-  onViewAssessment,
+  onPreview,
+  onPreviewLeave,
+  previewed = false,
   dragOverlay = false,
   copy: copyProp,
 }: {
@@ -113,6 +101,13 @@ export function RecruitmentPipelineCard({
     targetStage?: ApplicationStage,
   ) => void;
   onViewAssessment?: (card: PipelineApplicationCard) => void;
+  onPreview?: (
+    card: PipelineApplicationCard,
+    pinned: boolean,
+    anchor: DOMRect,
+  ) => void;
+  onPreviewLeave?: () => void;
+  previewed?: boolean;
   dragOverlay?: boolean;
   copy?: RecruiterApplicationsCopy["pipeline"];
 }) {
@@ -128,8 +123,6 @@ export function RecruitmentPipelineCard({
   const dragDestinations = terminal ? [] : (card.dragDestinations ?? []);
   const allowedDestinations = terminal ? [] : card.allowedDestinations;
   const canDrag = !dragOverlay && dragDestinations.length > 0 && !locked;
-  const collapsible = !dragOverlay && collapsibleStages.has(card.stage);
-  const [expanded, setExpanded] = useState(!collapsible);
   const draggable = useDraggable({
     id: dragOverlay ? `${card.applicationId}-overlay` : card.applicationId,
     data: { card, dragDestinations },
@@ -139,43 +132,22 @@ export function RecruitmentPipelineCard({
     draggable;
   const score = pipelineScoreForCard(card);
   const tier = pipelineTierForCard(card);
-  const isExpanded = !collapsible || expanded;
-  const quickActionLabels: Partial<Record<ApplicationStage, string>> = {
-    SHORTLISTED: copy.moveToShortlist,
-    INTERVIEWING: copy.moveToInterview,
-    OFFERED: copy.sendOffer,
-    REJECTED: copy.reject,
-    WAITLISTED: copy.waitlist,
-  };
   const localizedTierLabels = {
     strong: copy.strong,
     review: copy.review,
     low: copy.low,
     pending: copy.pending,
   } as const;
-  const quickActions = locked
-    ? []
-    : allowedDestinations
-        .filter((stage) => quickActionLabels[stage])
-        .map((stage) => ({
-          stage,
-          label: quickActionLabels[stage] as string,
-        }));
-
-  const toggleExpanded = () => {
-    if (collapsible) setExpanded((current) => !current);
-  };
-
   const handleCardClick = (event: React.MouseEvent<HTMLElement>) => {
     if (stopInteractiveEvent(event)) return;
-    toggleExpanded();
+    onPreview?.(card, true, event.currentTarget.getBoundingClientRect());
   };
 
   const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (!collapsible || stopInteractiveEvent(event)) return;
+    if (dragOverlay || stopInteractiveEvent(event)) return;
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      toggleExpanded();
+      onPreview?.(card, true, event.currentTarget.getBoundingClientRect());
     }
   };
   const handleCardPointerDown = (event: React.PointerEvent<HTMLElement>) => {
@@ -203,78 +175,6 @@ export function RecruitmentPipelineCard({
     </button>
   ) : null;
 
-  const actionPanel = (
-    <div
-      className="card-actions-panel pipeline-card__actions-panel"
-      data-state={isExpanded ? "open" : "closed"}
-    >
-      <div className="card-actions pipeline-card__document-actions">
-        {card.documents.cvAvailable ? (
-          <a
-            href={`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(card.applicationId)}/documents/cv`}
-            target="_blank"
-            rel="noreferrer"
-            onClick={(event) => event.stopPropagation()}
-          >
-            {copy.openCv}
-          </a>
-        ) : null}
-        {card.documents.coverLetterAvailable ? (
-          <a
-            href={`/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(card.applicationId)}/documents/cover-letter`}
-            target="_blank"
-            rel="noreferrer"
-            onClick={(event) => event.stopPropagation()}
-          >
-            {copy.coverLetter}
-          </a>
-        ) : null}
-      </div>
-      {onViewAssessment ? (
-        <button
-          type="button"
-          className="assessment-btn pipeline-card__assessment-action"
-          onClick={(event) => {
-            event.stopPropagation();
-            onViewAssessment(card);
-          }}
-        >
-          {copy.viewAiAssessment}
-        </button>
-      ) : null}
-      {quickActions.length > 0 ? (
-        <div className="quick-actions pipeline-card__quick-actions">
-          {quickActions.map(({ stage, label }) => (
-            <button
-              key={stage}
-              type="button"
-              className={`quick-action pipeline-card__quick-action pipeline-card__quick-action--${stage === "REJECTED" ? "reject" : stage === "WAITLISTED" ? "waitlist" : "move"} ${stage === "REJECTED" ? "danger" : stage === "WAITLISTED" ? "warn" : "move"}`}
-              onClick={(event) => {
-                event.stopPropagation();
-                onChangeStage?.(card, stage);
-              }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      ) : null}
-      {allowedDestinations.length > 0 && onChangeStage ? (
-        <button
-          type="button"
-          className="change-stage-link pipeline-card__change-stage"
-          aria-label={copy.changeStage}
-          onClick={(event) => {
-            event.stopPropagation();
-            onChangeStage(card);
-          }}
-        >
-          {copy.changeStage}
-        </button>
-      ) : null}
-    </div>
-  );
-
   return (
     <article
       ref={setNodeRef}
@@ -285,8 +185,8 @@ export function RecruitmentPipelineCard({
         canDrag ? "is-draggable" : "",
         isDragging ? "is-dragging" : "",
         dragOverlay ? "pipeline-card--overlay" : "",
-        collapsible ? "collapsible is-collapsible" : "",
-        isExpanded ? "expanded is-expanded" : "",
+        previewed ? "is-previewed" : "",
+        !dragOverlay ? "collapsible is-collapsible" : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -301,11 +201,17 @@ export function RecruitmentPipelineCard({
           ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
           : undefined,
       }}
-      role={collapsible ? "button" : undefined}
-      tabIndex={collapsible ? 0 : -1}
-      aria-expanded={collapsible ? expanded : undefined}
-      onClick={collapsible ? handleCardClick : undefined}
-      onKeyDown={collapsible ? handleCardKeyDown : undefined}
+      role={!dragOverlay ? "button" : undefined}
+      tabIndex={!dragOverlay ? 0 : -1}
+      onClick={!dragOverlay ? handleCardClick : undefined}
+      onKeyDown={!dragOverlay ? handleCardKeyDown : undefined}
+      onMouseEnter={(event) =>
+        onPreview?.(card, false, event.currentTarget.getBoundingClientRect())
+      }
+      onMouseLeave={onPreviewLeave}
+      onFocus={(event) =>
+        onPreview?.(card, false, event.currentTarget.getBoundingClientRect())
+      }
     >
       <div className="card-top pipeline-card__topline">
         <div className="candidate-name pipeline-card__identity">
@@ -362,14 +268,6 @@ export function RecruitmentPipelineCard({
           </span>
         </div>
       </div>
-      {collapsible ? (
-        <div className="card-hint pipeline-card__hint" aria-hidden="true">
-          <span className="hint-collapsed">{copy.clickActions}</span>
-          <span className="hint-expanded">{copy.clickCollapse}</span>
-          <ChevronDown aria-hidden="true" />
-        </div>
-      ) : null}
-      {actionPanel}
     </article>
   );
 }

@@ -14,5 +14,12 @@ export default async function AppliedJobsRoute() {
     { userId: context.userId, sessionId: context.sessionId },
     { limit: 24 },
   );
-  return <JobsWorkspace><CandidateApplicationsListPage initialApplications={result.applications} initialNextCursor={result.nextCursor} /></JobsWorkspace>;
+  return (
+    <JobsWorkspace>
+      <CandidateApplicationsListPage
+        initialApplications={result.applications}
+        initialNextCursor={result.nextCursor}
+      />
+    </JobsWorkspace>
+  );
 }

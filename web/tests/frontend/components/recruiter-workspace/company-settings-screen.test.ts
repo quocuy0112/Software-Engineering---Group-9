@@ -7,6 +7,7 @@ import {
   within,
 } from "@testing-library/react";
 import { createElement } from "react";
+import styles from "@/frontend/features/recruiter-workspace/company-settings-screen.module.css";
 import {
   CompanySettingsScreen,
   getCompanyProfileValidation,
@@ -42,6 +43,20 @@ describe("company posting gate validation", () => {
       missingFields: [],
       fieldErrors: {},
     });
+  });
+
+  it("keeps the no-company state inside the shared recruiter page root", () => {
+    render(
+      createElement(CompanySettingsScreen, {
+        initialCompany: null,
+        initialCompanies: [],
+      }),
+    );
+
+    const emptyState = screen.getByRole("heading", {
+      name: "No company is linked yet",
+    }).parentElement;
+    expect(emptyState?.parentElement).toHaveClass(styles.wrap);
   });
 
   it("does not show a stale posting gate for a filled company form", () => {
@@ -153,18 +168,28 @@ describe("company posting gate validation", () => {
     expect(
       screen.getByRole("heading", { name: "Dava", level: 1 }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "Owned by you" }),
-    ).toBeInTheDocument();
     expect(screen.getByText("1/3 slots")).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Your companies" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Add or join a company" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Member access" }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText("Owner")).toHaveLength(2);
-    expect(screen.getByRole("link", { name: "Manage team" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: /Dava/ })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    const manageTeamLink = screen.getByRole("link", { name: "Manage team" });
+    const teamApplicationsLink = screen.getByRole("link", {
+      name: "Team Applications",
+    });
+    expect(manageTeamLink).toHaveAttribute(
       "href",
       "/recruiter/company-settings/team?companyId=company-1",
     );
+    expect(manageTeamLink.parentElement).toHaveClass(styles.sideActions);
+    expect(teamApplicationsLink.parentElement).toBe(manageTeamLink.parentElement);
 
     fireEvent.click(screen.getByRole("button", { name: /Northstar Labs/ }));
 
@@ -173,7 +198,10 @@ describe("company posting gate validation", () => {
         screen.getByRole("heading", { name: "Northstar Labs", level: 1 }),
       ).toBeInTheDocument();
     });
-    expect(screen.getByText("Authorized recruiter")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Northstar Labs/ })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
     expect(screen.getByText("Verification: Approved")).toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: "Manage team" }),
@@ -227,7 +255,6 @@ describe("company posting gate validation", () => {
       screen.getByText(/Ownership limit reached \(3\/3\)/),
     ).toBeInTheDocument();
     expect(screen.getByText("3/3 slots")).toBeInTheDocument();
-    expect(screen.getByText("1 linked")).toBeInTheDocument();
     expect(
       screen.getByText(
         /You can still join companies as a Recruiter or HR Manager/,

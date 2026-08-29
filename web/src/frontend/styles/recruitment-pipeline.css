@@ -1217,6 +1217,221 @@
   margin-top: 0;
 }
 
+/* The board always receives the full workspace width. Candidate information is
+ * a floating popover, so it never reserves a permanent column. */
+.recruitment-pipeline__workspace {
+  position: relative;
+  margin-top: var(--sh-space-5);
+}
+
+.recruitment-pipeline__workspace .board.recruitment-pipeline__columns,
+.recruitment-pipeline__workspace .board.outcomes.recruitment-pipeline__columns {
+  width: 100%;
+  min-width: 0;
+  margin-inline: 0;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+/* Active and outcome stages use the same column template.  Let controls wrap
+ * within a narrow stage rather than forcing content over a neighbouring card. */
+.recruitment-pipeline__workspace .pipeline-column__header {
+  flex-wrap: wrap;
+}
+
+.recruitment-pipeline__workspace .pipeline-column__header-tools {
+  margin-left: auto;
+}
+
+.recruitment-pipeline__workspace .pipeline-sort-button {
+  width: 30px;
+  height: 30px;
+  justify-content: center;
+  padding: 0;
+}
+
+.recruitment-pipeline__workspace .pipeline-card {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.recruitment-pipeline__workspace .pipeline-card__identity {
+  overflow-wrap: anywhere;
+}
+
+.recruitment-pipeline__workspace .pipeline-card__status-pill {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pipeline-candidate-preview {
+  position: fixed;
+  z-index: 30;
+  width: min(320px, calc(100vw - 32px));
+  max-height: calc(100vh - 10px);
+  padding: var(--sh-space-4);
+  border: 1px solid var(--pipeline-border);
+  border-radius: var(--sh-radius-md);
+  background: var(--pipeline-surface);
+  box-shadow: var(--sh-shadow-card);
+  overflow-y: auto;
+  animation: pipeline-preview-enter 150ms ease-out;
+}
+
+.pipeline-candidate-preview__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sh-space-3);
+  padding-bottom: var(--sh-space-3);
+  border-bottom: 1px solid var(--pipeline-border);
+}
+
+.pipeline-candidate-preview__header p {
+  margin: 0 0 3px;
+  color: var(--sh-color-brand-primary);
+  font-size: 11px;
+  font-weight: var(--sh-font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pipeline-candidate-preview__header h2 {
+  margin: 0;
+  color: var(--pipeline-ink);
+  font-size: 16px;
+  font-weight: var(--sh-font-weight-bold);
+  line-height: 1.35;
+}
+
+.pipeline-candidate-preview__actions {
+  display: flex;
+  gap: 4px;
+}
+
+.pipeline-candidate-preview__actions button {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--pipeline-border);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-subtle);
+  cursor: pointer;
+}
+
+.pipeline-candidate-preview__actions button[aria-pressed="true"] {
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+}
+
+.pipeline-candidate-preview__actions svg {
+  width: 15px;
+  height: 15px;
+}
+
+.pipeline-candidate-preview__details {
+  display: grid;
+  gap: var(--sh-space-3);
+  margin: var(--sh-space-4) 0;
+}
+
+.pipeline-candidate-preview__details > div {
+  display: grid;
+  gap: 3px;
+}
+
+.pipeline-candidate-preview__details dt {
+  color: var(--sh-color-text-secondary);
+  font-size: 12px;
+  font-weight: var(--sh-font-weight-bold);
+}
+
+.pipeline-candidate-preview__details dd {
+  margin: 0;
+  color: var(--pipeline-ink);
+  font-size: 12px;
+  font-weight: var(--sh-font-weight-medium);
+  line-height: 1.45;
+}
+
+.pipeline-candidate-preview__assessment {
+  display: inline-flex;
+  width: 100%;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sh-space-2);
+  padding: 0 var(--sh-space-3);
+  border: 1px solid var(--sh-color-brand-primary);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-brand-primary);
+  background: transparent;
+  font-size: 12px;
+  font-weight: var(--sh-font-weight-bold);
+  cursor: pointer;
+}
+
+.pipeline-candidate-preview__assessment svg {
+  width: 15px;
+  height: 15px;
+}
+
+.pipeline-candidate-preview__actions-list {
+  display: grid;
+  gap: 8px;
+}
+
+.pipeline-candidate-preview__actions-list > a,
+.pipeline-candidate-preview__stage-action {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--sh-space-3);
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-subtle);
+  font-size: 12px;
+  font-weight: var(--sh-font-weight-semibold);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.pipeline-candidate-preview__actions-list > a:hover,
+.pipeline-candidate-preview__stage-action:hover {
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-brand-primary);
+}
+
+.pipeline-candidate-preview__stage-action--secondary {
+  color: var(--sh-color-brand-primary);
+  background: transparent;
+}
+
+@media (max-width: 1180px) {
+  .recruitment-pipeline__workspace .board.recruitment-pipeline__columns,
+  .recruitment-pipeline__workspace
+    .board.outcomes.recruitment-pipeline__columns {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@keyframes pipeline-preview-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .pipeline-section {
   min-width: 0;
 }
@@ -1615,8 +1830,9 @@
 }
 
 .candidate-card:hover,
-.pipeline-card:hover {
-  border-color: var(--sh-color-border-default);
+.pipeline-card:hover,
+.pipeline-card.is-previewed {
+  border-color: var(--sh-color-brand-primary);
   box-shadow: var(--shadow-card-hover);
   transform: translateY(-2px);
 }

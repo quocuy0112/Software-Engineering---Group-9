@@ -109,25 +109,26 @@ describe("RecruitmentPipelineCard interactions", () => {
     expect(pointerDown).toHaveBeenCalledOnce();
   });
 
-  it("keeps Change Stage pointer and keyboard activation outside DnD listeners", () => {
-    const onChangeStage = vi.fn();
+  it("opens a lightweight preview on hover and pins it on card click", () => {
+    const onPreview = vi.fn();
     render(
       <RecruitmentPipelineCard
         card={card}
         jobId="job-1"
-        onChangeStage={onChangeStage}
+        onPreview={onPreview}
       />,
     );
+
+    fireEvent.mouseEnter(screen.getByText("Ada Candidate"));
     fireEvent.click(screen.getByText("Ada Candidate"));
-    const changeStage = screen.getByRole("button", { name: "Change Stage" });
 
-    fireEvent.pointerDown(changeStage);
-    fireEvent.click(changeStage);
-    fireEvent.keyDown(changeStage, { key: "Enter" });
-
-    expect(onChangeStage).toHaveBeenCalledOnce();
-    expect(pointerDown).not.toHaveBeenCalled();
-    expect(keyDown).not.toHaveBeenCalled();
+    expect(onPreview).toHaveBeenNthCalledWith(
+      1,
+      card,
+      false,
+      expect.any(Object),
+    );
+    expect(onPreview).toHaveBeenLastCalledWith(card, true, expect.any(Object));
   });
 
   it("keeps a dedicated keyboard drag handle", () => {
@@ -160,10 +161,7 @@ describe("RecruitmentPipelineCard interactions", () => {
       screen.queryByRole("button", { name: "Change Stage" }),
     ).not.toBeInTheDocument();
 
-    const pipelineCard = screen.getByText("Ada Candidate").closest("article");
-    expect(pipelineCard).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(screen.getByText("Ada Candidate"));
-    expect(pipelineCard).toHaveAttribute("aria-expanded", "true");
 
     fireEvent.pointerDown(screen.getByText("Ada Candidate"));
 
@@ -217,7 +215,7 @@ describe("RecruitmentPipelineCard interactions", () => {
     ["REJECTED", "rejected"],
     ["WAITLISTED", "waitlisted"],
   ] as const)(
-    "supports click-to-view actions for %s cards",
+    "keeps %s card actions out of the compact card",
     (stage, applicationId) => {
       const stageCard: PipelineApplicationCard = {
         ...card,
@@ -231,12 +229,10 @@ describe("RecruitmentPipelineCard interactions", () => {
 
       const pipelineCard = screen.getByText("Ada Candidate").closest("article");
       expect(pipelineCard).toHaveClass("is-collapsible");
-      expect(pipelineCard).toHaveAttribute("aria-expanded", "false");
-
-      fireEvent.click(screen.getByText("Ada Candidate"));
-
-      expect(pipelineCard).toHaveAttribute("aria-expanded", "true");
-      expect(screen.getByText("Click to collapse")).toBeInTheDocument();
+      expect(
+        screen.queryByText("Click to view actions"),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText("Click to collapse")).not.toBeInTheDocument();
     },
   );
 
@@ -253,20 +249,12 @@ describe("RecruitmentPipelineCard interactions", () => {
     expect(pointerDown).toHaveBeenCalledOnce();
   });
 
-  it("shows Send offer for Interviewing cards and submits the Offered target", () => {
-    const onChangeStage = vi.fn();
-    render(
-      <RecruitmentPipelineCard
-        card={interviewingCard}
-        jobId="job-1"
-        onChangeStage={onChangeStage}
-      />,
-    );
+  it("keeps quick stage actions out of the compact card", () => {
+    render(<RecruitmentPipelineCard card={interviewingCard} jobId="job-1" />);
 
-    fireEvent.click(screen.getByText("Ada Candidate"));
-    fireEvent.click(screen.getByRole("button", { name: "Send offer" }));
-
-    expect(onChangeStage).toHaveBeenCalledWith(interviewingCard, "OFFERED");
+    expect(
+      screen.queryByRole("button", { name: "Send offer" }),
+    ).not.toBeInTheDocument();
   });
 
   it("displays the final score and final-score tier badge", () => {
@@ -287,21 +275,11 @@ describe("RecruitmentPipelineCard interactions", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("opens the AI assessment from the Kanban card", () => {
-    const onViewAssessment = vi.fn();
-    render(
-      <RecruitmentPipelineCard
-        card={scoredCard}
-        jobId="job-1"
-        onViewAssessment={onViewAssessment}
-      />,
-    );
+  it("keeps the AI assessment action in the preview rather than the card", () => {
+    render(<RecruitmentPipelineCard card={scoredCard} jobId="job-1" />);
 
-    fireEvent.click(screen.getByText("Ada Candidate"));
-
-    fireEvent.click(screen.getByRole("button", { name: "View AI assessment" }));
-
-    expect(onViewAssessment).toHaveBeenCalledOnce();
-    expect(onViewAssessment).toHaveBeenCalledWith(scoredCard);
+    expect(
+      screen.queryByRole("button", { name: "View AI assessment" }),
+    ).not.toBeInTheDocument();
   });
 });
