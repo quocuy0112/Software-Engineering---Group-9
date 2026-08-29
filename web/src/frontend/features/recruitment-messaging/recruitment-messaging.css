@@ -943,6 +943,74 @@
   line-height: 1.5;
 }
 
+/* Typography hierarchy for the recruiter inbox:
+ * page heading (22px) > panel headings (16px) > list subjects (14px) >
+ * supporting content (13px) > metadata (11–12px). A conversation is a
+ * child panel, so the selected candidate name must never compete with h1. */
+.recruitment-messaging--recruiter .recruitment-chat-header h2,
+.recruitment-messaging--recruiter .recruitment-messaging__context-header h2 {
+  font-family: var(--sh-font-family-label);
+  font-size: 16px;
+  font-weight: var(--sh-font-weight-bold);
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+}
+
+.recruitment-messaging--recruiter .recruitment-messaging__list button strong {
+  font-size: 13px;
+  font-weight: var(--sh-font-weight-bold);
+  line-height: 1.35;
+}
+
+.recruitment-messaging--recruiter
+  .recruitment-messaging__list
+  .recruitment-messaging__job-title {
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.recruitment-messaging--recruiter .recruitment-chat-header span,
+.recruitment-messaging--recruiter .recruitment-messaging__context-list dd {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.recruitment-messaging--recruiter .recruitment-messaging__list label,
+.recruitment-messaging--recruiter .recruitment-messaging__assignment label {
+  font-size: 12px;
+}
+
+/* Assignment is a supporting action inside the conversation, not its primary
+ * call to action. Keep it at the compact control size used by the filters. */
+.recruitment-messaging--recruiter .recruitment-messaging__assignment button {
+  min-height: 36px;
+  padding: 0.5rem 0.75rem;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+/* Empty and read-only guidance belongs to the body of the conversation. */
+.recruitment-messaging--recruiter
+  .recruitment-messaging__thread
+  .recruitment-messaging__empty {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* The context rail is scanned label-first, so its keys intentionally lead
+ * their values in both size and emphasis. */
+.recruitment-messaging--recruiter .recruitment-messaging__context-list dt {
+  font-size: 12px;
+  font-weight: var(--sh-font-weight-bold);
+  letter-spacing: 0.07em;
+}
+
+.recruitment-messaging--recruiter .recruitment-messaging__context-list dd {
+  font-size: 11.5px;
+  font-weight: var(--sh-font-weight-semibold);
+  line-height: 1.5;
+}
+
 :root[data-theme="dark"] .recruitment-messaging--candidate .recruitment-messaging__thread {
   border-color: var(--sh-color-border-subtle);
   background: var(--sh-color-surface-card);

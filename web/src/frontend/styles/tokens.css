@@ -94,6 +94,13 @@
   --sh-topbar-height: 64px;
   --sh-content-start-x: 244px;
   --sh-content-width: 1172px;
+  /* One content rail for every authenticated workspace page. Page features
+     may choose an internal reading column, but must not create a competing
+     outer gutter or centring rule. */
+  --sh-workspace-content-max: var(--sh-content-width);
+  --sh-workspace-gutter: var(--sh-space-6);
+  --sh-workspace-gutter-compact: var(--sh-space-4);
+  --sh-page-section-gap: var(--sh-space-6);
   --sh-card-padding: 24px;
   --sh-font-family:
     "Be Vietnam Pro", ui-sans-serif, system-ui, -apple-system,

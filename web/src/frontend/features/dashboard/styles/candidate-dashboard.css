@@ -1,6 +1,6 @@
 .candidate-dashboard-page {
-  width: min(1080px, 100%);
-  margin: 0 auto;
+  width: 100%;
+  min-width: 0;
   color: var(--sh-profile-text);
   font-family: var(--sh-font-family);
 }

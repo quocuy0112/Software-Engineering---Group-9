@@ -81,6 +81,21 @@ export function WorkspaceNavigation({
     { href: "/jobs/applied", label: copy.applications },
     { href: "/jobs/applied/team", label: copy.teamApplications },
   ] as const;
+  const sidebarWidthSamples = [
+    ...destinations.map((destination) => ({
+      id: `destination:${destination.href}`,
+      label: destination.label,
+    })),
+    ...jobsSubnav.map((subnav) => ({
+      id: `jobs-subnav:${subnav.href}`,
+      label: subnav.label,
+    })),
+    ...applicationsSubnav.map((subnav) => ({
+      id: `applications-subnav:${subnav.href}`,
+      label: subnav.label,
+    })),
+    { id: "sign-out", label: copy.signOut },
+  ];
   const pathname = usePathname() ?? "/";
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -141,13 +156,8 @@ export function WorkspaceNavigation({
         data-open={menuOpen}
       >
         <span className="workspace-sidebar-width-sizer" aria-hidden="true">
-          {[
-            ...destinations.map((destination) => destination.label),
-            ...jobsSubnav.map((subnav) => subnav.label),
-            ...applicationsSubnav.map((subnav) => subnav.label),
-            copy.signOut,
-          ].map((label) => (
-            <span key={label}>{label}</span>
+          {sidebarWidthSamples.map((sample) => (
+            <span key={sample.id}>{sample.label}</span>
           ))}
         </span>
         <p className="workspace-nav-label">{copy.workspace}</p>

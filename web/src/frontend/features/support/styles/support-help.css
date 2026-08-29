@@ -1,6 +1,6 @@
 .support-help {
-  width: min(100%, 840px);
-  margin-inline: auto;
+  width: 100%;
+  min-width: 0;
   color: var(--sh-color-text-primary);
 }
 

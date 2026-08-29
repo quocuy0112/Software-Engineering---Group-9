@@ -92,6 +92,23 @@ describe("identity navigation shells", () => {
     );
   });
 
+  it("uses unique keys for sidebar width samples when labels repeat", () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      render(
+        <WorkspaceShell csrfProof="proof">
+          <h1>Applications</h1>
+        </WorkspaceShell>,
+      );
+
+      expect(consoleError.mock.calls.flat().join(" ")).not.toContain(
+        "Encountered two children with the same key",
+      );
+    } finally {
+      consoleError.mockRestore();
+    }
+  });
+
   it("hydrates and renders the saved Vietnamese workspace locale", async () => {
     render(
       <WorkspaceShell

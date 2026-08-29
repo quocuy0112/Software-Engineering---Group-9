@@ -9,9 +9,11 @@
   --app-green-50: #ecfdf3;
   --app-yellow: #b54708;
   --app-yellow-50: #fffaeb;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 32px clamp(20px, 3vw, 42px) 56px;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0 0 var(--sh-space-10);
   color: var(--app-ink);
   font-family: var(--sh-font-family);
 }
@@ -925,7 +927,7 @@
 }
 /* File-selection step: the page is intentionally a full workspace flow, never a modal. */
 .candidate-application-flow {
-  max-width: 1180px;
+  max-width: none;
 }
 .candidate-application-flow__header h1 {
   font-size: 28px;
@@ -935,7 +937,9 @@
 }
 
 .candidate-application-list-page {
-  max-width: 920px;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
 }
 
 .candidate-application-list-page__header {
@@ -1416,7 +1420,7 @@
 
 @media (max-width: 860px) {
   .candidate-application-list-page {
-    padding: 20px 16px 48px;
+    padding: 0 0 var(--sh-space-10);
   }
 
   .candidate-application-list-card,
@@ -1437,7 +1441,9 @@
 
 /* Applications list redesign: keep the mockup language scoped to this list view. */
 .candidate-application-list-page {
-  max-width: 760px;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
   color: var(--sh-color-text-primary);
   font-family: var(--sh-font-family);
 }
